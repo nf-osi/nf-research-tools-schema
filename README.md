@@ -1,3 +1,4 @@
+<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/nf-osi/nf-research-tools-schema?label=latest%20release&display_name=release&style=flat-square">  <img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/nf-osi/nf-research-tools-schema?style=flat-square&color=orange">  <img alt="GitHub" src="https://img.shields.io/github/license/nf-osi/nf-research-tools-schema?style=flat-square&color=red">
 # NF Research Tools and Resources Database Schema
 
 This repository contains the released versions of the the JSON-LD schema for the NF Research Tools and Resources Database. 
