@@ -5,7 +5,7 @@ This repository contains the released versions of the the JSON-LD schema for the
 
 Learn more about the goals for this project by checking out the following documents and presentations: 
 
->Clayton, Ashley, Mialy DeFelice, Brynn Zalmanek, Jay Hodgson, Caroline Morin, Stockard Simon, James A. Eddy, et al. 2022. “Centralizing Neurofibromatosis Experimental Tool Knowledge with the NF Research Tools Database.” MetaArXiv. January 25. doi:10.31222/osf.io/t6zaf.
+>Clayton, Ashley, Mialy DeFelice, Brynn Zalmanek, Jay Hodgson, Caroline Morin, Stockard Simon, James A. Eddy, et al. 2022. “Centralizing Neurofibromatosis Experimental Tool Knowledge with the NF Research Tools Database.” MetaArXiv. January 25. https://doi.org/10.31222/osf.io/t6zaf.
 
 >Zalmanek, Brynn; Allaway, Robert; Goss, James; Clayton, Ashley; Eddy, James; Throgmorton, Kaitlin; et al. (2021): NF Research Tools Database: An experimental resource database for the neurofibromatosis community. figshare. Poster. https://doi.org/10.6084/m9.figshare.14825271.v1 
 
