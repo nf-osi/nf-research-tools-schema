@@ -31,10 +31,16 @@ jobs:
       - name: Install schematic and convert schema
         shell: bash
         run: |
-          python3 -m venv .venv
-          chmod 755 .venv/bin/activate
+          # has to activate each bash step
           source .venv/bin/activate
-          pip3 install schematicpy
+          # use 'poetry' to install schematic from the develop branch 
+          pip3 install poetry
+          # clone patched branch until develop is stable
+          git clone --single-branch --branch develop
+          cd schematic
+          poetry build
+          pip3 install dist/schematicpy-1.0.0-py3-none-any.whl
+          cd ..
           schematic schema convert $schema_filename
           
       - name: Commit files
