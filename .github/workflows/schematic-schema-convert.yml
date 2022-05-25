@@ -39,7 +39,8 @@ jobs:
           poetry build
           pip3 install dist/schematicpy-1.0.0-py3-none-any.whl
           cd ..
-          schematic schema convert $schema_filename
+          schematic schema convert $schema_filename -o nf-research-tools.jsonld
+
           
       - name: Commit files
         run: |
