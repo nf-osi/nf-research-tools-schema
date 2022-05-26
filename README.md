@@ -11,6 +11,6 @@ Learn more about the goals for this project by checking out the following docume
 
 >[Gilbert Family Foundation Press Release](https://www.gilbertfamilyfoundation.org/press-release/gff-and-sage-bionetworks-collaborate-on-an-nf1-research-tools-database/). 
 
-> Contributing:
+# Contributing:
 
 To contribute changes to the schema, please create a new branch, modify the schema CSV as desired, commit, and file a PR. The jsonld will automatically be updated. Please do not modify the jsonld manually. 
