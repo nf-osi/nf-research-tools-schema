@@ -10,3 +10,7 @@ Learn more about the goals for this project by checking out the following docume
 >Zalmanek, Brynn; Allaway, Robert; Goss, James; Clayton, Ashley; Eddy, James; Throgmorton, Kaitlin; et al. (2021): NF Research Tools Database: An experimental resource database for the neurofibromatosis community. figshare. Poster. https://doi.org/10.6084/m9.figshare.14825271.v1 
 
 >[Gilbert Family Foundation Press Release](https://www.gilbertfamilyfoundation.org/press-release/gff-and-sage-bionetworks-collaborate-on-an-nf1-research-tools-database/). 
+
+> Contributing:
+
+To contribute changes to the schema, please create a new branch, modify the schema CSV as desired, commit, and file a PR. The jsonld will automatically be updated. Please do not modify the jsonld manually. 
