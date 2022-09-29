@@ -21,7 +21,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pip libcurl4-openssl-dev
+          sudo apt-get install -y pip python3.8-venv libcurl4-openssl-dev
       
       - uses: actions/checkout@v2
         with:
@@ -31,6 +31,9 @@ jobs:
       - name: Install schematic and convert schema
         shell: bash
         run: |
+          python3 -m venv .venv
+          chmod 755 .venv/bin/activate
+          source .venv/bin/activate
           pip3 install schematicpy
           schematic schema convert $schema_filename -o nf-research-tools.jsonld
 
