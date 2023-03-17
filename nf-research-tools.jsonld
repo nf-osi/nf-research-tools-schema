@@ -4942,13 +4942,15 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:cellLineDisease",
-            "@type": "rdf:Property",
-            "rdfs:comment": "Diseases that this resource is used to model.",
-            "rdfs:label": "cellLineDisease",
-            "schema:domainIncludes": {
-                "@id": "bts:CellLine"
-            },
+            "@id": "bts:CellLineGeneticDisorder",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "Genetic diseases are diseases in which inherited genes predispose to increased risk. The genetic disorders associated with cancer often result from an alteration or mutation in a single gene. The diseases range from rare dominant cancer family syndrome to familial tendencies in which low-penetrance genes may interact with other genes or environmental factors to induce cancer. Research may involve clinical, epidemiologic, and laboratory studies of persons, families, and populations at high risk of these disorders. [ NCI ]",
+            "rdfs:label": "CellLineGeneticDisorder",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:CellLine"
+                }
+            ],
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
@@ -4963,10 +4965,10 @@
                     "@id": "bts:Schwannomatosis"
                 },
                 {
-                    "@id": "bts:Cancer"
+                    "@id": "bts:Noknowndisease"
                 }
             ],
-            "sms:displayName": "Cell Line Disease",
+            "sms:displayName": "Cell Line Genetic Disorder",
             "sms:required": "sms:false",
             "sms:validationRules": [
                 "list"
@@ -5642,13 +5644,15 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:animalModelDisease",
-            "@type": "rdf:Property",
-            "rdfs:comment": "Diseases that this resource is used to model",
-            "rdfs:label": "animalModelDisease",
-            "schema:domainIncludes": {
-                "@id": "bts:AnimalModel"
-            },
+            "@id": "bts:AnimalModelGeneticDisorder",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "Genetic diseases are diseases in which inherited genes predispose to increased risk. The genetic disorders associated with cancer often result from an alteration or mutation in a single gene. The diseases range from rare dominant cancer family syndrome to familial tendencies in which low-penetrance genes may interact with other genes or environmental factors to induce cancer. Research may involve clinical, epidemiologic, and laboratory studies of persons, families, and populations at high risk of these disorders. [ NCI ]",
+            "rdfs:label": "AnimalModelGeneticDisorder",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:AnimalModel"
+                }
+            ],
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
@@ -5666,7 +5670,7 @@
                     "@id": "bts:Noknowndisease"
                 }
             ],
-            "sms:displayName": "Animal Model Disease",
+            "sms:displayName": "Animal Model Genetic Disorder",
             "sms:required": "sms:true",
             "sms:validationRules": [
                 "list"
@@ -6274,6 +6278,21 @@
             "sms:validationRules": []
         },
         {
+            "@id": "bts:cellLineDisease",
+            "@type": "rdf:Property",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "cellLineDisease",
+            "schema:domainIncludes": {
+                "@id": "bts:CellLine"
+            },
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Cell Line Disease",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
             "@id": "bts:transplantationType",
             "@type": "rdf:Property",
             "rdfs:comment": "TBD",
@@ -6285,6 +6304,21 @@
                 "@id": "http://schema.biothings.io"
             },
             "sms:displayName": "Transplantation Type",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:animalModelDisease",
+            "@type": "rdf:Property",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "animalModelDisease",
+            "schema:domainIncludes": {
+                "@id": "bts:AnimalModel"
+            },
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Animal Model Disease",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -10503,19 +10537,19 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Cancer",
+            "@id": "bts:Noknowndisease",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Cancer",
+            "rdfs:label": "Noknowndisease",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:CellLine"
+                    "@id": "bts:CellLineGeneticDisorder"
                 }
             ],
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Cancer",
+            "sms:displayName": "No known disease",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -11366,23 +11400,6 @@
                 "@id": "http://schema.biothings.io"
             },
             "sms:displayName": "isograft",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Noknowndisease",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Noknowndisease",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:AnimalModel"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "No known disease",
             "sms:required": "sms:false",
             "sms:validationRules": []
         }
