@@ -284,7 +284,7 @@ function createCollapsibleTree(chart, schemaOption) {
     }
 
     //////////////////generate data for attribute table 
-    var csv = "files/nf-tools-db-attributes.csv"; // "files/Merged/nf-tools-db-attributes.csv";
+    var csv = "data/nf-research-tools-attributes.csv"; // "files/Merged/nf-tools-db-attributes.csv";
     var merged_data = parseCSVFiles(csv); 
 
     //define function related to generating attribute table
