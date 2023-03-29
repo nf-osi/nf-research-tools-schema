@@ -14,3 +14,17 @@ Learn more about the goals for this project by checking out the following docume
 # Contributing:
 
 To contribute changes to the schema, please create a new branch, modify the schema CSV as desired, commit, and file a PR. The jsonld will automatically be updated. Please do not modify the jsonld manually. 
+
+## Updating Schema-viz Files
+
+To update the nf-research-tools-attributes.csv and nf-research-tools.json:
+
+1) Run the following command in Schematic and save the json output file as nf-research-tools.json in the schema-viz/data directory.
+
+```
+schematic viz -c config.yml tangled_tree_layers -ft component 
+```
+2) Run the following command in Schematic and save the csv output file as nf-research-tools-attributes.csv in the schema-viz/data directory.
+```
+schematic viz -c config.yml attributes
+```
