@@ -2744,10 +2744,10 @@
         },
         {
             "@id": "bts:3primeCloningSite",
-            "@type": "rdfs:Class",
+            "@type": "rdf:Property",
             "rdfs:comment": "If Restriction Enzyme was selected as the cloning method, specifies what enzyme was used on the 3' (C-terminal) end of the insert",
             "rdfs:label": "3primeCloningSite",
-            "rdfs:subClassOf": [
+            "schema:domainIncludes": [
                 {
                     "@id": "bts:GeneticReagent"
                 }
@@ -3800,9 +3800,6 @@
                     "@id": "bts:synapseId"
                 },
                 {
-                    "@id": "bts:species"
-                },
-                {
                     "@id": "bts:observationText"
                 },
                 {
@@ -3952,6 +3949,18 @@
                 },
                 {
                     "@id": "bts:TumorGrowth"
+                },
+                {
+                    "@id": "bts:Issue"
+                },
+                {
+                    "@id": "bts:DepositorComment"
+                },
+                {
+                    "@id": "bts:UsageInstructions"
+                },
+                {
+                    "@id": "bts:GeneralCommentorReview"
                 },
                 {
                     "@id": "bts:Other"
@@ -4736,9 +4745,6 @@
             "rdfs:comment": "The species of the individual the resource was derived from.",
             "rdfs:label": "species",
             "schema:domainIncludes": [
-                {
-                    "@id": "bts:Observation"
-                },
                 {
                     "@id": "bts:Donor"
                 }
@@ -6609,65 +6615,6 @@
                 "@id": "http://schema.biothings.io"
             },
             "sms:displayName": "Insert Entrez_id",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:3primeCloningSite",
-            "@type": "rdf:Property",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "3primeCloningSite",
-            "schema:domainIncludes": [
-                {
-                    "@id": "bts:G"
-                },
-                {
-                    "@id": "bts:E"
-                },
-                {
-                    "@id": "bts:N"
-                },
-                {
-                    "@id": "bts:E"
-                },
-                {
-                    "@id": "bts:T"
-                },
-                {
-                    "@id": "bts:I"
-                },
-                {
-                    "@id": "bts:C"
-                },
-                {
-                    "@id": "bts:"
-                },
-                {
-                    "@id": "bts:R"
-                },
-                {
-                    "@id": "bts:E"
-                },
-                {
-                    "@id": "bts:A"
-                },
-                {
-                    "@id": "bts:G"
-                },
-                {
-                    "@id": "bts:E"
-                },
-                {
-                    "@id": "bts:N"
-                },
-                {
-                    "@id": "bts:T"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "3prime Clonin gSite",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -9227,6 +9174,74 @@
             "sms:validationRules": []
         },
         {
+            "@id": "bts:Issue",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "Issue",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Observation"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Issue",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:DepositorComment",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "DepositorComment",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Observation"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Depositor Comment",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:UsageInstructions",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "UsageInstructions",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Observation"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Usage Instructions",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:GeneralCommentorReview",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "GeneralCommentorReview",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Observation"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "General Comment or Review",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
             "@id": "bts:Adolescent",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
@@ -10525,9 +10540,6 @@
             "rdfs:label": "Musmusculus(humanized)",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:Observation"
-                },
-                {
                     "@id": "bts:Donor"
                 }
             ],
@@ -10544,9 +10556,6 @@
             "rdfs:comment": "TBD",
             "rdfs:label": "Drosophilamelanogaster",
             "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Observation"
-                },
                 {
                     "@id": "bts:Donor"
                 }
@@ -10565,9 +10574,6 @@
             "rdfs:label": "Rhesusmacaque",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:Observation"
-                },
-                {
                     "@id": "bts:Donor"
                 }
             ],
@@ -10584,9 +10590,6 @@
             "rdfs:comment": "TBD",
             "rdfs:label": "Pantroglodytes",
             "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Observation"
-                },
                 {
                     "@id": "bts:Donor"
                 }
@@ -10605,9 +10608,6 @@
             "rdfs:label": "Gallusgallus",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:Observation"
-                },
-                {
                     "@id": "bts:Donor"
                 }
             ],
@@ -10624,9 +10624,6 @@
             "rdfs:comment": "TBD",
             "rdfs:label": "Susscrofa",
             "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Observation"
-                },
                 {
                     "@id": "bts:Donor"
                 }
@@ -10645,9 +10642,6 @@
             "rdfs:label": "Oryctolaguscuniculus",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:Observation"
-                },
-                {
                     "@id": "bts:Donor"
                 }
             ],
@@ -10665,9 +10659,6 @@
             "rdfs:label": "Daniorerio",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:Observation"
-                },
-                {
                     "@id": "bts:Donor"
                 }
             ],
@@ -10684,9 +10675,6 @@
             "rdfs:comment": "TBD",
             "rdfs:label": "Escherichiacoli",
             "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Observation"
-                },
                 {
                     "@id": "bts:Donor"
                 }
