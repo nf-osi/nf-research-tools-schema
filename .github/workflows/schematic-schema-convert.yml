@@ -29,14 +29,19 @@ jobs:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository
  
-      - name: Install schematic and convert schema
+      - name: Install schematic and convert schema #temporarily revert to this to use edge version of schematic
         shell: bash
         run: |
-          python3 -m venv .venv
-          chmod 755 .venv/bin/activate
-          source .venv/bin/activate
-          pip3 install schematicpy
-          schematic -v DEBUG schema convert $schema_filename -o nf-research-tools.jsonld
+          # use 'poetry' to install schematic from the develop branch 
+          pip3 install poetry
+          # clone patched branch until develop is stable
+          git clone https://github.com/Sage-Bionetworks/schematic.git
+          git checkout 74d3b98f97eb14f70e9f6ad3a02005812b237329
+          cd schematic
+          poetry build
+          pip3 install dist/schematicpy-1.0.0-py3-none-any.whl
+          cd ..
+          schematic schema convert $schema_filename -o nf-research-tools.jsonld
 
           
       - name: Commit files
