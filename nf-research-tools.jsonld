@@ -2118,9 +2118,6 @@
                     "@id": "bts:tumorType"
                 },
                 {
-                    "@id": "bts:reactiveSpecies"
-                },
-                {
                     "@id": "bts:observationType"
                 },
                 {
@@ -5867,7 +5864,7 @@
         {
             "@id": "bts:uniprotId",
             "@type": "rdf:Property",
-            "rdfs:comment": "The uniprotId of the antibody.",
+            "rdfs:comment": "The uniprotId of the protein targeted by the antibody.",
             "rdfs:label": "uniprotId",
             "schema:domainIncludes": [
                 {
@@ -5878,7 +5875,7 @@
                 "@id": "http://schema.biothings.io"
             },
             "sms:displayName": "uniprotId",
-            "sms:required": "sms:true",
+            "sms:required": "sms:false",
             "sms:validationRules": []
         },
         {
@@ -5991,31 +5988,34 @@
             },
             "schema:rangeIncludes": [
                 {
-                    "@id": "bts:Avian"
+                    "@id": "bts:Human"
                 },
                 {
-                    "@id": "bts:Bovine"
+                    "@id": "bts:Mouse"
                 },
                 {
-                    "@id": "bts:Canine"
+                    "@id": "bts:Rat"
                 },
                 {
                     "@id": "bts:Chicken"
                 },
                 {
-                    "@id": "bts:Cow"
+                    "@id": "bts:Rabbit"
+                },
+                {
+                    "@id": "bts:Pig"
                 },
                 {
                     "@id": "bts:Dog"
                 },
                 {
-                    "@id": "bts:Donkey"
-                },
-                {
-                    "@id": "bts:Feline"
+                    "@id": "bts:Zebrafish"
                 },
                 {
                     "@id": "bts:Fish"
+                },
+                {
+                    "@id": "bts:Non-humanprimate"
                 },
                 {
                     "@id": "bts:Guineapig"
@@ -6024,43 +6024,22 @@
                     "@id": "bts:Hamster"
                 },
                 {
-                    "@id": "bts:Human"
+                    "@id": "bts:Cow"
                 },
                 {
                     "@id": "bts:Monkey"
                 },
                 {
-                    "@id": "bts:Mouse"
+                    "@id": "bts:Avian"
                 },
                 {
-                    "@id": "bts:Non-humanprimate"
-                },
-                {
-                    "@id": "bts:Other"
-                },
-                {
-                    "@id": "bts:Pig"
-                },
-                {
-                    "@id": "bts:Porcine"
-                },
-                {
-                    "@id": "bts:Rabbit"
-                },
-                {
-                    "@id": "bts:Rat"
+                    "@id": "bts:Horse"
                 },
                 {
                     "@id": "bts:Rodent"
                 },
                 {
-                    "@id": "bts:Sheep"
-                },
-                {
-                    "@id": "bts:Simian"
-                },
-                {
-                    "@id": "bts:Zebrafish"
+                    "@id": "bts:Drosophila"
                 }
             ],
             "sms:displayName": "reactiveSpecies",
@@ -6341,10 +6320,10 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Avian",
+            "@id": "bts:Human",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Avian",
+            "rdfs:label": "Human",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6353,16 +6332,19 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Avian",
+            "sms:displayName": "Human",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Bovine",
+            "@id": "bts:Mouse",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Bovine",
+            "rdfs:label": "Mouse",
             "rdfs:subClassOf": [
+                {
+                    "@id": "bts:hostOrganism"
+                },
                 {
                     "@id": "bts:reactiveSpecies"
                 }
@@ -6370,15 +6352,15 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Bovine",
+            "sms:displayName": "Mouse",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Canine",
+            "@id": "bts:Rat",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Canine",
+            "rdfs:label": "Rat",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6387,7 +6369,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Canine",
+            "sms:displayName": "Rat",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6409,10 +6391,30 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Cow",
+            "@id": "bts:Rabbit",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Cow",
+            "rdfs:label": "Rabbit",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:hostOrganism"
+                },
+                {
+                    "@id": "bts:reactiveSpecies"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Rabbit",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:Pig",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "Pig",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6421,7 +6423,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Cow",
+            "sms:displayName": "Pig",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6443,10 +6445,10 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Donkey",
+            "@id": "bts:Zebrafish",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Donkey",
+            "rdfs:label": "Zebrafish",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6455,24 +6457,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Donkey",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Feline",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Feline",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Feline",
+            "sms:displayName": "Zebrafish",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6490,6 +6475,23 @@
                 "@id": "http://schema.biothings.io"
             },
             "sms:displayName": "Fish",
+            "sms:required": "sms:false",
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:Non-humanprimate",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "Non-humanprimate",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:reactiveSpecies"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Non-human primate",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6528,10 +6530,10 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Human",
+            "@id": "bts:Cow",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Human",
+            "rdfs:label": "Cow",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6540,7 +6542,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Human",
+            "sms:displayName": "Cow",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6562,14 +6564,11 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Mouse",
+            "@id": "bts:Avian",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Mouse",
+            "rdfs:label": "Avian",
             "rdfs:subClassOf": [
-                {
-                    "@id": "bts:hostOrganism"
-                },
                 {
                     "@id": "bts:reactiveSpecies"
                 }
@@ -6577,15 +6576,15 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Mouse",
+            "sms:displayName": "Avian",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Non-humanprimate",
+            "@id": "bts:Horse",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Non-humanprimate",
+            "rdfs:label": "Horse",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6594,78 +6593,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Non-human primate",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Pig",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Pig",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Pig",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Porcine",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Porcine",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Porcine",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Rabbit",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Rabbit",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:hostOrganism"
-                },
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Rabbit",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Rat",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Rat",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Rat",
+            "sms:displayName": "Horse",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -6687,10 +6615,10 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Sheep",
+            "@id": "bts:Drosophila",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Sheep",
+            "rdfs:label": "Drosophila",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:reactiveSpecies"
@@ -6699,41 +6627,7 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Sheep",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Simian",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Simian",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Simian",
-            "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:Zebrafish",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "Zebrafish",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:reactiveSpecies"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "Zebrafish",
+            "sms:displayName": "Drosophila",
             "sms:required": "sms:false",
             "sms:validationRules": []
         },
@@ -10297,7 +10191,7 @@
             "sms:displayName": "animalModelGeneticDisorder",
             "sms:required": "sms:true",
             "sms:validationRules": [
-                "list"
+                "list like"
             ]
         },
         {
