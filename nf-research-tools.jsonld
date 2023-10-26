@@ -444,6 +444,11 @@
             },
             "sms:displayName": "Genetic Reagent",
             "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:geneticReagentId"
+                }
+            ],
             "sms:validationRules": []
         },
         {
@@ -478,6 +483,11 @@
             },
             "sms:displayName": "Cell Line",
             "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:cellLineId"
+                }
+            ],
             "sms:validationRules": []
         },
         {
@@ -495,6 +505,11 @@
             },
             "sms:displayName": "Animal Model",
             "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:animalModelId"
+                }
+            ],
             "sms:validationRules": []
         },
         {
@@ -512,6 +527,28 @@
             },
             "sms:displayName": "Biobank",
             "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:biobankId"
+                }
+            ],
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:biobankId",
+            "@type": "rdf:Property",
+            "rdfs:comment": "A unique identifier for the biobank.",
+            "rdfs:label": "biobankId",
+            "schema:domainIncludes": [
+                {
+                    "@id": "bts:BiobankDetails"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "biobankId",
+            "sms:required": "sms:true",
             "sms:validationRules": []
         },
         {
@@ -3084,23 +3121,6 @@
                     "@id": "bts:specimenFormat"
                 }
             ],
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:biobankId",
-            "@type": "rdf:Property",
-            "rdfs:comment": "A unique identifier for the biobank.",
-            "rdfs:label": "biobankId",
-            "schema:domainIncludes": [
-                {
-                    "@id": "bts:BiobankDetails"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "biobankId",
-            "sms:required": "sms:true",
             "sms:validationRules": []
         },
         {
