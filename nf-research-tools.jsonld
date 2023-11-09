@@ -41,16 +41,16 @@
             "sms:required": "sms:false",
             "sms:requiresComponent": [
                 {
-                    "@id": "bts:GeneticReagent"
+                    "@id": "bts:GeneticReagentDetails"
                 },
                 {
-                    "@id": "bts:Antibody"
+                    "@id": "bts:AntibodyDetails"
                 },
                 {
-                    "@id": "bts:CellLine"
+                    "@id": "bts:CellLineDetails"
                 },
                 {
-                    "@id": "bts:AnimalModel"
+                    "@id": "bts:AnimalModelDetails"
                 }
             ],
             "sms:requiresDependency": [
@@ -355,32 +355,279 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:GeneticReagent",
+            "@id": "bts:GeneticReagentDetails",
             "@type": "rdfs:Class",
-            "rdfs:comment": "TBD",
-            "rdfs:label": "GeneticReagent",
+            "rdfs:comment": "Genetic reagents.",
+            "rdfs:label": "GeneticReagentDetails",
             "rdfs:subClassOf": [
                 {
-                    "@id": "bts:resourceType"
+                    "@id": "bts:Thing"
                 }
             ],
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Genetic Reagent",
+            "sms:displayName": "geneticReagentDetails",
             "sms:required": "sms:false",
             "sms:requiresDependency": [
                 {
+                    "@id": "bts:Component"
+                },
+                {
                     "@id": "bts:geneticReagentId"
+                },
+                {
+                    "@id": "bts:insertName"
+                },
+                {
+                    "@id": "bts:insertEntrezId"
+                },
+                {
+                    "@id": "bts:gRNAshRNASequence"
+                },
+                {
+                    "@id": "bts:insertSize"
+                },
+                {
+                    "@id": "bts:insertSpecies"
+                },
+                {
+                    "@id": "bts:nTerminalTag"
+                },
+                {
+                    "@id": "bts:cTerminalTag"
+                },
+                {
+                    "@id": "bts:cloningMethod"
+                },
+                {
+                    "@id": "bts:5primeCloningSite"
+                },
+                {
+                    "@id": "bts:5primeSiteDestroyed"
+                },
+                {
+                    "@id": "bts:3primeCloningSite"
+                },
+                {
+                    "@id": "bts:3primeSiteDestroyed"
+                },
+                {
+                    "@id": "bts:promoter"
+                },
+                {
+                    "@id": "bts:5primer"
+                },
+                {
+                    "@id": "bts:3primer"
+                },
+                {
+                    "@id": "bts:vectorBackbone"
+                },
+                {
+                    "@id": "bts:vectorType"
+                },
+                {
+                    "@id": "bts:backboneSize"
+                },
+                {
+                    "@id": "bts:totalSize"
+                },
+                {
+                    "@id": "bts:bacterialResistance"
+                },
+                {
+                    "@id": "bts:selectableMarker"
+                },
+                {
+                    "@id": "bts:copyNumber"
+                },
+                {
+                    "@id": "bts:growthTemp"
+                },
+                {
+                    "@id": "bts:growthStrain"
+                },
+                {
+                    "@id": "bts:hazardous"
                 }
             ],
             "sms:validationRules": []
         },
         {
-            "@id": "bts:Antibody",
+            "@id": "bts:AntibodyDetails",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "A blood protein produced in response to and counteracting a specific antigen. Antibodies combine chemically with substances which the body recognizes as alien, such as bacteria, viruses, and foreign substances in the blood.",
+            "rdfs:label": "AntibodyDetails",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Thing"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "antibodyDetails",
+            "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:Component"
+                },
+                {
+                    "@id": "bts:antibodyId"
+                },
+                {
+                    "@id": "bts:uniprotId"
+                },
+                {
+                    "@id": "bts:targetAntigen"
+                },
+                {
+                    "@id": "bts:clonality"
+                },
+                {
+                    "@id": "bts:cloneId"
+                },
+                {
+                    "@id": "bts:reactiveSpecies"
+                },
+                {
+                    "@id": "bts:conjugate"
+                },
+                {
+                    "@id": "bts:hostOrganism"
+                }
+            ],
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:CellLineDetails",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "A cell culture selected for uniformity from a cell population derived from a usually homogeneous tissue source (such as an organ).",
+            "rdfs:label": "CellLineDetails",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Thing"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "cellLineDetails",
+            "sms:required": "sms:false",
+            "sms:requiresComponent": [
+                {
+                    "@id": "bts:Donor"
+                }
+            ],
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:Component"
+                },
+                {
+                    "@id": "bts:cellLineId"
+                },
+                {
+                    "@id": "bts:donorId"
+                },
+                {
+                    "@id": "bts:organ"
+                },
+                {
+                    "@id": "bts:tissue"
+                },
+                {
+                    "@id": "bts:cellLineCategory"
+                },
+                {
+                    "@id": "bts:originYear"
+                },
+                {
+                    "@id": "bts:strProfile"
+                },
+                {
+                    "@id": "bts:populationDoublingTime"
+                },
+                {
+                    "@id": "bts:resistance"
+                },
+                {
+                    "@id": "bts:contaminatedMisidentified"
+                },
+                {
+                    "@id": "bts:cellLineGeneticDisorder"
+                },
+                {
+                    "@id": "bts:cellLineManifestation"
+                }
+            ],
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:AnimalModelDetails",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "An animal sufficiently like humans in its anatomy, physiology, or response to a pathogen to be used in medical research in order to obtain results that can be extrapolated to human medicine.",
+            "rdfs:label": "AnimalModelDetails",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:Thing"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "animalModelDetails",
+            "sms:required": "sms:false",
+            "sms:requiresComponent": [
+                {
+                    "@id": "bts:Donor"
+                }
+            ],
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:Component"
+                },
+                {
+                    "@id": "bts:animalModelId"
+                },
+                {
+                    "@id": "bts:donorId"
+                },
+                {
+                    "@id": "bts:transplantationDonorId"
+                },
+                {
+                    "@id": "bts:animalState"
+                },
+                {
+                    "@id": "bts:backgroundStrain"
+                },
+                {
+                    "@id": "bts:backgroundSubstrain"
+                },
+                {
+                    "@id": "bts:strainNomenclature"
+                },
+                {
+                    "@id": "bts:generation"
+                },
+                {
+                    "@id": "bts:transplantationType"
+                },
+                {
+                    "@id": "bts:animalModelGeneticDisorder"
+                },
+                {
+                    "@id": "bts:animalModelOfManifestation"
+                }
+            ],
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:AnimalModel",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "Antibody",
+            "rdfs:label": "AnimalModel",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:resourceType"
@@ -389,11 +636,11 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Antibody",
+            "sms:displayName": "Animal Model",
             "sms:required": "sms:false",
             "sms:requiresDependency": [
                 {
-                    "@id": "bts:antibodyId"
+                    "@id": "bts:animalModelId"
                 }
             ],
             "sms:validationRules": []
@@ -421,10 +668,10 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:AnimalModel",
+            "@id": "bts:Antibody",
             "@type": "rdfs:Class",
             "rdfs:comment": "TBD",
-            "rdfs:label": "AnimalModel",
+            "rdfs:label": "Antibody",
             "rdfs:subClassOf": [
                 {
                     "@id": "bts:resourceType"
@@ -433,11 +680,33 @@
             "schema:isPartOf": {
                 "@id": "http://schema.biothings.io"
             },
-            "sms:displayName": "Animal Model",
+            "sms:displayName": "Antibody",
             "sms:required": "sms:false",
             "sms:requiresDependency": [
                 {
-                    "@id": "bts:animalModelId"
+                    "@id": "bts:antibodyId"
+                }
+            ],
+            "sms:validationRules": []
+        },
+        {
+            "@id": "bts:GeneticReagent",
+            "@type": "rdfs:Class",
+            "rdfs:comment": "TBD",
+            "rdfs:label": "GeneticReagent",
+            "rdfs:subClassOf": [
+                {
+                    "@id": "bts:resourceType"
+                }
+            ],
+            "schema:isPartOf": {
+                "@id": "http://schema.biothings.io"
+            },
+            "sms:displayName": "Genetic Reagent",
+            "sms:required": "sms:false",
+            "sms:requiresDependency": [
+                {
+                    "@id": "bts:geneticReagentId"
                 }
             ],
             "sms:validationRules": []
@@ -770,106 +1039,6 @@
             },
             "sms:displayName": "Unknown",
             "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:GeneticReagentDetails",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "Genetic reagents.",
-            "rdfs:label": "GeneticReagentDetails",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Thing"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "geneticReagentDetails",
-            "sms:required": "sms:false",
-            "sms:requiresDependency": [
-                {
-                    "@id": "bts:Component"
-                },
-                {
-                    "@id": "bts:geneticReagentId"
-                },
-                {
-                    "@id": "bts:insertName"
-                },
-                {
-                    "@id": "bts:insertEntrezId"
-                },
-                {
-                    "@id": "bts:gRNAshRNASequence"
-                },
-                {
-                    "@id": "bts:insertSize"
-                },
-                {
-                    "@id": "bts:insertSpecies"
-                },
-                {
-                    "@id": "bts:nTerminalTag"
-                },
-                {
-                    "@id": "bts:cTerminalTag"
-                },
-                {
-                    "@id": "bts:cloningMethod"
-                },
-                {
-                    "@id": "bts:5primeCloningSite"
-                },
-                {
-                    "@id": "bts:5primeSiteDestroyed"
-                },
-                {
-                    "@id": "bts:3primeCloningSite"
-                },
-                {
-                    "@id": "bts:3primeSiteDestroyed"
-                },
-                {
-                    "@id": "bts:promoter"
-                },
-                {
-                    "@id": "bts:5primer"
-                },
-                {
-                    "@id": "bts:3primer"
-                },
-                {
-                    "@id": "bts:vectorBackbone"
-                },
-                {
-                    "@id": "bts:vectorType"
-                },
-                {
-                    "@id": "bts:backboneSize"
-                },
-                {
-                    "@id": "bts:totalSize"
-                },
-                {
-                    "@id": "bts:bacterialResistance"
-                },
-                {
-                    "@id": "bts:selectableMarker"
-                },
-                {
-                    "@id": "bts:copyNumber"
-                },
-                {
-                    "@id": "bts:growthTemp"
-                },
-                {
-                    "@id": "bts:growthStrain"
-                },
-                {
-                    "@id": "bts:hazardous"
-                }
-            ],
             "sms:validationRules": []
         },
         {
@@ -5947,52 +6116,6 @@
             "sms:validationRules": []
         },
         {
-            "@id": "bts:AntibodyDetails",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "A blood protein produced in response to and counteracting a specific antigen. Antibodies combine chemically with substances which the body recognizes as alien, such as bacteria, viruses, and foreign substances in the blood.",
-            "rdfs:label": "AntibodyDetails",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Thing"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "antibodyDetails",
-            "sms:required": "sms:false",
-            "sms:requiresDependency": [
-                {
-                    "@id": "bts:Component"
-                },
-                {
-                    "@id": "bts:antibodyId"
-                },
-                {
-                    "@id": "bts:uniprotId"
-                },
-                {
-                    "@id": "bts:targetAntigen"
-                },
-                {
-                    "@id": "bts:clonality"
-                },
-                {
-                    "@id": "bts:cloneId"
-                },
-                {
-                    "@id": "bts:reactiveSpecies"
-                },
-                {
-                    "@id": "bts:conjugate"
-                },
-                {
-                    "@id": "bts:hostOrganism"
-                }
-            ],
-            "sms:validationRules": []
-        },
-        {
             "@id": "bts:uniprotId",
             "@type": "rdf:Property",
             "rdfs:comment": "The uniprotId of the protein targeted by the antibody.",
@@ -7289,69 +7412,6 @@
             },
             "sms:displayName": "Female",
             "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:CellLineDetails",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "A cell culture selected for uniformity from a cell population derived from a usually homogeneous tissue source (such as an organ).",
-            "rdfs:label": "CellLineDetails",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Thing"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "cellLineDetails",
-            "sms:required": "sms:false",
-            "sms:requiresComponent": [
-                {
-                    "@id": "bts:Donor"
-                }
-            ],
-            "sms:requiresDependency": [
-                {
-                    "@id": "bts:Component"
-                },
-                {
-                    "@id": "bts:cellLineId"
-                },
-                {
-                    "@id": "bts:donorId"
-                },
-                {
-                    "@id": "bts:organ"
-                },
-                {
-                    "@id": "bts:tissue"
-                },
-                {
-                    "@id": "bts:cellLineCategory"
-                },
-                {
-                    "@id": "bts:originYear"
-                },
-                {
-                    "@id": "bts:strProfile"
-                },
-                {
-                    "@id": "bts:populationDoublingTime"
-                },
-                {
-                    "@id": "bts:resistance"
-                },
-                {
-                    "@id": "bts:contaminatedMisidentified"
-                },
-                {
-                    "@id": "bts:cellLineGeneticDisorder"
-                },
-                {
-                    "@id": "bts:cellLineManifestation"
-                }
-            ],
             "sms:validationRules": []
         },
         {
@@ -10345,66 +10405,6 @@
             },
             "sms:displayName": "mutationId",
             "sms:required": "sms:false",
-            "sms:validationRules": []
-        },
-        {
-            "@id": "bts:AnimalModelDetails",
-            "@type": "rdfs:Class",
-            "rdfs:comment": "An animal sufficiently like humans in its anatomy, physiology, or response to a pathogen to be used in medical research in order to obtain results that can be extrapolated to human medicine.",
-            "rdfs:label": "AnimalModelDetails",
-            "rdfs:subClassOf": [
-                {
-                    "@id": "bts:Thing"
-                }
-            ],
-            "schema:isPartOf": {
-                "@id": "http://schema.biothings.io"
-            },
-            "sms:displayName": "animalModelDetails",
-            "sms:required": "sms:false",
-            "sms:requiresComponent": [
-                {
-                    "@id": "bts:Donor"
-                }
-            ],
-            "sms:requiresDependency": [
-                {
-                    "@id": "bts:Component"
-                },
-                {
-                    "@id": "bts:animalModelId"
-                },
-                {
-                    "@id": "bts:donorId"
-                },
-                {
-                    "@id": "bts:transplantationDonorId"
-                },
-                {
-                    "@id": "bts:animalState"
-                },
-                {
-                    "@id": "bts:backgroundStrain"
-                },
-                {
-                    "@id": "bts:backgroundSubstrain"
-                },
-                {
-                    "@id": "bts:strainNomenclature"
-                },
-                {
-                    "@id": "bts:generation"
-                },
-                {
-                    "@id": "bts:transplantationType"
-                },
-                {
-                    "@id": "bts:animalModelGeneticDisorder"
-                },
-                {
-                    "@id": "bts:animalModelOfManifestation"
-                }
-            ],
             "sms:validationRules": []
         },
         {
