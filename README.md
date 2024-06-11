@@ -17,6 +17,13 @@ Learn more about the goals for this project by checking out the following docume
 
 To contribute changes to the schema, please create a new branch, modify the schema CSV as desired, commit, and file a PR. The jsonld will automatically be updated. Please do not modify the jsonld manually. 
 
+# Updating schema with 
+
+```
+schematic schema convert xxx.jsonld
+```
+
+
 ## Updating Schema-viz Files
 
 To update the nf-research-tools-attributes.csv and nf-research-tools.json:
