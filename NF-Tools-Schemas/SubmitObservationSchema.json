@@ -1,0 +1,87 @@
+{
+  "title": "Submission Form for NF Tools",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "object",
+      "required": ["first_name", "last_name", "email"],
+      "properties": {
+        "first_name": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution",
+          "default": ""
+        }
+      }
+    },
+    "submitObservation": {
+      "type": "object",
+      "properties": {
+        "observations": {
+          "type": "array",
+          "title": "Add Observations",
+          "items": {
+            "type": "object",
+            "required": ["resourceName", "observationType", "details"],
+            "properties": {
+              "resourceName": {
+                "type": "string",
+                "title": "Name of Resource"
+              },
+              "observationType": {
+                "type": "string",
+                "title": "Observation Type",
+                "enum": [
+                  "Body Length",
+                  "Body Weight",
+                  "Coat Color",
+                  "Depositor Comment",
+                  "Disease Susceptibility",
+                  "Feed Intake",
+                  "Feeding Behavior",
+                  "General Comment or Review",
+                  "Growth Rate",
+                  "Issue",
+                  "Lifespan",
+                  "Motor Activity",
+                  "Organ Development",
+                  "Other",
+                  "Reflex Development",
+                  "Reproductive Behavior",
+                  "Social Behavior",
+                  "Swimming Behavior",
+                  "Tumor Growth",
+                  "Usage Instructions"
+                ]
+              },
+              "details": {
+                "type": "string",
+                "title": "Observation Details"
+              },
+              "referencePublication": {
+                "type": "string",
+                "title": "Publication Reference"
+              },
+              "fileUpload": {
+                "type": "string",
+                "title": "Associated File"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
