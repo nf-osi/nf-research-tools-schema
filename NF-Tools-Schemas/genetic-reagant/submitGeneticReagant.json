@@ -3,69 +3,143 @@
   "title": "Submit Genetic Reagent",
   "type": "object",
   "properties": {
-    "reagentName": {
+    "geneticReagentName": {
       "type": "string",
-      "title": "Genetic Reagent Name",
-      "description": "Provide the name of the genetic reagent."
+      "title": "What is the name of the genetic reagent?"
     },
-    "type": {
+    "synonyms": {
       "type": "string",
-      "title": "Type of Reagent",
-      "description": "Select the type of genetic reagent.",
-      "enum": [
-        "Plasmid",
-        "siRNA",
-        "CRISPR",
-        "Antisense Oligonucleotide"
-      ]
+      "title": "Are there any synonyms for it?"
     },
     "description": {
       "type": "string",
-      "title": "Description",
-      "description": "Provide a detailed description of the genetic reagent."
+      "title": "What's a short description of this genetic reagent (~20 words)?"
     },
-    "sequence": {
-      "type": "string",
-      "title": "Sequence",
-      "description": "Enter the sequence of the genetic reagent."
-    },
-    "targetGene": {
-      "type": "string",
-      "title": "Target Gene",
-      "description": "Enter the target gene for the reagent."
-    },
-    "applications": {
+    "mutationTypes": {
       "type": "array",
-      "title": "Applications",
-      "description": "List the applications or uses of this reagent.",
+      "title": "Do any of the mutation types apply?",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "Disruption caused by insertion of vector",
+          "Duplication",
+          "Insertion",
+          "Insertion of gene trap vector",
+          "Intergenic deletion",
+          "Intragenic deletion",
+          "Inversion",
+          "Loss of heterozygosity (unspecified mechanism)",
+          "Nucleotide repeat expansion",
+          "Nucleotide substitutions",
+          "Single point mutation",
+          "Translocation",
+          "Transposon insertion",
+          "Viral insertion",
+          "Other"
+        ]
       }
     },
-    "availability": {
+    "alleleType": {
       "type": "string",
-      "title": "Availability",
-      "description": "Provide the availability status (e.g., commercial, academic)."
+      "title": "What is the allele type?",
+      "enum": [
+        "Conditional ready",
+        "Constitutively active",
+        "Dominant negative",
+        "Humanized sequence",
+        "Hypomorph",
+        "Inducible",
+        "Inserted expressed sequence",
+        "Knockdown",
+        "Modified isoform(s)",
+        "No functional change",
+        "Null/knockout",
+        "RMCE-Ready",
+        "Recombinase",
+        "Reporter",
+        "Transactivator",
+        "Transposase",
+        "Transposon concatemer",
+        "Other"
+      ]
     },
-    "references": {
-      "type": "array",
-      "title": "References",
-      "description": "Provide relevant references (e.g., PubMed ID, DOI).",
-      "items": {
-        "type": "string"
-      }
-    },
-    "fundingAgency": {
+    "mutationMethod": {
       "type": "string",
-      "title": "Funding Agency",
-      "description": "Enter the funding agency supporting this reagent."
+      "title": "What is the method mutation was applied?",
+      "enum": [
+        "Chemically and radiation induced",
+        "Chemically induced (ENU)",
+        "Chemically induced (other)",
+        "Endonuclease-mediated (CRISPR)",
+        "Endonuclease-mediated (TALEN)",
+        "Gene trapped",
+        "QTL",
+        "Radiation induced",
+        "Spontaneous",
+        "Targeted",
+        "Transgenic",
+        "Transposon induced",
+        "Other"
+      ]
+    },
+    "affectedGeneSymbol": {
+      "type": "string",
+      "title": "What is the Affected Gene Symbol?"
+    },
+    "affectedGeneName": {
+      "type": "string",
+      "title": "What is the Affected Gene Name?"
+    },
+    "chromosomeNumber": {
+      "type": "string",
+      "title": "What chromosome number is the affected gene?"
+    },
+    "proteinVariation": {
+      "type": "string",
+      "title": "What is the protein variation?"
+    },
+    "sequenceVariation": {
+      "type": "string",
+      "title": "What is the sequence variation?"
+    },
+    "investigatorName": {
+      "type": "string",
+      "title": "What is the investigator's name who developed this tool?"
+    },
+    "investigatorAffiliation": {
+      "type": "string",
+      "title": "What is the investigator's affiliation who developed this tool?"
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "If there is a publication associated with the development of this tool, please include the DOI link below."
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How can one acquire this item?",
+      "enum": [
+        "Contact the Principal Investigator",
+        "It's able to be purchased online",
+        "Other"
+      ]
+    },
+    "vendor": {
+      "type": "string",
+      "title": "Please select a vendor you are aware has this item."
+    },
+    "catalogNumber": {
+      "type": "string",
+      "title": "What is the catalog number?"
+    },
+    "catalogURL": {
+      "type": "string",
+      "title": "What is the catalog URL?"
     }
   },
   "required": [
-    "reagentName",
-    "type",
+    "geneticReagentName",
     "description",
-    "sequence",
-    "targetGene"
+    "investigatorName",
+    "investigatorAffiliation"
   ]
 }
