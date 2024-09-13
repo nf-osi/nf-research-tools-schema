@@ -3,72 +3,188 @@
   "title": "Submit Animal Model",
   "type": "object",
   "properties": {
-    "modelName": {
+    "animalModelName": {
       "type": "string",
-      "title": "Animal Model Name",
-      "description": "Provide the name of the animal model."
+      "title": "What is the name of the animal model?"
     },
-    "species": {
+    "synonyms": {
       "type": "string",
-      "title": "Species",
-      "description": "Provide the species name (e.g., mouse, rat)."
+      "title": "Are there any synonyms?"
     },
-    "strain": {
+    "description": {
       "type": "string",
-      "title": "Strain",
-      "description": "Provide the strain of the animal model."
+      "title": "Please provide a description of the animal model (~20 words)"
     },
-    "genotype": {
+    "backgroundStrain": {
       "type": "string",
-      "title": "Genotype",
-      "description": "Provide the genotype of the animal model."
+      "title": "What is the background strain?"
     },
-    "mutations": {
+    "backgroundSubstrain": {
+      "type": "string",
+      "title": "What is the background substrain?"
+    },
+    "strainNomenclature": {
+      "type": "string",
+      "title": "What is the strain nomenclature?"
+    },
+    "animalModelDisease": {
+      "type": "string",
+      "title": "What is the animal model disease?",
+      "enum": [
+        "Neurofibromatosis type 1",
+        "Neurofibromatosis type 2",
+        "No known disease",
+        "Schwannomatosis"
+      ]
+    },
+    "animalModelManifestation": {
+      "type": "string",
+      "title": "What is the animal model of manifestation?",
+      "enum": [
+        "astrocytoma",
+        "high grade glioma",
+        "malignant peripheral nerve sheath tumor",
+        "optic nerve glioma",
+        "spinal development",
+        "plexiform neurofibroma",
+        "metabolic function",
+        "heart malformation",
+        "neural crest hyperplasia",
+        "cognition",
+        "growth",
+        "acute myeloid leukemia",
+        "no symptoms",
+        "Other"
+      ]
+    },
+    "mutationTypes": {
       "type": "array",
-      "title": "Mutations",
-      "description": "List any mutations in the animal model.",
+      "title": "Do any of the mutation types apply?",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "Disruption caused by insertion of vector",
+          "Duplication",
+          "Insertion",
+          "Insertion of gene trap vector",
+          "Intergenic deletion",
+          "Intragenic deletion",
+          "Inversion",
+          "Loss of heterozygosity (unspecified mechanism)",
+          "Nucleotide repeat expansion",
+          "Nucleotide substitutions",
+          "Single point mutation",
+          "Translocation",
+          "Transposon insertion",
+          "Viral insertion",
+          "Other"
+        ]
       }
     },
-    "phenotypes": {
-      "type": "array",
-      "title": "Phenotypes",
-      "description": "List the phenotypes associated with the animal model.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "availability": {
+    "alleleType": {
       "type": "string",
-      "title": "Availability",
-      "description": "Provide the availability status of the animal model (e.g., commercial, academic)."
+      "title": "What is the allele type?",
+      "enum": [
+        "Conditional ready",
+        "Constitutively active",
+        "Dominant negative",
+        "Humanized sequence",
+        "Hypomorph",
+        "Inducible",
+        "Inserted expressed sequence",
+        "Knockdown",
+        "Modified isoform(s)",
+        "No functional change",
+        "Null/knockout",
+        "RMCE-Ready",
+        "Recombinase",
+        "Reporter",
+        "Transactivator",
+        "Transposase",
+        "Transposon concatemer",
+        "Other"
+      ]
     },
-    "model_description": {
+    "mutationMethod": {
       "type": "string",
-      "title": "Model Description",
-      "description": "Provide a detailed description of the animal model."
+      "title": "What is the method mutation was applied?",
+      "enum": [
+        "Chemically and radiation induced",
+        "Chemically induced (ENU)",
+        "Chemically induced (other)",
+        "Endonuclease-mediated (CRISPR)",
+        "Endonuclease-mediated (TALEN)",
+        "Gene trapped",
+        "QTL",
+        "Radiation induced",
+        "Spontaneous",
+        "Targeted",
+        "Transgenic",
+        "Transposon induced",
+        "Other"
+      ]
     },
-    "references": {
-      "type": "array",
-      "title": "References",
-      "description": "Provide relevant references (e.g., PubMed ID, DOI) for this animal model.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "fundingAgency": {
+    "affectedGeneSymbol": {
       "type": "string",
-      "title": "Funding Agency",
-      "description": "Provide the funding agency supporting this model."
+      "title": "What is the Affected Gene Symbol?"
+    },
+    "affectedGeneName": {
+      "type": "string",
+      "title": "What is the Affected Gene Name?"
+    },
+    "chromosomeNumber": {
+      "type": "string",
+      "title": "What chromosome number is the affected gene?"
+    },
+    "proteinVariation": {
+      "type": "string",
+      "title": "What is the protein variation?"
+    },
+    "sequenceVariation": {
+      "type": "string",
+      "title": "What is the sequence variation?"
+    },
+    "investigatorName": {
+      "type": "string",
+      "title": "What is the investigator's name who developed this tool?"
+    },
+    "investigatorAffiliation": {
+      "type": "string",
+      "title": "What is the investigator's affiliation who developed this tool?"
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "If there is a publication associated with the development of this tool, please include the DOI link below."
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How can one acquire this item?",
+      "enum": [
+        "Contact the Principal Investigator",
+        "It's able to be purchased online",
+        "Other"
+      ]
+    },
+    "vendor": {
+      "type": "string",
+      "title": "Please select a vendor you are aware has this item."
+    },
+    "catalogNumber": {
+      "type": "string",
+      "title": "What is the catalog number?"
+    },
+    "catalogURL": {
+      "type": "string",
+      "title": "What is the catalog URL?"
     }
   },
   "required": [
-    "modelName",
-    "species",
-    "strain",
-    "genotype",
-    "model_description"
+    "animalModelName",
+    "description",
+    "backgroundStrain",
+    "animalModelDisease",
+    "animalModelManifestation",
+    "investigatorName",
+    "investigatorAffiliation"
   ]
 }
-
