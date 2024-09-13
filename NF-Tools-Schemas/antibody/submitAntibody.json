@@ -5,70 +5,169 @@
   "properties": {
     "antibodyName": {
       "type": "string",
-      "title": "Antibody Name",
-      "description": "Provide the name of the antibody."
+      "title": "What is the name of the antibody?"
     },
-    "hostOrganism": {
+    "synonyms": {
       "type": "string",
-      "title": "Host Organism",
-      "description": "Enter the host organism (e.g., rabbit, mouse)."
-    },
-    "isotype": {
-      "type": "string",
-      "title": "Isotype",
-      "description": "Provide the isotype of the antibody (e.g., IgG, IgM)."
+      "title": "Are there any synonyms for this name?"
     },
     "targetAntigen": {
       "type": "string",
-      "title": "Target Antigen",
-      "description": "Enter the target antigen of the antibody."
+      "title": "What is the target antigen?"
     },
     "clonality": {
       "type": "string",
-      "title": "Clonality",
-      "description": "Specify the clonality (e.g., monoclonal, polyclonal).",
+      "title": "What is the clonality?",
       "enum": [
         "Monoclonal",
         "Polyclonal"
       ]
     },
-    "applications": {
+    "hostSpecies": {
+      "type": "string",
+      "title": "What is the host species?"
+    },
+    "reactiveSpecies": {
+      "type": "string",
+      "title": "What is the reactive species?"
+    },
+    "conjugationStatus": {
+      "type": "string",
+      "title": "Is the antibody conjugated?",
+      "enum": [
+        "Yes",
+        "Nonconjugated"
+      ]
+    },
+    "mutationTypes": {
       "type": "array",
-      "title": "Applications",
-      "description": "List the applications or uses of this antibody.",
+      "title": "Do any of the mutation types apply?",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "Disruption caused by insertion of vector",
+          "Duplication",
+          "Insertion",
+          "Insertion of gene trap vector",
+          "Intergenic deletion",
+          "Intragenic deletion",
+          "Inversion",
+          "Loss of heterozygosity (unspecified mechanism)",
+          "Nucleotide repeat expansion",
+          "Nucleotide substitutions",
+          "Single point mutation",
+          "Translocation",
+          "Transposon insertion",
+          "Viral insertion",
+          "Other"
+        ]
       }
     },
-    "dilutionFactor": {
+    "alleleType": {
       "type": "string",
-      "title": "Dilution Factor",
-      "description": "Enter the dilution factor used for the antibody."
+      "title": "What is the allele type?",
+      "enum": [
+        "Conditional ready",
+        "Constitutively active",
+        "Dominant negative",
+        "Humanized sequence",
+        "Hypomorph",
+        "Inducible",
+        "Inserted expressed sequence",
+        "Knockdown",
+        "Modified isoform(s)",
+        "No functional change",
+        "Null/knockout",
+        "RMCE-Ready",
+        "Recombinase",
+        "Reporter",
+        "Transactivator",
+        "Transposase",
+        "Transposon concatemer",
+        "Other"
+      ]
     },
-    "availability": {
+    "mutationMethod": {
       "type": "string",
-      "title": "Availability",
-      "description": "Provide the availability status (e.g., commercial, academic)."
+      "title": "What is the method mutation was applied?",
+      "enum": [
+        "Chemically and radiation induced",
+        "Chemically induced (ENU)",
+        "Chemically induced (other)",
+        "Endonuclease-mediated (CRISPR)",
+        "Endonuclease-mediated (TALEN)",
+        "Gene trapped",
+        "QTL",
+        "Radiation induced",
+        "Spontaneous",
+        "Targeted",
+        "Transgenic",
+        "Transposon induced",
+        "Other"
+      ]
     },
-    "references": {
-      "type": "array",
-      "title": "References",
-      "description": "Provide relevant references (e.g., PubMed ID, DOI).",
-      "items": {
-        "type": "string"
-      }
-    },
-    "fundingAgency": {
+    "affectedGeneSymbol": {
       "type": "string",
-      "title": "Funding Agency",
-      "description": "Enter the funding agency supporting this antibody."
+      "title": "What is the Affected Gene Symbol?"
+    },
+    "affectedGeneName": {
+      "type": "string",
+      "title": "What is the Affected Gene Name?"
+    },
+    "chromosomeNumber": {
+      "type": "string",
+      "title": "What chromosome number is the affected gene?"
+    },
+    "proteinVariation": {
+      "type": "string",
+      "title": "What is the protein variation?"
+    },
+    "sequenceVariation": {
+      "type": "string",
+      "title": "What is the sequence variation?"
+    },
+    "investigatorName": {
+      "type": "string",
+      "title": "What is the investigator's name who developed this tool?"
+    },
+    "investigatorAffiliation": {
+      "type": "string",
+      "title": "What is the investigator's affiliation who developed this tool?"
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "If there is a publication associated with the development of this tool, please include the DOI link below."
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How can one acquire this item?",
+      "enum": [
+        "Contact the Principal Investigator",
+        "It's able to be purchased online",
+        "Other"
+      ]
+    },
+    "vendor": {
+      "type": "string",
+      "title": "Please select a vendor you are aware has this item."
+    },
+    "catalogNumber": {
+      "type": "string",
+      "title": "What is the catalog number?"
+    },
+    "catalogURL": {
+      "type": "string",
+      "title": "What is the catalog URL?"
     }
   },
   "required": [
     "antibodyName",
-    "hostOrganism",
-    "isotype",
     "targetAntigen",
-    "clonality"
+    "clonality",
+    "hostSpecies",
+    "reactiveSpecies",
+    "conjugationStatus",
+    "investigatorName",
+    "investigatorAffiliation"
   ]
 }
