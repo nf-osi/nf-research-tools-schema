@@ -1,250 +1,419 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Submit Genetic Reagents",
+  "title": "Submit Genetic Regagent",
   "type": "object",
   "properties": {
     "userInfo": {
       "type": "object",
       "title": "Your Information",
-      "required": ["first_name", "last_name", "email"],
       "properties": {
-        "first_name": {
+        "firstandlastName": {
           "type": "string",
-          "title": "First Name"
-        },
-        "last_name": {
-          "type": "string",
-          "title": "Last Name"
+          "title": "First and Last Name"
         },
         "email": {
           "type": "string",
-          "title": "Email",
+          "title": "Contact Email",
           "format": "email"
         },
         "institution": {
           "type": "string",
-          "title": "Institution (Optional)"
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
         }
       }
     },
-    "geneticReagents": {
-      "type": "array",
-      "title": "Genetic Reagents",
-      "items": {
-        "type": "object",
-        "title": "Genetic Reagent",
-        "properties": {
-          "geneticReagentName": {
-            "type": "string",
-            "title": "What is the name of the genetic reagent?"
-          },
-          "synonyms": {
-            "type": "string",
-            "title": "Are there any synonyms for it?"
-          },
-          "description": {
-            "type": "string",
-            "title": "What's a short description of this genetic reagent (~20 words)?"
-          },
-          "geneticReagentId": {
-            "type": "string",
-            "title": "What is the unique identifier for this genetic reagent?"
-          },
-          "insertName": {
-            "type": "string",
-            "title": "What is the name of the main gene insert in the plasmid?"
-          },
-          "insertEntrezId": {
-            "type": "string",
-            "title": "What is the Entrez gene ID for the insert?"
-          },
-          "insertSize": {
-            "type": "string",
-            "title": "What is the size (in bp) of the insert?"
-          },
-          "insertSpecies": {
-            "type": "string",
-            "title": "What is the species of the insert?",
-            "enum": ["Homosapiens", "Musmusculus", "Rattusnorvegicus"]
-          },
-          "gRNAshRNASequence": {
-            "type": "string",
-            "title": "What is the sequence of gRNA/shRNA, if applicable?"
-          },
-          "nTerminalTag": {
-            "type": "string",
-            "title": "What tag exists on the N-terminal end, if any?"
-          },
-          "cTerminalTag": {
-            "type": "string",
-            "title": "What tag exists on the C-terminal end, if any?"
-          },
-          "promoter": {
-            "type": "string",
-            "title": "What promoter is driving the insert expression?"
-          },
-          "vectorBackbone": {
-            "type": "string",
-            "title": "What is the name of the vector backbone?"
-          },
-          "vectorType": {
-            "type": "string",
-            "title": "What is the primary function of the vector?",
-            "enum": [
-              "Mammalian Expression",
-              "Bacterial Expression",
-              "Gateway Entry Clone",
-              "Lentiviral",
-              "Adenoviral",
-              "AAV",
-              "RNAi",
-              "Luciferase",
-              "Cre/Lox",
-              "Yeast Expression",
-              "Worm Expression",
-              "Insect Expression",
-              "Plant Expression",
-              "Mouse Targeting",
-              "CRISPR",
-              "TALEN",
-              "Synthetic Biology",
-              "Transfer Vector",
-              "Unspecified",
-              "Other"
-            ]
-          },
-          "backboneSize": {
-            "type": "string",
-            "title": "What is the size of the backbone (without insert)?"
-          },
-          "totalSize": {
-            "type": "string",
-            "title": "What is the total size of the plasmid (with insert)?"
-          },
-          "cloningMethod": {
-            "type": "string",
-            "title": "How was the vector constructed?",
-            "enum": [
-              "Restriction Enzyme",
-              "TOPO Cloning",
-              "Gateway Cloning",
-              "Ligation Independent Cloning",
-              "Gibson Cloning",
-              "Unknown"
-            ]
-          },
-          "5primeCloningSite": {
-            "type": "string",
-            "title": "What enzyme was used on the 5' end for cloning?"
-          },
-          "5primeSiteDestroyed": {
-            "type": "string",
-            "title": "Was the 5' site destroyed during cloning?",
-            "enum": ["Yes", "No", "Unknown"]
-          },
-          "3primeCloningSite": {
-            "type": "string",
-            "title": "What enzyme was used on the 3' end for cloning?"
-          },
-          "3primeSiteDestroyed": {
-            "type": "string",
-            "title": "Was the 3' site destroyed during cloning?",
-            "enum": ["Yes", "No", "Unknown"]
-          },
-          "bacterialResistance": {
-            "type": "string",
-            "title": "What antibiotic resistance is present?",
-            "enum": [
-              "Ampicillin",
-              "Kanamycin",
-              "Chloramphenicol",
-              "Tetracycline",
-              "Spectinomycin",
-              "Hygromycin",
-              "Bleocin (Zeocin)",
-              "Gentamycin",
-              "Streptomycin",
-              "Nourseothricin"
-            ]
-          },
-          "selectableMarker": {
-            "type": "string",
-            "title": "Are there any additional selection markers?",
-            "enum": [
-              "Neomycin",
-              "Puromycin",
-              "Hygromycin",
-              "Zeocin",
-              "Blasticidin",
-              "Gentamicin",
-              "TRP1",
-              "LEU1",
-              "URA3",
-              "HIS3",
-              "Basta",
-              "Other"
-            ]
-          },
-          "copyNumber": {
-            "type": "string",
-            "title": "What is the copy number?",
-            "enum": ["High Copy", "Low Copy", "Unknown"]
-          },
-          "growthTemp": {
-            "type": "string",
-            "title": "At what temperature should the bacteria be grown?",
-            "enum": ["37C", "30C", "Room Temperature"]
-          },
-          "growthStrain": {
-            "type": "string",
-            "title": "Which strain of E. Coli should be used?",
-            "enum": ["DH5alpha", "DH10B", "NEB Stable", "Ccdb Survival", "Pir1", "Other"]
-          },
-          "hazardous": {
-            "type": "string",
-            "title": "Does the plasmid require Biosafety Level 2 or higher?",
-            "enum": ["Yes", "No", "Unknown"]
-          },
-          "investigatorName": {
-            "type": "string",
-            "title": "What is the investigator's name who developed this tool?"
-          },
-          "investigatorAffiliation": {
-            "type": "string",
-            "title": "What is the investigator's affiliation?"
-          },
-          "publicationDOI": {
-            "type": "string",
-            "title": "If there is a publication associated, include the DOI."
-          },
-          "itemAcquisition": {
-            "type": "string",
-            "title": "How can one acquire this item?",
-            "enum": [
-              "Contact the Principal Investigator",
-              "It's able to be purchased online",
-              "Other"
-            ]
-          },
-          "vendor": {
-            "type": "string",
-            "title": "Please select a vendor."
-          },
-          "catalogNumber": {
-            "type": "string",
-            "title": "What is the catalog number?"
-          },
-          "catalogURL": {
-            "type": "string",
-            "title": "What is the catalog URL?"
+    "geneticReagentId": {
+      "type": "string",
+      "title": "Genetic Reagant ID"
+    },
+    "insertName": {
+      "type": "string",
+      "title": "Insert Name"
+    },
+    "insertEntrezId": {
+      "type": "string",
+      "title": "Insert Entrez ID"
+    },
+    "gRNAshRNASequence": {
+      "type": "string",
+      "title": "gRNA shRNA Sequence of Gene Insert"
+    },
+    "insertSize": {
+      "type": "string",
+      "title": "Insert Size (bp)"
+    },
+    "insertSpecies": {
+      "type": "string",
+      "title": "Insert Species",
+      "enum": [
+        "Human",
+        "Mouse",
+        "Rat"
+      ]
+    },
+    "nTerminalTag": {
+      "type": "string",
+      "title": "N Terminal Tag"
+    },
+    "cTerminalTag": {
+      "type": "string",
+      "title": "C Terminal Tag"
+    },
+    "cloningMethod": {
+      "type": "string",
+      "title": "Cloning Method",
+      "enum": [
+        "Restriction Enzyme",
+        "TOPO Cloning",
+        "Gateway Cloning",
+        "Ligation Independent Cloning",
+        "Gibson Cloning",
+        "Unknown",
+        "Other"
+      ]
+    },
+    "5primeCloningSite": {
+      "type": "string",
+      "title": "5 Prime Cloning Site (if Restriction Enzyme Selected)"
+    },
+    "5primeSiteDestroyed": {
+      "type": "string",
+      "title": "5 Prime Site Destroyed",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "3primeCloningSite": {
+      "type": "string",
+      "title": "3 Prime Cloning Site (if Restriction Enzyme Selected)"
+    },
+    "3primeSiteDestroyed": {
+      "type": "string",
+      "title": "3 Prime Site Destroyed",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "promoter": {
+      "type": "string",
+      "title": "Promoter"
+    },
+    "5primer": {
+      "type": "string",
+      "title": "5 Primer"
+    },
+    "3primer": {
+      "type": "string",
+      "title": "3 Primer"
+    },
+    "vectorBackbone": {
+      "type": "string",
+      "title": "Vector Backbone"
+    },
+    "vectorType": {
+      "type": "string",
+      "title": "Vector Type",
+      "enum": [
+        "MammalianExpression",
+        "BacterialExpression",
+        "GatewayEntryClone",
+        "Lentiviral",
+        "Adenoviral",
+        "AAV",
+        "RNAi",
+        "Luciferase",
+        "Cre/Lox",
+        "YeastExpression",
+        "WormExpression",
+        "InsectExpression",
+        "PlantExpression",
+        "MouseTargeting",
+        "CRISPR",
+        "TALEN",
+        "SyntheticBiology",
+        "TransferVector",
+        "Unspecified",
+        "Other"
+      ]
+    },
+    "backboneSize": {
+      "type": "string",
+      "title": "Backbone Size"
+    },
+    "totalSize": {
+      "type": "string",
+      "title": "Total Size"
+    },
+    "bacterialResistance": {
+      "type": "object",
+      "title": "Bacterial Resistance",
+      "properties": {
+        "Ampicillin": {
+          "type": "boolean"
+        },
+        "AmpicillinandBleocin(Zeocin)": {
+          "type": "boolean"
+        },
+        "AmpicillinandKanamycin": {
+          "type": "boolean"
+        },
+        "AmpicillinandSpectinomycin": {
+          "type": "boolean"
+        },
+        "AmpicillinandStreptomycin": {
+          "type": "boolean"
+        },
+        "AmpicillinandTetracycline": {
+          "type": "boolean"
+        },
+        "Bleocin(Zeocin)": {
+          "type": "boolean"
+        },
+        "Chloramphenicol": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandAmpicillin": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandBleocin(Zeocin)": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandGentamycin": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandKanamycin": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandSpectinomycin": {
+          "type": "boolean"
+        },
+        "ChloramphenicolandTetracycline": {
+          "type": "boolean"
+        },
+        "Gentamycin": {
+          "type": "boolean"
+        },
+        "Hygromycin": {
+          "type": "boolean"
+        },
+        "Kanamycin": {
+          "type": "boolean"
+        },
+        "Nourseothricin(clonNat)": {
+          "type": "boolean"
+        },
+        "Spectinomycin": {
+          "type": "boolean"
+        },
+        "SpectinomycinandStreptomycin": {
+          "type": "boolean"
+        },
+        "Streptomycin": {
+          "type": "boolean"
+        },
+        "Tetracycline": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
+      }
+    },
+    "selectableMarker": {
+      "type": "object",
+      "title": "Additional Selection Markers",
+      "properties": {
+        "Neomycin": {
+          "type": "boolean"
+        },
+        "Puromycin": {
+          "type": "boolean"
+        },
+        "Hygromycin": {
+          "type": "boolean"
+        },
+        "Zeocin": {
+          "type": "boolean"
+        },
+        "Blasticidin": {
+          "type": "boolean"
+        },
+        "Gentamicin": {
+          "type": "boolean"
+        },
+        "TRP1": {
+          "type": "boolean"
+        },
+        "LEU1": {
+          "type": "boolean"
+        },
+        "URA3": {
+          "type": "boolean"
+        },
+        "HIS3": {
+          "type": "boolean"
+        },
+        "Basta": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
+      },
+      "copyNumber": {
+        "type": "string",
+        "title": "Copy Number",
+        "enum": [
+          "High Copy",
+          "Low Copy",
+          "Unknown"
+        ]
+      },
+      "growthTemp": {
+        "type": "string",
+        "title": "Growth Temp",
+        "enum": [
+          "37 degrees Celsius",
+          "30 degrees Celsius",
+          "Room Temperature"
+        ]
+      },
+      "growthStrain": {
+        "type": "string",
+        "title": "Growth Strain",
+        "enum": [
+          "DH5alpha",
+          "DH10B",
+          "NEBStable",
+          "CcdbSurvival",
+          "Pir1",
+          "Other"
+        ]
+      },
+      "hazardous": {
+        "type": "string",
+        "title": "Hazardous",
+        "enum": [
+          "Yes",
+          "No",
+          "Unkown"
+        ]
+      },
+      "itemAcquisition": {
+        "type": "string",
+        "title": "How to acquire",
+        "enum": [
+          "Contact Developer",
+          "Purchase from Vendor",
+          "Other"
+        ],
+        "default": "Contact Developer"
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "userInfo": {
+              "properties": {
+                "isDeveloper": {
+                  "const": "No"
+                }
+              }
+            }
           }
         },
-        "required": [
-          "geneticReagentName",
-          "description"
-        ]
+        "then": {
+          "properties": {
+            "userInfo": {
+              "properties": {
+                "developerName": {
+                  "type": "string",
+                  "title": "Developer Name"
+                },
+                "developerAffiliation": {
+                  "type": "string",
+                  "title": "Developer Affiliation"
+                }
+              }
+            }
+          },
+          "required": [
+            "userInfo.developerName",
+            "userInfo.developerAffiliation"
+          ]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "itemAcquisition": {
+              "const": "Purchase from Vendor"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "vendor": {
+              "type": "string",
+              "title": "Vendor Name"
+            },
+            "catalogNumber": {
+              "type": "string",
+              "title": "Catalog Number"
+            },
+            "catalogURL": {
+              "type": "string",
+              "title": "Link to vendor page"
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "itemAcquisition": {
+              "const": "Other"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "additionalDetails": {
+              "type": "string",
+              "title": "Please provide additional details."
+            }
+          },
+          "required": [
+            "additionalDetails"
+          ]
+        }
       }
-    }
-  },
-  "required": ["userInfo", "geneticReagents"]
+    ],
+    "required": [
+      "userInfo.first_name",
+      "userInfo.last_name",
+      "userInfo.email",
+      "userInfo.isDeveloper",
+      "animalModelName",
+      "description",
+      "backgroundStrain",
+      "animalModelDisease",
+      "animalModelManifestation"
+    ]
+  }
 }
