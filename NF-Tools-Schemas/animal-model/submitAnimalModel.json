@@ -9,11 +9,7 @@
       "properties": {
         "first_name": {
           "type": "string",
-          "title": "First Name"
-        },
-        "last_name": {
-          "type": "string",
-          "title": "Last Name"
+          "title": "First and Last Name"
         },
         "email": {
           "type": "string",
@@ -22,7 +18,7 @@
         },
         "institution": {
           "type": "string",
-          "title": "Institution (Optional)",
+          "title": "Institution/Affiliation",
           "default": ""
         },
         "isDeveloper": {
@@ -203,11 +199,11 @@
       "type": "string",
       "title": "How to acquire",
       "enum": [
-        "Contact the Developer",
-        "It's able to be purchased online",
+        "Contact Developer",
+        "Purchase from Vendor",
         "Other"
       ],
-      "default": "Contact the Developer"
+      "default": "Contact Developer"
     }
   },
   "allOf": [
@@ -248,7 +244,7 @@
       "if": {
         "properties": {
           "itemAcquisition": {
-            "const": "It's able to be purchased online"
+            "const": "Purchase from Vendor"
           }
         }
       },
@@ -256,15 +252,15 @@
         "properties": {
           "vendor": {
             "type": "string",
-            "title": "Please select a vendor you are aware has this item."
+            "title": "Vendor Name"
           },
           "catalogNumber": {
             "type": "string",
-            "title": "What is the catalog number?"
+            "title": "Catalog Number"
           },
           "catalogURL": {
             "type": "string",
-            "title": "What is the catalog URL?"
+            "title": "Link to vendor page"
           }
         }
       }
