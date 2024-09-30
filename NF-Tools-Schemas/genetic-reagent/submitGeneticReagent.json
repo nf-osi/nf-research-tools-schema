@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Submit Genetic Regagent",
+  "title": "Submit Genetic Reagent",
   "type": "object",
   "properties": {
     "userInfo": {
@@ -34,7 +34,7 @@
     },
     "geneticReagentId": {
       "type": "string",
-      "title": "Genetic Reagant ID"
+      "title": "Genetic Reagent ID"
     },
     "insertName": {
       "type": "string",
@@ -273,147 +273,145 @@
         "Other": {
           "type": "boolean"
         }
-      },
-      "copyNumber": {
-        "type": "string",
-        "title": "Copy Number",
-        "enum": [
-          "High Copy",
-          "Low Copy",
-          "Unknown"
-        ]
-      },
-      "growthTemp": {
-        "type": "string",
-        "title": "Growth Temp",
-        "enum": [
-          "37 degrees Celsius",
-          "30 degrees Celsius",
-          "Room Temperature"
-        ]
-      },
-      "growthStrain": {
-        "type": "string",
-        "title": "Growth Strain",
-        "enum": [
-          "DH5alpha",
-          "DH10B",
-          "NEBStable",
-          "CcdbSurvival",
-          "Pir1",
-          "Other"
-        ]
-      },
-      "hazardous": {
-        "type": "string",
-        "title": "Hazardous",
-        "enum": [
-          "Yes",
-          "No",
-          "Unkown"
-        ]
-      },
-      "itemAcquisition": {
-        "type": "string",
-        "title": "How to acquire",
-        "enum": [
-          "Contact Developer",
-          "Purchase from Vendor",
-          "Other"
-        ],
-        "default": "Contact Developer"
       }
     },
-    "allOf": [
-      {
-        "if": {
-          "properties": {
-            "userInfo": {
-              "properties": {
-                "isDeveloper": {
-                  "const": "No"
-                }
+    "copyNumber": {
+      "type": "string",
+      "title": "Copy Number",
+      "enum": [
+        "High Copy",
+        "Low Copy",
+        "Unknown"
+      ]
+    },
+    "growthTemp": {
+      "type": "string",
+      "title": "Growth Temp",
+      "enum": [
+        "37 degrees Celsius",
+        "30 degrees Celsius",
+        "Room Temperature"
+      ]
+    },
+    "growthStrain": {
+      "type": "string",
+      "title": "Growth Strain",
+      "enum": [
+        "DH5alpha",
+        "DH10B",
+        "NEBStable",
+        "CcdbSurvival",
+        "Pir1",
+        "Other"
+      ]
+    },
+    "hazardous": {
+      "type": "string",
+      "title": "Hazardous",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
+      "default": "Contact Developer"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
               }
             }
           }
         },
-        "then": {
-          "properties": {
-            "userInfo": {
-              "properties": {
-                "developerName": {
-                  "type": "string",
-                  "title": "Developer Name"
-                },
-                "developerAffiliation": {
-                  "type": "string",
-                  "title": "Developer Affiliation"
-                }
-              }
-            }
-          },
-          "required": [
-            "userInfo.developerName",
-            "userInfo.developerAffiliation"
-          ]
-        }
-      },
-      {
-        "if": {
-          "properties": {
-            "itemAcquisition": {
-              "const": "Purchase from Vendor"
-            }
-          }
-        },
-        "then": {
-          "properties": {
-            "vendor": {
-              "type": "string",
-              "title": "Vendor Name"
-            },
-            "catalogNumber": {
-              "type": "string",
-              "title": "Catalog Number"
-            },
-            "catalogURL": {
-              "type": "string",
-              "title": "Link to vendor page"
-            }
+        "required": [
+          "userInfo.developerName",
+          "userInfo.developerAffiliation"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Purchase from Vendor"
           }
         }
       },
-      {
-        "if": {
-          "properties": {
-            "itemAcquisition": {
-              "const": "Other"
-            }
-          }
-        },
-        "then": {
-          "properties": {
-            "additionalDetails": {
-              "type": "string",
-              "title": "Please provide additional details."
-            }
+      "then": {
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "title": "Vendor Name"
           },
-          "required": [
-            "additionalDetails"
-          ]
+          "catalogNumber": {
+            "type": "string",
+            "title": "Catalog Number"
+          },
+          "catalogURL": {
+            "type": "string",
+            "title": "Link to vendor page"
+          }
         }
       }
-    ],
-    "required": [
-      "userInfo.first_name",
-      "userInfo.last_name",
-      "userInfo.email",
-      "userInfo.isDeveloper",
-      "animalModelName",
-      "description",
-      "backgroundStrain",
-      "animalModelDisease",
-      "animalModelManifestation"
-    ]
-  }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
+        },
+        "required": [
+          "additionalDetails"
+        ]
+      }
+    }
+  ],
+  "required": [
+    "userInfo.firstandlastName",
+    "userInfo.email",
+    "userInfo.isDeveloper",
+    "geneticReagentId",
+    "insertName",
+    "insertSize",
+    "insertSpecies"
+  ]
 }
