@@ -3,13 +3,46 @@
   "title": "Submit Animal Model",
   "type": "object",
   "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "first_name": {
+          "type": "string",
+          "title": "First Name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution (Optional)",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      }
+    },
     "animalModelName": {
       "type": "string",
       "title": "Name of Animal Model"
     },
     "synonyms": {
       "type": "string",
-      "title": "Synonyms (if applicable)"
+      "title": "Synonyms"
     },
     "description": {
       "type": "string",
@@ -17,69 +50,45 @@
     },
     "backgroundStrain": {
       "type": "string",
-      "title": "Background strain"
+      "title": "Background Strain"
     },
     "backgroundSubstrain": {
       "type": "string",
-      "title": "Background substrain"
+      "title": "Background Substrain"
     },
     "strainNomenclature": {
       "type": "string",
-      "title": "Strain nomenclature"
+      "title": "Strain Nomenclature"
     },
     "animalModelDisease": {
       "type": "string",
       "title": "Disease",
       "enum": [
-        "Neurofibromatosis type 1",
-        "Neurofibromatosis type 2",
-        "No known disease",
-        "Schwannomatosis"
+        "Neurofibromatosis Type 1",
+        "Neurofibromatosis Type 2-related schwannomatosis",
+        "Schwannomatosis",
+        "No known disease"
       ]
     },
     "animalModelManifestation": {
       "type": "string",
       "title": "Manifestation",
       "enum": [
-        "astrocytoma",
-        "high grade glioma",
-        "malignant peripheral nerve sheath tumor",
-        "optic nerve glioma",
-        "spinal development",
-        "plexiform neurofibroma",
-        "metabolic function",
-        "heart malformation",
-        "neural crest hyperplasia",
-        "cognition",
-        "growth",
-        "acute myeloid leukemia",
-        "no symptoms",
+        "No Symptoms",
+        "Acute Myeloid Leukemia",
+        "Astrocytoma",
+        "Cognition",
+        "Growth",
+        "Heart Malformation",
+        "High Grade Glioma",
+        "Malignant Peripheral Nerve Sheath Tumor",
+        "Metabolic Function",
+        "Neural Crest Hyperplasia",
+        "Optic Nerve Glioma",
+        "Plexiform Neurofibroma",
+        "Spinal Development",
         "Other"
       ]
-    },
-    "mutationTypes": {
-      "type": "array",
-      "title": "Applied Mutations",
-      "items": {
-        "type": "string",
-        "enum": [
-          "Disruption caused by insertion of vector",
-          "Duplication",
-          "Insertion",
-          "Insertion of gene trap vector",
-          "Intergenic deletion",
-          "Intragenic deletion",
-          "Inversion",
-          "Loss of heterozygosity (unspecified mechanism)",
-          "Nucleotide repeat expansion",
-          "Nucleotide substitutions",
-          "Single point mutation",
-          "Translocation",
-          "Transposon insertion",
-          "Viral insertion",
-          "Other"
-        ]
-      }
     },
     "alleleType": {
       "type": "string",
@@ -109,21 +118,51 @@
       "type": "object",
       "title": "Mutation Types",
       "properties": {
-        "Disruption caused by insertion of vector": { "type": "boolean" },
-        "Duplication": { "type": "boolean" },
-        "Insertion": { "type": "boolean" },
-        "Insertion of gene trap vector": { "type": "boolean" },
-        "Intergenic deletion": { "type": "boolean" },
-        "Intragenic deletion": { "type": "boolean" },
-        "Inversion": { "type": "boolean" },
-        "Loss of heterozygosity (unspecified mechanism)": { "type": "boolean" },
-        "Nucleotide repeat expansion": { "type": "boolean" },
-        "Nucleotide substitutions": { "type": "boolean" },
-        "Single point mutation": { "type": "boolean" },
-        "Translocation": { "type": "boolean" },
-        "Transposon insertion": { "type": "boolean" },
-        "Viral insertion": { "type": "boolean" },
-        "Other": { "type": "boolean" }
+        "Disruption caused by insertion of vector": {
+          "type": "boolean"
+        },
+        "Duplication": {
+          "type": "boolean"
+        },
+        "Insertion": {
+          "type": "boolean"
+        },
+        "Insertion of gene trap vector": {
+          "type": "boolean"
+        },
+        "Intergenic deletion": {
+          "type": "boolean"
+        },
+        "Intragenic deletion": {
+          "type": "boolean"
+        },
+        "Inversion": {
+          "type": "boolean"
+        },
+        "Loss of heterozygosity (unspecified mechanism)": {
+          "type": "boolean"
+        },
+        "Nucleotide repeat expansion": {
+          "type": "boolean"
+        },
+        "Nucleotide substitutions": {
+          "type": "boolean"
+        },
+        "Single point mutation": {
+          "type": "boolean"
+        },
+        "Translocation": {
+          "type": "boolean"
+        },
+        "Transposon insertion": {
+          "type": "boolean"
+        },
+        "Viral insertion": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
       }
     },
     "affectedGeneSymbol": {
@@ -138,47 +177,133 @@
       "type": "string",
       "title": "Sequence Variation"
     },
-    "investigatorName": {
-      "type": "string",
-      "title": "Developer Name"
-    },
-    "investigatorAffiliation": {
-      "type": "string",
-      "title": "Developer Affiliation"
-    },
     "publicationDOI": {
       "type": "string",
       "title": "Publication Link (DOI)"
     },
     "itemAcquisition": {
       "type": "string",
-      "title": "How to acquire",
       "enum": [
         "Contact the Principal Investigator",
         "It's able to be purchased online",
         "Other"
       ]
-    },
-    "vendor": {
-      "type": "string",
-      "title": "Please select a vendor you are aware has this item."
-    },
-    "catalogNumber": {
-      "type": "string",
-      "title": "What is the catalog number?"
-    },
-    "catalogURL": {
-      "type": "string",
-      "title": "What is the catalog URL?"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
+              }
+            }
+          }
+        },
+        "required": [
+          "userInfo.developerName",
+          "userInfo.developerAffiliation"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "It's able to be purchased online"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "title": "Please select a vendor you are aware has this item."
+          },
+          "catalogNumber": {
+            "type": "string",
+            "title": "What is the catalog number?"
+          },
+          "catalogURL": {
+            "type": "string",
+            "title": "What is the catalog URL?"
+          }
+        },
+        "required": [
+          "vendor",
+          "catalogNumber",
+          "catalogURL"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Contact the Principal Investigator"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contactInfo": {
+            "type": "string",
+            "title": "Please provide the contact information."
+          }
+        },
+        "required": [
+          "contactInfo"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
+        },
+        "required": [
+          "additionalDetails"
+        ]
+      }
+    }
+  ],
   "required": [
+    "userInfo.first_name",
+    "userInfo.last_name",
+    "userInfo.email",
+    "userInfo.isDeveloper",
     "animalModelName",
     "description",
     "backgroundStrain",
     "animalModelDisease",
-    "animalModelManifestation",
-    "investigatorName",
-    "investigatorAffiliation"
+    "animalModelManifestation"
   ]
 }
