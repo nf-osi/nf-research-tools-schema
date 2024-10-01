@@ -32,29 +32,35 @@
         }
       }
     },
-    "animalModelName": {
-      "type": "string",
-      "title": "Name of Animal Model"
-    },
-    "synonyms": {
-      "type": "string",
-      "title": "Synonyms"
-    },
-    "description": {
-      "type": "string",
-      "title": "Description (~20 words)"
-    },
-    "species": {
-      "type": "string",
-      "title": "Species",
-      "enum": [
-        "Mouse",
-        "Rat",
-        "Pig",
-        "Zebrafish",
-        "Fruit Fly",
-        "Other"
-      ]
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "animalModelName": {
+          "type": "string",
+          "title": "Name of Animal Model"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20 words)"
+        },
+        "species": {
+          "type": "string",
+          "title": "Species",
+          "enum": [
+            "Mouse",
+            "Rat",
+            "Pig",
+            "Zebrafish",
+            "Fruit Fly",
+            "Other"
+          ]
+        }
+      }
     },
     "backgroundStrain": {
       "type": "string",
@@ -243,58 +249,83 @@
     {
       "if": {
         "properties": {
-          "itemAcquisition": {
-            "const": "Purchase from Vendor"
+          "basicInfo": {
+            "properties": {
+              "species": {
+                "const": "Other"
+              }
+            }
           }
         }
       },
-      "then": {
-        "properties": {
-          "vendor": {
-            "type": "string",
-            "title": "Vendor Name"
-          },
-          "catalogNumber": {
-            "type": "string",
-            "title": "Catalog Number"
-          },
-          "catalogURL": {
-            "type": "string",
-            "title": "Link to vendor page"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Other"
+        "then": {
+          "properties": {
+            "basicInfo": {
+              "properties": {
+                "otherSpecies": {
+                  "type": "string",
+                  "title": "Other species name"
+                }
+              }
+            }
           }
         }
       },
-      "then": {
-        "properties": {
-          "additionalDetails": {
-            "type": "string",
-            "title": "Please provide additional details."
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Purchase from Vendor"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "vendor": {
+                "type": "string",
+                "title": "Vendor Name"
+              },
+              "catalogNumber": {
+                "type": "string",
+                "title": "Catalog Number"
+              },
+              "catalogURL": {
+                "type": "string",
+                "title": "Link to vendor page"
+              }
+            }
           }
         },
-        "required": [
-          "additionalDetails"
-        ]
-      }
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Other"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "additionalDetails": {
+                "type": "string",
+                "title": "Please provide additional details."
+              }
+            },
+            "required": [
+              "additionalDetails"
+            ]
+          }
+        }
+      ],
+      "required": [
+        "userInfo.first_name",
+        "userInfo.last_name",
+        "userInfo.email",
+        "userInfo.isDeveloper",
+        "animalModelName",
+        "description",
+        "backgroundStrain",
+        "animalModelDisease",
+        "animalModelManifestation"
+      ]
     }
-  ],
-  "required": [
-    "userInfo.first_name",
-    "userInfo.last_name",
-    "userInfo.email",
-    "userInfo.isDeveloper",
-    "animalModelName",
-    "description",
-    "backgroundStrain",
-    "animalModelDisease",
-    "animalModelManifestation"
-  ]
-}
