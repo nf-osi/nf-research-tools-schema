@@ -2,8 +2,9 @@
   "title": "Submission Form for NF Tools",
   "type": "object",
   "properties": {
-    "name": {
+    "userInfo": {
       "type": "object",
+      "title": "Your Information",
       "required": ["first_name", "last_name", "email"],
       "properties": {
         "first_name": {
@@ -21,28 +22,29 @@
         },
         "institution": {
           "type": "string",
-          "title": "Institution",
+          "title": "Institution (Optional)",
           "default": ""
         }
       }
     },
-    "submitObservation": {
+    "observationsSection": {
       "type": "object",
+      "title": "Submit Your Observations",
       "properties": {
         "observations": {
           "type": "array",
-          "title": "Add Observations",
+          "title": "Add Your Observations",
           "items": {
             "type": "object",
             "required": ["resourceName", "observationType", "details"],
             "properties": {
               "resourceName": {
                 "type": "string",
-                "title": "Name of Resource"
+                "title": "Name of the Resource"
               },
               "observationType": {
                 "type": "string",
-                "title": "Observation Type",
+                "title": "Type of Observation",
                 "enum": [
                   "Body Length",
                   "Body Weight",
@@ -72,11 +74,11 @@
               },
               "referencePublication": {
                 "type": "string",
-                "title": "Publication Reference"
+                "title": "Publication Reference (if available)"
               },
               "fileUpload": {
                 "type": "string",
-                "title": "Associated File"
+                "title": "Upload Related File (Optional)"
               }
             }
           }

@@ -1,0 +1,379 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Genetic Reagent",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      }
+    },
+    "insertName": {
+      "type": "string",
+      "title": "Insert Name"
+    },
+    "insertEntrezId": {
+      "type": "string",
+      "title": "Insert Entrez ID"
+    },
+    "gRNAshRNASequence": {
+      "type": "string",
+      "title": "gRNA shRNA Sequence of Gene Insert"
+    },
+    "insertSize": {
+      "type": "string",
+      "title": "Insert Size (bp)"
+    },
+    "insertSpecies": {
+      "type": "string",
+      "title": "Insert Species",
+      "enum": [
+        "Human",
+        "Mouse",
+        "Rat"
+      ]
+    },
+    "nTerminalTag": {
+      "type": "string",
+      "title": "N Terminal Tag"
+    },
+    "cTerminalTag": {
+      "type": "string",
+      "title": "C Terminal Tag"
+    },
+    "cloningMethod": {
+      "type": "string",
+      "title": "Cloning Method",
+      "enum": [
+        "Restriction Enzyme",
+        "TOPO Cloning",
+        "Gateway Cloning",
+        "Ligation Independent Cloning",
+        "Gibson Cloning",
+        "Unknown",
+        "Other"
+      ]
+    },
+    "5primeCloningSite": {
+      "type": "string",
+      "title": "5 Prime Cloning Site (if Restriction Enzyme Selected)"
+    },
+    "5primeSiteDestroyed": {
+      "type": "string",
+      "title": "5 Prime Site Destroyed",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "3primeCloningSite": {
+      "type": "string",
+      "title": "3 Prime Cloning Site (if Restriction Enzyme Selected)"
+    },
+    "3primeSiteDestroyed": {
+      "type": "string",
+      "title": "3 Prime Site Destroyed",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "promoter": {
+      "type": "string",
+      "title": "Promoter"
+    },
+    "5primer": {
+      "type": "string",
+      "description": "Primer to sequence the 5' end (N-terminal) of the insert",
+      "title": "5 Primer"
+    },
+    "3primer": {
+      "type": "string",
+      "description": "Primer to sequence the 3' end (C-terminal) of the insert",
+      "title": "3 Primer"
+    },
+    "vectorBackbone": {
+      "type": "string",
+      "title": "Vector Backbone"
+    },
+    "vectorType": {
+      "type": "string",
+      "title": "Vector Type",
+      "enum": [
+        "MammalianExpression",
+        "BacterialExpression",
+        "GatewayEntryClone",
+        "Lentiviral",
+        "Adenoviral",
+        "AAV",
+        "RNAi",
+        "Luciferase",
+        "Cre/Lox",
+        "YeastExpression",
+        "WormExpression",
+        "InsectExpression",
+        "PlantExpression",
+        "MouseTargeting",
+        "CRISPR",
+        "TALEN",
+        "SyntheticBiology",
+        "TransferVector",
+        "Unspecified",
+        "Other"
+      ]
+    },
+    "backboneSize": {
+      "type": "string",
+      "title": "Backbone Size"
+    },
+    "totalSize": {
+      "type": "string",
+      "title": "Total Size"
+    },
+    "bacterialResistance": {
+      "type": "object",
+      "title": "Bacterial Resistance",
+      "properties": {
+        "Ampicillin": {
+          "type": "boolean"
+        },
+        "Bleocin(Zeocin)": {
+          "type": "boolean"
+        },
+        "Chloramphenicol": {
+          "type": "boolean"
+        },
+        "Gentamycin": {
+          "type": "boolean"
+        },
+        "Hygromycin": {
+          "type": "boolean"
+        },
+        "Kanamycin": {
+          "type": "boolean"
+        },
+        "Nourseothricin(clonNat)": {
+          "type": "boolean"
+        },
+        "Spectinomycin": {
+          "type": "boolean"
+        },
+        "Streptomycin": {
+          "type": "boolean"
+        },
+        "Tetracycline": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
+      }
+    },
+    "selectableMarker": {
+      "type": "object",
+      "title": "Additional Selection Markers",
+      "properties": {
+        "Neomycin": {
+          "type": "boolean"
+        },
+        "Puromycin": {
+          "type": "boolean"
+        },
+        "Hygromycin": {
+          "type": "boolean"
+        },
+        "Zeocin": {
+          "type": "boolean"
+        },
+        "Blasticidin": {
+          "type": "boolean"
+        },
+        "Gentamicin": {
+          "type": "boolean"
+        },
+        "TRP1": {
+          "type": "boolean"
+        },
+        "LEU1": {
+          "type": "boolean"
+        },
+        "URA3": {
+          "type": "boolean"
+        },
+        "HIS3": {
+          "type": "boolean"
+        },
+        "Basta": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
+      }
+    },
+    "copyNumber": {
+      "type": "string",
+      "title": "Copy Number",
+      "enum": [
+        "High Copy",
+        "Low Copy",
+        "Unknown"
+      ]
+    },
+    "growthTemp": {
+      "type": "string",
+      "title": "Growth Temp",
+      "enum": [
+        "37 degrees Celsius",
+        "30 degrees Celsius",
+        "Room Temperature"
+      ]
+    },
+    "growthStrain": {
+      "type": "string",
+      "title": "Growth Strain",
+      "enum": [
+        "DH5alpha",
+        "DH10B",
+        "NEBStable",
+        "CcdbSurvival",
+        "Pir1",
+        "Other"
+      ]
+    },
+    "hazardous": {
+      "type": "string",
+      "title": "Hazardous",
+      "enum": [
+        "Yes",
+        "No",
+        "Unknown"
+      ]
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
+      "default": "Contact Developer"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
+              }
+            }
+          }
+        },
+        "required": [
+          "userInfo.developerName",
+          "userInfo.developerAffiliation"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Purchase from Vendor"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "title": "Vendor Name"
+          },
+          "catalogNumber": {
+            "type": "string",
+            "title": "Catalog Number"
+          },
+          "catalogURL": {
+            "type": "string",
+            "title": "Link to vendor page"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
+        },
+        "required": [
+          "additionalDetails"
+        ]
+      }
+    }
+  ],
+  "required": [
+    "userInfo.firstandlastName",
+    "userInfo.email",
+    "userInfo.isDeveloper",
+    "geneticReagentId",
+    "insertName",
+    "insertSize",
+    "insertSpecies"
+  ]
+}

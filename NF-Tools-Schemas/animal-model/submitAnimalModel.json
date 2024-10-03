@@ -1,0 +1,331 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Animal Model",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      }
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "animalModelName": {
+          "type": "string",
+          "title": "Name of Animal Model"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20 words)"
+        },
+        "species": {
+          "type": "string",
+          "title": "Species",
+          "enum": [
+            "Mouse",
+            "Rat",
+            "Pig",
+            "Zebrafish",
+            "Fruit Fly",
+            "Other"
+          ]
+        }
+      }
+    },
+    "backgroundStrain": {
+      "type": "string",
+      "title": "Background Strain",
+      "examples": [
+        "C57BL/6"
+      ]
+    },
+    "backgroundSubstrain": {
+      "type": "string",
+      "title": "Background Substrain",
+      "examples": [
+        "C57BL/6J"
+      ]
+    },
+    "strainNomenclature": {
+      "type": "string",
+      "title": "Strain Nomenclature"
+    },
+    "animalModelDisease": {
+      "type": "string",
+      "title": "Disease",
+      "enum": [
+        "Neurofibromatosis type 1",
+        "Neurofibromatosis type 2",
+        "No known disease",
+        "Schwannomatosis"
+      ]
+    },
+    "animalModelManifestation": {
+      "type": "string",
+      "title": "Manifestation",
+      "enum": [
+        "No Symptoms",
+        "Acute Myeloid Leukemia",
+        "Astrocytoma",
+        "Cognition",
+        "Growth",
+        "Heart Malformation",
+        "High Grade Glioma",
+        "Malignant Peripheral Nerve Sheath Tumor",
+        "Metabolic Function",
+        "Neural Crest Hyperplasia",
+        "Optic Nerve Glioma",
+        "Plexiform Neurofibroma",
+        "Spinal Development",
+        "Other"
+      ]
+    },
+    "alleleType": {
+      "type": "string",
+      "title": "Allele Type",
+      "enum": [
+        "Conditional ready",
+        "Constitutively active",
+        "Dominant negative",
+        "Humanized sequence",
+        "Hypomorph",
+        "Inducible",
+        "Inserted expressed sequence",
+        "Knockdown",
+        "Modified isoform(s)",
+        "No functional change",
+        "Null/knockout",
+        "RMCE-Ready",
+        "Recombinase",
+        "Reporter",
+        "Transactivator",
+        "Transposase",
+        "Transposon concatemer",
+        "Other"
+      ]
+    },
+    "affectedGeneSymbol": {
+      "type": "string",
+      "title": "Affected Gene Symbol"
+    },
+    "mutationTypes": {
+      "type": "object",
+      "title": "Mutation Types",
+      "properties": {
+        "Disruption caused by insertion of vector": {
+          "type": "boolean"
+        },
+        "Duplication": {
+          "type": "boolean"
+        },
+        "Insertion": {
+          "type": "boolean"
+        },
+        "Insertion of gene trap vector": {
+          "type": "boolean"
+        },
+        "Intergenic deletion": {
+          "type": "boolean"
+        },
+        "Intragenic deletion": {
+          "type": "boolean"
+        },
+        "Inversion": {
+          "type": "boolean"
+        },
+        "Loss of heterozygosity (unspecified mechanism)": {
+          "type": "boolean"
+        },
+        "Nucleotide repeat expansion": {
+          "type": "boolean"
+        },
+        "Nucleotide substitutions": {
+          "type": "boolean"
+        },
+        "Single point mutation": {
+          "type": "boolean"
+        },
+        "Translocation": {
+          "type": "boolean"
+        },
+        "Transposon insertion": {
+          "type": "boolean"
+        },
+        "Viral insertion": {
+          "type": "boolean"
+        },
+        "Other": {
+          "type": "boolean"
+        }
+      }
+    },
+    "proteinVariation": {
+      "type": "string",
+      "title": "Protein Variation"
+    },
+    "sequenceVariation": {
+      "type": "string",
+      "title": "Sequence Variation"
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "Publication Link (DOI)"
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
+      "default": "Contact Developer"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
+              }
+            }
+          }
+        },
+        "required": [
+          "userInfo.developerName",
+          "userInfo.developerAffiliation"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "species": {
+                "const": "Other"
+              }
+            }
+          }
+        }
+      },
+        "then": {
+          "properties": {
+            "basicInfo": {
+              "properties": {
+                "otherSpecies": {
+                  "type": "string",
+                  "title": "Other species name"
+                }
+              }
+            }
+          }
+        }
+      },
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Purchase from Vendor"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "vendor": {
+                "type": "string",
+                "title": "Vendor Name"
+              },
+              "catalogNumber": {
+                "type": "string",
+                "title": "Catalog Number"
+              },
+              "catalogURL": {
+                "type": "string",
+                "title": "Link to vendor page"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Other"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "additionalDetails": {
+                "type": "string",
+                "title": "Please provide additional details."
+              }
+            },
+            "required": [
+              "additionalDetails"
+            ]
+          }
+        }
+      ],
+      "required": [
+        "userInfo.first_name",
+        "userInfo.last_name",
+        "userInfo.email",
+        "userInfo.isDeveloper",
+        "animalModelName",
+        "description",
+        "backgroundStrain",
+        "animalModelDisease",
+        "animalModelManifestation"
+      ]
+    }
