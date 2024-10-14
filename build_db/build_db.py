@@ -1,10 +1,12 @@
 import os
 from schematic_db.schema.schema import Schema, SchemaConfig, DatabaseConfig
-from schematic_db.manifest_store.manifest_store import ManifestStore, ManifestStoreConfig
+from schematic_db.manifest_store.api_manifest_store import APIManifestStore
+from schematic_db.manifest_store.manifest_store import ManifestStoreConfig
 
-schema_link = "https://raw.githubusercontent.com/nf-osi/nf-research-tools-schema/main/nf-research-tools.jsonld"
+schema_link = "https://raw.githubusercontent.com/nf-osi/nf-research-tools-schema/update_schema/nf-research-tools.jsonld"
 #os.environ["API_URL"] = "http://127.0.0.1:3001/v1"
 storage_project_id = 'syn51710208'
+asset_view_id = 'syn51717771'
 
 schema_config= SchemaConfig(
         schema_url=schema_link
@@ -13,234 +15,230 @@ schema_config= SchemaConfig(
 db_config = [
     {
         "name": "Resource",
-        "primary_key": "Resource_id",
+        "primary_key": "resourceId",
         "foreign_keys": [
             {
-                "column_name": "Genetic Reagent_id",
-                "foreign_table_name": "Genetic Reagent",
-                "foreign_column_name": "Genetic Reagent_id"
+                "column_name": "geneticReagentId",
+                "foreign_table_name": "GeneticReagentDetails",
+                "foreign_column_name": "geneticReagentId"
             },
             {
-                "column_name": "Antibody_id",
-                "foreign_table_name": "Antibody",
-                "foreign_column_name": "Antibody_id"
+                "column_name": "antibodyId",
+                "foreign_table_name": "AntibodyDetails",
+                "foreign_column_name": "antibodyId"
             },
             {
-                "column_name": "Cell Line_id",
-                "foreign_table_name": "Cell Line",
-                "foreign_column_name": "Cell Line_id"
+                "column_name": "cellLineId",
+                "foreign_table_name": "CellLineDetails",
+                "foreign_column_name": "cellLineId"
             },
             {
-                "column_name": "Animal Model_id",
-                "foreign_table_name": "Animal Model",
-                "foreign_column_name": "Animal Model_id"
+                "column_name": "animalModelId",
+                "foreign_table_name": "AnimalModelDetails",
+                "foreign_column_name": "animalModelId"
             }
         ]
     },
     {
-        "name": "Genetic Reagent",
-        "primary_key": "Genetic Reagent_id"
+        "name": "GeneticReagentDetails",
+        "primary_key": "geneticReagentId"
     },
     {
-        "name": "Vendor Item",
-        "primary_key": "Vendor Item_id",
+        "name": "VendorItem",
+        "primary_key": "vendorItemId",
         "foreign_keys": [
             {
-                "column_name": "Vendor_id",
+                "column_name": "vendorId",
                 "foreign_table_name": "Vendor",
-                "foreign_column_name": "Vendor_id"
+                "foreign_column_name": "vendorId"
             },
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             }
         ]
     },
     {
         "name": "Vendor",
-        "primary_key": "Vendor_id",
+        "primary_key": "vendorId",
     },
     {
-        "name": "Biobank",
-        "primary_key": "Biobank_id",
+        "name": "BiobankDetails",
+        "primary_key": "biobankId",
         "foreign_keys": [
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             }
         ]
     },
     {
         "name": "Observation",
-        "primary_key": "Observation_id",
+        "primary_key": "observationId",
         "foreign_keys": [
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             },
             {
-                "column_name": "Publication_id",
+                "column_name": "publicationId",
                 "foreign_table_name": "Publication",
-                "foreign_column_name": "Publication_id"
+                "foreign_column_name": "publicationId"
             }
         ]
     },
     {
-        "name": "Resource Application",
-        "primary_key": "Resource Application_id",
+        "name": "ResourceApplication",
+        "primary_key": "resourceApplicationId",
         "foreign_keys": [
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             }
         ]
     },
     {
-        "name": "Antibody",
-        "primary_key": "Antibody_id",
+        "name": "AntibodyDetails",
+        "primary_key": "antibodyId",
     },
     {
         "name": "Donor",
-        "primary_key": "Donor_id"
+        "primary_key": "donorId"
     },
     {
-        "name": "Cell Line",
-        "primary_key": "Cell Line_id",
+        "name": "CellLineDetails",
+        "primary_key": "cellLineId",
         "foreign_keys": [
             {
-                "column_name": "Donor_id",
+                "column_name": "donorId",
                 "foreign_table_name": "Donor",
-                "foreign_column_name": "Donor_id",
+                "foreign_column_name": "donorId",
             }
         ]
     },
     {
-        "name": "Mutation Details",
-        "primary_key": "Mutation Details_id",
+        "name": "MutationDetails",
+        "primary_key": "mutationDetailsId",
     },
     {
         "name": "Mutation",
-        "primary_key": "Mutation_id",
+        "primary_key": "mutationId",
         "foreign_keys": [
             {
-                "column_name": "Mutation Details_id",
-                "foreign_table_name": "Mutation Details",
-                "foreign_column_name": "Mutation Details_id"
+                "column_name": "mutationDetailsId",
+                "foreign_table_name": "MutationDetails",
+                "foreign_column_name": "mutationDetailsId"
             },
             {
-                "column_name": "Animal Model_id",
-                "foreign_table_name": "Animal Model",
-                "foreign_column_name": "Animal Model_id"
+                "column_name": "animalModelId",
+                "foreign_table_name": "AnimalModelDetails",
+                "foreign_column_name": "animalModelId"
             },
             {
-                "column_name": "Cell Line_id",
-                "foreign_table_name": "Cell Line",
-                "foreign_column_name": "Cell Line_id"
+                "column_name": "cellLineId",
+                "foreign_table_name": "CellLineDetails",
+                "foreign_column_name": "cellLineId"
             }
         ]
     },
     {
-        "name": "Animal Model",
-        "primary_key": "Animal Model_id",
+        "name": "AnimalModelDetails",
+        "primary_key": "animalModelId",
         "foreign_keys": [
             {
-                "column_name": "Donor_id",
+                "column_name": "donorId",
                 "foreign_table_name": "Donor",
-                "foreign_column_name": "Donor_id"
+                "foreign_column_name": "donorId"
             },
             {
-                "column_name": "Transplantation Donor_id",
+                "column_name": "transplantationDonorId",
                 "foreign_table_name": "Donor",
-                "foreign_column_name": "Donor_id"
+                "foreign_column_name": "donorId"
             }
         ]
     },
     {
         "name": "Development",
-        "primary_key": "Development_id",
+        "primary_key": "developmentId",
         "foreign_keys": [
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             },
             {
-                "column_name": "Investigator_id",
+                "column_name": "investigatorId",
                 "foreign_table_name": "Investigator",
-                "foreign_column_name": "Investigator_id"
+                "foreign_column_name": "investigatorId"
             },
             {
-                "column_name": "Publication_id",
+                "column_name": "publicationId",
                 "foreign_table_name": "Publication",
-                "foreign_column_name": "Publication_id"
+                "foreign_column_name": "publicationId"
             },
             {
-                "column_name": "Funder_id",
+                "column_name": "funderId",
                 "foreign_table_name": "Funder",
-                "foreign_column_name": "Funder_id"
+                "foreign_column_name": "funderId"
             }
         ]
     },
     {
         "name": "Funder",
-        "primary_key": "Funder_id",
+        "primary_key": "funderId",
     },
     {
         "name": "Investigator",
-        "primary_key": "Investigator_id",
+        "primary_key": "investigatorId",
     },
     {
         "name": "Publication",
-        "primary_key": "Publication_id",
+        "primary_key": "publicationId",
     },
     {
         "name": "Usage",
-        "primary_key": "Usage_id",
+        "primary_key": "usageId",
         "foreign_keys": [
             {
-                "column_name": "Publication_id",
+                "column_name": "publicationId",
                 "foreign_table_name": "Publication",
-                "foreign_column_name": "Publication_id"
+                "foreign_column_name": "publicationId"
             },
             {
-                "column_name": "Resource_id",
+                "column_name": "resourceId",
                 "foreign_table_name": "Resource",
-                "foreign_column_name": "Resource_id"
+                "foreign_column_name": "resourceId"
             }
         ]
     }
 ]
-
 
 schema = Schema(
     schema_config,
     DatabaseConfig(db_config)
 )
 
+
 config = ManifestStoreConfig(
         schema_url = schema_link,
         synapse_project_id = storage_project_id,
-        synapse_asset_view_id = "syn51717771",
-        synapse_input_token = os.environ["NF_SERVICE_TOKEN"]
-        )
+        synapse_asset_view_id = asset_view_id,
+        synapse_auth_token = os.environ["NF_SERVICE_TOKEN"]
+    )
+manifest_store = APIManifestStore(config)
 
-manifest_store = ManifestStore(config)
 
 from schematic_db.rdb.synapse_database import SynapseDatabase
-from schematic_db.synapse.synapse import SynapseConfig
 
-config = SynapseConfig(
+database = SynapseDatabase(
         project_id=storage_project_id,
-        username="nf-osi-service",
         auth_token= os.environ["NF_SERVICE_TOKEN"]
     )
 
-
-database =  SynapseDatabase(config)
 
 from schematic_db.rdb_builder.rdb_builder import RDBBuilder
 
