@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Submit Antibody",
+  "title": "Submit Cell Line",
   "type": "object",
   "properties": {
     "userInfo": {
@@ -41,9 +41,9 @@
       "type": "object",
       "title": "",
       "properties": {
-        "antibodyName": {
+        "cellLineName": {
           "type": "string",
-          "title": "Name of Antibody"
+          "title": "Name of Cell Line"
         },
         "synonyms": {
           "type": "string",
@@ -53,110 +53,96 @@
           "type": "string",
           "title": "Description (~20 words)"
         },
-        "hostOrganism": {
+        "species": {
           "type": "string",
-          "title": "Host Organism",
+          "title": "Species",
           "enum": [
+            "Human",
             "Mouse",
-            "Rabit",
-            "Unknown"
+            "Dog",
+            "Chinese Hamster",
+            "E. Coli"
           ]
         },
-        "reactiveSpecies": {
-          "type": "object",
-          "title": "Reactive Species",
-          "properties": {
-            "Human": {
-              "type": "boolean"
-            },
-            "Mouse": {
-              "type": "boolean"
-            },
-            "Rat": {
-              "type": "boolean"
-            },
-            "Chicken": {
-              "type": "boolean"
-            },
-            "Rabbit": {
-              "type": "boolean"
-            },
-            "Pig": {
-              "type": "boolean"
-            },
-            "Dog": {
-              "type": "boolean"
-            },
-            "Zebrafish": {
-              "type": "boolean"
-            },
-            "Fish": {
-              "type": "boolean"
-            },
-            "Non-humanprimate": {
-              "type": "boolean"
-            },
-            "GuineaPig": {
-              "type": "boolean"
-            },
-            "Hamster": {
-              "type": "boolean"
-            },
-            "Cow": {
-              "type": "boolean"
-            },
-            "Monkey": {
-              "type": "boolean"
-            },
-            "Avian": {
-              "type": "boolean"
-            },
-            "Horse": {
-              "type": "boolean"
-            },
-            "Rodent": {
-              "type": "boolean"
-            },
-            "Drosophila": {
-              "type": "boolean"
-            },
-            "Unknown": {
-              "type": "boolean"
-            }
-          }
+        "sex": {
+          "type": "string",
+          "title": "Sex",
+          "enum": [
+            "Male",
+            "Female",
+            "Unkown"
+          ]
+        },
+        "race": {
+          "type": "string",
+          "title": "Race",
+          "enum": [
+            "American Indian or Alaska Native",
+            "Asian",
+            "Black or African American",
+            "Native Hawaiian or Other Pacific Islander",
+            "White",
+            "Hispanic or Latino",
+            "Middle Eastern or North African",
+            "Multiracial",
+            "Other",
+            "Not specified"
+          ]
+        },
+        "age": {
+          "type": "string",
+          "title": "Age"
         }
       },
       "required": [
-        "antibodyName",
+        "cellLineName",
         "description",
-        "hostOrganism",
-        "reactiveSpecies"
+        "species"
       ]
     },
-    "conjugated": {
+    "category": {
       "type": "string",
-      "title": "Conjugated",
+      "title": "Cell Line Category",
       "enum": [
-        "Yes",
-        "Non-conjugated"
+        "Cancer cell line",
+        "Embryonic stem cell",
+        "Finite cell line",
+        "Hybrid cell line",
+        "Hybridoma"
       ]
     },
-    "targetAntigen": {
+    "cellLineGeneticDisorder": {
       "type": "string",
-      "title": "Target Antigen"
-    },
-    "clonality": {
-      "type": "string",
-      "title": "Clonality",
+      "title": "Genetic Disorder",
       "enum": [
-        "Monoclonal",
-        "Polyclonal",
-        "Secondary",
-        "Recombinant",
-        "Control",
-        "Cocktail",
-        "Isotope Control",
-        "Unknown"
+        "Neurofibromatosis Type 1",
+        "Neurofibromatosis Type 2",
+        "Schwannamatosis",
+        "None"
+      ]
+    },
+    "tissue": {
+      "type": "string",
+      "title": "Tissue Type",
+      "enum": [
+        "Blood",
+        "Bone Marrow",
+        "Buccal Mucosa",
+        "Buffy Coat",
+        "Cerebral Cortex",
+        "Dorsal Root Ganglion",
+        "Embryonic Tissue",
+        "Meninges",
+        "Nerve Tissue",
+        "Optic Nerve",
+        "Plasma",
+        "Primary Tumor",
+        "Sciatic Nerve",
+        "Serum",
+        "Splenocyte",
+        "Unspecified",
+        "Urine",
+        "Whole Brain"
       ]
     },
     "publicationDOI": {
