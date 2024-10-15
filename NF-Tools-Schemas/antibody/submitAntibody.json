@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Antibody",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": ["firstandlastName", "email", "isDeveloper"]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "antibodyName": {
+          "type": "string",
+          "title": "Name of Antibody"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20 words)"
+        },
+        "reactiveSpecies": {
+          "type": "object",
+          "title": "Reactive Species",
+          "properties": {
+            "Human": {
+              "type": "boolean"
+            },
+            "Mouse": {
+              "type": "boolean"
+            },
+            "Rat": {
+              "type": "boolean"
+            },
+            "Chicken": {
+              "type": "boolean"
+            },
+            "Rabbit": {
+              "type": "boolean"
+            },
+            "Pig": {
+              "type": "boolean"
+            },
+            "Dog": {
+              "type": "boolean"
+            },
+            "Zebrafish": {
+              "type": "boolean"
+            },
+            "Fish": {
+              "type": "boolean"
+            },
+            "Non-humanprimate": {
+              "type": "boolean"
+            },
+            "GuineaPig": {
+              "type": "boolean"
+            },
+            "Hamster": {
+              "type": "boolean"
+            },
+            "Cow": {
+              "type": "boolean"
+            },
+            "Monkey": {
+              "type": "boolean"
+            },
+            "Avian": {
+              "type": "boolean"
+            },
+            "Horse": {
+              "type": "boolean"
+            },
+            "Rodent": {
+              "type": "boolean"
+            },
+            "Drosophila": {
+              "type": "boolean"
+            },
+            "Unknown": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "required": ["animalModelName", "description", "reactiveSpecies"]
+    },
+    "hostOrganism": {
+      "type": "string",
+      "title": "Host Organism",
+      "enum": [
+        "Mouse",
+        "Rabit",
+        "Unknown"
+      ]
+    },
+    "Conjugated": {
+      "type": "string",
+      "title": "Conjugated",
+      "enum": [
+        "Yes",
+        "Non-conjugated"
+      ]
+    },
+    "targetAntigen": {
+      "type": "string",
+      "title": "Target Antigen"
+    },
+    "clonality": {
+      "type": "object",
+      "title": "Clonality",
+      "properties": {
+        "Monoclonal": {
+          "type": "boolean"
+        },
+        "Polyclonal": {
+          "type": "boolean"
+        },
+        "Secondary": {
+          "type": "boolean"
+        },
+        "Recombinant": {
+          "type": "boolean"
+        },
+        "Control": {
+          "type": "boolean"
+        },
+        "Cocktail": {
+          "type": "boolean"
+        },
+        "Isotope Control": {
+          "type": "boolean"
+        },
+        "Unknown": {
+          "type": "boolean"
+        }
+      }
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "Publication Link (DOI)"
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
+      "default": "Contact Developer"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
+              }
+            }
+          }
+        },
+        "required": [
+          "userInfo.developerName",
+          "userInfo.developerAffiliation"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "species": {
+                "const": "Other"
+              }
+            }
+          }
+        }
+      },
+        "then": {
+          "properties": {
+            "basicInfo": {
+              "properties": {
+                "otherSpecies": {
+                  "type": "string",
+                  "title": "Other species name"
+                }
+              }
+            }
+          }
+        }
+      },
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Purchase from Vendor"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "vendor": {
+                "type": "string",
+                "title": "Vendor Name"
+              },
+              "catalogNumber": {
+                "type": "string",
+                "title": "Catalog Number"
+              },
+              "catalogURL": {
+                "type": "string",
+                "title": "Link to vendor page"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "itemAcquisition": {
+                "const": "Other"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "additionalDetails": {
+                "type": "string",
+                "title": "Please provide additional details."
+              }
+            },
+            "required": [
+              "additionalDetails"
+            ]
+          }
+        }
+      ]
+    }
