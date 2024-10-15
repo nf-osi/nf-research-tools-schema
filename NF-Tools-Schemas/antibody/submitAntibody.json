@@ -31,7 +31,11 @@
           "default": "Yes"
         }
       },
-      "required": ["firstandlastName", "email", "isDeveloper"]
+      "required": [
+        "firstandlastName",
+        "email",
+        "isDeveloper"
+      ]
     },
     "basicInfo": {
       "type": "object",
@@ -48,6 +52,15 @@
         "description": {
           "type": "string",
           "title": "Description (~20 words)"
+        },
+        "hostOrganism": {
+          "type": "string",
+          "title": "Host Organism",
+          "enum": [
+            "Mouse",
+            "Rabit",
+            "Unknown"
+          ]
         },
         "reactiveSpecies": {
           "type": "object",
@@ -113,18 +126,14 @@
           }
         }
       },
-      "required": ["animalModelName", "description", "reactiveSpecies"]
-    },
-    "hostOrganism": {
-      "type": "string",
-      "title": "Host Organism",
-      "enum": [
-        "Mouse",
-        "Rabit",
-        "Unknown"
+      "required": [
+        "animalModelName",
+        "description",
+        "hostOrganism",
+        "reactiveSpecies"
       ]
     },
-    "Conjugated": {
+    "conjugated": {
       "type": "string",
       "title": "Conjugated",
       "enum": [
@@ -227,63 +236,63 @@
           }
         }
       },
-        "then": {
-          "properties": {
-            "basicInfo": {
-              "properties": {
-                "otherSpecies": {
-                  "type": "string",
-                  "title": "Other species name"
-                }
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherSpecies": {
+                "type": "string",
+                "title": "Other species name"
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Purchase from Vendor"
           }
         }
       },
-        {
-          "if": {
-            "properties": {
-              "itemAcquisition": {
-                "const": "Purchase from Vendor"
-              }
-            }
+      "then": {
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "title": "Vendor Name"
           },
-          "then": {
-            "properties": {
-              "vendor": {
-                "type": "string",
-                "title": "Vendor Name"
-              },
-              "catalogNumber": {
-                "type": "string",
-                "title": "Catalog Number"
-              },
-              "catalogURL": {
-                "type": "string",
-                "title": "Link to vendor page"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "itemAcquisition": {
-                "const": "Other"
-              }
-            }
+          "catalogNumber": {
+            "type": "string",
+            "title": "Catalog Number"
           },
-          "then": {
-            "properties": {
-              "additionalDetails": {
-                "type": "string",
-                "title": "Please provide additional details."
-              }
-            },
-            "required": [
-              "additionalDetails"
-            ]
+          "catalogURL": {
+            "type": "string",
+            "title": "Link to vendor page"
           }
         }
-      ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
+        },
+        "required": [
+          "additionalDetails"
+        ]
+      }
     }
+  ]
+}
