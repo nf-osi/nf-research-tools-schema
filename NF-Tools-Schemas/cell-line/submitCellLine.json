@@ -1,0 +1,324 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Cell Line",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": [
+        "firstandlastName",
+        "email",
+        "isDeveloper"
+      ]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "cellLineName": {
+          "type": "string",
+          "title": "Name of Cell Line",
+          "minLength": 3,
+          "maxLength": 100,
+          "description": "Provide the official name of the cell line.",
+          "examples": [
+            "HEK293 NF1 -/- with R1306X mNf1 cDNA",
+            "SZ-NF4"
+          ],
+          "errorMessage": {
+            "minLength": "Cell line name should have at least 3 characters.",
+            "maxLength": "Cell line name should not exceed 100 characters."
+          }
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms",
+          "description": "Add one or more synonyms for the cell line."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20 words)",
+          "description": "Add a description in plain language of the cell line."
+        },
+        "species": {
+          "type": "string",
+          "title": "Species",
+          "enum": [
+            "Human",
+            "Mouse",
+            "Dog",
+            "Chinese Hamster",
+            "E. Coli"
+          ]
+        },
+        "sex": {
+          "type": "string",
+          "title": "Sex",
+          "enum": [
+            "Male",
+            "Female",
+            "Unknown"
+          ]
+        },
+        "race": {
+          "type": "string",
+          "title": "Race",
+          "enum": [
+            "American Indian or Alaska Native",
+            "Asian",
+            "Black or African American",
+            "Native Hawaiian or Other Pacific Islander",
+            "White",
+            "Hispanic or Latino",
+            "Middle Eastern or North African",
+            "Multiracial",
+            "Other",
+            "Not specified"
+          ]
+        },
+        "age": {
+          "type": "number",
+          "title": "Age (years)",
+          "minimum": 0,
+          "maximum": 120
+        }
+      },
+      "required": [
+        "cellLineName",
+        "description",
+        "species"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "title": "Cell Line Category",
+      "enum": [
+        "Cancer cell line",
+        "Embryonic stem cell",
+        "Finite cell line",
+        "Hybrid cell line",
+        "Hybridoma"
+      ]
+    },
+    "cellLineGeneticDisorder": {
+      "type": "string",
+      "title": "Genetic Disorder",
+      "enum": [
+        "Neurofibromatosis Type 1",
+        "Neurofibromatosis Type 2",
+        "Schwannamatosis",
+        "None"
+      ]
+    },
+    "cellLineManifestation": {
+      "type": "string",
+      "title": "Manifestation",
+      "enum": [
+        "Acute Lymphocytic Leukemia",
+        "Adult T Acute Lymphoblastic Leukemia",
+        "Amelanotic Cutaneous Melanoma",
+        "Askin Tumor",
+        "Astrocytoma",
+        "Atypical",
+        "BRCA2 Syndrome",
+        "BCR-ABL1 positive",
+        "Cafe-Au-Lait Spots",
+        "Canine Histiocytic Sarcoma",
+        "Canine Lymphoma",
+        "Canine Melanoma",
+        "Canine Soft Tissue Sarcoma",
+        "Cecum Adenocarcinoma",
+        "Cervical Adenocarcinoma",
+        "Chronic Myelogenous Leukemia",
+        "Clinically Affected",
+        "Clinically Asymptomatic (Self-reported)",
+        "Clinically Asymptomatic But At Risk",
+        "Colon Adenocarcinoma",
+        "Colon Carcinoma",
+        "Cutaneous Melanoma",
+        "Cutaneous Neurofibroma",
+        "Cystic Fibrosis",
+        "General NF1 Deficiency",
+        "Glioblastoma",
+        "Hereditary Breast and Ovarian Cancer Syndrome",
+        "Human Papillomavirus-Related Endocervical Adenocarcinoma",
+        "Invasive Breast Carcinoma",
+        "Lipoma",
+        "Lung Adenocarcinoma",
+        "Lung Adenosquamous Carcinoma",
+        "Lung Carcinoid Tumor",
+        "Lung Giant Cell Carcinoma",
+        "Lung Large Cell Carcinoma",
+        "Lung Non-Small Cell Carcinoma",
+        "Lung Papillary Adenocarcinoma",
+        "Lung Small Cell Carcinoma",
+        "Lung Squamous Cell Carcinoma",
+        "Malignant Peripheral Nerve Sheath Tumor",
+        "Melanoma",
+        "Minimally Invasive Lung Adenocarcinoma",
+        "Mouse Adrenal Gland Pheochromocytoma",
+        "Neuroblastoma",
+        "Neurofibroma",
+        "Noonan Syndrome",
+        "Ovarian Cystadenocarcinoma",
+        "Pancreatic Adenocarcinoma",
+        "Pancreatic Adenosquamous Carcinoma",
+        "Pancreatic Carcinoma",
+        "Pancreatic Ductal Adenocarcinoma",
+        "Pancreatic Somatostatinoma",
+        "Plexiform Neurofibroma",
+        "Pleural Malignant Mesothelioma",
+        "Poorly Differentiated Thyroid Gland Carcinoma",
+        "Rectal Adenocarcinoma",
+        "Schwannoma",
+        "Thyroid Gland Anaplastic Carcinoma",
+        "Thyroid Gland Follicular Carcinoma",
+        "Unaffected Nerve"
+      ]
+    },
+    "tissue": {
+      "type": "string",
+      "title": "Tissue Type",
+      "enum": [
+        "Blood",
+        "Bone Marrow",
+        "Buccal Mucosa",
+        "Buffy Coat",
+        "Cerebral Cortex",
+        "Dorsal Root Ganglion",
+        "Embryonic Tissue",
+        "Meninges",
+        "Nerve Tissue",
+        "Optic Nerve",
+        "Plasma",
+        "Primary Tumor",
+        "Sciatic Nerve",
+        "Serum",
+        "Splenocyte",
+        "Unspecified",
+        "Urine",
+        "Whole Brain"
+      ]
+    },
+    "populationDoublingTime": {
+      "type": "number",
+      "title": "Population Doubling Time (in hours)"
+    },
+    "publicationDOI": {
+      "type": "string",
+      "title": "Publication Link (DOI)"
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
+      "default": "Contact Developer"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "isDeveloper": {
+                "const": "No"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "userInfo": {
+            "properties": {
+              "developerName": {
+                "type": "string",
+                "title": "Developer Name"
+              },
+              "developerAffiliation": {
+                "type": "string",
+                "title": "Developer Affiliation"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Purchase from Vendor"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "vendor": {
+            "type": "string",
+            "title": "Vendor Name"
+          },
+          "catalogNumber": {
+            "type": "string",
+            "title": "Catalog Number"
+          },
+          "catalogURL": {
+            "type": "string",
+            "title": "Link to vendor page"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
+        },
+        "required": [
+          "additionalDetails"
+        ]
+      }
+    }
+  ]
+}
