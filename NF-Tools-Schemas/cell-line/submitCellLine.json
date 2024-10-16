@@ -43,15 +43,32 @@
       "properties": {
         "cellLineName": {
           "type": "string",
-          "title": "Name of Cell Line"
+          "title": "Name of Cell Line",
+          "minLength": 3,
+          "maxLength": 100,
+          "description": "Provide the official name of the cell line.",
+          "examples": [
+            "HEK293 NF1 -/- with R1306X mNf1 cDNA",
+            "SZ-NF4"
+          ],
+          "errorMessage": {
+            "minLength": "Cell line name should have at least 3 characters.",
+            "maxLength": "Cell line name should not exceed 100 characters."
+          }
         },
         "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
+          "type": "array",
+          "title": "Synonyms",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "Add one or more synonyms for the cell line."
         },
         "description": {
           "type": "string",
-          "title": "Description (~20 words)"
+          "title": "Description (~20 words)",
+          "description": "Add a description in plain language of the cell line."
         },
         "species": {
           "type": "string",
@@ -90,8 +107,8 @@
           ]
         },
         "age": {
-          "type": "string",
-          "title": "Age"
+          "type": "number",
+          "title": "Age (years)"
         }
       },
       "required": [
