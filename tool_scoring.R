@@ -18,23 +18,23 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
   total_score <- 0
   tool_type <- resource_data$resourceType
 
-  # Availability (40 points)
+  # Availability (30 points)
   availability_score <- 0
   availability_missing <- c()
 
   if (!is.na(tool_type) && tool_type == "Biobank") {
-    # For biobanks: biobankURL (40 points)
+    # For biobanks: biobankURL (30 points)
     if (!is.null(resource_data$biobankURL) && !is.na(resource_data$biobankURL) &&
         resource_data$biobankURL != "" && resource_data$biobankURL != "NULL") {
-      availability_score <- 40
+      availability_score <- 30
     } else {
       availability_missing <- c(availability_missing, "biobankURL")
     }
     score_breakdown$biobank_url <- availability_score
   } else {
-    # For other resource types: vendor/developer (20), RRID (10), DOI (10)
+    # For other resource types: vendor/developer (15), RRID (7.5), DOI (7.5)
 
-    # Vendor/developer: 20 points
+    # Vendor/developer: 15 points
     vendor_developer_score <- 0
     # Check if acquisition contact is available
     has_acquisition_info <- (!is.null(resource_data$howToAcquire) &&
@@ -44,29 +44,29 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
                                     "If you do, let us know at nf-osi@sagebionetworks.org!"))
 
     if (has_acquisition_info) {
-      vendor_developer_score <- 20
+      vendor_developer_score <- 15
     } else {
       availability_missing <- c(availability_missing, "howToAcquire")
     }
     score_breakdown$vendor_developer <- vendor_developer_score
     availability_score <- availability_score + vendor_developer_score
 
-    # RRID: 10 points
+    # RRID: 7.5 points
     rrid_score <- 0
     if (!is.null(resource_data$rrid) && !is.na(resource_data$rrid) &&
         resource_data$rrid != "" && resource_data$rrid != "NULL") {
-      rrid_score <- 10
+      rrid_score <- 7.5
     } else {
       availability_missing <- c(availability_missing, "rrid")
     }
     score_breakdown$rrid <- rrid_score
     availability_score <- availability_score + rrid_score
 
-    # DOI: 10 points
+    # DOI: 7.5 points
     doi_score <- 0
     if (nrow(pub_data)>0 && !is.null(pub_data$publicationId) && !is.na(pub_data$publicationId) &&
         pub_data$publicationId != "" && pub_data$publicationId != "NULL") {
-      doi_score <- 10
+      doi_score <- 7.5
     } else {
       availability_missing <- c(availability_missing, "publicationId")
     }
@@ -119,7 +119,7 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
   score_breakdown$critical_info <- round(critical_info_score, 1)
   total_score <- total_score + critical_info_score
 
-  # Other info (20 points distributed evenly)
+  # Other info (15 points distributed evenly)
   other_info_score <- 0
   other_info_missing <- c()
 
@@ -143,7 +143,7 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
       fields <- c()
     }
 
-    # Count how many other info fields are filled (evenly distributed to 20 points)
+    # Count how many other info fields are filled (evenly distributed to 15 points)
     if (length(fields) > 0) {
       for (field in fields) {
         is_filled <- !is.null(resource_data[[field]]) && !is.na(resource_data[[field]]) &&
@@ -153,7 +153,7 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
         }
       }
       filled_count <- length(fields) - length(other_info_missing)
-      other_info_score <- (filled_count / length(fields)) * 20
+      other_info_score <- (filled_count / length(fields)) * 15
     }
   }
 
@@ -161,8 +161,8 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
   score_breakdown$other_info <- round(other_info_score, 1)
   total_score <- total_score + other_info_score
 
-  # Observations (10 points max)
-  # With DOI: 3 points each, No DOI: 1 point each
+  # Observations (25 points max)
+  # With DOI: 7.5 points each, No DOI: 2.5 points each
   observation_score <- 0
   observation_status <- ""
   obs_with_doi <- 0
@@ -175,16 +175,16 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
       has_doi <- !is.null(obs$doi) && !is.na(obs$doi) && obs$doi != "" && obs$doi != "NULL"
 
       if (has_doi) {
-        observation_score <- observation_score + 3
+        observation_score <- observation_score + 7.5
         obs_with_doi <- obs_with_doi + 1
       } else {
-        observation_score <- observation_score + 1
+        observation_score <- observation_score + 2.5
         obs_without_doi <- obs_without_doi + 1
       }
 
-      # Cap at 10 points
-      if (observation_score >= 10) {
-        observation_score <- 10
+      # Cap at 25 points
+      if (observation_score >= 25) {
+        observation_score <- 25
         break
       }
     }
