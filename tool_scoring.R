@@ -11,20 +11,24 @@ count_filled <- function(x) {
 }
 
 # Function to calculate completeness score for a tool
-calculate_tool_score <- function(resource_data, observations_data) {
+calculate_tool_score <- function(resource_data, observations_data, pub_data) {
 
   score_breakdown <- list()
+  missing_fields <- list()
   total_score <- 0
   tool_type <- resource_data$resourceType
 
   # Availability (40 points)
   availability_score <- 0
+  availability_missing <- c()
 
-  if (!is.na(tool_type) && tool_type == "biobank") {
+  if (!is.na(tool_type) && tool_type == "Biobank") {
     # For biobanks: biobankURL (40 points)
     if (!is.null(resource_data$biobankURL) && !is.na(resource_data$biobankURL) &&
         resource_data$biobankURL != "" && resource_data$biobankURL != "NULL") {
       availability_score <- 40
+    } else {
+      availability_missing <- c(availability_missing, "biobankURL")
     }
     score_breakdown$biobank_url <- availability_score
   } else {
@@ -32,15 +36,17 @@ calculate_tool_score <- function(resource_data, observations_data) {
 
     # Vendor/developer: 20 points
     vendor_developer_score <- 0
-    # Check if isDeveloper and institution is filled, or vendor info is filled, or developer info is filled
-    has_developer_info <- (!is.null(resource_data$isDeveloper) && !is.na(resource_data$isDeveloper) &&
-                           !is.null(resource_data$institution) && !is.na(resource_data$institution) &&
-                           resource_data$institution != "" && resource_data$institution != "NULL")
-    has_vendor_info <- (!is.null(resource_data$vendorName) && !is.na(resource_data$vendorName) &&
-                        resource_data$vendorName != "" && resource_data$vendorName != "NULL")
+    # Check if acquisition contact is available
+    has_acquisition_info <- (!is.null(resource_data$howToAcquire) &&
+                               !is.na(resource_data$howToAcquire) &&
+                           resource_data$howToAcquire !=
+                             paste0("We don't know of a reliable source for this tool.",
+                                    "If you do, let us know at nf-osi@sagebionetworks.org!"))
 
-    if (has_developer_info || has_vendor_info) {
+    if (has_acquisition_info) {
       vendor_developer_score <- 20
+    } else {
+      availability_missing <- c(availability_missing, "howToAcquire")
     }
     score_breakdown$vendor_developer <- vendor_developer_score
     availability_score <- availability_score + vendor_developer_score
@@ -50,100 +56,118 @@ calculate_tool_score <- function(resource_data, observations_data) {
     if (!is.null(resource_data$rrid) && !is.na(resource_data$rrid) &&
         resource_data$rrid != "" && resource_data$rrid != "NULL") {
       rrid_score <- 10
+    } else {
+      availability_missing <- c(availability_missing, "rrid")
     }
     score_breakdown$rrid <- rrid_score
     availability_score <- availability_score + rrid_score
 
     # DOI: 10 points
     doi_score <- 0
-    if (!is.null(resource_data$doi) && !is.na(resource_data$doi) &&
-        resource_data$doi != "" && resource_data$doi != "NULL") {
+    if (nrow(pub_data)>0 && !is.null(pub_data$publicationId) && !is.na(pub_data$publicationId) &&
+        pub_data$publicationId != "" && pub_data$publicationId != "NULL") {
       doi_score <- 10
+    } else {
+      availability_missing <- c(availability_missing, "publicationId")
     }
     score_breakdown$doi <- doi_score
     availability_score <- availability_score + doi_score
   }
 
+  missing_fields$availability <- paste(availability_missing, collapse="; ")
   total_score <- total_score + availability_score
 
   # Critical info (30 points distributed evenly)
   critical_info_score <- 0
+  critical_info_missing <- c()
 
   if (!is.na(tool_type)) {
-    if (tool_type == "animal model") {
-      # 5 fields: backgroundStrain, backgroundSubstrain, animalModelManifestation, alleleType, affectedGeneSymbol
-      fields <- c("backgroundStrain", "backgroundSubstrain", "animalModelManifestation", "alleleType", "affectedGeneSymbol")
-    } else if (tool_type == "cell line") {
-      # 7 fields: sex, race, age, category, cellLineManifestation, tissue, cellLineGeneticDisorder
-      fields <- c("sex", "race", "age", "category", "cellLineManifestation", "tissue", "cellLineGeneticDisorder")
-    } else if (tool_type == "antibody") {
-      # 2 fields: targetAntigen, basicInfo.reactiveSpecies (may need to check reactiveSpecies)
-      fields <- c("targetAntigen", "reactiveSpecies")
-    } else if (tool_type == "genetic reagent") {
-      # 5 fields: EntrezId, growthTemp, growthStrain, hazardous, bacterialResistance
-      fields <- c("EntrezId", "growthTemp", "growthStrain", "hazardous", "bacterialResistance")
-    } else if (tool_type == "biobank") {
-      # No critical info fields specified for biobank in criteria
-      fields <- c()
+    if (tool_type == "Animal Model") {
+      # 4 fields with high completion: animalModelGeneticDisorder, backgroundStrain, animalState, description
+      fields <- c("animalModelGeneticDisorder", "backgroundStrain", "animalState", "description")
+    } else if (tool_type == "Cell Line") {
+      # 4 fields with high completion: cellLineCategory, cellLineGeneticDisorder, cellLineManifestation, synonyms
+      fields <- c("cellLineCategory", "cellLineGeneticDisorder", "cellLineManifestation", "synonyms")
+    } else if (tool_type == "Antibody") {
+      # 5 fields with high completion: targetAntigen, reactiveSpecies, hostOrganism, clonality, conjugate
+      fields <- c("targetAntigen", "reactiveSpecies", "hostOrganism", "clonality", "conjugate")
+    } else if (tool_type == "Genetic Reagent") {
+      # 5 fields with high completion: insertName, insertSpecies, vectorType, insertEntrezId, vectorBackbone
+      fields <- c("insertName", "insertSpecies", "vectorType", "insertEntrezId", "vectorBackbone")
+    } else if (tool_type == "Biobank") {
+      # 5 fields with high completion: specimenTissueType, diseaseType, tumorType, specimenFormat, specimenType
+      fields <- c("specimenTissueType", "diseaseType", "tumorType", "specimenFormat", "specimenType")
     } else {
       fields <- c()
     }
 
     # Count how many critical info fields are filled (evenly distributed to 30 points)
     if (length(fields) > 0) {
-      filled_count <- sum(sapply(fields, function(field) {
-        !is.null(resource_data[[field]]) && !is.na(resource_data[[field]]) &&
+      for (field in fields) {
+        is_filled <- !is.null(resource_data[[field]]) && !is.na(resource_data[[field]]) &&
           resource_data[[field]] != "" && resource_data[[field]] != "NULL"
-      }))
+        if (!is_filled) {
+          critical_info_missing <- c(critical_info_missing, field)
+        }
+      }
+      filled_count <- length(fields) - length(critical_info_missing)
       critical_info_score <- (filled_count / length(fields)) * 30
     }
   }
 
+  missing_fields$critical_info <- paste(critical_info_missing, collapse="; ")
   score_breakdown$critical_info <- round(critical_info_score, 1)
   total_score <- total_score + critical_info_score
 
   # Other info (20 points distributed evenly)
   other_info_score <- 0
+  other_info_missing <- c()
 
   if (!is.na(tool_type)) {
-    if (tool_type == "animal model") {
-      # 5 fields: synonyms, strainNomenclature, mutationTypes, proteinVariation, sequenceVariation
-      fields <- c("synonyms", "strainNomenclature", "mutationTypes", "proteinVariation", "sequenceVariation")
-    } else if (tool_type == "cell line") {
-      # 2 fields: synonyms, populationDoublingTime
-      fields <- c("synonyms", "populationDoublingTime")
-    } else if (tool_type == "antibody") {
-      # 3 fields: synonyms, conjugated, clonality
-      fields <- c("synonyms", "conjugated", "clonality")
-    } else if (tool_type == "genetic reagent") {
-      # 18 fields
-      fields <- c("gRNAshRNAsequence", "insertSize", "nTerminalTag", "cTerminalTag", "cloningMethod",
-                  "5primeCloningSite", "5primeSiteDestroyed", "3primeCloningSite", "3primeSiteDestroyed",
-                  "promoter", "5primer", "3primer", "vectorBackbone", "vectorType", "backboneSize",
-                  "totalSize", "copyNumber", "selectableMarker")
-    } else if (tool_type == "biobank") {
-      # No other info fields specified for biobank in criteria
-      fields <- c()
+    if (tool_type == "Animal Model") {
+      # 3 fields with medium completion: backgroundSubstrain, synonyms, animalModelOfManifestation
+      fields <- c("backgroundSubstrain", "synonyms", "animalModelOfManifestation")
+    } else if (tool_type == "Cell Line") {
+      # 1 field with medium completion: tissue
+      fields <- c("tissue")
+    } else if (tool_type == "Antibody") {
+      # 1 field with medium completion: cloneId
+      fields <- c("cloneId")
+    } else if (tool_type == "Genetic Reagent") {
+      # 2 fields with medium completion: synonyms, promoter
+      fields <- c("synonyms", "promoter")
+    } else if (tool_type == "Biobank") {
+      # 1 field with medium completion: specimenPreparationMethod
+      fields <- c("specimenPreparationMethod")
     } else {
       fields <- c()
     }
 
     # Count how many other info fields are filled (evenly distributed to 20 points)
     if (length(fields) > 0) {
-      filled_count <- sum(sapply(fields, function(field) {
-        !is.null(resource_data[[field]]) && !is.na(resource_data[[field]]) &&
+      for (field in fields) {
+        is_filled <- !is.null(resource_data[[field]]) && !is.na(resource_data[[field]]) &&
           resource_data[[field]] != "" && resource_data[[field]] != "NULL"
-      }))
+        if (!is_filled) {
+          other_info_missing <- c(other_info_missing, field)
+        }
+      }
+      filled_count <- length(fields) - length(other_info_missing)
       other_info_score <- (filled_count / length(fields)) * 20
     }
   }
 
+  missing_fields$other_info <- paste(other_info_missing, collapse="; ")
   score_breakdown$other_info <- round(other_info_score, 1)
   total_score <- total_score + other_info_score
 
   # Observations (10 points max)
   # With DOI: 3 points each, No DOI: 1 point each
   observation_score <- 0
+  observation_status <- ""
+  obs_with_doi <- 0
+  obs_without_doi <- 0
+
   if (!is.null(observations_data) && nrow(observations_data) > 0) {
     for (i in 1:nrow(observations_data)) {
       obs <- observations_data[i, ]
@@ -152,8 +176,10 @@ calculate_tool_score <- function(resource_data, observations_data) {
 
       if (has_doi) {
         observation_score <- observation_score + 3
+        obs_with_doi <- obs_with_doi + 1
       } else {
         observation_score <- observation_score + 1
+        obs_without_doi <- obs_without_doi + 1
       }
 
       # Cap at 10 points
@@ -162,32 +188,97 @@ calculate_tool_score <- function(resource_data, observations_data) {
         break
       }
     }
+    observation_status <- sprintf("%d with DOI, %d without DOI", obs_with_doi, obs_without_doi)
+  } else {
+    observation_status <- "No observations"
   }
+
+  missing_fields$observations <- observation_status
   score_breakdown$observations <- observation_score
   total_score <- total_score + observation_score
 
   return(list(
     total_score = round(total_score, 1),
-    breakdown = score_breakdown
+    breakdown = score_breakdown,
+    missing_fields = missing_fields
   ))
 }
 
 # Main scoring function
 score_all_tools <- function() {
-  
-  # Read the comprehensive materialized view
-  cat("Reading Resource data from Synapse...\n")
+
+  # Read base Resource table
+  cat("Reading base Resource data from Synapse...\n")
   resource_query <- synTableQuery(
-    "SELECT * FROM syn51730943"
+    "SELECT * FROM syn26450069"
   )
   resource_df <- as.data.frame(resource_query)
-  
+
+  # Read type-specific tables
+  cat("Reading Animal Model data...\n")
+  animal_model_query <- synTableQuery("SELECT * FROM syn26486808")
+  animal_model_df <- as.data.frame(animal_model_query)
+
+  cat("Reading Antibody data...\n")
+  antibody_query <- synTableQuery("SELECT * FROM syn26486811")
+  antibody_df <- as.data.frame(antibody_query)
+
+  cat("Reading Biobank data...\n")
+  biobank_query <- synTableQuery("SELECT * FROM syn26486821")
+  biobank_df <- as.data.frame(biobank_query)
+
+  cat("Reading Cell Line data...\n")
+  cell_line_query <- synTableQuery("SELECT * FROM syn26486823")
+  cell_line_df <- as.data.frame(cell_line_query)
+
+  cat("Reading Genetic Reagent data...\n")
+  genetic_reagent_query <- synTableQuery("SELECT * FROM syn26486832")
+  genetic_reagent_df <- as.data.frame(genetic_reagent_query)
+
+  # Join base resource data with type-specific data
+  cat("Joining resource data with type-specific tables...\n")
+
+  # Create full dataset by joining based on resourceType
+  resource_df <- resource_df %>%
+    left_join(
+      animal_model_df %>% filter(!is.na(animalModelId)),
+      by = "animalModelId",
+      suffix = c("", ".animal")
+    ) %>%
+    left_join(
+      antibody_df %>% filter(!is.na(antibodyId)),
+      by = "antibodyId",
+      suffix = c("", ".antibody")
+    ) %>%
+    left_join(
+      biobank_df %>% filter(!is.na(biobankId)),
+      by = "biobankId",
+      suffix = c("", ".biobank")
+    ) %>%
+    left_join(
+      cell_line_df %>% filter(!is.na(cellLineId)),
+      by = "cellLineId",
+      suffix = c("", ".cellline")
+    ) %>%
+    left_join(
+      genetic_reagent_df %>% filter(!is.na(geneticReagentId)),
+      by = "geneticReagentId",
+      suffix = c("", ".genetic")
+    )
+
   # Read observations data
   cat("Reading Observation data from Synapse...\n")
   obs_query <- synTableQuery(
     "SELECT * FROM syn26486836"
   )
   obs_df <- as.data.frame(obs_query)
+
+  # Read publications data
+  cat("Reading Publication data from Synapse...\n")
+  pub_query <- synTableQuery(
+    "SELECT resourceId, publicationId FROM syn26486807"
+  )
+  pub_df <- as.data.frame(pub_query)
   
   # Initialize results dataframe
   results <- data.frame()
@@ -197,12 +288,16 @@ score_all_tools <- function() {
   for (i in 1:nrow(resource_df)) {
     resource <- resource_df[i, ]
     
-    # Get observations for this resource/donor
+    # Get observations for this resource
     resource_obs <- obs_df %>%
-      filter(donorId == resource$donorId)
+      filter(resourceId == resource$resourceId)
+    
+    # Get observations for this resource
+    resource_pub <- pub_df %>%
+      filter(resourceId == resource$resourceId)
     
     # Calculate score
-    score_result <- calculate_tool_score(resource, resource_obs)
+    score_result <- calculate_tool_score(resource, resource_obs, resource_pub)
 
     # Create result row
     result_row <- data.frame(
@@ -218,6 +313,10 @@ score_all_tools <- function() {
       critical_info_score = score_result$breakdown$critical_info,
       other_info_score = score_result$breakdown$other_info,
       observation_score = score_result$breakdown$observations,
+      missing_availability = score_result$missing_fields$availability,
+      missing_critical_info = score_result$missing_fields$critical_info,
+      missing_other_info = score_result$missing_fields$other_info,
+      observation_status = score_result$missing_fields$observations,
       stringsAsFactors = FALSE
     )
     
@@ -298,7 +397,7 @@ cat("  - tool_completeness_summary.csv\n")
 cat("\nStoring results as Synapse table...\n")
 
 # Define table schema
-table_schema <- TableSchema(
+table_schema <- Schema(
   name = "ToolCompletenessScores",
   parent = "syn26338068",
   columns = list(
@@ -314,6 +413,10 @@ table_schema <- TableSchema(
     Column(name = "critical_info_score", columnType = "DOUBLE"),
     Column(name = "other_info_score", columnType = "DOUBLE"),
     Column(name = "observation_score", columnType = "DOUBLE"),
+    Column(name = "missing_availability", columnType = "STRING", maximumSize = 500),
+    Column(name = "missing_critical_info", columnType = "STRING", maximumSize = 500),
+    Column(name = "missing_other_info", columnType = "STRING", maximumSize = 500),
+    Column(name = "observation_status", columnType = "STRING", maximumSize = 200),
     Column(name = "completeness_category", columnType = "STRING", maximumSize = 50)
   )
 )
@@ -328,7 +431,7 @@ cat("  View at: https://www.synapse.org/Synapse:", table_result$tableId, "\n")
 # Also store summary statistics as a separate table
 cat("\nStoring summary statistics as Synapse table...\n")
 
-summary_schema <- TableSchema(
+summary_schema <- Schema(
   name = "ToolCompletenessSummary",
   parent = "syn26338068",
   columns = list(

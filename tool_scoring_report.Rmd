@@ -26,6 +26,7 @@ library(knitr)
 library(DT)
 library(scales)
 library(RColorBrewer)
+library(stringr)
 ```
 
 ## Executive Summary
@@ -43,29 +44,10 @@ This report provides a comprehensive analysis of the completeness scores for res
 
 ## Data Loading
 
-```{r load-data}
+```{r load-data, echo=FALSE}
 # Source the scoring script to get the functions
-source("tool_scoring.R")
-
-# Check if scores already exist as CSV
-if (file.exists("tool_completeness_scores.csv")) {
-  cat("Loading existing scores from CSV...\n")
-  all_scores <- read.csv("tool_completeness_scores.csv", stringsAsFactors = FALSE)
-  summary_by_type <- read.csv("tool_completeness_summary.csv", stringsAsFactors = FALSE)
-} else {
-  cat("Running scoring analysis...\n")
-  # Login to Synapse if needed
-  synLogin()
-
-  # Run the scoring
-  all_scores <- score_all_tools()
-  summary_by_type <- summarize_scores(all_scores)
-
-  # Save results
-  write.csv(all_scores, "tool_completeness_scores.csv", row.names = FALSE)
-  write.csv(summary_by_type, "tool_completeness_summary.csv", row.names = FALSE)
-}
-
+all_scores <- as.data.frame(synTableQuery("SELECT * FROM syn71218777"))
+summary_by_type <- as.data.frame(synTableQuery("SELECT * FROM syn71219401"))
 cat(sprintf("\nAnalyzed %d resources across %d resource types\n",
             nrow(all_scores),
             length(unique(all_scores$resourceType))))
@@ -75,8 +57,8 @@ cat(sprintf("\nAnalyzed %d resources across %d resource types\n",
 
 ## Overall Score Distribution
 
-```{r overall-distribution, fig.height=6}
-# Overall histogram
+```{r overall-distribution, fig.height=6, include=FALSE}
+# Overall histogram (hidden in HTML output)
 ggplot(all_scores, aes(x = total_score)) +
   geom_histogram(binwidth = 5, fill = "#3498db", color = "white", alpha = 0.8) +
   geom_vline(aes(xintercept = mean(total_score, na.rm = TRUE)),
@@ -184,6 +166,26 @@ ggplot(category_counts, aes(x = completeness_category, y = count, fill = complet
   ylim(0, max(category_counts$count) * 1.15)
 ```
 
+```{r category-pie-overall, fig.height=6}
+# Overall pie chart of completeness categories
+ggplot(category_counts, aes(x = "", y = count, fill = completeness_category)) +
+  geom_bar(stat = "identity", width = 1, color = "white", size = 1.5) +
+  coord_polar("y", start = 0) +
+  scale_fill_manual(values = c("Excellent" = "#27ae60", "Good" = "#2ecc71",
+                               "Fair" = "#f39c12", "Poor" = "#e67e22",
+                               "Minimal" = "#e74c3c")) +
+  geom_text(aes(label = sprintf("%d\n(%.1f%%)", count, percentage)),
+            position = position_stack(vjust = 0.5),
+            size = 5, fontface = "bold", color = "white") +
+  labs(title = "Overall Distribution of Completeness Categories",
+       subtitle = sprintf("Total: %d resources", sum(category_counts$count)),
+       fill = "Category") +
+  theme_void(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "right")
+```
+
 ```{r category-by-type}
 # Stacked bar chart by resource type
 category_by_type <- all_scores %>%
@@ -201,6 +203,210 @@ ggplot(category_by_type, aes(x = resourceType, y = count, fill = completeness_ca
        x = "Resource Type",
        y = "Number of Resources",
        fill = "Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r category-pie-by-type, fig.height=10, fig.width=12}
+# Pie charts by resource type
+category_by_type_pct <- all_scores %>%
+  group_by(resourceType, completeness_category) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  group_by(resourceType) %>%
+  mutate(
+    total_resources = sum(count),
+    percentage = count / sum(count) * 100,
+    completeness_category = factor(completeness_category,
+                                   levels = c("Excellent", "Good", "Fair", "Poor", "Minimal")),
+    resourceType_label = sprintf("%s (n=%d)", resourceType, total_resources)
+  ) %>%
+  ungroup()
+
+ggplot(category_by_type_pct, aes(x = "", y = percentage, fill = completeness_category)) +
+  geom_bar(stat = "identity", width = 1, color = "white", size = 1) +
+  coord_polar(theta = "y", start = 0) +
+  scale_fill_manual(values = c("Excellent" = "#27ae60", "Good" = "#2ecc71",
+                               "Fair" = "#f39c12", "Poor" = "#e67e22",
+                               "Minimal" = "#e74c3c")) +
+  geom_text(aes(label = ifelse(percentage >= 5, sprintf("%.0f%%", percentage), "")),
+            position = position_stack(vjust = 0.5),
+            size = 3.5, fontface = "bold", color = "white") +
+  facet_wrap(~resourceType_label, ncol = 3) +
+  labs(title = "Completeness Category Distribution by Resource Type",
+       fill = "Category") +
+  theme_void(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        legend.position = "bottom",
+        strip.text = element_text(size = 12, face = "bold"))
+```
+
+---
+
+## Missing Fields Analysis
+
+```{r missing-fields-prep}
+# Prepare missing fields data
+missing_data <- all_scores %>%
+  select(resourceType, missing_availability, missing_critical_info,
+         missing_other_info, observation_status) %>%
+  mutate(
+    n_missing_availability = ifelse(is.na(missing_availability) | missing_availability == "",
+                                     0,
+                                     str_count(missing_availability, ";") + 1),
+    n_missing_critical = ifelse(is.na(missing_critical_info) | missing_critical_info == "",
+                                0,
+                                str_count(missing_critical_info, ";") + 1),
+    n_missing_other = ifelse(is.na(missing_other_info) | missing_other_info == "",
+                            0,
+                            str_count(missing_other_info, ";") + 1),
+    has_observations = !grepl("No observations", observation_status, fixed = TRUE)
+  )
+```
+
+```{r missing-fields-summary, fig.height=6}
+# Summary of missing fields by category
+missing_summary <- missing_data %>%
+  group_by(resourceType) %>%
+  summarize(
+    avg_missing_availability = mean(n_missing_availability, na.rm = TRUE),
+    avg_missing_critical = mean(n_missing_critical, na.rm = TRUE),
+    avg_missing_other = mean(n_missing_other, na.rm = TRUE),
+    pct_no_observations = sum(!has_observations) / n() * 100,
+    .groups = "drop"
+  ) %>%
+  pivot_longer(cols = starts_with("avg_missing"),
+               names_to = "category",
+               values_to = "avg_missing") %>%
+  mutate(category = case_when(
+    category == "avg_missing_availability" ~ "Availability",
+    category == "avg_missing_critical" ~ "Critical Info",
+    category == "avg_missing_other" ~ "Other Info"
+  ))
+
+ggplot(missing_summary, aes(x = resourceType, y = avg_missing, fill = category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Availability" = "#e74c3c",
+                               "Critical Info" = "#f39c12",
+                               "Other Info" = "#3498db")) +
+  labs(title = "Average Number of Missing Fields by Category",
+       subtitle = "By resource type",
+       x = "Resource Type",
+       y = "Average Number of Missing Fields",
+       fill = "Field Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r most-common-missing, fig.height=8}
+# Find most common missing fields
+all_missing_fields <- c()
+all_missing_types <- c()
+all_missing_categories <- c()
+
+for (i in 1:nrow(all_scores)) {
+  # Availability
+  if (!is.na(all_scores$missing_availability[i]) && all_scores$missing_availability[i] != "") {
+    fields <- strsplit(all_scores$missing_availability[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Availability", length(fields)))
+  }
+
+  # Critical Info
+  if (!is.na(all_scores$missing_critical_info[i]) && all_scores$missing_critical_info[i] != "") {
+    fields <- strsplit(all_scores$missing_critical_info[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Critical Info", length(fields)))
+  }
+
+  # Other Info
+  if (!is.na(all_scores$missing_other_info[i]) && all_scores$missing_other_info[i] != "") {
+    fields <- strsplit(all_scores$missing_other_info[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Other Info", length(fields)))
+  }
+}
+
+missing_field_counts <- data.frame(
+  field = all_missing_fields,
+  resource_type = all_missing_types,
+  category = all_missing_categories,
+  stringsAsFactors = FALSE
+) %>%
+  group_by(field, category) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(desc(count)) %>%
+  head(20)
+
+ggplot(missing_field_counts, aes(x = reorder(field, count), y = count, fill = category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Availability" = "#e74c3c",
+                               "Critical Info" = "#f39c12",
+                               "Other Info" = "#3498db")) +
+  labs(title = "Top 20 Most Commonly Missing Fields",
+       subtitle = "Across all resource types",
+       x = "Field Name",
+       y = "Number of Resources Missing This Field",
+       fill = "Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(size = 10)) +
+  coord_flip()
+
+missing_field_counts_detailed <- data.frame(
+  field = all_missing_fields,
+  resource_type = all_missing_types,
+  category = all_missing_categories,
+  stringsAsFactors = FALSE
+) %>%
+  group_by(field, category, resource_type) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(desc(count)) %>%
+  head(20)
+
+ggplot(missing_field_counts_detailed, aes(x = reorder(field, count), y = count, fill = category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Availability" = "#e74c3c",
+                               "Critical Info" = "#f39c12",
+                               "Other Info" = "#3498db")) +
+  labs(title = "Top 20 Most Commonly Missing Fields",
+       x = "Field Name",
+       y = "Number of Resources Missing This Field",
+       fill = "Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(size = 10)) + facet_grid(.~resource_type) +
+  coord_flip()
+```
+
+```{r observation-status, fig.height=6}
+# Observation status distribution
+obs_status_summary <- missing_data %>%
+  group_by(resourceType) %>%
+  summarize(
+    has_observations = sum(has_observations),
+    no_observations = sum(!has_observations),
+    .groups = "drop"
+  ) %>%
+  pivot_longer(cols = c(has_observations, no_observations),
+               names_to = "status",
+               values_to = "count") %>%
+  mutate(status = ifelse(status == "has_observations",
+                         "Has Observations",
+                         "No Observations"))
+
+ggplot(obs_status_summary, aes(x = resourceType, y = count, fill = status)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Has Observations" = "#27ae60",
+                               "No Observations" = "#e74c3c")) +
+  labs(title = "Observation Status by Resource Type",
+       x = "Resource Type",
+       y = "Number of Resources",
+       fill = "Status") +
   theme_minimal(base_size = 14) +
   theme(plot.title = element_text(face = "bold", size = 16),
         axis.text.x = element_text(angle = 45, hjust = 1))
