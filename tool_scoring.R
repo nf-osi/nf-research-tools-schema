@@ -385,74 +385,131 @@ incomplete_tools <- all_scores %>%
 
 print(head(incomplete_tools, 20))
 
-# Save results to CSV
-write.csv(all_scores, "tool_completeness_scores.csv", row.names = FALSE)
-write.csv(summary_by_type, "tool_completeness_summary.csv", row.names = FALSE)
-
-cat("\n✓ Results saved to:\n")
-cat("  - tool_completeness_scores.csv\n")
-cat("  - tool_completeness_summary.csv\n")
+# Helper function to find existing table by name
+find_existing_table <- function(parent_id, table_name) {
+  tryCatch({
+    children <- as.list(synGetChildren(parent_id))
+    for (child in children) {
+      if (child$name == table_name && child$type == "org.sagebionetworks.repo.model.table.TableEntity") {
+        return(child$id)
+      }
+    }
+    return(NULL)
+  }, error = function(e) {
+    return(NULL)
+  })
+}
 
 # Store results as a Synapse table
 cat("\nStoring results as Synapse table...\n")
 
-# Define table schema
-table_schema <- Schema(
-  name = "ToolCompletenessScores",
-  parent = "syn26338068",
-  columns = list(
-    Column(name = "resourceId", columnType = "STRING", maximumSize = 50),
-    Column(name = "resourceName", columnType = "STRING", maximumSize = 255),
-    Column(name = "resourceType", columnType = "STRING", maximumSize = 50),
-    Column(name = "rrid", columnType = "STRING", maximumSize = 100),
-    Column(name = "total_score", columnType = "DOUBLE"),
-    Column(name = "biobank_url_score", columnType = "DOUBLE"),
-    Column(name = "vendor_developer_score", columnType = "DOUBLE"),
-    Column(name = "rrid_score", columnType = "DOUBLE"),
-    Column(name = "doi_score", columnType = "DOUBLE"),
-    Column(name = "critical_info_score", columnType = "DOUBLE"),
-    Column(name = "other_info_score", columnType = "DOUBLE"),
-    Column(name = "observation_score", columnType = "DOUBLE"),
-    Column(name = "missing_availability", columnType = "STRING", maximumSize = 500),
-    Column(name = "missing_critical_info", columnType = "STRING", maximumSize = 500),
-    Column(name = "missing_other_info", columnType = "STRING", maximumSize = 500),
-    Column(name = "observation_status", columnType = "STRING", maximumSize = 200),
-    Column(name = "completeness_category", columnType = "STRING", maximumSize = 50)
+# Check if the table already exists
+existing_scores_table_id <- find_existing_table("syn26338068", "ToolCompletenessScores")
+
+if (!is.null(existing_scores_table_id)) {
+  cat("Found existing table:", existing_scores_table_id, "\n")
+  cat("Updating table with new data (this will create a new version)...\n")
+
+  # Delete existing rows from the table
+  current_data <- synTableQuery(paste0("SELECT * FROM ", existing_scores_table_id))
+  synDelete(current_data)
+
+  # Store new data to the existing table (creates a new version)
+  table_object <- Table(existing_scores_table_id, all_scores)
+  table_object$headers <- colnames(all_scores)
+  synStore(table_object)
+  synCreateSnapshotVersion(existing_scores_table_id)
+
+  cat("\n✓ Completeness scores updated in Synapse table:", existing_scores_table_id, "\n")
+  cat("  View at: https://www.synapse.org/#!Synapse:", existing_scores_table_id, "\n")
+} else {
+  cat("Creating new table...\n")
+
+  # Define table schema
+  table_schema <- Schema(
+    name = "ToolCompletenessScores",
+    parent = "syn26338068",
+    columns = list(
+      Column(name = "resourceId", columnType = "STRING", maximumSize = 50),
+      Column(name = "resourceName", columnType = "STRING", maximumSize = 255),
+      Column(name = "resourceType", columnType = "STRING", maximumSize = 50),
+      Column(name = "rrid", columnType = "STRING", maximumSize = 100),
+      Column(name = "total_score", columnType = "DOUBLE"),
+      Column(name = "biobank_url_score", columnType = "DOUBLE"),
+      Column(name = "vendor_developer_score", columnType = "DOUBLE"),
+      Column(name = "rrid_score", columnType = "DOUBLE"),
+      Column(name = "doi_score", columnType = "DOUBLE"),
+      Column(name = "critical_info_score", columnType = "DOUBLE"),
+      Column(name = "other_info_score", columnType = "DOUBLE"),
+      Column(name = "observation_score", columnType = "DOUBLE"),
+      Column(name = "missing_availability", columnType = "STRING", maximumSize = 500),
+      Column(name = "missing_critical_info", columnType = "STRING", maximumSize = 500),
+      Column(name = "missing_other_info", columnType = "STRING", maximumSize = 500),
+      Column(name = "observation_status", columnType = "STRING", maximumSize = 200),
+      Column(name = "completeness_category", columnType = "STRING", maximumSize = 50)
+    )
   )
-)
 
-# Create and store the table
-table_object <- Table(table_schema, all_scores)
-table_result <- synStore(table_object)
+  # Create and store the table
+  table_object <- Table(table_schema, all_scores)
+  table_object$headers <- colnames(all_scores)
+  table_result <- synStore(table_object)
+  synCreateSnapshotVersion(table_result$tableId)
 
-cat("\n✓ Completeness scores stored as Synapse table:", table_result$tableId, "\n")
-cat("  View at: https://www.synapse.org/Synapse:", table_result$tableId, "\n")
+  cat("\n✓ Completeness scores stored as new Synapse table:", table_result$tableId, "\n")
+  cat("  View at: https://www.synapse.org/#!Synapse:", table_result$tableId, "\n")
+}
 
 # Also store summary statistics as a separate table
 cat("\nStoring summary statistics as Synapse table...\n")
 
-summary_schema <- Schema(
-  name = "ToolCompletenessSummary",
-  parent = "syn26338068",
-  columns = list(
-    Column(name = "resourceType", columnType = "STRING", maximumSize = 50),
-    Column(name = "count", columnType = "INTEGER"),
-    Column(name = "mean_score", columnType = "DOUBLE"),
-    Column(name = "median_score", columnType = "DOUBLE"),
-    Column(name = "min_score", columnType = "DOUBLE"),
-    Column(name = "max_score", columnType = "DOUBLE"),
-    Column(name = "sd_score", columnType = "DOUBLE"),
-    Column(name = "excellent", columnType = "INTEGER"),
-    Column(name = "good", columnType = "INTEGER"),
-    Column(name = "fair", columnType = "INTEGER"),
-    Column(name = "poor", columnType = "INTEGER"),
-    Column(name = "minimal", columnType = "INTEGER")
+# Check if the summary table already exists
+existing_summary_table_id <- find_existing_table("syn26338068", "ToolCompletenessSummary")
+
+if (!is.null(existing_summary_table_id)) {
+  cat("Found existing summary table:", existing_summary_table_id, "\n")
+  cat("Updating summary table with new data (this will create a new version)...\n")
+
+  # Delete existing rows from the table
+  current_summary <- synTableQuery(paste0("SELECT * FROM ", existing_summary_table_id))
+  synDelete(current_summary)
+
+  # Store new data to the existing table (creates a new version)
+  summary_table_object <- Table(existing_summary_table_id, summary_by_type)
+  summary_table_object$headers <- colnames(summary_by_type)
+  synStore(summary_table_object)
+  synCreateSnapshotVersion(existing_summary_table_id)
+
+  cat("✓ Summary statistics updated in Synapse table:", existing_summary_table_id, "\n")
+  cat("  View at: https://www.synapse.org/#!Synapse:", existing_summary_table_id, "\n")
+} else {
+  cat("Creating new summary table...\n")
+
+  summary_schema <- Schema(
+    name = "ToolCompletenessSummary",
+    parent = "syn26338068",
+    columns = list(
+      Column(name = "resourceType", columnType = "STRING", maximumSize = 50),
+      Column(name = "count", columnType = "INTEGER"),
+      Column(name = "mean_score", columnType = "DOUBLE"),
+      Column(name = "median_score", columnType = "DOUBLE"),
+      Column(name = "min_score", columnType = "DOUBLE"),
+      Column(name = "max_score", columnType = "DOUBLE"),
+      Column(name = "sd_score", columnType = "DOUBLE"),
+      Column(name = "excellent", columnType = "INTEGER"),
+      Column(name = "good", columnType = "INTEGER"),
+      Column(name = "fair", columnType = "INTEGER"),
+      Column(name = "poor", columnType = "INTEGER"),
+      Column(name = "minimal", columnType = "INTEGER")
+    )
   )
-)
 
-# Create and store the summary table
-summary_table_object <- Table(summary_schema, summary_by_type)
-summary_table_result <- synStore(summary_table_object)
+  # Create and store the summary table
+  summary_table_object <- Table(summary_schema, summary_by_type)
+  summary_table_object$headers <- colnames(summary_by_type)
+  summary_table_result <- synStore(summary_table_object)
+  synCreateSnapshotVersion(summary_table_result$tableId)
 
-cat("✓ Summary statistics stored as Synapse table:", summary_table_result$tableId, "\n")
-cat("  View at: https://www.synapse.org/Synapse:", summary_table_result$tableId, "\n")
+  cat("✓ Summary statistics stored as new Synapse table:", summary_table_result$tableId, "\n")
+  cat("  View at: https://www.synapse.org/#!Synapse:", summary_table_result$tableId, "\n")
+}
