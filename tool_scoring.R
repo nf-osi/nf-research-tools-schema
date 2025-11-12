@@ -75,6 +75,7 @@ calculate_tool_score <- function(resource_data, observations_data, pub_data) {
   }
 
   missing_fields$availability <- paste(availability_missing, collapse="; ")
+  score_breakdown$availability <- round(availability_score, 1)
   total_score <- total_score + availability_score
 
   # Critical info (30 points distributed evenly)
@@ -306,6 +307,7 @@ score_all_tools <- function() {
       resourceType = resource$resourceType,
       rrid = resource$rrid,
       total_score = score_result$total_score,
+      availability_score = ifelse(is.null(score_result$breakdown$availability), NA, score_result$breakdown$availability),
       biobank_url_score = ifelse(is.null(score_result$breakdown$biobank_url), NA, score_result$breakdown$biobank_url),
       vendor_developer_score = ifelse(is.null(score_result$breakdown$vendor_developer), NA, score_result$breakdown$vendor_developer),
       rrid_score = ifelse(is.null(score_result$breakdown$rrid), NA, score_result$breakdown$rrid),
