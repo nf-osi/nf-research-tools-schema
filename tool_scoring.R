@@ -325,7 +325,7 @@ score_all_tools <- function() {
     results <- rbind(results, result_row)
   }
   
-  # Add completeness category
+  # Add completeness categories
   results <- results %>%
     mutate(
       completeness_category = case_when(
@@ -334,6 +334,26 @@ score_all_tools <- function() {
         total_score >= 40 ~ "Fair",
         total_score >= 20 ~ "Poor",
         TRUE ~ "Minimal"
+      ),
+      availability_category = case_when(
+        availability_score == 30 ~ "All",
+        availability_score > 0 ~ "Some",
+        TRUE ~ "No"
+      ),
+      critical_info_category = case_when(
+        critical_info_score == 30 ~ "All",
+        critical_info_score > 0 ~ "Some",
+        TRUE ~ "No"
+      ),
+      other_info_category = case_when(
+        other_info_score == 15 ~ "All",
+        other_info_score > 0 ~ "Some",
+        TRUE ~ "No"
+      ),
+      observation_category = case_when(
+        observation_score == 25 ~ "All",
+        observation_score > 0 ~ "Some",
+        TRUE ~ "No"
       )
     )
   
@@ -362,6 +382,7 @@ summarize_scores <- function(scores_df) {
   return(summary_stats)
 }
 
+#### score tools ####
 # Run the analysis
 cat("Starting tool completeness scoring...\n")
 all_scores <- score_all_tools()
@@ -387,6 +408,7 @@ incomplete_tools <- all_scores %>%
 
 print(head(incomplete_tools, 20))
 
+#### update Synapse tables ####
 # Helper function to find existing table by name
 find_existing_table <- function(parent_id, table_name) {
   tryCatch({
@@ -437,6 +459,7 @@ if (!is.null(existing_scores_table_id)) {
       Column(name = "resourceType", columnType = "STRING", maximumSize = 50),
       Column(name = "rrid", columnType = "STRING", maximumSize = 100),
       Column(name = "total_score", columnType = "DOUBLE"),
+      Column(name = "availability_score", columnType = "DOUBLE"),
       Column(name = "biobank_url_score", columnType = "DOUBLE"),
       Column(name = "vendor_developer_score", columnType = "DOUBLE"),
       Column(name = "rrid_score", columnType = "DOUBLE"),
@@ -448,7 +471,11 @@ if (!is.null(existing_scores_table_id)) {
       Column(name = "missing_critical_info", columnType = "STRING", maximumSize = 500),
       Column(name = "missing_other_info", columnType = "STRING", maximumSize = 500),
       Column(name = "observation_status", columnType = "STRING", maximumSize = 200),
-      Column(name = "completeness_category", columnType = "STRING", maximumSize = 50)
+      Column(name = "completeness_category", columnType = "STRING", maximumSize = 50),
+      Column(name = "availability_category", columnType = "STRING", maximumSize = 4),
+      Column(name = "critical_info_category", columnType = "STRING", maximumSize = 4),
+      Column(name = "other_info_category", columnType = "STRING", maximumSize = 4),
+      Column(name = "observation_category", columnType = "STRING", maximumSize = 4)
     )
   )
 
@@ -460,6 +487,7 @@ if (!is.null(existing_scores_table_id)) {
 
   cat("\n✓ Completeness scores stored as new Synapse table:", table_result$tableId, "\n")
   cat("  View at: https://www.synapse.org/#!Synapse:", table_result$tableId, "\n")
+  existing_scores_table_id <- table_result$tableId
 }
 
 # Also store summary statistics as a separate table
@@ -514,4 +542,135 @@ if (!is.null(existing_summary_table_id)) {
 
   cat("✓ Summary statistics stored as new Synapse table:", summary_table_result$tableId, "\n")
   cat("  View at: https://www.synapse.org/#!Synapse:", summary_table_result$tableId, "\n")
+}
+
+# Update materialized view with completeness scores
+cat("\nUpdating materialized view syn51730943 with completeness scores...\n")
+
+# Get the scores table ID (either existing or just created)
+scores_table_id <- if (!is.null(existing_scores_table_id)) {
+  existing_scores_table_id
+} else {
+  "syn71218777"  # Default to the known scores table ID
+}
+
+cat("Using scores table:", scores_table_id, "\n")
+
+#### update Synapse materialized view ####
+# Function to update materialized view with completeness scores
+update_materialized_view <- function(view_id, scores_table_id) {
+  tryCatch({
+    # Get the current materialized view
+    cat("Fetching materialized view:", view_id, "\n")
+    mv <- synGet(view_id)
+
+    # Get the current defining SQL
+    current_sql <- mv$properties$definingSQL
+    cat("Current defining SQL:\n", current_sql, "\n\n")
+
+    # Create new SQL that includes the completeness scores
+    # This will add a LEFT JOIN to include the scores columns
+    new_sql <- paste0(
+      "SELECT 
+    R.resourceId AS resourceId, 
+    R.rrid AS rrid, 
+    R.resourceName AS resourceName, 
+    R.synonyms AS synonyms, 
+    R.description AS description, 
+    
+    R.resourceType AS resourceType, 
+    
+    D_I.investigatorName AS investigatorName, 
+    D_I.institution AS institution, 
+    D_I.orcid AS orcid, 
+    
+    R.usageRequirements AS usageRequirements, 
+    R.howToAcquire as howToAcquire, 
+    
+    AM_CL_R_DON.species AS species, 
+    
+    CL.cellLineCategory AS cellLineCategory, 
+    CL.cellLineGeneticDisorder AS cellLineGeneticDisorder, 
+    CL.cellLineManifestation AS cellLineManifestation, 
+    AM.backgroundStrain AS backgroundStrain, 
+    AM.backgroundSubstrain AS backgroundSubstrain, 
+    AM.animalModelGeneticDisorder AS animalModelGeneticDisorder, 
+    AM.animalModelOfManifestation AS animalModelOfManifestation, 
+    GR.insertName AS insertName, 
+    GR.insertSpecies AS insertSpecies, 
+    GR.vectorType AS vectorType, 
+    AB.targetAntigen AS targetAntigen, 
+    AB.reactiveSpecies AS reactiveSpecies, 
+    AB.hostOrganism AS hostOrganism, 
+    BB.biobankName AS biobankName, 
+    BB.biobankURL AS biobankURL, 
+    BB.specimenTissueType AS specimenTissueType, 
+    BB.specimenPreparationMethod AS specimenPreparationMethod, 
+    BB.diseaseType AS diseaseType, 
+    BB.tumorType AS tumorType, 
+    BB.specimenFormat AS specimenFormat, 
+    BB.specimenType AS specimenType, 
+    BB.contact AS contact, 
+    D_F.funderName AS funderName, 
+    AM_CL_R_DON.race AS race, 
+    AM_CL_R_DON.sex AS sex, 
+    AM_CL_R_DON.age AS age, 
+    R.dateAdded AS dateAdded,
+    R.dateModified AS dateModified,
+    L_P.latestPublicationDate AS latestPublicationDate,
+    S.completeness_category AS completenessCategory,
+    S.availability_category AS availabilityCategory,
+    S.critical_info_category AS criticalInfoCategory,
+    S.other_info_category AS otherInfoCategory,
+    S.observation_category AS observationCategory
+FROM 
+    syn26450069 R  
+LEFT JOIN 
+    syn26486823 CL ON (R.cellLineId = CL.cellLineId) 
+LEFT JOIN 
+    syn26486808 AM ON (R.animalModelId = AM.animalModelId) 
+LEFT JOIN 
+    syn26486832 GR ON (R.geneticReagentId = GR.geneticReagentId) 
+LEFT JOIN 
+    syn26486811 AB ON (R.antibodyId = AB.antibodyId) 
+LEFT JOIN 
+    syn26486821 BB ON (R.resourceId = BB.resourceId)  
+LEFT JOIN 
+    syn51734029 D_I ON (R.resourceId = D_I.resourceId) 
+LEFT JOIN 
+    syn51734076 D_F ON (R.resourceId = D_F.resourceId) 
+LEFT JOIN 
+    syn51735419 AM_CL_R_DON ON (R.resourceId = AM_CL_R_DON.resourceId)
+LEFT JOIN
+    syn62139114 L_P ON (R.resourceId = L_P.resourceId)
+LEFT JOIN
+      ", scores_table_id," S ON (R.resourceId = S.resourceId)"
+    )
+    
+    cat("New defining SQL:\n", new_sql, "\n\n")
+
+    # Update the materialized view with new SQL
+    mv$properties$definingSQL <- new_sql
+    updated_mv <- synStore(mv)
+
+    cat("✓ Materialized view updated successfully!\n")
+    cat("  View at: https://www.synapse.org/#!Synapse:", view_id, "\n")
+
+    return(TRUE)
+  }, error = function(e) {
+    cat("✗ Error updating materialized view:", conditionMessage(e), "\n")
+    cat("  You may need to update the materialized view manually.\n")
+    cat("  The scores are available in table:", scores_table_id, "\n")
+    return(FALSE)
+  })
+}
+
+# Attempt to update the materialized view
+update_success <- update_materialized_view("syn51730943", existing_scores_table_id)
+
+if (update_success) {
+  cat("\n✓ All tasks completed successfully!\n")
+} else {
+  cat("\n⚠ Materialized view update failed. Please update manually.\n")
+  cat("  Need to join", existing_scores_table_id, "with syn51730943 on resourceId column.\n")
 }
