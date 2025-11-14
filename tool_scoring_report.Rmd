@@ -1,0 +1,437 @@
+---
+title: "Research Tools Completeness Score Report"
+author: "NF-OSI"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 10
+    fig_height: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# Load required libraries
+library(synapser)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+library(scales)
+library(RColorBrewer)
+library(stringr)
+```
+
+## Executive Summary
+
+This report provides a comprehensive analysis of the completeness scores for research tools and biobanks in the NF-OSI database. The scoring system evaluates resources across multiple dimensions:
+
+- **Availability** (30 points): Biobank URL, vendor/developer info, RRID, and DOI
+- **Critical Info** (30 points): Type-specific essential fields
+- **Other Info** (15 points): Type-specific additional fields
+- **Observations** (25 points): Scientific characterizations with DOI weighting
+
+**Total Maximum Score: 100 points**
+
+- **Excellent**: 80+ points
+- **Good**: 60+ points
+- **Fair**: 40+ points
+- **Poor**: 20+ points
+- **Minimal**: <20 points
+
+```{r load-data, include=FALSE}
+# Source the scoring script to get the functions
+library(synapser)
+synLogin()
+all_scores <- as.data.frame(synTableQuery("SELECT * FROM syn71218777"))
+summary_by_type <- as.data.frame(synTableQuery("SELECT * FROM syn71219401"))
+cat(sprintf("\nAnalyzed %d resources across %d resource types\n",
+            nrow(all_scores),
+            length(unique(all_scores$resourceType))))
+```
+
+---
+
+## Completeness Category Distribution
+
+```{r category-counts, include=FALSE}
+# Count by completeness category
+category_counts <- all_scores %>%
+  group_by(completeness_category) %>%
+  summarize(count = n()) %>%
+  mutate(percentage = count / sum(count) * 100,
+         completeness_category = factor(completeness_category,
+                                       levels = c("Excellent", "Good", "Fair", "Poor", "Minimal")))
+```
+
+```{r category-pie-overall, fig.height=6}
+# Overall pie chart of completeness categories
+ggplot(category_counts, aes(x = "", y = count, fill = completeness_category)) +
+  geom_bar(stat = "identity", width = 1, color = "white", size = 1.5) +
+  coord_polar("y", start = 0) +
+  scale_fill_manual(values = c("Excellent" = "#27ae60", "Good" = "#2ecc71",
+                               "Fair" = "#f39c12", "Poor" = "#e67e22",
+                               "Minimal" = "#e74c3c")) +
+  geom_text(aes(label = sprintf("%d\n(%.1f%%)", count, percentage)),
+            position = position_stack(vjust = 0.5),
+            size = 5, fontface = "bold", color = "white") +
+  labs(title = "Overall Distribution of Completeness Categories",
+       subtitle = sprintf("Total: %d resources", sum(category_counts$count)),
+       fill = "Category") +
+  theme_void(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "right")
+```
+
+```{r category-pie-by-type, fig.height=8, fig.width=12}
+# Pie charts by resource type
+category_by_type_pct <- all_scores %>%
+  group_by(resourceType, completeness_category) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  group_by(resourceType) %>%
+  mutate(
+    total_resources = sum(count),
+    percentage = count / sum(count) * 100,
+    completeness_category = factor(completeness_category,
+                                   levels = c("Excellent", "Good", "Fair", "Poor", "Minimal")),
+    resourceType_label = sprintf("%s (n=%d)", resourceType, total_resources)
+  ) %>%
+  ungroup()
+
+ggplot(category_by_type_pct, aes(x = "", y = percentage, fill = completeness_category)) +
+  geom_bar(stat = "identity", width = 1, color = "white", size = 1) +
+  coord_polar(theta = "y", start = 0) +
+  scale_fill_manual(values = c("Excellent" = "#27ae60", "Good" = "#2ecc71",
+                               "Fair" = "#f39c12", "Poor" = "#e67e22",
+                               "Minimal" = "#e74c3c")) +
+  geom_text(aes(label = ifelse(percentage >= 5, sprintf("%.0f%%", percentage), "")),
+            position = position_stack(vjust = 0.5),
+            size = 3.5, fontface = "bold", color = "white") +
+  facet_wrap(~resourceType_label, ncol = 3) +
+  labs(title = "Completeness Category Distribution by Resource Type",
+       fill = "Category") +
+  theme_void(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        legend.position = "bottom",
+        strip.text = element_text(size = 12, face = "bold"))
+```
+
+---
+
+## Score Distribution
+
+```{r overall-distribution, fig.height=3}
+# Overall histogram (hidden in HTML output)
+ggplot(all_scores, aes(x = total_score)) +
+  geom_histogram(binwidth = 5, fill = "#3498db", color = "white", alpha = 0.8) +
+  labs(title = "Overall Completeness Score Distribution",
+       subtitle = sprintf("Mean: %.1f | Median: %.1f | N = %d",
+                         mean(all_scores$total_score, na.rm = TRUE),
+                         median(all_scores$total_score, na.rm = TRUE),
+                         nrow(all_scores)),
+       x = "Total Score (out of 100)",
+       y = "Number of Resources") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+
+```{r by-type-boxplot, fig.height=6}
+# Order resource types by median score
+type_order <- all_scores %>%
+  group_by(resourceType) %>%
+  summarize(median_score = median(total_score, na.rm = TRUE)) %>%
+  arrange(desc(median_score)) %>%
+  pull(resourceType)
+
+all_scores$resourceType <- factor(all_scores$resourceType, levels = type_order)
+
+# Boxplot by resource type
+ggplot(all_scores, aes(x = resourceType, y = total_score, fill = resourceType)) +
+  geom_boxplot(outlier.shape = 21, outlier.size = 2) +
+  geom_jitter(width = 0.2, alpha = 0.3, size = 1) +
+  scale_fill_brewer(palette = "Set3") +
+  labs(title = "Completeness Score Distribution by Resource Type",
+       subtitle = "Ordered by median score (highest to lowest)",
+       x = "Resource Type",
+       y = "Total Score (out of 100)") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+```{r score-components, fig.height=3.6}
+# Prepare data for component breakdown
+component_data <- all_scores %>%
+  select(resourceType,
+         biobank_url_score, vendor_developer_score, rrid_score, doi_score,
+         critical_info_score, other_info_score, observation_score) %>%
+  pivot_longer(cols = -resourceType,
+               names_to = "component",
+               values_to = "score") %>%
+  mutate(component = gsub("_score", "", component),
+         component = gsub("_", " ", component),
+         component = tools::toTitleCase(component))
+
+# Calculate mean scores by component and resource type
+component_means <- component_data %>%
+  group_by(resourceType, component) %>%
+  summarize(mean_score = mean(score, na.rm = TRUE), .groups = "drop")
+
+# Heatmap of mean component scores by resource type
+ggplot(component_means, aes(x = component, y = resourceType, fill = mean_score)) +
+  geom_tile(color = "white", size = 0.5) +
+  geom_text(aes(label = sprintf("%.1f", mean_score)), color = "white", fontface = "bold", size = 3) +
+  scale_fill_gradient2(low = "#e74c3c", mid = "#f39c12", high = "#27ae60",
+                      midpoint = 15, na.value = "grey90") +
+  labs(title = "Mean Score by Component and Resource Type",
+       subtitle = "Higher values indicate better completeness",
+       x = "Score Component",
+       y = "Resource Type",
+       fill = "Mean Score") +
+  theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+---
+
+## Missing Fields Analysis
+
+```{r missing-fields-prep, include=FALSE}
+# Prepare missing fields data
+missing_data <- all_scores %>%
+  select(resourceType, missing_availability, missing_critical_info,
+         missing_other_info, observation_status) %>%
+  mutate(
+    n_missing_availability = ifelse(is.na(missing_availability) | missing_availability == "",
+                                     0,
+                                     str_count(missing_availability, ";") + 1),
+    n_missing_critical = ifelse(is.na(missing_critical_info) | missing_critical_info == "",
+                                0,
+                                str_count(missing_critical_info, ";") + 1),
+    n_missing_other = ifelse(is.na(missing_other_info) | missing_other_info == "",
+                            0,
+                            str_count(missing_other_info, ";") + 1),
+    has_observations = !grepl("No observations", observation_status, fixed = TRUE)
+  )
+```
+
+```{r missing-fields-summary, fig.height=4}
+# Summary of missing fields by category
+missing_summary <- missing_data %>%
+  group_by(resourceType) %>%
+  summarize(
+    avg_missing_availability = mean(n_missing_availability, na.rm = TRUE),
+    avg_missing_critical = mean(n_missing_critical, na.rm = TRUE),
+    avg_missing_other = mean(n_missing_other, na.rm = TRUE),
+    pct_no_observations = sum(!has_observations) / n() * 100,
+    .groups = "drop"
+  ) %>%
+  pivot_longer(cols = starts_with("avg_missing"),
+               names_to = "category",
+               values_to = "avg_missing") %>%
+  mutate(category = case_when(
+    category == "avg_missing_availability" ~ "Availability",
+    category == "avg_missing_critical" ~ "Critical Info",
+    category == "avg_missing_other" ~ "Other Info"
+  ))
+
+ggplot(missing_summary, aes(x = resourceType, y = avg_missing, fill = category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Availability" = "#e74c3c",
+                               "Critical Info" = "#f39c12",
+                               "Other Info" = "#3498db")) +
+  labs(title = "Average Number of Missing Fields by Category",
+       subtitle = "By resource type",
+       x = "Resource Type",
+       y = "Average Number of Missing Fields",
+       fill = "Field Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r most-common-missing, fig.height=4}
+# Find most common missing fields
+all_missing_fields <- c()
+all_missing_types <- c()
+all_missing_categories <- c()
+
+for (i in 1:nrow(all_scores)) {
+  # Availability
+  if (!is.na(all_scores$missing_availability[i]) && all_scores$missing_availability[i] != "") {
+    fields <- strsplit(all_scores$missing_availability[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Availability", length(fields)))
+  }
+
+  # Critical Info
+  if (!is.na(all_scores$missing_critical_info[i]) && all_scores$missing_critical_info[i] != "") {
+    fields <- strsplit(all_scores$missing_critical_info[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Critical Info", length(fields)))
+  }
+
+  # Other Info
+  if (!is.na(all_scores$missing_other_info[i]) && all_scores$missing_other_info[i] != "") {
+    fields <- strsplit(all_scores$missing_other_info[i], "; ")[[1]]
+    all_missing_fields <- c(all_missing_fields, fields)
+    all_missing_types <- c(all_missing_types, rep(all_scores$resourceType[i], length(fields)))
+    all_missing_categories <- c(all_missing_categories, rep("Other Info", length(fields)))
+  }
+}
+
+missing_field_counts_detailed <- data.frame(
+  field = all_missing_fields,
+  resource_type = all_missing_types,
+  category = all_missing_categories,
+  stringsAsFactors = FALSE
+) %>%
+  group_by(field, category, resource_type) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  arrange(desc(count)) %>%
+  head(10)
+
+ggplot(missing_field_counts_detailed, aes(x = reorder(field, count), y = count, fill = category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Availability" = "#e74c3c",
+                               "Critical Info" = "#f39c12",
+                               "Other Info" = "#3498db")) +
+  labs(title = "Top 10 Most Commonly Missing Fields",
+       x = "Field Name",
+       y = "Number of Resources Missing This Field",
+       fill = "Category") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(size = 10)) + facet_grid(.~resource_type) +
+  coord_flip()
+```
+
+```{r observation-status, fig.height=4}
+# Observation status distribution
+obs_status_summary <- missing_data %>%
+  group_by(resourceType) %>%
+  summarize(
+    has_observations = sum(has_observations),
+    no_observations = sum(!has_observations),
+    .groups = "drop"
+  ) %>%
+  pivot_longer(cols = c(has_observations, no_observations),
+               names_to = "status",
+               values_to = "count") %>%
+  mutate(status = ifelse(status == "has_observations",
+                         "Has Observations",
+                         "No Observations"))
+
+ggplot(obs_status_summary, aes(x = resourceType, y = count, fill = status)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Has Observations" = "#27ae60",
+                               "No Observations" = "#e74c3c")) +
+  labs(title = "Observation Status by Resource Type",
+       x = "Resource Type",
+       y = "Number of Resources",
+       fill = "Status") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+---
+
+## Summary Statistics Tables
+
+```{r overall-stats-table}
+overall_stats <- data.frame(
+  Metric = c("Total Resources", "Mean Score", "Median Score", "Std Dev",
+             "Min Score", "Max Score", "Range"),
+  Value = c(
+    nrow(all_scores),
+    round(mean(all_scores$total_score, na.rm = TRUE), 2),
+    round(median(all_scores$total_score, na.rm = TRUE), 2),
+    round(sd(all_scores$total_score, na.rm = TRUE), 2),
+    round(min(all_scores$total_score, na.rm = TRUE), 2),
+    round(max(all_scores$total_score, na.rm = TRUE), 2),
+    round(max(all_scores$total_score, na.rm = TRUE) -
+          min(all_scores$total_score, na.rm = TRUE), 2)
+  )
+)
+
+kable(overall_stats, caption = "Overall Summary Statistics", align = c("l", "r"))
+```
+
+```{r type-stats-table}
+type_stats <- summary_by_type %>%
+  select(resourceType, count, mean_score, median_score, sd_score, min_score, max_score) %>%
+  arrange(desc(mean_score)) %>%
+  mutate(across(where(is.numeric), ~round(., 2)))
+
+colnames(type_stats) <- c("Resource Type", "Count", "Mean", "Median", "Std Dev", "Min", "Max")
+
+kable(type_stats,
+      caption = "Summary Statistics by Resource Type",
+      align = c("l", "r", "r", "r", "r", "r", "r"),
+      row.names = FALSE)
+```
+
+```{r top-resources}
+top_resources <- all_scores %>%
+  arrange(desc(total_score)) %>%
+  select(resourceName, resourceType, rrid, total_score, completeness_category) %>%
+  head(10) %>%
+  mutate(total_score = round(total_score, 1))
+
+colnames(top_resources) <- c("Resource Name", "Type", "RRID", "Score", "Category")
+
+kable(top_resources,
+      caption = "Top 10 Most Complete Resources",
+      align = c("l", "l", "l", "r", "l"),
+      row.names = FALSE)
+```
+
+```{r incomplete-resources}
+incomplete_resources <- all_scores %>%
+  filter(total_score < 40) %>%
+  arrange(total_score) %>%
+  select(resourceName, resourceType, total_score, completeness_category) %>%
+  mutate(total_score = round(total_score, 1))
+
+if (nrow(incomplete_resources) > 0) {
+  colnames(incomplete_resources) <- c("Resource Name", "Type", "Score", "Category")
+
+  kable(incomplete_resources,
+        caption = sprintf("Resources Needing Improvement (N = %d)",
+                        nrow(incomplete_resources)),
+        align = c("l", "l", "r", "l"),
+        row.names = FALSE)
+} else {
+  cat("No resources with scores below 40. Excellent!")
+}
+```
+
+---
+
+## Recommendations
+
+Based on the analysis above, here are key recommendations for improving resource completeness:
+
+1. **Focus on Low-Scoring Components**: Identify which score components (availability, critical info, other info, observations) have the lowest average scores across resource types and prioritize filling those fields.
+
+2. **Resource Type Priorities**: Target resource types with lower median scores for systematic improvement efforts.
+
+3. **Observation Documentation**: Encourage researchers to submit observations with publication DOIs, as these contribute more points (7.5 vs 2.5) to the completeness score.
+
+4. **RRID Registration**: Ensure all resources have registered RRIDs to improve findability and citation.
+
+5. **Vendor/Developer Information**: Complete vendor or developer information for resources to improve availability scores.
+
+---
+
+```{r session-info, include=FALSE}
+sessionInfo()
+```

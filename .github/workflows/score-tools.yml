@@ -1,0 +1,98 @@
+name: Calculate Tool Completeness Scores
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  calculate-scores:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.0'
+
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+      
+      - name: Install R packages
+        run: |
+          Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('tidyr', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('reticulate', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('ggplot2', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('knitr', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('rmarkdown', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('tinytex', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('scales', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('RColorBrewer', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('stringr', repos='https://cloud.r-project.org/')"
+
+      - name: Install TinyTeX
+        run: |
+          Rscript -e "tinytex::install_tinytex()"
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install synapseclient
+        run: |
+          pip install synapseclient
+      
+      - name: Install synapser
+        run: |
+          Rscript -e "install.packages('synapser', repos=c('http://ran.synapse.org', 'http://cran.fhcrc.org'))"
+      
+      - name: Authenticate with Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          Rscript -e "library(synapser); synLogin(authToken=Sys.getenv('SYNAPSE_AUTH_TOKEN'))"
+      
+      - name: Run completeness scoring script
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          Rscript tool_scoring.R
+
+      - name: Render R Markdown report to PDF
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          Rscript -e "rmarkdown::render('tool_scoring_report.Rmd', output_file='tool_scoring_report.pdf')"
+
+      - name: Upload PDF report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-scoring-report
+          path: tool_scoring_report.pdf
+          retention-days: 90
+
+      - name: Create workflow summary
+        run: |
+          echo "## Tool Completeness Scoring Complete ✓" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Synapse Tables:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ToolCompletenessScores" >> $GITHUB_STEP_SUMMARY
+          echo "- ToolCompletenessSummary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- PDF Report: Download from workflow artifacts" >> $GITHUB_STEP_SUMMARY
