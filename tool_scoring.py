@@ -28,7 +28,38 @@ def count_filled(x):
 
 def is_filled(value):
     """Check if a value is filled"""
-    return not pd.isna(value) and value != "" and value != "NULL"
+    # Handle None
+    if value is None:
+        return False
+
+    # Handle numpy/pandas arrays - check if it's array-like but not a string
+    if isinstance(value, (np.ndarray, pd.Series)):
+        # Empty arrays are not filled
+        if value.size == 0:
+            return False
+        # For non-empty arrays, check the first element
+        value = value.iloc[0] if isinstance(value, pd.Series) else value[0]
+        # Recursively check if the extracted value is filled
+        return is_filled(value)
+
+    # Now handle scalar values
+    try:
+        # Use try-except to handle any edge cases with pd.isna
+        if pd.isna(value):
+            return False
+    except (ValueError, TypeError):
+        # If pd.isna fails, assume it's a complex object
+        pass
+
+    # Check for empty string or "NULL"
+    try:
+        if value == "" or value == "NULL":
+            return False
+    except (ValueError, TypeError):
+        # If comparison fails, it's probably a filled complex object
+        pass
+
+    return True
 
 
 def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFrame,
