@@ -55,8 +55,8 @@ jobs:
           Rscript -e "install.packages('remotes')"
           #pyenv global 3.10
           #Rscript -e "reticulate::virtualenv_create(envname='r-reticulate', python=Sys.which('python3')); reticulate::use_virtualenv('r-reticulate', required = TRUE)"
+          Rscript -e "reticulate::py_run_string('import ensurepip; ensurepip.bootstrap()'); reticulate::py_run_string('import pip'); reticulate::py_require(c('synapseclient==4.4.0'))"
           Rscript -e "remotes::install_cran('synapser', repos = c('http://ran.synapse.org', 'https://cloud.r-project.org'))"
-          #Rscript -e "reticulate::py_run_string('import ensurepip; ensurepip.bootstrap()'); reticulate::py_run_string('import pip'); reticulate::py_require(c('synapseclient==4.4.0'))"
       
       - name: Authenticate with Synapse
         env:
