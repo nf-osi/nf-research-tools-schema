@@ -21,14 +21,14 @@ import os
 
 def count_filled(x):
     """Count non-NA, non-empty values"""
-    if pd.isna(x) or x == "" or x == "NULL":
+    if x.size == 0 or pd.isna(x) or x == "" or x == "NULL":
         return 0
     return 1
 
 
 def is_filled(value):
     """Check if a value is filled"""
-    return not pd.isna(value) and value != "" and value != "NULL"
+    return value.size > 0 and not pd.isna(value) and value != "" and value != "NULL"
 
 
 def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFrame,
