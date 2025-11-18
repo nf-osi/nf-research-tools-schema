@@ -26,13 +26,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libpng-dev
+          sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
+          curl https://pyenv.run | bash
       
       - name: Install R packages
         run: |
           Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org/')"
           Rscript -e "install.packages('tidyr', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('reticulate', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('rjson', repos='https://cloud.r-project.org/')"
           Rscript -e "install.packages('ggplot2', repos='https://cloud.r-project.org/')"
           Rscript -e "install.packages('knitr', repos='https://cloud.r-project.org/')"
           Rscript -e "install.packages('rmarkdown', repos='https://cloud.r-project.org/')"
@@ -44,21 +46,30 @@ jobs:
       - name: Install TinyTeX
         run: |
           Rscript -e "tinytex::install_tinytex()"
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      
-      - name: Install synapseclient
+          
+      - name: Configure pyenv, apply changes, confirm
         run: |
-          pip install synapseclient
+          echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
+          echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+          source ~/.bashrc
+          pyenv --version
+          which pyenv
+          
+      - name: Install Python through pyenv
+        run: |
+          pyenv install 3.10
+          pyenv global 3.10
+          python --version
+          pyenv version
       
       - name: Install synapser
         run: |
+          Rscript -e "install.packages('reticulate', repos='https://cloud.r-project.org/')"
+          Rscript -e "install.packages('rjson', repos='https://cloud.r-project.org/')"
           Rscript -e "install.packages('remotes')"
-          Rscript -e "remotes::install_cran('synapser', repos = c('http://ran.synapse.org', 'https://cloud.r-project.org'))"
-          Rscript -e "reticulate::py_run_string('import ensurepip; ensurepip.bootstrap()'); reticulate::py_run_string('import pip'); reticulate::py_require(c('synapseclient==4.4.0'))"
+          Rscript -e "reticulate::virtualenv_remove(envname='r-reticulate'); reticulate::virtualenv_create(envname='r-reticulate', version = '3.10.x'); reticulate::use_virtualenv("r-reticulate", required = TRUE); remotes::install_cran('synapser', repos = c('http://ran.synapse.org', 'https://cloud.r-project.org'))"
+          #Rscript -e "reticulate::py_run_string('import ensurepip; ensurepip.bootstrap()'); reticulate::py_run_string('import pip'); reticulate::py_require(c('synapseclient==4.4.0'))"
       
       - name: Authenticate with Synapse
         env:
