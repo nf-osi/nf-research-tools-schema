@@ -13,68 +13,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          r-version: '4.3.0'
+          python-version: '3.11'
+          cache: 'pip'
 
-      - name: Set up Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libpng-dev
-      
-      - name: Install R packages
-        run: |
-          Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('tidyr', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('ggplot2', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('knitr', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('rmarkdown', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('tinytex', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('scales', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('RColorBrewer', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('stringr', repos='https://cloud.r-project.org/')"
-
-      - name: Install TinyTeX
-        run: |
-          Rscript -e "tinytex::install_tinytex()"
-          
-      # - name: Install Python with pyenv
-      #   uses: gabrielfalcao/pyenv-action@v18 # Use the pyenv GitHub Action
-      #   with:
-      #     default: '3.10' # Specify the desired Python version
-      
-      - name: Install synapser
-        run: |
-          Rscript -e "install.packages('reticulate', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('rjson', repos='https://cloud.r-project.org/')"
-          Rscript -e "install.packages('remotes')"
-          #pyenv global 3.10
-          #Rscript -e "reticulate::virtualenv_create(envname='r-reticulate', python=Sys.which('python3')); reticulate::use_virtualenv('r-reticulate', required = TRUE)"
-          Rscript -e "reticulate::py_run_string('import ensurepip; ensurepip.bootstrap()'); reticulate::py_run_string('import pip'); reticulate::py_require(c('synapseclient==4.4.0'))"
-          Rscript -e "remotes::install_cran('synapser', repos = c('http://ran.synapse.org', 'https://cloud.r-project.org'))"
-      
-      - name: Authenticate with Synapse
-        env:
-          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-        run: |
-          Rscript -e "library(synapser); synLogin(authToken=Sys.getenv('SYNAPSE_AUTH_TOKEN'))"
-      
       - name: Run completeness scoring script
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          Rscript tool_scoring.R
+          python tool_scoring.py
 
-      - name: Render R Markdown report to PDF
+      - name: Generate PDF report
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          Rscript -e "rmarkdown::render('tool_scoring_report.Rmd', output_file='tool_scoring_report.pdf')"
+          python tool_scoring_report.py
 
       - name: Upload PDF report as artifact
         uses: actions/upload-artifact@v4
