@@ -295,7 +295,7 @@ def create_summary_tables(pdf, all_scores, summary_by_type):
     table1.auto_set_font_size(False)
     table1.set_fontsize(10)
     table1.scale(1, 2)
-    axes[0].set_title('Overall Summary Statistics', fontsize=14, fontweight='bold', pad=20)
+    axes[0].set_title('Overall Summary Statistics', fontsize=14, fontweight='bold', pad=0)
 
     # Summary by type
     type_stats = summary_by_type[['resourceType', 'count', 'mean_score', 'median_score',
@@ -309,7 +309,7 @@ def create_summary_tables(pdf, all_scores, summary_by_type):
     table2.auto_set_font_size(False)
     table2.set_fontsize(9)
     table2.scale(1, 2)
-    axes[1].set_title('Summary Statistics by Resource Type', fontsize=14, fontweight='bold', pad=20)
+    axes[1].set_title('Summary Statistics by Resource Type', fontsize=14, fontweight='bold', pad=0)
 
     # Top 10 improvable resources
     top_resources = all_scores.nsmallest(10, 'total_score')[
@@ -328,7 +328,7 @@ def create_summary_tables(pdf, all_scores, summary_by_type):
     table3.auto_set_font_size(False)
     table3.set_fontsize(8)
     table3.scale(1, 2)
-    axes[2].set_title('Resources with 10 Lowest Scores', fontsize=14, fontweight='bold', pad=20)
+    axes[2].set_title('Resources with 10 Lowest Scores', fontsize=14, fontweight='bold', pad=30)
 
     plt.tight_layout()
     pdf.savefig(fig, bbox_inches='tight')
@@ -371,9 +371,7 @@ resource completeness:
    availability scores. This accounts for 15 points in the scoring system.
 
 6. Address Low-Scoring Resources
-   There are {incomplete_count} resources with scores below 40 that need
-   immediate attention. Prioritize improving these to reach at least
-   "Fair" completeness status.
+   Prioritize improving these to reach at least "Fair" completeness status.
 
 7. Type-Specific Fields
    Review the critical info and other info fields specific to each resource
