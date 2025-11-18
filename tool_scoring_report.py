@@ -311,8 +311,8 @@ def create_summary_tables(pdf, all_scores, summary_by_type):
     table2.scale(1, 2)
     axes[1].set_title('Summary Statistics by Resource Type', fontsize=14, fontweight='bold', pad=20)
 
-    # Top 10 resources
-    top_resources = all_scores.nlargest(10, 'total_score')[
+    # Top 10 improvable resources
+    top_resources = all_scores.nsmallest(10, 'total_score')[
         ['resourceName', 'resourceType', 'rrid', 'total_score', 'completeness_category']
     ].round(1)
     top_resources.columns = ['Resource Name', 'Type', 'RRID', 'Score', 'Category']
@@ -328,7 +328,7 @@ def create_summary_tables(pdf, all_scores, summary_by_type):
     table3.auto_set_font_size(False)
     table3.set_fontsize(8)
     table3.scale(1, 2)
-    axes[2].set_title('Top 10 Most Complete Resources', fontsize=14, fontweight='bold', pad=20)
+    axes[2].set_title('Resources with 10 Lowest Scores', fontsize=14, fontweight='bold', pad=20)
 
     plt.tight_layout()
     pdf.savefig(fig, bbox_inches='tight')
