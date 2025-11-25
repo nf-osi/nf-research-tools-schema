@@ -37,6 +37,14 @@ jobs:
         run: |
           python tool_scoring_report.py
 
+      - name: Commit and push PDF report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tool_scoring_report.pdf
+          git diff --staged --quiet || git commit -m "Update tool scoring report [skip ci]"
+          git push
+
       - name: Upload PDF report as artifact
         uses: actions/upload-artifact@v4
         with:
