@@ -21,30 +21,23 @@ scripts/
 
 ## 🚀 Setup Instructions
 
-### Step 1: Create Synapse Personal Access Token
+### Important Notes
 
-1. Log in to [Synapse.org](https://www.synapse.org/)
-2. Navigate to **Account Settings** → **Personal Access Tokens**
-3. Click **Create New Token**
-4. Name it something descriptive (e.g., "GitHub Actions - Schema Updates")
-5. Select the following scopes:
-   - ✅ `view` (required to query tables)
-   - ✅ `download` (required to download query results)
-6. Click **Create Token**
-7. **IMPORTANT:** Copy the token immediately - you won't be able to see it again!
+#### GitHub Token (Required)
+This workflow uses `NF_SERVICE_GIT_TOKEN` to create pull requests. Verify this secret is configured in your repository settings:
+- Go to **Settings** → **Secrets and variables** → **Actions**
+- Confirm `NF_SERVICE_GIT_TOKEN` exists
+- If not, create a GitHub Personal Access Token with `repo` scope and add it
 
-### Step 2: Add Token to GitHub Repository Secrets
+#### Synapse Authentication (Optional)
+Since `syn51730943` is a **public table**, Synapse authentication is **optional**. The workflow will work without setting up `SYNAPSE_AUTH_TOKEN`.
 
-1. Go to your GitHub repository
-2. Click **Settings** tab
-3. In the left sidebar, click **Secrets and variables** → **Actions**
-4. Click **New repository secret** button
-5. Fill in:
-   - **Name:** `SYNAPSE_AUTH_TOKEN`
-   - **Secret:** Paste the Synapse token you copied in Step 1
-6. Click **Add secret**
+You only need to set up a Synapse token if:
+- The table becomes private in the future
+- You hit rate limits (unlikely for weekly updates)
+- You're adapting this for a private table
 
-### Step 3: Push Changes to GitHub
+### Step 1: Push Changes to GitHub (Required)
 
 ```bash
 # Add all new files
@@ -60,7 +53,7 @@ git commit -m "Add automated schema update workflow from Synapse"
 git push origin observation-select-tool
 ```
 
-### Step 4: Verify Setup (Optional)
+### Step 2: Verify Setup (Optional)
 
 Test the workflow manually:
 
@@ -70,6 +63,38 @@ Test the workflow manually:
 4. Select your branch
 5. Click **Run workflow** button
 6. Watch the workflow run - it should complete successfully
+
+### Optional: Set Up NF_SERVICE_GIT_TOKEN (If Not Already Set)
+
+If `NF_SERVICE_GIT_TOKEN` is not already configured in your repository:
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click **Generate new token** → **Generate new token (classic)**
+3. Give it a descriptive name (e.g., "NF Service - Repository Access")
+4. Select scopes:
+   - ✅ `repo` (Full control of private repositories)
+5. Click **Generate token** and copy it immediately
+6. In your GitHub repository: **Settings** → **Secrets and variables** → **Actions**
+7. Click **New repository secret**
+8. Name: `NF_SERVICE_GIT_TOKEN`
+9. Value: Paste the GitHub token
+10. Click **Add secret**
+
+### Optional: Set Up Synapse Authentication (Only if Needed)
+
+If you need to set up a Synapse token later:
+
+1. Log in to [Synapse.org](https://www.synapse.org/)
+2. Navigate to **Account Settings** → **Personal Access Tokens**
+3. Click **Create New Token**
+4. Name it something descriptive (e.g., "GitHub Actions - Schema Updates")
+5. Select scopes: `view` and `download`
+6. Click **Create Token** and copy the token immediately
+7. In your GitHub repository: **Settings** → **Secrets and variables** → **Actions**
+8. Click **New repository secret**
+9. Name: `SYNAPSE_AUTH_TOKEN`
+10. Value: Paste the Synapse token
+11. Click **Add secret**
 
 ## 📅 Schedule
 
@@ -122,22 +147,22 @@ Before the workflow runs on GitHub, you can test locally:
 # Install dependencies
 pip install synapseclient pandas
 
-# Set Synapse token (Option 1: Environment variable)
-export SYNAPSE_AUTH_TOKEN="your-token-here"
-
-# Or Option 2: Config file
-cat > ~/.synapseConfig <<EOF
-[authentication]
-authtoken = your-token-here
-EOF
-
-# Run the script
+# Run the script (no authentication needed for public table syn51730943)
 python scripts/update_observation_schema.py
 
 # Check exit codes:
 # 0 = Changes made successfully
 # 2 = No changes needed
 # 1 = Error occurred
+```
+
+**Optional:** If you need authentication (for private tables or rate limits):
+```bash
+# Set Synapse token via environment variable
+export SYNAPSE_AUTH_TOKEN="your-token-here"
+
+# Run the script
+python scripts/update_observation_schema.py
 ```
 
 ## 🔍 What Gets Updated
@@ -165,12 +190,14 @@ The script updates these parts of `SubmitObservationSchema.json`:
 
 ### "Authentication failed" error
 
-**Problem:** Synapse credentials not configured correctly
+**Problem:** Synapse credentials not configured correctly (only relevant if using private tables)
 
 **Solution:**
-- Verify `SYNAPSE_AUTH_TOKEN` secret is set in GitHub
-- Check token hasn't expired (regenerate if needed)
-- Ensure token has `view` and `download` permissions
+- For public table `syn51730943`, authentication is not required - you can safely ignore this
+- If using a private table:
+  - Verify `SYNAPSE_AUTH_TOKEN` secret is set in GitHub
+  - Check token hasn't expired (regenerate if needed)
+  - Ensure token has `view` and `download` permissions
 
 ### "Schema file not found" error
 
@@ -186,6 +213,8 @@ The script updates these parts of `SubmitObservationSchema.json`:
 **Problem:** Workflow ran but didn't create a PR
 
 **Solution:**
+- Verify `NF_SERVICE_GIT_TOKEN` secret is set correctly in repository settings
+- Check that the token has `repo` scope permissions and hasn't expired
 - Check workflow logs in Actions tab for errors
 - Verify workflow has correct permissions (contents: write, pull-requests: write)
 - Ensure branch protection rules allow automated PRs
@@ -223,8 +252,9 @@ GitHub will notify you:
 
 ## 🔐 Security Notes
 
-- ✅ Synapse token is stored as an encrypted GitHub secret
-- ✅ Token is only accessible during workflow runs
+- ✅ No authentication required for public table `syn51730943`
+- ✅ If using authentication: token is stored as an encrypted GitHub secret
+- ✅ Token is only accessible during workflow runs (never exposed in logs)
 - ✅ Token permissions are limited to view/download only
 - ✅ All changes go through PR review before merging
 - ✅ Workflow uses official GitHub actions

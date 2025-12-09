@@ -7,6 +7,7 @@ and updates the schema with conditional enums.
 
 import json
 import sys
+import os
 from pathlib import Path
 import synapseclient
 import pandas as pd
@@ -15,7 +16,13 @@ import pandas as pd
 def get_synapse_data(syn_id: str):
     """Fetch resourceType and resourceName mappings from Synapse."""
     syn = synapseclient.Synapse()
-    syn.login()
+
+    # Login only if SYNAPSE_AUTH_TOKEN is provided
+    # Not required for public tables like syn51730943
+    auth_token = os.environ.get('SYNAPSE_AUTH_TOKEN')
+    if auth_token:
+        syn.login(authToken=auth_token, silent=True)
+    # If no auth token, synapseclient can still access public resources without login
 
     # Get unique resourceType values
     query_result = syn.tableQuery(f'SELECT DISTINCT resourceType FROM {syn_id}')

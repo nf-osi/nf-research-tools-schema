@@ -27,16 +27,12 @@ jobs:
         run: |
           pip install synapseclient pandas
 
-      - name: Configure Synapse credentials
-        run: |
-          mkdir -p ~/.synapseConfig
-          cat > ~/.synapseConfig <<EOF
-          [authentication]
-          authtoken = ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-          EOF
-
       - name: Run schema update script
         id: update
+        env:
+          # SYNAPSE_AUTH_TOKEN is optional for public tables like syn51730943
+          # Only needed if the table becomes private or you hit rate limits
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           python scripts/update_observation_schema.py
           echo "exit_code=$?" >> $GITHUB_OUTPUT
@@ -57,7 +53,7 @@ jobs:
         if: steps.check_changes.outputs.changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
           commit-message: 'chore: update observation schema from Synapse'
           title: 'Update Observation Schema from Synapse'
           body: |
