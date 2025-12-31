@@ -1,0 +1,118 @@
+name: Check Tool Coverage and Suggest Novel Tools
+
+on:
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  analyze-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Analyze GFF tool coverage
+        id: coverage
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Running coverage analysis..."
+          python analyze_missing_tools.py 2>&1 | tee coverage_output.log
+
+          # Extract key metrics for issue summary
+          echo "coverage_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Mine publications for novel tools
+        id: mining
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Mining publications for novel tools..."
+          # Limit to first 50 publications to avoid long runtime
+          python fetch_fulltext_and_mine.py 2>&1 | tee mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
+
+          echo "mining_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Generate summary report
+        id: summary
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python generate_coverage_summary.py > issue_body.md
+
+          # Read the summary for the issue
+          echo "ISSUE_BODY<<EOF" >> $GITHUB_OUTPUT
+          cat issue_body.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload reports as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-coverage-reports
+          path: |
+            GFF_Tool_Coverage_Report.pdf
+            gff_publications_MISSING_tools.csv
+            novel_tools_FULLTEXT_mining.csv
+            priority_publications_FULLTEXT.csv
+            GFF_publications_with_tools_FULLTEXT.csv
+            coverage_output.log
+            mining_output.log
+          retention-days: 90
+
+      - name: Create or update GitHub issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const issueBody = fs.readFileSync('issue_body.md', 'utf8');
+
+            // Check for existing open issue with this title
+            const issueTitle = '🔍 Weekly Tool Coverage Report';
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'automated-report',
+              per_page: 100
+            });
+
+            const existingIssue = issues.find(issue => issue.title === issueTitle);
+
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `## 📊 Updated Report - ${new Date().toISOString().split('T')[0]}\n\n${issueBody}`
+              });
+              console.log(`Updated issue #${existingIssue.number}`);
+            } else {
+              // Create new issue
+              const { data: newIssue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['automated-report', 'tool-coverage']
+              });
+              console.log(`Created issue #${newIssue.number}`);
+            }
