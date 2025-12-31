@@ -156,17 +156,58 @@ def main():
     print(f"4. **Track Progress:** Monitor coverage percentage toward 80% target")
 
     # ========================================================================
-    # Section 4: Artifacts
+    # Section 4: Submission Files
+    # ========================================================================
+    print(f"\n---")
+    print(f"\n## 📤 Submission-Ready Files")
+
+    # Check for submission files
+    submission_files = [
+        ('SUBMIT_animal_models.csv', 'Animal Models (syn26486808)'),
+        ('SUBMIT_antibodies.csv', 'Antibodies (syn26486811)'),
+        ('SUBMIT_cell_lines.csv', 'Cell Lines (syn26486823)'),
+        ('SUBMIT_genetic_reagents.csv', 'Genetic Reagents (syn26486832)'),
+        ('SUBMIT_publication_links.csv', 'Publication Links (syn51735450)')
+    ]
+
+    found_submissions = []
+    for filename, description in submission_files:
+        if os.path.exists(filename):
+            df = pd.read_csv(filename)
+            found_submissions.append((filename, description, len(df)))
+
+    if found_submissions:
+        print(f"\n**Formatted CSVs ready for table submission:**\n")
+        for filename, description, count in found_submissions:
+            print(f"- `{filename}` - {count} entries for {description}")
+
+        print(f"\n**⚠️ Manual Review Required:**")
+        print(f"- Verify tool mentions in full text")
+        print(f"- Fill in required empty fields")
+        print(f"- Remove false positives")
+        print(f"- Check for duplicates with existing entries")
+    else:
+        print(f"\n⚠️ No submission files found. Mining may not have discovered novel tools.")
+
+    # ========================================================================
+    # Section 5: Artifacts
     # ========================================================================
     print(f"\n---")
     print(f"\n## 📎 Downloadable Reports")
     print(f"\nAll detailed reports are available in the [workflow artifacts](${{{{ github.server_url }}}}/${{{{ github.repository }}}}/actions/runs/${{{{ github.run_id }}}}):")
-    print(f"\n- `GFF_Tool_Coverage_Report.pdf` - Visual coverage analysis")
+    print(f"\n**Analysis Reports:**")
+    print(f"- `GFF_Tool_Coverage_Report.pdf` - Visual coverage analysis")
     print(f"- `gff_publications_MISSING_tools.csv` - GFF publications without tools")
     print(f"- `priority_publications_FULLTEXT.csv` - Top publications with novel tools")
     print(f"- `novel_tools_FULLTEXT_mining.csv` - Complete mining results")
+
+    print(f"\n**Submission Files:**")
+    print(f"- `SUBMIT_*.csv` - Formatted CSVs for table submission")
+
+    print(f"\n**Logs:**")
     print(f"- `coverage_output.log` - Coverage analysis log")
     print(f"- `mining_output.log` - Mining process log")
+    print(f"- `formatting_output.log` - Formatting process log")
 
     print(f"\n---")
     print(f"\n*This report is automatically generated weekly. To run manually, use the [workflow dispatch](${{{{ github.server_url }}}}/${{{{ github.repository }}}}/actions/workflows/check-tool-coverage.yml).*")

@@ -50,6 +50,17 @@ jobs:
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Format mining results for submission
+        id: formatting
+        run: |
+          echo "Formatting mining results into submission CSVs..."
+          if [ -f "novel_tools_FULLTEXT_mining.csv" ]; then
+            python format_mining_for_submission.py 2>&1 | tee formatting_output.log
+            echo "formatting_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Skipping formatting - no mining results found"
+          fi
+
       - name: Generate summary report
         id: summary
         env:
@@ -72,8 +83,10 @@ jobs:
             novel_tools_FULLTEXT_mining.csv
             priority_publications_FULLTEXT.csv
             GFF_publications_with_tools_FULLTEXT.csv
+            SUBMIT_*.csv
             coverage_output.log
             mining_output.log
+            formatting_output.log
           retention-days: 90
 
       - name: Create or update GitHub issue

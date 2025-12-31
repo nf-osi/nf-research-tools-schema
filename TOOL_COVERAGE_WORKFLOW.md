@@ -32,6 +32,20 @@ Mines full text from PubMed Central for novel tools:
 - `priority_publications_FULLTEXT.csv` - Top 30 by tool count
 - `GFF_publications_with_tools_FULLTEXT.csv` - GFF-specific findings
 
+#### `format_mining_for_submission.py`
+Transforms mining results into submission-ready CSVs:
+- Formats tool mentions to match Synapse table schemas
+- Generates unique UUIDs for new entries
+- Creates publication-tool linking entries
+- Adds metadata for tracking (source, confidence, context)
+
+**Outputs:**
+- `SUBMIT_animal_models.csv` - For syn26486808
+- `SUBMIT_antibodies.csv` - For syn26486811
+- `SUBMIT_cell_lines.csv` - For syn26486823
+- `SUBMIT_genetic_reagents.csv` - For syn26486832
+- `SUBMIT_publication_links.csv` - For syn51735450
+
 #### `generate_coverage_summary.py`
 Generates markdown summary for GitHub issue:
 - Summarizes current coverage status
@@ -144,21 +158,58 @@ A weekly issue is created with:
 - Novel tools discovered
 - Top priority publications to review
 - Links to downloadable artifacts
+- Summary of submission-ready CSVs
 
 ### Downloadable Artifacts
 
 All reports are available as workflow artifacts:
-- PDF reports with visualizations
-- CSV files for manual review
-- Full logs from analysis and mining
+- **Analysis Reports:**
+  - PDF reports with visualizations
+  - CSV files for manual review
+  - Full logs from analysis and mining
+
+- **Submission Files:**
+  - `SUBMIT_*.csv` - Formatted for direct table submission
+  - Each CSV matches the schema of its target Synapse table
+  - Includes UUIDs, publication links, and metadata
 
 ## Next Steps After Report
 
-1. **Download Artifacts:** Access reports from workflow run
-2. **Review Priority Publications:** Check top publications for valid tool mentions
-3. **Verify in Full Text:** Confirm tools are actually used in Methods
-4. **Submit to Database:** Add validated tools via submission forms
-5. **Track Progress:** Monitor coverage percentage in next report
+### 1. Download and Review Artifacts
+
+Access the workflow artifacts from the GitHub Actions run:
+- Download `SUBMIT_*.csv` files for your tool type
+- Review `priority_publications_FULLTEXT.csv` for context
+- Check PDF reports for coverage visualizations
+
+### 2. Validate Tool Mentions
+
+For each tool in the submission CSVs:
+- ✅ **Verify in Full Text:** Check the publication's Methods section
+- ✅ **Confirm Usage:** Ensure the tool was actually used (not just cited)
+- ✅ **Check for Duplicates:** Search existing database entries
+- ✅ **Remove False Positives:** Delete entries that aren't real tools
+
+### 3. Complete Required Fields
+
+The submission CSVs include empty fields that need manual completion:
+- **Animal Models:** `backgroundStrain`, `backgroundSubstrain`, `animalModelOfManifestation`
+- **Antibodies:** `clonality`, `hostOrganism`, `reactiveSpecies`
+- **Cell Lines:** `cellLineCategory`, `organ`, `tissue`
+- **Genetic Reagents:** `vectorType`, `vectorBackbone`, `bacterialResistance`
+
+### 4. Submit to Synapse Tables
+
+Upload validated entries to the appropriate tables:
+- `SUBMIT_animal_models.csv` → syn26486808
+- `SUBMIT_antibodies.csv` → syn26486811
+- `SUBMIT_cell_lines.csv` → syn26486823
+- `SUBMIT_genetic_reagents.csv` → syn26486832
+- `SUBMIT_publication_links.csv` → syn51735450
+
+### 5. Track Progress
+
+Monitor coverage percentage in the next weekly report to see improvement toward the 80% target.
 
 ## Limitations
 
