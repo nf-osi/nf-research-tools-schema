@@ -14,6 +14,8 @@ from xml.etree import ElementTree as ET
 from typing import Dict, List, Set, Tuple
 import sys
 import os
+import json
+from extract_tool_metadata import extract_all_metadata
 
 # PubMed Central API configuration
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -239,16 +241,16 @@ def fuzzy_match(text: str, patterns: List[str], threshold: float = 0.88) -> List
     return list(set(matches))
 
 
-def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]]) -> Dict[str, Set[str]]:
+def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]]) -> Tuple[Dict[str, Set[str]], Dict[str, Dict]]:
     """
-    Mine Methods section for tool mentions using trained patterns.
+    Mine Methods section for tool mentions using trained patterns and extract metadata.
 
     Args:
         methods_text: Methods section text
         tool_patterns: Dictionary of tool patterns by type
 
     Returns:
-        Dictionary of found tools by type
+        Tuple of (found tools dict, metadata dict)
     """
     found_tools = {
         'cell_lines': set(),
@@ -257,16 +259,23 @@ def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]])
         'genetic_reagents': set()
     }
 
-    if not methods_text or len(methods_text) < 50:
-        return found_tools
+    tool_metadata = {}
 
-    # Search for each tool type
+    if not methods_text or len(methods_text) < 50:
+        return found_tools, tool_metadata
+
+    # Search for each tool type and extract metadata
     for tool_type, patterns in tool_patterns.items():
         if patterns:
             matches = fuzzy_match(methods_text, patterns, threshold=0.88)
             found_tools[tool_type].update(matches)
 
-    return found_tools
+            # Extract metadata for each found tool
+            for tool_name in matches:
+                metadata_key = f"{tool_type}:{tool_name}"
+                tool_metadata[metadata_key] = extract_all_metadata(tool_name, tool_type, methods_text)
+
+    return found_tools, tool_metadata
 
 
 def main():
@@ -347,8 +356,8 @@ def main():
         methods_found += 1
         print(f"     ✓ Methods section: {len(methods_text)} chars")
 
-        # Mine for tools
-        found_tools = mine_methods_section(methods_text, tool_patterns)
+        # Mine for tools and extract metadata
+        found_tools, tool_metadata = mine_methods_section(methods_text, tool_patterns)
 
         # Count total tools
         tool_count = sum(len(tools) for tools in found_tools.values())
@@ -370,7 +379,8 @@ def main():
                 'genetic_reagents': ', '.join(sorted(found_tools['genetic_reagents'])) if found_tools['genetic_reagents'] else '',
                 'tool_count': tool_count,
                 'methods_length': len(methods_text),
-                'is_gff': row['is_gff']
+                'is_gff': row['is_gff'],
+                'tool_metadata': json.dumps(tool_metadata)  # Store as JSON string
             })
 
     print("\n\n" + "=" * 80)

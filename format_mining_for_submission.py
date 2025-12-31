@@ -15,10 +15,34 @@ import pandas as pd
 import uuid
 import sys
 import os
+import json
 
 def generate_uuid():
     """Generate a UUID for new entries."""
     return str(uuid.uuid4())
+
+
+def get_tool_metadata(row, tool_type, tool_name):
+    """
+    Extract metadata for a specific tool from the row's metadata JSON.
+
+    Args:
+        row: DataFrame row containing tool_metadata column
+        tool_type: Type of tool (e.g., 'antibodies', 'cell_lines')
+        tool_name: Name of the specific tool
+
+    Returns:
+        Dictionary with extracted metadata, or empty dict if not found
+    """
+    if 'tool_metadata' not in row or pd.isna(row['tool_metadata']):
+        return {}
+
+    try:
+        all_metadata = json.loads(row['tool_metadata'])
+        metadata_key = f"{tool_type}:{tool_name}"
+        return all_metadata.get(metadata_key, {})
+    except (json.JSONDecodeError, KeyError):
+        return {}
 
 
 def format_animal_models(mining_df):
@@ -41,15 +65,19 @@ def format_animal_models(mining_df):
             if not model_name.strip():
                 continue
 
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'animal_models', model_name)
+
             animal_rows.append({
                 'animalModelId': generate_uuid(),
                 'resourceName': model_name.strip(),
                 'description': f"Animal model mentioned in publication {row.get('pmid', 'N/A')}",
-                'backgroundStrain': '',  # To be filled manually
-                'backgroundSubstrain': '',
+                'backgroundStrain': metadata.get('backgroundStrain', ''),
+                'backgroundSubstrain': metadata.get('backgroundSubstrain', ''),
                 'strainNomenclature': '',
-                'animalModelOfManifestation': '',
+                'animalModelOfManifestation': ', '.join(metadata.get('animalModelOfManifestation', [])) if metadata.get('animalModelOfManifestation') else '',
                 'animalModelGeneticDisorder': '[Neurofibromatosis type 1]',  # Default for NF1 publications
+                'alleleType': ', '.join(metadata.get('alleleType', [])) if metadata.get('alleleType') else '',
                 'species': 'Mouse',  # Default assumption
                 'pmid': row.get('pmid', ''),
                 'doi': row.get('doi', ''),
@@ -81,15 +109,20 @@ def format_antibodies(mining_df):
             if not antibody_target.strip():
                 continue
 
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'antibodies', antibody_target)
+
             antibody_rows.append({
                 'antibodyId': generate_uuid(),
                 'resourceName': f"Anti-{antibody_target.strip()} antibody",
                 'targetAntigen': antibody_target.strip(),
                 'description': f"Antibody mentioned in publication {row.get('pmid', 'N/A')}",
-                'clonality': '',  # To be filled manually
+                'clonality': metadata.get('clonality', ''),
                 'conjugate': 'Nonconjugated',  # Default assumption
-                'hostOrganism': '',
-                'reactiveSpecies': '',
+                'hostOrganism': metadata.get('hostOrganism', ''),
+                'reactiveSpecies': ', '.join(metadata.get('reactiveSpecies', [])) if metadata.get('reactiveSpecies') else '',
+                'vendor': metadata.get('vendor', ''),
+                'catalogNumber': metadata.get('catalogNumber', ''),
                 'pmid': row.get('pmid', ''),
                 'doi': row.get('doi', ''),
                 'publicationTitle': row.get('title', ''),
@@ -121,15 +154,18 @@ def format_cell_lines(mining_df):
             if not cell_line_name.strip():
                 continue
 
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'cell_lines', cell_line_name)
+
             cell_line_rows.append({
                 'cellLineId': generate_uuid(),
                 'resourceName': cell_line_name.strip(),
                 'description': f"Cell line mentioned in publication {row.get('pmid', 'N/A')}",
-                'cellLineCategory': '',  # To be filled manually
+                'cellLineCategory': metadata.get('cellLineCategory', ''),
                 'cellLineGeneticDisorder': '[Neurofibromatosis type 1]',  # Default for NF1 publications
                 'cellLineManifestation': '',
-                'organ': '',
-                'tissue': '',
+                'organ': metadata.get('organ', ''),
+                'tissue': metadata.get('tissue', ''),
                 'species': 'Human',  # Default assumption
                 'pmid': row.get('pmid', ''),
                 'doi': row.get('doi', ''),
@@ -161,15 +197,18 @@ def format_genetic_reagents(mining_df):
             if not reagent_name.strip():
                 continue
 
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'genetic_reagents', reagent_name)
+
             genetic_reagent_rows.append({
                 'geneticReagentId': generate_uuid(),
                 'resourceName': reagent_name.strip(),
                 'description': f"Genetic reagent mentioned in publication {row.get('pmid', 'N/A')}",
-                'vectorType': '',  # To be filled manually
+                'vectorType': ', '.join(metadata.get('vectorType', [])) if metadata.get('vectorType') else '',
                 'insertName': reagent_name.strip(),
                 'insertSpecies': '[Homo sapiens]',  # Default assumption
-                'vectorBackbone': '',
-                'bacterialResistance': '',
+                'vectorBackbone': metadata.get('vectorBackbone', ''),
+                'bacterialResistance': metadata.get('bacterialResistance', ''),
                 'pmid': row.get('pmid', ''),
                 'doi': row.get('doi', ''),
                 'publicationTitle': row.get('title', ''),

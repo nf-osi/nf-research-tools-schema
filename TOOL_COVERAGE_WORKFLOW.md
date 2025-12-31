@@ -32,10 +32,20 @@ Mines full text from PubMed Central for novel tools:
 - `priority_publications_FULLTEXT.csv` - Top 30 by tool count
 - `GFF_publications_with_tools_FULLTEXT.csv` - GFF-specific findings
 
+#### `extract_tool_metadata.py`
+Extracts rich metadata from Methods section context:
+- **Antibodies:** clonality (monoclonal/polyclonal), host organism, vendor, catalog number, reactive species
+- **Cell Lines:** category (cancer/normal), organ, tissue
+- **Animal Models:** background strain/substrain, manifestations, allele types
+- **Genetic Reagents:** vector type, bacterial resistance, backbone
+
+Uses pattern matching within 200-character windows around tool mentions.
+
 #### `format_mining_for_submission.py`
 Transforms mining results into submission-ready CSVs:
 - Formats tool mentions to match Synapse table schemas
 - Generates unique UUIDs for new entries
+- **Pre-fills fields using extracted metadata**
 - Creates publication-tool linking entries
 - Adds metadata for tracking (source, confidence, context)
 
@@ -45,6 +55,12 @@ Transforms mining results into submission-ready CSVs:
 - `SUBMIT_cell_lines.csv` - For syn26486823
 - `SUBMIT_genetic_reagents.csv` - For syn26486832
 - `SUBMIT_publication_links.csv` - For syn51735450
+
+**Pre-filled Fields:**
+- Antibodies: clonality, host, vendor, catalog #, reactive species
+- Cell lines: category, organ, tissue
+- Animal models: strain, substrain, manifestations, allele type
+- Genetic reagents: vector type, resistance, backbone
 
 #### `generate_coverage_summary.py`
 Generates markdown summary for GitHub issue:
@@ -192,11 +208,25 @@ For each tool in the submission CSVs:
 
 ### 3. Complete Required Fields
 
-The submission CSVs include empty fields that need manual completion:
-- **Animal Models:** `backgroundStrain`, `backgroundSubstrain`, `animalModelOfManifestation`
-- **Antibodies:** `clonality`, `hostOrganism`, `reactiveSpecies`
-- **Cell Lines:** `cellLineCategory`, `organ`, `tissue`
-- **Genetic Reagents:** `vectorType`, `vectorBackbone`, `bacterialResistance`
+Many fields are **automatically pre-filled** from metadata extraction, but may need review:
+
+**Automatically Pre-filled:**
+- **Antibodies:** clonality, host organism, reactive species, vendor, catalog number
+- **Cell Lines:** category, organ, tissue
+- **Animal Models:** background strain/substrain, manifestations, allele types
+- **Genetic Reagents:** vector type, backbone, bacterial resistance
+
+**Still Need Manual Completion:**
+- Fields left empty if not detected in context
+- Vendor information if not recognized
+- Specific allele nomenclature
+- Population doubling times
+- RRID identifiers
+
+**Review Pre-filled Fields:**
+- Verify accuracy of auto-extracted values
+- Check for pattern matching false positives
+- Confirm species and organism assignments
 
 ### 4. Submit to Synapse Tables
 
