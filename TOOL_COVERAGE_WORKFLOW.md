@@ -23,14 +23,18 @@ Analyzes current tool coverage against GFF-funded publications:
 Mines full text from PubMed Central for novel tools:
 - Fetches full text XML from PMC using PMIDs
 - Extracts Methods sections using pattern matching
-- Uses existing tools as training data (1,142 tools)
+- Uses existing tools as training data (1,142+ tools)
 - Applies fuzzy matching (88% threshold) to find tool mentions
+- Extracts cell line names via regex patterns (no name field in database)
+- **Distinguishes development vs usage** using keyword context analysis
+- **Filters generic commercial tools** (e.g., C57BL/6, nude mice) unless NF-specific
 - Focuses on Methods sections to avoid false positives
 
 **Outputs:**
-- `novel_tools_FULLTEXT_mining.csv` - All findings
+- `novel_tools_FULLTEXT_mining.csv` - All findings with development flags
 - `priority_publications_FULLTEXT.csv` - Top 30 by tool count
 - `GFF_publications_with_tools_FULLTEXT.csv` - GFF-specific findings
+- `mining_summary_ALL_publications.csv` - All publications processed
 
 #### `extract_tool_metadata.py`
 Extracts rich metadata from Methods section context:
@@ -48,13 +52,20 @@ Transforms mining results into submission-ready CSVs:
 - **Pre-fills fields using extracted metadata**
 - Creates publication-tool linking entries
 - Adds metadata for tracking (source, confidence, context)
+- **Generates NEW ROWS only** - files are meant to be appended after verification
 
-**Outputs:**
+**Outputs (Core Tables):**
+- `SUBMIT_resources.csv` - For syn26450069 (main table with resourceName)
+
+**Outputs (Detail Tables):**
 - `SUBMIT_animal_models.csv` - For syn26486808
 - `SUBMIT_antibodies.csv` - For syn26486811
 - `SUBMIT_cell_lines.csv` - For syn26486823
 - `SUBMIT_genetic_reagents.csv` - For syn26486832
+
+**Outputs (Relationship Tables):**
 - `SUBMIT_publication_links.csv` - For syn51735450
+- `SUBMIT_development.csv` - For syn26486807 (publications where tools were developed)
 
 **Pre-filled Fields:**
 - Antibodies: clonality, host, vendor, catalog #, reactive species
@@ -158,6 +169,10 @@ The mining process identifies potential tools in four categories:
 - **Animal Models** (🐭) - Transgenic/knockout models
 - **Genetic Reagents** (🧬) - Plasmids, vectors, constructs
 
+Each tool is tagged with:
+- **Development Status** - Whether the tool was developed in this publication or just used
+- **Context Metadata** - Extracted characteristics (species, strain, clonality, etc.)
+
 ### Priority Publications
 
 Publications are ranked by:
@@ -230,12 +245,22 @@ Many fields are **automatically pre-filled** from metadata extraction, but may n
 
 ### 4. Submit to Synapse Tables
 
+**IMPORTANT:** All `SUBMIT_*.csv` files contain NEW ROWS only - these should be **appended** to existing tables, not used as replacements.
+
 Upload validated entries to the appropriate tables:
+
+**Core Tables:**
+- `SUBMIT_resources.csv` → syn26450069 (Resource table with resourceName)
+
+**Detail Tables:**
 - `SUBMIT_animal_models.csv` → syn26486808
 - `SUBMIT_antibodies.csv` → syn26486811
 - `SUBMIT_cell_lines.csv` → syn26486823
 - `SUBMIT_genetic_reagents.csv` → syn26486832
+
+**Relationship Tables:**
 - `SUBMIT_publication_links.csv` → syn51735450
+- `SUBMIT_development.csv` → syn26486807 (Development publications)
 
 ### 5. Track Progress
 
@@ -252,6 +277,12 @@ Monitor coverage percentage in the next weekly report to see improvement toward 
 - Fuzzy matching may identify gene/protein names that aren't reagents
 - Manual verification always required before adding to database
 - Focus on Methods sections reduces but doesn't eliminate false positives
+
+**Improvements to Reduce False Positives:**
+- Generic animal strains (C57BL/6, nude mice) filtered unless NF-specific genetic modifications present
+- Development context detection prevents listing tools that were only purchased/used
+- Cell line extraction uses regex patterns validated against cell line naming conventions
+- Commercial tool filtering removes standard lab reagents without NF context
 
 ### Rate Limits
 - NCBI E-utilities: 3 requests/second (10 with API key)
