@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """
-Format mining results into submission-ready CSVs for each tool type table.
+Format mining results into submission-ready CSVs for Synapse database.
 
-Takes the full text mining results and creates properly formatted CSVs
-matching the schemas of:
-- Animal Models (syn26486808)
-- Antibodies (syn26486811)
-- Cell Lines (syn26486823)
-- Genetic Reagents (syn26486832)
-- Publication Links (syn51735450)
+██████████████████████████████████████████████████████████████████████████████
+IMPORTANT: Generated SUBMIT_*.csv files contain ONLY NEW ROWS to be APPENDED
+to existing Synapse tables after manual verification. These are NOT full tables.
+██████████████████████████████████████████████████████████████████████████████
+
+Generates CSVs matching schemas of:
+- Resources (syn26450069) - main table with resourceName
+- AnimalModelDetails (syn26486808) - animal model specifics
+- AntibodyDetails (syn26486811) - antibody specifics
+- CellLineDetails (syn26486823) - cell line specifics
+- GeneticReagentDetails (syn26486832) - genetic reagent specifics
+- Development (syn26486807) - publications where tools were developed
+- Publication-Tool Links - many-to-many relationships
 """
 
 import pandas as pd
@@ -49,9 +55,10 @@ def format_animal_models(mining_df):
     """
     Format animal model suggestions for syn26486808.
 
-    Columns: transplantationDonorId, animalModelId, donorId, backgroundSubstrain,
-             strainNomenclature, backgroundStrain, animalModelOfManifestation,
-             animalModelGeneticDisorder, transplantationType, animalState, generation
+    Actual Synapse columns: transplantationDonorId, animalModelId, donorId,
+                           backgroundSubstrain, strainNomenclature, backgroundStrain,
+                           animalModelOfManifestation, animalModelGeneticDisorder,
+                           transplantationType, animalState, generation
     """
     animal_rows = []
 
@@ -68,23 +75,29 @@ def format_animal_models(mining_df):
             # Get extracted metadata
             metadata = get_tool_metadata(row, 'animal_models', model_name)
 
+            # Match actual Synapse table schema with EXACT column order
+            is_dev = metadata.get('is_development', False)
             animal_rows.append({
+                # EXACT Synapse column order (syn26486808)
+                'transplantationDonorId': '',
                 'animalModelId': generate_uuid(),
-                'resourceName': model_name.strip(),
-                'description': f"Animal model mentioned in publication {row.get('pmid', 'N/A')}",
-                'backgroundStrain': metadata.get('backgroundStrain', ''),
+                'donorId': '',
                 'backgroundSubstrain': metadata.get('backgroundSubstrain', ''),
-                'strainNomenclature': '',
-                'animalModelOfManifestation': ', '.join(metadata.get('animalModelOfManifestation', [])) if metadata.get('animalModelOfManifestation') else '',
-                'animalModelGeneticDisorder': '[Neurofibromatosis type 1]',  # Default for NF1 publications
-                'alleleType': ', '.join(metadata.get('alleleType', [])) if metadata.get('alleleType') else '',
-                'species': 'Mouse',  # Default assumption
-                'pmid': row.get('pmid', ''),
-                'doi': row.get('doi', ''),
-                'publicationTitle': row.get('title', ''),
-                'year': row.get('year', ''),
-                'fundingAgency': row.get('fundingAgency', ''),
-                'methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
+                'strainNomenclature': model_name.strip(),
+                'backgroundStrain': metadata.get('backgroundStrain', ''),
+                'animalModelOfManifestation': metadata.get('animalModelOfManifestation', []),
+                'animalModelGeneticDisorder': metadata.get('animalModelGeneticDisorder', []),
+                'transplantationType': '',
+                'animalState': '',
+                'generation': '',
+                # Extra fields for tracking (prefix with _ = not in Synapse)
+                '_is_development': is_dev,
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_fundingAgency': row.get('fundingAgency', ''),
+                '_methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
             })
 
     return pd.DataFrame(animal_rows)
@@ -94,8 +107,8 @@ def format_antibodies(mining_df):
     """
     Format antibody suggestions for syn26486811.
 
-    Columns: cloneId, uniprotId, antibodyId, reactiveSpecies, hostOrganism,
-             conjugate, clonality, targetAntigen
+    Actual Synapse columns: cloneId, uniprotId, antibodyId, reactiveSpecies,
+                           hostOrganism, conjugate, clonality, targetAntigen
     """
     antibody_rows = []
 
@@ -112,23 +125,28 @@ def format_antibodies(mining_df):
             # Get extracted metadata
             metadata = get_tool_metadata(row, 'antibodies', antibody_target)
 
+            # Match actual Synapse table schema with EXACT column order
+            is_dev = metadata.get('is_development', False)
             antibody_rows.append({
+                # EXACT Synapse column order (syn26486811)
+                'cloneId': '',
+                'uniprotId': '',
                 'antibodyId': generate_uuid(),
-                'resourceName': f"Anti-{antibody_target.strip()} antibody",
-                'targetAntigen': antibody_target.strip(),
-                'description': f"Antibody mentioned in publication {row.get('pmid', 'N/A')}",
-                'clonality': metadata.get('clonality', ''),
-                'conjugate': 'Nonconjugated',  # Default assumption
+                'reactiveSpecies': metadata.get('reactiveSpecies', []),
                 'hostOrganism': metadata.get('hostOrganism', ''),
-                'reactiveSpecies': ', '.join(metadata.get('reactiveSpecies', [])) if metadata.get('reactiveSpecies') else '',
-                'vendor': metadata.get('vendor', ''),
-                'catalogNumber': metadata.get('catalogNumber', ''),
-                'pmid': row.get('pmid', ''),
-                'doi': row.get('doi', ''),
-                'publicationTitle': row.get('title', ''),
-                'year': row.get('year', ''),
-                'fundingAgency': row.get('fundingAgency', ''),
-                'methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
+                'conjugate': metadata.get('conjugate', ''),  # Only from extracted metadata
+                'clonality': metadata.get('clonality', ''),
+                'targetAntigen': antibody_target.strip(),
+                # Extra fields for tracking (prefix with _ = not in Synapse)
+                '_is_development': is_dev,
+                '_vendor': metadata.get('vendor', ''),
+                '_catalogNumber': metadata.get('catalogNumber', ''),
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_fundingAgency': row.get('fundingAgency', ''),
+                '_methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
             })
 
     return pd.DataFrame(antibody_rows)
@@ -138,9 +156,13 @@ def format_cell_lines(mining_df):
     """
     Format cell line suggestions for syn26486823.
 
-    Columns: cellLineId, donorId, originYear, organ, strProfile, tissue,
-             cellLineManifestation, resistance, cellLineCategory,
-             contaminatedMisidentified, cellLineGeneticDisorder, populationDoublingTime
+    Actual Synapse columns: cellLineId, donorId, originYear, organ, strProfile, tissue,
+                           cellLineManifestation, resistance, cellLineCategory,
+                           contaminatedMisidentified, cellLineGeneticDisorder,
+                           populationDoublingTime
+
+    NOTE: Cell lines table has NO NAME FIELD in the actual schema.
+          This function creates placeholder records that need manual review.
     """
     cell_line_rows = []
 
@@ -157,22 +179,31 @@ def format_cell_lines(mining_df):
             # Get extracted metadata
             metadata = get_tool_metadata(row, 'cell_lines', cell_line_name)
 
+            # Match actual Synapse table schema with EXACT column order
+            is_dev = metadata.get('is_development', False)
             cell_line_rows.append({
+                # EXACT Synapse column order (syn26486823)
                 'cellLineId': generate_uuid(),
-                'resourceName': cell_line_name.strip(),
-                'description': f"Cell line mentioned in publication {row.get('pmid', 'N/A')}",
-                'cellLineCategory': metadata.get('cellLineCategory', ''),
-                'cellLineGeneticDisorder': '[Neurofibromatosis type 1]',  # Default for NF1 publications
-                'cellLineManifestation': '',
+                'donorId': '',
+                'originYear': '',
                 'organ': metadata.get('organ', ''),
+                'strProfile': '',
                 'tissue': metadata.get('tissue', ''),
-                'species': 'Human',  # Default assumption
-                'pmid': row.get('pmid', ''),
-                'doi': row.get('doi', ''),
-                'publicationTitle': row.get('title', ''),
-                'year': row.get('year', ''),
-                'fundingAgency': row.get('fundingAgency', ''),
-                'methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
+                'cellLineManifestation': metadata.get('cellLineManifestation', []),
+                'resistance': '',
+                'cellLineCategory': metadata.get('cellLineCategory', ''),
+                'contaminatedMisidentified': '',
+                'cellLineGeneticDisorder': metadata.get('cellLineGeneticDisorder', []),
+                'populationDoublingTime': '',
+                # Extra fields for tracking (prefix with _ = not in Synapse)
+                '_cellLineName': cell_line_name.strip(),  # CRITICAL: No name field in schema!
+                '_is_development': is_dev,
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_fundingAgency': row.get('fundingAgency', ''),
+                '_methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
             })
 
     return pd.DataFrame(cell_line_rows)
@@ -182,8 +213,13 @@ def format_genetic_reagents(mining_df):
     """
     Format genetic reagent suggestions for syn26486832.
 
-    Key Columns: geneticReagentId, vectorType, insertName, insertSpecies,
-                 vectorBackbone, bacterialResistance, insertEntrezId, etc.
+    Actual Synapse columns: vectorType, insertEntrezId, geneticReagentId, 5primer,
+                           cloningMethod, copyNumber, insertSpecies, nTerminalTag,
+                           cTerminalTag, totalSize, 5primeCloningSite, growthTemp,
+                           insertName, bacterialResistance, hazardous, 3primer,
+                           5primeSiteDestroyed, 3primeSiteDestroyed, promoter,
+                           backboneSize, insertSize, vectorBackbone, growthStrain,
+                           3primeCloningSite, gRNAshRNASequence, selectableMarker
     """
     genetic_reagent_rows = []
 
@@ -200,21 +236,44 @@ def format_genetic_reagents(mining_df):
             # Get extracted metadata
             metadata = get_tool_metadata(row, 'genetic_reagents', reagent_name)
 
+            # Match actual Synapse table schema with EXACT column order
+            is_dev = metadata.get('is_development', False)
             genetic_reagent_rows.append({
+                # EXACT Synapse column order (syn26486832)
+                'vectorType': metadata.get('vectorType', []),
+                'insertEntrezId': '',
                 'geneticReagentId': generate_uuid(),
-                'resourceName': reagent_name.strip(),
-                'description': f"Genetic reagent mentioned in publication {row.get('pmid', 'N/A')}",
-                'vectorType': ', '.join(metadata.get('vectorType', [])) if metadata.get('vectorType') else '',
+                '5primer': '',
+                'cloningMethod': '',
+                'copyNumber': '',
+                'insertSpecies': [],  # List type
+                'nTerminalTag': '',
+                'cTerminalTag': '',
+                'totalSize': '',
+                '5primeCloningSite': '',
+                'growthTemp': '',
                 'insertName': reagent_name.strip(),
-                'insertSpecies': '[Homo sapiens]',  # Default assumption
-                'vectorBackbone': metadata.get('vectorBackbone', ''),
                 'bacterialResistance': metadata.get('bacterialResistance', ''),
-                'pmid': row.get('pmid', ''),
-                'doi': row.get('doi', ''),
-                'publicationTitle': row.get('title', ''),
-                'year': row.get('year', ''),
-                'fundingAgency': row.get('fundingAgency', ''),
-                'methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
+                'hazardous': '',
+                '3primer': '',
+                '5primeSiteDestroyed': '',
+                '3primeSiteDestroyed': '',
+                'promoter': '',
+                'backboneSize': '',
+                'insertSize': '',
+                'vectorBackbone': metadata.get('vectorBackbone', ''),
+                'growthStrain': '',
+                '3primeCloningSite': '',
+                'gRNAshRNASequence': '',
+                'selectableMarker': '',
+                # Extra fields for tracking (prefix with _ = not in Synapse)
+                '_is_development': is_dev,
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_fundingAgency': row.get('fundingAgency', ''),
+                '_methods_context': f"Found in Methods section (length: {row.get('methods_length', 0)} chars)"
             })
 
     return pd.DataFrame(genetic_reagent_rows)
@@ -224,8 +283,9 @@ def format_publication_links(mining_df, tool_csvs):
     """
     Format publication-tool links for syn51735450.
 
-    Columns: resourceId, usageId, publicationId, doi, pmid, publicationTitle,
-             authors, journal, abstract, publicationDate, publicationDateUnix, citation
+    Actual Synapse columns: resourceId, usageId, publicationId, doi, pmid,
+                           publicationTitle, authors, journal, abstract,
+                           publicationDate, publicationDateUnix, citation
     """
     link_rows = []
 
@@ -235,31 +295,162 @@ def format_publication_links(mining_df, tool_csvs):
             continue
 
         for idx, tool_row in tool_df.iterrows():
-            pmid = tool_row.get('pmid', '')
-            doi = tool_row.get('doi', '')
+            pmid = tool_row.get('_pmid', '')
+            doi = tool_row.get('_doi', '')
 
             if not pmid and not doi:
                 continue
 
+            # Match actual Synapse table schema
             link_rows.append({
                 'resourceId': tool_row.get('animalModelId') or tool_row.get('antibodyId') or
                               tool_row.get('cellLineId') or tool_row.get('geneticReagentId'),
                 'usageId': generate_uuid(),
-                'publicationId': generate_uuid(),
+                'publicationId': generate_uuid(),  # Could deduplicate if needed
                 'pmid': pmid,
                 'doi': doi,
-                'publicationTitle': tool_row.get('publicationTitle', ''),
+                'publicationTitle': tool_row.get('_publicationTitle', ''),
+                'authors': '',  # Would need to fetch from Synapse publications table
                 'journal': '',  # Would need to fetch from Synapse publications table
-                'publicationDate': tool_row.get('year', ''),
-                'resourceName': tool_row.get('resourceName', ''),
-                'resourceType': tool_type,
-                'fundingAgency': tool_row.get('fundingAgency', ''),
-                'source': 'Automated full-text mining',
-                'confidence': 'Medium',  # Requires manual verification
-                'notes': tool_row.get('methods_context', '')
+                'abstract': '',
+                'publicationDate': tool_row.get('_year', ''),
+                'publicationDateUnix': '',
+                'citation': '',
+                # Extra fields for tracking (not in Synapse schema)
+                '_resourceType': tool_type,
+                '_fundingAgency': tool_row.get('_fundingAgency', ''),
+                '_source': 'Automated full-text mining',
+                '_confidence': 'REQUIRES MANUAL VERIFICATION',  # Important warning!
+                '_notes': tool_row.get('_methods_context', '')
             })
 
     return pd.DataFrame(link_rows)
+
+
+def format_resources(tool_csvs):
+    """
+    Format Resource table entries (syn26450069) that link to detail tables.
+
+    The Resource table is the main table containing resourceName and foreign keys
+    to the detail tables (animalModelId, antibodyId, cellLineId, geneticReagentId).
+
+    Args:
+        tool_csvs: Dictionary mapping tool type names to their DataFrames
+
+    Returns:
+        DataFrame with Resource table entries
+    """
+    resource_rows = []
+
+    # Map tool types to their ID columns and resource type names
+    type_mapping = {
+        'Animal Model': ('animalModelId', 'Animal Model'),
+        'Antibody': ('antibodyId', 'Antibody'),
+        'Cell Line': ('cellLineId', 'Cell Line'),
+        'Genetic Reagent': ('geneticReagentId', 'Genetic Reagent')
+    }
+
+    for tool_type_key, tool_df in tool_csvs.items():
+        if tool_df.empty:
+            continue
+
+        id_column, resource_type = type_mapping[tool_type_key]
+
+        for _, row in tool_df.iterrows():
+            # Determine tool name based on type
+            if tool_type_key == 'Animal Model':
+                tool_name = row.get('strainNomenclature', row.get('backgroundStrain', ''))
+            elif tool_type_key == 'Antibody':
+                tool_name = row.get('targetAntigen', '')
+            elif tool_type_key == 'Cell Line':
+                tool_name = row.get('_cellLineName', '')  # Cell lines have no name field in detail table
+            elif tool_type_key == 'Genetic Reagent':
+                tool_name = row.get('insertName', '')
+
+            if not tool_name:
+                continue  # Skip if no name available
+
+            # Create Resource table entry
+            resource_entry = {
+                'resourceId': generate_uuid(),
+                'resourceName': tool_name,
+                'resourceType': resource_type,
+                # Foreign key to detail table
+                'animalModelId': row[id_column] if id_column == 'animalModelId' else '',
+                'antibodyId': row[id_column] if id_column == 'antibodyId' else '',
+                'cellLineId': row[id_column] if id_column == 'cellLineId' else '',
+                'geneticReagentId': row[id_column] if id_column == 'geneticReagentId' else '',
+                'biobankId': '',
+                # Fields requiring manual curation
+                'rrid': '',
+                'description': '',
+                'synonyms': [],
+                'usageRequirements': [],
+                'howToAcquire': '',
+                'dateAdded': '',  # Will be set by Synapse on upload
+                'dateModified': '',
+                'aiSummary': '',
+                # Extra fields for tracking
+                '_is_development': row.get('_is_development', False),
+                '_pmid': row.get('_pmid', ''),
+                '_publicationTitle': row.get('_publicationTitle', ''),
+                '_year': row.get('_year', ''),
+                '_fundingAgency': row.get('_fundingAgency', [])
+            }
+
+            resource_rows.append(resource_entry)
+
+    return pd.DataFrame(resource_rows)
+
+
+def format_development_publications(mining_df, tool_csvs):
+    """
+    Format Development table entries (syn26486807) for publications where
+    tools were developed (not just used).
+
+    Args:
+        mining_df: DataFrame with mining results
+        tool_csvs: Dictionary of tool type DataFrames with _is_development flag
+
+    Returns:
+        DataFrame with Development publication entries
+    """
+    development_rows = []
+
+    # Get all PMIDs that have tools marked as development
+    development_pmids = set()
+    for tool_type, tool_df in tool_csvs.items():
+        if '_is_development' in tool_df.columns:
+            dev_tools = tool_df[tool_df['_is_development'] == True]
+            development_pmids.update(dev_tools['_pmid'].unique())
+
+    # Create development publication entries
+    for pmid in development_pmids:
+        # Find publication in mining results
+        pub_row = mining_df[mining_df['pmid'] == pmid]
+        if pub_row.empty:
+            continue
+
+        pub_row = pub_row.iloc[0]
+
+        development_rows.append({
+            'publicationDevelopmentId': generate_uuid(),
+            'pmid': pmid,
+            'doi': pub_row.get('doi', ''),
+            'publicationTitle': pub_row.get('title', ''),
+            'journal': pub_row.get('journal', ''),
+            'year': pub_row.get('year', ''),
+            'fundingAgency': pub_row.get('fundingAgency', []),
+            # Extra tracking fields
+            '_toolCount': sum(1 for df in tool_csvs.values()
+                            if '_is_development' in df.columns
+                            for _, r in df.iterrows()
+                            if r.get('_pmid') == pmid and r.get('_is_development')),
+            '_methods_length': pub_row.get('methods_length', ''),
+            '_source': 'Automated full-text mining - development context detected'
+        })
+
+    return pd.DataFrame(development_rows)
 
 
 def main():
@@ -337,7 +528,27 @@ def main():
     else:
         print("   (no links to create)")
 
-    # Summary
+    # Resources (main table with resourceName)
+    print("\n4. Formatting Resource table entries...")
+    resources_df = format_resources(tool_csvs)
+    if not resources_df.empty:
+        output_file = 'SUBMIT_resources.csv'
+        resources_df.to_csv(output_file, index=False)
+        print(f"   ✓ {len(resources_df)} resources → {output_file}")
+    else:
+        print("   (no resources to create)")
+
+    # Development Publications
+    print("\n5. Formatting Development publication entries...")
+    development_df = format_development_publications(mining_df, tool_csvs)
+    if not development_df.empty:
+        output_file = 'SUBMIT_development.csv'
+        development_df.to_csv(output_file, index=False)
+        print(f"   ✓ {len(development_df)} development publications → {output_file}")
+    else:
+        print("   (no development publications found)")
+
+    # Summary with development breakdown
     print("\n" + "=" * 80)
     print("SUMMARY")
     print("=" * 80)
@@ -345,7 +556,23 @@ def main():
     print(f"\nTotal tool suggestions: {total_tools}")
     print(f"Total publication links: {len(links_df)}")
 
-    print("\n📋 Submission Files Created:")
+    # Count development vs usage
+    dev_count = 0
+    usage_count = 0
+    for name, df in tool_csvs.items():
+        if '_is_development' in df.columns:
+            dev_count += df['_is_development'].sum()
+            usage_count += len(df) - df['_is_development'].sum()
+
+    print(f"\n🔬 Development status:")
+    print(f"   - Development publications: {dev_count} tools")
+    print(f"   - Usage publications: {usage_count} tools")
+
+    print("\n📋 Submission Files Created (NEW ROWS only - to be appended after verification):")
+    print("\n   Core Tables:")
+    if not resources_df.empty:
+        print(f"   - SUBMIT_resources.csv ({len(resources_df)} entries)")
+    print("\n   Detail Tables:")
     if not animal_df.empty:
         print(f"   - SUBMIT_animal_models.csv ({len(animal_df)} entries)")
     if not antibody_df.empty:
@@ -354,15 +581,21 @@ def main():
         print(f"   - SUBMIT_cell_lines.csv ({len(cell_line_df)} entries)")
     if not genetic_reagent_df.empty:
         print(f"   - SUBMIT_genetic_reagents.csv ({len(genetic_reagent_df)} entries)")
+    print("\n   Relationship Tables:")
     if not links_df.empty:
         print(f"   - SUBMIT_publication_links.csv ({len(links_df)} entries)")
+    if not development_df.empty:
+        print(f"   - SUBMIT_development.csv ({len(development_df)} publications)")
 
-    print("\n⚠️  IMPORTANT NEXT STEPS:")
-    print("   1. Review each CSV file manually for accuracy")
-    print("   2. Fill in empty required fields (marked with '')")
-    print("   3. Verify tool names and remove false positives")
-    print("   4. Check full text of publications to confirm tool usage")
-    print("   5. Submit validated entries to appropriate Synapse tables")
+    print("\n⚠️  CRITICAL: MANUAL VERIFICATION REQUIRED")
+    print("   These CSVs are suggestions only and MUST be manually verified:")
+    print("   1. Check each publication to confirm tools are actually mentioned")
+    print("   2. Verify tool names are correct (watch for fuzzy match errors)")
+    print("   3. Fill in empty required fields")
+    print("   4. Remove false positives")
+    print("   5. Columns prefixed with '_' are NOT in Synapse schema (for reference only)")
+    print("   6. Cell lines: Note that actual table has NO name field")
+    print("   7. After validation, remove '_' prefixed columns before upload")
 
     print("\n" + "=" * 80)
     print("FORMATTING COMPLETE")

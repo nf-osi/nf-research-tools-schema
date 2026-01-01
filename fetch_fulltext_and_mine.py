@@ -173,11 +173,11 @@ def load_existing_tools(syn) -> Dict[str, List[str]]:
     # Extract actual tool names as patterns
     print("\n2. Building patterns from existing tools...")
 
-    # Cell lines - use resourceName
-    if 'resourceName' in cl_df.columns:
-        cell_line_names = cl_df['resourceName'].dropna().unique()
-        tool_patterns['cell_lines'] = [str(name) for name in cell_line_names if str(name).strip()]
-        print(f"   - Learned {len(tool_patterns['cell_lines'])} cell line names")
+    # Cell lines - NO NAME FIELD IN DATABASE
+    # Cell lines table only has categories (organ, tissue, cellLineCategory), no unique names
+    # Skipping cell line pattern learning
+    tool_patterns['cell_lines'] = []
+    print(f"   - Cell lines: No name field in database, skipping pattern learning")
 
     # Antibodies - use targetAntigen
     if 'targetAntigen' in ab_df.columns:
@@ -185,20 +185,20 @@ def load_existing_tools(syn) -> Dict[str, List[str]]:
         tool_patterns['antibodies'] = [str(target) for target in antibody_targets if str(target).strip()]
         print(f"   - Learned {len(tool_patterns['antibodies'])} antibody targets")
 
-    # Animal models - use resourceName and animalModelOf
+    # Animal models - use strainNomenclature and backgroundStrain
     animal_model_names = []
-    if 'resourceName' in am_df.columns:
-        animal_model_names.extend(am_df['resourceName'].dropna().unique())
-    if 'animalModelOf' in am_df.columns:
-        animal_model_names.extend(am_df['animalModelOf'].dropna().unique())
+    if 'strainNomenclature' in am_df.columns:
+        animal_model_names.extend(am_df['strainNomenclature'].dropna().unique())
+    if 'backgroundStrain' in am_df.columns:
+        animal_model_names.extend(am_df['backgroundStrain'].dropna().unique())
     tool_patterns['animal_models'] = [str(name) for name in set(animal_model_names) if str(name).strip()]
-    print(f"   - Learned {len(tool_patterns['animal_models'])} animal model names/strains")
+    print(f"   - Learned {len(tool_patterns['animal_models'])} animal model strains")
 
-    # Genetic reagents - use resourceName
-    if 'resourceName' in gr_df.columns:
-        gr_names = gr_df['resourceName'].dropna().unique()
+    # Genetic reagents - use insertName
+    if 'insertName' in gr_df.columns:
+        gr_names = gr_df['insertName'].dropna().unique()
         tool_patterns['genetic_reagents'] = [str(name) for name in gr_names if str(name).strip()]
-        print(f"   - Learned {len(tool_patterns['genetic_reagents'])} genetic reagent names")
+        print(f"   - Learned {len(tool_patterns['genetic_reagents'])} genetic reagent insert names")
 
     return tool_patterns
 
@@ -241,9 +241,165 @@ def fuzzy_match(text: str, patterns: List[str], threshold: float = 0.88) -> List
     return list(set(matches))
 
 
+def extract_cell_line_names(methods_text: str) -> List[str]:
+    """
+    Extract potential cell line names from methods text using pattern matching.
+
+    Patterns:
+    - Capitalized names with hyphens/underscores (e.g., "dNF1-KO", "ipn02.3")
+    - Cell line codes (e.g., "HEK293", "MCF7")
+    - Near context words: "cell line", "cells", "cultured"
+    """
+    cell_lines = []
+
+    # Pattern 1: Common cell line naming patterns
+    # Format: Letters/Numbers with optional hyphens/underscores/dots
+    # Must be 3+ chars and contain both letters and numbers
+    cell_line_pattern = r'\b([A-Z][A-Za-z0-9]*[-_\.][A-Z0-9][-A-Za-z0-9_\.]{1,20})\b'
+
+    # Find all matches
+    for match in re.finditer(cell_line_pattern, methods_text):
+        candidate = match.group(1)
+
+        # Get surrounding context (200 chars)
+        start = max(0, match.start() - 200)
+        end = min(len(methods_text), match.end() + 200)
+        context = methods_text[start:end].lower()
+
+        # Must be near cell line related terms
+        cell_keywords = ['cell line', 'cells', 'cell culture', 'cultured', 'derived', 'generated']
+        if any(keyword in context for keyword in cell_keywords):
+            cell_lines.append(candidate)
+
+    return list(set(cell_lines))
+
+
+def is_development_context(tool_name: str, tool_type: str, methods_text: str, window_size: int = 300) -> bool:
+    """
+    Detect if a tool was developed/generated in this publication or just used.
+
+    Development keywords: "generated", "created", "derived", "developed", "established",
+                         "engineered", "constructed", "novel", "new"
+    Usage keywords: "obtained from", "purchased", "acquired", "provided by"
+
+    Returns True if development context detected, False if just usage.
+    """
+    # Find all mentions of the tool
+    tool_lower = tool_name.lower()
+    text_lower = methods_text.lower()
+
+    development_keywords = [
+        'generat', 'creat', 'deriv', 'develop', 'establish',
+        'engineer', 'construct', 'novel', 'new ', 'design',
+        'produc', 'synthes', 'clone', 'isolat', 'immortaliz'
+    ]
+
+    usage_keywords = [
+        'obtained from', 'purchased from', 'acquired from',
+        'provided by', 'bought from', 'commercial',
+        'charles river', 'jax', 'jackson lab', 'taconic',
+        'atcc', 'sigma', 'millipore', 'thermo fisher',
+        'invitrogen', 'cell signaling', 'abcam', 'santa cruz'
+    ]
+
+    # Find positions of tool mentions
+    positions = []
+    idx = 0
+    while idx < len(text_lower):
+        idx = text_lower.find(tool_lower, idx)
+        if idx == -1:
+            break
+        positions.append(idx)
+        idx += 1
+
+    if not positions:
+        return False
+
+    # Check context around each mention
+    dev_score = 0
+    usage_score = 0
+
+    for pos in positions:
+        start = max(0, pos - window_size)
+        end = min(len(text_lower), pos + len(tool_lower) + window_size)
+        context = text_lower[start:end]
+
+        # Count development keywords
+        for keyword in development_keywords:
+            if keyword in context:
+                dev_score += 1
+
+        # Count usage keywords (weighted higher - more specific)
+        for keyword in usage_keywords:
+            if keyword in context:
+                usage_score += 2
+
+    # Development if development keywords present and no strong usage indicators
+    return dev_score > 0 and usage_score == 0
+
+
+def is_generic_commercial_tool(tool_name: str, tool_type: str, methods_text: str) -> bool:
+    """
+    Filter out generic commercial tools that aren't novel NF-specific resources.
+
+    Examples to filter:
+    - Generic mouse strains: nude, C57BL/6, BALB/c (unless modified for NF)
+    - Commercial antibodies without NF context
+    - Standard reagents
+    """
+    tool_lower = tool_name.lower()
+    text_lower = methods_text.lower()
+
+    # Generic animal model strains (filter unless NF-modified)
+    if tool_type == 'animal_models':
+        generic_strains = [
+            'nude', 'nude mice', 'athymic nude',
+            'c57bl/6', 'balb/c', 'cd-1', 'swiss webster',
+            'scid', 'nod scid', 'nsg'
+        ]
+
+        # Check if it's a generic strain
+        is_generic = any(generic in tool_lower for generic in generic_strains)
+
+        if is_generic:
+            # ONLY allow if there's NF-specific genetic modification IN THE STRAIN NAME ITSELF
+            # Look for patterns like: Nf1tm1, Nf1-/-, Nf2-/-, etc.
+            nf_genetic_modifications = [
+                'nf1tm', 'nf2tm', 'nf1-/-', 'nf2-/-',
+                'nf1+/-', 'nf2+/-', 'nf1flox', 'nf2flox',
+                'nf1 knockout', 'nf2 knockout'
+            ]
+            has_nf_modification = any(mod in tool_lower for mod in nf_genetic_modifications)
+
+            # Filter if generic and no NF-specific genetic modification in the name
+            if not has_nf_modification:
+                return True
+
+    # Check for commercial vendor mentions
+    commercial_indicators = [
+        'charles river', 'jax', 'jackson lab', 'taconic',
+        'purchased from', 'obtained from', 'acquired from',
+        'provided by', 'bought from', 'commercially available'
+    ]
+
+    # Find tool mentions and check nearby text
+    idx = text_lower.find(tool_lower)
+    if idx != -1:
+        context = text_lower[max(0, idx-200):min(len(text_lower), idx+200)]
+        if any(indicator in context for indicator in commercial_indicators):
+            return True
+
+    return False
+
+
 def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]]) -> Tuple[Dict[str, Set[str]], Dict[str, Dict]]:
     """
     Mine Methods section for tool mentions using trained patterns and extract metadata.
+
+    Now includes:
+    - Cell line name extraction (pattern-based)
+    - Development vs usage detection
+    - Generic/commercial tool filtering
 
     Args:
         methods_text: Methods section text
@@ -264,16 +420,48 @@ def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]])
     if not methods_text or len(methods_text) < 50:
         return found_tools, tool_metadata
 
-    # Search for each tool type and extract metadata
-    for tool_type, patterns in tool_patterns.items():
-        if patterns:
-            matches = fuzzy_match(methods_text, patterns, threshold=0.88)
-            found_tools[tool_type].update(matches)
+    # 1. Extract cell lines using pattern matching (no pre-existing patterns)
+    cell_line_names = extract_cell_line_names(methods_text)
+    for cell_line_name in cell_line_names:
+        # Check if it's a development (not just usage)
+        is_dev = is_development_context(cell_line_name, 'cell_lines', methods_text)
 
-            # Extract metadata for each found tool
-            for tool_name in matches:
-                metadata_key = f"{tool_type}:{tool_name}"
-                tool_metadata[metadata_key] = extract_all_metadata(tool_name, tool_type, methods_text)
+        # Check if it's generic/commercial
+        is_generic = is_generic_commercial_tool(cell_line_name, 'cell_lines', methods_text)
+
+        # Only include if development context and not generic
+        if is_dev and not is_generic:
+            found_tools['cell_lines'].add(cell_line_name)
+            metadata_key = f"cell_lines:{cell_line_name}"
+            metadata = extract_all_metadata(cell_line_name, 'cell_lines', methods_text)
+            metadata['is_development'] = True
+            metadata['is_generic'] = False
+            tool_metadata[metadata_key] = metadata
+
+    # 2. Search for other tool types using patterns
+    for tool_type, patterns in tool_patterns.items():
+        if not patterns or tool_type == 'cell_lines':  # Skip cell_lines (handled above)
+            continue
+
+        matches = fuzzy_match(methods_text, patterns, threshold=0.88)
+
+        for tool_name in matches:
+            # Filter generic/commercial tools
+            if is_generic_commercial_tool(tool_name, tool_type, methods_text):
+                continue  # Skip this tool
+
+            # Check development context
+            is_dev = is_development_context(tool_name, tool_type, methods_text)
+
+            # Include tool (either development or usage)
+            found_tools[tool_type].add(tool_name)
+
+            # Extract metadata
+            metadata_key = f"{tool_type}:{tool_name}"
+            metadata = extract_all_metadata(tool_name, tool_type, methods_text)
+            metadata['is_development'] = is_dev
+            metadata['is_generic'] = False  # Already filtered generics
+            tool_metadata[metadata_key] = metadata
 
     return found_tools, tool_metadata
 
@@ -324,6 +512,7 @@ def main():
     print(f"   (This may take a while - ~0.3s per publication)")
 
     results = []
+    summary = []  # Track ALL publications
     fetch_success = 0
     fetch_fail = 0
     methods_found = 0
@@ -341,6 +530,24 @@ def main():
         if not fulltext:
             print(" ❌ Not available in PMC")
             fetch_fail += 1
+            # Track in summary
+            summary.append({
+                'pmid': pmid,
+                'doi': row.get('doi', ''),
+                'title': row.get('title', ''),
+                'journal': row.get('journal', ''),
+                'year': row.get('year', ''),
+                'fundingAgency': row.get('fundingAgency', ''),
+                'fulltext_available': False,
+                'methods_found': False,
+                'methods_length': 0,
+                'tool_count': 0,
+                'antibodies_count': 0,
+                'animal_models_count': 0,
+                'cell_lines_count': 0,
+                'genetic_reagents_count': 0,
+                'is_gff': row['is_gff']
+            })
             continue
 
         fetch_success += 1
@@ -351,6 +558,24 @@ def main():
 
         if not methods_text or len(methods_text) < 50:
             print("     ⚠️  No Methods section found")
+            # Track in summary
+            summary.append({
+                'pmid': pmid,
+                'doi': row.get('doi', ''),
+                'title': row.get('title', ''),
+                'journal': row.get('journal', ''),
+                'year': row.get('year', ''),
+                'fundingAgency': row.get('fundingAgency', ''),
+                'fulltext_available': True,
+                'methods_found': False,
+                'methods_length': 0,
+                'tool_count': 0,
+                'antibodies_count': 0,
+                'animal_models_count': 0,
+                'cell_lines_count': 0,
+                'genetic_reagents_count': 0,
+                'is_gff': row['is_gff']
+            })
             continue
 
         methods_found += 1
@@ -361,6 +586,25 @@ def main():
 
         # Count total tools
         tool_count = sum(len(tools) for tools in found_tools.values())
+
+        # Track in summary (all publications with methods)
+        summary.append({
+            'pmid': pmid,
+            'doi': row.get('doi', ''),
+            'title': row.get('title', ''),
+            'journal': row.get('journal', ''),
+            'year': row.get('year', ''),
+            'fundingAgency': row.get('fundingAgency', ''),
+            'fulltext_available': True,
+            'methods_found': True,
+            'methods_length': len(methods_text),
+            'tool_count': tool_count,
+            'antibodies_count': len(found_tools['antibodies']),
+            'animal_models_count': len(found_tools['animal_models']),
+            'cell_lines_count': len(found_tools['cell_lines']),
+            'genetic_reagents_count': len(found_tools['genetic_reagents']),
+            'is_gff': row['is_gff']
+        })
 
         if tool_count > 0:
             tools_found += 1
@@ -386,9 +630,23 @@ def main():
     print("\n\n" + "=" * 80)
     print("5. Mining Results:")
     print("=" * 80)
+    print(f"   Total publications mined: {len(summary)}")
     print(f"   Full text fetched: {fetch_success}/{len(unlinked_pubs)} ({100*fetch_success/len(unlinked_pubs):.1f}%)")
-    print(f"   Methods sections found: {methods_found}/{fetch_success} ({100*methods_found/fetch_success:.1f}% of fetched)")
-    print(f"   Publications with tools: {tools_found}/{methods_found} ({100*tools_found/methods_found:.1f}% of with Methods)")
+    if fetch_success > 0:
+        print(f"   Methods sections found: {methods_found}/{fetch_success} ({100*methods_found/fetch_success:.1f}% of fetched)")
+    if methods_found > 0:
+        print(f"   Publications with tools: {tools_found}/{methods_found} ({100*tools_found/methods_found:.1f}% of with Methods)")
+
+    # Save summary of ALL publications
+    if summary:
+        summary_df = pd.DataFrame(summary)
+        summary_file = 'mining_summary_ALL_publications.csv'
+        summary_df.to_csv(summary_file, index=False)
+        print(f"\n📄 Summary of all publications saved to: {summary_file}")
+        print(f"   - {len(summary_df)} total publications")
+        print(f"   - {summary_df['fulltext_available'].sum()} with full text")
+        print(f"   - {summary_df['methods_found'].sum()} with Methods sections")
+        print(f"   - {(summary_df['tool_count'] > 0).sum()} with potential tools")
 
     if results:
         results_df = pd.DataFrame(results)
