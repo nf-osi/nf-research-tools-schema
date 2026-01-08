@@ -28,7 +28,7 @@ tool_reviews/publication_cache/{PMID}_text.json (cached text)
 run_publication_reviews.py
     ↓ (reads from cache, no duplicate API calls)
     ↓ (invokes Goose only for non-reviewed publications)
-Goose AI Agent (recipes/publication_tool_review.yaml)
+Goose AI Agent (tool_coverage/recipes/publication_tool_review.yaml)
     ↓ (generates)
 {PMID}_tool_review.yaml (per publication)
     ↓ (compiles)
@@ -42,7 +42,7 @@ VALIDATED_*.csv (filtered submission files)
 
 ## Components
 
-### 1. Goose Recipe (`recipes/publication_tool_review.yaml`)
+### 1. Goose Recipe (`tool_coverage/recipes/publication_tool_review.yaml`)
 
 Defines the AI agent's task, instructions, and output format.
 
@@ -84,19 +84,19 @@ Python script that manages the validation workflow:
 **Usage:**
 ```bash
 # Validate specific publications
-python run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745"
+python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745"
 
 # Validate all mined publications (skips already-reviewed)
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 
 # Force re-review of already-reviewed publications
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
 
 # Compile results from existing YAMLs (skip goose reviews)
-python run_publication_reviews.py --compile-only
+python tool_coverage/run_publication_reviews.py --compile-only
 
 # Skip goose, just filter CSVs from existing YAMLs
-python run_publication_reviews.py --skip-goose
+python tool_coverage/run_publication_reviews.py --skip-goose
 ```
 
 **Smart Optimizations:**
@@ -125,10 +125,10 @@ AI validation is integrated into `fetch_fulltext_and_mine.py` via environment va
 
 ```bash
 # Run mining WITH AI validation
-AI_VALIDATE_TOOLS=true python fetch_fulltext_and_mine.py
+AI_VALIDATE_TOOLS=true python tool_coverage/fetch_fulltext_and_mine.py
 
 # Run mining WITHOUT AI validation (default)
-python fetch_fulltext_and_mine.py
+python tool_coverage/fetch_fulltext_and_mine.py
 ```
 
 When enabled, validation runs automatically after mining completes.
@@ -179,13 +179,13 @@ pyyaml>=6.0
 
 ```bash
 # With AI validation (default)
-python fetch_fulltext_and_mine.py
+python tool_coverage/fetch_fulltext_and_mine.py
 
 # Without AI validation (faster, but may have false positives)
-python fetch_fulltext_and_mine.py --no-validate
+python tool_coverage/fetch_fulltext_and_mine.py --no-validate
 
 # Standalone validation (if you already have mining results)
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 ```
 
 **Generates:**
@@ -308,7 +308,7 @@ Based on the false positive example (PMID:28078640):
 
 ### Adjust Validation Strictness
 
-Edit `recipes/publication_tool_review.yaml`:
+Edit `tool_coverage/recipes/publication_tool_review.yaml`:
 
 ```yaml
 # Make more strict (fewer false positives, more manual review)
@@ -375,7 +375,7 @@ export PATH=$PATH:$(go env GOPATH)/bin
 ```bash
 # Test recipe directly
 cd tool_reviews/results
-goose run --recipe ../../recipes/publication_tool_review.yaml \
+goose run --recipe ../../tool_coverage/recipes/publication_tool_review.yaml \
   --params pmid=PMID:28078640 \
   --params inputFile=/full/path/to/input.json
 ```

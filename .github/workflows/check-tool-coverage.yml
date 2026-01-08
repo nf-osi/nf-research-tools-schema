@@ -70,7 +70,7 @@ jobs:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "Running coverage analysis..."
-          python analyze_missing_tools.py 2>&1 | tee coverage_output.log
+          python tool_coverage/analyze_missing_tools.py 2>&1 | tee coverage_output.log
 
           # Extract key metrics for issue summary
           echo "coverage_complete=true" >> $GITHUB_OUTPUT
@@ -84,7 +84,7 @@ jobs:
           echo "Mining publications for novel tools..."
 
           # Build command with optional flags
-          CMD="python fetch_fulltext_and_mine.py"
+          CMD="python tool_coverage/fetch_fulltext_and_mine.py"
 
           # Add max publications limit if specified
           if [ -n "${{ github.event.inputs.max_publications }}" ]; then
@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "Formatting mining results into submission CSVs..."
           if [ -f "novel_tools_FULLTEXT_mining.csv" ]; then
-            python format_mining_for_submission.py 2>&1 | tee formatting_output.log
+            python tool_coverage/format_mining_for_submission.py 2>&1 | tee formatting_output.log
             echo "formatting_complete=true" >> $GITHUB_OUTPUT
           else
             echo "⚠️ Skipping formatting - no mining results found"
@@ -121,7 +121,7 @@ jobs:
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          python generate_coverage_summary.py > issue_body.md
+          python tool_coverage/generate_coverage_summary.py > issue_body.md
 
           # Read the summary for the issue
           echo "ISSUE_BODY<<EOF" >> $GITHUB_OUTPUT

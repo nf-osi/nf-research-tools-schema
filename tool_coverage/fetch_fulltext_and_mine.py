@@ -1338,7 +1338,7 @@ Examples:
             # Run the validation orchestrator
             import subprocess
             result = subprocess.run(
-                ['python3', 'run_publication_reviews.py', '--mining-file', 'novel_tools_FULLTEXT_mining.csv'],
+                ['python3', 'tool_coverage/run_publication_reviews.py', '--mining-file', 'novel_tools_FULLTEXT_mining.csv'],
                 capture_output=False,
                 text=True
             )

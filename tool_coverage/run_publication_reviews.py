@@ -15,7 +15,7 @@ import os
 import argparse
 
 # Configuration
-RECIPE_PATH = 'recipes/publication_tool_review.yaml'
+RECIPE_PATH = 'tool_coverage/recipes/publication_tool_review.yaml'
 REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'novel_tools_FULLTEXT_mining.csv'
 

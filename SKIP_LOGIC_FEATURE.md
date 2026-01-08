@@ -41,7 +41,7 @@ if yaml_path.exists() and not args.force_rereviews:
 To re-review publications (e.g., after recipe changes):
 
 ```bash
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
 ```
 
 This will:
@@ -56,7 +56,7 @@ This will:
 
 ```bash
 # Default behavior - skips existing validations
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 ```
 
 Output:
@@ -76,7 +76,7 @@ Running Goose Reviews for 50 publications
 
 ```bash
 # Force flag - re-reviews everything
-python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
 ```
 
 Output:
@@ -94,7 +94,7 @@ Running Goose Reviews for 50 publications
 
 ```bash
 # Just compile existing YAMLs, no validation
-python run_publication_reviews.py --compile-only
+python tool_coverage/run_publication_reviews.py --compile-only
 ```
 
 ## GitHub Actions Integration
@@ -163,7 +163,7 @@ workflow_dispatch:
 **Behavior**:
 ```bash
 # Re-validate all publications with new recipe
-python run_publication_reviews.py --force-rereviews
+python tool_coverage/run_publication_reviews.py --force-rereviews
 ```
 
 **Result**: All publications re-reviewed with new criteria
@@ -178,7 +178,7 @@ python run_publication_reviews.py --force-rereviews
 rm tool_reviews/results/PMID:28078640_tool_review.yaml
 
 # Re-run validation
-python run_publication_reviews.py --pmids "PMID:28078640"
+python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640"
 ```
 
 **Result**: Only that publication is re-validated
@@ -225,7 +225,7 @@ elif yaml_path.exists() and args.force_rereviews:
 ### Test 1: Skip Logic Works
 
 ```bash
-$ python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+$ python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 
 ⏭️  Skipping PMID:28078640 (already reviewed, use --force-rereviews to override)
 ⏭️  Skipping PMID:28198162 (already reviewed, use --force-rereviews to override)
@@ -236,7 +236,7 @@ $ python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.cs
 ### Test 2: Force Flag Works
 
 ```bash
-$ python run_publication_reviews.py --pmids "PMID:28078640" --force-rereviews
+$ python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640" --force-rereviews
 
 🔄 Re-reviewing PMID:28078640 (force flag set)
   Fetching abstract from PubMed...
@@ -248,7 +248,7 @@ $ python run_publication_reviews.py --pmids "PMID:28078640" --force-rereviews
 ### Test 3: Help Message
 
 ```bash
-$ python run_publication_reviews.py --help
+$ python tool_coverage/run_publication_reviews.py --help
 
   --force-rereviews     Force re-review of publications even if YAML files
                         already exist
