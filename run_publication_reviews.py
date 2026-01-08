@@ -42,6 +42,25 @@ def load_mining_results(mining_file):
         print(f"Error loading mining results: {e}")
         return None
 
+def load_cached_text(pmid, cache_dir='tool_reviews/publication_cache'):
+    """
+    Load cached publication text if available.
+
+    Args:
+        pmid: Publication PMID
+        cache_dir: Cache directory
+
+    Returns:
+        Dict with cached text, or None if not found
+    """
+    cache_file = Path(cache_dir) / f'{pmid}_text.json'
+
+    if cache_file.exists():
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return None
+
+
 def prepare_goose_input(pub_row, inputs_dir):
     """Prepare input JSON file for goose review.
 
@@ -54,29 +73,39 @@ def prepare_goose_input(pub_row, inputs_dir):
     """
     pmid = pub_row['pmid']
 
-    # Import mining functions to fetch text
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from fetch_fulltext_and_mine import (
-        fetch_pubmed_abstract,
-        fetch_pmc_fulltext,
-        extract_methods_section,
-        extract_introduction_section
-    )
+    # Try to load from cache first
+    cached = load_cached_text(pmid)
 
-    # Fetch abstract from PubMed
-    print(f"  Fetching abstract from PubMed...")
-    abstract_text = fetch_pubmed_abstract(pmid)
+    if cached:
+        print(f"  ✅ Using cached text (skipping API calls)")
+        abstract_text = cached['abstract']
+        methods_text = cached['methods']
+        intro_text = cached['introduction']
+    else:
+        # Fall back to fetching (backwards compatibility)
+        # Import mining functions to fetch text
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from fetch_fulltext_and_mine import (
+            fetch_pubmed_abstract,
+            fetch_pmc_fulltext,
+            extract_methods_section,
+            extract_introduction_section
+        )
 
-    # Fetch full text from PMC
-    print(f"  Fetching full text from PMC...")
-    fulltext_xml = fetch_pmc_fulltext(pmid)
-    methods_text = ""
-    intro_text = ""
+        # Fetch abstract from PubMed
+        print(f"  Fetching abstract from PubMed...")
+        abstract_text = fetch_pubmed_abstract(pmid)
 
-    if fulltext_xml:
-        print(f"  Extracting Methods and Introduction sections...")
-        methods_text = extract_methods_section(fulltext_xml)
-        intro_text = extract_introduction_section(fulltext_xml)
+        # Fetch full text from PMC
+        print(f"  Fetching full text from PMC...")
+        fulltext_xml = fetch_pmc_fulltext(pmid)
+        methods_text = ""
+        intro_text = ""
+
+        if fulltext_xml:
+            print(f"  Extracting Methods and Introduction sections...")
+            methods_text = extract_methods_section(fulltext_xml)
+            intro_text = extract_introduction_section(fulltext_xml)
 
     # Parse mined tools from JSON columns
     novel_tools = json.loads(pub_row.get('novel_tools', '{}'))

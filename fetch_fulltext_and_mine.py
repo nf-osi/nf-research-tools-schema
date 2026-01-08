@@ -18,6 +18,8 @@ import sys
 import os
 import json
 import argparse
+from datetime import datetime
+from pathlib import Path
 from extract_tool_metadata import extract_all_metadata
 
 # PubMed Central API configuration
@@ -258,6 +260,39 @@ def extract_introduction_section(fulltext_xml: str) -> str:
 
     except ET.ParseError:
         return ""
+
+
+def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str, cache_dir: str = 'tool_reviews/publication_cache'):
+    """
+    Cache fetched publication text to avoid duplicate API calls during validation.
+
+    Args:
+        pmid: Publication PMID
+        abstract: Abstract text from PubMed
+        methods: Methods section text from PMC
+        intro: Introduction section text from PMC
+        cache_dir: Directory to store cache files
+    """
+    # Create cache directory if it doesn't exist
+    cache_path = Path(cache_dir)
+    cache_path.mkdir(parents=True, exist_ok=True)
+
+    # Prepare cache data
+    cache_data = {
+        'pmid': pmid,
+        'abstract': abstract,
+        'methods': methods,
+        'introduction': intro,
+        'fetched_at': datetime.now().isoformat(),
+        'abstract_length': len(abstract) if abstract else 0,
+        'methods_length': len(methods) if methods else 0,
+        'introduction_length': len(intro) if intro else 0
+    }
+
+    # Write to cache file
+    cache_file = cache_path / f'{pmid}_text.json'
+    with open(cache_file, 'w', encoding='utf-8') as f:
+        json.dump(cache_data, f, indent=2, ensure_ascii=False)
 
 
 def load_existing_tools(syn) -> Dict[str, List[str]]:
@@ -1009,6 +1044,11 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     result['tool_sources'] = tool_sources
     result['tool_metadata'] = merged_metadata
 
+    # Store fetched text for caching (to avoid duplicate API calls during validation)
+    result['abstract_text'] = abstract_text
+    result['methods_text'] = methods_text
+    result['intro_text'] = intro_text
+
     # 6. Match against existing tools
     for tool_type, tools in merged_tools.items():
         result['existing_tools'][tool_type] = {}
@@ -1140,6 +1180,14 @@ Examples:
 
         # Mine publication (abstract + full text)
         mining_result = mine_publication(row, tool_patterns, existing_tools)
+
+        # Cache fetched text to avoid duplicate API calls during validation
+        cache_publication_text(
+            pmid=mining_result['pmid'],
+            abstract=mining_result.get('abstract_text', ''),
+            methods=mining_result.get('methods_text', ''),
+            intro=mining_result.get('intro_text', '')
+        )
 
         # Log progress
         if mining_result['abstract_available']:
