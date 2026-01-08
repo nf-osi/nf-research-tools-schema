@@ -197,7 +197,7 @@ python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640"
    - Default: false (cost-efficient behavior)
 
 3. **Documentation Updates**:
-   - `docs/AI_VALIDATION_README.md` - Usage examples
+   - `tool_coverage/docs/AI_VALIDATION_README.md` - Usage examples
    - `TOOL_COVERAGE_WORKFLOW.md` - Workflow options
    - `PR_DESCRIPTION.md` - Feature documentation
 

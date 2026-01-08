@@ -122,7 +122,7 @@ AI-powered validation of mined tools using Goose agent (optional):
 - **Generates validation reports** with detailed reasoning for accept/reject decisions
 - **Creates VALIDATED_*.csv** files with rejected tools removed
 
-⚠️ **Requires Anthropic API key** - See [docs/AI_VALIDATION_README.md](docs/AI_VALIDATION_README.md) for setup
+⚠️ **Requires Anthropic API key** - See [tool_coverage/docs/AI_VALIDATION_README.md](tool_coverage/docs/AI_VALIDATION_README.md) for setup
 
 **Usage:**
 ```bash
@@ -150,7 +150,7 @@ python tool_coverage/fetch_fulltext_and_mine.py
 - Mined: "NF1 antibody", "NF1 genetic reagent"
 - AI verdict: **Reject** - "Questionnaire development study, not lab research. NF1 refers to disease throughout."
 
-#### `clean_submission_csvs.py`
+#### `tool_coverage/clean_submission_csvs.py`
 Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
 - **Removes tracking columns** (prefixed with '_') used for manual review
 - **Saves cleaned versions** as CLEAN_*.csv files
@@ -163,13 +163,13 @@ Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
 **Usage:**
 ```bash
 # Clean only (default)
-python clean_submission_csvs.py
+python tool_coverage/clean_submission_csvs.py
 
 # Preview upload (no changes)
-python clean_submission_csvs.py --upsert --dry-run
+python tool_coverage/clean_submission_csvs.py --upsert --dry-run
 
 # Clean and upload to Synapse
-python clean_submission_csvs.py --upsert
+python tool_coverage/clean_submission_csvs.py --upsert
 ```
 
 ### 2. GitHub Actions Workflow
