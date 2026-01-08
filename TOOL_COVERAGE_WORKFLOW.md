@@ -20,21 +20,50 @@ Analyzes current tool coverage against GFF-funded publications:
 - `gff_publications_MISSING_tools.csv` - Publications without tools
 
 #### `fetch_fulltext_and_mine.py`
-Mines full text from PubMed Central for novel tools:
-- Fetches full text XML from PMC using PMIDs
-- Extracts Methods sections using pattern matching
-- Uses existing tools as training data (1,142+ tools)
-- Applies fuzzy matching (88% threshold) to find tool mentions
+Mines abstracts and full text for tools, with AI validation enabled by default:
+- **Mines ALL publications via abstracts** (fetched from PubMed API using PMID) - no PMC requirement
+- **Enhances with full text when available:** Fetches PMC XML and extracts Methods + Introduction sections
+- **Matches against existing tools** using fuzzy matching (88% threshold) before creating new entries
+- **AI validates mined tools** (default: enabled) using Goose agent to filter false positives
+- Uses existing tools as training data (1,142+ tools) for pattern matching
 - Extracts cell line names via regex patterns (no name field in database)
-- **Distinguishes development vs usage** using keyword context analysis
+- **Distinguishes development vs usage** using keyword context analysis (100-300 char windows)
 - **Filters generic commercial tools** (e.g., C57BL/6, nude mice) unless NF-specific
-- Focuses on Methods sections to avoid false positives
+- **Tracks source sections** (abstract, methods, introduction) for each tool found
+- **Deduplicates** tools found in multiple sections, preferring Methods metadata
 
-**Outputs:**
-- `novel_tools_FULLTEXT_mining.csv` - All findings with development flags
-- `priority_publications_FULLTEXT.csv` - Top 30 by tool count
-- `GFF_publications_with_tools_FULLTEXT.csv` - GFF-specific findings
-- `mining_summary_ALL_publications.csv` - All publications processed
+**Tool Matching & Validation Process:**
+1. Mine abstract (always available)
+2. Mine Methods + Introduction sections (when PMC full text available)
+3. Merge results with deduplication
+4. Match tool names against existing database tools (fuzzy, 88%)
+5. **If match found:** Link to existing tool (reuse resourceId)
+6. **If no match:** Create new tool entry (generate UUID)
+7. **AI validation (default):** Goose agent analyzes each tool in context
+8. **Filter false positives:** Remove disease/gene names, non-lab publications
+
+**Command-line options:**
+```bash
+# With AI validation (default)
+python fetch_fulltext_and_mine.py
+
+# Without AI validation (faster, may have false positives)
+python fetch_fulltext_and_mine.py --no-validate
+
+# Limit publications for testing
+python fetch_fulltext_and_mine.py --max-publications 50
+```
+
+**Outputs (without AI validation):**
+- `novel_tools_FULLTEXT_mining.csv` - All findings with existing/novel categorization
+- `SUBMIT_*.csv` - Submission-ready CSVs (may contain false positives)
+
+**Outputs (with AI validation - default):**
+- `novel_tools_FULLTEXT_mining.csv` - All findings
+- `SUBMIT_*.csv` - Unvalidated submissions
+- `VALIDATED_*.csv` - Validated submissions (false positives removed) ⭐ USE THESE
+- `tool_reviews/validation_report.xlsx` - AI validation summary
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
 
 #### `extract_tool_metadata.py`
 Extracts rich metadata from Methods section context:
@@ -47,7 +76,8 @@ Uses pattern matching within 200-character windows around tool mentions.
 
 #### `format_mining_for_submission.py`
 Transforms mining results into submission-ready CSVs:
-- Formats tool mentions to match Synapse table schemas
+- **Separates existing tool links from novel tool entries**
+- Formats novel tool mentions to match Synapse table schemas
 - Generates unique UUIDs for new entries
 - **Pre-fills fields using extracted metadata**
 - Creates publication-tool linking entries
@@ -57,14 +87,15 @@ Transforms mining results into submission-ready CSVs:
 **Outputs (Core Tables):**
 - `SUBMIT_resources.csv` - For syn26450069 (main table with resourceName)
 
-**Outputs (Detail Tables):**
+**Outputs (Detail Tables) - Novel tools only:**
 - `SUBMIT_animal_models.csv` - For syn26486808
 - `SUBMIT_antibodies.csv` - For syn26486811
 - `SUBMIT_cell_lines.csv` - For syn26486823
 - `SUBMIT_genetic_reagents.csv` - For syn26486832
 
 **Outputs (Relationship Tables):**
-- `SUBMIT_publication_links.csv` - For syn51735450
+- `SUBMIT_publication_links_EXISTING.csv` - Links to existing tools (uses existing resourceIds)
+- `SUBMIT_publication_links_NEW.csv` - Links for newly discovered tools
 - `SUBMIT_development.csv` - For syn26486807 (publications where tools were developed)
 
 **Pre-filled Fields:**
@@ -83,23 +114,82 @@ Generates markdown summary for GitHub issue:
 **Output:**
 - `issue_body.md` - Markdown content for GitHub issue
 
+#### `run_publication_reviews.py`
+AI-powered validation of mined tools using Goose agent (optional):
+- **Validates mined tools** to filter out false positives (gene/disease names misidentified as tools)
+- **Analyzes publication type** (lab research vs clinical studies vs questionnaires)
+- **Checks tool keywords** (antibody, plasmid, cell line, etc.) near mentions
+- **Generates validation reports** with detailed reasoning for accept/reject decisions
+- **Creates VALIDATED_*.csv** files with rejected tools removed
+
+⚠️ **Requires Anthropic API key** - See [docs/AI_VALIDATION_README.md](docs/AI_VALIDATION_README.md) for setup
+
+**Usage:**
+```bash
+# Validate specific publications
+python run_publication_reviews.py --pmids "PMID:28078640"
+
+# Validate all mined publications (skips already-reviewed to save API costs)
+python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+
+# Force re-review of already-reviewed publications
+python run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+
+# Integrated with mining (default behavior)
+python fetch_fulltext_and_mine.py
+```
+
+⭐ **Smart Skip Logic**: Publications with existing validation YAMLs are automatically skipped to avoid redundant API calls and save costs. Use `--force-rereviews` to override.
+
+**Example false positive caught:**
+- Publication: "Development of pediatric quality of life inventory for NF1"
+- Mined: "NF1 antibody", "NF1 genetic reagent"
+- AI verdict: **Reject** - "Questionnaire development study, not lab research. NF1 refers to disease throughout."
+
+#### `clean_submission_csvs.py`
+Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
+- **Removes tracking columns** (prefixed with '_') used for manual review
+- **Saves cleaned versions** as CLEAN_*.csv files
+- **Optionally uploads** cleaned data to Synapse tables via --upsert flag
+- **Dry-run mode** (--dry-run) previews uploads without making changes
+- Maps CSV files to appropriate Synapse table IDs automatically
+
+⚠️ **Not part of automated workflow** - intended for manual use after reviewing mined tools
+
+**Usage:**
+```bash
+# Clean only (default)
+python clean_submission_csvs.py
+
+# Preview upload (no changes)
+python clean_submission_csvs.py --upsert --dry-run
+
+# Clean and upload to Synapse
+python clean_submission_csvs.py --upsert
+```
+
 ### 2. GitHub Actions Workflow
 
 **File:** `.github/workflows/check-tool-coverage.yml`
 
 **Schedule:** Weekly on Mondays at 9 AM UTC
 
-**Manual Trigger:** Available via workflow dispatch
+**Manual Trigger:** Available via workflow dispatch with options:
+- **AI Validation** (default: enabled) - Run Goose AI validation on mined tools
+- **Max Publications** (default: all) - Limit number of publications to mine
+- **Force Re-reviews** (default: disabled) - Force re-review of already-reviewed publications
 
 **Steps:**
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
-4. Run coverage analysis
-5. Mine publications for novel tools
-6. Generate summary report
-7. Upload all reports as artifacts (90-day retention)
-8. Create or update GitHub issue with findings
+4. Install Goose CLI (if AI validation enabled)
+5. Configure Goose with Anthropic API
+6. Run coverage analysis
+7. Mine publications for novel tools (with AI validation by default)
+8. Generate summary report
+9. Upload all reports as artifacts including validation results (90-day retention)
+10. Create or update GitHub issue with findings
 
 ## Configuration
 
@@ -112,7 +202,13 @@ The workflow requires the following GitHub secrets to be configured:
    - Used to query publications and tools databases
    - Generate at: https://www.synapse.org/#!PersonalAccessTokens:
 
-2. **`NF_SERVICE_GIT_TOKEN`**
+2. **`ANTHROPIC_API_KEY`** ⭐ NEW
+   - API key for Claude AI (used by Goose for tool validation)
+   - Required for AI validation (enabled by default)
+   - Generate at: https://console.anthropic.com/settings/keys
+   - Cost: ~$0.01-0.03 per publication validated
+
+3. **`NF_SERVICE_GIT_TOKEN`**
    - GitHub token with `issues: write` permission
    - Used to create/update GitHub issues
    - Can use a personal access token or GitHub App token
@@ -144,8 +240,29 @@ python analyze_missing_tools.py
 ```
 
 ### Run Full Text Mining
+
+**With AI validation (recommended):**
 ```bash
+# Requires Goose CLI and Anthropic API key
 python fetch_fulltext_and_mine.py
+
+# Or test with limited publications
+python fetch_fulltext_and_mine.py --max-publications 10
+```
+
+**Setup for AI validation:**
+```bash
+# Install Goose CLI
+go install github.com/block/goose@latest
+
+# Configure with Anthropic API key
+goose configure
+# (Enter API key from https://console.anthropic.com/settings/keys)
+```
+
+**Without AI validation (faster, but may have false positives):**
+```bash
+python fetch_fulltext_and_mine.py --no-validate
 ```
 
 ### Generate Summary
@@ -268,10 +385,11 @@ Monitor coverage percentage in the next weekly report to see improvement toward 
 
 ## Limitations
 
-### Full Text Availability
-- Only publications in PubMed Central (PMC) can be fully analyzed
-- Closed-access articles may only show in coverage analysis
-- Typically ~30-50% of publications have PMC full text
+### Abstract and Full Text Availability
+- **Abstracts:** Fetched from PubMed API - available for nearly all publications (>95%)
+- **Full Text:** Only publications in PubMed Central (PMC) provide complete Methods and Introduction sections
+- Closed-access articles can still be mined via abstracts but with less detail
+- Typically ~30-50% of publications have PMC full text available for enhanced mining
 
 ### False Positives
 - Fuzzy matching may identify gene/protein names that aren't reagents

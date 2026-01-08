@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""
+Clean SUBMIT_*.csv files by removing tracking columns (prefixed with '_').
+Optionally upsert cleaned data to Synapse tables.
+
+These columns are for manual review only and must be removed before
+uploading to Synapse.
+"""
+
+import pandas as pd
+import os
+import glob
+import argparse
+import synapseclient
+from synapseclient import Table
+
+# Mapping of CLEAN_*.csv files to Synapse table IDs
+SYNAPSE_TABLE_MAP = {
+    'CLEAN_animal_models.csv': 'syn26486808',
+    'CLEAN_antibodies.csv': 'syn26486811',
+    'CLEAN_cell_lines.csv': 'syn26486823',
+    'CLEAN_genetic_reagents.csv': 'syn26486832',
+    'CLEAN_publication_links_NEW.csv': 'syn51735450',
+    'CLEAN_publication_links_EXISTING.csv': 'syn51735450',  # Same table for all links
+    'CLEAN_resources.csv': 'syn26450069',
+}
+
+def get_synapse_table_id(filename):
+    """Get Synapse table ID for a given cleaned CSV file."""
+    basename = os.path.basename(filename)
+    return SYNAPSE_TABLE_MAP.get(basename)
+
+def clean_csv(input_file):
+    """Remove columns prefixed with '_' from CSV and save cleaned version.
+
+    Returns:
+        tuple: (output_file, df_clean) - Path to cleaned file and cleaned DataFrame
+    """
+    df = pd.read_csv(input_file)
+
+    # Find columns that start with '_'
+    tracking_cols = [col for col in df.columns if col.startswith('_')]
+
+    if not tracking_cols:
+        print(f"   {input_file}: No tracking columns to remove")
+        # Still save even if no tracking columns
+        output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+        df.to_csv(output_file, index=False)
+        return output_file, df
+
+    # Remove tracking columns
+    df_clean = df.drop(columns=tracking_cols)
+
+    # Save to CLEAN_ prefixed file
+    output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+    df_clean.to_csv(output_file, index=False)
+
+    print(f"   {input_file}: Removed {len(tracking_cols)} columns → {output_file}")
+    print(f"      Removed: {', '.join(tracking_cols)}")
+
+    return output_file, df_clean
+
+def upsert_to_synapse(syn, clean_file, df_clean):
+    """Upsert cleaned data to Synapse table.
+
+    This function appends new rows to the Synapse table. Since we're working with
+    new tool discoveries and publication links, we're always adding new rows rather
+    than updating existing ones.
+
+    Args:
+        syn: Synapse client
+        clean_file: Path to cleaned CSV file
+        df_clean: Cleaned DataFrame to upload
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    # Get Synapse table ID for this file
+    table_id = get_synapse_table_id(clean_file)
+
+    if not table_id:
+        print(f"      ⚠️  No Synapse table mapping for {os.path.basename(clean_file)}")
+        return False
+
+    if df_clean.empty:
+        print(f"      ⚠️  Empty DataFrame, skipping upload")
+        return False
+
+    try:
+        # Store the DataFrame to Synapse table
+        # This appends new rows to the existing table
+        table = Table(table_id, df_clean)
+        table = syn.store(table)
+
+        print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
+        return True
+
+    except Exception as e:
+        print(f"      ❌ Error uploading to {table_id}: {str(e)}")
+        return False
+
+def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Clean SUBMIT_*.csv files and optionally upsert to Synapse',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Clean CSVs only (default)
+  python clean_submission_csvs.py
+
+  # Clean and upsert to Synapse
+  python clean_submission_csvs.py --upsert
+
+  # Dry run (show what would be uploaded without uploading)
+  python clean_submission_csvs.py --upsert --dry-run
+        """
+    )
+    parser.add_argument(
+        '--upsert',
+        action='store_true',
+        help='Upload cleaned data to Synapse tables'
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Show what would be uploaded without actually uploading (requires --upsert)'
+    )
+
+    args = parser.parse_args()
+
+    print("=" * 80)
+    print("CLEANING SUBMISSION CSVs FOR SYNAPSE UPLOAD")
+    print("=" * 80)
+    print("\nRemoving tracking columns (prefixed with '_') from SUBMIT_*.csv files...")
+    print("These columns are for manual review only.\n")
+
+    if args.upsert:
+        if args.dry_run:
+            print("🔍 DRY RUN MODE - No data will be uploaded\n")
+        else:
+            print("⚠️  UPSERT MODE - Data will be uploaded to Synapse!\n")
+
+    # Find all SUBMIT_*.csv files
+    submit_files = glob.glob('SUBMIT_*.csv')
+
+    if not submit_files:
+        print("❌ No SUBMIT_*.csv files found!")
+        return
+
+    print(f"Found {len(submit_files)} files to clean:\n")
+
+    # Initialize Synapse client if upserting
+    syn = None
+    if args.upsert and not args.dry_run:
+        try:
+            print("Connecting to Synapse...")
+            syn = synapseclient.Synapse()
+            syn.login()
+            print("✅ Connected to Synapse\n")
+        except Exception as e:
+            print(f"❌ Failed to connect to Synapse: {str(e)}")
+            print("Continuing with cleaning only...\n")
+            args.upsert = False
+
+    # Process each file
+    upload_summary = []
+    for file in sorted(submit_files):
+        clean_file, df_clean = clean_csv(file)
+
+        # Upsert if requested
+        if args.upsert and not args.dry_run:
+            success = upsert_to_synapse(syn, clean_file, df_clean)
+            upload_summary.append((clean_file, len(df_clean), success))
+        elif args.dry_run:
+            table_id = get_synapse_table_id(clean_file)
+            if table_id:
+                print(f"      🔍 Would upload {len(df_clean)} rows to {table_id}")
+                upload_summary.append((clean_file, len(df_clean), None))
+
+    # Print summary
+    print("\n" + "=" * 80)
+    print("CLEANING COMPLETE")
+    print("=" * 80)
+    print("\n✅ Clean files saved with CLEAN_* prefix")
+
+    if args.upsert and not args.dry_run:
+        print("\n📊 UPLOAD SUMMARY:")
+        total_rows = 0
+        success_count = 0
+        for clean_file, row_count, success in upload_summary:
+            total_rows += row_count
+            if success:
+                success_count += 1
+                status = "✅"
+            else:
+                status = "❌"
+            print(f"   {status} {os.path.basename(clean_file)}: {row_count} rows")
+
+        print(f"\n   Total: {success_count}/{len(upload_summary)} tables uploaded successfully")
+        print(f"   Total rows: {total_rows}")
+
+    elif args.dry_run:
+        print("\n📊 DRY RUN SUMMARY:")
+        total_rows = sum(count for _, count, _ in upload_summary)
+        print(f"   Would upload {len(upload_summary)} files")
+        print(f"   Would upload {total_rows} total rows")
+
+    else:
+        print("\n⚠️  Review CLEAN_*.csv files before uploading to Synapse")
+        print("⚠️  Verify all required fields are filled in")
+        print("\n💡 To upload to Synapse, run: python clean_submission_csvs.py --upsert")
+
+if __name__ == "__main__":
+    main()

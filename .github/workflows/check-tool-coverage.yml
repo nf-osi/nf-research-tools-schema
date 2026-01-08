@@ -5,6 +5,22 @@ on:
     # Run weekly on Mondays at 9 AM UTC
     - cron: '0 9 * * 1'
   workflow_dispatch:  # Allow manual triggering
+    inputs:
+      ai_validation:
+        description: 'Run AI validation on mined tools using Goose'
+        required: false
+        type: boolean
+        default: true
+      max_publications:
+        description: 'Maximum number of publications to mine (blank = all)'
+        required: false
+        type: string
+        default: ''
+      force_rereviews:
+        description: 'Force re-review of already-reviewed publications'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -28,6 +44,26 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Install Goose CLI
+        if: ${{ github.event.inputs.ai_validation != 'false' }}
+        run: |
+          echo "Installing Goose CLI for AI validation..."
+          # Install Go if needed
+          sudo apt-get update
+          sudo apt-get install -y golang-go
+          # Install Goose
+          go install github.com/block/goose@latest
+          # Add to PATH
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Configure Goose
+        if: ${{ github.event.inputs.ai_validation != 'false' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Configuring Goose with Anthropic API..."
+          # Goose will use ANTHROPIC_API_KEY from environment
+
       - name: Analyze GFF tool coverage
         id: coverage
         env:
@@ -43,10 +79,29 @@ jobs:
         id: mining
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           echo "Mining publications for novel tools..."
-          # Limit to first 50 publications to avoid long runtime
-          python fetch_fulltext_and_mine.py 2>&1 | tee mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
+
+          # Build command with optional flags
+          CMD="python fetch_fulltext_and_mine.py"
+
+          # Add max publications limit if specified
+          if [ -n "${{ github.event.inputs.max_publications }}" ]; then
+            CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
+          fi
+
+          # Disable AI validation if requested
+          if [ "${{ github.event.inputs.ai_validation }}" = "false" ]; then
+            CMD="$CMD --no-validate"
+            echo "AI validation disabled"
+          else
+            echo "AI validation enabled (default)"
+          fi
+
+          # Run mining
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
@@ -84,6 +139,10 @@ jobs:
             priority_publications_FULLTEXT.csv
             GFF_publications_with_tools_FULLTEXT.csv
             SUBMIT_*.csv
+            VALIDATED_*.csv
+            tool_reviews/validation_report.xlsx
+            tool_reviews/validation_summary.json
+            tool_reviews/results/*.yaml
             coverage_output.log
             mining_output.log
             formatting_output.log

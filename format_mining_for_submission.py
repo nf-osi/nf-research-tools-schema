@@ -51,9 +51,77 @@ def get_tool_metadata(row, tool_type, tool_name):
         return {}
 
 
+def format_existing_tool_links(mining_df):
+    """
+    Format publication links to EXISTING tools (no new tool creation).
+
+    These are publications that mention tools already in the database.
+    Only creates link records, not new tool records.
+
+    Args:
+        mining_df: DataFrame with mining results including 'existing_tools' column
+
+    Returns:
+        DataFrame with link records to existing tools
+    """
+    link_rows = []
+
+    for idx, row in mining_df.iterrows():
+        if 'existing_tools' not in row or pd.isna(row['existing_tools']):
+            continue
+
+        # Parse existing_tools (JSON string: {tool_type: {tool_name: resourceId}})
+        try:
+            existing_tools = json.loads(row['existing_tools'])
+        except:
+            continue
+
+        # Get tool sources if available
+        tool_sources_dict = {}
+        if 'tool_sources' in row and pd.notna(row['tool_sources']):
+            try:
+                tool_sources_dict = json.loads(row['tool_sources'])
+            except:
+                pass
+
+        for tool_type, tools_dict in existing_tools.items():
+            if not tools_dict:
+                continue
+
+            for tool_name, resource_id in tools_dict.items():
+                tool_key = f"{tool_type}:{tool_name}"
+                sources = tool_sources_dict.get(tool_key, [])
+
+                link_rows.append({
+                    'resourceId': resource_id,  # Use existing resourceId
+                    'usageId': generate_uuid(),
+                    'publicationId': generate_uuid(),
+                    'pmid': row.get('pmid', ''),
+                    'doi': row.get('doi', ''),
+                    'publicationTitle': row.get('title', ''),
+                    'authors': '',
+                    'journal': row.get('journal', ''),
+                    'abstract': '',
+                    'publicationDate': row.get('year', ''),
+                    'publicationDateUnix': '',
+                    'citation': '',
+                    # Extra tracking fields
+                    '_resourceType': tool_type,
+                    '_toolName': tool_name,
+                    '_linkType': 'EXISTING_TOOL',
+                    '_sources': ', '.join(sources) if isinstance(sources, list) else str(sources),
+                    '_fundingAgency': row.get('fundingAgency', ''),
+                    '_confidence': 'AUTO - Matched to existing tool - VERIFY'
+                })
+
+    return pd.DataFrame(link_rows)
+
+
 def format_animal_models(mining_df):
     """
     Format animal model suggestions for syn26486808.
+
+    Now processes NOVEL tools only (not existing tools).
 
     Actual Synapse columns: transplantationDonorId, animalModelId, donorId,
                            backgroundSubstrain, strainNomenclature, backgroundStrain,
@@ -63,13 +131,21 @@ def format_animal_models(mining_df):
     animal_rows = []
 
     for idx, row in mining_df.iterrows():
-        if not row.get('animal_models') or pd.isna(row.get('animal_models')):
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
             continue
 
-        models = str(row['animal_models']).split(', ')
+        # Parse novel_tools (JSON string: {tool_type: [tool_names]})
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        models = novel_tools.get('animal_models', [])
+        if not models:
+            continue
 
         for model_name in models:
-            if not model_name.strip():
+            if not model_name or not str(model_name).strip():
                 continue
 
             # Get extracted metadata
@@ -107,19 +183,29 @@ def format_antibodies(mining_df):
     """
     Format antibody suggestions for syn26486811.
 
+    Now processes NOVEL tools only (not existing tools).
+
     Actual Synapse columns: cloneId, uniprotId, antibodyId, reactiveSpecies,
                            hostOrganism, conjugate, clonality, targetAntigen
     """
     antibody_rows = []
 
     for idx, row in mining_df.iterrows():
-        if not row.get('antibodies') or pd.isna(row.get('antibodies')):
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
             continue
 
-        antibodies = str(row['antibodies']).split(', ')
+        # Parse novel_tools (JSON string: {tool_type: [tool_names]})
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        antibodies = novel_tools.get('antibodies', [])
+        if not antibodies:
+            continue
 
         for antibody_target in antibodies:
-            if not antibody_target.strip():
+            if not antibody_target or not str(antibody_target).strip():
                 continue
 
             # Get extracted metadata
@@ -156,6 +242,8 @@ def format_cell_lines(mining_df):
     """
     Format cell line suggestions for syn26486823.
 
+    Now processes NOVEL tools only (not existing tools).
+
     Actual Synapse columns: cellLineId, donorId, originYear, organ, strProfile, tissue,
                            cellLineManifestation, resistance, cellLineCategory,
                            contaminatedMisidentified, cellLineGeneticDisorder,
@@ -167,13 +255,21 @@ def format_cell_lines(mining_df):
     cell_line_rows = []
 
     for idx, row in mining_df.iterrows():
-        if not row.get('cell_lines') or pd.isna(row.get('cell_lines')):
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
             continue
 
-        cell_lines = str(row['cell_lines']).split(', ')
+        # Parse novel_tools (JSON string: {tool_type: [tool_names]})
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        cell_lines = novel_tools.get('cell_lines', [])
+        if not cell_lines:
+            continue
 
         for cell_line_name in cell_lines:
-            if not cell_line_name.strip():
+            if not cell_line_name or not str(cell_line_name).strip():
                 continue
 
             # Get extracted metadata
@@ -213,6 +309,8 @@ def format_genetic_reagents(mining_df):
     """
     Format genetic reagent suggestions for syn26486832.
 
+    Now processes NOVEL tools only (not existing tools).
+
     Actual Synapse columns: vectorType, insertEntrezId, geneticReagentId, 5primer,
                            cloningMethod, copyNumber, insertSpecies, nTerminalTag,
                            cTerminalTag, totalSize, 5primeCloningSite, growthTemp,
@@ -224,13 +322,21 @@ def format_genetic_reagents(mining_df):
     genetic_reagent_rows = []
 
     for idx, row in mining_df.iterrows():
-        if not row.get('genetic_reagents') or pd.isna(row.get('genetic_reagents')):
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
             continue
 
-        reagents = str(row['genetic_reagents']).split(', ')
+        # Parse novel_tools (JSON string: {tool_type: [tool_names]})
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        reagents = novel_tools.get('genetic_reagents', [])
+        if not reagents:
+            continue
 
         for reagent_name in reagents:
-            if not reagent_name.strip():
+            if not reagent_name or not str(reagent_name).strip():
                 continue
 
             # Get extracted metadata
@@ -518,15 +624,25 @@ def main():
     else:
         print(" (none found)")
 
-    # Publication Links
-    print("\n3. Formatting publication-tool links...")
-    links_df = format_publication_links(mining_df, tool_csvs)
-    if not links_df.empty:
-        output_file = 'SUBMIT_publication_links.csv'
-        links_df.to_csv(output_file, index=False)
-        print(f"   ✓ {len(links_df)} links → {output_file}")
+    # Existing Tool Links (NEW)
+    print("\n3a. Formatting links to EXISTING tools...")
+    existing_links_df = format_existing_tool_links(mining_df)
+    if not existing_links_df.empty:
+        output_file = 'SUBMIT_publication_links_EXISTING.csv'
+        existing_links_df.to_csv(output_file, index=False)
+        print(f"   ✓ {len(existing_links_df)} links to existing tools → {output_file}")
     else:
-        print("   (no links to create)")
+        print("   (no existing tool links)")
+
+    # New Tool Links
+    print("\n3b. Formatting links to NEW tools...")
+    new_links_df = format_publication_links(mining_df, tool_csvs)
+    if not new_links_df.empty:
+        output_file = 'SUBMIT_publication_links_NEW.csv'
+        new_links_df.to_csv(output_file, index=False)
+        print(f"   ✓ {len(new_links_df)} links to new tools → {output_file}")
+    else:
+        print("   (no new tool links)")
 
     # Resources (main table with resourceName)
     print("\n4. Formatting Resource table entries...")
@@ -548,13 +664,17 @@ def main():
     else:
         print("   (no development publications found)")
 
-    # Summary with development breakdown
+    # Summary with existing vs novel breakdown
     print("\n" + "=" * 80)
     print("SUMMARY")
     print("=" * 80)
-    total_tools = sum(len(df) for df in tool_csvs.values())
-    print(f"\nTotal tool suggestions: {total_tools}")
-    print(f"Total publication links: {len(links_df)}")
+    total_novel_tools = sum(len(df) for df in tool_csvs.values())
+    total_existing_links = len(existing_links_df) if not existing_links_df.empty else 0
+    total_new_links = len(new_links_df) if not new_links_df.empty else 0
+
+    print(f"\nNovel tool suggestions: {total_novel_tools}")
+    print(f"Links to existing tools: {total_existing_links}")
+    print(f"Total publication links: {total_existing_links + total_new_links}")
 
     # Count development vs usage
     dev_count = 0
@@ -564,7 +684,7 @@ def main():
             dev_count += df['_is_development'].sum()
             usage_count += len(df) - df['_is_development'].sum()
 
-    print(f"\n🔬 Development status:")
+    print(f"\n🔬 Development status (novel tools):")
     print(f"   - Development publications: {dev_count} tools")
     print(f"   - Usage publications: {usage_count} tools")
 
@@ -582,8 +702,10 @@ def main():
     if not genetic_reagent_df.empty:
         print(f"   - SUBMIT_genetic_reagents.csv ({len(genetic_reagent_df)} entries)")
     print("\n   Relationship Tables:")
-    if not links_df.empty:
-        print(f"   - SUBMIT_publication_links.csv ({len(links_df)} entries)")
+    if not existing_links_df.empty:
+        print(f"   - SUBMIT_publication_links_EXISTING.csv ({len(existing_links_df)} entries)")
+    if not new_links_df.empty:
+        print(f"   - SUBMIT_publication_links_NEW.csv ({len(new_links_df)} entries)")
     if not development_df.empty:
         print(f"   - SUBMIT_development.csv ({len(development_df)} publications)")
 
