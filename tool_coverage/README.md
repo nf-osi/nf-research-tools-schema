@@ -8,7 +8,7 @@ This repository includes an automated workflow to monitor tool coverage in the N
 
 ### 1. Scripts
 
-#### `tool_coverage/analyze_missing_tools.py`
+#### `tool_coverage/scripts/analyze_missing_tools.py`
 Analyzes current tool coverage against GFF-funded publications:
 - Queries publications table (syn16857542) for GFF-funded publications
 - Checks which publications have linked tools in the database (syn51730943)
@@ -19,7 +19,7 @@ Analyzes current tool coverage against GFF-funded publications:
 - `GFF_Tool_Coverage_Report.pdf` - Visual coverage analysis
 - `gff_publications_MISSING_tools.csv` - Publications without tools
 
-#### `tool_coverage/fetch_fulltext_and_mine.py`
+#### `tool_coverage/scripts/fetch_fulltext_and_mine.py`
 Mines abstracts and full text for tools, with AI validation enabled by default:
 - **Mines ALL publications via abstracts** (fetched from PubMed API using PMID) - no PMC requirement
 - **Enhances with full text when available:** Fetches PMC XML and extracts Methods + Introduction sections
@@ -45,13 +45,13 @@ Mines abstracts and full text for tools, with AI validation enabled by default:
 **Command-line options:**
 ```bash
 # With AI validation (default)
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Without AI validation (faster, may have false positives)
-python tool_coverage/fetch_fulltext_and_mine.py --no-validate
+python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
 
 # Limit publications for testing
-python tool_coverage/fetch_fulltext_and_mine.py --max-publications 50
+python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 50
 ```
 
 **Outputs (without AI validation):**
@@ -65,7 +65,7 @@ python tool_coverage/fetch_fulltext_and_mine.py --max-publications 50
 - `tool_reviews/validation_report.xlsx` - AI validation summary
 - `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
 
-#### `tool_coverage/extract_tool_metadata.py`
+#### `tool_coverage/scripts/extract_tool_metadata.py`
 Extracts rich metadata from Methods section context:
 - **Antibodies:** clonality (monoclonal/polyclonal), host organism, vendor, catalog number, reactive species
 - **Cell Lines:** category (cancer/normal), organ, tissue
@@ -74,7 +74,7 @@ Extracts rich metadata from Methods section context:
 
 Uses pattern matching within 200-character windows around tool mentions.
 
-#### `tool_coverage/format_mining_for_submission.py`
+#### `tool_coverage/scripts/format_mining_for_submission.py`
 Transforms mining results into submission-ready CSVs:
 - **Separates existing tool links from novel tool entries**
 - Formats novel tool mentions to match Synapse table schemas
@@ -104,7 +104,7 @@ Transforms mining results into submission-ready CSVs:
 - Animal models: strain, substrain, manifestations, allele type
 - Genetic reagents: vector type, resistance, backbone
 
-#### `tool_coverage/generate_coverage_summary.py`
+#### `tool_coverage/scripts/generate_coverage_summary.py`
 Generates markdown summary for GitHub issue:
 - Summarizes current coverage status
 - Lists novel tools discovered
@@ -114,7 +114,7 @@ Generates markdown summary for GitHub issue:
 **Output:**
 - `issue_body.md` - Markdown content for GitHub issue
 
-#### `tool_coverage/run_publication_reviews.py`
+#### `tool_coverage/scripts/run_publication_reviews.py`
 AI-powered validation of mined tools using Goose agent (optional):
 - **Validates mined tools** to filter out false positives (gene/disease names misidentified as tools)
 - **Analyzes publication type** (lab research vs clinical studies vs questionnaires)
@@ -127,16 +127,16 @@ AI-powered validation of mined tools using Goose agent (optional):
 **Usage:**
 ```bash
 # Validate specific publications
-python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640"
+python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640"
 
 # Validate all mined publications (skips already-reviewed to save API costs)
-python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 
 # Force re-review of already-reviewed publications
-python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
 
 # Integrated with mining (default behavior)
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 ```
 
 ⭐ **Smart Optimizations**:
@@ -150,7 +150,7 @@ python tool_coverage/fetch_fulltext_and_mine.py
 - Mined: "NF1 antibody", "NF1 genetic reagent"
 - AI verdict: **Reject** - "Questionnaire development study, not lab research. NF1 refers to disease throughout."
 
-#### `tool_coverage/clean_submission_csvs.py`
+#### `tool_coverage/scripts/clean_submission_csvs.py`
 Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
 - **Removes tracking columns** (prefixed with '_') used for manual review
 - **Saves cleaned versions** as CLEAN_*.csv files
@@ -163,13 +163,13 @@ Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
 **Usage:**
 ```bash
 # Clean only (default)
-python tool_coverage/clean_submission_csvs.py
+python tool_coverage/scripts/clean_submission_csvs.py
 
 # Preview upload (no changes)
-python tool_coverage/clean_submission_csvs.py --upsert --dry-run
+python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
 # Clean and upload to Synapse
-python tool_coverage/clean_submission_csvs.py --upsert
+python tool_coverage/scripts/clean_submission_csvs.py --upsert
 ```
 
 ### 2. GitHub Actions Workflow
@@ -240,7 +240,7 @@ export SYNAPSE_AUTH_TOKEN="your_token_here"
 
 ### Run Coverage Analysis
 ```bash
-python tool_coverage/analyze_missing_tools.py
+python tool_coverage/scripts/analyze_missing_tools.py
 ```
 
 ### Run Full Text Mining
@@ -248,10 +248,10 @@ python tool_coverage/analyze_missing_tools.py
 **With AI validation (recommended):**
 ```bash
 # Requires Goose CLI and Anthropic API key
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Or test with limited publications
-python tool_coverage/fetch_fulltext_and_mine.py --max-publications 10
+python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 10
 ```
 
 **Setup for AI validation:**
@@ -266,12 +266,12 @@ goose configure
 
 **Without AI validation (faster, but may have false positives):**
 ```bash
-python tool_coverage/fetch_fulltext_and_mine.py --no-validate
+python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
 ```
 
 ### Generate Summary
 ```bash
-python tool_coverage/generate_coverage_summary.py > issue_body.md
+python tool_coverage/scripts/generate_coverage_summary.py > issue_body.md
 ```
 
 ## Understanding the Results

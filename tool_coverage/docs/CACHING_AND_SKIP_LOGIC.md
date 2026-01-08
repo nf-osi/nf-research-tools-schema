@@ -116,14 +116,14 @@ rm -rf tool_reviews/publication_cache/
 
 ```bash
 # Run mining (creates cache)
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Check cache was created
 ls tool_reviews/publication_cache/
 # Should see: PMID:28078640_text.json, PMID:28198162_text.json, ...
 
 # Run validation (uses cache)
-python tool_coverage/run_publication_reviews.py --skip-goose
+python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 
 # Should see: "✅ Using cached text (skipping API calls)"
 ```
@@ -178,7 +178,7 @@ for idx, row in mining_df.iterrows():
 
 ```bash
 # Only validates new publications
-python tool_coverage/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
 ```
 
 Output:
@@ -198,7 +198,7 @@ Running Goose Reviews for 50 publications
 
 ```bash
 # Re-validates ALL publications (override skip logic)
-python tool_coverage/run_publication_reviews.py --force-rereviews
+python tool_coverage/scripts/run_publication_reviews.py --force-rereviews
 ```
 
 Output:
@@ -212,7 +212,7 @@ Output:
 
 ```bash
 # Force re-review specific publications
-python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745" --force-rereviews
+python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745" --force-rereviews
 ```
 
 ### When to Use Each Mode
@@ -270,12 +270,12 @@ To re-review a specific publication:
 **Option 1: Delete YAML file**
 ```bash
 rm tool_reviews/results/PMID:28078640_tool_review.yaml
-python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640"
+python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640"
 ```
 
 **Option 2: Use force flag**
 ```bash
-python tool_coverage/run_publication_reviews.py --pmids "PMID:28078640" --force-rereviews
+python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640" --force-rereviews
 ```
 
 ### GitHub Actions Integration
@@ -380,13 +380,13 @@ nf-research-tools-schema/
 
 ```bash
 # Run mining
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Check cache files created
 ls -lh tool_reviews/publication_cache/
 
 # Run validation
-python tool_coverage/run_publication_reviews.py --skip-goose
+python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 
 # Should see: "✅ Using cached text (skipping API calls)"
 ```
@@ -395,7 +395,7 @@ python tool_coverage/run_publication_reviews.py --skip-goose
 
 ```bash
 # Run validation
-python tool_coverage/run_publication_reviews.py
+python tool_coverage/scripts/run_publication_reviews.py
 
 # Should see: "⏭️  Skipping PMID:... (already reviewed)"
 
@@ -411,10 +411,10 @@ rm -rf tool_reviews/publication_cache/
 rm -rf tool_reviews/results/*.yaml
 
 # Re-run mining (creates fresh cache)
-python tool_coverage/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Re-run validation (reviews all)
-python tool_coverage/run_publication_reviews.py
+python tool_coverage/scripts/run_publication_reviews.py
 ```
 
 ---
