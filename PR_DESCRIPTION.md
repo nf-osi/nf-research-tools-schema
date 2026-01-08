@@ -1,23 +1,18 @@
 # Automated Tool Coverage Monitoring with AI-Powered Validation
 
-> **Builds on**: PR #92 - Automated tool coverage monitoring and intelligent mining workflow
-
 ## Summary
 
-Implements comprehensive automated workflow to monitor GFF tool coverage and discover novel tools from publications with intelligent metadata extraction **and AI-powered validation** for streamlined submission.
+Implements comprehensive automated workflow to monitor GFF tool coverage and discover novel tools from publications with intelligent metadata extraction and AI-powered validation for streamlined submission.
 
-**PR #92 established** the foundation:
-- ✅ Weekly automated workflow for tool coverage monitoring
-- ✅ Full-text mining from PMC with fuzzy matching (88% threshold)
-- ✅ Intelligent metadata extraction (20+ fields pre-filled, ~70-80% reduction in manual entry)
-- ✅ Methods section isolation to reduce false positives
-- ✅ Submission-ready CSVs for Synapse tables
-
-**This PR adds** AI-powered enhancements:
+**This PR includes**:
+- 🤖 **Weekly automated workflow** for tool coverage monitoring
+- 🔍 **Full-text mining** from PMC with fuzzy matching (88% threshold)
+- 🧠 **Intelligent metadata extraction** (20+ fields pre-filled, ~70-80% reduction in manual entry)
 - 🤖 **AI validation** using Goose + Claude Sonnet 4 to filter false positives (100% accuracy)
 - 💾 **Text caching** to eliminate duplicate API calls (50% reduction)
 - ⏭️ **Smart skip logic** to avoid re-reviewing already-validated publications (85-90% cost savings)
 - 🎯 **Combined optimization**: 80-85% reduction in API calls and costs for ongoing operations
+- 📤 **Submission-ready CSVs** for Synapse tables
 
 ## Key Features
 
@@ -25,7 +20,7 @@ Implements comprehensive automated workflow to monitor GFF tool coverage and dis
 - GitHub Actions workflow runs every Monday at 9 AM UTC
 - Analyzes GFF publication coverage against 80% target
 - Mines full text from PubMed Central for novel tools
-- **AI validates tools to remove false positives** (NEW)
+- AI validates tools to remove false positives
 - Creates GitHub issues with findings and downloadable reports
 
 ### 🔍 Full Text Mining with Intelligence
@@ -33,9 +28,9 @@ Implements comprehensive automated workflow to monitor GFF tool coverage and dis
 - Extracts Methods and Introduction sections using pattern matching
 - Uses 1,142 existing tools as training data
 - Applies fuzzy matching (88% threshold) to find mentions
-- **AI analyzes publication context** to distinguish disease/gene references from actual tools (NEW)
+- AI analyzes publication context to distinguish disease/gene references from actual tools
 
-### 🧠 AI-Powered Validation (NEW)
+### 🧠 AI-Powered Validation
 For each publication, the AI agent:
 1. **Analyzes publication type** (lab research, clinical study, questionnaire development, etc.)
 2. **Checks for Methods sections** indicating experimental work
@@ -61,7 +56,7 @@ Automatically generates formatted CSVs for each tool type table:
 - `VALIDATED_SUBMIT_genetic_reagents.csv` → syn26486832
 - `VALIDATED_SUBMIT_resources.csv` (publication links)
 
-Original `SUBMIT_*.csv` files still generated for comparison.
+Original `SUBMIT_*.csv` files also generated for comparison.
 
 ### 🧠 Intelligent Metadata Extraction
 **Automatically pre-fills 20+ fields** from Methods section context:
@@ -72,7 +67,7 @@ Original `SUBMIT_*.csv` files still generated for comparison.
 
 **~70-80% reduction in manual data entry**
 
-### ⚡ Smart Optimizations (NEW)
+### ⚡ Smart Optimizations
 
 **1. Publication Text Caching**:
 - Fetched text (abstract, methods, intro) cached during mining phase
@@ -98,7 +93,7 @@ Original `SUBMIT_*.csv` files still generated for comparison.
 
 ### Complete Workflow
 
-**Mining Phase** (from PR #92):
+**Mining Phase**:
 ```
 1. Load existing tools from Synapse (1,142 tools across 4 tables)
 2. Build patterns from tool names for fuzzy matching
@@ -108,15 +103,15 @@ Original `SUBMIT_*.csv` files still generated for comparison.
    b. Extract Methods and Introduction sections
    c. Apply fuzzy matching against known patterns
    d. Extract metadata from surrounding context
-   e. Cache fetched text for validation ← NEW
+   e. Cache fetched text for validation
 5. Generate SUBMIT_*.csv files (may contain false positives)
 ```
 
-**Validation Phase** (NEW in this PR):
+**Validation Phase**:
 ```
 6. For each publication with mined tools:
-   a. Load cached text (or fetch if cache missing) ← NEW
-   b. Check for existing validation YAML (skip if found) ← NEW
+   a. Load cached text (or fetch if cache missing)
+   b. Check for existing validation YAML (skip if found)
    c. Prepare input JSON with abstract, methods, intro text
    d. Invoke Goose AI agent with publication_tool_review recipe
    e. AI analyzes publication and validates each tool
@@ -126,13 +121,7 @@ Original `SUBMIT_*.csv` files still generated for comparison.
 9. Create validation_report.xlsx with summary statistics
 ```
 
-**Before (PR #92 alone)**:
-```
-Publications → Mine Tools → Generate SUBMIT_*.csv → Manual Review → Upload to Synapse
-                            ↑ May contain false positives
-```
-
-**After (PR #92 + This PR)**:
+**Workflow Diagram**:
 ```
 Publications → Mine Tools → Cache Text → AI Validation → VALIDATED_*.csv → Upload to Synapse
                 ↓                              ↓              ↑ False positives removed
@@ -169,30 +158,29 @@ This PR requires the following GitHub repository secret to be added **before the
 - Target: **16/21 (80%)**
 - Gap: **15 publications needed**
 
-## New and Modified Files
+## New Files
 
-### New Files (PR #92)
-- `.github/workflows/check-tool-coverage.yml` - Weekly automation
-- `fetch_fulltext_and_mine.py` - Full text mining with PMC API
+### Core Mining and Validation
+- `.github/workflows/check-tool-coverage.yml` - Weekly automation with AI validation
+- `fetch_fulltext_and_mine.py` - Full text mining with PMC API, text caching, validation integration
 - `extract_tool_metadata.py` - Intelligent metadata extraction (40+ patterns)
 - `format_mining_for_submission.py` - CSV formatting for each table
+- `run_publication_reviews.py` - AI validation orchestrator with skip logic
+- `recipes/publication_tool_review.yaml` - Goose AI agent recipe for validation
+
+### Analysis and Reporting
 - `analyze_missing_tools.py` - Coverage analysis and reporting
 - `generate_coverage_summary.py` - GitHub issue generation
-- `TOOL_COVERAGE_WORKFLOW.md` - Complete documentation
 
-### New Files (This PR - AI Validation)
-- `recipes/publication_tool_review.yaml` - Goose AI agent recipe for validation
-- `run_publication_reviews.py` - Validation orchestrator script
+### Documentation
+- `TOOL_COVERAGE_WORKFLOW.md` - Complete workflow documentation
 - `docs/AI_VALIDATION_README.md` - AI validation setup and usage guide
 - `CACHING_AND_SKIP_LOGIC.md` - Optimization details
 - `VALIDATION_TEST_RESULTS.md` - Test results and analysis
 - `SKIP_LOGIC_FEATURE.md` - Skip logic documentation
 
-### Modified Files (This PR)
-- `fetch_fulltext_and_mine.py` - Added argparse, AI validation integration, text caching
-- `.github/workflows/check-tool-coverage.yml` - Added Goose CLI installation, validation options
-- `TOOL_COVERAGE_WORKFLOW.md` - Updated with AI validation sections
-- `.gitignore` - Added tool_reviews/ patterns
+### Configuration
+- `.gitignore` - Updated with tool_reviews/ patterns
 
 ## Setup Requirements
 
@@ -284,14 +272,13 @@ See "Deployment Prerequisites" section above for required `ANTHROPIC_API_KEY` se
 
 ## Testing
 
-### From PR #92
+### Metadata Extraction
 - ✅ Validated metadata extraction with realistic sample data
 - ✅ Tested CSV formatting matches Synapse table schemas
 - ✅ Verified automated workflow steps
 - ✅ Confirmed pre-filling of vendor, catalog, strain, and organism fields
 
-### From This PR (AI Validation)
-
+### AI Validation
 **1. False Positive Detection**:
 - ✅ Tested on 2 publications (PMID:28078640, PMID:28198162)
   - Both questionnaire development studies (non-lab research)
@@ -322,7 +309,7 @@ See "Deployment Prerequisites" section above for required `ANTHROPIC_API_KEY` se
 ## Performance
 
 **Speed**:
-- Mining: ~0.3s per publication (unchanged from PR #92)
+- Mining: ~0.3s per publication
 - AI Validation: ~30-60 seconds per publication (depending on text length)
 - For 50 publications: ~25-50 minutes (first run), ~3-5 minutes (subsequent runs with skip logic)
 
@@ -335,7 +322,7 @@ See "Deployment Prerequisites" section above for required `ANTHROPIC_API_KEY` se
 
 ## Benefits
 
-### From PR #92
+### Efficiency
 - Automated weekly monitoring reduces manual tracking
 - Full text analysis improves tool discovery accuracy
 - Pre-filled CSVs accelerate submission process (70-80% less data entry)
@@ -343,46 +330,30 @@ See "Deployment Prerequisites" section above for required `ANTHROPIC_API_KEY` se
 - Consistent nomenclature across submissions
 - Traceability from publication to tool
 
-### From This PR (AI Validation)
+### Quality
 - **Dramatically reduces false positives** (100% detection rate in tests)
 - **Audit trail for every decision** (detailed reasoning in YAMLs)
 - **Significantly reduces manual review burden**
-- **Cost-optimized** through caching and skip logic (80-85% savings)
-- **Respects NCBI infrastructure** (50% fewer API calls)
-- **Incremental processing** (only new publications reviewed weekly)
+
+### Cost Optimization
+- **Text caching**: 50% fewer API calls, respects NCBI infrastructure
+- **Skip logic**: 85-90% AI cost savings on weekly runs
+- **Combined**: 80-85% total cost reduction
+- **Incremental processing**: Only new publications reviewed weekly
 
 ## Documentation
 
 Complete documentation includes:
-
-**From PR #92**:
-- `TOOL_COVERAGE_WORKFLOW.md` - Main workflow documentation (updated with AI validation)
-- `extract_tool_metadata.py` docstrings - Metadata extraction patterns
-
-**From This PR**:
-- `docs/AI_VALIDATION_README.md` - AI validation setup and usage guide
-  - Setup requirements (Goose CLI, Anthropic API key)
-  - Architecture explanation
-  - Workflow examples
-  - Troubleshooting guide
-  - Customization options
-- `CACHING_AND_SKIP_LOGIC.md` - Optimization details
-  - Publication text caching explanation with code examples
-  - Review skip logic explanation
-  - Combined benefits analysis
-  - Best practices
+- `TOOL_COVERAGE_WORKFLOW.md` - Main workflow documentation with all features
+- `docs/AI_VALIDATION_README.md` - AI validation setup, architecture, troubleshooting
+- `CACHING_AND_SKIP_LOGIC.md` - Optimization details and best practices
 - `VALIDATION_TEST_RESULTS.md` - Test results and analysis
 - `SKIP_LOGIC_FEATURE.md` - Skip logic feature documentation
+- `extract_tool_metadata.py` docstrings - Metadata extraction patterns
 
 ## Breaking Changes
 
-**None** - This is a backward-compatible enhancement:
-- AI validation is enabled by default but can be disabled with `--no-validate`
-- Original `SUBMIT_*.csv` files are still generated (unvalidated)
-- New `VALIDATED_*.csv` files are additional outputs
-- Existing scripts and workflows continue to work
-
-To use the old behavior (no AI validation):
+**None** - AI validation can be disabled:
 ```bash
 # Command line
 python fetch_fulltext_and_mine.py --no-validate
@@ -391,6 +362,8 @@ python fetch_fulltext_and_mine.py --no-validate
 # Go to Actions → Check Tool Coverage → Run workflow
 # Uncheck "Run AI validation"
 ```
+
+Original `SUBMIT_*.csv` files are still generated alongside `VALIDATED_*.csv` files.
 
 ## Future Enhancements
 
@@ -413,10 +386,12 @@ Potential improvements:
 ## Checklist
 
 ### Completed by PR Author
-- [x] Code changes implemented (PR #92 + AI validation)
+- [x] Code changes implemented (mining + metadata extraction + AI validation)
 - [x] Tests performed:
-  - [x] PR #92: Metadata extraction, CSV formatting, workflow steps
-  - [x] This PR: False positive detection (100% accuracy), caching (50% savings), skip logic (85-90% savings)
+  - [x] Metadata extraction, CSV formatting, workflow steps
+  - [x] False positive detection (100% accuracy)
+  - [x] Text caching (50% API savings)
+  - [x] Skip logic (85-90% cost savings)
 - [x] Performance optimizations implemented:
   - [x] Publication text caching (50% fewer API calls)
   - [x] Review skip logic (85-90% AI cost savings)
@@ -430,7 +405,7 @@ Potential improvements:
   - [x] CACHING_AND_SKIP_LOGIC.md (optimization details)
   - [x] VALIDATION_TEST_RESULTS.md (test analysis)
   - [x] SKIP_LOGIC_FEATURE.md (skip logic docs)
-- [x] GitHub workflow updated with AI validation and force re-review options
+- [x] GitHub workflow updated with AI validation and optimization features
 - [x] Required secrets documented with setup instructions
 
 ### Required Before Merge (Repository Admin)
@@ -455,8 +430,6 @@ Potential improvements:
 5. Should we add a manual review interface for "uncertain" cases?
 
 ---
-
-**Builds on**: PR #92 - Automated tool coverage monitoring and intelligent mining workflow
 
 **Related**:
 - False positive discovery in PMID:28078640 (questionnaire study mined as having research tools)
