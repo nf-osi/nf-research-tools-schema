@@ -1,8 +1,75 @@
 # Enable AI Validation by Default to Filter False Positives in Tool Mining
 
+> **Builds on**: PR #92 - Automated tool coverage monitoring and intelligent mining workflow
+
 ## Summary
 
-This PR integrates AI-powered validation into the tool mining workflow to automatically filter false positives (e.g., disease/gene names misidentified as research tools). AI validation is now **enabled by default** using the Goose AI agent framework with Claude Sonnet 4.
+This PR enhances the automated tool mining workflow (from PR #92) by integrating AI-powered validation to automatically filter false positives. The core mining system successfully extracts tools from publications, but pattern matching alone cannot distinguish disease/gene references from actual research tools. AI validation using the Goose agent framework with Claude Sonnet 4 is now **enabled by default** to dramatically improve precision.
+
+## Context from PR #92
+
+PR #92 established:
+- ✅ Weekly automated workflow for tool coverage monitoring
+- ✅ Full-text mining from PMC with fuzzy matching (88% threshold)
+- ✅ Intelligent metadata extraction (20+ fields pre-filled)
+- ✅ Methods section isolation to reduce false positives
+- ✅ Submission-ready CSVs for Synapse tables
+
+**This PR adds**: AI-powered validation layer to catch remaining false positives that pattern matching misses.
+
+## How This Integrates with PR #92
+
+### Workflow Enhancement
+
+**Before (PR #92 alone)**:
+```
+Publications → Mine Tools → Generate SUBMIT_*.csv → Manual Review → Upload to Synapse
+                            ↑ May contain false positives
+```
+
+**After (PR #92 + This PR)**:
+```
+Publications → Mine Tools → AI Validation → Generate VALIDATED_*.csv → Upload to Synapse
+                            ↓                     ↑ False positives removed
+                     (SUBMIT_*.csv preserved for comparison)
+```
+
+### File Organization
+
+- **From PR #92**: `SUBMIT_*.csv` files (unvalidated mining results)
+- **New in this PR**: `VALIDATED_*.csv` files (AI-filtered, production-ready)
+- **New validation artifacts**: `tool_reviews/validation_report.xlsx`, `tool_reviews/results/*.yaml`
+
+### Backward Compatibility
+
+- AI validation is enabled by default but can be disabled with `--no-validate`
+- Original `SUBMIT_*.csv` files are still generated alongside `VALIDATED_*.csv`
+- No breaking changes to existing workflow - purely additive enhancement
+
+## ⚠️ Deployment Prerequisites
+
+### Required GitHub Secret (Action Required)
+
+This PR requires the following GitHub repository secret to be added **before the workflow can run**:
+
+**Secret Name**: `ANTHROPIC_API_KEY`
+
+**What it is**: Anthropic API key for Claude AI access (used by Goose for validation)
+
+**How to add**:
+1. Go to repository Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `ANTHROPIC_API_KEY`
+4. Value: Your Anthropic API key from https://console.anthropic.com/settings/keys
+5. Click "Add secret"
+
+**Cost**: ~$0.01-0.03 per publication validated (~$0.50-1.50 per 50 publications)
+
+**Note**: The PR author does not have permissions to add this secret. A repository admin with `secrets` scope will need to add it before merging or the GitHub Actions workflow will fail.
+
+**Existing Secrets** (already configured):
+- ✅ `SYNAPSE_AUTH_TOKEN` - For querying publications/tools databases
+- ✅ `NF_SERVICE_GIT_TOKEN` - For creating GitHub issues
 
 ## Problem
 
@@ -215,11 +282,13 @@ python run_publication_reviews.py --skip-goose
 
 ### For GitHub Actions
 
-**Required Secret**: `ANTHROPIC_API_KEY`
-- Anthropic API key for Claude access
-- Generate at: https://console.anthropic.com/settings/keys
-- Cost: ~$0.01-0.03 per publication validated
-- For 50 publications: ~$0.50-$1.50 (much cheaper than manual curator time)
+See "Deployment Prerequisites" section above for required `ANTHROPIC_API_KEY` secret.
+
+**Workflow will**:
+- Automatically run weekly (Mondays 9 AM UTC) with AI validation enabled
+- Only validate new publications (smart skip logic saves 85-90% API costs)
+- Generate `VALIDATED_*.csv` files and validation reports
+- Upload all artifacts including validation YAMLs (90-day retention)
 
 ## Output Files
 
@@ -339,14 +408,26 @@ Potential improvements:
 
 ## Checklist
 
+### Completed by PR Author
 - [x] Code changes implemented
-- [x] Tests performed on false positive example
+- [x] Tests performed on false positive examples (2 publications, 100% accuracy)
+- [x] Bug fixes applied (tool type normalization, PubMed API integration)
 - [x] Documentation updated (AI_VALIDATION_README.md, TOOL_COVERAGE_WORKFLOW.md)
-- [x] GitHub workflow updated
-- [x] Required secrets documented (ANTHROPIC_API_KEY)
-- [ ] Testing on full dataset
-- [ ] PR reviewed by maintainer
-- [ ] ANTHROPIC_API_KEY secret added to repository
+- [x] GitHub workflow updated with AI validation options
+- [x] Smart skip logic implemented (85-90% cost savings)
+- [x] Required secrets documented with setup instructions
+
+### Required Before Merge (Repository Admin)
+- [ ] **🔑 ANTHROPIC_API_KEY secret added to repository** ⚠️ **BLOCKER**
+  - Repository admin needs to add this secret for GitHub Actions to work
+  - See "Deployment Prerequisites" section above for instructions
+  - Without this secret, the workflow will fail when AI validation is enabled
+
+### Post-Merge
+- [ ] Testing on full dataset (50+ publications)
+- [ ] Monitor API costs in first few runs
+- [ ] Verify validation reports look correct
+- [ ] Update team on new VALIDATED_*.csv output files
 
 ## Migration Guide
 
@@ -367,12 +448,16 @@ For users upgrading from the previous version:
 
 ## Questions for Reviewers
 
-1. Should we adjust the validation strictness? (currently uses confidence > 0.5 for "uncertain")
-2. Should we add validation metrics to the weekly GitHub issue report?
-3. Should we store validation results in a separate Synapse table for auditing?
-4. Should we add a manual review interface for "uncertain" cases?
+1. **Can a repository admin add the `ANTHROPIC_API_KEY` secret?** (Required for GitHub Actions to work)
+2. Should we adjust the validation strictness? (currently uses confidence > 0.5 for "uncertain")
+3. Should we add validation metrics to the weekly GitHub issue report?
+4. Should we store validation results in a separate Synapse table for auditing?
+5. Should we add a manual review interface for "uncertain" cases?
 
 ---
 
-**Closes**: #[issue number if applicable]
-**Related**: False positive discovery in PMID:28078640, dcc-site PR #1812 (Goose project reviews)
+**Builds on**: PR #92 - Automated tool coverage monitoring and intelligent mining workflow
+**Related**:
+- False positive discovery in PMID:28078640 (questionnaire study mined as having research tools)
+- Inspiration from [dcc-site PR #1812](https://github.com/nf-osi/dcc-site/pull/1812) (Goose project reviews)
+- GFF tool coverage target: 80% (currently 1/21)
