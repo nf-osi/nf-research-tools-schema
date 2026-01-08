@@ -441,3 +441,15 @@ For issues or questions:
 - Open a GitHub issue with label `tool-coverage`
 - Tag maintainers in weekly report comments
 - Check workflow logs in Actions tab
+
+## Output Files
+
+Scripts currently write output files to the **repository root** (for GitHub Actions workflow compatibility). Generated files are gitignored and include:
+- `novel_tools_FULLTEXT_mining.csv` - Mining results
+- `SUBMIT_*.csv` - Unvalidated submission files
+- `VALIDATED_*.csv` - AI-validated submission files (production-ready)
+- `GFF_Tool_Coverage_Report.pdf` - Coverage analysis report
+- `tool_reviews/` - AI validation results and cache
+
+The `results/` folder in this directory is available for organizing outputs locally if desired.
+
