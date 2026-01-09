@@ -81,6 +81,19 @@ jobs:
           echo ""
           echo "✅ Upload completed successfully"
 
+      - name: Regenerate coverage report
+        if: steps.check_files.outputs.has_files == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "REGENERATING Coverage Report"
+          echo "=========================================="
+          python tool_coverage/scripts/analyze_missing_tools.py
+
+          echo ""
+          echo "✅ Updated coverage report generated"
+
       - name: Create upload summary
         if: steps.check_files.outputs.has_files == 'true'
         run: |
@@ -98,12 +111,14 @@ jobs:
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Synapse Tables**:" >> $GITHUB_STEP_SUMMARY
+          echo "**Synapse Tables Updated**:" >> $GITHUB_STEP_SUMMARY
           echo "- Animal Models: syn26486808" >> $GITHUB_STEP_SUMMARY
           echo "- Antibodies: syn26486811" >> $GITHUB_STEP_SUMMARY
           echo "- Cell Lines: syn26486823" >> $GITHUB_STEP_SUMMARY
           echo "- Genetic Reagents: syn26486832" >> $GITHUB_STEP_SUMMARY
           echo "- Resources (links): syn51730943" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload summary artifacts
         if: steps.check_files.outputs.has_files == 'true'
@@ -112,4 +127,5 @@ jobs:
           name: synapse-upload-logs
           path: |
             CLEAN_*.csv
+            GFF_Tool_Coverage_Report.pdf
           retention-days: 30
