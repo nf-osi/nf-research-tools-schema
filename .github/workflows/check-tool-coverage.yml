@@ -75,17 +75,6 @@ jobs:
           echo "Configuring Goose with Anthropic API..."
           # Goose will use ANTHROPIC_API_KEY from environment
 
-      - name: Analyze GFF tool coverage
-        id: coverage
-        env:
-          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-        run: |
-          echo "Running coverage analysis..."
-          python tool_coverage/scripts/analyze_missing_tools.py 2>&1 | tee coverage_output.log
-
-          # Extract key metrics for issue summary
-          echo "coverage_complete=true" >> $GITHUB_OUTPUT
-
       - name: Mine publications for novel tools
         id: mining
         env:
@@ -129,6 +118,17 @@ jobs:
           else
             echo "⚠️ Skipping formatting - no mining results found"
           fi
+
+      - name: Analyze tool coverage
+        id: coverage
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Running coverage analysis with validated results..."
+          python tool_coverage/scripts/analyze_missing_tools.py 2>&1 | tee coverage_output.log
+
+          # Extract key metrics for summary
+          echo "coverage_complete=true" >> $GITHUB_OUTPUT
 
       - name: Generate summary report
         id: summary

@@ -33,14 +33,43 @@ print("\n1. Querying publications table (syn16857542)...")
 pub_query = syn.tableQuery("SELECT * FROM syn16857542")
 pub_df = pub_query.asDataFrame()
 
-# Filter for GFF-funded publications (GFF can appear alone or with other funders)
-if 'fundingAgency' in pub_df.columns:
-    # fundingAgency is stored as string representations of lists, e.g., "[GFF]" or "[NTAP, CTF, GFF]"
-    pub_df['is_gff'] = pub_df['fundingAgency'].astype(str).str.contains('GFF', na=False)
-    pub_df = pub_df[pub_df['is_gff']].copy()
-
-print(f"   Found {len(pub_df)} GFF-funded publications")
+# Parse funding agencies from all publications
+print(f"   Found {len(pub_df)} total publications")
 print(f"   Columns: {', '.join(pub_df.columns.tolist())}")
+
+# Extract individual funding agencies
+if 'fundingAgency' in pub_df.columns:
+    import ast
+
+    def parse_funding_agencies(funding_str):
+        """Parse funding agency string into list"""
+        if pd.isna(funding_str):
+            return []
+        try:
+            # Try to parse as Python list string
+            agencies = ast.literal_eval(str(funding_str))
+            if isinstance(agencies, list):
+                return [str(a).strip() for a in agencies if a]
+            return [str(agencies).strip()]
+        except:
+            # If parsing fails, treat as single string
+            return [str(funding_str).strip()] if funding_str else []
+
+    pub_df['funding_agencies'] = pub_df['fundingAgency'].apply(parse_funding_agencies)
+
+    # Get all unique agencies
+    all_agencies = set()
+    for agencies in pub_df['funding_agencies']:
+        all_agencies.update(agencies)
+
+    print(f"   Funding agencies found: {sorted(all_agencies)}")
+
+    # Create indicator columns for each agency
+    for agency in all_agencies:
+        pub_df[f'is_{agency}'] = pub_df['funding_agencies'].apply(lambda x: agency in x)
+else:
+    print("   WARNING: No fundingAgency column found")
+    all_agencies = set()
 
 # Query tools materialized view
 print("\n2. Querying tools materialized view (syn51730943)...")
@@ -89,7 +118,7 @@ gr_query = syn.tableQuery("SELECT * FROM syn26486832")
 gr_df = gr_query.asDataFrame()
 print(f"   Genetic Reagents (syn26486832): {len(gr_df)} records")
 
-print("\n5. Analyzing GFF publications against linked tools...")
+print("\n5. Analyzing publications against linked tools by funding agency...")
 
 # Merge publications with linking table to see which are already represented
 # The linking table might use pmid or doi to link rather than publicationId
@@ -101,41 +130,55 @@ elif 'pmid' in link_df.columns and 'pmid' in pub_df.columns:
 elif 'doi' in link_df.columns and 'doi' in pub_df.columns:
     link_key = 'doi'
 
+# Store coverage data for all agencies
+agency_coverage = {}
+
 if link_key:
     print(f"   Using '{link_key}' to link publications with tools")
 
     # Get publications that have tools linked
-    linked_pub_ids = link_df[link_key].dropna().unique()
-    gff_pub_ids = pub_df[link_key].dropna().unique()
+    linked_pub_ids = set(link_df[link_key].dropna().unique())
 
-    represented_pubs = set(gff_pub_ids) & set(linked_pub_ids)
-    missing_pubs = set(gff_pub_ids) - set(linked_pub_ids)
-
-    print(f"   Total GFF publications: {len(gff_pub_ids)}")
-    print(f"   GFF publications with linked tools: {len(represented_pubs)} ({len(represented_pubs)/len(gff_pub_ids)*100:.1f}%)")
-    print(f"   GFF publications WITHOUT linked tools: {len(missing_pubs)} ({len(missing_pubs)/len(gff_pub_ids)*100:.1f}%)")
-
-    # Get details of linked tools for GFF publications
-    gff_links = link_df[link_df[link_key].isin(gff_pub_ids)]
-    print(f"   Total tool-publication links for GFF pubs: {len(gff_links)}")
-
-    # Merge with tools to see what types
-    if len(gff_links) > 0 and 'resourceId' in gff_links.columns:
-        gff_tools = tools_df[tools_df['resourceId'].isin(gff_links['resourceId'])]
-        print(f"\n   GFF-linked tools by type:")
-        for resource_type, count in gff_tools['resourceType'].value_counts().items():
-            print(f"   - {resource_type}: {count}")
-
-    # Mark publications as represented or not
-    pub_df['has_linked_tools'] = pub_df[link_key].isin(represented_pubs)
+    # Mark publications as having linked tools
+    pub_df['has_linked_tools'] = pub_df[link_key].isin(linked_pub_ids)
     pub_df['is_missing'] = ~pub_df['has_linked_tools']
 
-    # Get missing publications details
+    # Calculate coverage for each funding agency
+    for agency in sorted(all_agencies):
+        agency_pubs = pub_df[pub_df[f'is_{agency}']]
+        if len(agency_pubs) > 0:
+            agency_pub_ids = set(agency_pubs[link_key].dropna().unique())
+            represented_pubs = agency_pub_ids & linked_pub_ids
+            missing_pubs = agency_pub_ids - linked_pub_ids
+
+            coverage_pct = (len(represented_pubs) / len(agency_pub_ids) * 100) if len(agency_pub_ids) > 0 else 0
+
+            agency_coverage[agency] = {
+                'total': len(agency_pub_ids),
+                'with_tools': len(represented_pubs),
+                'without_tools': len(missing_pubs),
+                'coverage_pct': coverage_pct
+            }
+
+            print(f"\n   {agency}:")
+            print(f"      Total publications: {len(agency_pub_ids)}")
+            print(f"      With linked tools: {len(represented_pubs)} ({coverage_pct:.1f}%)")
+            print(f"      Without linked tools: {len(missing_pubs)} ({100-coverage_pct:.1f}%)")
+
+            # Get tools linked to this agency's publications
+            agency_links = link_df[link_df[link_key].isin(agency_pub_ids)]
+            if len(agency_links) > 0 and 'resourceId' in agency_links.columns:
+                agency_tools = tools_df[tools_df['resourceId'].isin(agency_links['resourceId'])]
+                print(f"      Linked tools by type:")
+                for resource_type, count in agency_tools['resourceType'].value_counts().items():
+                    print(f"         - {resource_type}: {count}")
+
+    # Get missing publications details (for primary focus agency, e.g., GFF)
     missing_pubs_df = pub_df[pub_df['is_missing']]
-    print(f"\n   Missing publications that need tools added: {len(missing_pubs_df)}")
+    print(f"\n   Total publications WITHOUT linked tools: {len(missing_pubs_df)}")
 
 else:
-    print("   WARNING: Could not find publicationId column to link publications")
+    print("   WARNING: Could not find publication ID column to link publications")
     missing_pubs_df = pub_df
     pub_df['has_linked_tools'] = False
     pub_df['is_missing'] = True
@@ -193,21 +236,11 @@ for tool_types in pub_df['tool_types_mentioned']:
     for tool_type in tool_types:
         tool_type_counts[tool_type] += 1
 
-print(f"\n   Tool types mentioned in GFF publications:")
+print(f"\n   Tool types mentioned in all publications:")
 for tool_type, count in sorted(tool_type_counts.items(), key=lambda x: x[1], reverse=True):
     print(f"   - {tool_type}: {count} publications")
 
-print("\n5. Identifying specific tools mentioned...")
-
-# Check if publications have resourceId or tool name columns
-print(f"\n   Publication columns that might reference tools:")
-possible_tool_cols = [col for col in pub_df.columns if any(
-    keyword in col.lower() for keyword in ['resource', 'tool', 'model', 'reagent', 'antibody', 'cell']
-)]
-print(f"   {possible_tool_cols}")
-
-# Display sample of publications
-print(f"\n7. Sample GFF-funded publications (focusing on those without linked tools):")
+print("\n7. Sample publications (focusing on those without linked tools):")
 sample_cols = ['title', 'journal', 'year', 'tool_types_mentioned']
 available_cols = [col for col in sample_cols if col in pub_df.columns]
 
@@ -226,37 +259,41 @@ else:
     print("   (No publications to display)")
 
 print("\n" + "=" * 80)
-print("COVERAGE ANALYSIS")
+print("COVERAGE ANALYSIS BY FUNDING AGENCY")
 print("=" * 80)
 
-# Calculate actual coverage
-total_gff_pubs = len(pub_df)
-if 'has_linked_tools' in pub_df.columns:
-    pubs_with_linked_tools = len(pub_df[pub_df['has_linked_tools']])
-    current_coverage = (pubs_with_linked_tools / total_gff_pubs * 100) if total_gff_pubs > 0 else 0
+# Display coverage for all agencies
+if agency_coverage:
+    print(f"\n📊 CURRENT COVERAGE BY FUNDING AGENCY:")
+    print(f"\n{'Agency':<15} {'Total':<8} {'With Tools':<12} {'Coverage':<10} {'80% Target':<12}")
+    print("-" * 65)
 
-    print(f"\n📊 CURRENT COVERAGE:")
-    print(f"   Total GFF-funded publications: {total_gff_pubs}")
-    print(f"   Publications with linked tools: {pubs_with_linked_tools} ({current_coverage:.1f}%)")
-    print(f"   Publications WITHOUT linked tools: {total_gff_pubs - pubs_with_linked_tools} ({100-current_coverage:.1f}%)")
+    for agency in sorted(agency_coverage.keys()):
+        data = agency_coverage[agency]
+        target_pubs = int(data['total'] * 0.8)
+        status = '✅' if data['coverage_pct'] >= 80 else '⚠️'
 
-    # Calculate what's needed for 80% coverage
-    target_coverage = 80
-    target_pubs = int(total_gff_pubs * target_coverage / 100)
-    pubs_needed = target_pubs - pubs_with_linked_tools
+        print(f"{agency:<15} {data['total']:<8} {data['with_tools']:<12} "
+              f"{data['coverage_pct']:>6.1f}%    {status} {target_pubs} needed")
 
-    print(f"\n🎯 TARGET: 80% COVERAGE")
-    print(f"   Need tools from: {target_pubs} publications")
-    print(f"   Currently have: {pubs_with_linked_tools} publications")
-    if pubs_needed > 0:
-        print(f"   STILL NEED: {pubs_needed} more publications with tools ({pubs_needed/total_gff_pubs*100:.1f}% of total)")
-        print(f"   ✅ STATUS: {'ABOVE TARGET' if current_coverage >= target_coverage else 'BELOW TARGET'}")
-    else:
-        print(f"   ✅ STATUS: ABOVE TARGET! Currently at {current_coverage:.1f}%")
+    # Focus on GFF for detailed analysis (primary funding agency)
+    if 'GFF' in agency_coverage:
+        gff_data = agency_coverage['GFF']
+        print(f"\n🎯 GFF TARGET: 80% COVERAGE")
+        print(f"   Total GFF publications: {gff_data['total']}")
+        print(f"   Publications with tools: {gff_data['with_tools']} ({gff_data['coverage_pct']:.1f}%)")
+        print(f"   Publications without tools: {gff_data['without_tools']}")
+
+        target_pubs = int(gff_data['total'] * 0.8)
+        pubs_needed = target_pubs - gff_data['with_tools']
+
+        if pubs_needed > 0:
+            print(f"   STILL NEED: {pubs_needed} more publications with tools")
+            print(f"   STATUS: ⚠️ BELOW TARGET")
+        else:
+            print(f"   STATUS: ✅ ABOVE TARGET!")
 else:
-    pubs_with_tools = len(pub_df[pub_df['tool_types_mentioned'].apply(len) > 0])
-    print(f"\nTotal GFF-funded publications: {total_gff_pubs}")
-    print(f"Publications mentioning tools (estimated): {pubs_with_tools} ({pubs_with_tools/total_gff_pubs*100:.1f}%)")
+    print(f"\n⚠️ No coverage data available (could not link publications to tools)")
 
 print(f"\nTools in database by type:")
 for resource_type in tools_df['resourceType'].unique():
@@ -267,31 +304,29 @@ print("\n" + "=" * 80)
 print("RECOMMENDATIONS")
 print("=" * 80)
 
-if 'has_linked_tools' in pub_df.columns:
-    if current_coverage >= 80:
+if agency_coverage and 'GFF' in agency_coverage:
+    gff_data = agency_coverage['GFF']
+    target_pubs = int(gff_data['total'] * 0.8)
+    pubs_needed = target_pubs - gff_data['with_tools']
+
+    if gff_data['coverage_pct'] >= 80:
         print(f"""
-✅ EXCELLENT! Current coverage of {current_coverage:.1f}% exceeds the 80% target.
+✅ EXCELLENT! GFF coverage of {gff_data['coverage_pct']:.1f}% exceeds the 80% target.
 
 Recommendations for maintenance:
-1. Review the {total_gff_pubs - pubs_with_linked_tools} remaining publications without tools
+1. Review the {gff_data['without_tools']} remaining publications without tools
 2. Verify that existing tool-publication links are accurate
-3. Continue adding tools from new GFF publications as they are published
+3. Continue adding tools from new publications as they are published
 """)
     else:
-        pubs_to_review = missing_pubs_df if len(missing_pubs_df) > 0 else pub_df
         print(f"""
-⚠️  Current coverage of {current_coverage:.1f}% is BELOW the 80% target.
+⚠️  GFF coverage of {gff_data['coverage_pct']:.1f}% is BELOW the 80% target.
 
 ACTION REQUIRED: Add tools from {pubs_needed} more publications to reach 80% coverage.
 
 Priority actions:
 1. Review the {len(missing_pubs_df)} publications WITHOUT linked tools
-2. Focus on publications mentioning these tool types:
-""")
-        for tool_type, count in sorted(tool_type_counts.items(), key=lambda x: x[1], reverse=True):
-            print(f"   - {tool_type}: {count} publications")
-
-        print(f"""
+2. Focus on publications mentioning tool types
 3. For each publication:
    - Check if tools are mentioned in abstract/methods
    - Search for tool names, model names, cell line names, etc.
@@ -307,7 +342,7 @@ Priority actions:
 """)
 else:
     print(f"""
-To achieve 80% coverage of GFF-funded tools:
+To achieve 80% coverage:
 1. Review publications that mention tools
 2. Identify specific tools mentioned in abstracts/methods
 3. Cross-reference with existing tools in syn51730943
@@ -331,38 +366,69 @@ print("=" * 80)
 
 pdf_file = 'GFF_Tool_Coverage_Report.pdf'
 with PdfPages(pdf_file) as pdf:
-    # Page 1: Coverage Summary
+    # Page 1: Coverage Comparison Across Funding Agencies
     fig, axes = plt.subplots(2, 2, figsize=(11, 8.5))
-    fig.suptitle(f'GFF Tool Coverage Analysis\n{datetime.now().strftime("%Y-%m-%d %H:%M")}',
+    fig.suptitle(f'Tool Coverage Analysis by Funding Agency\n{datetime.now().strftime("%Y-%m-%d %H:%M")}',
                  fontsize=16, fontweight='bold')
 
-    # Coverage pie chart
-    if 'has_linked_tools' in pub_df.columns:
-        coverage_data = [pubs_with_linked_tools, total_gff_pubs - pubs_with_linked_tools]
-        colors = ['#2ecc71', '#e74c3c']
-        labels = [f'With Tools\n({pubs_with_linked_tools})',
-                 f'Without Tools\n({total_gff_pubs - pubs_with_linked_tools})']
+    # Plot 1: Coverage percentage comparison across agencies
+    if agency_coverage:
+        agencies = sorted(agency_coverage.keys())
+        coverage_pcts = [agency_coverage[a]['coverage_pct'] for a in agencies]
+        colors = ['#2ecc71' if pct >= 80 else '#e74c3c' for pct in coverage_pcts]
 
-        axes[0, 0].pie(coverage_data, labels=labels, colors=colors, autopct='%1.1f%%',
-                      startangle=90)
-        axes[0, 0].set_title(f'GFF Publication Coverage\n({current_coverage:.1f}% have tools)',
-                            fontweight='bold')
+        bars = axes[0, 0].barh(agencies, coverage_pcts, color=colors)
+        axes[0, 0].set_xlabel('Coverage (%)')
+        axes[0, 0].set_title('Publication Coverage by Funding Agency', fontweight='bold')
+        axes[0, 0].axvline(x=80, color='orange', linestyle='--', linewidth=2, label='80% Target')
+        axes[0, 0].legend()
+        axes[0, 0].grid(axis='x', alpha=0.3)
 
-    # Resource type distribution for GFF tools
-    if len(gff_links) > 0 and 'resourceId' in gff_links.columns:
-        gff_tools = tools_df[tools_df['resourceId'].isin(gff_links['resourceId'])]
-        resource_counts = gff_tools['resourceType'].value_counts()
+        # Add percentage labels
+        for i, (bar, pct) in enumerate(zip(bars, coverage_pcts)):
+            axes[0, 0].text(pct + 1, i, f'{pct:.1f}%', va='center')
 
-        axes[0, 1].barh(resource_counts.index, resource_counts.values, color='#3498db')
-        axes[0, 1].set_xlabel('Number of Tools')
-        axes[0, 1].set_title('GFF-Linked Tools by Type', fontweight='bold')
-        axes[0, 1].grid(axis='x', alpha=0.3)
+    # Plot 2: Resource type distribution across agencies
+    if agency_coverage and link_key:
+        # Get resource types for each agency
+        resource_types = sorted(tools_df['resourceType'].unique())
+        agency_tool_counts = {}
 
-        # Add counts at the end of bars
-        for i, v in enumerate(resource_counts.values):
-            axes[0, 1].text(v + 0.1, i, str(v), va='center')
+        for agency in sorted(agency_coverage.keys()):
+            agency_pubs = pub_df[pub_df[f'is_{agency}']]
+            agency_pub_ids = set(agency_pubs[link_key].dropna().unique())
+            agency_links = link_df[link_df[link_key].isin(agency_pub_ids)]
 
-    # All tools distribution
+            if len(agency_links) > 0 and 'resourceId' in agency_links.columns:
+                agency_tools = tools_df[tools_df['resourceId'].isin(agency_links['resourceId'])]
+                agency_tool_counts[agency] = {
+                    rt: len(agency_tools[agency_tools['resourceType'] == rt])
+                    for rt in resource_types
+                }
+            else:
+                agency_tool_counts[agency] = {rt: 0 for rt in resource_types}
+
+        # Create grouped bar chart
+        x = range(len(resource_types))
+        width = 0.8 / len(agency_tool_counts)
+        colors_palette = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c']
+
+        for i, (agency, counts) in enumerate(sorted(agency_tool_counts.items())):
+            values = [counts[rt] for rt in resource_types]
+            offset = (i - len(agency_tool_counts)/2 + 0.5) * width
+            axes[0, 1].bar([p + offset for p in x], values,
+                          width=width, label=agency,
+                          color=colors_palette[i % len(colors_palette)])
+
+        axes[0, 1].set_xlabel('Resource Type')
+        axes[0, 1].set_ylabel('Number of Tools')
+        axes[0, 1].set_title('Linked Tools by Type and Agency', fontweight='bold')
+        axes[0, 1].set_xticks(x)
+        axes[0, 1].set_xticklabels(resource_types, rotation=45, ha='right')
+        axes[0, 1].legend(loc='upper right', fontsize=8)
+        axes[0, 1].grid(axis='y', alpha=0.3)
+
+    # Plot 3: All tools distribution
     all_resource_counts = tools_df['resourceType'].value_counts()
     axes[1, 0].barh(all_resource_counts.index, all_resource_counts.values, color='#95a5a6')
     axes[1, 0].set_xlabel('Number of Tools')
@@ -372,33 +438,26 @@ with PdfPages(pdf_file) as pdf:
     for i, v in enumerate(all_resource_counts.values):
         axes[1, 0].text(v + 5, i, str(v), va='center')
 
-    # Summary statistics text
-    coverage_pct = f"{current_coverage:.1f}%" if 'has_linked_tools' in pub_df.columns else 'N/A'
-    coverage_status = '✅ ABOVE TARGET' if (current_coverage >= 80 if 'has_linked_tools' in pub_df.columns else False) else '⚠️ BELOW TARGET'
-    gff_tool_count = len(gff_tools) if (len(gff_links) > 0 and 'resourceId' in gff_links.columns) else 0
+    # Plot 4: Summary statistics text
+    summary_lines = ["\n📊 SUMMARY STATISTICS\n"]
 
-    summary_text = f"""
-📊 SUMMARY STATISTICS
+    if agency_coverage:
+        summary_lines.append("Coverage by Agency:")
+        for agency in sorted(agency_coverage.keys()):
+            data = agency_coverage[agency]
+            status = '✅' if data['coverage_pct'] >= 80 else '⚠️'
+            summary_lines.append(f"{agency}: {data['with_tools']}/{data['total']} "
+                               f"({data['coverage_pct']:.1f}%) {status}")
 
-Total GFF Publications: {total_gff_pubs}
-Publications with Tools: {pubs_with_linked_tools if 'has_linked_tools' in pub_df.columns else 'N/A'}
-Current Coverage: {coverage_pct}
+    summary_lines.append(f"\nTotal Tools: {len(tools_df)}")
+    for rt in sorted(tools_df['resourceType'].unique()):
+        count = len(tools_df[tools_df['resourceType']==rt])
+        summary_lines.append(f"  {rt}: {count}")
 
-TARGET: 80% coverage
-Status: {coverage_status}
-
-Tools in Database: {len(tools_df)}
-- Animal Models: {len(tools_df[tools_df['resourceType']=='Animal Model'])}
-- Antibodies: {len(tools_df[tools_df['resourceType']=='Antibody'])}
-- Cell Lines: {len(tools_df[tools_df['resourceType']=='Cell Line'])}
-- Genetic Reagents: {len(tools_df[tools_df['resourceType']=='Genetic Reagent'])}
-- Biobanks: {len(tools_df[tools_df['resourceType']=='Biobank'])}
-
-GFF-Linked Tools: {gff_tool_count}
-    """
+    summary_text = '\n'.join(summary_lines)
 
     axes[1, 1].text(0.1, 0.5, summary_text, transform=axes[1, 1].transAxes,
-                   fontsize=10, verticalalignment='center', fontfamily='monospace',
+                   fontsize=9, verticalalignment='center', fontfamily='monospace',
                    bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
     axes[1, 1].axis('off')
 
