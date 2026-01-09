@@ -162,43 +162,29 @@ jobs:
             formatting_output.log
           retention-days: 90
 
-      - name: Create or update GitHub issue
-        uses: actions/github-script@v7
+      - name: Create Pull Request with results
+        uses: peter-evans/create-pull-request@v6
         with:
-          github-token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const issueBody = fs.readFileSync('issue_body.md', 'utf8');
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          commit-message: |
+            Update tool coverage: automated mining results
 
-            // Check for existing open issue with this title
-            const issueTitle = '🔍 Weekly Tool Coverage Report';
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'automated-report',
-              per_page: 100
-            });
-
-            const existingIssue = issues.find(issue => issue.title === issueTitle);
-
-            if (existingIssue) {
-              // Update existing issue
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existingIssue.number,
-                body: `## 📊 Updated Report - ${new Date().toISOString().split('T')[0]}\n\n${issueBody}`
-              });
-              console.log(`Updated issue #${existingIssue.number}`);
-            } else {
-              // Create new issue
-              const { data: newIssue } = await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: issueTitle,
-                body: issueBody,
-                labels: ['automated-report', 'tool-coverage']
-              });
-              console.log(`Created issue #${newIssue.number}`);
-            }
+            - Coverage report updated
+            - Novel tools mined from publications
+            - Ready for Synapse upload after review
+          branch: tool-coverage-update-${{ github.run_number }}
+          delete-branch: true
+          title: '🔍 Tool Coverage Update - ${{ github.run_number }}'
+          body-path: issue_body.md
+          labels: |
+            automated-mining
+            tool-coverage
+          add-paths: |
+            VALIDATED_*.csv
+            SUBMIT_*.csv
+            GFF_Tool_Coverage_Report.pdf
+            novel_tools_FULLTEXT_mining.csv
+            priority_publications_FULLTEXT.csv
+            GFF_publications_with_tools_FULLTEXT.csv
+            mining_summary_ALL_publications.csv
+            gff_publications_MISSING_tools.csv
