@@ -63,11 +63,14 @@ def main():
     print(f"- Publication Links: syn51735450")
 
     # ========================================================================
-    # Section 1: Coverage Analysis
+    # Section 1: Coverage Analysis (Before/After Comparison)
     # ========================================================================
-    print(f"\n## 📊 Coverage Status")
+    print(f"\n## 📊 Coverage Impact")
 
     try:
+        import ast
+        import glob
+
         # Load publications
         pub_query = syn.tableQuery("SELECT * FROM syn16857542")
         pub_df = pub_query.asDataFrame()
@@ -76,26 +79,82 @@ def main():
         link_query = syn.tableQuery("SELECT * FROM syn51735450")
         link_df = link_query.asDataFrame()
 
-        # Identify GFF publications
-        pub_df['is_gff'] = pub_df['fundingAgency'].astype(str).str.contains('GFF', na=False)
-        gff_pubs = pub_df[pub_df['is_gff']]
+        # Parse funding agencies
+        def parse_funding_agencies(funding_str):
+            if pd.isna(funding_str):
+                return []
+            try:
+                agencies = ast.literal_eval(str(funding_str))
+                if isinstance(agencies, list):
+                    return [str(a).strip() for a in agencies if a]
+                return [str(agencies).strip()]
+            except:
+                return [str(funding_str).strip()] if funding_str else []
 
-        # Count GFF publications with links
-        if 'pmid' in link_df.columns and 'pmid' in pub_df.columns:
-            linked_pmids = set(link_df['pmid'].dropna().unique())
-            gff_linked = gff_pubs[gff_pubs['pmid'].isin(linked_pmids)]
+        pub_df['funding_agencies'] = pub_df['fundingAgency'].apply(parse_funding_agencies)
+
+        # Get all unique agencies
+        all_agencies = set()
+        for agencies in pub_df['funding_agencies']:
+            all_agencies.update(agencies)
+
+        # Create indicator columns for each agency
+        for agency in all_agencies:
+            pub_df[f'is_{agency}'] = pub_df['funding_agencies'].apply(lambda x: agency in x)
+
+        # Determine link key
+        link_key = 'pmid' if 'pmid' in link_df.columns and 'pmid' in pub_df.columns else None
+
+        if link_key:
+            # Current coverage (before PR)
+            linked_pmids = set(link_df[link_key].dropna().unique())
+
+            # Load submission files to see what publications are getting tools in this PR
+            new_tool_pmids = set()
+            for csv_file in glob.glob('VALIDATED_*.csv') + glob.glob('SUBMIT_*.csv'):
+                try:
+                    submission_df = pd.read_csv(csv_file)
+                    if 'pmid' in submission_df.columns:
+                        new_tool_pmids.update(submission_df['pmid'].dropna().unique())
+                except:
+                    pass
+
+            # Calculate coverage before and after for each agency
+            print(f"\n**Before vs. After This PR:**\n")
+            print(f"| Agency | Current | After Merge | Change | Target (80%) |")
+            print(f"|--------|---------|-------------|--------|--------------|")
+
+            for agency in sorted(all_agencies):
+                agency_pubs = pub_df[pub_df[f'is_{agency}']]
+                if len(agency_pubs) > 0:
+                    agency_pmids = set(agency_pubs[link_key].dropna().unique())
+                    total = len(agency_pmids)
+
+                    # Current coverage
+                    current_with_tools = len(agency_pmids & linked_pmids)
+                    current_pct = (current_with_tools / total * 100) if total > 0 else 0
+
+                    # After PR coverage (current + new from this PR)
+                    new_from_pr = len(agency_pmids & new_tool_pmids)
+                    after_with_tools = current_with_tools + new_from_pr
+                    after_pct = (after_with_tools / total * 100) if total > 0 else 0
+
+                    # Change
+                    change = f"+{new_from_pr}" if new_from_pr > 0 else "—"
+                    change_pct = f"(+{after_pct - current_pct:.1f}%)" if new_from_pr > 0 else ""
+
+                    # Target
+                    target = int(total * 0.8)
+                    target_status = "✅" if after_pct >= 80 else f"{target - after_with_tools} needed"
+
+                    print(f"| {agency} | {current_with_tools}/{total} ({current_pct:.1f}%) | "
+                          f"{after_with_tools}/{total} ({after_pct:.1f}%) | "
+                          f"{change} {change_pct} | {target_status} |")
+
+            print(f"\n*Note: 'After Merge' shows projected coverage if all tools in this PR are validated and merged.*")
+
         else:
-            gff_linked = pd.DataFrame()
-
-        total_gff = len(gff_pubs)
-        gff_with_tools = len(gff_linked)
-        coverage_pct = (gff_with_tools / total_gff * 100) if total_gff > 0 else 0
-        target_count = int(total_gff * 0.8)
-        needed = max(0, target_count - gff_with_tools)
-
-        print(f"\n- **Current:** {gff_with_tools}/{total_gff} ({coverage_pct:.1f}%) GFF publications with tools")
-        print(f"- **Target:** {target_count}/{total_gff} (80%)")
-        print(f"- **Gap:** {needed} publications needed")
+            print(f"\n⚠️ Could not determine link key for coverage calculation")
 
     except Exception as e:
         print(f"\n⚠️ Error loading coverage data: {e}")
