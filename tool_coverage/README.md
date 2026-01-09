@@ -213,8 +213,9 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 5. Clean submission files (remove tracking columns)
 6. **Dry-run preview** of Synapse uploads (safety check)
 7. **Upload cleaned data** to Synapse tables
-8. Create upload summary with table links
-9. Upload cleaned CSVs as artifacts (30-day retention)
+8. **Regenerate coverage report** (shows updated metrics after upload)
+9. Create upload summary with table links
+10. Upload cleaned CSVs and updated PDF as artifacts (30-day retention)
 
 **Safety Features:**
 - Prefers `VALIDATED_*.csv` files (AI-validated, false positives removed)
@@ -433,7 +434,9 @@ Once you've validated the results and completed any necessary edits:
    - **Genetic Reagents:** syn26486832
    - **Publication Links:** syn51735450
    - **Development:** syn26486807
-5. Creates upload summary in GitHub Actions
+5. Creates snapshot versions for all updated tables (audit trail)
+6. **Regenerates coverage report PDF** with updated metrics
+7. Creates upload summary in GitHub Actions
 
 **IMPORTANT:** The CSV files contain NEW ROWS only - they are **appended** to existing Synapse tables, not used as replacements.
 
@@ -443,6 +446,7 @@ After merging:
 - Check the `upsert-tools` workflow run in GitHub Actions
 - Review the upload summary for any errors
 - Verify row counts increased in Synapse tables
+- Download the updated `GFF_Tool_Coverage_Report.pdf` from workflow artifacts to see new coverage metrics
 
 ### 6. Track Progress
 
