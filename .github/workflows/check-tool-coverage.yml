@@ -135,11 +135,11 @@ jobs:
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          python tool_coverage/scripts/generate_coverage_summary.py > issue_body.md
+          python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
 
-          # Read the summary for the issue
-          echo "ISSUE_BODY<<EOF" >> $GITHUB_OUTPUT
-          cat issue_body.md >> $GITHUB_OUTPUT
+          # Read the summary for the PR body
+          echo "PR_BODY<<EOF" >> $GITHUB_OUTPUT
+          cat pr_body.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload reports as artifacts
@@ -175,7 +175,7 @@ jobs:
           branch: tool-coverage-update-${{ github.run_number }}
           delete-branch: true
           title: '🔍 Tool Coverage Update - ${{ github.run_number }}'
-          body-path: issue_body.md
+          body-path: pr_body.md
           labels: |
             automated-mining
             tool-coverage

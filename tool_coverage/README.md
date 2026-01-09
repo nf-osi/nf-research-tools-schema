@@ -105,14 +105,14 @@ Transforms mining results into submission-ready CSVs:
 - Genetic reagents: vector type, resistance, backbone
 
 #### `tool_coverage/scripts/generate_coverage_summary.py`
-Generates markdown summary for GitHub issue:
+Generates markdown summary for GitHub Pull Request:
 - Summarizes current coverage status
 - Lists novel tools discovered
 - Highlights GFF publications with potential tools
-- Provides action items and links to artifacts
+- Explains review workflow and automatic upload on merge
 
 **Output:**
-- `issue_body.md` - Markdown content for GitHub issue
+- `pr_body.md` - Markdown content for GitHub Pull Request
 
 #### `tool_coverage/scripts/run_publication_reviews.py`
 AI-powered validation of mined tools using Goose agent (optional):
@@ -306,7 +306,7 @@ python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
 
 ### Generate Summary
 ```bash
-python tool_coverage/scripts/generate_coverage_summary.py > issue_body.md
+python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
 ```
 
 ## Understanding the Results
