@@ -187,13 +187,47 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
-4. Install Goose CLI (if AI validation enabled)
-5. Configure Goose with Anthropic API
-6. Run coverage analysis
-7. Mine publications for novel tools (with AI validation by default)
-8. Generate summary report
-9. Upload all reports as artifacts including validation results (90-day retention)
-10. Create or update GitHub issue with findings
+4. Check for ANTHROPIC_API_KEY (skips validation if missing)
+5. Install Goose CLI (if AI validation enabled and API key present)
+6. Configure Goose with Anthropic API
+7. Run coverage analysis
+8. Mine publications for novel tools (with AI validation by default)
+9. Format mining results into submission CSVs
+10. Generate summary report
+11. Upload all reports as artifacts including validation results (90-day retention)
+12. **Create Pull Request** with result files for review
+
+### 3. Synapse Upsert Workflow
+
+**File:** `.github/workflows/upsert-tools.yml`
+
+**Triggers:**
+- Automatically when PR is merged to `main` branch with `VALIDATED_*.csv` or `SUBMIT_*.csv` files
+- Manual trigger via workflow dispatch
+
+**Steps:**
+1. Checkout repository
+2. Set up Python 3.11 with pip cache
+3. Install dependencies from requirements.txt
+4. Check for validated or submit CSV files
+5. Clean submission files (remove tracking columns)
+6. **Dry-run preview** of Synapse uploads (safety check)
+7. **Upload cleaned data** to Synapse tables
+8. Create upload summary with table links
+9. Upload cleaned CSVs as artifacts (30-day retention)
+
+**Safety Features:**
+- Prefers `VALIDATED_*.csv` files (AI-validated, false positives removed)
+- Falls back to `SUBMIT_*.csv` if validated files not present
+- Runs dry-run before actual upload
+- Skips if no CSV files found
+
+**Synapse Tables Updated:**
+- Animal Models: syn26486808
+- Antibodies: syn26486811
+- Cell Lines: syn26486823
+- Genetic Reagents: syn26486832
+- Resources (links): syn51730943
 
 ## Configuration
 
@@ -213,8 +247,8 @@ The workflow requires the following GitHub secrets to be configured:
    - Cost: ~$0.01-0.03 per publication validated
 
 3. **`NF_SERVICE_GIT_TOKEN`**
-   - GitHub token with `issues: write` permission
-   - Used to create/update GitHub issues
+   - GitHub token with `contents: write` and `pull_requests: write` permissions
+   - Used to create Pull Requests with mining results
    - Can use a personal access token or GitHub App token
 
 ### Dependencies
@@ -303,14 +337,29 @@ Publications are ranked by:
 
 ## Workflow Outputs
 
-### GitHub Issue
+### Pull Request
 
-A weekly issue is created with:
-- Current coverage status
-- Novel tools discovered
-- Top priority publications to review
-- Links to downloadable artifacts
-- Summary of submission-ready CSVs
+A weekly PR is created with:
+- **Title:** `🔍 Tool Coverage Update - [run number]`
+- **Labels:** `automated-mining`, `tool-coverage`
+- **Description includes:**
+  - Current coverage status
+  - Novel tools discovered
+  - Top priority publications to review
+  - Summary of submission-ready CSVs
+- **Files included:**
+  - `VALIDATED_*.csv` or `SUBMIT_*.csv` - Submission files
+  - `GFF_Tool_Coverage_Report.pdf` - Coverage analysis
+  - `novel_tools_FULLTEXT_mining.csv` - All mining results
+  - `priority_publications_FULLTEXT.csv` - Top publications
+  - Other supporting files
+
+**Workflow after PR creation:**
+1. Review the mining results and validation reports
+2. Verify tool mentions in publication full text
+3. Remove any false positives
+4. Complete missing metadata fields
+5. **Merge PR** → Automatically triggers Synapse upsert workflow
 
 ### Downloadable Artifacts
 
@@ -325,14 +374,16 @@ All reports are available as workflow artifacts:
   - Each CSV matches the schema of its target Synapse table
   - Includes UUIDs, publication links, and metadata
 
-## Next Steps After Report
+## Next Steps After PR Creation
 
-### 1. Download and Review Artifacts
+### 1. Review the Pull Request
 
-Access the workflow artifacts from the GitHub Actions run:
-- Download `SUBMIT_*.csv` files for your tool type
-- Review `priority_publications_FULLTEXT.csv` for context
-- Check PDF reports for coverage visualizations
+Navigate to the created PR and review the changes:
+- Check the PR description for coverage summary
+- Download artifacts from the workflow run if needed
+- Review `VALIDATED_*.csv` or `SUBMIT_*.csv` files in the PR
+- Check `priority_publications_FULLTEXT.csv` for context
+- Review PDF coverage reports
 
 ### 2. Validate Tool Mentions
 
@@ -364,28 +415,38 @@ Many fields are **automatically pre-filled** from metadata extraction, but may n
 - Check for pattern matching false positives
 - Confirm species and organism assignments
 
-### 4. Submit to Synapse Tables
+### 4. Merge the Pull Request
 
-**IMPORTANT:** All `SUBMIT_*.csv` files contain NEW ROWS only - these should be **appended** to existing tables, not used as replacements.
+Once you've validated the results and completed any necessary edits:
 
-Upload validated entries to the appropriate tables:
+**Merge the PR** → This automatically triggers the Synapse upsert workflow
 
-**Core Tables:**
-- `SUBMIT_resources.csv` → syn26450069 (Resource table with resourceName)
+**What happens automatically:**
+1. The upsert workflow detects the CSV files
+2. Cleans submission files (removes tracking columns)
+3. Runs a dry-run preview of uploads
+4. Uploads data to Synapse tables:
+   - **Resources:** syn26450069
+   - **Animal Models:** syn26486808
+   - **Antibodies:** syn26486811
+   - **Cell Lines:** syn26486823
+   - **Genetic Reagents:** syn26486832
+   - **Publication Links:** syn51735450
+   - **Development:** syn26486807
+5. Creates upload summary in GitHub Actions
 
-**Detail Tables:**
-- `SUBMIT_animal_models.csv` → syn26486808
-- `SUBMIT_antibodies.csv` → syn26486811
-- `SUBMIT_cell_lines.csv` → syn26486823
-- `SUBMIT_genetic_reagents.csv` → syn26486832
+**IMPORTANT:** The CSV files contain NEW ROWS only - they are **appended** to existing Synapse tables, not used as replacements.
 
-**Relationship Tables:**
-- `SUBMIT_publication_links.csv` → syn51735450
-- `SUBMIT_development.csv` → syn26486807 (Development publications)
+### 5. Verify Upload Success
 
-### 5. Track Progress
+After merging:
+- Check the `upsert-tools` workflow run in GitHub Actions
+- Review the upload summary for any errors
+- Verify row counts increased in Synapse tables
 
-Monitor coverage percentage in the next weekly report to see improvement toward the 80% target.
+### 6. Track Progress
+
+Monitor coverage percentage in the next weekly PR to see improvement toward the 80% target.
 
 ## Limitations
 
