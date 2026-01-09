@@ -44,8 +44,19 @@ jobs:
         run: |
           pip install -r tool_coverage/requirements.txt
 
+      - name: Check for ANTHROPIC_API_KEY
+        id: check_api_key
+        run: |
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "api_key_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ ANTHROPIC_API_KEY is configured"
+          else
+            echo "api_key_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️  ANTHROPIC_API_KEY not found - AI validation will be skipped"
+          fi
+
       - name: Install Goose CLI
-        if: ${{ github.event.inputs.ai_validation != 'false' }}
+        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
         run: |
           echo "Installing Goose CLI for AI validation..."
           # Install Go if needed
@@ -57,7 +68,7 @@ jobs:
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Configure Goose
-        if: ${{ github.event.inputs.ai_validation != 'false' }}
+        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
@@ -91,12 +102,15 @@ jobs:
             CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
           fi
 
-          # Disable AI validation if requested
+          # Disable AI validation if requested or if API key is missing
           if [ "${{ github.event.inputs.ai_validation }}" = "false" ]; then
             CMD="$CMD --no-validate"
-            echo "AI validation disabled"
+            echo "⚠️  AI validation disabled by user"
+          elif [ "${{ steps.check_api_key.outputs.api_key_exists }}" != "true" ]; then
+            CMD="$CMD --no-validate"
+            echo "⚠️  AI validation disabled - ANTHROPIC_API_KEY not found"
           else
-            echo "AI validation enabled (default)"
+            echo "✅ AI validation enabled"
           fi
 
           # Run mining

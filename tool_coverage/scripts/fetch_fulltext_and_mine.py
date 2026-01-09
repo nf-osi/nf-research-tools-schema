@@ -1146,6 +1146,25 @@ Examples:
     unlinked_pubs = pub_df[~pub_df['pmid'].isin(linked_pmids)].copy()
     print(f"   - {len(unlinked_pubs)} unlinked publications to mine")
 
+    # Check for previously mined publications to avoid re-mining
+    previously_mined_pmids = set()
+    mining_results_file = 'novel_tools_FULLTEXT_mining.csv'
+    if os.path.exists(mining_results_file):
+        try:
+            previous_results = pd.read_csv(mining_results_file)
+            if 'pmid' in previous_results.columns:
+                previously_mined_pmids = set(previous_results['pmid'].dropna().astype(str).unique())
+                print(f"   - {len(previously_mined_pmids)} previously mined publications found")
+
+                # Filter out previously mined
+                before_filter = len(unlinked_pubs)
+                unlinked_pubs = unlinked_pubs[~unlinked_pubs['pmid'].isin(previously_mined_pmids)].copy()
+                skipped = before_filter - len(unlinked_pubs)
+                if skipped > 0:
+                    print(f"   - Skipping {skipped} already-mined publications")
+        except Exception as e:
+            print(f"   ⚠️  Could not load previous mining results: {e}")
+
     # Apply max_publications limit if specified
     if args.max_publications and len(unlinked_pubs) > args.max_publications:
         print(f"   - Limiting to first {args.max_publications} publications (--max-publications)")
@@ -1293,13 +1312,28 @@ Examples:
         # Sort by total tool count
         results_df = results_df.sort_values('total_tool_count', ascending=False)
 
-        # Save full results
+        # Save full results (append to existing if present)
         output_file = 'novel_tools_FULLTEXT_mining.csv'
-        results_df.to_csv(output_file, index=False)
-        print(f"\n📄 Full results saved to: {output_file}")
+        if os.path.exists(output_file) and len(previously_mined_pmids) > 0:
+            # Append to existing file
+            existing_df = pd.read_csv(output_file)
+            combined_df = pd.concat([existing_df, results_df], ignore_index=True)
+            # Remove duplicates (in case of re-mining)
+            combined_df = combined_df.drop_duplicates(subset='pmid', keep='last')
+            combined_df.to_csv(output_file, index=False)
+            print(f"\n📄 Results appended to: {output_file}")
+            print(f"   - {len(existing_df)} previous + {len(results_df)} new = {len(combined_df)} total")
+        else:
+            # Create new file
+            results_df.to_csv(output_file, index=False)
+            print(f"\n📄 Full results saved to: {output_file}")
 
-        # Save priority publications (top 30)
-        priority_df = results_df.head(30)
+        # Save priority publications (top 30 from combined results)
+        if os.path.exists(output_file) and len(previously_mined_pmids) > 0:
+            # Use combined results for priority list
+            priority_df = combined_df.sort_values('total_tool_count', ascending=False).head(30)
+        else:
+            priority_df = results_df.head(30)
         priority_file = 'priority_publications_FULLTEXT.csv'
         priority_df.to_csv(priority_file, index=False)
         print(f"📄 Top 30 priority publications saved to: {priority_file}")
@@ -1329,38 +1363,47 @@ Examples:
         print("\n" + "=" * 80)
         print("AI VALIDATION - Running Goose Reviews")
         print("=" * 80)
-        print("\n⚠️  This requires goose CLI to be installed and configured")
-        print("   Install: https://github.com/block/goose")
-        print("   Configure: goose configure")
-        print("   Skip with: --no-validate")
 
-        try:
-            # Run the validation orchestrator
-            import subprocess
-            result = subprocess.run(
-                ['python3', 'tool_coverage/scripts/run_publication_reviews.py', '--mining-file', 'novel_tools_FULLTEXT_mining.csv'],
-                capture_output=False,
-                text=True
-            )
+        # Check if ANTHROPIC_API_KEY is set
+        if not os.environ.get('ANTHROPIC_API_KEY'):
+            print("\n⚠️  ANTHROPIC_API_KEY environment variable not found")
+            print("   AI validation requires an Anthropic API key")
+            print("   Set key: export ANTHROPIC_API_KEY='your-key-here'")
+            print("   Or skip validation: --no-validate")
+            print("\n   Skipping AI validation...")
+        else:
+            print("\n⚠️  This requires goose CLI to be installed and configured")
+            print("   Install: https://github.com/block/goose")
+            print("   Configure: goose configure")
+            print("   Skip with: --no-validate")
 
-            if result.returncode == 0:
-                print("\n✅ AI validation completed successfully")
-                print("   Review VALIDATED_*.csv files instead of SUBMIT_*.csv")
-            else:
-                print(f"\n⚠️  AI validation failed with exit code {result.returncode}")
-                print("   Continuing with unvalidated SUBMIT_*.csv files")
+            try:
+                # Run the validation orchestrator
+                import subprocess
+                result = subprocess.run(
+                    ['python3', 'tool_coverage/scripts/run_publication_reviews.py', '--mining-file', 'novel_tools_FULLTEXT_mining.csv'],
+                    capture_output=False,
+                    text=True
+                )
 
-        except FileNotFoundError:
-            print("\n❌ Error: goose CLI not found. Please install goose:")
-            print("   https://github.com/block/goose")
-            print("   Skipping validation - using unvalidated SUBMIT_*.csv files")
-        except Exception as e:
-            print(f"\n❌ Error running AI validation: {e}")
-            print("   Continuing without validation...")
+                if result.returncode == 0:
+                    print("\n✅ AI validation completed successfully")
+                    print("   Review VALIDATED_*.csv files instead of SUBMIT_*.csv")
+                else:
+                    print(f"\n⚠️  AI validation failed with exit code {result.returncode}")
+                    print("   Continuing with unvalidated SUBMIT_*.csv files")
 
-        print("\n" + "=" * 80)
-        print("AI VALIDATION COMPLETE")
-        print("=" * 80)
+            except FileNotFoundError:
+                print("\n❌ Error: goose CLI not found. Please install goose:")
+                print("   https://github.com/block/goose")
+                print("   Skipping validation - using unvalidated SUBMIT_*.csv files")
+            except Exception as e:
+                print(f"\n❌ Error running AI validation: {e}")
+                print("   Continuing without validation...")
+
+            print("\n" + "=" * 80)
+            print("AI VALIDATION COMPLETE")
+            print("=" * 80)
     else:
         print("\n" + "=" * 80)
         print("AI VALIDATION SKIPPED (--no-validate)")
