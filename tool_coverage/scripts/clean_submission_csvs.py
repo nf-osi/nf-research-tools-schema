@@ -67,6 +67,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     new tool discoveries and publication links, we're always adding new rows rather
     than updating existing ones.
 
+    After uploading, creates a snapshot version of the table to track this update.
+
     Args:
         syn: Synapse client
         clean_file: Path to cleaned CSV file
@@ -92,7 +94,12 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         table = Table(table_id, df_clean)
         table = syn.store(table)
 
+        # Create a snapshot version to track this update
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
+        print(f"         Creating snapshot version...")
+        syn.create_snapshot_version(table_id)
+        print(f"         ✅ Snapshot version created")
+
         return True
 
     except Exception as e:
