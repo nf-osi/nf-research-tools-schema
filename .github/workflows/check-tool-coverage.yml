@@ -79,7 +79,6 @@ jobs:
         id: mining
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           echo "Mining publications for novel tools..."
 
@@ -91,22 +90,33 @@ jobs:
             CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
           fi
 
-          # Disable AI validation if requested or if API key is missing
-          if [ "${{ github.event.inputs.ai_validation }}" = "false" ]; then
-            CMD="$CMD --no-validate"
-            echo "⚠️  AI validation disabled by user"
-          elif [ "${{ steps.check_api_key.outputs.api_key_exists }}" != "true" ]; then
-            CMD="$CMD --no-validate"
-            echo "⚠️  AI validation disabled - ANTHROPIC_API_KEY not found"
-          else
-            echo "✅ AI validation enabled"
-          fi
-
           # Run mining
           echo "Running: $CMD"
           $CMD 2>&1 | tee mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Run AI validation on mined tools
+        id: validation
+        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Running AI validation on mined tools..."
+
+          # Build command with optional flags
+          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv"
+
+          # Add force re-reviews flag if specified
+          if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
+            CMD="$CMD --force-rereviews"
+          fi
+
+          # Run validation
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee validation_output.log || echo "validation_failed=true" >> $GITHUB_OUTPUT
+
+          echo "validation_complete=true" >> $GITHUB_OUTPUT
 
       - name: Format mining results for submission
         id: formatting
@@ -156,9 +166,12 @@ jobs:
             VALIDATED_*.csv
             tool_reviews/validation_report.xlsx
             tool_reviews/validation_summary.json
+            tool_reviews/potentially_missed_tools.csv
+            tool_reviews/suggested_patterns.csv
             tool_reviews/results/*.yaml
             coverage_output.log
             mining_output.log
+            validation_output.log
             formatting_output.log
           retention-days: 90
 
