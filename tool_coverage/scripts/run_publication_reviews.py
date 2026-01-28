@@ -112,13 +112,17 @@ def fetch_unlinked_publications(syn):
         linked_pub_ids = usage_pub_ids | dev_pub_ids
         print(f"  Total unique publications with tool links: {len(linked_pub_ids)}")
 
-        # Get all tools publications with ROW_ID (which is the publicationId)
-        pubs_query_with_id = syn.tableQuery("SELECT ROW_ID, pmid, title, doi FROM syn26486839")
+        # Get all tools publications with publicationId
+        # Note: publicationId column contains the row IDs used in usage/development tables
+        pubs_query_with_id = syn.tableQuery("SELECT publicationId, pmid, publicationTitle, doi FROM syn26486839")
         pubs_with_id_df = pubs_query_with_id.asDataFrame()
 
-        # Filter to unlinked (where ROW_ID not in linked_pub_ids)
-        tools_pubs_unlinked = pubs_with_id_df[~pubs_with_id_df['ROW_ID'].isin(linked_pub_ids)].copy()
+        # Filter to unlinked (where publicationId not in linked_pub_ids)
+        tools_pubs_unlinked = pubs_with_id_df[~pubs_with_id_df['publicationId'].isin(linked_pub_ids)].copy()
         tools_pubs_unlinked['source'] = 'tools_table_unlinked'
+
+        # Rename publicationTitle to title for consistency
+        tools_pubs_unlinked = tools_pubs_unlinked.rename(columns={'publicationTitle': 'title'})
 
         print(f"  ✅ Found {len(tools_pubs_unlinked)} tools publications without tool links")
 
