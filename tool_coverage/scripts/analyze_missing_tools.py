@@ -43,7 +43,14 @@ if 'fundingAgency' in pub_df.columns:
 
     def parse_funding_agencies(funding_str):
         """Parse funding agency string into list"""
-        if pd.isna(funding_str):
+        # Handle scalar NaN values
+        if isinstance(funding_str, (float, int)) and pd.isna(funding_str):
+            return []
+        # Handle None
+        if funding_str is None:
+            return []
+        # Handle empty string
+        if not funding_str or (isinstance(funding_str, str) and not funding_str.strip()):
             return []
         try:
             # Try to parse as Python list string
@@ -53,7 +60,7 @@ if 'fundingAgency' in pub_df.columns:
             return [str(agencies).strip()]
         except:
             # If parsing fails, treat as single string
-            return [str(funding_str).strip()] if funding_str else []
+            return [str(funding_str).strip()]
 
     pub_df['funding_agencies'] = pub_df['fundingAgency'].apply(parse_funding_agencies)
 
