@@ -3,7 +3,7 @@
 Fetch full text from PubMed Central, extract Methods sections,
 and mine for novel tools using trained patterns.
 
-Includes optional AI-powered validation using Goose agent (default: enabled).
+Note: AI validation should be run separately using run_publication_reviews.py
 """
 
 import synapseclient
@@ -1015,8 +1015,6 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
 
     # 2. Fetch full text
     fulltext = fetch_pmc_fulltext(pmid)
-    if fulltext:
-        result['fulltext_available'] = True
 
     # 3. Mine Methods section
     methods_text = extract_methods_section(fulltext) if fulltext else ""
@@ -1035,6 +1033,10 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
         intro_results = mine_introduction_section(intro_text, tool_patterns)
     else:
         intro_results = ({t: set() for t in tool_patterns.keys()}, {})
+
+    # Mark fulltext as available only if we got meaningful content (methods or intro)
+    if methods_text or intro_text:
+        result['fulltext_available'] = True
 
     # 5. Merge results
     merged_tools, merged_metadata, tool_sources = merge_mining_results(
@@ -1067,32 +1069,18 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Mine publications for research tools with optional AI validation',
+        description='Mine publications for research tools',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Mine with AI validation (default)
+  # Mine publications
   python fetch_fulltext_and_mine.py
-
-  # Mine WITHOUT AI validation
-  python fetch_fulltext_and_mine.py --no-validate
 
   # Mine with custom limits
   python fetch_fulltext_and_mine.py --max-publications 100
+
+Note: Run run_publication_reviews.py separately for AI validation
         """
-    )
-    parser.add_argument(
-        '--validate-tools',
-        dest='validate_tools',
-        action='store_true',
-        default=True,
-        help='Run AI validation on mined tools using Goose (default: enabled)'
-    )
-    parser.add_argument(
-        '--no-validate',
-        dest='validate_tools',
-        action='store_false',
-        help='Skip AI validation (faster, but may include false positives)'
     )
     parser.add_argument(
         '--max-publications',
@@ -1106,9 +1094,8 @@ Examples:
     print("=" * 80)
     print("FULL TEXT MINING FOR NOVEL TOOLS")
     print("=" * 80)
-    print(f"\n⚙️  Configuration:")
-    print(f"   - AI Validation: {'✅ ENABLED' if args.validate_tools else '❌ DISABLED'}")
     if args.max_publications:
+        print(f"\n⚙️  Configuration:")
         print(f"   - Max Publications: {args.max_publications}")
     print()
 
@@ -1213,10 +1200,6 @@ Examples:
             abstract_mined += 1
             print(f"     ✓ Abstract: {mining_result['abstract_length']} chars")
 
-        if mining_result['fulltext_available']:
-            fetch_success += 1
-            print(f"     ✓ Full text downloaded")
-
         if mining_result['methods_found']:
             methods_found += 1
             print(f"     ✓ Methods section: {mining_result['methods_length']} chars")
@@ -1224,6 +1207,10 @@ Examples:
         if mining_result['introduction_found']:
             intro_found += 1
             print(f"     ✓ Introduction section: {mining_result['intro_length']} chars")
+
+        if mining_result['fulltext_available']:
+            fetch_success += 1
+            print(f"     ✓ Full text sections extracted")
 
         # Count existing vs novel tools
         existing_count = sum(len(tools) for tools in mining_result['existing_tools'].values())
@@ -1284,10 +1271,10 @@ Examples:
     print("=" * 80)
     print(f"   Total publications mined: {len(summary)}")
     print(f"   Abstracts mined: {abstract_mined}/{len(unlinked_pubs)} ({100*abstract_mined/len(unlinked_pubs):.1f}%)")
-    print(f"   Full text fetched: {fetch_success}/{len(unlinked_pubs)} ({100*fetch_success/len(unlinked_pubs):.1f}%)")
+    print(f"   Methods sections found: {methods_found}/{len(unlinked_pubs)} ({100*methods_found/len(unlinked_pubs):.1f}%)")
+    print(f"   Introduction sections found: {intro_found}/{len(unlinked_pubs)} ({100*intro_found/len(unlinked_pubs):.1f}%)")
     if fetch_success > 0:
-        print(f"   Methods sections found: {methods_found}/{fetch_success} ({100*methods_found/fetch_success:.1f}%)")
-        print(f"   Introduction sections found: {intro_found}/{fetch_success} ({100*intro_found/fetch_success:.1f}%)")
+        print(f"   Full text sections extracted: {fetch_success}/{len(unlinked_pubs)} ({100*fetch_success/len(unlinked_pubs):.1f}%)")
     print(f"\n   Tool Matching:")
     print(f"   - Existing tools matched: {existing_tool_matches}")
     print(f"   - Novel tools found: {novel_tools_found}")
@@ -1357,60 +1344,13 @@ Examples:
     print("\n" + "=" * 80)
     print("FULL TEXT MINING COMPLETE")
     print("=" * 80)
-
-    # Optional: Run AI validation on mined tools
-    if args.validate_tools:
-        print("\n" + "=" * 80)
-        print("AI VALIDATION - Running Goose Reviews")
-        print("=" * 80)
-
-        # Check if ANTHROPIC_API_KEY is set
-        if not os.environ.get('ANTHROPIC_API_KEY'):
-            print("\n⚠️  ANTHROPIC_API_KEY environment variable not found")
-            print("   AI validation requires an Anthropic API key")
-            print("   Set key: export ANTHROPIC_API_KEY='your-key-here'")
-            print("   Or skip validation: --no-validate")
-            print("\n   Skipping AI validation...")
-        else:
-            print("\n⚠️  This requires goose CLI to be installed and configured")
-            print("   Install: https://github.com/block/goose")
-            print("   Configure: goose configure")
-            print("   Skip with: --no-validate")
-
-            try:
-                # Run the validation orchestrator
-                import subprocess
-                result = subprocess.run(
-                    ['python3', 'tool_coverage/scripts/run_publication_reviews.py', '--mining-file', 'novel_tools_FULLTEXT_mining.csv'],
-                    capture_output=False,
-                    text=True
-                )
-
-                if result.returncode == 0:
-                    print("\n✅ AI validation completed successfully")
-                    print("   Review VALIDATED_*.csv files instead of SUBMIT_*.csv")
-                else:
-                    print(f"\n⚠️  AI validation failed with exit code {result.returncode}")
-                    print("   Continuing with unvalidated SUBMIT_*.csv files")
-
-            except FileNotFoundError:
-                print("\n❌ Error: goose CLI not found. Please install goose:")
-                print("   https://github.com/block/goose")
-                print("   Skipping validation - using unvalidated SUBMIT_*.csv files")
-            except Exception as e:
-                print(f"\n❌ Error running AI validation: {e}")
-                print("   Continuing without validation...")
-
-            print("\n" + "=" * 80)
-            print("AI VALIDATION COMPLETE")
-            print("=" * 80)
-    else:
-        print("\n" + "=" * 80)
-        print("AI VALIDATION SKIPPED (--no-validate)")
-        print("=" * 80)
-        print("\n⚠️  SUBMIT_*.csv files may contain false positives")
-        print("   Consider running with AI validation to filter false positives")
-        print("   Re-run with: python fetch_fulltext_and_mine.py (validation enabled by default)")
+    print("\n📋 Next Steps:")
+    print("   1. Run AI validation (recommended):")
+    print("      python tool_coverage/scripts/run_publication_reviews.py")
+    print("   2. Format mining results for submission:")
+    print("      python tool_coverage/scripts/format_mining_for_submission.py")
+    print("   3. Use VALIDATED_*.csv files (after validation) or SUBMIT_*.csv files")
+    print("=" * 80)
 
 
 if __name__ == "__main__":

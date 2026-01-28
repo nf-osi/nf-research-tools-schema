@@ -24,7 +24,24 @@ prompt: |
      - **Usage Type**: Is the tool being DEVELOPED, USED in experiments, or just CITED from other work?
      - **Methods Presence**: Does the publication have a Methods section indicating actual lab work?
 
-  3. CRITICAL FALSE POSITIVE PATTERNS TO REJECT:
+  3. DETECT POTENTIALLY MISSED TOOLS:
+     After reviewing mined tools, scan the full text (Abstract, Methods, Introduction) for:
+     - Tool mentions that match common patterns but weren't captured
+     - Specific tool names with catalog numbers, vendor names, or RRID identifiers
+     - Cell line names following standard naming conventions (e.g., HEK293, MCF-7, iPSC-derived)
+     - Mouse strain nomenclature (e.g., Nf1+/-, B6.129-Nf1tm1Tyj)
+     - Antibody targets or clones (e.g., anti-NF1 [D7R7D], rabbit polyclonal)
+     - Plasmids, vectors, or constructs (e.g., pCMV-NF1, AAV-GFP)
+     - Any tools mentioned with "we used", "we generated", "obtained from", "purchased from"
+
+  4. SUGGEST NEW PATTERNS:
+     Based on your analysis, recommend NEW search patterns that could improve mining:
+     - Specific terminology or naming conventions that were missed
+     - Context phrases that reliably indicate tool usage
+     - Ways to distinguish real tools from false positives
+     - Tool types that need better pattern coverage
+
+  5. CRITICAL FALSE POSITIVE PATTERNS TO REJECT:
      - Gene/disease names (NF1, NF2) mentioned without tool keywords
      - Clinical studies focused on patient outcomes, not lab research
      - Questionnaire/survey development studies (e.g., quality of life assessments)
@@ -32,13 +49,13 @@ prompt: |
      - Epidemiological or population studies
      - Publications without Methods sections describing experimental procedures
 
-  4. ACCEPT ONLY IF:
+  6. ACCEPT ONLY IF:
      - Clear tool-specific context (e.g., "NF1 antibody", "NF1-deficient cell line", "NF1 knockout mice")
      - Methods section describes experimental procedures using the tool
      - Publication type is laboratory research (molecular biology, cell biology, animal models)
      - Context indicates tool development or experimental usage
 
-  5. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
+  7. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
 
   ```yaml
   publicationMetadata:
@@ -74,11 +91,31 @@ prompt: |
 
     # Repeat for each mined tool
 
+  potentiallyMissedTools:
+    - toolName: "Exact tool name found in text"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent"
+      foundIn: "abstract" | "methods" | "introduction"
+      contextSnippet: "...text showing this tool mention..."
+      whyMissed: "Explanation of why this wasn't caught by initial mining"
+      confidence: 0.0-1.0  # How confident this is a real tool
+      shouldBeAdded: Yes | No | Maybe
+    # Include all potentially missed tools (if any)
+
+  suggestedPatterns:
+    - patternType: "term" | "context_phrase" | "naming_convention" | "vendor_indicator"
+      pattern: "Specific pattern or regex to add"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "general"
+      examples: ["Example 1 from this paper", "Example 2 from this paper"]
+      reasoning: "Why this pattern would improve mining accuracy"
+    # Include all pattern suggestions (if any)
+
   summary:
     totalToolsMined: 6
     toolsAccepted: 2
     toolsRejected: 3
     toolsUncertain: 1
+    potentiallyMissedCount: 2  # Number of tools that might have been missed
+    newPatternsCount: 3  # Number of new patterns suggested
     majorIssuesFound: |
       List major issues found during review:
       - Example: "Publication is questionnaire development, not lab research"
@@ -89,6 +126,8 @@ prompt: |
       - Should all tools be rejected? Why?
       - Are there specific tools that need manual curator review?
       - Any other concerns about the mining results?
+      - Any tools that were potentially missed?
+      - Any patterns that should be added to improve future mining?
   ```
 
   IMPORTANT INSTRUCTIONS:
@@ -99,6 +138,10 @@ prompt: |
   - If the publication has no Methods section, be extremely skeptical
   - Provide detailed reasoning for every decision to enable audit trail
   - Use "Uncertain" verdict sparingly - only when genuinely ambiguous after thorough analysis
+  - ACTIVELY search for potentially missed tools - don't just validate what was found
+  - Look for tools mentioned with vendor/catalog info, RRIDs, or specific experimental context
+  - Suggest concrete, actionable patterns that would catch tools missed in this paper
+  - If no tools were missed and no patterns are needed, set potentiallyMissedTools: [] and suggestedPatterns: []
 
 activities:
   - Review publication {{ pmid }} for tool validation

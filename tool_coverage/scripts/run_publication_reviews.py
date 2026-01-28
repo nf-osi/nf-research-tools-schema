@@ -239,6 +239,8 @@ def compile_validation_results(mining_df, results_dir):
     print("=" * 80)
 
     validation_results = []
+    all_missed_tools = []
+    all_suggested_patterns = []
 
     for _, row in mining_df.iterrows():
         pmid = row['pmid']
@@ -260,6 +262,8 @@ def compile_validation_results(mining_df, results_dir):
         pub_meta = review_data.get('publicationMetadata', {})
         tool_validations = review_data.get('toolValidations', [])
         summary = review_data.get('summary', {})
+        missed_tools = review_data.get('potentiallyMissedTools', [])
+        suggested_patterns = review_data.get('suggestedPatterns', [])
 
         # Categorize tools by recommendation
         accepted_tools = []
@@ -284,6 +288,16 @@ def compile_validation_results(mining_df, results_dir):
             else:  # Manual Review Required
                 uncertain_tools.append(tool_info)
 
+        # Collect missed tools
+        for missed_tool in missed_tools:
+            missed_tool['pmid'] = pmid
+            all_missed_tools.append(missed_tool)
+
+        # Collect suggested patterns
+        for pattern in suggested_patterns:
+            pattern['pmid'] = pmid
+            all_suggested_patterns.append(pattern)
+
         validation_results.append({
             'pmid': pmid,
             'title': pub_meta.get('title', ''),
@@ -293,17 +307,23 @@ def compile_validation_results(mining_df, results_dir):
             'toolsAccepted': summary.get('toolsAccepted', 0),
             'toolsRejected': summary.get('toolsRejected', 0),
             'toolsUncertain': summary.get('toolsUncertain', 0),
+            'potentiallyMissedCount': summary.get('potentiallyMissedCount', 0),
+            'newPatternsCount': summary.get('newPatternsCount', 0),
             'acceptedTools': accepted_tools,
             'rejectedTools': rejected_tools,
             'uncertainTools': uncertain_tools,
+            'missedTools': missed_tools,
+            'suggestedPatterns': suggested_patterns,
             'overallAssessment': pub_meta.get('overallAssessment', ''),
             'majorIssues': summary.get('majorIssuesFound', ''),
             'recommendations': summary.get('recommendations', '')
         })
 
     print(f"\n✅ Compiled {len(validation_results)} publication reviews")
+    print(f"   - Total potentially missed tools: {len(all_missed_tools)}")
+    print(f"   - Total suggested patterns: {len(all_suggested_patterns)}")
 
-    return validation_results
+    return validation_results, all_missed_tools, all_suggested_patterns
 
 def normalize_tool_type(tool_type):
     """Normalize tool type to match CSV file naming convention."""
@@ -488,7 +508,7 @@ def main():
             run_goose_review(pmid, input_file, results_dir)
 
     # Compile validation results
-    validation_results = compile_validation_results(mining_df, results_dir)
+    validation_results, all_missed_tools, all_suggested_patterns = compile_validation_results(mining_df, results_dir)
 
     # Save validation summary
     summary_file = Path(review_dir) / 'validation_summary.json'
@@ -508,6 +528,8 @@ def main():
             'accepted': result['toolsAccepted'],
             'rejected': result['toolsRejected'],
             'uncertain': result['toolsUncertain'],
+            'potentiallyMissed': result['potentiallyMissedCount'],
+            'suggestedPatterns': result['newPatternsCount'],
             'majorIssues': result['majorIssues'],
             'recommendations': result['recommendations']
         })
@@ -516,6 +538,22 @@ def main():
     report_file = Path(review_dir) / 'validation_report.xlsx'
     report_df.to_excel(report_file, index=False)
     print(f"✅ Validation report saved: {report_file}")
+
+    # Save missed tools report
+    if all_missed_tools:
+        missed_tools_df = pd.DataFrame(all_missed_tools)
+        missed_tools_file = Path(review_dir) / 'potentially_missed_tools.csv'
+        missed_tools_df.to_csv(missed_tools_file, index=False)
+        print(f"✅ Potentially missed tools saved: {missed_tools_file}")
+        print(f"   - {len(all_missed_tools)} tools that may have been missed")
+
+    # Save suggested patterns report
+    if all_suggested_patterns:
+        patterns_df = pd.DataFrame(all_suggested_patterns)
+        patterns_file = Path(review_dir) / 'suggested_patterns.csv'
+        patterns_df.to_csv(patterns_file, index=False)
+        print(f"✅ Suggested patterns saved: {patterns_file}")
+        print(f"   - {len(all_suggested_patterns)} patterns to improve mining")
 
     # Filter SUBMIT_*.csv files
     if not args.compile_only:
@@ -528,7 +566,9 @@ def main():
     print("  1. Review validation_report.xlsx for summary")
     print("  2. Check VALIDATED_*.csv files (rejected tools removed)")
     print("  3. Manually review 'uncertain' tools if any")
-    print("  4. Use VALIDATED_*.csv files instead of SUBMIT_*.csv")
+    print("  4. Review potentially_missed_tools.csv for tools that may need manual addition")
+    print("  5. Review suggested_patterns.csv to improve future mining accuracy")
+    print("  6. Use VALIDATED_*.csv files instead of SUBMIT_*.csv")
     print("=" * 80)
 
 if __name__ == '__main__':
