@@ -38,6 +38,15 @@ Goose AI Agent (tool_coverage/scripts/recipes/publication_tool_review.yaml)
 VALIDATED_*.csv (filtered submission files)
 potentially_missed_tools.csv (tools AI found)
 suggested_patterns.csv (pattern recommendations)
+
+Step 3: Automated Pattern Improvement
+apply_pattern_suggestions.py
+    ↓ (reads suggested patterns with confidence scores)
+    ↓ (auto-adds patterns with >0.9 confidence)
+    ↓ (generates report for 0.7-0.9 confidence)
+tool_coverage/config/mining_patterns.json (updated)
+PATTERN_IMPROVEMENTS.md (manual review report)
+    ↓ (feedback loop: next mining run uses improved patterns)
 ```
 
 **Key Optimizations**:
@@ -155,7 +164,124 @@ python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 - Week 2: 10 API calls + 5 AI reviews = $0.05-0.15 (skip 45)
 - **Monthly savings**: 80-85% reduction in costs
 
-### 3. Integration with Mining Workflow
+### 3. Pattern Improvement Script (`apply_pattern_suggestions.py`)
+
+Automatically applies high-confidence pattern suggestions from AI validation, creating a feedback loop that continuously improves mining accuracy.
+
+**Features:**
+- **Auto-add high confidence patterns** (>0.9): Directly updates `mining_patterns.json`
+- **Generate manual review report** (0.7-0.9): Creates `PATTERN_IMPROVEMENTS.md` for human review
+- **Ignore low confidence** (<0.7): Filters out unreliable suggestions
+- **Audit trail**: Tracks all AI-added patterns with reasoning and confidence scores
+
+**Pattern Categories:**
+```json
+{
+  "antibodies": {
+    "vendor_indicators": ["Abcam ab\\d+", "Cell Signaling #\\d+"],
+    "context_phrases": ["antibody.*purchased from"]
+  },
+  "cell_lines": {
+    "naming_conventions": ["[A-Z]{2,4}[0-9]{2,3}"],
+    "context_phrases": ["cells were cultured"]
+  },
+  "animal_models": {
+    "strain_nomenclature": ["C57BL/6", "Nf1\\+/-"],
+    "context_phrases": ["knockout mice"]
+  },
+  "genetic_reagents": {
+    "vector_indicators": ["pCMV-", "AAV-"],
+    "context_phrases": ["transfected with"]
+  }
+}
+```
+
+**Usage:**
+```bash
+# Apply pattern improvements
+python tool_coverage/scripts/apply_pattern_suggestions.py
+
+# Preview without modifying files
+python tool_coverage/scripts/apply_pattern_suggestions.py --dry-run
+```
+
+**Example Output:**
+```
+================================================================================
+PATTERN IMPROVEMENT APPLICATION
+================================================================================
+
+📂 Loading mining patterns configuration...
+📂 Loading AI-suggested patterns...
+   Found 5 suggested patterns
+
+📊 Categorizing suggestions by confidence...
+   High confidence (>0.9): 2 patterns
+   Medium confidence (0.7-0.9): 2 patterns
+   Low confidence (<0.7): 1 patterns (ignored)
+
+🤖 Processing high-confidence patterns...
+✅ Added pattern to antibodies.vendor_indicators: ThermoFisher \\d+
+✅ Added pattern to antibodies.context_phrases: purchased from.*Company
+
+📝 Generated manual review report: PATTERN_IMPROVEMENTS.md
+
+================================================================================
+SUMMARY
+================================================================================
+✅ Automatically added: 2 patterns
+📋 Requiring manual review: 2 patterns
+```
+
+**Audit Trail:**
+
+All AI-added patterns are tracked in `mining_patterns.json`:
+```json
+{
+  "ai_suggested_patterns": {
+    "comment": "Patterns automatically added by AI validation with confidence >0.9",
+    "additions": [
+      {
+        "category": "antibodies",
+        "section": "vendor_indicators",
+        "pattern": "ThermoFisher \\\\d+",
+        "reasoning": "Common vendor catalog number format",
+        "confidence": 0.92,
+        "added_date": "2026-01-28"
+      }
+    ]
+  }
+}
+```
+
+**Manual Review Report (`PATTERN_IMPROVEMENTS.md`):**
+
+Generated for medium-confidence patterns requiring human judgment:
+```markdown
+# Pattern Improvement Suggestions - Manual Review Required
+
+## Cell Lines
+
+### Pattern: `NCI-H\\d+`
+
+- **Type**: naming_convention
+- **Confidence**: 0.85
+- **Source PMID**: 23456789
+- **Reasoning**: Standard cell line nomenclature for lung cancer lines
+
+**Action**: Review and manually add to `tool_coverage/config/mining_patterns.json` if appropriate.
+```
+
+**Integration:**
+
+Pattern improvement runs automatically after AI validation in GitHub Actions workflow, creating a continuous improvement cycle:
+1. Mining extracts tools using current patterns
+2. AI validation identifies missed tools and suggests new patterns
+3. High-confidence patterns auto-added, medium-confidence exported to report
+4. Updated patterns committed to PR
+5. Next mining run benefits from improved patterns
+
+### 4. Integration with Mining Workflow
 
 AI validation is integrated into `fetch_fulltext_and_mine.py` via environment variable:
 
@@ -461,8 +587,9 @@ Potential improvements:
 - [ ] Confidence threshold tuning based on validation accuracy
 - [ ] Custom MCP tools for fetching publication text (avoid API delays)
 - [ ] Integration with PubMed metadata for journal quality signals
-- [ ] Learning from manual corrections to improve recipe
+- [x] Automated pattern learning from missed tools (IMPLEMENTED - see Pattern Improvement Script)
 - [ ] Batch validation mode for large publication sets
+- [ ] Learning from manual corrections to further refine patterns
 
 ## Support
 
