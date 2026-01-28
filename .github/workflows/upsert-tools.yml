@@ -8,6 +8,12 @@ on:
       - 'VALIDATED_*.csv'
       - 'SUBMIT_*.csv'
   workflow_dispatch:  # Allow manual triggering
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (validate and preview, but do not upsert to Synapse)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -46,13 +52,26 @@ jobs:
           fi
           echo "has_files=true" >> $GITHUB_OUTPUT
 
+      - name: Validate CSV schema
+        if: steps.check_files.outputs.has_files == 'true'
+        run: |
+          echo "=========================================="
+          echo "VALIDATING CSV Schema"
+          echo "=========================================="
+          python tool_coverage/scripts/clean_submission_csvs.py --validate
+
+          if [ $? -ne 0 ]; then
+            echo "❌ Validation failed - stopping workflow"
+            exit 1
+          fi
+
       - name: Clean and prepare submission files
         if: steps.check_files.outputs.has_files == 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "Cleaning submission files..."
-          python tool_coverage/scripts/clean_submission_csvs.py
+          python tool_coverage/scripts/clean_submission_csvs.py --validate
 
           echo ""
           echo "Files prepared for upload:"
@@ -69,7 +88,7 @@ jobs:
           python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
       - name: Confirm and upload to Synapse
-        if: steps.check_files.outputs.has_files == 'true'
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
@@ -81,8 +100,17 @@ jobs:
           echo ""
           echo "✅ Upload completed successfully"
 
+      - name: Dry-run mode - skip upload
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run == 'true'
+        run: |
+          echo "=========================================="
+          echo "DRY-RUN MODE - Skipping upload"
+          echo "=========================================="
+          echo "✅ Validation passed, files are ready for upload"
+          echo "⚠️  Run workflow without dry_run option to actually upload"
+
       - name: Regenerate coverage report
-        if: steps.check_files.outputs.has_files == 'true'
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
@@ -97,11 +125,22 @@ jobs:
       - name: Create upload summary
         if: steps.check_files.outputs.has_files == 'true'
         run: |
-          echo "## 📤 Synapse Upload Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Status**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Files uploaded**:" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "## 🔍 Dry-Run Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Status**: ✅ Validation passed (dry-run mode)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note**: No data was uploaded to Synapse (dry-run mode)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Files validated**:" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 📤 Synapse Upload Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Status**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Files uploaded**:" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ steps.check_files.outputs.has_validated }}" = "true" ]; then
@@ -110,15 +149,17 @@ jobs:
             echo "- Using SUBMIT_*.csv (not AI-validated)" >> $GITHUB_STEP_SUMMARY
           fi
 
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Synapse Tables Updated**:" >> $GITHUB_STEP_SUMMARY
-          echo "- Animal Models: syn26486808" >> $GITHUB_STEP_SUMMARY
-          echo "- Antibodies: syn26486811" >> $GITHUB_STEP_SUMMARY
-          echo "- Cell Lines: syn26486823" >> $GITHUB_STEP_SUMMARY
-          echo "- Genetic Reagents: syn26486832" >> $GITHUB_STEP_SUMMARY
-          echo "- Resources (links): syn51730943" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Synapse Tables Updated**:" >> $GITHUB_STEP_SUMMARY
+            echo "- Animal Models: syn26486808" >> $GITHUB_STEP_SUMMARY
+            echo "- Antibodies: syn26486811" >> $GITHUB_STEP_SUMMARY
+            echo "- Cell Lines: syn26486823" >> $GITHUB_STEP_SUMMARY
+            echo "- Genetic Reagents: syn26486832" >> $GITHUB_STEP_SUMMARY
+            echo "- Resources (links): syn51730943" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload summary artifacts
         if: steps.check_files.outputs.has_files == 'true'

@@ -13,6 +13,7 @@ import glob
 import argparse
 import synapseclient
 from synapseclient import Table
+from typing import List, Dict, Tuple
 
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
@@ -29,6 +30,56 @@ def get_synapse_table_id(filename):
     """Get Synapse table ID for a given cleaned CSV file."""
     basename = os.path.basename(filename)
     return SYNAPSE_TABLE_MAP.get(basename)
+
+def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[str]]:
+    """Validate CSV against expected schema requirements.
+
+    Args:
+        df: DataFrame to validate
+        file_type: Type of CSV (animal_models, antibodies, cell_lines, genetic_reagents, etc.)
+
+    Returns:
+        Tuple of (is_valid, error_messages)
+    """
+    errors = []
+
+    # Define required columns for each type
+    required_columns = {
+        'animal_models': ['name', 'species'],
+        'antibodies': ['targetAntigen'],
+        'cell_lines': ['organ'],
+        'genetic_reagents': ['insertName'],
+        'publication_links': ['pmid', 'resourceId'],
+        'resources': ['resourceName', 'resourceType']
+    }
+
+    # Extract file type from filename
+    for key in required_columns.keys():
+        if key in file_type:
+            req_cols = required_columns[key]
+            break
+    else:
+        # Unknown type, skip validation
+        return True, []
+
+    # Check for required columns
+    missing_cols = [col for col in req_cols if col not in df.columns]
+    if missing_cols:
+        errors.append(f"Missing required columns: {', '.join(missing_cols)}")
+
+    # Check for empty required fields
+    for col in req_cols:
+        if col in df.columns:
+            null_count = df[col].isna().sum()
+            if null_count > 0:
+                errors.append(f"Column '{col}' has {null_count} null/empty values")
+
+    # Check for completely empty rows
+    empty_rows = df.isna().all(axis=1).sum()
+    if empty_rows > 0:
+        errors.append(f"Found {empty_rows} completely empty rows")
+
+    return len(errors) == 0, errors
 
 def clean_csv(input_file):
     """Remove columns prefixed with '_' from CSV and save cleaned version.
@@ -133,6 +184,11 @@ Examples:
         action='store_true',
         help='Show what would be uploaded without actually uploading (requires --upsert)'
     )
+    parser.add_argument(
+        '--validate',
+        action='store_true',
+        help='Validate CSV schema before cleaning/upserting'
+    )
 
     args = parser.parse_args()
 
@@ -172,7 +228,22 @@ Examples:
 
     # Process each file
     upload_summary = []
+    validation_errors = []
+
     for file in sorted(submit_files):
+        # Validate if requested
+        if args.validate:
+            df_to_validate = pd.read_csv(file)
+            is_valid, errors = validate_csv_schema(df_to_validate, file)
+            if not is_valid:
+                print(f"\n   ❌ Validation failed for {file}:")
+                for error in errors:
+                    print(f"      - {error}")
+                validation_errors.append((file, errors))
+                continue  # Skip this file
+            else:
+                print(f"   ✅ Validation passed for {file}")
+
         clean_file, df_clean = clean_csv(file)
 
         # Upsert if requested
@@ -189,6 +260,19 @@ Examples:
     print("\n" + "=" * 80)
     print("CLEANING COMPLETE")
     print("=" * 80)
+
+    if validation_errors:
+        print("\n⚠️  VALIDATION ERRORS:")
+        for file, errors in validation_errors:
+            print(f"\n   {file}:")
+            for error in errors:
+                print(f"      - {error}")
+        print("\n❌ Some files failed validation and were skipped")
+        print("   Fix the errors above before uploading to Synapse")
+        return
+    elif args.validate:
+        print("\n✅ All files passed validation")
+
     print("\n✅ Clean files saved with CLEAN_* prefix")
 
     if args.upsert and not args.dry_run:
