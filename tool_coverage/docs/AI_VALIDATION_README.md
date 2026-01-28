@@ -1,8 +1,8 @@
-# AI-Powered Tool Validation with Goose (Enabled by Default)
+# AI-Powered Tool Validation with Goose
 
 ## Overview
 
-**AI validation is now enabled by default** in the tool mining workflow. This system uses Goose AI agent to automatically filter false positives like gene/disease names being misidentified as research tools, dramatically improving precision.
+**AI validation runs as a separate step** in the tool mining workflow. This system uses Goose AI agent to automatically filter false positives like gene/disease names being misidentified as research tools, and to detect tools the mining step may have missed.
 
 ## Problem It Solves
 
@@ -11,34 +11,41 @@
 - Mining system found: "NF1 antibody", "NF1 genetic reagent"
 - Reality: This is a questionnaire development study, not lab research. All "NF1" mentions refer to the disease, not tools.
 
-**AI validation catches these issues by:**
-- Analyzing publication type (clinical study vs lab research)
-- Checking for tool-specific keywords near mentions (antibody, plasmid, cell line, etc.)
-- Distinguishing disease/gene references from actual research tools
-- Verifying Methods sections exist indicating experimental work
+**AI validation provides:**
+- **False Positive Filtering:** Catches disease/gene names misidentified as tools
+- **Publication Type Analysis:** Distinguishes clinical studies from lab research
+- **Keyword Checking:** Verifies tool-specific keywords near mentions
+- **Missed Tool Detection:** Actively searches for tools mining didn't catch
+- **Pattern Suggestions:** Recommends improvements to mining patterns
 
 ## Architecture
 
 ```
+Step 1: Mining
 fetch_fulltext_and_mine.py
     ↓ (mines tools + caches fetched text)
-novel_tools_FULLTEXT_mining.csv
+processed_publications.csv
 tool_reviews/publication_cache/{PMID}_text.json (cached text)
-    ↓ (AI validation enabled by default)
+
+Step 2: AI Validation (Separate Step)
 run_publication_reviews.py
     ↓ (reads from cache, no duplicate API calls)
     ↓ (invokes Goose only for non-reviewed publications)
 Goose AI Agent (tool_coverage/scripts/recipes/publication_tool_review.yaml)
-    ↓ (generates)
-{PMID}_tool_review.yaml (per publication)
-    ↓ (compiles)
+    ↓ (generates per-publication validation)
+{PMID}_tool_review.yaml
+    ↓ (compiles all results)
 VALIDATED_*.csv (filtered submission files)
+potentially_missed_tools.csv (tools AI found)
+suggested_patterns.csv (pattern recommendations)
 ```
 
 **Key Optimizations**:
 - 📦 **Text Caching**: Fetched text cached during mining, reused in validation (50% fewer API calls)
 - ⏭️ **Smart Skip**: Only validates new publications, skips already-reviewed (85-90% cost savings)
 - 💰 **Combined**: 80-85% reduction in API calls and costs for ongoing operations
+- 🔍 **Missed Tool Detection**: AI actively searches for tools mining didn't catch
+- 📈 **Pattern Learning**: Suggests improvements based on missed tools
 
 ## Components
 
@@ -68,17 +75,38 @@ toolValidations:
       This publication is questionnaire development, not lab research.
       NF1 refers to disease name throughout, never mentioned with tool keywords.
     recommendation: "Remove"
+
+potentiallyMissedTools:
+  - toolName: "Anti-Neurofibromin antibody (clone D7R7D)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...stained with Anti-Neurofibromin antibody (clone D7R7D, Cell Signaling)..."
+    whyMissed: "Specific clone name not in pattern database"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "Cell Signaling #\\d+"
+    toolType: "antibody"
+    examples: ["Cell Signaling #9876"]
+    reasoning: "Commonly used vendor catalog format for antibodies"
+
+summary:
+  potentiallyMissedCount: 1
+  newPatternsCount: 1
 ```
 
 ### 2. Orchestrator (`run_publication_reviews.py`)
 
 Python script that manages the validation workflow:
 - Loads mining results CSV
-- Fetches abstracts and full text for each publication
+- Uses cached text from mining step (no duplicate API calls)
 - Prepares input JSON files for Goose
 - Invokes Goose AI agent for each publication
 - Parses validation YAMLs
 - Filters SUBMIT_*.csv files to remove rejected tools
+- Extracts potentially missed tools and pattern suggestions
 - Generates validation reports
 
 **Usage:**
@@ -87,10 +115,10 @@ Python script that manages the validation workflow:
 python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745"
 
 # Validate all mined publications (skips already-reviewed)
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 
 # Force re-review of already-reviewed publications
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --force-rereviews
 
 # Compile results from existing YAMLs (skip goose reviews)
 python tool_coverage/scripts/run_publication_reviews.py --compile-only
@@ -98,6 +126,14 @@ python tool_coverage/scripts/run_publication_reviews.py --compile-only
 # Skip goose, just filter CSVs from existing YAMLs
 python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 ```
+
+**Outputs:**
+- `VALIDATED_*.csv` - Filtered submission files (rejected tools removed)
+- `tool_reviews/validation_report.xlsx` - Summary report
+- `tool_reviews/validation_summary.json` - Machine-readable results
+- `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
+- `tool_reviews/suggested_patterns.csv` - Pattern recommendations
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication details
 
 **Smart Optimizations:**
 
@@ -185,11 +221,11 @@ python tool_coverage/scripts/fetch_fulltext_and_mine.py
 python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
 
 # Standalone validation (if you already have mining results)
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 ```
 
 **Generates:**
-- `novel_tools_FULLTEXT_mining.csv` - All mined tools
+- `processed_publications.csv` - All mined tools
 - `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication reviews (if validation enabled)
 - `tool_reviews/validation_summary.json` - JSON summary (if validation enabled)
 - `tool_reviews/validation_report.xlsx` - Excel report (if validation enabled)

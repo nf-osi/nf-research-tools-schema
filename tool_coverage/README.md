@@ -20,50 +20,42 @@ Analyzes current tool coverage against GFF-funded publications:
 - `gff_publications_MISSING_tools.csv` - Publications without tools
 
 #### `tool_coverage/scripts/fetch_fulltext_and_mine.py`
-Mines abstracts and full text for tools, with AI validation enabled by default:
+Mines abstracts and full text for tools:
 - **Mines ALL publications via abstracts** (fetched from PubMed API using PMID) - no PMC requirement
 - **Enhances with full text when available:** Fetches PMC XML and extracts Methods + Introduction sections
 - **Matches against existing tools** using fuzzy matching (88% threshold) before creating new entries
-- **AI validates mined tools** (default: enabled) using Goose agent to filter false positives
 - Uses existing tools as training data (1,142+ tools) for pattern matching
 - Extracts cell line names via regex patterns (no name field in database)
 - **Distinguishes development vs usage** using keyword context analysis (100-300 char windows)
 - **Filters generic commercial tools** (e.g., C57BL/6, nude mice) unless NF-specific
 - **Tracks source sections** (abstract, methods, introduction) for each tool found
 - **Deduplicates** tools found in multiple sections, preferring Methods metadata
+- **Caches fetched text** for efficient AI validation in separate step
 
-**Tool Matching & Validation Process:**
+**Tool Matching Process:**
 1. Mine abstract (always available)
 2. Mine Methods + Introduction sections (when PMC full text available)
 3. Merge results with deduplication
 4. Match tool names against existing database tools (fuzzy, 88%)
 5. **If match found:** Link to existing tool (reuse resourceId)
 6. **If no match:** Create new tool entry (generate UUID)
-7. **AI validation (default):** Goose agent analyzes each tool in context
-8. **Filter false positives:** Remove disease/gene names, non-lab publications
+7. Cache fetched text for AI validation step
 
 **Command-line options:**
 ```bash
-# With AI validation (default)
+# Mine publications (AI validation runs separately)
 python tool_coverage/scripts/fetch_fulltext_and_mine.py
-
-# Without AI validation (faster, may have false positives)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
 
 # Limit publications for testing
 python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 50
 ```
 
-**Outputs (without AI validation):**
-- `novel_tools_FULLTEXT_mining.csv` - All findings with existing/novel categorization
-- `SUBMIT_*.csv` - Submission-ready CSVs (may contain false positives)
-
-**Outputs (with AI validation - default):**
-- `novel_tools_FULLTEXT_mining.csv` - All findings
-- `SUBMIT_*.csv` - Unvalidated submissions
-- `VALIDATED_*.csv` - Validated submissions (false positives removed) ⭐ USE THESE
-- `tool_reviews/validation_report.xlsx` - AI validation summary
-- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
+**Outputs:**
+- `processed_publications.csv` - All findings with existing/novel categorization
+- `SUBMIT_*.csv` - Submission-ready CSVs (unvalidated)
+- `mining_summary_ALL_publications.csv` - Summary of all processed publications
+- `priority_publications_FULLTEXT.csv` - Top publications ranked by tool count
+- `tool_reviews/publication_cache/{PMID}_text.json` - Cached text for validation
 
 #### `tool_coverage/scripts/extract_tool_metadata.py`
 Extracts rich metadata from Methods section context:
@@ -115,10 +107,12 @@ Generates markdown summary for GitHub Pull Request:
 - `pr_body.md` - Markdown content for GitHub Pull Request
 
 #### `tool_coverage/scripts/run_publication_reviews.py`
-AI-powered validation of mined tools using Goose agent (optional):
+AI-powered validation of mined tools using Goose agent:
 - **Validates mined tools** to filter out false positives (gene/disease names misidentified as tools)
 - **Analyzes publication type** (lab research vs clinical studies vs questionnaires)
 - **Checks tool keywords** (antibody, plasmid, cell line, etc.) near mentions
+- **Detects potentially missed tools** that mining didn't catch
+- **Suggests new patterns** to improve future mining accuracy
 - **Generates validation reports** with detailed reasoning for accept/reject decisions
 - **Creates VALIDATED_*.csv** files with rejected tools removed
 
@@ -130,13 +124,10 @@ AI-powered validation of mined tools using Goose agent (optional):
 python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640"
 
 # Validate all mined publications (skips already-reviewed to save API costs)
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 
 # Force re-review of already-reviewed publications
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv --force-rereviews
-
-# Integrated with mining (default behavior)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --force-rereviews
 ```
 
 ⭐ **Smart Optimizations**:
@@ -145,30 +136,42 @@ python tool_coverage/scripts/fetch_fulltext_and_mine.py
 - **Combined**: 80-85% reduction in API calls and costs for ongoing operations
 - Use `--force-rereviews` to override skip logic when needed
 
+**Outputs:**
+- `VALIDATED_*.csv` - Validated submissions (false positives removed) ⭐ USE THESE
+- `tool_reviews/validation_report.xlsx` - AI validation summary
+- `tool_reviews/validation_summary.json` - Machine-readable validation results
+- `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
+- `tool_reviews/suggested_patterns.csv` - Recommended patterns to improve mining
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
+
 **Example false positive caught:**
 - Publication: "Development of pediatric quality of life inventory for NF1"
 - Mined: "NF1 antibody", "NF1 genetic reagent"
 - AI verdict: **Reject** - "Questionnaire development study, not lab research. NF1 refers to disease throughout."
 
 #### `tool_coverage/scripts/clean_submission_csvs.py`
-Prepares SUBMIT_*.csv files for Synapse upload (manual use only):
+Prepares SUBMIT_*.csv files for Synapse upload:
+- **Validates CSV schema** against required columns and non-null constraints
 - **Removes tracking columns** (prefixed with '_') used for manual review
 - **Saves cleaned versions** as CLEAN_*.csv files
 - **Optionally uploads** cleaned data to Synapse tables via --upsert flag
 - **Dry-run mode** (--dry-run) previews uploads without making changes
 - Maps CSV files to appropriate Synapse table IDs automatically
 
-⚠️ **Not part of automated workflow** - intended for manual use after reviewing mined tools
+⚠️ **Validation runs automatically in workflow** - also available for local testing
 
 **Usage:**
 ```bash
-# Clean only (default)
+# Validate only
+python tool_coverage/scripts/clean_submission_csvs.py --validate
+
+# Clean only (with validation)
 python tool_coverage/scripts/clean_submission_csvs.py
 
-# Preview upload (no changes)
+# Preview upload (validate + dry-run, no actual upload)
 python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
-# Clean and upload to Synapse
+# Validate, clean, and upload to Synapse
 python tool_coverage/scripts/clean_submission_csvs.py --upsert
 ```
 
@@ -190,12 +193,13 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 4. Check for ANTHROPIC_API_KEY (skips validation if missing)
 5. Install Goose CLI (if AI validation enabled and API key present)
 6. Configure Goose with Anthropic API
-7. Run coverage analysis
-8. Mine publications for novel tools (with AI validation by default)
+7. Mine publications for novel tools (caches text for validation)
+8. **Run AI validation** on mined tools (separate step, skips if API key missing)
 9. Format mining results into submission CSVs
-10. Generate summary report
-11. Upload all reports as artifacts including validation results (90-day retention)
-12. **Create Pull Request** with result files for review
+10. Run coverage analysis
+11. Generate summary report
+12. Upload all reports as artifacts including validation results (90-day retention)
+13. **Create Pull Request** with result files for review
 
 ### 3. Synapse Upsert Workflow
 
@@ -203,25 +207,28 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 
 **Triggers:**
 - Automatically when PR is merged to `main` branch with `VALIDATED_*.csv` or `SUBMIT_*.csv` files
-- Manual trigger via workflow dispatch
+- Manual trigger via workflow dispatch (with optional `dry_run` mode)
 
 **Steps:**
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
 4. Check for validated or submit CSV files
-5. Clean submission files (remove tracking columns)
-6. **Dry-run preview** of Synapse uploads (safety check)
-7. **Upload cleaned data** to Synapse tables
-8. **Regenerate coverage report** (shows updated metrics after upload)
-9. Create upload summary with table links
-10. Upload cleaned CSVs and updated PDF as artifacts (30-day retention)
+5. **Validate CSV schema** against required columns and constraints
+6. Clean submission files (remove tracking columns)
+7. **Dry-run preview** of Synapse uploads (safety check)
+8. **Upload cleaned data** to Synapse tables (skipped if `dry_run=true`)
+9. **Regenerate coverage report** (shows updated metrics after upload)
+10. Create upload summary with table links
+11. Upload cleaned CSVs and updated PDF as artifacts (30-day retention)
 
 **Safety Features:**
+- **Schema validation** checks required fields before upload
+- **Dry-run mode** available via workflow_dispatch input (validate without uploading)
 - Prefers `VALIDATED_*.csv` files (AI-validated, false positives removed)
 - Falls back to `SUBMIT_*.csv` if validated files not present
-- Runs dry-run before actual upload
-- Skips if no CSV files found
+- Runs dry-run preview before actual upload
+- Skips if no CSV files found or validation fails
 
 **Synapse Tables Updated:**
 - Animal Models: syn26486808
@@ -280,14 +287,15 @@ python tool_coverage/scripts/analyze_missing_tools.py
 
 ### Run Full Text Mining
 
-**With AI validation (recommended):**
 ```bash
-# Requires Goose CLI and Anthropic API key
+# Mine publications (fetches and caches text)
 python tool_coverage/scripts/fetch_fulltext_and_mine.py
 
 # Or test with limited publications
 python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 10
 ```
+
+### Run AI Validation (Optional but Recommended)
 
 **Setup for AI validation:**
 ```bash
@@ -299,9 +307,10 @@ goose configure
 # (Enter API key from https://console.anthropic.com/settings/keys)
 ```
 
-**Without AI validation (faster, but may have false positives):**
+**Run validation:**
 ```bash
-python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
+# Validate mined tools (uses cached text from mining step)
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 ```
 
 ### Generate Summary
@@ -351,7 +360,7 @@ A weekly PR is created with:
 - **Files included:**
   - `VALIDATED_*.csv` or `SUBMIT_*.csv` - Submission files
   - `GFF_Tool_Coverage_Report.pdf` - Coverage analysis
-  - `novel_tools_FULLTEXT_mining.csv` - All mining results
+  - `processed_publications.csv` - All mining results
   - `priority_publications_FULLTEXT.csv` - Top publications
   - Other supporting files
 
@@ -509,12 +518,24 @@ For issues or questions:
 
 ## Output Files
 
-Scripts currently write output files to the **repository root** (for GitHub Actions workflow compatibility). Generated files are gitignored and include:
-- `novel_tools_FULLTEXT_mining.csv` - Mining results
+Scripts currently write output files to the **repository root** (for GitHub Actions workflow compatibility).
+
+**Tracked files (persistent state):**
+- `processed_publications.csv` - Cache of all processed publications
 - `SUBMIT_*.csv` - Unvalidated submission files
 - `VALIDATED_*.csv` - AI-validated submission files (production-ready)
-- `GFF_Tool_Coverage_Report.pdf` - Coverage analysis report
-- `tool_reviews/` - AI validation results and cache
+- Analysis CSVs (priority publications, GFF pubs, missing tools)
+- `tool_reviews/validation_report.xlsx` - AI validation summary
+- `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
+- `tool_reviews/suggested_patterns.csv` - Recommended patterns to improve mining
+
+**Ignored files (temporary/regenerated):**
+- `CLEAN_*.csv` - Cleaned files (regenerated from SUBMIT/VALIDATED)
+- `*.log` - Workflow execution logs
+- `pr_body.md` - Generated PR description
+- `tool_reviews/publication_cache/` - API call caching
+- `tool_reviews/inputs/` - Temporary input files
+- PDF reports - Regenerated and available as artifacts
 
 The `results/` folder in this directory is available for organizing outputs locally if desired.
 

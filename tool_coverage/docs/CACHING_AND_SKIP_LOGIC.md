@@ -178,7 +178,7 @@ for idx, row in mining_df.iterrows():
 
 ```bash
 # Only validates new publications
-python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 ```
 
 Output:
