@@ -85,10 +85,10 @@ Transforms mining results into submission-ready CSVs:
 - `SUBMIT_cell_lines.csv` - For syn26486823
 - `SUBMIT_genetic_reagents.csv` - For syn26486832
 
-**Outputs (Relationship Tables):**
-- `SUBMIT_publication_links_EXISTING.csv` - Links to existing tools (uses existing resourceIds)
-- `SUBMIT_publication_links_NEW.csv` - Links for newly discovered tools
-- `SUBMIT_development.csv` - For syn26486807 (publications where tools were developed)
+**Outputs (Publication Tables):**
+- `SUBMIT_publications.csv` - For syn26486839 (base publication information)
+- `SUBMIT_usage.csv` - For syn26486841 (publications where tools were USED)
+- `SUBMIT_development.csv` - For syn26486807 (publications where tools were DEVELOPED)
 
 **Pre-filled Fields:**
 - Antibodies: clonality, host, vendor, catalog #, reactive species
@@ -235,7 +235,10 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - Antibodies: syn26486811
 - Cell Lines: syn26486823
 - Genetic Reagents: syn26486832
-- Resources (links): syn51730943
+- Resources: syn26450069
+- Publications: syn26486839
+- Usage: syn26486841
+- Development: syn26486807
 
 ## Configuration
 
@@ -441,8 +444,9 @@ Once you've validated the results and completed any necessary edits:
    - **Antibodies:** syn26486811
    - **Cell Lines:** syn26486823
    - **Genetic Reagents:** syn26486832
-   - **Publication Links:** syn51735450
-   - **Development:** syn26486807
+   - **Publications:** syn26486839
+   - **Usage:** syn26486841 (tools that were USED)
+   - **Development:** syn26486807 (tools that were DEVELOPED)
 5. Creates snapshot versions for all updated tables (audit trail)
 6. **Regenerates coverage report PDF** with updated metrics
 7. Creates upload summary in GitHub Actions

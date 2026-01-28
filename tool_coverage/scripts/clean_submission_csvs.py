@@ -21,9 +21,11 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_antibodies.csv': 'syn26486811',
     'CLEAN_cell_lines.csv': 'syn26486823',
     'CLEAN_genetic_reagents.csv': 'syn26486832',
-    'CLEAN_publication_links_NEW.csv': 'syn51735450',
-    'CLEAN_publication_links_EXISTING.csv': 'syn51735450',  # Same table for all links
     'CLEAN_resources.csv': 'syn26450069',
+    'CLEAN_publications.csv': 'syn26486839',  # Base publication table
+    'CLEAN_usage.csv': 'syn26486841',  # Publications where tools were USED
+    'CLEAN_development.csv': 'syn26486807',  # Publications where tools were DEVELOPED
+    # Note: syn51735450 is a materialized view that auto-updates from usage + resources
 }
 
 def get_synapse_table_id(filename):
@@ -49,7 +51,10 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'antibodies': ['targetAntigen'],
         'cell_lines': ['organ'],
         'genetic_reagents': ['insertName'],
-        'publication_links': ['pmid', 'resourceId'],
+        'publications': ['publicationId', 'pmid'],
+        'usage': ['usageId', 'publicationId', 'resourceId'],
+        'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
+        'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType']
     }
 
