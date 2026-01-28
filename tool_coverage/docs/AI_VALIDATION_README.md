@@ -110,6 +110,9 @@ summary:
 
 Python script that manages the validation workflow:
 - Loads mining results CSV
+- **Automatically fetches candidate publications from Synapse**:
+  - NF portal publications (syn16857542) not yet in tools table (syn26486839)
+  - Tools publications (syn26486839) not linked to usage (syn26486841) or development (syn26486807)
 - Uses cached text from mining step (no duplicate API calls)
 - Prepares input JSON files for Goose
 - Invokes Goose AI agent for each publication
@@ -120,11 +123,11 @@ Python script that manages the validation workflow:
 
 **Usage:**
 ```bash
+# Validate mined + candidate publications (includes Synapse candidates automatically)
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
+
 # Validate specific publications
 python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745"
-
-# Validate all mined publications (skips already-reviewed)
-python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 
 # Force re-review of already-reviewed publications
 python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --force-rereviews
@@ -135,6 +138,12 @@ python tool_coverage/scripts/run_publication_reviews.py --compile-only
 # Skip goose, just filter CSVs from existing YAMLs
 python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 ```
+
+**Candidate Publication Sources** (fetched automatically):
+1. **NF Portal → Tools Table Gap**: Publications in NF portal (syn16857542) not yet in tools publications table (syn26486839)
+2. **Unlinked Tools Publications**: Publications in tools table (syn26486839) without any tool links in usage (syn26486841) or development (syn26486807)
+
+These publications are reviewed to discover potential new tools or confirm they don't contain relevant tools. No Synapse authentication required (tables are open access).
 
 **Outputs:**
 - `VALIDATED_*.csv` - Filtered submission files (rejected tools removed)

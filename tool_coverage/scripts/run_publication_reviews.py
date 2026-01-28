@@ -13,6 +13,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import argparse
+import synapseclient
 
 # Configuration
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
@@ -41,6 +42,112 @@ def load_mining_results(mining_file):
     except Exception as e:
         print(f"Error loading mining results: {e}")
         return None
+
+
+def fetch_unlinked_publications(syn):
+    """
+    Fetch publications from Synapse that should be reviewed for potential tool links:
+    1. Publications in NF portal (syn16857542) not yet in tools publications (syn26486839)
+    2. Publications in tools publications (syn26486839) not linked to tools in usage (syn26486841) or development (syn26486807)
+
+    Args:
+        syn: Synapse client (no auth needed - tables are open access)
+
+    Returns:
+        DataFrame with unlinked publications (pmid, title, doi, source)
+    """
+    print("\n" + "=" * 80)
+    print("Fetching candidate publications from Synapse")
+    print("=" * 80)
+
+    all_unlinked = []
+
+    try:
+        # Part 1: NF portal publications not in tools publications
+        print("\n[1] Checking NF portal publications (syn16857542) not in tools publications (syn26486839)...")
+
+        portal_query = syn.tableQuery("SELECT pmid, title, doi FROM syn16857542")
+        portal_df = portal_query.asDataFrame()
+        print(f"  Found {len(portal_df)} publications in NF portal")
+
+        tools_pubs_query = syn.tableQuery("SELECT pmid FROM syn26486839")
+        tools_pubs_df = tools_pubs_query.asDataFrame()
+        tools_pmids = set(tools_pubs_df['pmid'].dropna().tolist())
+        print(f"  Found {len(tools_pmids)} publications already in tools table")
+
+        # Find portal pubs not in tools table
+        portal_not_in_tools = portal_df[~portal_df['pmid'].isin(tools_pmids)].copy()
+        portal_not_in_tools['source'] = 'nf_portal_not_in_tools'
+
+        print(f"  ✅ Found {len(portal_not_in_tools)} NF portal publications not in tools table")
+
+        if len(portal_not_in_tools) > 0:
+            all_unlinked.append(portal_not_in_tools[['pmid', 'title', 'doi', 'source']])
+            print(f"\n  Sample:")
+            for idx, row in portal_not_in_tools.head(3).iterrows():
+                pmid = row['pmid']
+                title = row.get('title', 'N/A')
+                print(f"    - {pmid}: {title[:70]}...")
+
+    except Exception as e:
+        print(f"  ⚠️  Error fetching NF portal publications: {e}")
+
+    try:
+        # Part 2: Tools publications not linked to any tools
+        print("\n[2] Checking tools publications (syn26486839) not linked to usage or development...")
+
+        # Fetch publications with usage links
+        usage_query = syn.tableQuery("SELECT DISTINCT publicationId FROM syn26486841")
+        usage_df = usage_query.asDataFrame()
+        usage_pub_ids = set(usage_df['publicationId'].dropna().tolist())
+        print(f"  Found {len(usage_pub_ids)} publications with usage links")
+
+        # Fetch publications with development links
+        dev_query = syn.tableQuery("SELECT DISTINCT publicationId FROM syn26486807")
+        dev_df = dev_query.asDataFrame()
+        dev_pub_ids = set(dev_df['publicationId'].dropna().tolist())
+        print(f"  Found {len(dev_pub_ids)} publications with development links")
+
+        # Combine all linked publication IDs
+        linked_pub_ids = usage_pub_ids | dev_pub_ids
+        print(f"  Total unique publications with tool links: {len(linked_pub_ids)}")
+
+        # Get all tools publications with ROW_ID (which is the publicationId)
+        pubs_query_with_id = syn.tableQuery("SELECT ROW_ID, pmid, title, doi FROM syn26486839")
+        pubs_with_id_df = pubs_query_with_id.asDataFrame()
+
+        # Filter to unlinked (where ROW_ID not in linked_pub_ids)
+        tools_pubs_unlinked = pubs_with_id_df[~pubs_with_id_df['ROW_ID'].isin(linked_pub_ids)].copy()
+        tools_pubs_unlinked['source'] = 'tools_table_unlinked'
+
+        print(f"  ✅ Found {len(tools_pubs_unlinked)} tools publications without tool links")
+
+        if len(tools_pubs_unlinked) > 0:
+            all_unlinked.append(tools_pubs_unlinked[['pmid', 'title', 'doi', 'source']])
+            print(f"\n  Sample:")
+            for idx, row in tools_pubs_unlinked.head(3).iterrows():
+                pmid = row['pmid']
+                title = row.get('title', 'N/A')
+                print(f"    - {pmid}: {title[:70]}...")
+
+    except Exception as e:
+        print(f"  ⚠️  Error fetching unlinked tools publications: {e}")
+
+    # Combine all unlinked publications
+    if all_unlinked:
+        combined_df = pd.concat(all_unlinked, ignore_index=True)
+
+        # Remove duplicates (some might be in both lists)
+        combined_df = combined_df.drop_duplicates(subset=['pmid'])
+
+        print(f"\n{'='*80}")
+        print(f"✅ Total unique candidate publications: {len(combined_df)}")
+        print(f"{'='*80}")
+
+        return combined_df
+    else:
+        print("\n✅ No candidate publications found")
+        return pd.DataFrame(columns=['pmid', 'title', 'doi', 'source'])
 
 def load_cached_text(pmid, cache_dir='tool_reviews/publication_cache'):
     """
@@ -129,12 +236,12 @@ def prepare_goose_input(pub_row, inputs_dir):
                 'contextSnippet': metadata.get('context_snippet', '')
             })
 
-    # Prepare input data
+    # Prepare input data (handle both mined and unlinked publications)
     input_data = {
         'publicationMetadata': {
             'pmid': pmid,
             'doi': pub_row.get('doi', ''),
-            'title': pub_row.get('publicationTitle', ''),
+            'title': pub_row.get('title', pub_row.get('publicationTitle', '')),
             'journal': pub_row.get('journal', ''),
             'year': pub_row.get('year', ''),
             'fundingAgency': pub_row.get('fundingAgency', '')
@@ -477,6 +584,45 @@ def main():
     if mining_df is None or len(mining_df) == 0:
         print("\n❌ Failed to load mining results")
         sys.exit(1)
+
+    # Add candidate publications from Synapse (always enabled)
+    print("\nFetching candidate publications from Synapse...")
+
+    # Initialize Synapse client (no auth needed for open access tables)
+    try:
+        syn = synapseclient.Synapse()
+        print("✅ Synapse client initialized (no auth needed - tables are open access)")
+    except Exception as e:
+        print(f"⚠️  Synapse client initialization failed: {e}")
+        print("   Continuing with only mined publications...")
+        syn = None
+
+    if syn:
+        candidate_df = fetch_unlinked_publications(syn)
+
+        if len(candidate_df) > 0:
+            # Add empty tool columns to match mining_df structure
+            candidate_df['novel_tools'] = '{}'
+            candidate_df['tool_metadata'] = '{}'
+            candidate_df['tool_sources'] = '{}'
+            candidate_df['fulltext_available'] = False
+
+            # Append to mining_df
+            original_count = len(mining_df)
+            mining_df = pd.concat([mining_df, candidate_df], ignore_index=True)
+
+            # Remove duplicates by pmid (keep first occurrence - mined takes precedence)
+            before_dedup = len(mining_df)
+            mining_df = mining_df.drop_duplicates(subset=['pmid'], keep='first')
+            duplicates_removed = before_dedup - len(mining_df)
+
+            added_count = len(mining_df) - original_count
+            print(f"\n✅ Added {added_count} unique candidate publications to review queue")
+            if duplicates_removed > 0:
+                print(f"   ({duplicates_removed} duplicates removed)")
+            print(f"   Total publications to review: {len(mining_df)}")
+        else:
+            print("\n✅ No additional candidate publications found")
 
     # Filter by specific PMIDs if requested
     if args.pmids:

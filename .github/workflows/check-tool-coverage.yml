@@ -102,9 +102,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          echo "Running AI validation on mined tools..."
+          echo "Running AI validation on mined tools and candidate publications..."
 
           # Build command with optional flags
+          # Note: --include-unlinked is now the default (fetches from NF portal + unlinked tools pubs)
           CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv"
 
           # Add force re-reviews flag if specified
