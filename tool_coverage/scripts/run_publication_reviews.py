@@ -17,7 +17,7 @@ import argparse
 # Configuration
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
 REVIEW_OUTPUT_DIR = 'tool_reviews'
-MINING_RESULTS_FILE = 'novel_tools_FULLTEXT_mining.csv'
+MINING_RESULTS_FILE = 'processed_publications.csv'
 
 def setup_directories():
     """Create output directories."""

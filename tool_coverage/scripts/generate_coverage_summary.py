@@ -34,8 +34,8 @@ def main():
         print(f"- `SUBMIT_*.csv` - Unvalidated submissions (fallback if validation failed)")
     if os.path.exists('GFF_Tool_Coverage_Report.pdf'):
         print(f"- `GFF_Tool_Coverage_Report.pdf` - Coverage analysis")
-    if os.path.exists('novel_tools_FULLTEXT_mining.csv'):
-        print(f"- `novel_tools_FULLTEXT_mining.csv` - Full mining results")
+    if os.path.exists('processed_publications.csv'):
+        print(f"- `processed_publications.csv` - Full mining results")
     if os.path.exists('tool_reviews/validation_report.xlsx'):
         print(f"- `tool_reviews/` - AI validation reports")
 

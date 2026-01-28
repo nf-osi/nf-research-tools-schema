@@ -1135,7 +1135,7 @@ Note: Run run_publication_reviews.py separately for AI validation
 
     # Check for previously mined publications to avoid re-mining
     previously_mined_pmids = set()
-    mining_results_file = 'novel_tools_FULLTEXT_mining.csv'
+    mining_results_file = 'processed_publications.csv'
     if os.path.exists(mining_results_file):
         try:
             previous_results = pd.read_csv(mining_results_file)
@@ -1300,7 +1300,7 @@ Note: Run run_publication_reviews.py separately for AI validation
         results_df = results_df.sort_values('total_tool_count', ascending=False)
 
         # Save full results (append to existing if present)
-        output_file = 'novel_tools_FULLTEXT_mining.csv'
+        output_file = 'processed_publications.csv'
         if os.path.exists(output_file) and len(previously_mined_pmids) > 0:
             # Append to existing file
             existing_df = pd.read_csv(output_file)

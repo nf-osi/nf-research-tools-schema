@@ -105,7 +105,7 @@ jobs:
           echo "Running AI validation on mined tools..."
 
           # Build command with optional flags
-          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file novel_tools_FULLTEXT_mining.csv"
+          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv"
 
           # Add force re-reviews flag if specified
           if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
@@ -122,7 +122,7 @@ jobs:
         id: formatting
         run: |
           echo "Formatting mining results into submission CSVs..."
-          if [ -f "novel_tools_FULLTEXT_mining.csv" ]; then
+          if [ -f "processed_publications.csv" ]; then
             python tool_coverage/scripts/format_mining_for_submission.py 2>&1 | tee formatting_output.log
             echo "formatting_complete=true" >> $GITHUB_OUTPUT
           else
@@ -159,7 +159,7 @@ jobs:
           path: |
             GFF_Tool_Coverage_Report.pdf
             gff_publications_MISSING_tools.csv
-            novel_tools_FULLTEXT_mining.csv
+            processed_publications.csv
             priority_publications_FULLTEXT.csv
             GFF_publications_with_tools_FULLTEXT.csv
             SUBMIT_*.csv
@@ -196,7 +196,7 @@ jobs:
             VALIDATED_*.csv
             SUBMIT_*.csv
             GFF_Tool_Coverage_Report.pdf
-            novel_tools_FULLTEXT_mining.csv
+            processed_publications.csv
             priority_publications_FULLTEXT.csv
             GFF_publications_with_tools_FULLTEXT.csv
             mining_summary_ALL_publications.csv

@@ -565,7 +565,7 @@ def main():
     print("=" * 80)
 
     # Check for input file
-    input_file = 'novel_tools_FULLTEXT_mining.csv'
+    input_file = 'processed_publications.csv'
     if not os.path.exists(input_file):
         print(f"\n❌ Error: Input file '{input_file}' not found!")
         print("   Please run fetch_fulltext_and_mine.py first.")
