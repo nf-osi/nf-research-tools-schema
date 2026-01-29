@@ -356,13 +356,16 @@ To achieve 80% coverage:
 4. Add missing tools to appropriate tool type tables
 """)
 
+# Create outputs directory if it doesn't exist
+os.makedirs('tool_coverage/outputs', exist_ok=True)
+
 # Save detailed analysis
-output_file = 'gff_publications_tool_analysis.csv'
+output_file = 'tool_coverage/outputs/gff_publications_tool_analysis.csv'
 pub_df.to_csv(output_file, index=False)
 print(f"\n📄 Detailed analysis saved to: {output_file}")
 
 if 'is_missing' in pub_df.columns and len(missing_pubs_df) > 0:
-    missing_file = 'gff_publications_MISSING_tools.csv'
+    missing_file = 'tool_coverage/outputs/gff_publications_MISSING_tools.csv'
     missing_pubs_df.to_csv(missing_file, index=False)
     print(f"📄 Publications needing tools saved to: {missing_file}")
 
@@ -371,7 +374,7 @@ print("\n" + "=" * 80)
 print("GENERATING PDF REPORT")
 print("=" * 80)
 
-pdf_file = 'GFF_Tool_Coverage_Report.pdf'
+pdf_file = 'tool_coverage/outputs/GFF_Tool_Coverage_Report.pdf'
 with PdfPages(pdf_file) as pdf:
     # Page 1: Coverage Comparison Across Funding Agencies
     fig, axes = plt.subplots(2, 2, figsize=(11, 8.5))

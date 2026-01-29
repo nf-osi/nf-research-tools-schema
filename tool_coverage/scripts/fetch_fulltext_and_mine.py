@@ -1407,10 +1407,13 @@ Note: Run run_publication_reviews.py separately for AI validation
     print(f"   - Novel tools found: {novel_tools_found}")
     print(f"   - Publications with tools: {len(results)}")
 
+    # Create outputs directory if it doesn't exist
+    os.makedirs('tool_coverage/outputs', exist_ok=True)
+
     # Save summary of ALL publications
     if summary:
         summary_df = pd.DataFrame(summary)
-        summary_file = 'mining_summary_ALL_publications.csv'
+        summary_file = 'tool_coverage/outputs/mining_summary_ALL_publications.csv'
         summary_df.to_csv(summary_file, index=False)
         print(f"\n📄 Summary of all publications saved to: {summary_file}")
         print(f"   - {len(summary_df)} total publications")
@@ -1427,7 +1430,7 @@ Note: Run run_publication_reviews.py separately for AI validation
         results_df = results_df.sort_values('total_tool_count', ascending=False)
 
         # Save full results (append to existing if present)
-        output_file = 'processed_publications.csv'
+        output_file = 'tool_coverage/outputs/processed_publications.csv'
         if os.path.exists(output_file) and len(previously_mined_pmids) > 0:
             # Append to existing file
             existing_df = pd.read_csv(output_file)
@@ -1448,14 +1451,14 @@ Note: Run run_publication_reviews.py separately for AI validation
             priority_df = combined_df.sort_values('total_tool_count', ascending=False).head(30)
         else:
             priority_df = results_df.head(30)
-        priority_file = 'priority_publications_FULLTEXT.csv'
+        priority_file = 'tool_coverage/outputs/priority_publications_FULLTEXT.csv'
         priority_df.to_csv(priority_file, index=False)
         print(f"📄 Top 30 priority publications saved to: {priority_file}")
 
         # Save GFF publications with tools
         gff_df = results_df[results_df['is_gff'] == True]
         if not gff_df.empty:
-            gff_file = 'GFF_publications_with_tools_FULLTEXT.csv'
+            gff_file = 'tool_coverage/outputs/GFF_publications_with_tools_FULLTEXT.csv'
             gff_df.to_csv(gff_file, index=False)
             print(f"📄 GFF publications with tools saved to: {gff_file}")
             print(f"   - {len(gff_df)} GFF publications with tools found")

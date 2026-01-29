@@ -742,8 +742,11 @@ def main():
     print("FORMATTING MINING RESULTS FOR TABLE SUBMISSION")
     print("=" * 80)
 
+    # Create outputs directory if it doesn't exist
+    os.makedirs('tool_coverage/outputs', exist_ok=True)
+
     # Check for input file
-    input_file = 'processed_publications.csv'
+    input_file = 'tool_coverage/outputs/processed_publications.csv'
     if not os.path.exists(input_file):
         print(f"\n❌ Error: Input file '{input_file}' not found!")
         print("   Please run fetch_fulltext_and_mine.py first.")
@@ -763,7 +766,7 @@ def main():
     animal_df = format_animal_models(mining_df)
     tool_csvs['Animal Model'] = animal_df
     if not animal_df.empty:
-        output_file = 'SUBMIT_animal_models.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_animal_models.csv'
         animal_df.to_csv(output_file, index=False)
         print(f" ✓ {len(animal_df)} entries → {output_file}")
     else:
@@ -774,7 +777,7 @@ def main():
     antibody_df = format_antibodies(mining_df)
     tool_csvs['Antibody'] = antibody_df
     if not antibody_df.empty:
-        output_file = 'SUBMIT_antibodies.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_antibodies.csv'
         antibody_df.to_csv(output_file, index=False)
         print(f" ✓ {len(antibody_df)} entries → {output_file}")
     else:
@@ -785,7 +788,7 @@ def main():
     cell_line_df = format_cell_lines(mining_df)
     tool_csvs['Cell Line'] = cell_line_df
     if not cell_line_df.empty:
-        output_file = 'SUBMIT_cell_lines.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_cell_lines.csv'
         cell_line_df.to_csv(output_file, index=False)
         print(f" ✓ {len(cell_line_df)} entries → {output_file}")
     else:
@@ -796,7 +799,7 @@ def main():
     genetic_reagent_df = format_genetic_reagents(mining_df)
     tool_csvs['Genetic Reagent'] = genetic_reagent_df
     if not genetic_reagent_df.empty:
-        output_file = 'SUBMIT_genetic_reagents.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_genetic_reagents.csv'
         genetic_reagent_df.to_csv(output_file, index=False)
         print(f" ✓ {len(genetic_reagent_df)} entries → {output_file}")
     else:
@@ -806,7 +809,7 @@ def main():
     print("\n3. Formatting Resource table entries...")
     resources_df = format_resources(tool_csvs)
     if not resources_df.empty:
-        output_file = 'SUBMIT_resources.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_resources.csv'
         resources_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(resources_df)} resources → {output_file}")
     else:
@@ -816,7 +819,7 @@ def main():
     print("\n4. Formatting Publications table (syn26486839)...")
     publications_df = format_publications(mining_df, tool_csvs)
     if not publications_df.empty:
-        output_file = 'SUBMIT_publications.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_publications.csv'
         publications_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(publications_df)} publications → {output_file}")
 
@@ -830,7 +833,7 @@ def main():
     print("\n5. Formatting Usage table (syn26486841)...")
     usage_df = format_usage_links(tool_csvs, publication_ids_map)
     if not usage_df.empty:
-        output_file = 'SUBMIT_usage.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_usage.csv'
         usage_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(usage_df)} usage links → {output_file}")
     else:
@@ -840,7 +843,7 @@ def main():
     print("\n6. Formatting Development table (syn26486807)...")
     development_df = format_development_links(tool_csvs, publication_ids_map)
     if not development_df.empty:
-        output_file = 'SUBMIT_development.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_development.csv'
         development_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(development_df)} development links → {output_file}")
     else:
@@ -897,12 +900,12 @@ def main():
     observations_df, unmatched_obs_df = format_observations()
 
     if not observations_df.empty:
-        output_file = 'SUBMIT_observations.csv'
+        output_file = 'tool_coverage/outputs/SUBMIT_observations.csv'
         observations_df.to_csv(output_file, index=False)
         print(f"   - SUBMIT_observations.csv ({len(observations_df)} observations) → syn26486836")
 
     if not unmatched_obs_df.empty:
-        unmatched_file = 'SUBMIT_observations_UNMATCHED.csv'
+        unmatched_file = 'tool_coverage/outputs/SUBMIT_observations_UNMATCHED.csv'
         unmatched_obs_df.to_csv(unmatched_file, index=False)
         print(f"   - SUBMIT_observations_UNMATCHED.csv ({len(unmatched_obs_df)} unmatched - needs manual review)")
 

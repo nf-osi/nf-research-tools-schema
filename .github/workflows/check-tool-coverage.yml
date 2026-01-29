@@ -90,9 +90,12 @@ jobs:
             CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
           fi
 
+          # Create outputs directory
+          mkdir -p tool_coverage/outputs
+
           # Run mining
           echo "Running: $CMD"
-          $CMD 2>&1 | tee mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
+          $CMD 2>&1 | tee tool_coverage/outputs/mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
@@ -106,7 +109,7 @@ jobs:
 
           # Build command with optional flags
           # Note: --include-unlinked is now the default (fetches from NF portal + unlinked tools pubs)
-          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv"
+          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file tool_coverage/outputs/processed_publications.csv"
 
           # Add force re-reviews flag if specified
           if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
@@ -115,7 +118,7 @@ jobs:
 
           # Run validation
           echo "Running: $CMD"
-          $CMD 2>&1 | tee validation_output.log || echo "validation_failed=true" >> $GITHUB_OUTPUT
+          $CMD 2>&1 | tee tool_coverage/outputs/validation_output.log || echo "validation_failed=true" >> $GITHUB_OUTPUT
 
           echo "validation_complete=true" >> $GITHUB_OUTPUT
 
@@ -135,8 +138,8 @@ jobs:
         id: formatting
         run: |
           echo "Formatting mining results into submission CSVs..."
-          if [ -f "processed_publications.csv" ]; then
-            python tool_coverage/scripts/format_mining_for_submission.py 2>&1 | tee formatting_output.log
+          if [ -f "tool_coverage/outputs/processed_publications.csv" ]; then
+            python tool_coverage/scripts/format_mining_for_submission.py 2>&1 | tee tool_coverage/outputs/formatting_output.log
             echo "formatting_complete=true" >> $GITHUB_OUTPUT
           else
             echo "⚠️ Skipping formatting - no mining results found"
@@ -148,7 +151,7 @@ jobs:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "Running coverage analysis with validated results..."
-          python tool_coverage/scripts/analyze_missing_tools.py 2>&1 | tee coverage_output.log
+          python tool_coverage/scripts/analyze_missing_tools.py 2>&1 | tee tool_coverage/outputs/coverage_output.log
 
           # Extract key metrics for summary
           echo "coverage_complete=true" >> $GITHUB_OUTPUT
@@ -170,13 +173,7 @@ jobs:
         with:
           name: tool-coverage-reports
           path: |
-            GFF_Tool_Coverage_Report.pdf
-            gff_publications_MISSING_tools.csv
-            processed_publications.csv
-            priority_publications_FULLTEXT.csv
-            GFF_publications_with_tools_FULLTEXT.csv
-            SUBMIT_*.csv
-            VALIDATED_*.csv
+            tool_coverage/outputs/
             tool_reviews/validation_report.xlsx
             tool_reviews/validation_summary.json
             tool_reviews/potentially_missed_tools.csv
@@ -184,9 +181,7 @@ jobs:
             tool_reviews/results/*.yaml
             tool_coverage/config/mining_patterns.json
             PATTERN_IMPROVEMENTS.md
-            coverage_output.log
-            mining_output.log
-            validation_output.log
+            pr_body.md
             formatting_output.log
             pattern_improvements_output.log
           retention-days: 90
@@ -209,13 +204,6 @@ jobs:
             automated-mining
             tool-coverage
           add-paths: |
-            VALIDATED_*.csv
-            SUBMIT_*.csv
-            GFF_Tool_Coverage_Report.pdf
-            processed_publications.csv
-            priority_publications_FULLTEXT.csv
-            GFF_publications_with_tools_FULLTEXT.csv
-            mining_summary_ALL_publications.csv
-            gff_publications_MISSING_tools.csv
+            tool_coverage/outputs/
             tool_coverage/config/mining_patterns.json
             PATTERN_IMPROVEMENTS.md
