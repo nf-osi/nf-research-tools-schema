@@ -1,0 +1,134 @@
+name: Upsert PubMed Publications to Synapse
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - 'tool_coverage/outputs/pubmed_nf_publications.csv'
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  upsert-publications:
+    # Only run if PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install synapseclient pandas
+
+      - name: Upsert publications to Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python - <<'PYTHON_SCRIPT'
+          import os
+          import sys
+          import pandas as pd
+          import synapseclient
+          from synapseclient import Table
+
+          # Check if input file exists
+          csv_file = 'tool_coverage/outputs/pubmed_nf_publications.csv'
+          if not os.path.exists(csv_file):
+              print(f"❌ File not found: {csv_file}")
+              sys.exit(1)
+
+          # Login to Synapse
+          syn = synapseclient.Synapse()
+          auth_token = os.getenv('SYNAPSE_AUTH_TOKEN')
+          if not auth_token:
+              print("❌ SYNAPSE_AUTH_TOKEN not found")
+              sys.exit(1)
+
+          syn.login(authToken=auth_token)
+          print("✅ Logged into Synapse")
+
+          # Read publications
+          df = pd.read_csv(csv_file)
+          print(f"📚 Read {len(df)} publications from CSV")
+
+          # Get existing publications to avoid duplicates
+          print("🔍 Checking for existing publications...")
+          query = "SELECT pmid FROM syn26486839"
+          existing = syn.tableQuery(query)
+          existing_df = existing.asDataFrame()
+          existing_pmids = set(existing_df['pmid'].str.upper().tolist())
+          print(f"   Found {len(existing_pmids)} existing publications")
+
+          # Filter out duplicates
+          df['pmid_upper'] = df['pmid'].str.upper()
+          new_pubs = df[~df['pmid_upper'].isin(existing_pmids)].copy()
+          new_pubs = new_pubs.drop('pmid_upper', axis=1)
+
+          if len(new_pubs) == 0:
+              print("✅ No new publications to add (all already exist)")
+              sys.exit(0)
+
+          print(f"📝 Adding {len(new_pubs)} new publications to syn26486839")
+
+          # Prepare data for Synapse table
+          # Note: We're not classifying as usage/development yet - that requires manual review
+          table_df = new_pubs[['pmid', 'doi', 'title', 'journal', 'year']].copy()
+
+          # Add missing columns that may be required by the table schema
+          # These can be filled in later during manual review
+          table_df['fundingAgency'] = None
+          table_df['consortium'] = None
+
+          # Store to Synapse table
+          table = syn.store(Table('syn26486839', table_df))
+          print(f"✅ Successfully added {len(new_pubs)} publications to syn26486839")
+
+          # Log the PMIDs that were added
+          print("\n📋 Added PMIDs:")
+          for pmid in table_df['pmid'].tolist()[:10]:  # Show first 10
+              print(f"   - {pmid}")
+          if len(table_df) > 10:
+              print(f"   ... and {len(table_df) - 10} more")
+
+          PYTHON_SCRIPT
+
+      - name: Comment on PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ Publications successfully added to Synapse table syn26486839
+
+            **Next Step:**
+            Run tool mining workflow to discover tools and observations from these publications
+            })
+
+      - name: Comment on PR if failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ Failed to upsert publications to Synapse
+
+            Please check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            })
