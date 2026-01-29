@@ -262,7 +262,106 @@ def extract_introduction_section(fulltext_xml: str) -> str:
         return ""
 
 
-def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str, cache_dir: str = 'tool_reviews/publication_cache'):
+def extract_results_section(fulltext_xml: str) -> str:
+    """
+    Extract Results section from PMC XML.
+
+    Args:
+        fulltext_xml: Full text XML string from PMC
+
+    Returns:
+        Results section text, or empty string if not found
+    """
+    if not fulltext_xml:
+        return ""
+
+    try:
+        root = ET.fromstring(fulltext_xml)
+
+        # Common section titles for results
+        results_titles = [
+            'results', 'result', 'findings', 'observations'
+        ]
+
+        # Find all sections
+        sections = root.findall(".//sec")
+        results_text = []
+
+        for section in sections:
+            title_elem = section.find(".//title")
+            if title_elem is not None and title_elem.text:
+                title = title_elem.text.lower().strip()
+
+                # Check if this is a results section
+                if any(results_title in title for results_title in results_titles):
+                    # Extract all text from this section
+                    text_parts = []
+                    for elem in section.iter():
+                        if elem.text:
+                            text_parts.append(elem.text)
+                        if elem.tail:
+                            text_parts.append(elem.tail)
+
+                    results_text.append(' '.join(text_parts))
+
+        return ' '.join(results_text)
+
+    except ET.ParseError:
+        return ""
+
+
+def extract_discussion_section(fulltext_xml: str) -> str:
+    """
+    Extract Discussion section from PMC XML.
+
+    Args:
+        fulltext_xml: Full text XML string from PMC
+
+    Returns:
+        Discussion section text, or empty string if not found
+    """
+    if not fulltext_xml:
+        return ""
+
+    try:
+        root = ET.fromstring(fulltext_xml)
+
+        # Common section titles for discussion
+        discussion_titles = [
+            'discussion', 'conclusion', 'conclusions', 'concluding remarks',
+            'summary and discussion', 'discussion and conclusions'
+        ]
+
+        # Find all sections
+        sections = root.findall(".//sec")
+        discussion_text = []
+
+        for section in sections:
+            title_elem = section.find(".//title")
+            if title_elem is not None and title_elem.text:
+                title = title_elem.text.lower().strip()
+
+                # Check if this is a discussion section
+                if any(discussion_title in title for discussion_title in discussion_titles):
+                    # Extract all text from this section
+                    text_parts = []
+                    for elem in section.iter():
+                        if elem.text:
+                            text_parts.append(elem.text)
+                        if elem.tail:
+                            text_parts.append(elem.tail)
+
+                    discussion_text.append(' '.join(text_parts))
+
+        return ' '.join(discussion_text)
+
+    except ET.ParseError:
+        return ""
+
+
+def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str,
+                          results: str = "", discussion: str = "",
+                          cache_dir: str = 'tool_reviews/publication_cache'):
     """
     Cache fetched publication text to avoid duplicate API calls during validation.
 
@@ -271,6 +370,8 @@ def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str, c
         abstract: Abstract text from PubMed
         methods: Methods section text from PMC
         intro: Introduction section text from PMC
+        results: Results section text from PMC
+        discussion: Discussion section text from PMC
         cache_dir: Directory to store cache files
     """
     # Create cache directory if it doesn't exist
@@ -283,10 +384,14 @@ def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str, c
         'abstract': abstract,
         'methods': methods,
         'introduction': intro,
+        'results': results,
+        'discussion': discussion,
         'fetched_at': datetime.now().isoformat(),
         'abstract_length': len(abstract) if abstract else 0,
         'methods_length': len(methods) if methods else 0,
-        'introduction_length': len(intro) if intro else 0
+        'introduction_length': len(intro) if intro else 0,
+        'results_length': len(results) if results else 0,
+        'discussion_length': len(discussion) if discussion else 0
     }
 
     # Write to cache file
@@ -1034,11 +1139,23 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     else:
         intro_results = ({t: set() for t in tool_patterns.keys()}, {})
 
-    # Mark fulltext as available only if we got meaningful content (methods or intro)
-    if methods_text or intro_text:
+    # 5. Extract Results section (for observation mining during AI validation)
+    results_text = extract_results_section(fulltext) if fulltext else ""
+    if results_text and len(results_text) >= 50:
+        result['results_found'] = True
+        result['results_length'] = len(results_text)
+
+    # 6. Extract Discussion section (for observation mining during AI validation)
+    discussion_text = extract_discussion_section(fulltext) if fulltext else ""
+    if discussion_text and len(discussion_text) >= 50:
+        result['discussion_found'] = True
+        result['discussion_length'] = len(discussion_text)
+
+    # Mark fulltext as available only if we got meaningful content
+    if methods_text or intro_text or results_text or discussion_text:
         result['fulltext_available'] = True
 
-    # 5. Merge results
+    # 7. Merge results
     merged_tools, merged_metadata, tool_sources = merge_mining_results(
         abstract_results, methods_results, intro_results
     )
@@ -1050,6 +1167,8 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     result['abstract_text'] = abstract_text
     result['methods_text'] = methods_text
     result['intro_text'] = intro_text
+    result['results_text'] = results_text
+    result['discussion_text'] = discussion_text
 
     # 6. Match against existing tools
     for tool_type, tools in merged_tools.items():
@@ -1192,7 +1311,9 @@ Note: Run run_publication_reviews.py separately for AI validation
             pmid=mining_result['pmid'],
             abstract=mining_result.get('abstract_text', ''),
             methods=mining_result.get('methods_text', ''),
-            intro=mining_result.get('intro_text', '')
+            intro=mining_result.get('intro_text', ''),
+            results=mining_result.get('results_text', ''),
+            discussion=mining_result.get('discussion_text', '')
         )
 
         # Log progress
@@ -1207,6 +1328,12 @@ Note: Run run_publication_reviews.py separately for AI validation
         if mining_result['introduction_found']:
             intro_found += 1
             print(f"     ✓ Introduction section: {mining_result['intro_length']} chars")
+
+        if mining_result.get('results_found'):
+            print(f"     ✓ Results section: {mining_result['results_length']} chars")
+
+        if mining_result.get('discussion_found'):
+            print(f"     ✓ Discussion section: {mining_result['discussion_length']} chars")
 
         if mining_result['fulltext_available']:
             fetch_success += 1

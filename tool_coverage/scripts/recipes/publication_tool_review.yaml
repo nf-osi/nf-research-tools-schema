@@ -13,7 +13,11 @@ prompt: |
   1. Read the input file at {{ inputFile }} which contains:
      - Publication metadata (PMID, title, DOI, journal, year)
      - Abstract text
-     - Full text (Methods and Introduction sections, if available)
+     - Full text sections (if available):
+       * Methods (tool usage details)
+       * Introduction (background)
+       * Results (experimental findings and observations)
+       * Discussion (interpretation and conclusions)
      - List of mined tools with their types and context
 
   2. For each mined tool, evaluate:
@@ -55,7 +59,58 @@ prompt: |
      - Publication type is laboratory research (molecular biology, cell biology, animal models)
      - Context indicates tool development or experimental usage
 
-  7. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
+  7. EXTRACT SCIENTIFIC OBSERVATIONS:
+     After validating tools, extract scientific observations about each validated tool from the Results and Discussion sections.
+
+     OBSERVATION TYPES (from Synapse schema syn26486836):
+
+     **Phenotypic/Morphometric:**
+     - Body Length - Physical length measurements
+     - Body Weight - Weight measurements and changes
+     - Coat Color - Fur/coat coloration observations
+     - Organ Development - Developmental characteristics
+
+     **Growth/Metabolic:**
+     - Growth Rate - Growth patterns and kinetics
+     - Lifespan - Survival and longevity data
+     - Feed Intake - Feeding amounts and patterns
+     - Feeding Behavior - Feeding-related behaviors
+
+     **Behavioral:**
+     - Motor Activity - Movement and locomotion
+     - Swimming Behavior - Swimming patterns (zebrafish, etc.)
+     - Social Behavior - Social interactions
+     - Reproductive Behavior - Mating and reproduction
+     - Reflex Development - Reflex responses
+
+     **Disease/Pathology:**
+     - Disease Susceptibility - Disease predisposition
+     - Tumor Growth - Tumor formation and progression
+
+     **Practical/Documentation:**
+     - Usage Instructions - Best practices, protocols
+     - Issue - Problems, limitations, caveats
+     - Depositor Comment - Notes from tool creator
+     - General Comment or Review - Other observations
+     - Other - Any other relevant observations
+
+     EXTRACTION GUIDELINES:
+     - **Focus on Results and Discussion sections** - these report experimental findings
+     - **Link to specific tools** - each observation must reference a validated tool
+     - **Include quantitative data** when available (e.g., "15% weight reduction at 8 weeks")
+     - **Capture sufficient context** - enough detail to understand the observation
+     - **Be precise about the finding** - quote or paraphrase accurately from the text
+     - **Only extract explicit observations** - do not infer beyond what's stated
+     - **Multiple observations per tool are allowed** - extract all relevant findings
+     - **Skip if no observations found** - empty list is acceptable
+
+     EXAMPLE OBSERVATIONS:
+     - "Nf1+/- mice showed significantly reduced body weight (15% decrease) compared to wild-type littermates at 8 weeks (p<0.01)"
+     - "Tumor formation observed in 30% of animals by 12 months, with higher penetrance in females"
+     - "Cell line exhibited slow proliferation and required extended culture time"
+     - "Antibody showed strong cross-reactivity with mouse NF2, use with caution"
+
+  8. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
 
   ```yaml
   publicationMetadata:
@@ -109,6 +164,23 @@ prompt: |
       reasoning: "Why this pattern would improve mining accuracy"
     # Include all pattern suggestions (if any)
 
+  observations:
+    - resourceName: "Exact tool name (must match a validated tool)"
+      resourceType: "Animal Model" | "Antibody" | "Cell Line" | "Genetic Reagent"
+      observationType: "Body Length" | "Body Weight" | "Coat Color" | "Organ Development" | "Growth Rate" | "Lifespan" | "Feed Intake" | "Feeding Behavior" | "Motor Activity" | "Swimming Behavior" | "Social Behavior" | "Reproductive Behavior" | "Reflex Development" | "Disease Susceptibility" | "Tumor Growth" | "Usage Instructions" | "Issue" | "Depositor Comment" | "General Comment or Review" | "Other"
+      details: |
+        Detailed observation text including:
+        - Specific findings (quantitative data preferred)
+        - Experimental conditions if relevant
+        - Comparison groups if applicable
+        - Statistical significance if reported
+        - Any important caveats or notes
+      foundIn: "results" | "discussion" | "both"
+      contextSnippet: "...relevant excerpt from Results or Discussion sections..."
+      confidence: 0.0-1.0  # Confidence this is a legitimate scientific observation
+      doi: "{{ doi }}"  # Publication DOI for attribution
+    # Repeat for each observation found. Use empty list [] if no observations.
+
   summary:
     totalToolsMined: 6
     toolsAccepted: 2
@@ -116,6 +188,11 @@ prompt: |
     toolsUncertain: 1
     potentiallyMissedCount: 2  # Number of tools that might have been missed
     newPatternsCount: 3  # Number of new patterns suggested
+    observationsExtracted: 5  # Number of scientific observations found
+    observationsByType:  # Breakdown by observation type
+      Body Weight: 2
+      Tumor Growth: 2
+      Usage Instructions: 1
     majorIssuesFound: |
       List major issues found during review:
       - Example: "Publication is questionnaire development, not lab research"
@@ -128,9 +205,12 @@ prompt: |
       - Any other concerns about the mining results?
       - Any tools that were potentially missed?
       - Any patterns that should be added to improve future mining?
+      - What observations were extracted and their quality?
   ```
 
   IMPORTANT INSTRUCTIONS:
+
+  **Tool Validation:**
   - Be highly critical and conservative - when in doubt, recommend "Remove" or "Manual Review Required"
   - Look for clear evidence of EXPERIMENTAL usage, not just mentions
   - Publications about quality of life, patient outcomes, clinical trials, surveys, or epidemiology rarely use research tools
@@ -143,11 +223,25 @@ prompt: |
   - Suggest concrete, actionable patterns that would catch tools missed in this paper
   - If no tools were missed and no patterns are needed, set potentiallyMissedTools: [] and suggestedPatterns: []
 
+  **Observation Extraction:**
+  - ONLY extract observations for VALIDATED (accepted) tools
+  - Focus on Results and Discussion sections - these contain experimental findings
+  - Include quantitative data whenever possible (numbers, percentages, p-values)
+  - Be precise and faithful to the original text - do not embellish or infer
+  - Choose the most specific observationType that fits (use "Other" only when necessary)
+  - Extract multiple observations per tool if multiple distinct findings are reported
+  - Empty observations list is acceptable if publication reports no specific findings
+  - Link each observation to the exact tool name (must match resourceName from validated tools)
+  - Include enough context to make the observation meaningful and interpretable
+  - Note the section where observation was found (results, discussion, or both)
+
 activities:
-  - Review publication {{ pmid }} for tool validation
+  - Review publication {{ pmid }} for tool validation and observation extraction
   - Analyze publication type and research methods
   - Evaluate each mined tool in context
   - Provide accept/reject recommendations with detailed reasoning
+  - Extract scientific observations from Results and Discussion sections
+  - Link observations to validated tools with proper attribution
 
 extensions:
   - type: builtin

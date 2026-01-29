@@ -17,6 +17,7 @@
 - **Keyword Checking:** Verifies tool-specific keywords near mentions
 - **Missed Tool Detection:** Actively searches for tools mining didn't catch
 - **Pattern Suggestions:** Recommends improvements to mining patterns
+- **Observation Extraction:** Mines scientific observations from Results/Discussion sections
 
 ## Architecture
 
@@ -27,15 +28,16 @@ fetch_fulltext_and_mine.py
 processed_publications.csv
 tool_reviews/publication_cache/{PMID}_text.json (cached text)
 
-Step 2: AI Validation (Separate Step)
+Step 2: AI Validation + Observation Extraction (Separate Step)
 run_publication_reviews.py
     ↓ (reads from cache, no duplicate API calls)
     ↓ (invokes Goose only for non-reviewed publications)
 Goose AI Agent (tool_coverage/scripts/recipes/publication_tool_review.yaml)
-    ↓ (generates per-publication validation)
+    ↓ (generates per-publication validation + observations)
 {PMID}_tool_review.yaml
     ↓ (compiles all results)
 VALIDATED_*.csv (filtered submission files)
+observations.csv (scientific observations extracted)
 potentially_missed_tools.csv (tools AI found)
 suggested_patterns.csv (pattern recommendations)
 
@@ -147,17 +149,19 @@ These publications are reviewed to discover potential new tools or confirm they 
 
 **Outputs:**
 - `VALIDATED_*.csv` - Filtered submission files (rejected tools removed)
-- `tool_reviews/validation_report.xlsx` - Summary report
+- `tool_reviews/validation_report.xlsx` - Summary report (includes observation counts)
 - `tool_reviews/validation_summary.json` - Machine-readable results
+- `tool_reviews/observations.csv` - Scientific observations extracted from publications
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
 - `tool_reviews/suggested_patterns.csv` - Pattern recommendations
-- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication details
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication details (includes observations)
 
 **Smart Optimizations:**
 
 **Publication Text Caching:**
-- Fetched text (abstract, methods, intro) is **cached during mining** in `tool_reviews/publication_cache/`
+- Fetched text (abstract, methods, intro, results, discussion) is **cached during mining** in `tool_reviews/publication_cache/`
 - Validation reads from cache instead of re-fetching from PubMed/PMC APIs
+- **5 sections cached**: Abstract, Methods, Introduction (for tool mining), Results & Discussion (for observation extraction)
 - **Eliminates duplicate API calls**: 50% reduction (100 vs 200 for 50 publications)
 - Cache persists across runs, enabling fast re-validation
 - Backwards compatible: falls back to API if cache missing
@@ -290,7 +294,77 @@ Pattern improvement runs automatically after AI validation in GitHub Actions wor
 4. Updated patterns committed to PR
 5. Next mining run benefits from improved patterns
 
-### 4. Integration with Mining Workflow
+### 4. Observation Extraction
+
+AI validation also extracts **scientific observations** about tools from Results and Discussion sections of publications.
+
+**What Are Observations?**
+
+Observations are scientific characterizations of research tools stored in syn26486836:
+- Phenotypic data (body weight, coat color, growth rate)
+- Behavioral observations (motor activity, social behavior)
+- Disease characteristics (tumor growth, disease susceptibility)
+- Usage notes (best practices, issues, cross-reactivity)
+
+**Observation Types (20 categories from schema):**
+
+| Category | Types |
+|----------|-------|
+| **Phenotypic** | Body Length, Body Weight, Coat Color, Organ Development |
+| **Growth/Metabolic** | Growth Rate, Lifespan, Feed Intake, Feeding Behavior |
+| **Behavioral** | Motor Activity, Swimming Behavior, Social Behavior, Reproductive Behavior, Reflex Development |
+| **Disease** | Disease Susceptibility, Tumor Growth |
+| **Practical** | Usage Instructions, Issue, Depositor Comment, General Comment or Review, Other |
+
+**Extraction Process:**
+
+1. **AI reads Results/Discussion sections** from cached publication text
+2. **Identifies scientific findings** about validated tools
+3. **Categorizes by observation type** (20 types from schema)
+4. **Links to tool** via resourceName
+5. **Includes quantitative data** when available
+6. **Outputs to observations.csv**
+
+**Example Output (`observations.csv`):**
+
+```csv
+pmid,doi,resourceName,resourceType,observationType,details,foundIn,confidence
+12345678,10.1234/journal.2023.001,Nf1+/-,Animal Model,Body Weight,"Nf1+/- mice showed significantly reduced body weight (15% decrease) compared to wild-type at 8 weeks (p<0.01)",results,0.95
+12345678,10.1234/journal.2023.001,Nf1+/-,Animal Model,Tumor Growth,"Optic gliomas developed in 30% of animals by 12 months, higher in females",results,0.92
+```
+
+**Integration with Submission Workflow:**
+
+Observations are integrated into `format_mining_for_submission.py`:
+1. Loads `observations.csv` from AI validation
+2. Matches `resourceName` → `resourceId` via syn51730943 lookup
+3. Creates `SUBMIT_observations.csv` (matched, ready for Synapse)
+4. Creates `SUBMIT_observations_UNMATCHED.csv` (needs manual review)
+
+This allows observations to be reviewed alongside tools before Synapse upload.
+
+**Impact on Tool Completeness:**
+
+Observations contribute **25 points** (25%) to tool completeness scoring:
+- Observations with DOI: 7.5 points each (up to 4)
+- Observations without DOI: 2.5 points each (up to 10)
+- Maximum: 25 points from observations
+
+**YAML Output Structure:**
+
+```yaml
+observations:
+  - resourceName: "Nf1+/-"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    details: "Nf1+/- mice showed 15% reduced body weight at 8 weeks (p<0.01)"
+    foundIn: "results"
+    contextSnippet: "...relevant excerpt..."
+    confidence: 0.95
+    doi: "10.1234/journal.2023.001"
+```
+
+### 5. Integration with Mining Workflow
 
 AI validation is integrated into `fetch_fulltext_and_mine.py` via environment variable:
 

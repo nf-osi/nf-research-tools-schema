@@ -22,7 +22,9 @@ Analyzes current tool coverage against GFF-funded publications:
 #### `tool_coverage/scripts/fetch_fulltext_and_mine.py`
 Mines abstracts and full text for tools:
 - **Mines ALL publications via abstracts** (fetched from PubMed API using PMID) - no PMC requirement
-- **Enhances with full text when available:** Fetches PMC XML and extracts Methods + Introduction sections
+- **Enhances with full text when available:** Fetches PMC XML and extracts 5 sections:
+  - **Methods + Introduction** (for tool mining)
+  - **Results + Discussion** (for observation extraction)
 - **Matches against existing tools** using fuzzy matching (88% threshold) before creating new entries
 - Uses existing tools as training data (1,142+ tools) for pattern matching
 - Extracts cell line names via regex patterns (no name field in database)
@@ -30,7 +32,7 @@ Mines abstracts and full text for tools:
 - **Filters generic commercial tools** (e.g., C57BL/6, nude mice) unless NF-specific
 - **Tracks source sections** (abstract, methods, introduction) for each tool found
 - **Deduplicates** tools found in multiple sections, preferring Methods metadata
-- **Caches fetched text** for efficient AI validation in separate step
+- **Caches ALL 5 sections** for efficient AI validation and observation extraction
 
 **Tool Matching Process:**
 1. Mine abstract (always available)
@@ -73,6 +75,7 @@ Transforms mining results into submission-ready CSVs:
 - Generates unique UUIDs for new entries
 - **Pre-fills fields using extracted metadata**
 - Creates publication-tool linking entries
+- **Matches observations to resources** via syn51730943 lookup
 - Adds metadata for tracking (source, confidence, context)
 - **Generates NEW ROWS only** - files are meant to be appended after verification
 
@@ -89,6 +92,10 @@ Transforms mining results into submission-ready CSVs:
 - `SUBMIT_publications.csv` - For syn26486839 (base publication information)
 - `SUBMIT_usage.csv` - For syn26486841 (publications where tools were USED)
 - `SUBMIT_development.csv` - For syn26486807 (publications where tools were DEVELOPED)
+
+**Outputs (Observation Tables):**
+- `SUBMIT_observations.csv` - For syn26486836 (scientific observations about tools)
+- `SUBMIT_observations_UNMATCHED.csv` - Observations needing manual resource matching
 
 **Pre-filled Fields:**
 - Antibodies: clonality, host, vendor, catalog #, reactive species
@@ -310,11 +317,25 @@ goose configure
 # (Enter API key from https://console.anthropic.com/settings/keys)
 ```
 
-**Run validation:**
+**Run validation + observation extraction:**
 ```bash
-# Validate mined tools (uses cached text from mining step)
+# Validates mined tools AND extracts scientific observations
+# Uses cached text (all 5 sections) from mining step - no additional API calls
 python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
 ```
+
+**AI validation performs:**
+- Tool validation (accept/reject false positives)
+- Potentially missed tool detection
+- Mining pattern suggestions
+- **Scientific observation extraction** (from Results/Discussion sections)
+
+**Outputs:**
+- `VALIDATED_*.csv` - Filtered tool lists (false positives removed)
+- `observations.csv` - Scientific observations about tools
+- `potentially_missed_tools.csv` - Tools that mining may have missed
+- `suggested_patterns.csv` - Patterns to improve future mining
+- `validation_report.xlsx` - Summary with observation counts
 
 ### Generate Summary
 ```bash
@@ -340,6 +361,40 @@ The mining process identifies potential tools in four categories:
 Each tool is tagged with:
 - **Development Status** - Whether the tool was developed in this publication or just used
 - **Context Metadata** - Extracted characteristics (species, strain, clonality, etc.)
+
+### Observation Mining
+
+The AI validation also extracts **scientific observations** about tools from Results and Discussion sections:
+
+**Observation Types Extracted (20 categories):**
+- **Phenotypic:** Body Length, Body Weight, Coat Color, Organ Development
+- **Growth/Metabolic:** Growth Rate, Lifespan, Feed Intake, Feeding Behavior
+- **Behavioral:** Motor Activity, Swimming Behavior, Social Behavior, Reproductive Behavior
+- **Disease:** Disease Susceptibility, Tumor Growth
+- **Practical:** Usage Instructions, Issue, Depositor Comment, General Comment or Review, Other
+
+**Example Observations:**
+- "Nf1+/- mice showed 15% reduced body weight at 8 weeks (p<0.01)" → Body Weight
+- "Optic gliomas developed in 30% of animals by 12 months" → Tumor Growth
+- "Antibody shows cross-reactivity with NF2, use 1:1000 dilution" → Usage Instructions
+
+**Observation Processing:**
+1. AI extracts observations from Results/Discussion sections
+2. Links observations to validated tools (via resourceName)
+3. `format_mining_for_submission.py` matches observations to resourceIds via syn51730943
+4. Creates `SUBMIT_observations.csv` (matched) and `SUBMIT_observations_UNMATCHED.csv` (unmatched)
+5. `clean_submission_csvs.py` validates schema (same as all other entities):
+   - Required fields: resourceId, resourceType, resourceName, observationType, details
+   - No null values in required fields
+   - No empty rows
+6. Creates `CLEAN_observations.csv` ready for Synapse upload
+
+**Consistent with all SUBMIT files** - observations validated the same way as tools, publications, and links.
+
+**Impact on Tool Completeness:**
+- Observations contribute **25 points** (25%) to tool completeness score
+- Observations with DOI: 7.5 points each (up to 4)
+- Observations without DOI: 2.5 points each (up to 10)
 
 ### Priority Publications
 

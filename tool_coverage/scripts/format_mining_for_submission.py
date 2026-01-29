@@ -15,6 +15,7 @@ Generates CSVs matching schemas of:
 - GeneticReagentDetails (syn26486832) - genetic reagent specifics
 - Development (syn26486807) - publications where tools were developed
 - Publication-Tool Links - many-to-many relationships
+- Observations (syn26486836) - scientific observations about tools
 """
 
 import pandas as pd
@@ -22,6 +23,8 @@ import uuid
 import sys
 import os
 import json
+import synapseclient
+from pathlib import Path
 
 def generate_uuid():
     """Generate a UUID for new entries."""
@@ -620,6 +623,120 @@ def format_development_links(tool_csvs, publication_ids_map):
     return pd.DataFrame(development_rows)
 
 
+def match_observation_to_resource(resource_name, resource_type, syn):
+    """
+    Match observation to existing resource by name and type.
+
+    Args:
+        resource_name: Name of the resource
+        resource_type: Type of resource (Animal Model, Antibody, etc.)
+        syn: Authenticated Synapse client
+
+    Returns:
+        resourceId if found, None otherwise
+    """
+    try:
+        # Escape single quotes for SQL
+        escaped_name = resource_name.replace("'", "''")
+
+        query = f"""
+            SELECT resourceId, resourceName, resourceType
+            FROM syn51730943
+            WHERE resourceType = '{resource_type}'
+            AND resourceName = '{escaped_name}'
+        """
+
+        result = syn.tableQuery(query).asDataFrame()
+
+        if len(result) == 1:
+            return result.iloc[0]['resourceId']
+        elif len(result) > 1:
+            return result.iloc[0]['resourceId']  # Take first
+        else:
+            return None
+
+    except Exception as e:
+        return None
+
+
+def format_observations(observations_csv='tool_reviews/observations.csv'):
+    """
+    Format observations from AI validation for Synapse submission.
+
+    Matches observation resource names to existing resourceIds in the database.
+
+    Args:
+        observations_csv: Path to observations.csv from AI validation
+
+    Returns:
+        Tuple of (matched_df, unmatched_df)
+    """
+    obs_file = Path(observations_csv)
+    if not obs_file.exists():
+        print(f"\n⚠️  Observations file not found: {observations_csv}")
+        print("   Run run_publication_reviews.py first to extract observations")
+        return pd.DataFrame(), pd.DataFrame()
+
+    # Load observations
+    obs_df = pd.read_csv(obs_file)
+    if obs_df.empty:
+        print(f"\n⚠️  No observations found in {observations_csv}")
+        return pd.DataFrame(), pd.DataFrame()
+
+    print(f"\nLoading observations from {observations_csv}...")
+    print(f"Found {len(obs_df)} observations to match")
+
+    # Login to Synapse for matching
+    syn = synapseclient.Synapse()
+    try:
+        syn.login(silent=True)
+    except Exception as e:
+        print(f"⚠️  Could not login to Synapse: {e}")
+        print("   Observations will be saved to SUBMIT_observations_UNMATCHED.csv for manual matching")
+        return pd.DataFrame(), obs_df
+
+    # Match observations to resources
+    matched_rows = []
+    unmatched_rows = []
+
+    for idx, obs in obs_df.iterrows():
+        resource_name = obs.get('resourceName')
+        resource_type = obs.get('resourceType')
+
+        if pd.isna(resource_name) or pd.isna(resource_type):
+            unmatched_rows.append(obs.to_dict())
+            continue
+
+        # Match to existing resource
+        resource_id = match_observation_to_resource(resource_name, resource_type, syn)
+
+        if resource_id:
+            matched_rows.append({
+                'resourceId': resource_id,
+                'resourceType': resource_type,
+                'resourceName': resource_name,
+                'observationType': obs.get('observationType'),
+                'details': obs.get('details', ''),
+                'referencePublication': obs.get('doi', ''),
+                # Tracking fields (prefixed with _)
+                '_pmid': obs.get('pmid', ''),
+                '_foundIn': obs.get('foundIn', ''),
+                '_confidence': obs.get('confidence', ''),
+                '_source': 'AI extraction from publication Results/Discussion'
+            })
+        else:
+            unmatched_rows.append(obs.to_dict())
+
+    matched_df = pd.DataFrame(matched_rows) if matched_rows else pd.DataFrame()
+    unmatched_df = pd.DataFrame(unmatched_rows) if unmatched_rows else pd.DataFrame()
+
+    print(f"   ✓ Matched: {len(matched_df)} observations")
+    if not unmatched_df.empty:
+        print(f"   ⚠️  Unmatched: {len(unmatched_df)} observations (will be saved separately)")
+
+    return matched_df, unmatched_df
+
+
 def main():
     print("=" * 80)
     print("FORMATTING MINING RESULTS FOR TABLE SUBMISSION")
@@ -775,6 +892,19 @@ def main():
         print(f"   - SUBMIT_usage.csv ({len(usage_df)} usage links) → syn26486841")
     if not development_df.empty:
         print(f"   - SUBMIT_development.csv ({len(development_df)} development links) → syn26486807")
+
+    # Format observations (from AI validation)
+    observations_df, unmatched_obs_df = format_observations()
+
+    if not observations_df.empty:
+        output_file = 'SUBMIT_observations.csv'
+        observations_df.to_csv(output_file, index=False)
+        print(f"   - SUBMIT_observations.csv ({len(observations_df)} observations) → syn26486836")
+
+    if not unmatched_obs_df.empty:
+        unmatched_file = 'SUBMIT_observations_UNMATCHED.csv'
+        unmatched_obs_df.to_csv(unmatched_file, index=False)
+        print(f"   - SUBMIT_observations_UNMATCHED.csv ({len(unmatched_obs_df)} unmatched - needs manual review)")
 
     print("\n⚠️  CRITICAL: MANUAL VERIFICATION REQUIRED")
     print("   These CSVs are suggestions only and MUST be manually verified:")

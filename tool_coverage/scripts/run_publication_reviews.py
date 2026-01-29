@@ -192,6 +192,9 @@ def prepare_goose_input(pub_row, inputs_dir):
         abstract_text = cached['abstract']
         methods_text = cached['methods']
         intro_text = cached['introduction']
+        # Load Results and Discussion sections (with backwards compatibility)
+        results_text = cached.get('results', '')
+        discussion_text = cached.get('discussion', '')
     else:
         # Fall back to fetching (backwards compatibility)
         # Import mining functions to fetch text
@@ -200,7 +203,9 @@ def prepare_goose_input(pub_row, inputs_dir):
             fetch_pubmed_abstract,
             fetch_pmc_fulltext,
             extract_methods_section,
-            extract_introduction_section
+            extract_introduction_section,
+            extract_results_section,
+            extract_discussion_section
         )
 
         # Fetch abstract from PubMed
@@ -212,11 +217,15 @@ def prepare_goose_input(pub_row, inputs_dir):
         fulltext_xml = fetch_pmc_fulltext(pmid)
         methods_text = ""
         intro_text = ""
+        results_text = ""
+        discussion_text = ""
 
         if fulltext_xml:
-            print(f"  Extracting Methods and Introduction sections...")
+            print(f"  Extracting sections from full text...")
             methods_text = extract_methods_section(fulltext_xml)
             intro_text = extract_introduction_section(fulltext_xml)
+            results_text = extract_results_section(fulltext_xml)
+            discussion_text = extract_discussion_section(fulltext_xml)
 
     # Parse mined tools from JSON columns
     novel_tools = json.loads(pub_row.get('novel_tools', '{}'))
@@ -253,9 +262,13 @@ def prepare_goose_input(pub_row, inputs_dir):
         'abstractText': abstract_text,
         'methodsText': methods_text,
         'introductionText': intro_text,
+        'resultsText': results_text,
+        'discussionText': discussion_text,
         'hasAbstract': bool(abstract_text),
         'hasMethodsSection': bool(methods_text),
         'hasIntroduction': bool(intro_text),
+        'hasResults': bool(results_text),
+        'hasDiscussion': bool(discussion_text),
         'minedTools': tools_list,
         'miningMetrics': {
             'totalTools': len(tools_list),
@@ -352,9 +365,11 @@ def compile_validation_results(mining_df, results_dir):
     validation_results = []
     all_missed_tools = []
     all_suggested_patterns = []
+    all_observations = []
 
     for _, row in mining_df.iterrows():
         pmid = row['pmid']
+        doi = row.get('doi', '')
 
         # Check if YAML file exists
         yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
@@ -375,6 +390,7 @@ def compile_validation_results(mining_df, results_dir):
         summary = review_data.get('summary', {})
         missed_tools = review_data.get('potentiallyMissedTools', [])
         suggested_patterns = review_data.get('suggestedPatterns', [])
+        observations = review_data.get('observations', [])
 
         # Categorize tools by recommendation
         accepted_tools = []
@@ -409,6 +425,20 @@ def compile_validation_results(mining_df, results_dir):
             pattern['pmid'] = pmid
             all_suggested_patterns.append(pattern)
 
+        # Collect observations
+        for obs in observations:
+            obs_info = {
+                'pmid': pmid,
+                'doi': doi if doi else obs.get('doi', ''),
+                'resourceName': obs.get('resourceName'),
+                'resourceType': obs.get('resourceType'),
+                'observationType': obs.get('observationType'),
+                'details': obs.get('details', ''),
+                'foundIn': obs.get('foundIn', ''),
+                'confidence': obs.get('confidence', 1.0)
+            }
+            all_observations.append(obs_info)
+
         validation_results.append({
             'pmid': pmid,
             'title': pub_meta.get('title', ''),
@@ -420,6 +450,7 @@ def compile_validation_results(mining_df, results_dir):
             'toolsUncertain': summary.get('toolsUncertain', 0),
             'potentiallyMissedCount': summary.get('potentiallyMissedCount', 0),
             'newPatternsCount': summary.get('newPatternsCount', 0),
+            'observationsExtracted': summary.get('observationsExtracted', 0),
             'acceptedTools': accepted_tools,
             'rejectedTools': rejected_tools,
             'uncertainTools': uncertain_tools,
@@ -433,8 +464,9 @@ def compile_validation_results(mining_df, results_dir):
     print(f"\n✅ Compiled {len(validation_results)} publication reviews")
     print(f"   - Total potentially missed tools: {len(all_missed_tools)}")
     print(f"   - Total suggested patterns: {len(all_suggested_patterns)}")
+    print(f"   - Total observations extracted: {len(all_observations)}")
 
-    return validation_results, all_missed_tools, all_suggested_patterns
+    return validation_results, all_missed_tools, all_suggested_patterns, all_observations
 
 def normalize_tool_type(tool_type):
     """Normalize tool type to match CSV file naming convention."""
@@ -658,7 +690,7 @@ def main():
             run_goose_review(pmid, input_file, results_dir)
 
     # Compile validation results
-    validation_results, all_missed_tools, all_suggested_patterns = compile_validation_results(mining_df, results_dir)
+    validation_results, all_missed_tools, all_suggested_patterns, all_observations = compile_validation_results(mining_df, results_dir)
 
     # Save validation summary
     summary_file = Path(review_dir) / 'validation_summary.json'
@@ -680,6 +712,7 @@ def main():
             'uncertain': result['toolsUncertain'],
             'potentiallyMissed': result['potentiallyMissedCount'],
             'suggestedPatterns': result['newPatternsCount'],
+            'observationsExtracted': result.get('observationsExtracted', 0),
             'majorIssues': result['majorIssues'],
             'recommendations': result['recommendations']
         })
@@ -705,6 +738,23 @@ def main():
         print(f"✅ Suggested patterns saved: {patterns_file}")
         print(f"   - {len(all_suggested_patterns)} patterns to improve mining")
 
+    # Save observations report
+    if all_observations:
+        observations_df = pd.DataFrame(all_observations)
+        observations_file = Path(review_dir) / 'observations.csv'
+        observations_df.to_csv(observations_file, index=False)
+        print(f"✅ Observations saved: {observations_file}")
+        print(f"   - {len(all_observations)} scientific observations extracted")
+
+        # Print observation breakdown by type
+        if 'observationType' in observations_df.columns:
+            obs_counts = observations_df['observationType'].value_counts()
+            print(f"   - Breakdown by type:")
+            for obs_type, count in obs_counts.head(5).items():
+                print(f"     • {obs_type}: {count}")
+            if len(obs_counts) > 5:
+                print(f"     • ... and {len(obs_counts) - 5} more types")
+
     # Filter SUBMIT_*.csv files
     if not args.compile_only:
         filter_submission_csvs(validation_results)
@@ -718,7 +768,9 @@ def main():
     print("  3. Manually review 'uncertain' tools if any")
     print("  4. Review potentially_missed_tools.csv for tools that may need manual addition")
     print("  5. Review suggested_patterns.csv to improve future mining accuracy")
-    print("  6. Use VALIDATED_*.csv files instead of SUBMIT_*.csv")
+    print("  6. Review observations.csv for scientific observations extracted")
+    print("  7. Run format_mining_for_submission.py to create SUBMIT files (includes observations)")
+    print("  8. Manually verify SUBMIT_*.csv files before uploading to Synapse")
     print("=" * 80)
 
 if __name__ == '__main__':

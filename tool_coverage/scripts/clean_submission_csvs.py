@@ -25,6 +25,7 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
     'CLEAN_usage.csv': 'syn26486841',  # Publications where tools were USED
     'CLEAN_development.csv': 'syn26486807',  # Publications where tools were DEVELOPED
+    'CLEAN_observations.csv': 'syn26486836',  # Scientific observations about tools
     # Note: syn51735450 is a materialized view that auto-updates from usage + resources
 }
 
@@ -55,7 +56,8 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'usage': ['usageId', 'publicationId', 'resourceId'],
         'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
-        'resources': ['resourceName', 'resourceType']
+        'resources': ['resourceName', 'resourceType'],
+        'observations': ['resourceId', 'resourceType', 'resourceName', 'observationType', 'details']
     }
 
     # Extract file type from filename
