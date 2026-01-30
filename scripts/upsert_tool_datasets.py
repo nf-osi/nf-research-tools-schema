@@ -9,6 +9,8 @@ This script:
 4. Upserts the data to Synapse
 5. Creates a snapshot version
 6. Creates/updates a Dataset table with dataset information from syn50913342
+
+Requires: synapseclient >= 4.4.0
 """
 
 import os
@@ -17,6 +19,13 @@ from pathlib import Path
 import synapseclient
 import pandas as pd
 from typing import List
+
+# Try to import new API (synapseclient >= 4.9.0)
+try:
+    from synapseclient.models import Table as TableModel
+    USE_NEW_API = True
+except ImportError:
+    USE_NEW_API = False
 
 
 def clean_csv(input_file: Path, output_file: Path) -> pd.DataFrame:
@@ -103,8 +112,19 @@ def ensure_datasets_column_exists(syn: synapseclient.Synapse, table_id: str) -> 
 
     try:
         # Get table schema
-        table = syn.get(table_id)
-        column_names = [col['name'] for col in table.columns_to_store]
+        if USE_NEW_API:
+            table_model = TableModel(id=table_id)
+            table_model = table_model.get(synapse_client=syn)
+
+            if isinstance(table_model.columns, dict):
+                column_names = list(table_model.columns.keys())
+            elif isinstance(table_model.columns, list):
+                column_names = [col.name for col in table_model.columns]
+            else:
+                column_names = []
+        else:
+            table = syn.get(table_id)
+            column_names = [col['name'] for col in table.columns_to_store]
 
         if 'datasets' in column_names:
             print("  ✓ Column 'datasets' already exists")
@@ -120,7 +140,11 @@ def ensure_datasets_column_exists(syn: synapseclient.Synapse, table_id: str) -> 
             defaultValue=''
         )
 
-        # Add column to schema
+        # Add column to schema (use old API for both cases since new API column addition is complex)
+        if USE_NEW_API:
+            # Get table using old API for column addition
+            table = syn.get(table_id)
+
         table.addColumn(new_column)
         syn.store(table)
 
@@ -150,7 +174,13 @@ def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: p
 
     # Get current table data to find ROW_IDs
     print("  - Fetching current table data...")
-    current_data = syn.tableQuery(f"SELECT * FROM {table_id}").asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id=table_id)
+        current_data = table.query(f"SELECT * FROM {table_id}", synapse_client=syn)
+    else:
+        current_data = syn.tableQuery(f"SELECT * FROM {table_id}").asDataFrame()
+
     print(f"    Retrieved {len(current_data)} rows from table")
 
     # Determine which column to use for matching
@@ -234,7 +264,12 @@ def get_all_dataset_ids(syn: synapseclient.Synapse, table_id: str) -> set:
 
     # Query the datasets column
     query = f"SELECT datasets FROM {table_id}"
-    result = syn.tableQuery(query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id=table_id)
+        result = table.query(query, synapse_client=syn)
+    else:
+        result = syn.tableQuery(query).asDataFrame()
 
     # Parse comma-separated dataset IDs
     all_dataset_ids = set()
@@ -267,7 +302,12 @@ def get_dataset_info(syn: synapseclient.Synapse, dataset_collection_id: str,
 
     # Query all datasets from the collection
     query = f"SELECT * FROM {dataset_collection_id}"
-    all_datasets = syn.tableQuery(query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id=dataset_collection_id)
+        all_datasets = table.query(query, synapse_client=syn)
+    else:
+        all_datasets = syn.tableQuery(query).asDataFrame()
 
     print(f"  - Retrieved {len(all_datasets)} total datasets from collection")
 
@@ -339,7 +379,12 @@ def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
         print("  - Upserting data to table...")
 
         # Get current table data
-        current_data = syn.tableQuery(f"SELECT * FROM {existing_table_id}").asDataFrame()
+        if USE_NEW_API:
+            table = TableModel(id=existing_table_id)
+            current_data = table.query(f"SELECT * FROM {existing_table_id}", synapse_client=syn)
+        else:
+            current_data = syn.tableQuery(f"SELECT * FROM {existing_table_id}").asDataFrame()
+
         print(f"    Current rows: {len(current_data)}")
 
         # Determine the ID column for matching

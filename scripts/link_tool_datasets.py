@@ -7,6 +7,8 @@ This script:
 2. Extracts studyId from those publications
 3. Queries Synapse for datasets associated with each study
 4. Creates a CSV file to upsert dataset information to the tool publications table
+
+Requires: synapseclient >= 4.4.0
 """
 
 import os
@@ -15,6 +17,13 @@ from pathlib import Path
 import synapseclient
 import pandas as pd
 from typing import List, Dict, Set
+
+# Try to import new API (synapseclient >= 4.9.0)
+try:
+    from synapseclient.models import Table as TableModel
+    USE_NEW_API = True
+except ImportError:
+    USE_NEW_API = False
 
 
 def get_tool_linked_publications(syn: synapseclient.Synapse) -> pd.DataFrame:
@@ -29,14 +38,26 @@ def get_tool_linked_publications(syn: synapseclient.Synapse) -> pd.DataFrame:
     # Get all tool-linked pmids from usage table
     print("  - Querying tool usage table (syn26486841)...")
     usage_query = "SELECT DISTINCT pmid FROM syn26486841"
-    usage_df = syn.tableQuery(usage_query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id='syn26486841')
+        usage_df = table.query(usage_query, synapse_client=syn)
+    else:
+        usage_df = syn.tableQuery(usage_query).asDataFrame()
+
     usage_pmids = set(usage_df['pmid'].dropna().unique())
     print(f"    Found {len(usage_pmids)} unique PMIDs in usage table")
 
     # Get all tool-linked pmids from development table
     print("  - Querying tool development table (syn26486807)...")
     dev_query = "SELECT DISTINCT pmid FROM syn26486807"
-    dev_df = syn.tableQuery(dev_query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id='syn26486807')
+        dev_df = table.query(dev_query, synapse_client=syn)
+    else:
+        dev_df = syn.tableQuery(dev_query).asDataFrame()
+
     dev_pmids = set(dev_df['pmid'].dropna().unique())
     print(f"    Found {len(dev_pmids)} unique PMIDs in development table")
 
@@ -51,7 +72,12 @@ def get_tool_linked_publications(syn: synapseclient.Synapse) -> pd.DataFrame:
     # Get publications from portal with those pmids
     print("  - Querying portal publications (syn16857542)...")
     portal_query = "SELECT pmid, studyId, publicationId FROM syn16857542"
-    portal_df = syn.tableQuery(portal_query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id='syn16857542')
+        portal_df = table.query(portal_query, synapse_client=syn)
+    else:
+        portal_df = syn.tableQuery(portal_query).asDataFrame()
 
     # Filter to only publications linked to tools and with valid studyIds
     filtered_pubs = portal_df[
@@ -149,7 +175,13 @@ def get_tool_publications(syn: synapseclient.Synapse) -> pd.DataFrame:
     """
     print("\nFetching current tool publications (syn26486839)...")
     query = "SELECT * FROM syn26486839"
-    tool_pubs_df = syn.tableQuery(query).asDataFrame()
+
+    if USE_NEW_API:
+        table = TableModel(id='syn26486839')
+        tool_pubs_df = table.query(query, synapse_client=syn)
+    else:
+        tool_pubs_df = syn.tableQuery(query).asDataFrame()
+
     print(f"  ✓ Retrieved {len(tool_pubs_df)} tool publication records")
 
     return tool_pubs_df
