@@ -1,0 +1,65 @@
+name: Upsert Tool Datasets to Synapse
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'SUBMIT_tool_datasets.csv'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  upsert-datasets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate CSV file exists
+        id: validate
+        run: |
+          if [ ! -f "SUBMIT_tool_datasets.csv" ]; then
+            echo "Error: SUBMIT_tool_datasets.csv not found"
+            exit 1
+          fi
+          echo "CSV file found and validated"
+
+      - name: Clean and upsert to Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python scripts/upsert_tool_datasets.py
+
+      - name: Upload cleaned CSV as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-tool-datasets
+          path: CLEAN_tool_datasets.csv
+          retention-days: 90
+
+      - name: Create workflow summary
+        run: |
+          echo "## Tool Datasets Upsert Complete ✓" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Synapse Table Updated:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Tool Publications: [syn26486839](https://www.synapse.org/Synapse:syn26486839)" >> $GITHUB_STEP_SUMMARY
+          echo "- New column: datasets (comma-separated Synapse IDs)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Cleaned CSV: Download from workflow artifacts" >> $GITHUB_STEP_SUMMARY
