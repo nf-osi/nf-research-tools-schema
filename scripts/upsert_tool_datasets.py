@@ -156,7 +156,7 @@ def ensure_datasets_column_exists(syn: synapseclient.Synapse, table_id: str) -> 
         raise
 
 
-def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: pd.DataFrame):
+def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: pd.DataFrame, dry_run: bool = False):
     """
     Upsert the datasets column to the Synapse table.
 
@@ -166,8 +166,11 @@ def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: p
         syn: Authenticated Synapse client
         table_id: Synapse ID of the target table
         data_df: DataFrame with data to upsert
+        dry_run: If True, validate but don't actually upsert
     """
     print(f"\nUpserting data to {table_id}...")
+    if dry_run:
+        print("  (DRY-RUN MODE - validation only)")
 
     # Ensure the datasets column exists
     ensure_datasets_column_exists(syn, table_id)
@@ -232,21 +235,29 @@ def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: p
     # Create update dataframe
     update_df = pd.DataFrame(update_rows)
 
-    # Store updates to Synapse
-    print("  - Uploading updates to Synapse...")
-    table = synapseclient.Table(table_id, update_df)
-    syn.store(table)
+    if dry_run:
+        print("\n  📊 DRY-RUN SUMMARY:")
+        print(f"    - Would update {len(update_rows)} rows in {table_id}")
+        print(f"    - Preview of first 3 updates:")
+        for idx, row in update_df.head(3).iterrows():
+            print(f"      ROW_ID {row['ROW_ID']}: datasets={row['datasets'][:50]}...")
+        print("\n  ✓ Dry-run validation complete - no changes made")
+    else:
+        # Store updates to Synapse
+        print("  - Uploading updates to Synapse...")
+        table = synapseclient.Table(table_id, update_df)
+        syn.store(table)
 
-    print("  ✓ Data upserted successfully")
+        print("  ✓ Data upserted successfully")
 
-    # Create snapshot version
-    print("  - Creating snapshot version...")
-    syn.create_snapshot_version(table_id)
-    print("  ✓ Snapshot version created")
+        # Create snapshot version
+        print("  - Creating snapshot version...")
+        syn.create_snapshot_version(table_id)
+        print("  ✓ Snapshot version created")
 
-    print(f"\n✓ Upsert complete!")
-    print(f"  - Updated {len(update_rows)} rows in {table_id}")
-    print(f"  - View at: https://www.synapse.org/#!Synapse:{table_id}")
+        print(f"\n✓ Upsert complete!")
+        print(f"  - Updated {len(update_rows)} rows in {table_id}")
+        print(f"  - View at: https://www.synapse.org/#!Synapse:{table_id}")
 
 
 def get_all_dataset_ids(syn: synapseclient.Synapse, table_id: str) -> set:
@@ -355,7 +366,7 @@ def find_existing_table(syn: synapseclient.Synapse, parent_id: str, table_name: 
 
 
 def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
-                                    dataset_df: pd.DataFrame) -> str:
+                                    dataset_df: pd.DataFrame, dry_run: bool = False) -> str:
     """
     Create or update the Dataset table in Synapse.
 
@@ -363,11 +374,14 @@ def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
         syn: Authenticated Synapse client
         parent_id: Parent Synapse ID for the table (syn26338068)
         dataset_df: DataFrame with dataset information
+        dry_run: If True, validate but don't actually create/update
 
     Returns:
-        Synapse ID of the created or updated table
+        Synapse ID of the created or updated table (or None in dry-run)
     """
     print(f"\nCreating/updating Dataset table under {parent_id}...")
+    if dry_run:
+        print("  (DRY-RUN MODE - validation only)")
 
     table_name = "NFToolDatasets"
 
@@ -438,22 +452,29 @@ def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
 
                 update_rows.append(update_row)
 
-            if update_rows:
+            if update_rows and not dry_run:
                 update_df = pd.DataFrame(update_rows)
                 table = synapseclient.Table(existing_table_id, update_df)
                 syn.store(table)
                 rows_updated = len(update_rows)
                 print(f"    ✓ Updated {rows_updated} rows")
+            elif update_rows:
+                rows_updated = len(update_rows)
+                print(f"    Would update {rows_updated} rows (dry-run)")
 
         # Insert new rows
         if ids_to_insert:
             print(f"    Inserting {len(ids_to_insert)} new rows...")
             insert_df = dataset_df[dataset_df[id_col].isin(ids_to_insert)].copy()
 
-            table = synapseclient.Table(existing_table_id, insert_df)
-            syn.store(table)
-            rows_inserted = len(insert_df)
-            print(f"    ✓ Inserted {rows_inserted} rows")
+            if not dry_run:
+                table = synapseclient.Table(existing_table_id, insert_df)
+                syn.store(table)
+                rows_inserted = len(insert_df)
+                print(f"    ✓ Inserted {rows_inserted} rows")
+            else:
+                rows_inserted = len(insert_df)
+                print(f"    Would insert {rows_inserted} rows (dry-run)")
 
         # Handle deletions (datasets no longer referenced)
         ids_to_delete = existing_ids - new_ids
@@ -462,11 +483,15 @@ def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
             print(f"    (Not deleting them - they remain in the table)")
 
         # Create snapshot version
-        syn.create_snapshot_version(existing_table_id)
+        if not dry_run:
+            syn.create_snapshot_version(existing_table_id)
 
-        print(f"  ✓ Dataset table upserted: {existing_table_id}")
-        print(f"    Total rows now: {len(current_data) - len(ids_to_delete) + rows_inserted}")
-        print(f"    View at: https://www.synapse.org/#!Synapse:{existing_table_id}")
+        if dry_run:
+            print(f"\n  ✓ Dry-run complete for dataset table: {existing_table_id}")
+        else:
+            print(f"  ✓ Dataset table upserted: {existing_table_id}")
+            print(f"    Total rows now: {len(current_data) - len(ids_to_delete) + rows_inserted}")
+            print(f"    View at: https://www.synapse.org/#!Synapse:{existing_table_id}")
 
         return existing_table_id
 
@@ -492,24 +517,39 @@ def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
 
             cols.append(col)
 
-        # Create schema
-        schema = synapseclient.Schema(name=table_name, columns=cols, parent=parent_id)
+        if dry_run:
+            print(f"\n  ✓ Dry-run: Would create new table '{table_name}' with {len(dataset_df)} rows")
+            print(f"    Columns: {', '.join(dataset_df.columns)}")
+            return None
+        else:
+            # Create schema
+            schema = synapseclient.Schema(name=table_name, columns=cols, parent=parent_id)
 
-        # Store table
-        table = synapseclient.Table(schema, dataset_df)
-        table_result = syn.store(table)
-        syn.create_snapshot_version(table_result.tableId)
+            # Store table
+            table = synapseclient.Table(schema, dataset_df)
+            table_result = syn.store(table)
+            syn.create_snapshot_version(table_result.tableId)
 
-        print(f"  ✓ Dataset table created: {table_result.tableId}")
-        print(f"    View at: https://www.synapse.org/#!Synapse:{table_result.tableId}")
+            print(f"  ✓ Dataset table created: {table_result.tableId}")
+            print(f"    View at: https://www.synapse.org/#!Synapse:{table_result.tableId}")
 
-        return table_result.tableId
+            return table_result.tableId
 
 
 def main():
     """Main entry point."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Upsert tool datasets to Synapse')
+    parser.add_argument('--dry-run', action='store_true', help='Dry run mode - validate without upserting')
+    args = parser.parse_args()
+
+    dry_run = args.dry_run
+
     print("\n" + "=" * 70)
     print("UPSERT TOOL DATASETS SCRIPT")
+    if dry_run:
+        print("🔍 DRY-RUN MODE - No changes will be made to Synapse")
     print("=" * 70 + "\n")
 
     # Define file paths
@@ -542,11 +582,13 @@ def main():
 
         # Upsert to Synapse
         table_id = "syn26486839"  # Tool publications table
-        upsert_datasets_column(syn, table_id, clean_df)
+        upsert_datasets_column(syn, table_id, clean_df, dry_run=dry_run)
 
         # Create/update Dataset table
         print("\n" + "=" * 70)
         print("Creating Dataset table from NF portal dataset collection...")
+        if dry_run:
+            print("(DRY-RUN MODE)")
         print("=" * 70)
 
         # Get all dataset IDs from the tool publications table
@@ -560,14 +602,17 @@ def main():
             if not dataset_info.empty:
                 # Create or update the Dataset table
                 parent_id = "syn26338068"
-                dataset_table_id = create_or_update_dataset_table(syn, parent_id, dataset_info)
+                dataset_table_id = create_or_update_dataset_table(syn, parent_id, dataset_info, dry_run=dry_run)
             else:
                 print("  ⚠ No matching datasets found in collection")
         else:
             print("  ⚠ No dataset IDs found in tool publications table")
 
         print("\n" + "=" * 70)
-        print("SUCCESS: Tool datasets upserted and Dataset table updated!")
+        if dry_run:
+            print("SUCCESS: Dry-run validation complete - no changes made!")
+        else:
+            print("SUCCESS: Tool datasets upserted and Dataset table updated!")
         print("=" * 70)
 
         sys.exit(0)
