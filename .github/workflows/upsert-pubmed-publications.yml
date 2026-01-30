@@ -33,6 +33,7 @@ jobs:
           pip install synapseclient pandas
 
       - name: Upsert publications to Synapse
+        id: upsert
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
@@ -78,22 +79,44 @@ jobs:
 
           if len(new_pubs) == 0:
               print("✅ No new publications to add (all already exist)")
+              # Write output for GitHub Actions
+              with open(os.getenv('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+                  f.write(f"new_count=0\n")
+                  f.write(f"total_checked={len(df)}\n")
               sys.exit(0)
 
           print(f"📝 Adding {len(new_pubs)} new publications to syn26486839")
 
+          # Add optional columns to dataframe (fill with empty string)
+          optional_cols = ['fundingAgency', 'consortium']
+          for col in optional_cols:
+              if col not in new_pubs.columns:
+                  new_pubs[col] = ''
+
+          # Get table schema to validate columns
+          print("🔍 Checking table schema...")
+          table_entity = syn.get('syn26486839')
+          table_cols = syn.getTableColumns(table_entity)
+          schema_col_names = {col.name for col in table_cols}
+          print(f"   Table has {len(schema_col_names)} columns")
+
           # Prepare data for Synapse table
           # Note: We're not classifying as usage/development yet - that requires manual review
-          table_df = new_pubs[['pmid', 'doi', 'title', 'journal', 'year']].copy()
+          # Only include columns that exist in both dataframe and table schema
+          available_cols = ['pmid', 'doi', 'title', 'journal', 'year', 'pmc_id', 'publication_types'] + optional_cols
+          valid_cols = [col for col in available_cols if col in new_pubs.columns and col in schema_col_names]
 
-          # Add missing columns that may be required by the table schema
-          # These can be filled in later during manual review
-          table_df['fundingAgency'] = None
-          table_df['consortium'] = None
+          print(f"   Using columns: {', '.join(valid_cols)}")
+          table_df = new_pubs[valid_cols].copy()
 
           # Store to Synapse table
           table = syn.store(Table('syn26486839', table_df))
           print(f"✅ Successfully added {len(new_pubs)} publications to syn26486839")
+
+          # Create snapshot version for tracking
+          print("   Creating snapshot version...")
+          syn.create_snapshot_version('syn26486839')
+          print("   ✅ Snapshot version created")
 
           # Log the PMIDs that were added
           print("\n📋 Added PMIDs:")
@@ -102,6 +125,11 @@ jobs:
           if len(table_df) > 10:
               print(f"   ... and {len(table_df) - 10} more")
 
+          # Write output for GitHub Actions
+          with open(os.getenv('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+              f.write(f"new_count={len(new_pubs)}\n")
+              f.write(f"total_checked={len(df)}\n")
+
           PYTHON_SCRIPT
 
       - name: Comment on PR
@@ -109,14 +137,37 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const newCount = '${{ steps.upsert.outputs.new_count }}';
+            const totalChecked = '${{ steps.upsert.outputs.total_checked }}';
+
+            let message;
+            if (newCount === '0') {
+              message = `✅ Publications checked - no new additions needed
+
+            **Summary:**
+            - Publications checked: ${totalChecked}
+            - New publications added: 0 (all already exist in syn26486839)
+
+            **Snapshot:** Table version snapshot created`;
+            } else {
+              message = `✅ Publications successfully added to Synapse table syn26486839
+
+            **Summary:**
+            - Publications checked: ${totalChecked}
+            - New publications added: ${newCount}
+            - Synapse table: [syn26486839](https://www.synapse.org/Synapse:syn26486839)
+
+            **Snapshot:** Table version snapshot created for tracking
+
+            **Next Step:**
+            Run tool mining workflow to discover tools and observations from these publications`;
+            }
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ Publications successfully added to Synapse table syn26486839
-
-            **Next Step:**
-            Run tool mining workflow to discover tools and observations from these publications
+              body: message
             })
 
       - name: Comment on PR if failed
