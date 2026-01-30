@@ -8,6 +8,7 @@ This script:
 3. Adds or updates the 'datasets' column in syn26486839
 4. Upserts the data to Synapse
 5. Creates a snapshot version
+6. Creates/updates a Dataset table with dataset information from syn50913342
 """
 
 import os
@@ -218,6 +219,248 @@ def upsert_datasets_column(syn: synapseclient.Synapse, table_id: str, data_df: p
     print(f"  - View at: https://www.synapse.org/#!Synapse:{table_id}")
 
 
+def get_all_dataset_ids(syn: synapseclient.Synapse, table_id: str) -> set:
+    """
+    Get all unique dataset IDs from the datasets column in the table.
+
+    Args:
+        syn: Authenticated Synapse client
+        table_id: Synapse ID of the tool publications table
+
+    Returns:
+        Set of unique dataset IDs
+    """
+    print(f"\nExtracting dataset IDs from {table_id}...")
+
+    # Query the datasets column
+    query = f"SELECT datasets FROM {table_id}"
+    result = syn.tableQuery(query).asDataFrame()
+
+    # Parse comma-separated dataset IDs
+    all_dataset_ids = set()
+
+    for datasets_str in result['datasets'].dropna():
+        if datasets_str and datasets_str != '':
+            # Split by comma and strip whitespace
+            dataset_ids = [d.strip() for d in str(datasets_str).split(',') if d.strip()]
+            all_dataset_ids.update(dataset_ids)
+
+    print(f"  ✓ Found {len(all_dataset_ids)} unique dataset IDs")
+
+    return all_dataset_ids
+
+
+def get_dataset_info(syn: synapseclient.Synapse, dataset_collection_id: str,
+                     dataset_ids: set) -> pd.DataFrame:
+    """
+    Get dataset information from the NF portal dataset collection.
+
+    Args:
+        syn: Authenticated Synapse client
+        dataset_collection_id: Synapse ID of the dataset collection (syn50913342)
+        dataset_ids: Set of dataset IDs to filter for
+
+    Returns:
+        DataFrame with dataset information
+    """
+    print(f"\nFetching dataset information from {dataset_collection_id}...")
+
+    # Query all datasets from the collection
+    query = f"SELECT * FROM {dataset_collection_id}"
+    all_datasets = syn.tableQuery(query).asDataFrame()
+
+    print(f"  - Retrieved {len(all_datasets)} total datasets from collection")
+
+    # Filter to only datasets referenced in tool publications
+    # Check what the ID column is called in the dataset collection
+    id_columns = ['id', 'datasetId', 'synId', 'synapseId']
+    id_col = None
+
+    for col in id_columns:
+        if col in all_datasets.columns:
+            id_col = col
+            break
+
+    if id_col is None:
+        print(f"  Warning: Could not find ID column in dataset collection")
+        print(f"  Available columns: {list(all_datasets.columns)}")
+        # Use the first column that looks like a Synapse ID
+        for col in all_datasets.columns:
+            if all_datasets[col].astype(str).str.contains('syn', case=False).any():
+                id_col = col
+                print(f"  Using column '{id_col}' as ID column")
+                break
+
+    if id_col is None:
+        raise ValueError("Cannot identify ID column in dataset collection")
+
+    # Filter datasets
+    filtered_datasets = all_datasets[all_datasets[id_col].isin(dataset_ids)].copy()
+
+    print(f"  ✓ Filtered to {len(filtered_datasets)} datasets referenced in tool publications")
+
+    return filtered_datasets
+
+
+def find_existing_table(syn: synapseclient.Synapse, parent_id: str, table_name: str):
+    """Find existing table by name in a project/folder"""
+    try:
+        children = list(syn.getChildren(parent_id))
+        for child in children:
+            if child['name'] == table_name and child['type'] == 'org.sagebionetworks.repo.model.table.TableEntity':
+                return child['id']
+        return None
+    except Exception:
+        return None
+
+
+def create_or_update_dataset_table(syn: synapseclient.Synapse, parent_id: str,
+                                    dataset_df: pd.DataFrame) -> str:
+    """
+    Create or update the Dataset table in Synapse.
+
+    Args:
+        syn: Authenticated Synapse client
+        parent_id: Parent Synapse ID for the table (syn26338068)
+        dataset_df: DataFrame with dataset information
+
+    Returns:
+        Synapse ID of the created or updated table
+    """
+    print(f"\nCreating/updating Dataset table under {parent_id}...")
+
+    table_name = "NFToolDatasets"
+
+    # Check if table already exists
+    existing_table_id = find_existing_table(syn, parent_id, table_name)
+
+    if existing_table_id:
+        print(f"  - Found existing table: {existing_table_id}")
+        print("  - Upserting data to table...")
+
+        # Get current table data
+        current_data = syn.tableQuery(f"SELECT * FROM {existing_table_id}").asDataFrame()
+        print(f"    Current rows: {len(current_data)}")
+
+        # Determine the ID column for matching
+        id_columns = ['id', 'datasetId', 'synId', 'synapseId']
+        id_col = None
+        for col in id_columns:
+            if col in dataset_df.columns:
+                id_col = col
+                break
+
+        if id_col is None:
+            # Fallback: find first column with 'syn' IDs
+            for col in dataset_df.columns:
+                if dataset_df[col].astype(str).str.contains('syn', case=False).any():
+                    id_col = col
+                    break
+
+        if id_col is None:
+            raise ValueError("Cannot identify ID column for upserting")
+
+        print(f"    Matching by column: {id_col}")
+
+        # Split into updates and inserts
+        existing_ids = set(current_data[id_col].values) if id_col in current_data.columns else set()
+        new_ids = set(dataset_df[id_col].values)
+
+        ids_to_update = existing_ids & new_ids  # Intersection
+        ids_to_insert = new_ids - existing_ids  # New IDs
+
+        rows_updated = 0
+        rows_inserted = 0
+
+        # Update existing rows
+        if ids_to_update:
+            print(f"    Updating {len(ids_to_update)} existing rows...")
+            update_rows = []
+
+            for dataset_id in ids_to_update:
+                # Get new data for this ID
+                new_row = dataset_df[dataset_df[id_col] == dataset_id].iloc[0].to_dict()
+
+                # Get ROW_ID and ROW_VERSION from current data
+                current_row = current_data[current_data[id_col] == dataset_id].iloc[0]
+
+                # Build update row with ROW_ID, ROW_VERSION, and all new data
+                update_row = {
+                    'ROW_ID': current_row['ROW_ID'],
+                    'ROW_VERSION': current_row['ROW_VERSION']
+                }
+                update_row.update(new_row)
+
+                update_rows.append(update_row)
+
+            if update_rows:
+                update_df = pd.DataFrame(update_rows)
+                table = synapseclient.Table(existing_table_id, update_df)
+                syn.store(table)
+                rows_updated = len(update_rows)
+                print(f"    ✓ Updated {rows_updated} rows")
+
+        # Insert new rows
+        if ids_to_insert:
+            print(f"    Inserting {len(ids_to_insert)} new rows...")
+            insert_df = dataset_df[dataset_df[id_col].isin(ids_to_insert)].copy()
+
+            table = synapseclient.Table(existing_table_id, insert_df)
+            syn.store(table)
+            rows_inserted = len(insert_df)
+            print(f"    ✓ Inserted {rows_inserted} rows")
+
+        # Handle deletions (datasets no longer referenced)
+        ids_to_delete = existing_ids - new_ids
+        if ids_to_delete:
+            print(f"    Note: {len(ids_to_delete)} datasets are no longer referenced")
+            print(f"    (Not deleting them - they remain in the table)")
+
+        # Create snapshot version
+        syn.create_snapshot_version(existing_table_id)
+
+        print(f"  ✓ Dataset table upserted: {existing_table_id}")
+        print(f"    Total rows now: {len(current_data) - len(ids_to_delete) + rows_inserted}")
+        print(f"    View at: https://www.synapse.org/#!Synapse:{existing_table_id}")
+
+        return existing_table_id
+
+    else:
+        print("  - Creating new Dataset table...")
+
+        # Create schema from DataFrame
+        # Let Synapse infer column types from the data
+        cols = []
+        for col_name in dataset_df.columns:
+            # Determine column type
+            dtype = dataset_df[col_name].dtype
+
+            if dtype == 'int64':
+                col = synapseclient.Column(name=col_name, columnType='INTEGER')
+            elif dtype == 'float64':
+                col = synapseclient.Column(name=col_name, columnType='DOUBLE')
+            elif dtype == 'bool':
+                col = synapseclient.Column(name=col_name, columnType='BOOLEAN')
+            else:
+                # Default to STRING with reasonable max size
+                col = synapseclient.Column(name=col_name, columnType='STRING', maximumSize=500)
+
+            cols.append(col)
+
+        # Create schema
+        schema = synapseclient.Schema(name=table_name, columns=cols, parent=parent_id)
+
+        # Store table
+        table = synapseclient.Table(schema, dataset_df)
+        table_result = syn.store(table)
+        syn.create_snapshot_version(table_result.tableId)
+
+        print(f"  ✓ Dataset table created: {table_result.tableId}")
+        print(f"    View at: https://www.synapse.org/#!Synapse:{table_result.tableId}")
+
+        return table_result.tableId
+
+
 def main():
     """Main entry point."""
     print("\n" + "=" * 70)
@@ -256,8 +499,30 @@ def main():
         table_id = "syn26486839"  # Tool publications table
         upsert_datasets_column(syn, table_id, clean_df)
 
+        # Create/update Dataset table
         print("\n" + "=" * 70)
-        print("SUCCESS: Tool datasets upserted to Synapse!")
+        print("Creating Dataset table from NF portal dataset collection...")
+        print("=" * 70)
+
+        # Get all dataset IDs from the tool publications table
+        all_dataset_ids = get_all_dataset_ids(syn, table_id)
+
+        if all_dataset_ids:
+            # Get dataset information from the collection
+            dataset_collection_id = "syn50913342"
+            dataset_info = get_dataset_info(syn, dataset_collection_id, all_dataset_ids)
+
+            if not dataset_info.empty:
+                # Create or update the Dataset table
+                parent_id = "syn26338068"
+                dataset_table_id = create_or_update_dataset_table(syn, parent_id, dataset_info)
+            else:
+                print("  ⚠ No matching datasets found in collection")
+        else:
+            print("  ⚠ No dataset IDs found in tool publications table")
+
+        print("\n" + "=" * 70)
+        print("SUCCESS: Tool datasets upserted and Dataset table updated!")
         print("=" * 70)
 
         sys.exit(0)
