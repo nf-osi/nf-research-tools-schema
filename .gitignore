@@ -144,3 +144,24 @@ tool_completeness_summary.csv
 field_analysis_results.txt
 completeness_score_presentation.html
 .Rhistory
+
+# Tool coverage workflow outputs
+# All outputs are now organized in tool_coverage/outputs/ and tool_reviews/
+# Most outputs are temporary and ignored, except SUBMIT_*.csv, VALIDATED_*.csv, and processed_publications.csv
+# which are tracked for persistence in PRs
+tool_coverage/outputs/*
+!tool_coverage/outputs/SUBMIT_*.csv
+!tool_coverage/outputs/VALIDATED_*.csv
+!tool_coverage/outputs/processed_publications.csv
+pr_body.md
+
+# AI validation temporary files (cache and intermediate results)
+tool_reviews/publication_cache/
+tool_reviews/inputs/
+tool_reviews/results/*.yaml
+
+# AI validation output reports tracked for continuity
+# tool_reviews/validation_report.xlsx
+# tool_reviews/validation_summary.json
+# tool_reviews/potentially_missed_tools.csv
+# tool_reviews/suggested_patterns.csv
