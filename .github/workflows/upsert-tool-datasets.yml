@@ -1,0 +1,89 @@
+name: Upsert Tool Datasets to Synapse
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'SUBMIT_tool_datasets.csv'
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      dry_run:
+        description: 'Dry run (test without upserting to Synapse)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  upsert-datasets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate CSV file exists
+        id: validate
+        run: |
+          if [ ! -f "SUBMIT_tool_datasets.csv" ]; then
+            echo "Error: SUBMIT_tool_datasets.csv not found"
+            exit 1
+          fi
+          echo "CSV file found and validated"
+
+      - name: Clean and upsert to Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/upsert_tool_datasets.py --dry-run
+          else
+            python scripts/upsert_tool_datasets.py
+          fi
+
+      - name: Upload cleaned CSV as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-tool-datasets
+          path: CLEAN_tool_datasets.csv
+          retention-days: 90
+
+      - name: Create workflow summary
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "## 🔍 Tool Datasets Dry-Run Complete ✓" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Status:** Validation complete (no changes made)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Tool Datasets Upsert Complete ✓" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Status:** Successfully uploaded to Synapse" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
+            echo "**Synapse Tables Updated:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Tool Publications: [syn26486839](https://www.synapse.org/Synapse:syn26486839)" >> $GITHUB_STEP_SUMMARY
+            echo "  - New column: datasets (comma-separated Synapse IDs)" >> $GITHUB_STEP_SUMMARY
+            echo "- NFToolDatasets table created/updated under [syn26338068](https://www.synapse.org/Synapse:syn26338068)" >> $GITHUB_STEP_SUMMARY
+            echo "  - Contains dataset information from NF portal collection" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "**Artifacts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Cleaned CSV: Download from workflow artifacts" >> $GITHUB_STEP_SUMMARY
