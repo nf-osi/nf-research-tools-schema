@@ -1,10 +1,10 @@
 name: Check Tool Coverage and Suggest Novel Tools
 
 on:
-  schedule:
-    # Run weekly on Mondays at 9 AM UTC
-    # Step 1 in coordinated workflow sequence - triggers dependent workflows on completion
-    - cron: '0 9 * * 1'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
   workflow_dispatch:  # Allow manual triggering
     inputs:
       ai_validation:
@@ -30,6 +30,8 @@ permissions:
 jobs:
   analyze-coverage:
     runs-on: ubuntu-latest
+    # Only run if: (1) manual trigger, OR (2) PR was merged from annotation review workflow
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'automated-annotation-review'))
 
     steps:
       - name: Checkout repository

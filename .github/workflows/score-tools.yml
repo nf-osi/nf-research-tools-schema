@@ -1,10 +1,8 @@
 name: Calculate Tool Completeness Scores
 
 on:
-  workflow_run:
-    workflows: ["Link Tool Datasets"]
-    types:
-      - completed
+  pull_request:
+    types: [closed]
     branches:
       - main
   workflow_dispatch:  # Allow manual trigger
@@ -12,6 +10,8 @@ on:
 jobs:
   calculate-scores:
     runs-on: ubuntu-latest
+    # Only run if: (1) manual trigger, OR (2) PR was merged from link-datasets workflow
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'dataset-linking'))
     
     steps:
       - name: Checkout repository
