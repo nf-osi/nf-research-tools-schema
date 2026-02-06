@@ -7,6 +7,10 @@ on:
     paths:
       - 'VALIDATED_*.csv'
       - 'SUBMIT_*.csv'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -21,6 +25,8 @@ permissions:
 jobs:
   upsert-to-synapse:
     runs-on: ubuntu-latest
+    # Only run if: (1) push event, OR (2) PR was merged (not just closed)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     steps:
       - name: Checkout repository

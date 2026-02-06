@@ -1,0 +1,207 @@
+name: Review Annotations and Suggest Tools
+
+on:
+  schedule:
+    # Run weekly on Tuesdays at 9 AM UTC (after tool coverage runs on Mondays)
+    - cron: '0 9 * * 2'
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      limit:
+        description: 'Limit number of records to query (blank = all, useful for testing)'
+        required: false
+        type: string
+        default: ''
+      min_count:
+        description: 'Minimum usage count to suggest a new resource'
+        required: false
+        type: number
+        default: 2
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  review-and-suggest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install synapseclient pandas
+
+      - name: Review individualID annotations
+        id: review
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Reviewing individualID annotations and tools data..."
+
+          # Build command with optional limit
+          CMD="python scripts/review_tool_annotations.py"
+
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            CMD="$CMD --limit ${{ github.event.inputs.limit }}"
+          fi
+
+          # Run review
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee review_output.log
+
+          # Check if suggestions were generated
+          if [ -f "tool_annotation_suggestions.json" ]; then
+            echo "review_complete=true" >> $GITHUB_OUTPUT
+
+            # Check if there are any new resources to add
+            NEW_COUNT=$(python -c "import json; data=json.load(open('tool_annotation_suggestions.json')); print(len(data.get('individual_id_suggestions', {}).get('new_resources', [])))")
+            echo "new_resources_count=$NEW_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$NEW_COUNT" -gt 0 ]; then
+              echo "has_suggestions=true" >> $GITHUB_OUTPUT
+              echo "✅ Found $NEW_COUNT new resource suggestions"
+            else
+              echo "has_suggestions=false" >> $GITHUB_OUTPUT
+              echo "ℹ️  No new resources to suggest"
+            fi
+          else
+            echo "review_complete=false" >> $GITHUB_OUTPUT
+            echo "❌ Review failed - no output generated"
+          fi
+
+      - name: Format suggestions into submission CSVs
+        id: format
+        if: steps.review.outputs.has_suggestions == 'true'
+        run: |
+          echo "Formatting suggestions into SUBMIT_*.csv files..."
+
+          # Build command with optional min_count
+          CMD="python scripts/format_annotation_suggestions.py"
+
+          if [ -n "${{ github.event.inputs.min_count }}" ]; then
+            CMD="$CMD --min-count ${{ github.event.inputs.min_count }}"
+          fi
+
+          # Run formatting
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee format_output.log
+
+          # Check if files were generated
+          if [ -f "SUBMIT_cell_lines.csv" ] && [ -f "SUBMIT_resources.csv" ]; then
+            echo "format_complete=true" >> $GITHUB_OUTPUT
+            echo "✅ Created submission CSV files"
+
+            # Count rows in each file
+            CELL_LINES=$(wc -l < SUBMIT_cell_lines.csv)
+            RESOURCES=$(wc -l < SUBMIT_resources.csv)
+            echo "cell_lines_count=$((CELL_LINES - 1))" >> $GITHUB_OUTPUT
+            echo "resources_count=$((RESOURCES - 1))" >> $GITHUB_OUTPUT
+          else
+            echo "format_complete=false" >> $GITHUB_OUTPUT
+            echo "❌ Formatting failed - no CSV files generated"
+          fi
+
+      - name: Generate PR body
+        id: pr_body
+        if: steps.format.outputs.format_complete == 'true'
+        run: |
+          # Use the markdown report from review script as base
+          cat tool_annotation_suggestions.md > pr_body.md
+
+          # Add submission details
+          cat >> pr_body.md << 'EOF'
+
+          ---
+
+          ## 📤 Files Ready for Submission
+
+          This PR includes SUBMIT_*.csv files ready for automated upload to Synapse:
+
+          - **SUBMIT_cell_lines.csv**: ${{ steps.format.outputs.cell_lines_count }} new cell lines
+          - **SUBMIT_resources.csv**: ${{ steps.format.outputs.resources_count }} new resources
+
+          ### What Happens Next
+
+          1. **Review the suggestions**: Check that cell line names are valid and not duplicates
+          2. **Fill in required fields**: Cell lines need `organ` field populated
+          3. **Merge this PR**: Upon merge, the upsert-tools workflow will automatically:
+             - Validate CSV schemas
+             - Clean tracking columns
+             - Upload to Synapse tables (syn26486823 for cell lines, syn26450069 for resources)
+
+          ### Manual Actions Required
+
+          - [ ] Review cell line names in SUBMIT_cell_lines.csv
+          - [ ] Fill in `organ` field for all cell lines (required)
+          - [ ] Check MANUAL_SYNONYM_UPDATES.md for synonyms needing manual database updates
+
+          EOF
+
+          echo "PR_BODY<<EOF" >> $GITHUB_OUTPUT
+          cat pr_body.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload reports as artifacts
+        if: steps.review.outputs.review_complete == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: annotation-review-reports
+          path: |
+            tool_annotation_suggestions.json
+            tool_annotation_suggestions.md
+            SUBMIT_*.csv
+            MANUAL_SYNONYM_UPDATES.md
+            review_output.log
+            format_output.log
+            pr_body.md
+          retention-days: 90
+
+      - name: Create Pull Request with submission files
+        if: steps.format.outputs.format_complete == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          commit-message: |
+            Add new cell lines from individualID annotations
+
+            - Review of individualID annotations from syn52702673
+            - Compared against tools in syn51730943
+            - Found ${{ steps.format.outputs.cell_lines_count }} new cell lines
+            - Ready for manual review and Synapse upload
+
+            Co-Authored-By: GitHub Actions <noreply@github.com>
+          branch: annotation-review-${{ github.run_number }}
+          delete-branch: true
+          title: '🔍 Annotation Review - New Cell Lines (${{ steps.format.outputs.cell_lines_count }} suggested)'
+          body-path: pr_body.md
+          assignees: BelindaBGarana
+          labels: |
+            automated-annotation-review
+            cell-lines
+            needs-manual-review
+          add-paths: |
+            SUBMIT_*.csv
+            tool_annotation_suggestions.json
+            tool_annotation_suggestions.md
+            MANUAL_SYNONYM_UPDATES.md
+
+      - name: No suggestions to process
+        if: steps.review.outputs.has_suggestions == 'false' && steps.review.outputs.review_complete == 'true'
+        run: |
+          echo "=========================================="
+          echo "✅ Annotation review completed"
+          echo "ℹ️  No new resources to suggest at this time"
+          echo "=========================================="
+          echo ""
+          echo "This means all individualID values in annotations either:"
+          echo "  - Match existing resourceName values"
+          echo "  - Match existing synonyms"
+          echo "  - Have usage counts below the minimum threshold"
