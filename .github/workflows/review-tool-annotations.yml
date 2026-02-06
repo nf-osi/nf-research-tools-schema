@@ -1,0 +1,150 @@
+name: Weekly Tool Annotation Review
+
+on:
+  workflow_run:
+    workflows: ["Check Tool Coverage and Suggest Novel Tools"]
+    types:
+      - completed
+    branches:
+      - main
+  schedule:
+    # Fallback schedule: Run Monday at 10 AM UTC if check-tool-coverage didn't run
+    # Also coordinates with metadata dictionary sync (9 AM)
+    - cron: '0 10 * * 1'
+  workflow_dispatch:
+    # Allow manual triggering
+    inputs:
+      annotation_limit:
+        description: 'Limit annotation records (for testing)'
+        required: false
+        type: string
+        default: ''
+
+env:
+  SYNAPSE_MATERIALIZED_VIEW: syn52702673
+
+jobs:
+  review-tool-annotations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "date=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+          echo "date-short=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install synapseclient pandas pyyaml
+
+      - name: Review tool-related annotations
+        id: annotation_review
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "🔍 Reviewing tool-related annotations from view ${{ env.SYNAPSE_MATERIALIZED_VIEW }}..."
+
+          # Build command
+          CMD="python scripts/review_tool_annotations.py"
+
+          # Add limit if specified (for manual testing)
+          if [ -n "${{ github.event.inputs.annotation_limit }}" ]; then
+            CMD="$CMD --limit ${{ github.event.inputs.annotation_limit }}"
+            echo "📊 Limiting to ${{ github.event.inputs.annotation_limit }} records for testing"
+          fi
+
+          echo "Running: $CMD"
+          $CMD
+
+          # Check if suggestions were generated
+          if [ -f tool_annotation_suggestions.json ]; then
+            SUGGESTION_COUNT=$(python3 -c "import json; data = json.load(open('tool_annotation_suggestions.json')); print(len(data.get('suggestions', {})))")
+            echo "suggestion_count=$SUGGESTION_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$SUGGESTION_COUNT" -gt 0 ]; then
+              echo "has_suggestions=true" >> $GITHUB_OUTPUT
+              echo "✅ Found $SUGGESTION_COUNT tool fields with annotation suggestions"
+
+              # Show preview
+              if [ -f tool_annotation_suggestions.md ]; then
+                echo ""
+                echo "📝 Summary:"
+                head -n 40 tool_annotation_suggestions.md
+              fi
+            else
+              echo "has_suggestions=false" >> $GITHUB_OUTPUT
+              echo "ℹ️  No new tool annotation suggestions - all values match schema"
+            fi
+          else
+            echo "has_suggestions=false" >> $GITHUB_OUTPUT
+            echo "⚠️  No suggestion file generated"
+          fi
+
+      - name: Create Pull Request
+        if: steps.annotation_review.outputs.has_suggestions == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: tool annotation review suggestions"
+          title: "Tool Annotation Review - ${{ steps.date.outputs.date }}"
+          body: |
+            This PR contains suggested updates to the NF Research Tools schema based on analysis of tool-related file annotations in Synapse.
+
+            **Review Date:** ${{ steps.date.outputs.date }}
+
+            ---
+
+            ## Tool Annotation Review
+
+            ✅ **Found ${{ steps.annotation_review.outputs.suggestion_count }} tool fields with suggested additions**
+
+            **Source:** Synapse materialized view `${{ env.SYNAPSE_MATERIALIZED_VIEW }}`
+
+            **Tool-related fields reviewed:**
+            - Tool identifiers: `animalModelID`, `cellLineID`, `antibodyID`, `geneticReagentID`
+            - Specimen fields: `tumorType`, `tissue`, `organ`, `species`
+            - Manifestation fields: `cellLineManifestation`, `animalModelOfManifestation`
+            - Disease fields: `cellLineGeneticDisorder`, `animalModelGeneticDisorder`
+            - Other tool-specific fields
+
+            **Note:** These suggestions are based on annotation frequency (minimum 2 occurrences). Review the changes to ensure they are appropriate before updating the schema.
+
+            See `tool_annotation_suggestions.json` and `tool_annotation_suggestions.md` for details and frequency counts.
+
+            ---
+
+            **Related:** This workflow complements the metadata dictionary annotation review, which handles non-tool-specific fields. Tool-related annotations are reviewed here for efficiency, since the tools database is already synced by other workflows in this repository.
+
+            **Automated via:** `.github/workflows/review-tool-annotations.yml`
+          branch: tool-annotation-review-${{ steps.date.outputs.date-short }}
+          labels: |
+            automated
+            annotation-review
+          draft: false
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          echo "### Tool Annotation Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.annotation_review.outputs.has_suggestions }}" = "true" ]; then
+            echo "✅ Found ${{ steps.annotation_review.outputs.suggestion_count }} tool fields with suggestions" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📝 **A pull request has been created with the suggestions**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✓ No new tool annotation suggestions - schema is up to date" >> $GITHUB_STEP_SUMMARY
+          fi
