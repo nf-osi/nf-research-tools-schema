@@ -1,0 +1,266 @@
+name: Weekly Tool Annotation Review
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:
+    # Allow manual triggering
+    inputs:
+      annotation_limit:
+        description: 'Limit annotation records (for testing)'
+        required: false
+        type: string
+        default: ''
+      min_count:
+        description: 'Minimum usage count to suggest a new resource'
+        required: false
+        type: number
+        default: 2
+
+env:
+  SYNAPSE_MATERIALIZED_VIEW: syn52702673
+
+jobs:
+  review-tool-annotations:
+    runs-on: ubuntu-latest
+    # Only run if: (1) manual trigger, OR (2) PR was merged from mine-pubmed workflow
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'pubmed-mining'))
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "date=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+          echo "date-short=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install synapseclient pandas pyyaml
+
+      - name: Review individualID annotations
+        id: review
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "🔍 Reviewing individualID annotations and tools data..."
+
+          # Build command
+          CMD="python scripts/review_tool_annotations.py"
+
+          # Add limit if specified
+          if [ -n "${{ github.event.inputs.annotation_limit }}" ]; then
+            CMD="$CMD --limit ${{ github.event.inputs.annotation_limit }}"
+          fi
+
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee review_output.log
+
+          # Check if suggestions were generated
+          if [ -f "tool_annotation_suggestions.json" ]; then
+            echo "review_complete=true" >> $GITHUB_OUTPUT
+
+            # Check for new resources
+            NEW_COUNT=$(python -c "import json; data=json.load(open('tool_annotation_suggestions.json')); print(len(data.get('individual_id_suggestions', {}).get('new_resources', [])))")
+            echo "new_resources_count=$NEW_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$NEW_COUNT" -gt 0 ]; then
+              echo "has_suggestions=true" >> $GITHUB_OUTPUT
+              echo "✅ Found $NEW_COUNT new resource suggestions"
+            else
+              echo "has_suggestions=false" >> $GITHUB_OUTPUT
+              echo "ℹ️  No new resources to suggest"
+            fi
+          else
+            echo "review_complete=false" >> $GITHUB_OUTPUT
+            echo "❌ Review failed"
+          fi
+
+      - name: Format suggestions into submission CSVs
+        id: format
+        if: steps.review.outputs.has_suggestions == 'true'
+        run: |
+          echo "Formatting suggestions into SUBMIT_*.csv files..."
+
+          python << 'EOF'
+          import json
+          import pandas as pd
+          import uuid
+
+          def generate_uuid():
+              return str(uuid.uuid4())
+
+          with open('tool_annotation_suggestions.json', 'r') as f:
+              data = json.load(f)
+
+          suggestions = data.get('individual_id_suggestions', {})
+          new_resources = suggestions.get('new_resources', [])
+          min_count = int('${{ github.event.inputs.min_count }}' or '2')
+          filtered = [item for item in new_resources if item['count'] >= min_count]
+
+          if not filtered:
+              print(f"No resources with count >= {min_count}")
+              exit(0)
+
+          # Create cell lines DataFrame
+          cell_line_rows = []
+          for item in filtered:
+              cell_line_id = generate_uuid()
+              cell_line_rows.append({
+                  'cellLineId': cell_line_id,
+                  'donorId': '',
+                  'originYear': '',
+                  'organ': '',
+                  'strProfile': '',
+                  'tissue': '',
+                  'cellLineManifestation': '',
+                  'resistance': '',
+                  'cellLineCategory': '',
+                  'contaminatedMisidentified': '',
+                  'cellLineGeneticDisorder': '',
+                  'populationDoublingTime': '',
+                  '_cellLineName': item['value'],
+                  '_individualID': item['value'],
+                  '_usage_count': item['count'],
+                  '_source': 'annotation_review'
+              })
+
+          cell_lines_df = pd.DataFrame(cell_line_rows)
+
+          # Create resources DataFrame
+          resource_rows = []
+          for _, row in cell_lines_df.iterrows():
+              resource_rows.append({
+                  'resourceId': generate_uuid(),
+                  'resourceName': row['_cellLineName'],
+                  'resourceType': 'Cell Line',
+                  'synonyms': '',
+                  'rrid': '',
+                  'description': '',
+                  'aiSummary': '',
+                  'usageRequirements': '',
+                  'howToAcquire': '',
+                  'animalModelId': '',
+                  'antibodyId': '',
+                  'cellLineId': row['cellLineId'],
+                  'geneticReagentId': '',
+                  'biobankId': '',
+                  '_individualID': row['_individualID'],
+                  '_usage_count': row['_usage_count'],
+                  '_source': 'annotation_review'
+              })
+
+          resources_df = pd.DataFrame(resource_rows)
+
+          # Save files
+          cell_lines_df.to_csv('SUBMIT_cell_lines.csv', index=False)
+          resources_df.to_csv('SUBMIT_resources.csv', index=False)
+
+          print(f"✅ Created SUBMIT_cell_lines.csv ({len(cell_lines_df)} rows)")
+          print(f"✅ Created SUBMIT_resources.csv ({len(resources_df)} rows)")
+          EOF
+
+          # Check if files were generated
+          if [ -f "SUBMIT_cell_lines.csv" ] && [ -f "SUBMIT_resources.csv" ]; then
+            echo "format_complete=true" >> $GITHUB_OUTPUT
+            CELL_LINES=$(wc -l < SUBMIT_cell_lines.csv)
+            RESOURCES=$(wc -l < SUBMIT_resources.csv)
+            echo "cell_lines_count=$((CELL_LINES - 1))" >> $GITHUB_OUTPUT
+            echo "resources_count=$((RESOURCES - 1))" >> $GITHUB_OUTPUT
+          else
+            echo "format_complete=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.format.outputs.format_complete == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          commit-message: |
+            Add new cell lines from individualID annotations
+
+            - Review of individualID annotations from syn52702673
+            - Compared against tools in syn51730943
+            - Found ${{ steps.format.outputs.cell_lines_count }} new cell lines
+            - Ready for manual review and Synapse upload
+
+            Co-Authored-By: GitHub Actions <noreply@github.com>
+          title: "🔍 Annotation Review - New Cell Lines (${{ steps.format.outputs.cell_lines_count }} suggested)"
+          body: |
+            # Tool Annotation Review - New Cell Lines
+
+            This PR contains new cell line suggestions based on `individualID` annotations from Synapse.
+
+            **Review Date:** ${{ steps.date.outputs.date }}
+
+            ---
+
+            ## Summary
+
+            - **New cell lines**: ${{ steps.format.outputs.cell_lines_count }}
+            - **Source**: individualID annotations from syn52702673
+            - **Compared against**: Tools in syn51730943
+
+            ## Files Ready for Submission
+
+            - `SUBMIT_cell_lines.csv`: ${{ steps.format.outputs.cell_lines_count }} new cell lines
+            - `SUBMIT_resources.csv`: ${{ steps.format.outputs.resources_count }} new resources
+
+            ## What Happens Next
+
+            1. **Review the suggestions**: Check that cell line names are valid
+            2. **Fill in required fields**: Cell lines need `organ` field populated
+            3. **Merge this PR**: Upon merge, the upsert-tools workflow will automatically:
+               - Validate CSV schemas
+               - Clean tracking columns
+               - Upload to Synapse tables (syn26486823 for cell lines, syn26450069 for resources)
+
+            ## Manual Actions Required
+
+            - [ ] Review cell line names in SUBMIT_cell_lines.csv
+            - [ ] Fill in `organ` field for all cell lines (required)
+            - [ ] Check `tool_annotation_suggestions.md` for facet suggestions and synonym updates
+
+            ---
+
+            See `tool_annotation_suggestions.md` for full analysis including facet suggestions.
+
+            **Automated via:** `.github/workflows/review-tool-annotations.yml` (Step 2 in workflow sequence per issue #97)
+          branch: annotation-review-${{ steps.date.outputs.date-short }}
+          labels: |
+            automated-annotation-review
+            cell-lines
+            needs-manual-review
+          draft: false
+          assignees: BelindaBGarana
+          add-paths: |
+            SUBMIT_*.csv
+            tool_annotation_suggestions.json
+            tool_annotation_suggestions.md
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          echo "### Tool Annotation Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.annotation_review.outputs.has_suggestions }}" = "true" ]; then
+            echo "✅ Found ${{ steps.annotation_review.outputs.suggestion_count }} tool fields with suggestions" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📝 **A pull request has been created with the suggestions**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✓ No new tool annotation suggestions - schema is up to date" >> $GITHUB_STEP_SUMMARY
+          fi

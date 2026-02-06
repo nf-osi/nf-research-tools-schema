@@ -1,14 +1,17 @@
 name: Link Tool Datasets
 
 on:
-  schedule:
-    # Run every Tuesday at 9:00 AM UTC
-    - cron: '0 9 * * 2'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
   link-datasets:
     runs-on: ubuntu-latest
+    # Only run if: (1) manual trigger, OR (2) PR was merged from tool coverage workflow
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'automated-mining'))
     permissions:
       contents: write
       pull-requests: write
