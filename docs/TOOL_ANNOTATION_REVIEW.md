@@ -1,488 +1,279 @@
-# Tool Annotation Review Workflow
+# Tool Annotation Review
 
 ## Overview
 
-The tool annotation review workflow automatically analyzes tool-related file annotations from Synapse to identify free-text values that should be standardized in the NF Research Tools schema. This workflow complements the metadata dictionary annotation review by focusing specifically on fields relevant to research tools (animal models, cell lines, antibodies, genetic reagents).
+The tool annotation review system analyzes `individualID` annotations from Synapse and suggests new cell lines and synonyms to add to the tools database.
 
-**Workflow:** `.github/workflows/review-tool-annotations.yml`
-**Script:** `scripts/review_tool_annotations.py`
-**Schedule:** Runs weekly on Mondays at 10:00 AM UTC (1 hour after metadata dictionary sync)
+**Workflow**: `review-tool-annotations.yml`
+**Script**: `scripts/review_tool_annotations.py`
+**Trigger**: When PubMed mining PR is merged
+**Schedule Position**: Step 2 in workflow sequence (after mine-pubmed-nf)
 
-## Why Separate from Metadata Dictionary?
+## Purpose
 
-Tool-related annotations are reviewed in this repository rather than in nf-metadata-dictionary for several reasons:
-
-1. **Efficiency**: Tool annotations are already being synced from Synapse tables in this repository
-2. **Organization**: Tool schema updates are managed alongside tool database maintenance
-3. **No Duplication**: Avoids reviewing the same fields in two different repositories
-4. **Clear Separation**: Metadata dictionary focuses on file/dataset annotations, this repo focuses on research tool metadata
-
-## Tool-Related Fields Reviewed
-
-The workflow analyzes the following annotation fields:
-
-### Tool Identifiers
-- `animalModelID` - Links to animal model resources
-- `cellLineID` - Links to cell line resources
-- `antibodyID` - Links to antibody resources
-- `geneticReagentID` - Links to genetic reagent resources
-
-### Specimen/Biobank Fields
-- `tumorType` - Type of tumor in specimens
-- `tissue` - Tissue type
-- `organ` - Organ of origin
-- `species` - Species of the specimen/tool
-
-### Manifestation Fields
-- `cellLineManifestation` - Clinical manifestations modeled by cell lines
-- `animalModelOfManifestation` - Symptoms/phenotypes in animal models
-- `animalModelManifestation` - Alternative manifestation field
-
-### Disease Fields
-- `cellLineGeneticDisorder` - Genetic disorders in cell lines
-- `animalModelGeneticDisorder` - Genetic disorders in animal models
-- `animalModelDisease` - Disease associations
-
-### Other Tool-Specific Fields
-- `cellLineCategory` - Classification of cell lines
-- `backgroundStrain` - Genetic background of animal models
-- `backgroundSubstrain` - Specific substrain information
-- `sex` - Sex of donor/model (in tool context)
-- `race` - Ethnicity of donor (in tool context)
+Ensures that individualID values used in file annotations are properly represented in the tools database as cell lines, preventing orphaned or unrecognized tool references.
 
 ## How It Works
 
-### 1. Data Sources
+### 1. Data Collection
 
-The script loads and checks values against multiple sources:
+**Annotations Source** (`syn52702673`):
+- Queries all `individualID` values from file annotations
+- Counts frequency of each unique value
+- Filters to values with ≥2 occurrences (configurable)
 
-**Tools Schema** (`nf_research_tools.rdb.model.csv`):
-- Contains valid values defined in the tools database schema
-- 41 fields with controlled vocabularies
+**Tools Source** (`syn51730943`):
+- Fetches all tools with resourceName and synonyms
+- Analyzes which columns are configured as facets
+- Evaluates value diversity across all fields
 
-**Metadata Dictionary** (from sibling repository):
-- Contains enum definitions with synonyms/aliases
-- 109 enums loaded for cross-checking
-- Prevents suggesting values that are already defined as aliases
+### 2. IndividualID Analysis
 
-### 2. Analysis Process
+For each individualID value, the script:
 
-```python
-# For each annotation value:
-1. Check if value is in tools schema valid values ✓
-2. Check if value is in metadata dictionary enums (including aliases) ✓
-3. If found in neither → Add to suggestions
-4. Track frequency of each unique value
-5. Filter by minimum frequency threshold (≥2)
-```
+1. **Exact match with resourceName**
+   - If found: Classified as "existing resource"
+   - No action needed
 
-### 3. Synonym Detection
+2. **Exact match with synonyms**
+   - If found: Classified as "existing synonym"
+   - No action needed
 
-The script performs **two-stage checking** to avoid suggesting synonyms:
+3. **Fuzzy match with synonyms** (threshold: 0.85)
+   - If match score ≥ 0.85: Suggest adding as synonym
+   - Example: "NF90.8" fuzzy matches "NF90-8" → suggest synonym
 
-```python
-# Example: species = "Mouse"
-1. Check tools schema: "Mouse" in species valid values? → No
-2. Check metadata dictionary: "Mouse" is alias of "Mus musculus"? → Check enums
-3. If found as synonym → Don't suggest
-4. If not found anywhere → Suggest as new value
-```
+4. **No match**
+   - Suggest creating as new cell line
+   - Generates SUBMIT_cell_lines.csv entry
 
-This prevents suggesting values like "Human" when "Homo sapiens" is already defined with "Human" as an alias.
+### 3. Facet Analysis
 
-## Script Usage
+Analyzes all columns in syn51730943:
 
-### Prerequisites
+- **Existing facets**: Documents current facets and their value diversity
+- **Suggested new facets**: Columns with 5-100 unique values
+- **Low diversity facets**: Flags facets with very few values (may not be useful)
 
-```bash
-# Install dependencies
-pip install synapseclient pandas pyyaml
+### 4. Output Generation
 
-# Set Synapse authentication
-export SYNAPSE_AUTH_TOKEN=your_token
-```
+Creates multiple files:
 
-### Basic Usage
-
-```bash
-# Run full analysis (requires Synapse auth)
-cd /path/to/nf-research-tools-schema
-python scripts/review_tool_annotations.py
-
-# Dry run - preview without creating files
-python scripts/review_tool_annotations.py --dry-run
-
-# Test with limited records
-python scripts/review_tool_annotations.py --limit 1000 --dry-run
-
-# Custom output files
-python scripts/review_tool_annotations.py \
-  --output suggestions.json \
-  --markdown summary.md
-```
-
-### Output Files
-
-**tool_annotation_suggestions.json** - Structured data:
+**JSON Output** (`tool_annotation_suggestions.json`):
 ```json
 {
-  "suggestions": {
-    "species": {
-      "Novel Species Name": 5,
-      "Another Species": 3
-    },
-    "tumorType": {
-      "Novel Tumor Type": 12
-    }
+  "individual_id_suggestions": {
+    "new_resources": [...],      // New cell lines to add
+    "new_synonyms": [...],        // Synonyms to add
+    "existing_exact": [...],      // Already in resourceName
+    "existing_synonyms": [...]    // Already in synonyms
   },
-  "filters": {
-    "cellLineCategory": 8,
-    "species": 15
-  },
-  "materialized_view": "syn52702673",
-  "tool_fields_reviewed": ["animalModelID", "cellLineID", ...]
+  "facet_analysis": {
+    "existing_facets": {...},     // Current facet info
+    "suggested_new_facets": {...} // Potential new facets
+  }
 }
 ```
 
-**tool_annotation_suggestions.md** - Human-readable summary:
-```markdown
-# Tool Annotation Review - Schema Updates from Synapse Annotations
+**Markdown Report** (`tool_annotation_suggestions.md`):
+- Human-readable summary
+- Categorized suggestions
+- Facet recommendations
+- Usage frequencies
 
-## Suggested Value Additions
+**Submission CSVs**:
+- `SUBMIT_cell_lines.csv` - New cell lines
+- `SUBMIT_resources.csv` - Corresponding resource entries
 
-### Field: `species`
-- `Novel Species Name` (used 5 times)
-- `Another Species` (used 3 times)
+## Assumptions
 
-### Field: `tumorType`
-- `Novel Tumor Type` (used 12 times)
+### All individualIDs are Cell Lines
 
-## Suggested Search Filters
-- `cellLineCategory` (8 unique values)
-- `species` (15 unique values)
+The system assumes all `individualID` values refer to cell lines. This is because:
+
+1. The `individualID` annotation is primarily used for biospecimen tracking
+2. Most biospecimens in NF research come from cell lines
+3. Cell lines are the most common type of individual/specimen
+
+**Manual Review Required**: Before merging the PR, verify that suggested resources are indeed cell lines and fill in the required `organ` field.
+
+## Workflow Integration
+
+### Position in Chain
+
+```
+1. mine-pubmed-nf → Creates PR
+         ↓ (PR merged)
+2. review-tool-annotations → Analyzes annotations → Creates PR  ← YOU ARE HERE
+         ↓ (PR merged)
+3. check-tool-coverage → Mines tools
+         ↓ ...
 ```
 
-## Automated Workflow
+### PR Creation
 
-### Schedule
+When new resources are found, creates a PR with:
 
-The workflow runs automatically:
-- **Every Monday at 10:00 AM UTC**
-- 1 hour after the metadata dictionary annotation review
-- Can be manually triggered via GitHub Actions
+**Title**: `🔍 Annotation Review - New Cell Lines (N suggested)`
 
-### Manual Triggering
+**Labels**:
+- `automated-annotation-review`
+- `cell-lines`
+- `needs-manual-review`
 
-**Via GitHub CLI:**
-```bash
-# Run full workflow
-gh workflow run review-tool-annotations.yml
+**Assignee**: BelindaBGarana
 
-# Test with limited records
-gh workflow run review-tool-annotations.yml \
-  -f annotation_limit=1000
-```
+**Files Included**:
+- `SUBMIT_cell_lines.csv`
+- `SUBMIT_resources.csv`
+- `tool_annotation_suggestions.json`
+- `tool_annotation_suggestions.md`
 
-**Via GitHub UI:**
-1. Go to Actions tab
-2. Select "Weekly Tool Annotation Review"
-3. Click "Run workflow"
-4. Optional: Set `annotation_limit` for testing
+### Manual Review Checklist
 
-### Workflow Steps
+Before merging the PR:
 
-1. **Checkout repository** - Get latest code
-2. **Set up Python** - Install Python 3.10
-3. **Install dependencies** - synapseclient, pandas, pyyaml
-4. **Review annotations** - Run analysis script
-5. **Create PR** - If suggestions found, create pull request with:
-   - `tool_annotation_suggestions.json`
-   - `tool_annotation_suggestions.md`
-   - Branch: `tool-annotation-review-YYYYMMDD`
-   - Labels: `automated`, `annotation-review`
+- [ ] Verify suggested cell lines are legitimate (not typos or errors)
+- [ ] Fill in `organ` field for each cell line (REQUIRED)
+- [ ] Check suggested synonyms make sense
+- [ ] Review facet suggestions (informational only)
+- [ ] Ensure no duplicate entries
 
-### Pull Request Format
+### What Happens After Merge
 
-**Title:** Tool Annotation Review - 2026-02-05 10:00:00 UTC
+When the PR is merged:
 
-**Body:**
-- Summary of findings
-- Number of fields with suggestions
-- List of tool-related fields reviewed
-- Links to suggestion files
-- Reminder about minimum frequency threshold
-- Context about integration with tools sync
+1. **Immediate**: `upsert-tools.yml` triggers automatically
+   - Validates CSV schemas
+   - Cleans tracking columns (prefixed with `_`)
+   - Uploads to Synapse:
+     - syn26486823 (cell lines table)
+     - syn26450069 (resources table)
 
-## Reviewing Suggestions
-
-### When a PR is Created
-
-1. **Review the suggestions:**
-   - Check `tool_annotation_suggestions.md` for summary
-   - Review `tool_annotation_suggestions.json` for detailed counts
-
-2. **Evaluate each suggestion:**
-   - Is this a legitimate new value or a typo?
-   - Should it be added to the tools schema?
-   - Should it be added to metadata dictionary (with synonym)?
-   - Does it need standardization (e.g., "Mouse" → "Mus musculus")?
-
-3. **Take action:**
-
-   **Option A: Add to tools schema** (for tool-specific values)
-   ```csv
-   # Edit nf_research_tools.rdb.model.csv
-   Attribute,Description,Valid Values,...
-   species,Species of model,"Mouse, Rat, ..., Novel Species Name"
-   ```
-
-   **Option B: Add to metadata dictionary** (for general values)
-   ```yaml
-   # In nf-metadata-dictionary/modules/Sample/BodyPart.yaml
-   SpeciesEnum:
-     permissible_values:
-       Novel Species Name:
-         description: A newly supported species
-   ```
-
-   **Option C: Add as alias** (for synonyms)
-   ```yaml
-   # In metadata dictionary
-   SpeciesEnum:
-     permissible_values:
-       Mus musculus:
-         aliases:
-           - Mouse
-           - mouse
-   ```
-
-4. **Merge or close PR:**
-   - Merge if you've made schema updates in separate commits
-   - Close with comment explaining decision
-   - Document rationale for future reference
-
-### Handling False Positives
-
-Common cases:
-
-**Typos/Variations:**
-- "Mus musculus" vs "mus musculus" (case differences)
-- "NF1" vs "NF-1" (punctuation)
-
-**Solution:** Add as aliases in metadata dictionary
-
-**Data Quality Issues:**
-- Inconsistent naming conventions
-- Deprecated terms
-- Legacy identifiers
-
-**Solution:** Coordinate with data contributors to fix at source
+2. **Next Step**: `check-tool-coverage.yml` triggers
+   - Continues the workflow chain
 
 ## Configuration
 
-### Script Configuration
+### Tunable Parameters
 
-Edit `scripts/review_tool_annotations.py`:
+**In Script** (`review_tool_annotations.py`):
+- `MIN_FREQUENCY = 2` - Minimum occurrences to suggest a value
+- `MIN_FILTER_FREQUENCY = 5` - Minimum unique values for facet suggestion
+- `FUZZY_MATCH_THRESHOLD = 0.85` - Similarity threshold for synonym matching
 
-```python
-# Synapse materialized view
-MATERIALIZED_VIEW_ID = "syn52702673"
+**In Workflow** (`review-tool-annotations.yml`):
+- `min_count` input - Override minimum frequency (workflow_dispatch)
+- `annotation_limit` input - Limit records for testing
 
-# Tool-related fields to review
-TOOL_RELATED_FIELDS = {
-    'animalModelID',
-    'cellLineID',
-    # ... full list
-}
+### Data Sources
 
-# Minimum frequency for suggestions
-MIN_FREQUENCY = 2
+**Annotations**: `syn52702673`
+- File annotations view
+- Contains individualID field
+- Public access
 
-# Minimum diversity for filter suggestions
-MIN_FILTER_FREQUENCY = 5
-```
+**Tools**: `syn51730943`
+- Tools materialized view
+- Contains resourceName, synonyms, all tool fields
+- Public access
 
-### Workflow Configuration
+## Example Output
 
-Edit `.github/workflows/review-tool-annotations.yml`:
-
-```yaml
-# Schedule (runs Monday 10:00 AM UTC)
-on:
-  schedule:
-    - cron: '0 10 * * 1'
-
-# Required secret
-env:
-  SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-```
-
-## Integration with Other Workflows
-
-### Related Workflows
-
-| Workflow | Repository | Purpose | Schedule |
-|----------|-----------|---------|----------|
-| **Tool Annotation Review** | nf-research-tools-schema | Review tool annotations | Mon 10:00 AM UTC |
-| **Metadata Annotation Review** | nf-metadata-dictionary | Review file annotations | Mon 9:00 AM UTC |
-| **Model System Sync** | nf-metadata-dictionary | Sync model systems | Mon 9:00 AM UTC |
-| **Tool Coverage Mining** | nf-research-tools-schema | Mine publications for tools | On-demand |
-
-### Workflow Coordination
+### New Resources Suggested
 
 ```
-Monday 9:00 AM UTC
-├─ nf-metadata-dictionary: Model System Sync + Annotation Review
-│  └─ Reviews non-tool annotation fields
-│  └─ Updates metadata dictionary enums
-│
-Monday 10:00 AM UTC (1 hour later)
-└─ nf-research-tools-schema: Tool Annotation Review
-   └─ Reviews tool-specific annotation fields
-   └─ Generates suggestions for tools schema
+individualID: "NF-ipsc-1234"
+Usage count: 15
+Status: New cell line
+Action: Create SUBMIT_cell_lines.csv entry
 ```
 
-**Why 1-hour offset?**
-- Ensures metadata dictionary completes first
-- Allows tool review to benefit from any metadata updates
-- Spreads workflow load
-- Reduces chance of concurrent Synapse API limits
+### Synonym Suggested
+
+```
+individualID: "NF-90.8"
+Fuzzy matched: "NF90-8" in resource "NF90-8 Cell Line" (score: 0.92)
+Usage count: 8
+Action: Add "NF-90.8" to synonyms field
+Note: Manual update required (not in SUBMIT_*.csv)
+```
+
+### Facet Suggestion
+
+```
+Column: "cellLineCategory"
+Unique values: 12
+Current status: Not a facet
+Recommendation: Add as facet for filtering
+Sample values: ["Cancer cell line", "Induced pluripotent stem cell", ...]
+```
 
 ## Troubleshooting
 
-### Issue: Script fails with authentication error
+### No PR Created
 
-**Solution:**
-```bash
-# Check token is set
-echo $SYNAPSE_AUTH_TOKEN
+**Possible reasons**:
+- All individualID values already exist as resources or synonyms
+- No values meet minimum frequency threshold
+- Workflow ran but had no new suggestions
 
-# Verify token is valid
-synapse login -p $SYNAPSE_AUTH_TOKEN
+**Check**:
+- View workflow logs in Actions tab
+- Check `tool_annotation_suggestions.json` artifact
+- Verify syn52702673 has data
+
+### Wrong Resource Type Suggested
+
+**Problem**: IndividualID should not be a cell line
+
+**Solution**:
+- Close PR without merging
+- Update script assumption if needed
+- Or manually create correct resource type in Synapse
+
+### Fuzzy Matching Issues
+
+**Problem**: Too many/few synonym suggestions
+
+**Solution**:
+- Adjust `FUZZY_MATCH_THRESHOLD` in script
+- Lower = more lenient (more suggestions)
+- Higher = stricter (fewer suggestions)
+- Recommended range: 0.80-0.90
+
+## Technical Details
+
+### Fuzzy Matching Algorithm
+
+Uses Python's `difflib.SequenceMatcher`:
+- Compares strings character by character
+- Returns similarity ratio (0.0 to 1.0)
+- Case-insensitive comparison
+- Works well for typos, formatting variations
+
+### CSV Format
+
+**SUBMIT_cell_lines.csv** schema:
+```
+cellLineId,donorId,originYear,organ,strProfile,tissue,...
+uuid1234,,,,[empty fields]...,
 ```
 
-### Issue: No suggestions generated
-
-**Possible causes:**
-1. All tool annotations match schema (good!)
-2. Frequency threshold too high
-3. Metadata dictionary sibling path incorrect
-
-**Debug:**
-```bash
-# Run with verbose output
-python scripts/review_tool_annotations.py --dry-run --limit 1000
-
-# Check what was loaded
-python -c "
-import sys
-sys.path.insert(0, 'scripts')
-import review_tool_annotations as rta
-schema = rta.load_tools_schema_values()
-print(f'Loaded {len(schema)} fields')
-print(f'Fields: {list(schema.keys())}')
-"
+**Tracking columns** (prefixed with `_`, removed before upload):
+```
+_cellLineName,_individualID,_usage_count,_source
 ```
 
-### Issue: Metadata dictionary not found
-
-**Error:** `Metadata dictionary not found at /path/to/nf-metadata-dictionary`
-
-**Solution:**
-```bash
-# Ensure repositories are sibling directories
-ls -la ..
-# Should show both:
-# - nf-metadata-dictionary/
-# - nf-research-tools-schema/
-
-# Or adjust path in script
-METADATA_DICT_PATH = Path(__file__).parent.parent.parent / "nf-metadata-dictionary" / "modules"
+**SUBMIT_resources.csv** schema:
+```
+resourceId,resourceName,resourceType,synonyms,cellLineId,...
+uuid5678,NF-ipsc-1234,Cell Line,,uuid1234,...
 ```
 
-### Issue: Too many suggestions
+## Related Documentation
 
-**Solutions:**
-1. Increase `MIN_FREQUENCY` threshold (default: 2)
-2. Add common variations as aliases in metadata dictionary
-3. Improve data quality at source
-
-## Best Practices
-
-### 1. Regular Review
-- Review PRs promptly when generated
-- Don't let suggestions accumulate
-- Provide feedback to data contributors
-
-### 2. Documentation
-- Document rationale for accepting/rejecting suggestions
-- Add source URLs when adding new values
-- Keep this guide updated with new patterns
-
-### 3. Coordination
-- Coordinate with metadata dictionary team
-- Share insights about common issues
-- Align on naming conventions
-
-### 4. Quality Control
-- Verify new terms against authoritative sources
-- Maintain consistency with metadata dictionary
-- Add ontology mappings where applicable
-
-## Testing
-
-### Unit Tests
-
-See `TEST_RESULTS.md` for comprehensive test results.
-
-**Test coverage:**
-- ✅ Schema loading functions
-- ✅ Synonym detection logic
-- ✅ Tool field identification
-- ✅ Frequency thresholding
-- ✅ Output file generation
-
-### Manual Testing
-
-```bash
-# Test with small dataset
-python scripts/review_tool_annotations.py --limit 100 --dry-run
-
-# Test specific fields
-# (Edit TOOL_RELATED_FIELDS to focus on specific fields)
-
-# Test with different frequencies
-# (Edit MIN_FREQUENCY in script)
-```
-
-## Future Enhancements
-
-Potential improvements:
-
-1. **Automated Schema Updates**: Directly update CSV schema file
-2. **ML-based Matching**: Use similarity matching for synonyms
-3. **Ontology Integration**: Auto-map to biomedical ontologies
-4. **Data Quality Reports**: Identify inconsistencies at source
-5. **Interactive Dashboard**: Web UI for reviewing suggestions
-
-## Reference
-
-### Files
-- `scripts/review_tool_annotations.py` - Main analysis script
-- `.github/workflows/review-tool-annotations.yml` - Automated workflow
-- `nf_research_tools.rdb.model.csv` - Tools schema with valid values
-- `../nf-metadata-dictionary/modules/` - Metadata dictionary enums
-
-### Documentation
-- `ANNOTATION_REVIEW_SEPARATION.md` - Implementation details
-- [Metadata Dictionary Annotation Review](https://github.com/nf-osi/nf-metadata-dictionary/blob/main/docs/annotation-review-workflow.md)
-- `TEST_RESULTS.md` - Test results and validation
-
-### External Resources
-- [Synapse Materialized View](https://www.synapse.org/#!Synapse:syn52702673)
-- [NF Research Tools Database](https://www.synapse.org/#!Synapse:syn26486839)
-
----
-
-*Last Updated: 2026-02-05*
-*Related Issue: Efficiency improvement for annotation review workflow*
+- **Workflow sequence**: [`.github/workflows/README.md`](../.github/workflows/README.md)
+- **Workflow coordination**: [`WORKFLOW_COORDINATION.md`](WORKFLOW_COORDINATION.md)
+- **Scripts**: [`../scripts/README.md`](../scripts/README.md)
+- **Tool coverage**: [`../tool_coverage/README.md`](../tool_coverage/README.md)

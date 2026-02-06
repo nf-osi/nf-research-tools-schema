@@ -1,239 +1,306 @@
-# GitHub Workflows
+# Automated Workflows
 
-## Workflow Coordination
+This repository uses automated GitHub Actions workflows to maintain and improve the NF Research Tools schema.
 
-**Based on [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97)**
+## 🔗 Workflow Sequence (Issue #97)
 
-The workflows in this repository run in a coordinated sequence using GitHub Actions `workflow_run` triggers to ensure data dependencies are respected and prevent race conditions.
-
-### Trigger-Based Workflow Chain
-
-Workflows are chained together using `workflow_run` triggers, ensuring each step completes before the next begins:
+Workflows are coordinated through **PR merge triggers** - each workflow creates a PR, and when merged, triggers the next workflow in the sequence:
 
 ```
-check-tool-coverage.yml (Monday 9:00 AM UTC - entry point)
-   ↓ workflow_run trigger (on completion)
-review-tool-annotations.yml (+ fallback schedule Monday 10:00 AM UTC)
-   ↓ workflow_run trigger (on completion)
-link-tool-datasets.yml
-   ↓ workflow_run trigger (on completion)
-score-tools.yml
-   ↓ workflow_run trigger (on completion)
-update-observation-schema.yml
+1. mine-pubmed-nf.yml (Sunday 9 AM UTC)
+   ├─ Mines PubMed for NF publications
+   └─ Creates PR with label: pubmed-mining
+         ↓ (when PR merged)
+
+2. review-tool-annotations.yml
+   ├─ Analyzes individualID annotations vs tools
+   ├─ Suggests new cell lines and synonyms
+   └─ Creates PR with label: automated-annotation-review
+         ↓ (when PR merged)
+
+3. check-tool-coverage.yml
+   ├─ Mines publications for novel tools
+   ├─ AI validation with Goose
+   └─ Creates PR with label: automated-mining
+         ↓ (when PR merged)
+
+4. link-tool-datasets.yml
+   ├─ Links datasets to tool publications
+   └─ Creates PR with label: dataset-linking
+         ↓ (when PR merged)
+
+5. score-tools.yml
+   ├─ Calculates tool completeness scores
+   ├─ Uploads directly to Synapse
+   └─ No PR created (direct upload)
+         ↓ (workflow_run trigger)
+
+6. update-observation-schema.yml
+   ├─ Updates observation schema from Synapse
+   └─ Creates PR only if changes detected
 ```
 
-### Workflow Descriptions
+### Key Points
 
-**Step 1: Check Tool Coverage** (`check-tool-coverage.yml`)
-- **Trigger:** Schedule (Monday 9:00 AM UTC) or manual
-- **Purpose:** Mines PubMed for novel NF tools, validates with AI
-- **Outputs:** Mining results, validation reports, pattern improvements
+- **Entry point**: `mine-pubmed-nf.yml` runs on schedule (Sunday 9 AM UTC)
+- **All other workflows**: Trigger on PR merge from previous step
+- **Manual triggers**: All workflows support `workflow_dispatch` for testing
+- **No schedules**: Only the entry point has a schedule; others are PR-driven
 
-**Step 2: Review Tool Annotations** (`review-tool-annotations.yml`)
-- **Trigger:** After Step 1 completes, or fallback schedule (Monday 10:00 AM UTC)
-- **Purpose:** Reviews Synapse annotations for tool-related fields
-- **Outputs:** Suggested schema updates based on annotation frequency
+## 📋 Workflow Details
 
-**Step 3: Link Tool Datasets** (`link-tool-datasets.yml`)
-- **Trigger:** After Step 2 completes
-- **Purpose:** Links datasets to tool publications
-- **Outputs:** CSV file ready for Synapse upsert
+### 1. Mine PubMed (mine-pubmed-nf.yml)
 
-**Step 4: Calculate Completeness Scores** (`score-tools.yml`)
-- **Trigger:** After Step 3 completes
-- **Purpose:** Calculates tool completeness scores
-- **Outputs:** Scores uploaded to Synapse, PDF report
+**Purpose**: Discover NF-related publications from PubMed
 
-**Step 5: Update Observation Schema** (`update-observation-schema.yml`)
-- **Trigger:** After Step 4 completes
-- **Purpose:** Updates observation schema with latest Synapse data
-- **Outputs:** Updated schema PRs when changes detected
+**Trigger**:
+- Schedule: Sunday 9 AM UTC
+- Manual: workflow_dispatch
 
-### Key Benefits
+**What it does**:
+1. Queries PubMed for NF-related publications
+2. Filters and deduplicates results
+3. Creates CSV with new publications
+4. Creates PR for review
 
-- **Explicit dependencies:** Workflows only run after prerequisites complete
-- **No race conditions:** Sequential execution ensures data consistency
-- **Automatic propagation:** Changes flow through the entire pipeline automatically
-- **Manual flexibility:** All workflows support `workflow_dispatch` for testing
-- **Fallback schedules:** Critical workflows have backup schedules for reliability
+**Outputs**: `tool_coverage/outputs/pubmed_nf_publications.csv`
 
-### Manual Trigger Order
+**PR Labels**: `pubmed-mining`, `publications`
 
-If running workflows manually (via `workflow_dispatch`), follow this sequence and wait for each to complete:
-
-1. `check-tool-coverage.yml`
-2. `review-tool-annotations.yml`
-3. `link-tool-datasets.yml`
-4. `score-tools.yml`
-5. `update-observation-schema.yml`
-
-### Monitoring Workflow Chain
-
-To monitor the workflow chain:
-1. Go to **Actions** tab in the repository
-2. Check the status of workflows in sequence
-3. Each workflow will show which workflow triggered it
-4. Failed workflows won't trigger downstream workflows
-
-See [`docs/WORKFLOW_COORDINATION.md`](../docs/WORKFLOW_COORDINATION.md) for detailed documentation.
+**Assignee**: BelindaBGarana
 
 ---
 
-## Update Observation Schema
+### 2. Review Tool Annotations (review-tool-annotations.yml)
 
-### Overview
-This workflow automatically updates `SubmitObservationSchema.json` with the latest data from Synapse materialized view `syn51730943`.
+**Purpose**: Analyze individualID annotations and suggest new tools
 
-**Workflow File:** `update-observation-schema.yml`
+**Trigger**:
+- When PR from `mine-pubmed-nf` is merged
+- Manual: workflow_dispatch
 
-### Schedule
-- **Runs:** Every Monday at 9:00 AM UTC
-- **Can be triggered manually** via the GitHub Actions UI
+**What it does**:
+1. Queries `individualID` from syn52702673 (annotations)
+2. Compares against tools in syn51730943
+3. Suggests new cell lines (assumes all individualIDs are cell lines)
+4. Uses fuzzy matching (0.85 threshold) to suggest synonyms
+5. Analyzes facet configuration
+6. Creates SUBMIT_*.csv files ready for Synapse upload
 
-### Required Secret
+**Outputs**:
+- `SUBMIT_cell_lines.csv`
+- `SUBMIT_resources.csv`
+- `tool_annotation_suggestions.json`
+- `tool_annotation_suggestions.md`
 
-This workflow requires `NF_SERVICE_GIT_TOKEN` to be configured in repository secrets for creating pull requests. This should be a GitHub Personal Access Token with `repo` permissions.
+**PR Labels**: `automated-annotation-review`, `cell-lines`, `needs-manual-review`
 
-### What It Does
-1. Fetches unique `resourceType` and `resourceName` values from Synapse table `syn51730943`
-2. Compares with current schema values
-3. If changes are detected:
-   - Updates the schema with new values
-   - Creates conditional enums (resourceName depends on resourceType)
-   - Creates a Pull Request with the changes
-4. If no changes: Workflow completes successfully without creating a PR
+**Assignee**: BelindaBGarana
 
-### Setup Instructions
+**Manual Review Required**: Fill in `organ` field for cell lines before merging
 
-#### Required: GitHub Token for Pull Requests
+**Documentation**: See [`docs/TOOL_ANNOTATION_REVIEW.md`](../../docs/TOOL_ANNOTATION_REVIEW.md)
 
-The workflow requires `NF_SERVICE_GIT_TOKEN` to create pull requests:
+---
 
-1. Go to your repository on GitHub
-2. Click **Settings** → **Secrets and variables** → **Actions**
-3. Verify that `NF_SERVICE_GIT_TOKEN` secret exists
-4. If not, you'll need to:
-   - Create a GitHub Personal Access Token with `repo` scope
-   - Add it as a repository secret named `NF_SERVICE_GIT_TOKEN`
+### 3. Check Tool Coverage (check-tool-coverage.yml)
 
-#### Optional: Synapse Authentication
+**Purpose**: Mine publications for novel tools and validate with AI
 
-**Note:** Since `syn51730943` is a public table, Synapse authentication is **optional**. You only need `SYNAPSE_AUTH_TOKEN` if:
-- The table becomes private in the future
-- You need higher rate limits
-- You're adapting this workflow for a private table
+**Trigger**:
+- When PR from `review-tool-annotations` is merged
+- Manual: workflow_dispatch
 
-To set up Synapse authentication:
+**What it does**:
+1. Mines publications from NF Portal for tool mentions
+2. Extracts tools using pattern matching
+3. AI validation using Goose (optional, requires ANTHROPIC_API_KEY)
+4. Applies pattern improvements
+5. Formats results into SUBMIT_*.csv files
+6. Analyzes missing tools
 
-1. Log in to [Synapse](https://www.synapse.org/)
-2. Go to Account Settings → Personal Access Tokens
-3. Click "Create New Token"
-4. Give it a descriptive name (e.g., "GitHub Actions Schema Updates")
-5. Select scopes: `view`, `download`
-6. Copy the token (you won't be able to see it again!)
-7. Go to your repository on GitHub
-8. Click **Settings** → **Secrets and variables** → **Actions**
-9. Click **New repository secret**
-10. Name: `SYNAPSE_AUTH_TOKEN`
-11. Value: Paste the Synapse token you copied
-12. Click **Add secret**
+**Outputs**:
+- `tool_coverage/outputs/processed_publications.csv`
+- `SUBMIT_*.csv` files for various tool types
+- `tool_reviews/validation_report.xlsx`
+- Mining patterns improvements
 
-#### Enable Workflow
+**PR Labels**: `automated-mining`, `tool-coverage`
 
-Once `NF_SERVICE_GIT_TOKEN` is configured, the workflow is ready! It will run automatically every Monday at 9 AM UTC.
+**Assignee**: BelindaBGarana
 
-### Manual Trigger
+**Documentation**: See [`tool_coverage/README.md`](../../tool_coverage/README.md)
 
-To manually trigger the workflow:
+---
 
-1. Go to **Actions** tab in your repository
-2. Select **Update Observation Schema from Synapse** workflow
-3. Click **Run workflow** button
-4. Select the branch and click **Run workflow**
+### 4. Link Tool Datasets (link-tool-datasets.yml)
 
-### What Happens After a Run
+**Purpose**: Link datasets to tools via publication relationships
 
-#### If Changes Are Detected:
-- A new Pull Request is created with branch name `update-observation-schema-{run-number}`
-- PR includes details about what changed
-- PR is labeled with `automated` and `schema-update`
-- Review the PR and merge if changes look correct
+**Trigger**:
+- When PR from `check-tool-coverage` is merged
+- Manual: workflow_dispatch
 
-#### If No Changes:
-- Workflow completes successfully
-- No PR is created
-- Check workflow logs to confirm everything ran correctly
+**What it does**:
+1. Queries NF Portal publications linked to tools
+2. Finds datasets associated with those publications
+3. Creates tool-dataset linkage CSV
+4. Generates PR if new linkages found
 
-### Troubleshooting
+**Outputs**: `SUBMIT_tool_datasets.csv`
 
-#### Authentication Errors
-If you see errors about Synapse authentication:
-- **Note:** Authentication is not required for public table `syn51730943`
-- If using a private table:
-  - Verify `SYNAPSE_AUTH_TOKEN` secret is set correctly
-  - Check token hasn't expired (regenerate if needed)
-  - Ensure token has `view` and `download` permissions
+**PR Labels**: `automated`, `dataset-linking`
 
-#### Schema Update Errors
-If the script fails to update the schema:
-- Check workflow logs for detailed error messages
-- Verify `syn51730943` table is still accessible
-- Ensure schema file structure hasn't changed
+**Assignee**: BelindaBGarana
 
-#### No PR Created
-If changes should exist but no PR is created:
-- Verify `NF_SERVICE_GIT_TOKEN` secret is set correctly in repository settings
-- Check that the token has `repo` scope permissions
-- Verify workflow has `contents: write` and `pull-requests: write` permissions
-- Check that the repository has PR permissions enabled
-- Look at workflow logs for any git or PR creation errors
+**Documentation**: See [`tool_coverage/docs/Dataset-tool_linking_README.md`](../../tool_coverage/docs/Dataset-tool_linking_README.md)
 
-### Testing Locally
+---
 
-You can test the update script locally before pushing:
+### 5. Calculate Completeness Scores (score-tools.yml)
 
-```bash
-# Install dependencies
-pip install synapseclient pandas
+**Purpose**: Calculate and upload tool completeness scores
 
-# Run the script (no authentication needed for public table)
-python scripts/update_observation_schema.py
-```
+**Trigger**:
+- When PR from `link-tool-datasets` is merged
+- Manual: workflow_dispatch
 
-**Optional Authentication:** If you're testing with a private table or need higher rate limits:
-```bash
-# Set Synapse token via environment variable
-export SYNAPSE_AUTH_TOKEN="your-token-here"
+**What it does**:
+1. Fetches all tools from syn51730943
+2. Calculates completeness scores based on filled fields
+3. Uploads scores directly to Synapse
+4. Generates PDF report
 
-# Run the script
-python scripts/update_observation_schema.py
-```
+**Outputs**:
+- Synapse tables: ToolCompletenessScores, ToolCompletenessSummary
+- PDF report (artifact)
 
-### Customization
+**No PR Created**: Uploads directly to Synapse
 
-#### Change Schedule
-Edit the `cron` expression in the workflow file:
-```yaml
-schedule:
-  - cron: '0 9 * * 1'  # Minute Hour Day-of-Month Month Day-of-Week
-```
+---
 
-Common schedules:
-- Every Monday at 9 AM: `0 9 * * 1`
-- Every day at midnight: `0 0 * * *`
-- First day of month: `0 0 1 * *`
-- Every 6 hours: `0 */6 * * *`
+### 6. Update Observation Schema (update-observation-schema.yml)
 
-Use [crontab.guru](https://crontab.guru/) to test cron expressions.
+**Purpose**: Keep observation schema in sync with Synapse data
 
-#### Change Synapse Table
-To sync from a different Synapse table, update the `syn_id` variable in `scripts/update_observation_schema.py`:
-```python
-syn_id = 'syn51730943'  # Change this to your table ID
-```
+**Trigger**:
+- When `score-tools` workflow completes (workflow_run)
+- Manual: workflow_dispatch
 
-### Related Files
+**What it does**:
+1. Queries syn51730943 for unique resourceType and resourceName values
+2. Compares with current SubmitObservationSchema.json
+3. If changes detected, updates schema and creates PR
+4. If no changes, workflow completes without PR
 
-- **Workflow:** `.github/workflows/update-observation-schema.yml`
-- **Update Script:** `scripts/update_observation_schema.py`
-- **Schema File:** `NF-Tools-Schemas/observations/SubmitObservationSchema.json`
+**Outputs**: Updated `SubmitObservationSchema.json` (if changes)
+
+**PR Labels**: `automated`, `schema-update`
+
+**Assignee**: BelindaBGarana
+
+---
+
+## 🛠️ Setup Requirements
+
+### Required Secrets
+
+1. **NF_SERVICE_GIT_TOKEN** (required for all workflows that create PRs)
+   - GitHub Personal Access Token with `repo` scope
+   - Used to create pull requests
+   - Configure in: Settings → Secrets and variables → Actions
+
+2. **SYNAPSE_AUTH_TOKEN** (required for Synapse operations)
+   - Synapse Personal Access Token
+   - Scopes: `view`, `download`, `modify`
+   - Configure in: Settings → Secrets and variables → Actions
+
+3. **ANTHROPIC_API_KEY** (optional, for AI validation)
+   - Only needed for check-tool-coverage.yml AI validation
+   - Can skip validation if not configured
+   - Configure in: Settings → Secrets and variables → Actions
+
+### Repository Permissions
+
+Ensure workflows have these permissions:
+- `contents: write` - to commit changes
+- `pull-requests: write` - to create PRs
+- `issues: write` - for check-tool-coverage workflow
+
+## 🧪 Manual Testing
+
+All workflows can be manually triggered:
+
+1. Go to **Actions** tab
+2. Select the workflow you want to run
+3. Click **Run workflow**
+4. Select branch and provide any inputs
+5. Click **Run workflow**
+
+**Testing Order** (if running entire chain manually):
+1. mine-pubmed-nf
+2. Review & merge PR → triggers review-tool-annotations
+3. Review & merge PR → triggers check-tool-coverage
+4. Review & merge PR → triggers link-tool-datasets
+5. Review & merge PR → triggers score-tools
+6. Automatically runs → update-observation-schema
+
+## 📊 Monitoring
+
+### Check Workflow Status
+
+1. Go to **Actions** tab
+2. View recent workflow runs
+3. Green checkmark = Success
+4. Red X = Failed (click to view logs)
+
+### Review PRs
+
+Filter PRs by labels:
+- `pubmed-mining` - PubMed mining results
+- `automated-annotation-review` - New cell lines from annotations
+- `automated-mining` - Novel tools from publications
+- `dataset-linking` - Dataset-tool linkages
+- `schema-update` - Observation schema updates
+
+## 🔍 Troubleshooting
+
+### Workflow Not Triggering
+
+**Problem**: Next workflow doesn't trigger after merging PR
+
+**Check**:
+- Verify PR has the correct label (e.g., `pubmed-mining`)
+- Confirm PR was merged (not just closed)
+- Check Actions tab for any failed runs
+- Verify workflow permissions are correct
+
+### Authentication Errors
+
+**Problem**: Synapse or GitHub authentication failed
+
+**Solution**:
+- Verify secrets are configured correctly
+- Check tokens haven't expired
+- Regenerate tokens if needed
+- Ensure tokens have required scopes
+
+### No PR Created
+
+**Problem**: Workflow ran but didn't create PR
+
+**Check**:
+- Verify NF_SERVICE_GIT_TOKEN is set correctly
+- Check workflow logs for errors
+- Confirm there were actually changes to commit
+- Verify repository allows automated PRs
+
+## 📁 Related Documentation
+
+- **Workflow coordination**: [`docs/WORKFLOW_COORDINATION.md`](../../docs/WORKFLOW_COORDINATION.md)
+- **Tool annotation review**: [`docs/TOOL_ANNOTATION_REVIEW.md`](../../docs/TOOL_ANNOTATION_REVIEW.md)
+- **Tool coverage mining**: [`tool_coverage/README.md`](../../tool_coverage/README.md)
+- **AI validation**: [`tool_coverage/docs/AI_VALIDATION_README.md`](../../tool_coverage/docs/AI_VALIDATION_README.md)
+- **Dataset linking**: [`tool_coverage/docs/Dataset-tool_linking_README.md`](../../tool_coverage/docs/Dataset-tool_linking_README.md)
+- **PubMed mining**: [`tool_coverage/docs/README_PUBMED_MINING.md`](../../tool_coverage/docs/README_PUBMED_MINING.md)
+- **Scripts documentation**: [`scripts/README.md`](../../scripts/README.md)

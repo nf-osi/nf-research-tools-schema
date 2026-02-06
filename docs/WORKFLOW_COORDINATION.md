@@ -1,266 +1,292 @@
-# Workflow Coordination - nf-research-tools-schema
+# Workflow Coordination
+
+**Implementation of [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97)**
 
 ## Overview
 
-Based on [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97), the workflows in this repository have been coordinated to run in a specific sequence that respects data dependencies and prevents race conditions.
+The automated workflows in this repository run in a coordinated sequence where each workflow creates a Pull Request, and when that PR is merged, it triggers the next workflow in the chain. This ensures:
 
-## Problem Statement
+- ✅ Data dependencies are respected
+- ✅ Manual review gates between steps
+- ✅ No race conditions or overlapping workflows
+- ✅ Clear audit trail of changes
 
-Previously, multiple workflows ran simultaneously (Monday 9 AM UTC):
-- `check-tool-coverage.yml`
-- `score-tools.yml`
-- `update-observation-schema.yml`
-
-This caused:
-- ⚠️ Race conditions on shared data
-- ⚠️ Incomplete data for scoring calculations
-- ⚠️ Duplicated processing
-- ⚠️ Missed data linkages
-
-## Solution: Coordinated Schedule
-
-### Monday - Data Collection Day
-
-| Time | Workflow | Duration | Purpose |
-|------|----------|----------|---------|
-| **9:00 AM** | `check-tool-coverage` | ~30-60 min | Mine PubMed for NF tools, validate with AI |
-| **10:00 AM** | `review-tool-annotations` | ~10-15 min | Review Synapse annotations for tool fields |
-| **11:00 AM** | `link-tool-datasets` | ~15-30 min | Link datasets to tools, cross-reference pubs |
-
-### Tuesday - Analysis Day
-
-| Time | Workflow | Duration | Purpose |
-|------|----------|----------|---------|
-| **9:00 AM** | `score-tools` | ~10-20 min | Calculate tool completeness scores |
-| **10:00 AM** | `update-observation-schema` | ~5-10 min | Update schema with latest tool data |
-
-## Dependency Chain
+## Workflow Sequence
 
 ```mermaid
 graph TD
-    A[Monday 9 AM<br/>check-tool-coverage<br/>Mine PubMed] --> B[Monday 10 AM<br/>review-tool-annotations<br/>Review Annotations]
-    B --> C[Monday 11 AM<br/>link-tool-datasets<br/>Link Datasets]
-    C --> D[Tuesday 9 AM<br/>score-tools<br/>Calculate Scores]
-    D --> E[Tuesday 10 AM<br/>update-observation-schema<br/>Update Schema]
+    A[mine-pubmed-nf<br/>Sunday 9 AM UTC] -->|Creates PR| B[PR Review & Merge]
+    B -->|Triggers| C[review-tool-annotations]
+    C -->|Creates PR| D[PR Review & Merge]
+    D -->|Triggers| E[check-tool-coverage]
+    E -->|Creates PR| F[PR Review & Merge]
+    F -->|Triggers| G[link-tool-datasets]
+    G -->|Creates PR| H[PR Review & Merge]
+    H -->|Triggers| I[score-tools]
+    I -->|workflow_run| J[update-observation-schema]
+    J -->|Creates PR if changes| K[Final Review]
 ```
 
-**Text Version:**
-```
-Step 1: check-tool-coverage (Mon 9 AM)
-   ↓ Provides: Novel tool data, validation results
-Step 2: review-tool-annotations (Mon 10 AM)
-   ↓ Provides: Annotation suggestions, schema updates
-Step 3: link-tool-datasets (Mon 11 AM)
-   ↓ Provides: Tool-dataset relationships
-Step 4: score-tools (Tue 9 AM)
-   ↓ Provides: Completeness scores
-Step 5: update-observation-schema (Tue 10 AM)
-   ↓ Provides: Updated schema definitions
-```
+## Detailed Flow
 
-## Changes Made
+### 1. Mine PubMed (Entry Point)
+**Workflow**: `mine-pubmed-nf.yml`
+**Trigger**: Schedule (Sunday 9 AM UTC)
+**Creates PR**: Yes (label: `pubmed-mining`)
 
-### 1. link-tool-datasets.yml
-**Before:** Tuesday 9:00 AM UTC
-**After:** Monday 11:00 AM UTC
-**Reason:** Must run after annotation review completes
+Discovers new NF-related publications from PubMed.
 
-### 2. score-tools.yml
-**Before:** Monday 9:00 AM UTC
-**After:** Tuesday 9:00 AM UTC
-**Reason:** Needs complete data from all Monday workflows
-
-### 3. update-observation-schema.yml
-**Before:** Monday 9:00 AM UTC
-**After:** Tuesday 10:00 AM UTC
-**Reason:** Depends on completeness scores from score-tools
-
-### 4. check-tool-coverage.yml
-**Status:** No change (already at Monday 9:00 AM)
-**Role:** Runs FIRST, other workflows depend on this
-
-### 5. review-tool-annotations.yml
-**Status:** No change (already at Monday 10:00 AM)
-**Role:** Step 2 in sequence, added as part of annotation review separation
-
-## Design Decisions
-
-### Why 1-Hour Buffers?
-- Allows adequate time for workflow completion
-- Handles variable execution times (API calls, data volume)
-- Prevents race conditions on shared resources
-- Provides buffer for Synapse API rate limits
-- Easier debugging if failures occur
-
-### Why Split Monday/Tuesday?
-- **Logical separation**: Data collection vs. analysis
-- **Complete datasets**: Scoring runs on fully updated data
-- **Load distribution**: Spreads computational load
-- **Clear milestones**: Monday data ready, Tuesday results ready
-
-### Why This Order?
-1. **Mine PubMed first**: Source of truth for publications
-2. **Review annotations**: Ensures schema is current
-3. **Link datasets**: Requires both tool data and annotations
-4. **Score completeness**: Requires all data linkages complete
-5. **Update schema**: Final step reflects all changes
-
-## Manual Execution
-
-All workflows support manual triggering via `workflow_dispatch`. If you need to run them manually:
-
-### Via GitHub UI
-1. Go to **Actions** tab
-2. Select the workflow
-3. Click **Run workflow**
-4. Select branch and run
-
-### Via GitHub CLI
-```bash
-# Step 1
-gh workflow run check-tool-coverage.yml
-
-# Step 2 (wait for Step 1 to complete)
-gh workflow run review-tool-annotations.yml
-
-# Step 3 (wait for Step 2 to complete)
-gh workflow run link-tool-datasets.yml
-
-# Step 4 (wait for Step 3 to complete)
-gh workflow run score-tools.yml
-
-# Step 5 (wait for Step 4 to complete)
-gh workflow run update-observation-schema.yml
-```
-
-**Important:** When running manually, respect the dependency order and wait for each workflow to complete before starting the next.
-
-## Monitoring
-
-### Expected Behavior
-- **Monday 9-12 PM UTC**: Data collection workflows run
-- **Tuesday 9-11 AM UTC**: Analysis workflows run
-- Each workflow creates PRs or artifacts as appropriate
-
-### Warning Signs
-- Multiple workflows running simultaneously
-- Workflows failing with "data not found" errors
-- PRs missing expected data
-- Scores calculated before data links complete
-
-### What to Check
-```bash
-# Check recent workflow runs
-gh run list --workflow=check-tool-coverage.yml --limit 5
-gh run list --workflow=review-tool-annotations.yml --limit 5
-gh run list --workflow=link-tool-datasets.yml --limit 5
-gh run list --workflow=score-tools.yml --limit 5
-gh run list --workflow=update-observation-schema.yml --limit 5
-
-# Check for failures
-gh run list --status failure --limit 10
-```
-
-## Troubleshooting
-
-### Workflow Runs at Wrong Time
-**Issue:** Workflow triggered at old schedule
-**Solution:** Changes may take 1 week to apply; manually trigger if needed
-
-### Dependency Not Met
-**Issue:** Workflow runs but missing expected data
-**Solution:** Check if previous workflow in sequence completed successfully
-
-### Multiple PRs Created
-**Issue:** Workflows creating conflicting PRs
-**Solution:** May indicate workflows ran out of order; check timestamps
-
-### Rate Limit Errors
-**Issue:** Synapse API rate limits exceeded
-**Solution:** 1-hour buffers should prevent this; may need to increase if hitting limits
-
-## Rollback Procedure
-
-If coordination causes issues:
-
-1. **Disable problematic workflow:**
-   ```yaml
-   # Comment out the schedule section
-   # on:
-   #   schedule:
-   #     - cron: '0 11 * * 1'
-   ```
-
-2. **Manual trigger as needed:**
-   - Use `workflow_dispatch` to run manually
-   - Control exact timing
-
-3. **Revert schedule changes:**
-   - Can revert to previous times if needed
-   - Each workflow independent
-
-4. **Monitor and adjust:**
-   - May need to adjust time buffers
-   - Can shift to different days if needed
-
-## Future Enhancements
-
-Potential improvements:
-
-1. **Workflow Dependencies:**
-   - Use GitHub Actions `workflow_call` for explicit dependencies
-   - Trigger workflows only after dependencies complete
-
-2. **Status Checks:**
-   - Add inter-workflow status checks
-   - Skip if previous workflow failed
-
-3. **Consolidated Workflow:**
-   - Combine all steps into single workflow
-   - Better control over sequence
-
-4. **Notifications:**
-   - Slack/email notifications on completion
-   - Alert on failures or missing data
-
-5. **Data Validation:**
-   - Check data quality between steps
-   - Fail fast if dependencies not met
-
-## Testing Plan
-
-### Week 1 (Data Collection)
-- ✅ Monitor Monday 9 AM: check-tool-coverage
-- ✅ Monitor Monday 10 AM: review-tool-annotations
-- ✅ Monitor Monday 11 AM: link-tool-datasets
-- Check: All PRs created successfully
-- Check: Data linkages complete
-
-### Week 2 (Analysis)
-- ✅ Monitor Tuesday 9 AM: score-tools
-- ✅ Monitor Tuesday 10 AM: update-observation-schema
-- Check: Scores calculated correctly
-- Check: Schema updated with complete data
-
-### Week 3 (Validation)
-- Verify full sequence runs smoothly
-- Confirm no race conditions
-- Check PR quality and completeness
-
-### Week 4 (Documentation)
-- Document any issues encountered
-- Adjust timing if needed
-- Update troubleshooting guide
-
-## Related Documentation
-
-- [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97) - Original coordination issue
-- [Workflows README](../.github/workflows/README.md) - Individual workflow docs
-- [Tool Annotation Review](TOOL_ANNOTATION_REVIEW.md) - Annotation review workflow
-- [Tool Coverage README](../tool_coverage/README.md) - Coverage mining details
+**Next Step**: When PR is merged → triggers `review-tool-annotations`
 
 ---
 
-*Last Updated: 2026-02-05*
-*Status: Implemented and Testing*
-*Issue: #97*
+### 2. Review Tool Annotations
+**Workflow**: `review-tool-annotations.yml`
+**Trigger**: PR merge with label `pubmed-mining`
+**Creates PR**: Yes (label: `automated-annotation-review`)
+
+Analyzes individualID annotations from Synapse, suggests new cell lines and synonyms.
+
+**Manual Action Required**: Fill in `organ` field for cell lines
+
+**Next Step**: When PR is merged → triggers `check-tool-coverage`
+
+---
+
+### 3. Check Tool Coverage
+**Workflow**: `check-tool-coverage.yml`
+**Trigger**: PR merge with label `automated-annotation-review`
+**Creates PR**: Yes (label: `automated-mining`)
+
+Mines publications for novel tools, validates with AI (optional).
+
+**Next Step**: When PR is merged → triggers `link-tool-datasets`
+
+---
+
+### 4. Link Tool Datasets
+**Workflow**: `link-tool-datasets.yml`
+**Trigger**: PR merge with label `automated-mining`
+**Creates PR**: Yes (label: `dataset-linking`)
+
+Links datasets to tools via publication relationships.
+
+**Next Step**: When PR is merged → triggers `score-tools`
+
+---
+
+### 5. Calculate Completeness Scores
+**Workflow**: `score-tools.yml`
+**Trigger**: PR merge with label `dataset-linking`
+**Creates PR**: No (uploads directly to Synapse)
+
+Calculates tool completeness scores and uploads to Synapse tables.
+
+**Next Step**: When workflow completes → triggers `update-observation-schema`
+
+---
+
+### 6. Update Observation Schema
+**Workflow**: `update-observation-schema.yml`
+**Trigger**: `workflow_run` (after `score-tools` completes)
+**Creates PR**: Only if schema changes detected
+
+Updates observation schema with latest tool data from Synapse.
+
+**End of Chain**: Final step in the sequence
+
+## Technical Implementation
+
+### PR Merge Triggers
+
+Most workflows use this pattern:
+
+```yaml
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  workflow-name:
+    # Only run if PR was merged (not just closed) and has correct label
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       contains(github.event.pull_request.labels.*.name, 'expected-label'))
+```
+
+### Label-Based Coordination
+
+Each workflow checks for specific labels to ensure correct chaining:
+
+| Workflow | Checks for Label | Creates PR with Label |
+|----------|-----------------|----------------------|
+| mine-pubmed-nf | N/A (entry point) | `pubmed-mining` |
+| review-tool-annotations | `pubmed-mining` | `automated-annotation-review` |
+| check-tool-coverage | `automated-annotation-review` | `automated-mining` |
+| link-tool-datasets | `automated-mining` | `dataset-linking` |
+| score-tools | `dataset-linking` | N/A (no PR) |
+| update-observation-schema | N/A (workflow_run) | `schema-update` |
+
+### Workflow Run Trigger
+
+The final step uses `workflow_run` since `score-tools` doesn't create a PR:
+
+```yaml
+on:
+  workflow_run:
+    workflows: ["Calculate Tool Completeness Scores"]
+    types:
+      - completed
+    branches:
+      - main
+```
+
+## Benefits of PR-Merge Coordination
+
+### 1. **Manual Review Gates**
+Each step can be reviewed before proceeding. Reviewers can:
+- Verify data quality
+- Check for errors or anomalies
+- Make corrections before proceeding
+- Stop the chain if issues found
+
+### 2. **Clear Audit Trail**
+- Each PR documents what changed
+- Git history shows when and why changes were made
+- Easy to track which workflow triggered which changes
+
+### 3. **Fail-Safe Design**
+- If a PR is closed without merging, chain stops
+- Bad data doesn't propagate through the pipeline
+- Can fix issues at any step
+
+### 4. **Flexible Testing**
+- Can test individual workflows without running entire chain
+- Manual triggers available for all workflows
+- Can merge PRs out of order if needed (for testing)
+
+## Manual Trigger Guide
+
+All workflows support manual triggers via `workflow_dispatch`:
+
+### To Run Entire Chain Manually:
+
+1. **Trigger**: `mine-pubmed-nf`
+   - Go to Actions → Mine PubMed → Run workflow
+   - Wait for completion
+
+2. **Review & Merge PR**
+   - Check the created PR
+   - Merge when ready
+
+3. **Automatic**: `review-tool-annotations` triggers
+   - Runs automatically after merge
+   - Wait for completion
+
+4. **Review & Merge PR**
+   - Fill in required fields (organ for cell lines)
+   - Merge when ready
+
+5. **Automatic**: `check-tool-coverage` triggers
+   - Continues automatically
+   - Repeat review & merge pattern
+
+6. Continue through remaining workflows
+
+### To Test Single Workflow:
+
+1. Go to Actions tab
+2. Select workflow to test
+3. Click "Run workflow"
+4. Provide inputs if needed
+5. Run on your branch
+
+## Monitoring the Chain
+
+### Check Progress
+
+1. **Actions Tab**: See all running/completed workflows
+2. **Pull Requests**: Filter by labels to see chain PRs
+3. **Workflow Dependencies**: Each workflow shows what triggered it
+
+### Troubleshooting Breaks
+
+If a workflow doesn't trigger:
+
+1. **Check PR was merged** (not just closed)
+2. **Verify labels** on the merged PR
+3. **Check workflow permissions** in Settings
+4. **Review Actions logs** for errors
+5. **Verify secrets** are configured correctly
+
+## Schedule vs. PR Triggers
+
+Only `mine-pubmed-nf` has a schedule (entry point). All others are triggered by PR merges.
+
+### Why Only One Schedule?
+
+- **Prevents race conditions**: Only one entry point
+- **Ensures order**: Chain runs sequentially
+- **Data consistency**: Each step uses previous step's outputs
+- **Manual control**: Review gates between steps
+
+### Schedule Pattern
+
+```
+Sunday 9 AM UTC: mine-pubmed-nf runs
+    ↓
+Monday: Review & merge pubmed PR
+    ↓
+Monday/Tuesday: Annotation review runs & merges
+    ↓
+Tuesday: Tool coverage runs & merges
+    ↓
+Tuesday/Wednesday: Dataset linking runs & merges
+    ↓
+Wednesday: Scoring runs (no PR)
+    ↓
+Wednesday: Schema update runs (if changes)
+```
+
+Actual timing depends on:
+- When PRs are reviewed and merged
+- Workflow execution time
+- Synapse data availability
+
+## Best Practices
+
+### For Reviewers
+
+1. **Check data quality** before merging
+2. **Fill in required fields** (e.g., organ for cell lines)
+3. **Look for anomalies** in suggested values
+4. **Verify counts** match expectations
+5. **Read workflow logs** if something looks wrong
+
+### For Maintainers
+
+1. **Monitor Actions tab** regularly
+2. **Set up notifications** for failed workflows
+3. **Review PRs promptly** to keep chain moving
+4. **Check labels** are correct on PRs
+5. **Update secrets** before they expire
+
+### For Developers
+
+1. **Test changes** with manual triggers first
+2. **Don't modify labels** used for coordination
+3. **Keep PR conditionals** in sync with labels
+4. **Document changes** in workflow files
+5. **Update this documentation** when changing flows
+
+## Related Documentation
+
+- **Workflow details**: [`.github/workflows/README.md`](../.github/workflows/README.md)
+- **Tool annotation review**: [`TOOL_ANNOTATION_REVIEW.md`](TOOL_ANNOTATION_REVIEW.md)
+- **Tool coverage**: [`../tool_coverage/README.md`](../tool_coverage/README.md)
+- **Scripts**: [`../scripts/README.md`](../scripts/README.md)
