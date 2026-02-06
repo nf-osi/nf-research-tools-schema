@@ -1,5 +1,84 @@
 # GitHub Workflows
 
+## Workflow Coordination
+
+**Based on [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97)**
+
+The workflows in this repository run in a coordinated sequence using GitHub Actions `workflow_run` triggers to ensure data dependencies are respected and prevent race conditions.
+
+### Trigger-Based Workflow Chain
+
+Workflows are chained together using `workflow_run` triggers, ensuring each step completes before the next begins:
+
+```
+check-tool-coverage.yml (Monday 9:00 AM UTC - entry point)
+   ↓ workflow_run trigger (on completion)
+review-tool-annotations.yml (+ fallback schedule Monday 10:00 AM UTC)
+   ↓ workflow_run trigger (on completion)
+link-tool-datasets.yml
+   ↓ workflow_run trigger (on completion)
+score-tools.yml
+   ↓ workflow_run trigger (on completion)
+update-observation-schema.yml
+```
+
+### Workflow Descriptions
+
+**Step 1: Check Tool Coverage** (`check-tool-coverage.yml`)
+- **Trigger:** Schedule (Monday 9:00 AM UTC) or manual
+- **Purpose:** Mines PubMed for novel NF tools, validates with AI
+- **Outputs:** Mining results, validation reports, pattern improvements
+
+**Step 2: Review Tool Annotations** (`review-tool-annotations.yml`)
+- **Trigger:** After Step 1 completes, or fallback schedule (Monday 10:00 AM UTC)
+- **Purpose:** Reviews Synapse annotations for tool-related fields
+- **Outputs:** Suggested schema updates based on annotation frequency
+
+**Step 3: Link Tool Datasets** (`link-tool-datasets.yml`)
+- **Trigger:** After Step 2 completes
+- **Purpose:** Links datasets to tool publications
+- **Outputs:** CSV file ready for Synapse upsert
+
+**Step 4: Calculate Completeness Scores** (`score-tools.yml`)
+- **Trigger:** After Step 3 completes
+- **Purpose:** Calculates tool completeness scores
+- **Outputs:** Scores uploaded to Synapse, PDF report
+
+**Step 5: Update Observation Schema** (`update-observation-schema.yml`)
+- **Trigger:** After Step 4 completes
+- **Purpose:** Updates observation schema with latest Synapse data
+- **Outputs:** Updated schema PRs when changes detected
+
+### Key Benefits
+
+- **Explicit dependencies:** Workflows only run after prerequisites complete
+- **No race conditions:** Sequential execution ensures data consistency
+- **Automatic propagation:** Changes flow through the entire pipeline automatically
+- **Manual flexibility:** All workflows support `workflow_dispatch` for testing
+- **Fallback schedules:** Critical workflows have backup schedules for reliability
+
+### Manual Trigger Order
+
+If running workflows manually (via `workflow_dispatch`), follow this sequence and wait for each to complete:
+
+1. `check-tool-coverage.yml`
+2. `review-tool-annotations.yml`
+3. `link-tool-datasets.yml`
+4. `score-tools.yml`
+5. `update-observation-schema.yml`
+
+### Monitoring Workflow Chain
+
+To monitor the workflow chain:
+1. Go to **Actions** tab in the repository
+2. Check the status of workflows in sequence
+3. Each workflow will show which workflow triggered it
+4. Failed workflows won't trigger downstream workflows
+
+See [`docs/WORKFLOW_COORDINATION.md`](../docs/WORKFLOW_COORDINATION.md) for detailed documentation.
+
+---
+
 ## Update Observation Schema
 
 ### Overview

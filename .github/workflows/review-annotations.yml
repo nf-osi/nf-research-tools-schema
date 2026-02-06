@@ -1,9 +1,15 @@
-name: Review Annotations and Suggest Tools
+name: Weekly Tool Annotation Review
 
 on:
+  workflow_run:
+    workflows: ["Check Tool Coverage and Suggest Novel Tools"]
+    types:
+      - completed
+    branches:
+      - main
   schedule:
-    # Run weekly on Tuesdays at 9 AM UTC (after tool coverage runs on Mondays)
-    - cron: '0 9 * * 2'
+    # Fallback schedule: Run weekly on Mondays at 10 AM UTC (1 hour after tool coverage)
+    - cron: '0 10 * * 1'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       limit:
@@ -83,30 +89,99 @@ jobs:
         run: |
           echo "Formatting suggestions into SUBMIT_*.csv files..."
 
-          # Build command with optional min_count
-          CMD="python scripts/format_annotation_suggestions.py"
+          # Use Python to format JSON suggestions into CSV files
+          python << 'EOF'
+          import json
+          import pandas as pd
+          import uuid
+          from pathlib import Path
 
-          if [ -n "${{ github.event.inputs.min_count }}" ]; then
-            CMD="$CMD --min-count ${{ github.event.inputs.min_count }}"
-          fi
+          def generate_uuid():
+              return str(uuid.uuid4())
 
-          # Run formatting
-          echo "Running: $CMD"
-          $CMD 2>&1 | tee format_output.log
+          # Load suggestions
+          with open('tool_annotation_suggestions.json', 'r') as f:
+              data = json.load(f)
+
+          suggestions = data.get('individual_id_suggestions', {})
+          new_resources = suggestions.get('new_resources', [])
+
+          min_count = int('${{ github.event.inputs.min_count }}' or '2')
+          filtered = [item for item in new_resources if item['count'] >= min_count]
+
+          if not filtered:
+              print(f"No resources with count >= {min_count}")
+              exit(0)
+
+          # Create cell lines DataFrame
+          cell_line_rows = []
+          for item in filtered:
+              cell_line_id = generate_uuid()
+              cell_line_rows.append({
+                  'cellLineId': cell_line_id,
+                  'donorId': '',
+                  'originYear': '',
+                  'organ': '',  # Required - needs manual fill
+                  'strProfile': '',
+                  'tissue': '',
+                  'cellLineManifestation': '',
+                  'resistance': '',
+                  'cellLineCategory': '',
+                  'contaminatedMisidentified': '',
+                  'cellLineGeneticDisorder': '',
+                  'populationDoublingTime': '',
+                  '_cellLineName': item['value'],
+                  '_individualID': item['value'],
+                  '_usage_count': item['count'],
+                  '_source': 'annotation_review'
+              })
+
+          cell_lines_df = pd.DataFrame(cell_line_rows)
+
+          # Create resources DataFrame
+          resource_rows = []
+          for _, row in cell_lines_df.iterrows():
+              resource_rows.append({
+                  'resourceId': generate_uuid(),
+                  'resourceName': row['_cellLineName'],
+                  'resourceType': 'Cell Line',
+                  'synonyms': '',
+                  'rrid': '',
+                  'description': '',
+                  'aiSummary': '',
+                  'usageRequirements': '',
+                  'howToAcquire': '',
+                  'animalModelId': '',
+                  'antibodyId': '',
+                  'cellLineId': row['cellLineId'],
+                  'geneticReagentId': '',
+                  'biobankId': '',
+                  '_individualID': row['_individualID'],
+                  '_usage_count': row['_usage_count'],
+                  '_source': 'annotation_review'
+              })
+
+          resources_df = pd.DataFrame(resource_rows)
+
+          # Save files
+          cell_lines_df.to_csv('SUBMIT_cell_lines.csv', index=False)
+          resources_df.to_csv('SUBMIT_resources.csv', index=False)
+
+          print(f"✅ Created SUBMIT_cell_lines.csv ({len(cell_lines_df)} rows)")
+          print(f"✅ Created SUBMIT_resources.csv ({len(resources_df)} rows)")
+          EOF
 
           # Check if files were generated
           if [ -f "SUBMIT_cell_lines.csv" ] && [ -f "SUBMIT_resources.csv" ]; then
             echo "format_complete=true" >> $GITHUB_OUTPUT
-            echo "✅ Created submission CSV files"
 
-            # Count rows in each file
+            # Count rows
             CELL_LINES=$(wc -l < SUBMIT_cell_lines.csv)
             RESOURCES=$(wc -l < SUBMIT_resources.csv)
             echo "cell_lines_count=$((CELL_LINES - 1))" >> $GITHUB_OUTPUT
             echo "resources_count=$((RESOURCES - 1))" >> $GITHUB_OUTPUT
           else
             echo "format_complete=false" >> $GITHUB_OUTPUT
-            echo "❌ Formatting failed - no CSV files generated"
           fi
 
       - name: Generate PR body

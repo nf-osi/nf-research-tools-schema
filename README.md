@@ -13,7 +13,28 @@ Learn more about the goals for this project by checking out the following docume
 
 >[Gilbert Family Foundation Press Release](https://www.gilbertfamilyfoundation.org/press-release/gff-and-sage-bionetworks-collaborate-on-an-nf1-research-tools-database/). 
 
-# Contributing:
+# Automated Workflows
+
+This repository includes several automated workflows for maintaining and improving the tools schema:
+
+## Tool Annotation Review
+
+**Workflow:** `.github/workflows/review-tool-annotations.yml`
+**Schedule:** Weekly on Mondays at 10:00 AM UTC
+**Purpose:** Analyzes tool-related file annotations from Synapse to identify values that should be standardized in the schema.
+
+The workflow reviews annotations for tool-specific fields (animalModelID, cellLineID, antibodyID, geneticReagentID, tumorType, tissue, organ, species, etc.) and creates PRs with suggestions for schema updates.
+
+**Documentation:** See [`docs/TOOL_ANNOTATION_REVIEW.md`](docs/TOOL_ANNOTATION_REVIEW.md) for detailed information.
+
+## Tool Coverage Mining
+
+**Workflows:** `mine-pubmed-nf.yml`, `upsert-pubmed-publications.yml`
+**Purpose:** Automatically mines PubMed publications for NF research tools and updates the database.
+
+**Documentation:** See [`tool_coverage/README.md`](tool_coverage/README.md) for details.
+
+# Contributing
 
 To contribute changes to the schema, please create a new branch, modify the schema CSV as desired, commit, and file a PR. The jsonld will automatically be updated. Please do not modify the jsonld manually. 
 
