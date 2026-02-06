@@ -1,42 +1,36 @@
 #!/usr/bin/env python3
 """
-Review Synapse file annotations for tool-related fields and suggest additions to tools schema.
+Review Synapse annotations and tools schema to suggest additions and facet configuration.
 
 This script:
-1. Queries Synapse materialized view syn52702673 for file annotations
-2. Loads the current tools schema from nf_research_tools.rdb.model.csv
-3. Identifies tool-related annotation fields with free-text values
-4. Generates suggestions for new values to add to the tools schema
-5. Outputs suggestions in a format suitable for PR creation
-
-Tool-related fields reviewed:
-- Tool identifiers: animalModelID, cellLineID, antibodyID, geneticReagentID
-- Specimen fields: tumorType, tissue, organ, species
-- Manifestation fields: cellLineManifestation, animalModelOfManifestation
-- Disease fields: cellLineGeneticDisorder, animalModelGeneticDisorder
-- Donor fields: sex, age, race
+1. Queries Synapse materialized view syn52702673 for individualID annotations
+2. Queries Synapse materialized view syn51730943 for tools data
+3. Compares individualID values against resourceName and synonyms in tools
+4. Suggests new resourceName values or synonyms to add based on fuzzy matching
+5. Analyzes which columns in syn51730943 are already facets
+6. Suggests new facets based on value diversity in tools data
+7. Outputs suggestions in a format suitable for PR creation
 
 Usage:
     python review_tool_annotations.py [--output OUTPUT_FILE] [--dry-run] [--limit LIMIT]
 """
 
 import argparse
-import csv
 import json
 import logging
 import os
 import sys
 from collections import defaultdict
+from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Optional
 
 try:
     import synapseclient
     from synapseclient import Synapse
     import pandas as pd
-    import yaml
 except ImportError:
-    print("Error: Required packages not installed. Install with: pip install synapseclient pandas pyyaml")
+    print("Error: Required packages not installed. Install with: pip install synapseclient pandas")
     sys.exit(1)
 
 # Configure logging
@@ -47,219 +41,37 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Constants
-MATERIALIZED_VIEW_ID = "syn52702673"
-TOOLS_SCHEMA_CSV = Path(__file__).parent.parent / "nf_research_tools.rdb.model.csv"
+ANNOTATIONS_VIEW_ID = "syn52702673"  # File annotations view (for individualID)
+TOOLS_VIEW_ID = "syn51730943"  # Tools materialized view (for resourceName, synonyms, facets)
 
-# Tool-related fields to review from file annotations
-TOOL_RELATED_FIELDS = {
-    # Tool identifiers
-    'animalModelID',
-    'cellLineID',
-    'antibodyID',
-    'geneticReagentID',
-
-    # Specimen/biobank fields
-    'tumorType',
-    'tissue',
-    'organ',
-    'species',
-
-    # Manifestation fields
-    'cellLineManifestation',
-    'animalModelOfManifestation',
-    'animalModelManifestation',
-
-    # Disease fields
-    'cellLineGeneticDisorder',
-    'animalModelGeneticDisorder',
-    'animalModelDisease',
-
-    # Donor fields
-    'sex',
-    'race',
-
-    # Cell line specific
-    'cellLineCategory',
-
-    # Other tool-related
-    'backgroundStrain',
-    'backgroundSubstrain',
-}
-
-# Minimum frequency threshold for suggesting new values
+# Minimum frequency threshold for suggesting new individualID values
 MIN_FREQUENCY = 2
 
-# Minimum frequency for suggesting search filters
+# Minimum unique values for suggesting search filters/facets
 MIN_FILTER_FREQUENCY = 5
 
+# Fuzzy match threshold for synonym suggestions (0.0 to 1.0)
+FUZZY_MATCH_THRESHOLD = 0.85
 
-def load_tools_schema_values() -> Dict[str, Set[str]]:
+
+
+
+
+
+def query_individual_ids(syn: Synapse, limit: int = None) -> List[str]:
     """
-    Load valid values for tool-related fields from the tools schema CSV.
-
-    Returns:
-        Dictionary mapping field names to their valid values
-    """
-    schema_values = {}
-
-    logger.info(f"Loading tools schema from {TOOLS_SCHEMA_CSV}...")
-
-    try:
-        with open(TOOLS_SCHEMA_CSV, 'r') as f:
-            reader = csv.DictReader(f)
-
-            for row in reader:
-                attribute = row.get('Attribute', '')
-                valid_values_str = row.get('Valid Values', '')
-
-                # Skip if no valid values defined
-                if not valid_values_str or valid_values_str.strip() == '':
-                    continue
-
-                # Parse comma-separated valid values
-                valid_values = set()
-                for value in valid_values_str.split(','):
-                    value = value.strip()
-                    if value:
-                        valid_values.add(value)
-
-                if valid_values:
-                    schema_values[attribute] = valid_values
-
-        logger.info(f"Loaded {len(schema_values)} fields with valid values from tools schema")
-
-    except Exception as e:
-        logger.error(f"Error loading tools schema: {e}")
-        raise
-
-    return schema_values
-
-
-def load_metadata_dict_enums() -> Dict[str, Dict[str, Set[str]]]:
-    """
-    Load enum permissible values and aliases from the metadata dictionary schema.
-    This is important for checking if annotation values are synonyms/aliases.
-
-    Returns:
-        Dictionary mapping enum names to their permissible values and aliases
-    """
-    enums = {}
-
-    # Path to metadata dictionary (assuming it's a sibling directory)
-    metadata_dict_path = Path(__file__).parent.parent.parent / "nf-metadata-dictionary" / "modules"
-
-    if not metadata_dict_path.exists():
-        logger.warning(f"Metadata dictionary not found at {metadata_dict_path}, skipping synonym checking")
-        return {}
-
-    logger.info(f"Loading metadata dictionary enums for synonym checking from {metadata_dict_path}...")
-
-    try:
-        # Load from all module YAML files
-        for yaml_file in metadata_dict_path.rglob("*.yaml"):
-            try:
-                with open(yaml_file, 'r') as f:
-                    data = yaml.safe_load(f)
-
-                if not data or 'enums' not in data:
-                    continue
-
-                for enum_name, enum_data in data['enums'].items():
-                    if 'permissible_values' not in enum_data:
-                        continue
-
-                    values = set()
-                    aliases = set()
-
-                    for value, value_data in enum_data['permissible_values'].items():
-                        values.add(value)
-
-                        # Also collect aliases
-                        if value_data and isinstance(value_data, dict) and 'aliases' in value_data:
-                            if isinstance(value_data['aliases'], list):
-                                aliases.update(value_data['aliases'])
-                            elif isinstance(value_data['aliases'], str):
-                                aliases.add(value_data['aliases'])
-
-                    enums[enum_name] = {
-                        'values': values,
-                        'aliases': aliases,
-                        'all': values | aliases
-                    }
-
-            except Exception as e:
-                logger.debug(f"Error loading {yaml_file}: {e}")
-
-        logger.info(f"Loaded {len(enums)} enums with aliases from metadata dictionary")
-
-    except Exception as e:
-        logger.warning(f"Error loading metadata dictionary enums: {e}")
-
-    return enums
-
-
-def load_metadata_dict_slot_mappings() -> Dict[str, List[str]]:
-    """
-    Load mapping of slot names to their enum types from metadata dictionary.
-
-    Returns:
-        Dictionary mapping slot names to list of enum names
-    """
-    slot_enum_map = {}
-
-    metadata_dict_path = Path(__file__).parent.parent.parent / "nf-metadata-dictionary" / "modules"
-    props_file = metadata_dict_path / "props.yaml"
-
-    if not props_file.exists():
-        logger.warning(f"props.yaml not found at {props_file}")
-        return {}
-
-    try:
-        with open(props_file, 'r') as f:
-            data = yaml.safe_load(f)
-
-        if data and 'slots' in data:
-            for slot_name, slot_data in data['slots'].items():
-                if not slot_data:
-                    continue
-
-                enum_types = []
-
-                # Check for direct range
-                if 'range' in slot_data and slot_data['range'].endswith('Enum'):
-                    enum_types.append(slot_data['range'])
-
-                # Check for any_of ranges
-                if 'any_of' in slot_data and isinstance(slot_data['any_of'], list):
-                    for constraint in slot_data['any_of']:
-                        if 'range' in constraint and constraint['range'].endswith('Enum'):
-                            enum_types.append(constraint['range'])
-
-                if enum_types:
-                    slot_enum_map[slot_name] = enum_types
-
-        logger.info(f"Loaded {len(slot_enum_map)} slot mappings from metadata dictionary")
-
-    except Exception as e:
-        logger.warning(f"Error loading slot mappings: {e}")
-
-    return slot_enum_map
-
-
-def query_synapse_annotations(syn: Synapse, limit: int = None) -> List[Dict]:
-    """
-    Query Synapse materialized view for file annotations.
+    Query Synapse annotations view for individualID values.
 
     Args:
         syn: Synapse client
         limit: Optional limit on number of rows to retrieve
 
     Returns:
-        List of annotation records
+        List of unique individualID values
     """
-    logger.info(f"Querying Synapse view {MATERIALIZED_VIEW_ID}...")
+    logger.info(f"Querying Synapse annotations view {ANNOTATIONS_VIEW_ID} for individualID...")
 
-    query = f"SELECT * FROM {MATERIALIZED_VIEW_ID}"
+    query = f"SELECT individualID FROM {ANNOTATIONS_VIEW_ID} WHERE individualID IS NOT NULL"
     if limit:
         query += f" LIMIT {limit}"
 
@@ -267,188 +79,439 @@ def query_synapse_annotations(syn: Synapse, limit: int = None) -> List[Dict]:
         results = syn.tableQuery(query)
         df = results.asDataFrame()
 
-        logger.info(f"Retrieved {len(df)} records with {len(df.columns)} columns")
+        logger.info(f"Retrieved {len(df)} records with individualID")
+
+        # Get unique non-null values
+        individual_ids = df['individualID'].dropna().unique().tolist()
+        logger.info(f"Found {len(individual_ids)} unique individualID values")
+
+        return individual_ids
+
+    except Exception as e:
+        logger.error(f"Error querying Synapse annotations: {e}")
+        raise
+
+
+def query_tools_data(syn: Synapse, limit: int = None) -> List[Dict]:
+    """
+    Query Synapse tools view for all tool data.
+
+    Args:
+        syn: Synapse client
+        limit: Optional limit on number of rows to retrieve
+
+    Returns:
+        List of tool records
+    """
+    logger.info(f"Querying Synapse tools view {TOOLS_VIEW_ID}...")
+
+    query = f"SELECT * FROM {TOOLS_VIEW_ID}"
+    if limit:
+        query += f" LIMIT {limit}"
+
+    try:
+        results = syn.tableQuery(query)
+        df = results.asDataFrame()
+
+        logger.info(f"Retrieved {len(df)} tools with {len(df.columns)} columns")
 
         # Convert to list of dicts
         records = df.to_dict('records')
         return records
 
     except Exception as e:
-        logger.error(f"Error querying Synapse: {e}")
+        logger.error(f"Error querying Synapse tools: {e}")
         raise
 
 
-def analyze_tool_annotations(
-    records: List[Dict],
-    schema_values: Dict[str, Set[str]],
-    metadata_enums: Dict[str, Dict[str, Set[str]]] = None,
-    slot_enum_map: Dict[str, List[str]] = None
-) -> Tuple[Dict[str, Dict[str, int]], Dict[str, int]]:
+def get_facet_columns(syn: Synapse) -> Set[str]:
     """
-    Analyze tool-related annotations to find free-text values not in schema.
+    Get the list of columns configured as facets in the tools view.
 
     Args:
-        records: List of annotation records from Synapse
-        schema_values: Valid values from tools schema
-        metadata_enums: Enum definitions from metadata dictionary (includes aliases)
-        slot_enum_map: Mapping of slot names to enum types from metadata dictionary
+        syn: Synapse client
 
     Returns:
-        Tuple of (suggestions_by_field, filter_suggestions)
+        Set of column names that are configured as facets
     """
-    suggestions = defaultdict(lambda: defaultdict(int))
-    filter_candidates = defaultdict(set)
+    logger.info(f"Getting facet configuration for {TOOLS_VIEW_ID}...")
 
-    if not records:
-        logger.warning("No records to analyze")
-        return {}, {}
+    try:
+        # Get the table/view entity
+        entity = syn.get(TOOLS_VIEW_ID)
 
-    if metadata_enums is None:
-        metadata_enums = {}
-    if slot_enum_map is None:
-        slot_enum_map = {}
+        facet_columns = set()
 
-    # Get all column names
-    columns = list(records[0].keys())
+        # Check if the entity has column models
+        if hasattr(entity, 'columnIds'):
+            for col_id in entity.columnIds:
+                col = syn.getColumn(col_id)
+                # Check if column has facet type set
+                if hasattr(col, 'facetType') and col.facetType:
+                    facet_columns.add(col.name)
+                    logger.debug(f"Found facet column: {col.name} (type: {col.facetType})")
 
-    # Filter to only tool-related fields that exist in the data
-    tool_fields_in_data = [f for f in columns if f in TOOL_RELATED_FIELDS]
-    logger.info(f"Found {len(tool_fields_in_data)} tool-related fields in annotations: {tool_fields_in_data}")
+        logger.info(f"Found {len(facet_columns)} columns configured as facets")
+        return facet_columns
 
-    for record in records:
-        for field in tool_fields_in_data:
-            value = record.get(field)
+    except Exception as e:
+        logger.warning(f"Error getting facet configuration: {e}")
+        return set()
 
-            # Skip null/empty values
-            if value is None or value == '':
-                continue
 
-            # Convert to string and clean
-            value_str = str(value).strip()
-            if not value_str:
-                continue
+def fuzzy_match(s1: str, s2: str) -> float:
+    """
+    Calculate fuzzy match score between two strings.
 
-            # Track for potential filters
-            filter_candidates[field].add(value_str)
+    Args:
+        s1: First string
+        s2: Second string
 
-            # Check if value is already valid
-            value_is_valid = False
+    Returns:
+        Similarity score between 0.0 and 1.0
+    """
+    return SequenceMatcher(None, s1.lower(), s2.lower()).ratio()
 
-            # 1. Check against tools schema valid values
-            if field in schema_values and value_str in schema_values[field]:
-                value_is_valid = True
 
-            # 2. Check against metadata dictionary enums (including synonyms/aliases)
-            if not value_is_valid and field in slot_enum_map:
-                enum_names = slot_enum_map[field]
-                for enum_name in enum_names:
-                    if enum_name in metadata_enums:
-                        # Check against both values and aliases
-                        if value_str in metadata_enums[enum_name]['all']:
-                            value_is_valid = True
-                            logger.debug(f"Value '{value_str}' for field '{field}' found as synonym in enum '{enum_name}'")
-                            break
+def find_best_synonym_match(value: str, synonyms_list: List[str]) -> Optional[Tuple[str, float]]:
+    """
+    Find the best fuzzy match for a value among a list of synonyms.
 
-            # If value is not valid anywhere, add as suggestion
-            if not value_is_valid:
-                suggestions[field][value_str] += 1
+    Args:
+        value: Value to match
+        synonyms_list: List of synonym strings
 
-    # Filter suggestions by minimum frequency
-    filtered_suggestions = {}
-    for field, values in suggestions.items():
-        filtered_values = {v: c for v, c in values.items() if c >= MIN_FREQUENCY}
-        if filtered_values:
-            filtered_suggestions[field] = filtered_values
+    Returns:
+        Tuple of (best_match, score) or None if no good match
+    """
+    best_match = None
+    best_score = 0.0
 
-    # Identify filter candidates (fields with diverse values)
-    filter_suggestions = {}
-    for field, values in filter_candidates.items():
+    for synonym in synonyms_list:
+        score = fuzzy_match(value, synonym)
+        if score > best_score:
+            best_score = score
+            best_match = synonym
+
+    if best_score >= FUZZY_MATCH_THRESHOLD:
+        return (best_match, best_score)
+
+    return None
+
+
+def analyze_individual_ids(
+    individual_ids: List[str],
+    tools_data: List[Dict]
+) -> Dict[str, List[Dict]]:
+    """
+    Analyze individualID values against tools data to suggest additions.
+
+    Args:
+        individual_ids: List of unique individualID values from annotations
+        tools_data: List of tool records from tools view
+
+    Returns:
+        Dictionary with suggestions categorized by type:
+        - 'new_resources': individualIDs to add as new resourceName
+        - 'new_synonyms': individualIDs to add as synonyms (with fuzzy match info)
+        - 'existing_exact': individualIDs that exactly match existing resourceName
+        - 'existing_synonyms': individualIDs that match existing synonyms
+    """
+    logger.info("Analyzing individualID values against tools data...")
+
+    # Build lookup structures from tools data
+    resource_names = set()
+    synonyms_by_resource = {}  # resourceName -> list of synonyms
+
+    for tool in tools_data:
+        resource_name = tool.get('resourceName')
+        if resource_name:
+            resource_names.add(resource_name)
+
+            # Parse synonyms (comma-separated)
+            synonyms_str = tool.get('synonyms', '')
+            if synonyms_str and isinstance(synonyms_str, str):
+                synonyms = [s.strip() for s in synonyms_str.split(',') if s.strip()]
+                synonyms_by_resource[resource_name] = synonyms
+
+    # Count frequencies of individualIDs
+    id_counts = defaultdict(int)
+    for individual_id in individual_ids:
+        if individual_id:
+            id_counts[str(individual_id).strip()] += 1
+
+    # Categorize suggestions
+    suggestions = {
+        'new_resources': [],  # List of (individualID, count)
+        'new_synonyms': [],  # List of (individualID, best_match_resource, match_score, count)
+        'existing_exact': [],  # List of (individualID, count)
+        'existing_synonyms': []  # List of (individualID, matching_resource, count)
+    }
+
+    for individual_id, count in id_counts.items():
+        if count < MIN_FREQUENCY:
+            continue
+
+        # Check for exact match with resourceName
+        if individual_id in resource_names:
+            suggestions['existing_exact'].append({
+                'value': individual_id,
+                'count': count
+            })
+            continue
+
+        # Check for exact match with any synonym
+        found_in_synonyms = False
+        for resource_name, synonyms in synonyms_by_resource.items():
+            if individual_id in synonyms:
+                suggestions['existing_synonyms'].append({
+                    'value': individual_id,
+                    'resource': resource_name,
+                    'count': count
+                })
+                found_in_synonyms = True
+                break
+
+        if found_in_synonyms:
+            continue
+
+        # Try fuzzy matching with synonyms
+        best_match = None
+        best_score = 0.0
+        best_resource = None
+
+        for resource_name, synonyms in synonyms_by_resource.items():
+            match_result = find_best_synonym_match(individual_id, synonyms)
+            if match_result and match_result[1] > best_score:
+                best_match, best_score = match_result
+                best_resource = resource_name
+
+        if best_match and best_resource:
+            suggestions['new_synonyms'].append({
+                'value': individual_id,
+                'resource': best_resource,
+                'matched_synonym': best_match,
+                'match_score': best_score,
+                'count': count
+            })
+        else:
+            # No match found - suggest as new resource
+            suggestions['new_resources'].append({
+                'value': individual_id,
+                'count': count
+            })
+
+    # Sort by count (descending)
+    for category in suggestions:
+        suggestions[category].sort(key=lambda x: x['count'], reverse=True)
+
+    logger.info(f"Found {len(suggestions['new_resources'])} new resource suggestions")
+    logger.info(f"Found {len(suggestions['new_synonyms'])} new synonym suggestions")
+    logger.info(f"Found {len(suggestions['existing_exact'])} exact matches with resourceName")
+    logger.info(f"Found {len(suggestions['existing_synonyms'])} matches with existing synonyms")
+
+    return suggestions
+
+
+def analyze_facets(
+    tools_data: List[Dict],
+    existing_facets: Set[str]
+) -> Dict[str, Dict]:
+    """
+    Analyze tools data to suggest facet configuration.
+
+    Args:
+        tools_data: List of tool records
+        existing_facets: Set of column names already configured as facets
+
+    Returns:
+        Dictionary with facet analysis:
+        - 'existing_facets': Info about existing facets (diversity, sample values)
+        - 'suggested_new_facets': Columns that could be good facets
+    """
+    logger.info("Analyzing facet configuration...")
+
+    if not tools_data:
+        return {'existing_facets': {}, 'suggested_new_facets': {}}
+
+    # Count unique values per column
+    column_values = defaultdict(set)
+
+    for tool in tools_data:
+        for column, value in tool.items():
+            if value is not None and str(value).strip():
+                # Handle comma-separated lists
+                value_str = str(value).strip()
+                if ',' in value_str:
+                    # Split and add each value
+                    for v in value_str.split(','):
+                        if v.strip():
+                            column_values[column].add(v.strip())
+                else:
+                    column_values[column].add(value_str)
+
+    # Analyze existing facets
+    existing_facets_info = {}
+    for column in existing_facets:
+        if column in column_values:
+            values = column_values[column]
+            existing_facets_info[column] = {
+                'unique_count': len(values),
+                'sample_values': sorted(list(values))[:10]
+            }
+
+    # Suggest new facets (columns with good diversity, not already facets)
+    suggested_new_facets = {}
+    for column, values in column_values.items():
         unique_count = len(values)
-        if unique_count >= MIN_FILTER_FREQUENCY:
-            filter_suggestions[field] = unique_count
 
-    logger.info(f"Found {len(filtered_suggestions)} tool fields with suggested additions")
-    logger.info(f"Found {len(filter_suggestions)} tool fields as potential filters")
+        # Skip if already a facet
+        if column in existing_facets:
+            continue
 
-    return filtered_suggestions, filter_suggestions
+        # Only suggest if has enough diversity
+        if unique_count >= MIN_FILTER_FREQUENCY and unique_count <= 100:  # Not too many
+            suggested_new_facets[column] = {
+                'unique_count': unique_count,
+                'sample_values': sorted(list(values))[:10]
+            }
+
+    # Sort by unique count
+    suggested_new_facets = dict(sorted(
+        suggested_new_facets.items(),
+        key=lambda x: x[1]['unique_count'],
+        reverse=True
+    ))
+
+    logger.info(f"Analyzed {len(existing_facets_info)} existing facets")
+    logger.info(f"Suggested {len(suggested_new_facets)} new facets")
+
+    return {
+        'existing_facets': existing_facets_info,
+        'suggested_new_facets': suggested_new_facets
+    }
 
 
 def format_suggestions_as_markdown(
-    suggestions: Dict[str, Dict[str, int]],
-    filters: Dict[str, int]
+    individual_id_suggestions: Dict[str, List[Dict]],
+    facet_analysis: Dict[str, Dict]
 ) -> str:
     """
     Format suggestions as markdown for PR description.
 
     Args:
-        suggestions: Field suggestions with counts
-        filters: Filter candidates with unique value counts
+        individual_id_suggestions: Categorized individualID suggestions
+        facet_analysis: Facet configuration analysis
 
     Returns:
         Markdown formatted string
     """
-    md = ["# Tool Annotation Review - Schema Updates from Synapse Annotations\n"]
-    md.append("This PR contains automatic updates to the NF Research Tools schema based on ")
-    md.append(f"analysis of tool-related file annotations in Synapse view {MATERIALIZED_VIEW_ID}.\n\n")
-    md.append("**Note:** This review checks both tools schema values and metadata dictionary enums ")
-    md.append("(including synonyms/aliases) to avoid suggesting values that are already defined.\n")
+    md = ["# Tool Annotation Review - Schema Updates and Facet Suggestions\n\n"]
+    md.append("This PR contains automatic updates based on analysis of:\n")
+    md.append(f"- **Annotations**: individualID values from {ANNOTATIONS_VIEW_ID}\n")
+    md.append(f"- **Tools data**: resourceName, synonyms, and facets from {TOOLS_VIEW_ID}\n\n")
 
-    if suggestions:
-        md.append("\n## Suggested Value Additions\n")
-        md.append("The following values appear in tool-related annotations but are not currently ")
-        md.append("in the tools schema. Values shown with frequency counts.\n")
+    # Section 1: individualID value suggestions
+    md.append("## 1. IndividualID Value Suggestions\n\n")
 
-        for field in sorted(suggestions.keys()):
-            values = suggestions[field]
-            md.append(f"\n### Field: `{field}`\n")
+    new_resources = individual_id_suggestions.get('new_resources', [])
+    new_synonyms = individual_id_suggestions.get('new_synonyms', [])
+    existing_exact = individual_id_suggestions.get('existing_exact', [])
+    existing_synonyms = individual_id_suggestions.get('existing_synonyms', [])
 
-            # Sort by frequency (descending)
-            sorted_values = sorted(values.items(), key=lambda x: x[1], reverse=True)
+    if new_resources:
+        md.append(f"### New Resources to Add ({len(new_resources)})\n")
+        md.append("These individualID values don't match any existing resourceName or synonyms:\n\n")
+        for item in new_resources[:20]:
+            md.append(f"- `{item['value']}` (used {item['count']} times)\n")
+        if len(new_resources) > 20:
+            md.append(f"\n*...and {len(new_resources) - 20} more*\n")
+        md.append("\n")
 
-            for value, count in sorted_values[:20]:  # Limit to top 20
-                md.append(f"- `{value}` (used {count} times)\n")
+    if new_synonyms:
+        md.append(f"### Synonyms to Add ({len(new_synonyms)})\n")
+        md.append("These individualID values fuzzy-match existing synonyms and could be added as synonyms:\n\n")
+        for item in new_synonyms[:20]:
+            md.append(f"- `{item['value']}` → add as synonym to `{item['resource']}` ")
+            md.append(f"(matches `{item['matched_synonym']}`, score: {item['match_score']:.2f}, ")
+            md.append(f"used {item['count']} times)\n")
+        if len(new_synonyms) > 20:
+            md.append(f"\n*...and {len(new_synonyms) - 20} more*\n")
+        md.append("\n")
 
-            if len(sorted_values) > 20:
-                md.append(f"\n*...and {len(sorted_values) - 20} more*\n")
+    if existing_exact:
+        md.append(f"### ✓ Existing Resources ({len(existing_exact)})\n")
+        md.append("These individualID values already match resourceName exactly:\n\n")
+        for item in existing_exact[:10]:
+            md.append(f"- `{item['value']}` (used {item['count']} times)\n")
+        if len(existing_exact) > 10:
+            md.append(f"\n*...and {len(existing_exact) - 10} more*\n")
+        md.append("\n")
+
+    if existing_synonyms:
+        md.append(f"### ✓ Existing Synonyms ({len(existing_synonyms)})\n")
+        md.append("These individualID values already match existing synonyms:\n\n")
+        for item in existing_synonyms[:10]:
+            md.append(f"- `{item['value']}` (synonym of `{item['resource']}`, used {item['count']} times)\n")
+        if len(existing_synonyms) > 10:
+            md.append(f"\n*...and {len(existing_synonyms) - 10} more*\n")
+        md.append("\n")
+
+    # Section 2: Facet analysis
+    md.append("## 2. Facet Configuration Analysis\n\n")
+
+    existing_facets = facet_analysis.get('existing_facets', {})
+    suggested_facets = facet_analysis.get('suggested_new_facets', {})
+
+    if existing_facets:
+        md.append(f"### Current Facets ({len(existing_facets)})\n")
+        md.append("Columns currently configured as facets:\n\n")
+        for column, info in sorted(existing_facets.items(), key=lambda x: x[1]['unique_count'], reverse=True):
+            md.append(f"- `{column}` ({info['unique_count']} unique values)\n")
+            sample = ", ".join([f"`{v}`" for v in info['sample_values'][:5]])
+            md.append(f"  - Sample values: {sample}\n")
+        md.append("\n")
+
+    if suggested_facets:
+        md.append(f"### Suggested New Facets ({len(suggested_facets)})\n")
+        md.append("Columns with good value diversity that could be added as facets:\n\n")
+        for column, info in list(suggested_facets.items())[:15]:
+            md.append(f"- `{column}` ({info['unique_count']} unique values)\n")
+            sample = ", ".join([f"`{v}`" for v in info['sample_values'][:5]])
+            md.append(f"  - Sample values: {sample}\n")
+        if len(suggested_facets) > 15:
+            md.append(f"\n*...and {len(suggested_facets) - 15} more*\n")
+        md.append("\n")
     else:
-        md.append("\n## No New Values Suggested\n")
-        md.append("All tool annotation values match existing schema definitions.\n")
+        md.append("### No New Facets Suggested\n")
+        md.append("All columns with good diversity are already configured as facets.\n\n")
 
-    if filters:
-        md.append("\n## Suggested Search Filters\n")
-        md.append("The following tool-related fields have diverse values and could be useful as ")
-        md.append("search filters:\n")
-
-        # Sort by unique value count (descending)
-        sorted_filters = sorted(filters.items(), key=lambda x: x[1], reverse=True)
-
-        for field, count in sorted_filters:
-            md.append(f"- `{field}` ({count} unique values)\n")
-
-    md.append("\n---\n")
+    md.append("---\n")
     md.append("*Generated by automated tool annotation review workflow*\n")
 
     return ''.join(md)
 
 
 def save_suggestions_to_file(
-    suggestions: Dict[str, Dict[str, int]],
-    filters: Dict[str, int],
+    individual_id_suggestions: Dict[str, List[Dict]],
+    facet_analysis: Dict[str, Dict],
     output_file: Path
 ) -> None:
     """
     Save suggestions to JSON file for potential automated processing.
 
     Args:
-        suggestions: Field suggestions with counts
-        filters: Filter candidates
+        individual_id_suggestions: Categorized individualID suggestions
+        facet_analysis: Facet configuration analysis
         output_file: Path to output file
     """
     data = {
-        'suggestions': suggestions,
-        'filters': filters,
-        'materialized_view': MATERIALIZED_VIEW_ID,
-        'tool_fields_reviewed': list(TOOL_RELATED_FIELDS)
+        'individual_id_suggestions': individual_id_suggestions,
+        'facet_analysis': facet_analysis,
+        'annotations_view': ANNOTATIONS_VIEW_ID,
+        'tools_view': TOOLS_VIEW_ID,
+        'min_frequency': MIN_FREQUENCY,
+        'fuzzy_match_threshold': FUZZY_MATCH_THRESHOLD
     }
 
     with open(output_file, 'w') as f:
@@ -459,7 +522,7 @@ def save_suggestions_to_file(
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Review tool-related Synapse annotations and suggest schema additions'
+        description='Review Synapse annotations and tools schema, suggest additions and facet configuration'
     )
     parser.add_argument(
         '--output',
@@ -498,49 +561,59 @@ def main():
         syn.login(authToken=auth_token)
         logger.info("Logged into Synapse")
 
-        # Load tools schema
-        logger.info("Loading tools schema values...")
-        schema_values = load_tools_schema_values()
+        # Query individualID from annotations
+        logger.info("\n=== Querying Annotations ===")
+        individual_ids = query_individual_ids(syn, limit=args.limit)
 
-        # Load metadata dictionary enums for synonym checking
-        logger.info("Loading metadata dictionary enums for synonym checking...")
-        metadata_enums = load_metadata_dict_enums()
-        slot_enum_map = load_metadata_dict_slot_mappings()
+        # Query tools data
+        logger.info("\n=== Querying Tools Data ===")
+        tools_data = query_tools_data(syn, limit=args.limit)
 
-        # Query annotations
-        records = query_synapse_annotations(syn, limit=args.limit)
+        # Get facet configuration
+        logger.info("\n=== Getting Facet Configuration ===")
+        existing_facets = get_facet_columns(syn)
 
-        # Analyze tool-related annotations
-        logger.info("Analyzing tool-related annotations...")
-        suggestions, filters = analyze_tool_annotations(
-            records,
-            schema_values,
-            metadata_enums,
-            slot_enum_map
-        )
+        # Analyze individualID values
+        logger.info("\n=== Analyzing IndividualID Values ===")
+        individual_id_suggestions = analyze_individual_ids(individual_ids, tools_data)
+
+        # Analyze facet configuration
+        logger.info("\n=== Analyzing Facet Configuration ===")
+        facet_analysis = analyze_facets(tools_data, existing_facets)
 
         # Format as markdown
-        markdown = format_suggestions_as_markdown(suggestions, filters)
+        markdown = format_suggestions_as_markdown(
+            individual_id_suggestions,
+            facet_analysis
+        )
 
         if args.dry_run:
-            logger.info("Dry run - printing results:")
+            logger.info("\n=== Dry Run - Printing Results ===")
             print("\n" + "="*80)
             print(markdown)
             print("="*80)
         else:
             # Save files
-            save_suggestions_to_file(suggestions, filters, args.output)
+            save_suggestions_to_file(
+                individual_id_suggestions,
+                facet_analysis,
+                args.output
+            )
 
             with open(args.markdown, 'w') as f:
                 f.write(markdown)
             logger.info(f"Saved markdown to {args.markdown}")
 
         # Summary
-        total_suggestions = sum(len(v) for v in suggestions.values())
-        logger.info(f"\nSummary:")
-        logger.info(f"  - {len(suggestions)} tool fields with suggested additions")
-        logger.info(f"  - {total_suggestions} total value suggestions")
-        logger.info(f"  - {len(filters)} potential search filters")
+        logger.info(f"\n=== Summary ===")
+        logger.info(f"  IndividualID Analysis:")
+        logger.info(f"    - {len(individual_id_suggestions.get('new_resources', []))} new resources to add")
+        logger.info(f"    - {len(individual_id_suggestions.get('new_synonyms', []))} synonyms to add")
+        logger.info(f"    - {len(individual_id_suggestions.get('existing_exact', []))} exact matches")
+        logger.info(f"    - {len(individual_id_suggestions.get('existing_synonyms', []))} synonym matches")
+        logger.info(f"  Facet Analysis:")
+        logger.info(f"    - {len(facet_analysis.get('existing_facets', {}))} existing facets")
+        logger.info(f"    - {len(facet_analysis.get('suggested_new_facets', {}))} suggested new facets")
 
     except Exception as e:
         logger.error(f"Error: {e}")
