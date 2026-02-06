@@ -186,9 +186,11 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 
 **File:** `.github/workflows/check-tool-coverage.yml`
 
-**Schedule:** Weekly on Mondays at 9 AM UTC
+**Trigger:**
+- When PR from review-tool-annotations is merged (label: `automated-annotation-review`)
+- Manual trigger via workflow_dispatch
 
-**Manual Trigger:** Available via workflow dispatch with options:
+**Manual Trigger Options:**
 - **AI Validation** (default: enabled) - Run Goose AI validation on mined tools
 - **Max Publications** (default: all) - Limit number of publications to mine
 - **Force Re-reviews** (default: disabled) - Force re-review of already-reviewed publications

@@ -201,6 +201,100 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ---
 
+## 🔧 Supporting Workflows
+
+These workflows support the main sequence but run independently:
+
+### Upsert Tools to Synapse (upsert-tools.yml)
+
+**Purpose**: Automatically upload validated tool data to Synapse
+
+**Trigger**:
+- When SUBMIT_*.csv or VALIDATED_*.csv files are pushed to main
+- Manual: workflow_dispatch with optional dry-run
+
+**What it does**:
+1. Detects VALIDATED_*.csv (AI-validated) or SUBMIT_*.csv files
+2. Validates CSV schemas
+3. Cleans tracking columns (prefixed with `_`)
+4. Uploads to corresponding Synapse tables:
+   - syn26486808 (animal models)
+   - syn26486811 (antibodies)
+   - syn26486823 (cell lines)
+   - syn26486832 (genetic reagents)
+   - syn26450069 (resources)
+5. Regenerates coverage report
+
+**No PR Created**: Uploads directly, creates summary in Actions
+
+---
+
+### Upsert PubMed Publications (upsert-pubmed-publications.yml)
+
+**Purpose**: Upload mined PubMed publications to Synapse
+
+**Trigger**:
+- When pubmed_nf_publications.csv is pushed to main
+- Manual: workflow_dispatch
+
+**What it does**:
+1. Validates publication CSV format
+2. Deduplicates against existing publications
+3. Uploads to syn26486839 (publications table)
+
+**Target Table**: syn26486839
+
+---
+
+### Upsert Tool Datasets (upsert-tool-datasets.yml)
+
+**Purpose**: Upload tool-dataset linkages to Synapse
+
+**Trigger**:
+- When SUBMIT_tool_datasets.csv is pushed to main
+- Manual: workflow_dispatch
+
+**What it does**:
+1. Validates dataset linkage CSV
+2. Uploads to appropriate Synapse table
+3. Links datasets to tools via publications
+
+---
+
+### Publish Schema Visualization (publish-schema-viz.yml)
+
+**Purpose**: Generate and publish interactive schema visualization
+
+**Trigger**:
+- When schema files change
+- Manual: workflow_dispatch
+
+**What it does**:
+1. Generates visual representation of schema
+2. Creates interactive documentation
+3. Publishes to GitHub Pages or artifact
+
+**Output**: Interactive schema browser
+
+---
+
+### Schematic Schema Convert (schematic-schema-convert.yml)
+
+**Purpose**: Convert between schema formats
+
+**Trigger**:
+- When schema CSV is updated
+- Manual: workflow_dispatch
+
+**What it does**:
+1. Converts nf_research_tools.rdb.model.csv to JSON-LD
+2. Validates schema format
+3. Commits converted schema
+
+**Note**: Keeps CSV and JSON-LD schemas in sync
+
+---
+
 ## 🛠️ Setup Requirements
 
 ### Required Secrets
