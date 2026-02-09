@@ -267,15 +267,10 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
             skipped_duplicate += 1
             continue
 
-        # Only include publications with "Journal Article" type
+        # Only include publications with EXACTLY "Journal Article" type (no concatenated types)
         pub_types = pub.get('publication_types', '')
-        if 'Journal Article' not in pub_types:
+        if pub_types != 'Journal Article':
             skipped_not_journal_article += 1
-            continue
-
-        # Skip reviews
-        pub_types_lower = pub_types.lower()
-        if 'review' in pub_types_lower and 'systematic review' not in pub_types_lower:
             continue
 
         # Only include publications with free full text
