@@ -112,12 +112,6 @@ def main():
 
     print(f"📝 Found {len(new_pubs)} new publications to add to {table_id}")
 
-    # Add optional columns to dataframe (fill with empty string)
-    optional_cols = ['fundingAgency', 'consortium']
-    for col in optional_cols:
-        if col not in new_pubs.columns:
-            new_pubs[col] = ''
-
     # Get table schema to validate columns
     print("🔍 Checking table schema...")
 
@@ -142,9 +136,13 @@ def main():
     print(f"   Table has {len(schema_col_names)} columns")
 
     # Prepare data for Synapse table
+    # Expected columns in CSV match syn26486839 schema
+    expected_cols = ['publicationId', 'doi', 'pmid', 'abstract', 'journal',
+                     'publicationDate', 'citation', 'publicationDateUnix',
+                     'authors', 'publicationTitle']
+
     # Only include columns that exist in both dataframe and table schema
-    available_cols = ['pmid', 'doi', 'title', 'journal', 'year', 'pmc_id', 'publication_types'] + optional_cols
-    valid_cols = [col for col in available_cols if col in new_pubs.columns and col in schema_col_names]
+    valid_cols = [col for col in expected_cols if col in new_pubs.columns and col in schema_col_names]
 
     print(f"   Using columns: {', '.join(valid_cols)}")
     table_df = new_pubs[valid_cols].copy()

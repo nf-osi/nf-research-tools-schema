@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'tool_coverage/outputs/pubmed_nf_publications.csv'
+      - 'tool_coverage/outputs/pubmed_nf_publications_synapse.csv'
   workflow_dispatch:  # Allow manual testing
     inputs:
       dry_run:
@@ -15,10 +16,10 @@ on:
         type: boolean
         default: true
       csv_path:
-        description: 'Path to CSV file (default: tool_coverage/outputs/pubmed_nf_publications.csv)'
+        description: 'Path to CSV file (default: tool_coverage/outputs/pubmed_nf_publications_synapse.csv)'
         required: false
         type: string
-        default: 'tool_coverage/outputs/pubmed_nf_publications.csv'
+        default: 'tool_coverage/outputs/pubmed_nf_publications_synapse.csv'
 
 permissions:
   contents: write
@@ -49,7 +50,7 @@ jobs:
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-          CSV_PATH: ${{ github.event.inputs.csv_path || 'tool_coverage/outputs/pubmed_nf_publications.csv' }}
+          CSV_PATH: ${{ github.event.inputs.csv_path || 'tool_coverage/outputs/pubmed_nf_publications_synapse.csv' }}
         run: |
           python - <<'PYTHON_SCRIPT'
           import os
@@ -66,7 +67,7 @@ jobs:
               USE_NEW_API = False
 
           # Get configuration from environment
-          csv_file = os.getenv('CSV_PATH', 'tool_coverage/outputs/pubmed_nf_publications.csv')
+          csv_file = os.getenv('CSV_PATH', 'tool_coverage/outputs/pubmed_nf_publications_synapse.csv')
           dry_run = os.getenv('DRY_RUN', 'false').lower() == 'true'
 
           if dry_run:
@@ -129,12 +130,6 @@ jobs:
 
           print(f"📝 Adding {len(new_pubs)} new publications to syn26486839")
 
-          # Add optional columns to dataframe (fill with empty string)
-          optional_cols = ['fundingAgency', 'consortium']
-          for col in optional_cols:
-              if col not in new_pubs.columns:
-                  new_pubs[col] = ''
-
           # Get table schema to validate columns
           print("🔍 Checking table schema...")
 
@@ -158,11 +153,15 @@ jobs:
 
           print(f"   Table has {len(schema_col_names)} columns")
 
-          # Prepare data for Synapse table
-          # Note: We're not classifying as usage/development yet - that requires manual review
+          # Prepare data for Synapse table matching syn26486839 schema
+          # Expected columns: publicationId, doi, pmid, abstract, journal,
+          #                   publicationDate, citation, publicationDateUnix, authors, publicationTitle
+          expected_cols = ['publicationId', 'doi', 'pmid', 'abstract', 'journal',
+                           'publicationDate', 'citation', 'publicationDateUnix',
+                           'authors', 'publicationTitle']
+
           # Only include columns that exist in both dataframe and table schema
-          available_cols = ['pmid', 'doi', 'title', 'journal', 'year', 'pmc_id', 'publication_types'] + optional_cols
-          valid_cols = [col for col in available_cols if col in new_pubs.columns and col in schema_col_names]
+          valid_cols = [col for col in expected_cols if col in new_pubs.columns and col in schema_col_names]
 
           print(f"   Using columns: {', '.join(valid_cols)}")
           table_df = new_pubs[valid_cols].copy()
