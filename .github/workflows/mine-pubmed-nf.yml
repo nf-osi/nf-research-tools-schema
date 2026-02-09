@@ -115,6 +115,7 @@ jobs:
         if: steps.mining.outputs.mining_success == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
           commit-message: |
             Add PubMed mining results for NF publications
 
