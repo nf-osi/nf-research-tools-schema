@@ -28,6 +28,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -113,7 +116,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.mining.outputs.mining_success == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
           commit-message: |
