@@ -7,12 +7,17 @@ on:
   workflow_dispatch:  # Allow manual triggering
     inputs:
       max_results:
-        description: 'Maximum number of publications to retrieve'
+        description: 'Maximum number of publications to retrieve (from PubMed, before filtering)'
         required: false
         type: string
         default: '1000'
       years:
         description: 'Year range (e.g., 2020:2024) to limit search'
+        required: false
+        type: string
+        default: ''
+      days:
+        description: 'Only publications from last N days (leave empty for scheduled weekly runs to auto-use 7 days)'
         required: false
         type: string
         default: ''
@@ -56,6 +61,12 @@ jobs:
 
           if [ -n "${{ github.event.inputs.years }}" ]; then
             CMD="$CMD --years ${{ github.event.inputs.years }}"
+          elif [ -n "${{ github.event.inputs.days }}" ]; then
+            CMD="$CMD --days ${{ github.event.inputs.days }}"
+          elif [ "${{ github.event_name }}" == "schedule" ]; then
+            # For scheduled weekly runs, automatically fetch last 7 days
+            CMD="$CMD --days 7"
+            echo "ℹ️  Scheduled run: fetching publications from last 7 days"
           fi
 
           # Run mining
