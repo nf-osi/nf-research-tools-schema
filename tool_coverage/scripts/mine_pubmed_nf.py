@@ -309,7 +309,7 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
     Filter publications to include only research articles with free full text.
 
     Note: Duplicates are now filtered BEFORE fetching details (more efficient).
-    This function now just does final validation.
+    This function does final validation including EXACT match on publication type.
 
     Args:
         pubs: List of publication dictionaries
@@ -322,16 +322,24 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
         existing_pmids = set()
 
     filtered = []
+    skipped_wrong_type = 0
 
     for pub in pubs:
-        # PubMed query already filtered for:
-        # - Journal Article[Publication Type]
-        # - free full text[Filter]
-        # But double-check to be safe
+        # CRITICAL: PubMed query includes publications where "Journal Article" is ONE of the types
+        # (e.g., "Journal Article|Case Reports"), but we want ONLY "Journal Article" (exact match)
+        pub_types = pub.get('publication_types', '')
+        if pub_types != 'Journal Article':
+            skipped_wrong_type += 1
+            continue
+
+        # Double-check free full text (query should already filter this)
         if not pub.get('has_free_fulltext', False):
             continue
 
         filtered.append(pub)
+
+    if skipped_wrong_type > 0:
+        print(f"   Filtered out {skipped_wrong_type} publications with concatenated types (not pure Journal Article)")
 
     return filtered
 
