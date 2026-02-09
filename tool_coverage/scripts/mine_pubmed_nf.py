@@ -10,11 +10,13 @@ import os
 import sys
 import time
 import argparse
+import uuid
 from datetime import datetime
 from typing import List, Dict, Optional, Set
 import requests
 from xml.etree import ElementTree as ET
 import pandas as pd
+from dateutil import parser as date_parser
 
 try:
     import synapseclient
@@ -149,9 +151,49 @@ def extract_article_metadata(article) -> Optional[Dict]:
         title_elem = article_elem.find('.//ArticleTitle')
         title = title_elem.text if title_elem is not None else ''
 
-        # Abstract
+        # Abstract - extract all text elements and labels
+        abstract_parts = []
         abstract_texts = article_elem.findall('.//AbstractText')
-        abstract = ' '.join([a.text for a in abstract_texts if a.text]) if abstract_texts else ''
+        for abstract_elem in abstract_texts:
+            # Check for labeled sections (BACKGROUND:, METHODS:, etc.)
+            label = abstract_elem.get('Label', '')
+            text = ''.join(abstract_elem.itertext()).strip()
+            if text:
+                if label:
+                    abstract_parts.append(f"{label}: {text}")
+                else:
+                    abstract_parts.append(text)
+        abstract = ' '.join(abstract_parts) if abstract_parts else ''
+
+        # Authors - format: LastName Initials. (comma-separated)
+        # Example: "Pong WW, Higer SB, Gianino SM, Emnett RJ, Gutmann DH."
+        author_list = article_elem.findall('.//Author')
+        authors = []
+        for author in author_list:
+            last_name = author.find('.//LastName')
+            fore_name = author.find('.//ForeName')
+            initials_elem = author.find('.//Initials')
+
+            if last_name is not None:
+                last = last_name.text or ''
+
+                # Try to get initials from Initials field first
+                if initials_elem is not None and initials_elem.text:
+                    initials = initials_elem.text
+                # Otherwise extract from ForeName
+                elif fore_name is not None and fore_name.text:
+                    # Extract initials from first name
+                    name_parts = fore_name.text.split()
+                    initials = ''.join([part[0].upper() for part in name_parts if part])
+                else:
+                    initials = ''
+
+                if initials:
+                    authors.append(f"{last} {initials}.")
+                else:
+                    authors.append(f"{last}.")
+
+        authors_str = ', '.join(authors) if authors else ''
 
         # Journal
         journal_elem = article_elem.find('.//Journal')
@@ -160,12 +202,27 @@ def extract_article_metadata(article) -> Optional[Dict]:
             title_elem = journal_elem.find('.//Title')
             journal = title_elem.text if title_elem is not None else ''
 
-        # Publication date
+        # Publication date - get full date
         pub_date = medline.find('.//PubDate')
         year = ''
+        month = ''
+        day = ''
+        full_date = ''
         if pub_date is not None:
             year_elem = pub_date.find('.//Year')
             year = year_elem.text if year_elem is not None else ''
+            month_elem = pub_date.find('.//Month')
+            month = month_elem.text if month_elem is not None else ''
+            day_elem = pub_date.find('.//Day')
+            day = day_elem.text if day_elem is not None else ''
+
+            # Create full date string
+            if year and month and day:
+                full_date = f"{year}-{month}-{day}"
+            elif year and month:
+                full_date = f"{year}-{month}"
+            elif year:
+                full_date = year
 
         # DOI
         doi = ''
@@ -197,7 +254,9 @@ def extract_article_metadata(article) -> Optional[Dict]:
             'title': title,
             'journal': journal,
             'year': year,
+            'publicationDate': full_date,
             'abstract': abstract,
+            'authors': authors_str,
             'publication_types': '|'.join(pub_types),
             'pmc_id': pmc_id,
             'has_free_fulltext': has_free_fulltext
@@ -223,17 +282,19 @@ def get_existing_publications() -> Set[str]:
         syn = synapseclient.Synapse()
         auth_token = os.getenv('SYNAPSE_AUTH_TOKEN')
         if auth_token:
-            syn.login(authToken=auth_token)
+            syn.login(authToken=auth_token, silent=True)
         else:
-            print("   ⚠️  No SYNAPSE_AUTH_TOKEN found, skipping duplicate check")
-            return set()
+            # Try anonymous login for public data
+            print("   ℹ️  No SYNAPSE_AUTH_TOKEN found, trying anonymous access")
+            syn.login(silent=True)
 
         # Query publications table for existing PMIDs
         query = "SELECT pmid FROM syn26486839"
         results = syn.tableQuery(query)
         df = results.asDataFrame()
 
-        existing_pmids = set(df['pmid'].str.upper().tolist())
+        # Normalize PMIDs to uppercase for comparison
+        existing_pmids = set(df['pmid'].dropna().str.upper().tolist())
         print(f"   Found {len(existing_pmids)} existing publications in syn26486839")
 
         return existing_pmids
@@ -375,17 +436,67 @@ def main():
     synapse_output = args.output.replace('.csv', '_synapse.csv')
     df_synapse = pd.DataFrame(filtered_pubs)
 
+    def generate_citation(row):
+        """Generate citation string from publication metadata."""
+        authors = row.get('authors', '')
+        title = row.get('title', '')
+        journal = row.get('journal', '')
+        year = row.get('year', '')
+        doi = row.get('doi', '')
+
+        # Format: Authors. Title. Journal. Year. DOI
+        parts = []
+        if authors:
+            parts.append(authors)
+        if title:
+            parts.append(title)
+        if journal:
+            parts.append(journal)
+        if year:
+            parts.append(f"({year})")
+        if doi:
+            parts.append(f"doi:{doi}")
+
+        return '. '.join(parts) if parts else ''
+
+    def parse_date_to_unix(date_str):
+        """Convert publication date to Unix timestamp (milliseconds)."""
+        if not date_str:
+            return ''
+        try:
+            # Handle various date formats
+            if '-' in date_str:
+                # Try parsing full date
+                dt = date_parser.parse(date_str)
+            else:
+                # Just a year
+                dt = datetime(int(date_str), 1, 1)
+            # Return Unix timestamp in milliseconds
+            return int(dt.timestamp() * 1000)
+        except:
+            return ''
+
+    # Generate citation, Unix timestamps, and unique publicationIds
+    citations = []
+    unix_timestamps = []
+    publication_ids = []
+    for _, row in df_synapse.iterrows():
+        citations.append(generate_citation(row))
+        unix_timestamps.append(parse_date_to_unix(row.get('publicationDate', '')))
+        # Generate unique UUID for each publication
+        publication_ids.append(str(uuid.uuid4()))
+
     # Map to Synapse table column names
     df_synapse_formatted = pd.DataFrame({
-        'publicationId': '',  # Will be auto-generated by Synapse
+        'publicationId': publication_ids,
         'doi': df_synapse['doi'],
         'pmid': df_synapse['pmid'],
         'abstract': df_synapse['abstract'],
         'journal': df_synapse['journal'],
-        'publicationDate': df_synapse['year'],  # Map year to publicationDate
-        'citation': '',  # Will be generated from other fields
-        'publicationDateUnix': '',  # Will be generated from publicationDate
-        'authors': '',  # Can be extracted from PubMed if needed
+        'publicationDate': df_synapse['publicationDate'],
+        'citation': citations,
+        'publicationDateUnix': unix_timestamps,
+        'authors': df_synapse['authors'],
         'publicationTitle': df_synapse['title']
     })
 
