@@ -438,11 +438,11 @@ def main():
 
     def generate_citation(row):
         """Generate citation string from publication metadata."""
-        authors = row.get('authors', '')
-        title = row.get('title', '')
-        journal = row.get('journal', '')
-        year = row.get('year', '')
-        doi = row.get('doi', '')
+        authors = str(row.get('authors', '')) if row.get('authors') else ''
+        title = str(row.get('title', '')) if row.get('title') else ''
+        journal = str(row.get('journal', '')) if row.get('journal') else ''
+        year = str(row.get('year', '')) if row.get('year') else ''
+        doi = str(row.get('doi', '')) if row.get('doi') else ''
 
         # Format: Authors. Title. Journal. Year. DOI
         parts = []
