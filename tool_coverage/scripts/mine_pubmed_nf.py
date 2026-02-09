@@ -308,9 +308,12 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
     """
     Filter publications to include only research articles with free full text.
 
+    Note: Duplicates are now filtered BEFORE fetching details (more efficient).
+    This function now just does final validation.
+
     Args:
         pubs: List of publication dictionaries
-        existing_pmids: Set of PMIDs already in database
+        existing_pmids: Set of PMIDs already in database (usually empty now)
 
     Returns:
         Filtered list of publications
@@ -319,31 +322,16 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
         existing_pmids = set()
 
     filtered = []
-    skipped_duplicate = 0
-    skipped_not_journal_article = 0
 
     for pub in pubs:
-        # Skip duplicates
-        if pub.get('pmid', '').upper() in existing_pmids:
-            skipped_duplicate += 1
-            continue
-
-        # Only include publications with EXACTLY "Journal Article" type (no concatenated types)
-        pub_types = pub.get('publication_types', '')
-        if pub_types != 'Journal Article':
-            skipped_not_journal_article += 1
-            continue
-
-        # Only include publications with free full text
+        # PubMed query already filtered for:
+        # - Journal Article[Publication Type]
+        # - free full text[Filter]
+        # But double-check to be safe
         if not pub.get('has_free_fulltext', False):
             continue
 
         filtered.append(pub)
-
-    if skipped_duplicate > 0:
-        print(f"   Skipped {skipped_duplicate} duplicate publications")
-    if skipped_not_journal_article > 0:
-        print(f"   Skipped {skipped_not_journal_article} non-journal articles")
 
     return filtered
 
@@ -369,6 +357,11 @@ def main():
         type=str,
         help='Year range (e.g., 2020:2024) to limit search'
     )
+    parser.add_argument(
+        '--days',
+        type=int,
+        help='Only include publications from the last N days (e.g., 7 for weekly runs)'
+    )
 
     args = parser.parse_args()
 
@@ -377,45 +370,69 @@ def main():
     print("=" * 80)
 
     # Build search query
-    # Include neurofibromatosis terms, exclude reviews, require free full text
+    # Include neurofibromatosis terms, require Journal Article type, require free full text
     query_parts = [
         '(neurofibromatosis[Title/Abstract] OR neurofibromatoses[Title/Abstract]',
         'OR "neurofibromatosis type 1"[Title/Abstract] OR "neurofibromatosis type 2"[Title/Abstract]',
         'OR NF1[Title/Abstract] OR NF2[Title/Abstract] OR schwannomatosis[Title/Abstract])',
         'AND (hasabstract)',
         'AND (free full text[Filter])',
-        'NOT (review[Publication Type])',
-        'NOT (systematic review[Publication Type])'
+        'AND (Journal Article[Publication Type])'
     ]
 
     if args.years:
         query_parts.append(f'AND ({args.years}[Publication Date])')
+    elif args.days:
+        # Calculate date range for last N days
+        from datetime import datetime, timedelta
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=args.days)
+        date_range = f'{start_date.strftime("%Y/%m/%d")}:{end_date.strftime("%Y/%m/%d")}'
+        query_parts.append(f'AND ("{date_range}"[Publication Date])')
 
     query = ' '.join(query_parts)
+
+    # Check for existing publications in Synapse FIRST (before fetching from PubMed)
+    print(f"\n🔍 Checking existing publications in Synapse (syn26486839)...")
+    existing_pmids = get_existing_publications()
 
     print(f"\n📋 Search Query:")
     print(f"   {query}")
     print(f"\n🔍 Searching PubMed...")
 
-    # Search PubMed
+    # Search PubMed to get PMIDs
     pmids, total_count = search_pubmed(query, max_results=args.max_results)
 
     if not pmids:
         print("\n❌ No publications found")
         sys.exit(1)
 
-    print(f"\n📚 Fetching details for {len(pmids)} publications...")
-    pubs = fetch_publication_details(pmids)
+    print(f"   Found {len(pmids)} PMIDs from PubMed")
+
+    # Filter out PMIDs that already exist in Synapse BEFORE fetching details
+    pmids_set = set(pmids)
+    # Normalize PMIDs to match format (remove "PMID:" prefix if present)
+    normalized_pmids = {p.replace('PMID:', '') for p in pmids}
+    normalized_existing = {p.replace('PMID:', '') for p in existing_pmids}
+
+    new_pmids = [p for p in pmids if p.replace('PMID:', '') not in normalized_existing]
+    duplicates_skipped = len(pmids) - len(new_pmids)
+
+    if duplicates_skipped > 0:
+        print(f"   Skipped {duplicates_skipped} PMIDs already in Synapse")
+
+    if not new_pmids:
+        print("\n❌ No new publications found (all already in Synapse)")
+        sys.exit(0)
+
+    print(f"\n📚 Fetching details for {len(new_pmids)} NEW publications...")
+    pubs = fetch_publication_details(new_pmids)
 
     print(f"   Retrieved metadata for {len(pubs)} publications")
 
-    # Check for existing publications in Synapse
-    print(f"\n🔍 Checking for duplicates in Synapse (syn26486839)...")
-    existing_pmids = get_existing_publications()
-
-    # Filter publications
-    print(f"\n🔬 Filtering for research articles with free full text...")
-    filtered_pubs = filter_publications(pubs, existing_pmids)
+    # Filter publications (now just checking for free full text, since we already filtered duplicates)
+    print(f"\n🔬 Final filtering...")
+    filtered_pubs = filter_publications(pubs, set())  # Pass empty set since already filtered
 
     print(f"   {len(filtered_pubs)} publications match criteria")
 
