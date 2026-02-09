@@ -259,6 +259,7 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
 
     filtered = []
     skipped_duplicate = 0
+    skipped_not_journal_article = 0
 
     for pub in pubs:
         # Skip duplicates
@@ -266,8 +267,14 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
             skipped_duplicate += 1
             continue
 
+        # Only include publications with "Journal Article" type
+        pub_types = pub.get('publication_types', '')
+        if 'Journal Article' not in pub_types:
+            skipped_not_journal_article += 1
+            continue
+
         # Skip reviews
-        pub_types_lower = pub.get('publication_types', '').lower()
+        pub_types_lower = pub_types.lower()
         if 'review' in pub_types_lower and 'systematic review' not in pub_types_lower:
             continue
 
@@ -279,6 +286,8 @@ def filter_publications(pubs: List[Dict], existing_pmids: Set[str] = None) -> Li
 
     if skipped_duplicate > 0:
         print(f"   Skipped {skipped_duplicate} duplicate publications")
+    if skipped_not_journal_article > 0:
+        print(f"   Skipped {skipped_not_journal_article} non-journal articles")
 
     return filtered
 
@@ -367,10 +376,26 @@ def main():
 
     print(f"\n✅ Saved {len(df)} publications to: {args.output}")
 
+    # Save Synapse-ready version with optional columns
+    synapse_output = args.output.replace('.csv', '_synapse.csv')
+    df_synapse = df.copy()
+
+    # Add optional columns for Synapse table syn26486839
+    df_synapse['fundingAgency'] = ''
+    df_synapse['consortium'] = ''
+
+    # Reorder columns to match Synapse schema
+    synapse_cols = ['pmid', 'doi', 'title', 'journal', 'year', 'pmc_id',
+                    'publication_types', 'fundingAgency', 'consortium']
+    df_synapse = df_synapse[synapse_cols]
+    df_synapse.to_csv(synapse_output, index=False)
+
+    print(f"✅ Saved Synapse-ready version to: {synapse_output}")
+
     # Summary statistics
     print(f"\n📊 Summary:")
     print(f"   Total found: {total_count}")
-    print(f"   With free full text: {len(filtered_pubs)}")
+    print(f"   Journal articles with free full text: {len(filtered_pubs)}")
     print(f"   Year range: {df['year'].min()} - {df['year'].max()}")
     print(f"   Journals: {df['journal'].nunique()} unique")
 

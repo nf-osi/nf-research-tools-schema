@@ -81,19 +81,20 @@ jobs:
           ## Results
 
           - **Publications found:** ${{ steps.mining.outputs.pub_count }}
-          - **Criteria:** Research articles (not reviews) with free full text available
+          - **Criteria:** Journal articles (not reviews) with free full text available
           - **Search terms:** neurofibromatosis, NF1, NF2, schwannomatosis
 
           ## Next Steps
 
-          1. **Review** `pubmed_nf_publications.csv` for relevance
-          2. **Add** relevant publications to NF Research Tools database (syn26486839)
+          1. **Review** publications for relevance
+          2. **Merge PR** - Publications will be automatically upserted to Synapse table (syn26486839)
           3. **Classify** as tool usage (syn26486841) or development (syn26486807)
           4. **Run** publication mining workflow (#92) to discover tools
 
-          ## File
+          ## Files
 
-          - `tool_coverage/outputs/pubmed_nf_publications.csv` - List of publications with PMIDs, DOIs, titles
+          - `tool_coverage/outputs/pubmed_nf_publications.csv` - Publications with metadata
+          - `tool_coverage/outputs/pubmed_nf_publications_synapse.csv` - Synapse-ready format (auto-upserted on merge)
 
           Related to #97 (Step 1: Add NF-related publications from PubMed)
 
@@ -106,6 +107,7 @@ jobs:
           name: pubmed-mining-results
           path: |
             tool_coverage/outputs/pubmed_nf_publications.csv
+            tool_coverage/outputs/pubmed_nf_publications_synapse.csv
             mining_output.log
           retention-days: 90
 
@@ -113,7 +115,6 @@ jobs:
         if: steps.mining.outputs.mining_success == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
           commit-message: |
             Add PubMed mining results for NF publications
 
@@ -130,3 +131,4 @@ jobs:
             publications
           add-paths: |
             tool_coverage/outputs/pubmed_nf_publications.csv
+            tool_coverage/outputs/pubmed_nf_publications_synapse.csv
