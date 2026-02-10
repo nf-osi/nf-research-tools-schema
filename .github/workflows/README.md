@@ -7,76 +7,52 @@ This repository uses automated GitHub Actions workflows to maintain and improve 
 Workflows are coordinated through **PR merge triggers** - each workflow creates a PR, and when merged, triggers the next workflow in the sequence:
 
 ```
-1. mine-pubmed-nf.yml (Sunday 9 AM UTC)
-   ├─ Mines PubMed for NF publications
-   └─ Creates PR with label: pubmed-mining
-         ↓ (when PR merged)
-
-2. review-tool-annotations.yml
+1. review-tool-annotations.yml (Monday 9 AM UTC)
    ├─ Analyzes individualID annotations vs tools
    ├─ Suggests new cell lines and synonyms
    └─ Creates PR with label: automated-annotation-review
          ↓ (when PR merged)
 
-3. check-tool-coverage.yml
-   ├─ Mines publications for novel tools
-   ├─ AI validation with Goose
+2. check-tool-coverage.yml
+   ├─ Mines NF Portal + PubMed publications for tools
+   ├─ Filters for research-focused publications
+   ├─ Checks PMC full text availability
+   ├─ Incremental processing (caches reviewed PMIDs)
+   ├─ AI validation with Goose (optional)
    └─ Creates PR with label: automated-mining
          ↓ (when PR merged)
 
-4. link-tool-datasets.yml
+3. link-tool-datasets.yml
    ├─ Links datasets to tool publications
    └─ Creates PR with label: dataset-linking
          ↓ (when PR merged)
 
-5. score-tools.yml
+4. score-tools.yml
    ├─ Calculates tool completeness scores
    ├─ Uploads directly to Synapse
    └─ No PR created (direct upload)
          ↓ (workflow_run trigger)
 
-6. update-observation-schema.yml
+5. update-observation-schema.yml
    ├─ Updates observation schema from Synapse
    └─ Creates PR only if changes detected
 ```
 
 ### Key Points
 
-- **Entry point**: `mine-pubmed-nf.yml` runs on schedule (Sunday 9 AM UTC)
+- **Entry point**: `review-tool-annotations.yml` runs on schedule (Monday 9 AM UTC)
 - **All other workflows**: Trigger on PR merge from previous step
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
 - **No schedules**: Only the entry point has a schedule; others are PR-driven
 
 ## 📋 Workflow Details
 
-### 1. Mine PubMed (mine-pubmed-nf.yml)
+### 1. Review Tool Annotations (review-tool-annotations.yml)
 
-**Purpose**: Discover NF-related publications from PubMed
-
-**Trigger**:
-- Schedule: Sunday 9 AM UTC
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Queries PubMed for NF-related publications
-2. Filters and deduplicates results
-3. Creates CSV with new publications
-4. Creates PR for review
-
-**Outputs**: `tool_coverage/outputs/pubmed_nf_publications.csv`
-
-**PR Labels**: `pubmed-mining`, `publications`
-
-**Assignee**: BelindaBGarana
-
----
-
-### 2. Review Tool Annotations (review-tool-annotations.yml)
-
-**Purpose**: Analyze individualID annotations and suggest new tools
+**Purpose**: Analyze individualID annotations and suggest new tools (ENTRY POINT)
 
 **Trigger**:
-- When PR from `mine-pubmed-nf` is merged
+- Schedule: Monday 9 AM UTC
 - Manual: workflow_dispatch
 
 **What it does**:
@@ -103,24 +79,28 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ---
 
-### 3. Check Tool Coverage (check-tool-coverage.yml)
+### 2. Check Tool Coverage (check-tool-coverage.yml)
 
-**Purpose**: Mine publications for novel tools and validate with AI
+**Purpose**: Mine NF Portal + PubMed publications for novel tools with AI validation
 
 **Trigger**:
 - When PR from `review-tool-annotations` is merged
 - Manual: workflow_dispatch
 
 **What it does**:
-1. Mines publications from NF Portal for tool mentions
-2. Extracts tools using pattern matching
-3. AI validation using Goose (optional, requires ANTHROPIC_API_KEY)
-4. Applies pattern improvements
-5. Formats results into SUBMIT_*.csv files
-6. Analyzes missing tools
+1. Loads NF Portal publications from Synapse
+2. Applies research-focused filters (excludes clinical case reports, reviews, etc.)
+3. Checks PMC full text availability for NF Portal publications
+4. Queries PubMed for additional research-focused NF publications
+5. Maintains cache of reviewed publications (`previously_reviewed_pmids.csv`)
+6. Mines full text (Methods, Introduction, Results, Discussion sections)
+7. Searches for cell lines, antibodies, animal models, genetic reagents
+8. AI validation using Goose (optional, requires ANTHROPIC_API_KEY)
+9. Formats results into SUBMIT_*.csv files
 
 **Outputs**:
 - `tool_coverage/outputs/processed_publications.csv`
+- `tool_coverage/outputs/previously_reviewed_pmids.csv` (cache)
 - `SUBMIT_*.csv` files for various tool types
 - `tool_reviews/validation_report.xlsx`
 - Mining patterns improvements
@@ -133,7 +113,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ---
 
-### 4. Link Tool Datasets (link-tool-datasets.yml)
+### 3. Link Tool Datasets (link-tool-datasets.yml)
 
 **Purpose**: Link datasets to tools via publication relationships
 
@@ -157,7 +137,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ---
 
-### 5. Calculate Completeness Scores (score-tools.yml)
+### 4. Calculate Completeness Scores (score-tools.yml)
 
 **Purpose**: Calculate and upload tool completeness scores
 
@@ -179,7 +159,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ---
 
-### 6. Update Observation Schema (update-observation-schema.yml)
+### 5. Update Observation Schema (update-observation-schema.yml)
 
 **Purpose**: Keep observation schema in sync with Synapse data
 
@@ -229,22 +209,7 @@ These workflows support the main sequence but run independently:
 
 ---
 
-### Upsert PubMed Publications (upsert-pubmed-publications.yml)
 
-**Purpose**: Upload mined PubMed publications to Synapse
-
-**Trigger**:
-- When pubmed_nf_publications.csv is pushed to main
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Validates publication CSV format
-2. Deduplicates against existing publications
-3. Uploads to syn26486839 (publications table)
-
-**Target Table**: syn26486839
-
----
 
 ### Upsert Tool Datasets (upsert-tool-datasets.yml)
 
@@ -332,12 +297,11 @@ All workflows can be manually triggered:
 5. Click **Run workflow**
 
 **Testing Order** (if running entire chain manually):
-1. mine-pubmed-nf
-2. Review & merge PR → triggers review-tool-annotations
-3. Review & merge PR → triggers check-tool-coverage
-4. Review & merge PR → triggers link-tool-datasets
-5. Review & merge PR → triggers score-tools
-6. Automatically runs → update-observation-schema
+1. review-tool-annotations (entry point)
+2. Review & merge PR → triggers check-tool-coverage
+3. Review & merge PR → triggers link-tool-datasets
+4. Review & merge PR → triggers score-tools
+5. Automatically runs → update-observation-schema
 
 ## 📊 Monitoring
 
@@ -364,7 +328,7 @@ Filter PRs by labels:
 **Problem**: Next workflow doesn't trigger after merging PR
 
 **Check**:
-- Verify PR has the correct label (e.g., `pubmed-mining`)
+- Verify PR has the correct label (e.g., `automated-annotation-review`)
 - Confirm PR was merged (not just closed)
 - Check Actions tab for any failed runs
 - Verify workflow permissions are correct

@@ -1,10 +1,9 @@
 name: Weekly Tool Annotation Review
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
   workflow_dispatch:
     # Allow manual triggering
     inputs:
@@ -25,8 +24,8 @@ env:
 jobs:
   review-tool-annotations:
     runs-on: ubuntu-latest
-    # Only run if: (1) manual trigger, OR (2) PR was merged from mine-pubmed workflow
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'pubmed-mining'))
+    # Runs on: (1) scheduled trigger, OR (2) manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository

@@ -6,8 +6,8 @@ The tool annotation review system analyzes `individualID` annotations from Synap
 
 **Workflow**: `review-tool-annotations.yml`
 **Script**: `scripts/review_tool_annotations.py`
-**Trigger**: When PubMed mining PR is merged
-**Schedule Position**: Step 2 in workflow sequence (after mine-pubmed-nf)
+**Trigger**: Scheduled weekly (Monday 9 AM UTC) OR manual workflow_dispatch
+**Schedule Position**: Step 1 in workflow sequence (entry point)
 
 ## Purpose
 
@@ -102,11 +102,11 @@ The system assumes all `individualID` values refer to cell lines. This is becaus
 ### Position in Chain
 
 ```
-1. mine-pubmed-nf → Creates PR
+1. review-tool-annotations (scheduled Mon 9AM UTC) → Analyzes annotations → Creates PR  ← ENTRY POINT
          ↓ (PR merged)
-2. review-tool-annotations → Analyzes annotations → Creates PR  ← YOU ARE HERE
+2. check-tool-coverage → Mines NF Portal + PubMed for tools
          ↓ (PR merged)
-3. check-tool-coverage → Mines tools
+3. link-tool-datasets → Links tools to datasets
          ↓ ...
 ```
 
