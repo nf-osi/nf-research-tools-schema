@@ -133,8 +133,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Set up authentication for push
-          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.NF_SERVICE_GIT_TOKEN }} | base64)"
+          # Set up remote with token authentication
+          git remote set-url origin "https://x-access-token:${{ secrets.NF_SERVICE_GIT_TOKEN }}@github.com/nf-osi/nf-research-tools-schema.git"
 
           # Create a new branch
           BRANCH_NAME="pubmed-mining-${{ github.run_number }}"
