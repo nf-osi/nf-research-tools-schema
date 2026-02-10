@@ -1,10 +1,9 @@
 name: Weekly Tool Annotation Review
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
   workflow_dispatch:
     # Allow manual triggering
     inputs:
@@ -25,15 +24,14 @@ env:
 jobs:
   review-tool-annotations:
     runs-on: ubuntu-latest
-    # Only run if: (1) manual trigger, OR (2) PR was merged from mine-pubmed workflow
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'pubmed-mining'))
+    # Runs on: (1) scheduled trigger, OR (2) manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -186,9 +184,9 @@ jobs:
 
       - name: Create Pull Request
         if: steps.format.outputs.format_complete == 'true'
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
             Add new cell lines from individualID annotations
 
@@ -238,7 +236,7 @@ jobs:
 
             See `tool_annotation_suggestions.md` for full analysis including facet suggestions.
 
-            **Automated via:** `.github/workflows/review-tool-annotations.yml` (Step 2 in workflow sequence per issue #97)
+            **Automated via:** `.github/workflows/review-tool-annotations.yml`
           branch: annotation-review-${{ steps.date.outputs.date-short }}
           labels: |
             automated-annotation-review

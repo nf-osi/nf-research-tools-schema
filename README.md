@@ -20,18 +20,16 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 ## Workflow Sequence
 
 **Entry Point:**
-1. **mine-pubmed-nf.yml** (Sunday 9 AM UTC) - Mines PubMed for NF publications
+1. **review-tool-annotations.yml** (Monday 9 AM UTC) - Analyzes individualID annotations, suggests new cell lines
 
 **Main Sequence (PR-merge triggered):**
-2. **review-tool-annotations.yml** - Analyzes individualID annotations, suggests new cell lines
-3. **check-tool-coverage.yml** - Mines publications for tools, AI validation with Goose
-4. **link-tool-datasets.yml** - Links datasets to tools via publications
-5. **score-tools.yml** - Calculates tool completeness scores, uploads to Synapse
-6. **update-observation-schema.yml** - Updates observation schema from Synapse data
+2. **check-tool-coverage.yml** - Mines NF Portal + PubMed publications for tools, AI validation with Goose
+3. **link-tool-datasets.yml** - Links datasets to tools via publications
+4. **score-tools.yml** - Calculates tool completeness scores, uploads to Synapse
+5. **update-observation-schema.yml** - Updates observation schema from Synapse data
 
 **Supporting Workflows:**
 - **upsert-tools.yml** - Uploads validated tool data to Synapse (triggered by CSV files on main)
-- **upsert-pubmed-publications.yml** - Uploads PubMed publications to Synapse
 - **upsert-tool-datasets.yml** - Uploads tool-dataset linkages to Synapse
 - **publish-schema-viz.yml** - Generates interactive schema visualization
 - **schematic-schema-convert.yml** - Converts schema between CSV and JSON-LD formats

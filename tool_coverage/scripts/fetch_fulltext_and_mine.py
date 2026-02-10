@@ -28,6 +28,24 @@ EMAIL = "your.email@example.com"  # Required by NCBI
 TOOL_NAME = "nf-research-tools-miner"
 API_KEY = None  # Optional: set NCBI API key for higher rate limits
 
+# PubMed query filters (from mine_pubmed_nf.py lines 382-397)
+PUBMED_QUERY_FILTERS = [
+    '(neurofibroma*[Abstract] NOT case[Title] NOT review[Title] NOT pain[Title] NOT tomography[Title]',
+    'NOT outcomes[Title] NOT individiual*[Title] NOT patient*[Title] NOT population[Title]',
+    'NOT clinic*[Title] NOT cohort*[Title] NOT child*[Title] NOT current[Title] NOT MRI*[Title]',
+    'NOT guideline*[Title] NOT perspective*[Title] NOT retrospective[Title] NOT after[Title]',
+    'NOT "quality of life"[Title] NOT pediatric*[Title] NOT adult*[Title] NOT resection[Title]',
+    'NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title]',
+    'NOT prevalence[Title] NOT experience[Title] NOT famil*[Title] NOT presentation[Title]',
+    'NOT trial[Title] NOT "novel mutation"[Title] NOT presenting[Title] NOT overview[Title]',
+    'NOT pregnancy[Title] NOT lady[Title] NOT female[Title] NOT woman[Title] NOT women[Title]',
+    'NOT "hearing loss"[Title] NOT "pictorial essay"[Title]',
+    'NOT "Clinical case reports"[Journal] NOT "JA clinical reports"[Journal])',
+    'AND (hasabstract)',
+    'AND (free full text[Filter])',
+    'AND (Journal Article[Publication Type])'
+]
+
 def fetch_pmc_fulltext(pmid: str, max_retries: int = 3) -> str:
     """
     Fetch full text XML from PubMed Central using PMID.
@@ -94,6 +112,258 @@ def fetch_pmc_fulltext(pmid: str, max_retries: int = 3) -> str:
             continue
 
     return ""
+
+
+def check_pmc_availability(pmids: List[str], max_retries: int = 3) -> Set[str]:
+    """
+    Check which PMIDs have full text available in PubMed Central.
+
+    Args:
+        pmids: List of PMIDs to check (without 'PMID:' prefix)
+        max_retries: Number of retry attempts
+
+    Returns:
+        Set of PMIDs (with 'PMID:' prefix) that have full text in PMC
+    """
+    if not pmids:
+        return set()
+
+    # Clean PMIDs (remove PMID: prefix if present)
+    clean_pmids = [p.replace('PMID:', '').strip() for p in pmids if p]
+
+    # PubMed allows checking up to 200 IDs per request
+    batch_size = 200
+    available_pmids = set()
+
+    for i in range(0, len(clean_pmids), batch_size):
+        batch_pmids = clean_pmids[i:i + batch_size]
+        pmid_str = ','.join(batch_pmids)
+
+        params = {
+            'dbfrom': 'pubmed',
+            'db': 'pmc',
+            'id': pmid_str,
+            'email': EMAIL,
+            'tool': TOOL_NAME
+        }
+        if API_KEY:
+            params['api_key'] = API_KEY
+
+        for attempt in range(max_retries):
+            try:
+                time.sleep(0.34)  # Rate limit
+                response = requests.get(f"{EUTILS_BASE}elink.fcgi", params=params, timeout=30)
+                response.raise_for_status()
+
+                # Parse XML to find PMIDs with PMC links
+                root = ET.fromstring(response.content)
+
+                # Find all LinkSets that have PMC links
+                for linkset in root.findall(".//LinkSet"):
+                    # Get the source PMID
+                    source_id = linkset.find(".//Id")
+                    if source_id is not None:
+                        source_pmid = source_id.text
+
+                        # Check if this PMID has a link to PMC
+                        pmc_links = linkset.findall(".//Link/Id")
+                        if pmc_links:
+                            # Has full text in PMC
+                            available_pmids.add(f"PMID:{source_pmid}")
+
+                break  # Success
+
+            except requests.exceptions.RequestException as e:
+                print(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed checking PMC availability: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                continue
+            except ET.ParseError as e:
+                print(f"  ⚠️  Failed to parse PMC link XML: {e}")
+                break
+
+    return available_pmids
+
+
+def load_previously_reviewed_pmids(cache_file: str = 'tool_coverage/outputs/previously_reviewed_pmids.csv') -> Set[str]:
+    """
+    Load set of previously reviewed PMIDs from cache file.
+
+    Args:
+        cache_file: Path to CSV file with previously reviewed PMIDs
+
+    Returns:
+        Set of previously reviewed PMIDs (with 'PMID:' prefix)
+    """
+    if not os.path.exists(cache_file):
+        return set()
+
+    try:
+        df = pd.read_csv(cache_file)
+        if 'pmid' in df.columns:
+            pmids = set(df['pmid'].dropna().astype(str).unique())
+            # Ensure PMID: prefix
+            pmids = {f"PMID:{p.replace('PMID:', '')}" for p in pmids if p and p != 'nan'}
+            return pmids
+    except Exception as e:
+        print(f"  ⚠️  Could not load previously reviewed PMIDs: {e}")
+        return set()
+
+    return set()
+
+
+def save_reviewed_pmids(pmids: Set[str], cache_file: str = 'tool_coverage/outputs/previously_reviewed_pmids.csv'):
+    """
+    Save reviewed PMIDs to cache file (append mode).
+
+    Args:
+        pmids: Set of PMIDs that were reviewed (with 'PMID:' prefix)
+        cache_file: Path to CSV file
+    """
+    if not pmids:
+        return
+
+    # Create outputs directory if needed
+    os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+
+    # Load existing PMIDs
+    existing_pmids = load_previously_reviewed_pmids(cache_file)
+
+    # Merge with new PMIDs
+    all_pmids = existing_pmids.union(pmids)
+
+    # Save to CSV
+    df = pd.DataFrame({'pmid': sorted(list(all_pmids))})
+    df.to_csv(cache_file, index=False)
+    print(f"\n   📝 Saved {len(all_pmids)} reviewed PMIDs to cache ({len(pmids)} new)")
+
+
+def query_pubmed(query: str, max_results: int = 10000, max_retries: int = 3) -> List[str]:
+    """
+    Query PubMed and return list of PMIDs matching the query.
+
+    Args:
+        query: PubMed query string
+        max_results: Maximum number of results to return
+        max_retries: Number of retry attempts
+
+    Returns:
+        List of PMIDs as strings
+    """
+    params = {
+        'db': 'pubmed',
+        'term': query,
+        'retmax': max_results,
+        'retmode': 'xml',
+        'email': EMAIL,
+        'tool': TOOL_NAME
+    }
+    if API_KEY:
+        params['api_key'] = API_KEY
+
+    for attempt in range(max_retries):
+        try:
+            time.sleep(0.34)  # Rate limit: 3 requests/second without API key
+            response = requests.get(f"{EUTILS_BASE}esearch.fcgi", params=params, timeout=30)
+            response.raise_for_status()
+
+            # Parse XML to extract PMIDs
+            root = ET.fromstring(response.content)
+            pmids = [id_elem.text for id_elem in root.findall(".//Id")]
+
+            return pmids
+
+        except requests.exceptions.RequestException as e:
+            print(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed querying PubMed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)  # Exponential backoff
+            continue
+        except ET.ParseError as e:
+            print(f"  ⚠️  Failed to parse PubMed search XML: {e}")
+            return []
+
+    return []
+
+
+def fetch_pubmed_metadata_batch(pmids: List[str], max_retries: int = 3) -> pd.DataFrame:
+    """
+    Fetch metadata for a batch of PMIDs from PubMed.
+
+    Args:
+        pmids: List of PMIDs to fetch
+        max_retries: Number of retry attempts
+
+    Returns:
+        DataFrame with columns: pmid, doi, title, journal, year, abstract
+    """
+    if not pmids:
+        return pd.DataFrame()
+
+    # PubMed allows up to 200 IDs per request
+    batch_size = 200
+    all_records = []
+
+    for i in range(0, len(pmids), batch_size):
+        batch_pmids = pmids[i:i + batch_size]
+        pmid_str = ','.join(batch_pmids)
+
+        params = {
+            'db': 'pubmed',
+            'id': pmid_str,
+            'retmode': 'xml',
+            'email': EMAIL,
+            'tool': TOOL_NAME
+        }
+        if API_KEY:
+            params['api_key'] = API_KEY
+
+        for attempt in range(max_retries):
+            try:
+                time.sleep(0.34)  # Rate limit
+                response = requests.get(f"{EUTILS_BASE}efetch.fcgi", params=params, timeout=30)
+                response.raise_for_status()
+
+                # Parse XML
+                root = ET.fromstring(response.content)
+
+                # Extract article metadata
+                for article in root.findall(".//PubmedArticle"):
+                    record = {}
+
+                    # PMID
+                    pmid_elem = article.find(".//PMID")
+                    record['pmid'] = f"PMID:{pmid_elem.text}" if pmid_elem is not None else ""
+
+                    # DOI
+                    doi_elem = article.find(".//ArticleId[@IdType='doi']")
+                    record['doi'] = doi_elem.text if doi_elem is not None else ""
+
+                    # Title
+                    title_elem = article.find(".//ArticleTitle")
+                    record['title'] = title_elem.text if title_elem is not None else ""
+
+                    # Journal
+                    journal_elem = article.find(".//Journal/Title")
+                    record['journal'] = journal_elem.text if journal_elem is not None else ""
+
+                    # Year
+                    year_elem = article.find(".//PubDate/Year")
+                    record['year'] = year_elem.text if year_elem is not None else ""
+
+                    all_records.append(record)
+
+                break  # Success
+
+            except requests.exceptions.RequestException as e:
+                print(f"  ⚠️  Attempt {attempt + 1}/{max_retries} failed fetching batch: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                continue
+            except ET.ParseError as e:
+                print(f"  ⚠️  Failed to parse batch XML: {e}")
+                break
+
+    return pd.DataFrame(all_records)
 
 
 def fetch_pubmed_abstract(pmid: str, max_retries: int = 3) -> str:
@@ -1185,18 +1455,77 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     return result
 
 
+def should_exclude_publication(title, journal):
+    """
+    Check if a publication should be excluded based on title and journal filters.
+    Applies the same exclusion criteria from mine_pubmed_nf.py lines 382-397.
+
+    Returns True if the publication should be excluded, False otherwise.
+    """
+    if pd.isna(title):
+        return True  # Exclude if no title
+
+    title_lower = str(title).lower()
+
+    # Excluded title terms (case-insensitive)
+    excluded_terms = [
+        'case', 'review', 'pain', 'tomography', 'outcomes',
+        'individual', 'individuals', 'patient', 'patients', 'population',
+        'clinic', 'clinical', 'clinics', 'cohort', 'cohorts',
+        'child', 'children', 'childhood', 'current', 'mri', 'mris',
+        'guideline', 'guidelines', 'perspective', 'perspectives',
+        'retrospective', 'after',
+        'quality of life', 'pediatric', 'pediatrics', 'adult', 'adults', 'resection',
+        'parent', 'parents', 'parental', 'prognostic', 'surg', 'surgery',
+        'surgical', 'surgeries', 'facial',
+        'prevalence', 'experience', 'famil', 'family', 'families', 'presentation',
+        'trial', 'novel mutation', 'presenting', 'overview',
+        'pregnancy', 'lady', 'female', 'woman', 'women',
+        'hearing loss', 'pictorial essay'
+    ]
+
+    # Check each excluded term
+    for term in excluded_terms:
+        if term in title_lower:
+            return True
+
+    # Excluded journals
+    if pd.notna(journal):
+        journal_lower = str(journal).lower()
+        excluded_journals = [
+            'clinical case reports',
+            'ja clinical reports'
+        ]
+
+        for excluded_journal in excluded_journals:
+            if excluded_journal in journal_lower:
+                return True
+
+    return False
+
+
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Mine publications for research tools',
+        description='Mine publications for research tools using filtered NF research publications',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Mine publications
+  # Mine publications from NF Portal + PubMed query
   python fetch_fulltext_and_mine.py
 
   # Mine with custom limits
   python fetch_fulltext_and_mine.py --max-publications 100
+
+  # Mine only from NF Portal (skip PubMed query)
+  python fetch_fulltext_and_mine.py --skip-pubmed-query
+
+Workflow:
+  1. Loads publications from NF Portal (Synapse)
+  2. Applies research-focused filters (excludes clinical case reports, reviews, etc.)
+  3. Queries PubMed for additional NF research publications (unless --skip-pubmed-query)
+  4. Merges and deduplicates all publications
+  5. Mines full text for research tools (cell lines, antibodies, animal models, genetic reagents)
 
 Note: Run run_publication_reviews.py separately for AI validation
         """
@@ -1207,15 +1536,30 @@ Note: Run run_publication_reviews.py separately for AI validation
         default=None,
         help='Limit number of publications to mine (for testing)'
     )
+    parser.add_argument(
+        '--skip-pubmed-query',
+        action='store_true',
+        default=False,
+        help='Skip querying PubMed for additional publications (only use NF Portal)'
+    )
 
     args = parser.parse_args()
 
     print("=" * 80)
     print("FULL TEXT MINING FOR NOVEL TOOLS")
     print("=" * 80)
+    print("\nThis script will:")
+    print("1. Load publications from NF Portal (Synapse)")
+    print("2. Apply research-focused filters (exclude clinical case reports, etc.)")
+    if not args.skip_pubmed_query:
+        print("3. Query PubMed for additional NF research publications")
+        print("4. Merge and deduplicate publications")
+    print(f"{4 if not args.skip_pubmed_query else 3}. Mine full text for research tools (cell lines, antibodies, animal models, genetic reagents)")
     if args.max_publications:
         print(f"\n⚙️  Configuration:")
         print(f"   - Max Publications: {args.max_publications}")
+    if args.skip_pubmed_query:
+        print(f"   - PubMed Query: Disabled")
     print()
 
     # Login to Synapse
@@ -1232,25 +1576,150 @@ Note: Run run_publication_reviews.py separately for AI validation
     # Load existing tools for matching
     existing_tools = load_existing_tools_for_matching(syn)
 
-    # Load publications
-    print("\n3. Loading publications...")
+    # Load previously reviewed PMIDs
+    print("\n3. Loading and filtering publications...")
+    print("   Step 3a: Loading previously reviewed PMIDs...")
+    previously_reviewed = load_previously_reviewed_pmids()
+    print(f"   - {len(previously_reviewed)} previously reviewed publications")
+
+    # Load publications from Synapse
+    print("\n   Step 3b: Loading NF Portal publications from Synapse...")
     pub_query = syn.tableQuery("SELECT * FROM syn16857542")
     pub_df = pub_query.asDataFrame()
-    print(f"   - {len(pub_df)} total publications")
+    print(f"   - {len(pub_df)} total NF Portal publications")
+
+    # Standardize PMID format early
+    if 'pmid' in pub_df.columns:
+        pub_df['pmid'] = pub_df['pmid'].astype(str)
+        pub_df.loc[~pub_df['pmid'].str.startswith('PMID:'), 'pmid'] = 'PMID:' + pub_df['pmid']
+
+    # Apply query filters to Synapse publications
+    print("   Step 3c: Applying query filters to NF Portal publications...")
+    if 'publicationTitle' in pub_df.columns:
+        title_col = 'publicationTitle'
+    elif 'title' in pub_df.columns:
+        title_col = 'title'
+    else:
+        print("   ⚠️  No title column found in publications table")
+        title_col = None
+
+    initial_count = len(pub_df)
+    if title_col:
+        pub_df['exclude'] = pub_df.apply(
+            lambda row: should_exclude_publication(
+                row[title_col],
+                row.get('journal', '')
+            ),
+            axis=1
+        )
+        excluded_count = pub_df['exclude'].sum()
+        pub_df = pub_df[~pub_df['exclude']].drop(columns=['exclude'])
+        print(f"   - Excluded {excluded_count} publications based on title/journal filters")
+        print(f"   - {len(pub_df)} publications remain after filtering")
+
+    # Check PMC full text availability for NF Portal publications
+    print("\n   Step 3d: Checking PMC full text availability for NF Portal publications...")
+    nf_portal_pmids = pub_df['pmid'].dropna().astype(str).unique().tolist()
+    print(f"   - Checking {len(nf_portal_pmids)} PMIDs for full text availability...")
+
+    # Check in batches to show progress
+    pmc_available = set()
+    batch_size = 500
+    for i in range(0, len(nf_portal_pmids), batch_size):
+        batch = nf_portal_pmids[i:i + batch_size]
+        batch_available = check_pmc_availability(batch)
+        pmc_available.update(batch_available)
+        print(f"     Checked {min(i + batch_size, len(nf_portal_pmids))}/{len(nf_portal_pmids)} PMIDs... ({len(pmc_available)} with full text so far)")
+
+    print(f"   - {len(pmc_available)} publications have full text in PMC")
+
+    # Filter to only publications with PMC full text
+    before_pmc_filter = len(pub_df)
+    pub_df = pub_df[pub_df['pmid'].isin(pmc_available)].copy()
+    print(f"   - Excluded {before_pmc_filter - len(pub_df)} publications without PMC full text")
+    print(f"   - {len(pub_df)} NF Portal publications with full text remain")
+
+    # Query PubMed for additional publications (unless disabled)
+    if not args.skip_pubmed_query:
+        print("\n   Step 3e: Querying PubMed for additional publications...")
+        print("   - Building PubMed query with NF research filters...")
+        pubmed_query = ' '.join(PUBMED_QUERY_FILTERS)
+        print(f"   - Query: {pubmed_query[:200]}...")
+
+        print("   - Searching PubMed (this may take a moment)...")
+        pubmed_pmids = query_pubmed(pubmed_query, max_results=10000)
+        print(f"   - Found {len(pubmed_pmids)} publications in PubMed")
+
+        # Fetch metadata for PubMed results
+        if pubmed_pmids:
+            # Format PMIDs with prefix
+            pubmed_pmids_formatted = [f"PMID:{p}" if not p.startswith('PMID:') else p for p in pubmed_pmids]
+
+            # Filter out previously reviewed and already loaded publications
+            synapse_pmids = set(pub_df['pmid'].dropna().unique())
+            all_existing = synapse_pmids.union(previously_reviewed)
+            new_pmids = [p for p in pubmed_pmids_formatted if p not in all_existing]
+
+            print(f"   - {len(new_pmids)} new publications (after excluding already reviewed/loaded)")
+
+            if new_pmids:
+                print("   - Fetching metadata for new PubMed publications...")
+                # Remove PMID: prefix for API call
+                new_pmids_clean = [p.replace('PMID:', '') for p in new_pmids]
+                pubmed_df = fetch_pubmed_metadata_batch(new_pmids_clean)
+                print(f"   - Retrieved metadata for {len(pubmed_df)} publications")
+
+                if len(pubmed_df) > 0:
+                    # Standardize PMID format
+                    pubmed_df['pmid'] = pubmed_df['pmid'].astype(str)
+
+                    # Note: PubMed query already includes 'free full text[Filter]',
+                    # so these should all have PMC full text available
+                    print(f"   - Adding {len(pubmed_df)} new publications from PubMed")
+
+                    # Align column names
+                    if title_col and title_col != 'title':
+                        pubmed_df = pubmed_df.rename(columns={'title': title_col})
+
+                    pub_df = pd.concat([pub_df, pubmed_df], ignore_index=True)
+                    print(f"   - Total publications after merge: {len(pub_df)}")
+            else:
+                print("   - No new publications to add (all already reviewed/loaded)")
+        else:
+            print("   - No publications found in PubMed query")
+    else:
+        print("\n   Step 3e: Skipping PubMed query (--skip-pubmed-query enabled)")
+
+    # Standardize column names
+    column_mapping = {
+        'publicationTitle': 'title',
+        'publicationDate': 'year'  # Will need additional processing
+    }
+    for old_col, new_col in column_mapping.items():
+        if old_col in pub_df.columns and new_col not in pub_df.columns:
+            pub_df = pub_df.rename(columns={old_col: new_col})
 
     # Load existing links
+    print("\n   Step 3f: Filtering out already-linked and previously reviewed publications...")
     link_query = syn.tableQuery("SELECT * FROM syn51735450")
     link_df = link_query.asDataFrame()
 
     # Identify publications already linked to tools
     linked_pmids = set()
     if 'pmid' in link_df.columns and 'pmid' in pub_df.columns:
-        linked_pmids = set(link_df['pmid'].dropna().unique())
+        linked_pmids = set(link_df['pmid'].dropna().astype(str).unique())
+        # Ensure PMID: prefix
+        linked_pmids = {f"PMID:{p.replace('PMID:', '')}" for p in linked_pmids if p and p != 'nan'}
 
-    # Filter to unlinked publications
+    print(f"   - {len(linked_pmids)} publications already linked to tools")
+    print(f"   - {len(previously_reviewed)} publications previously reviewed")
+
+    # Filter to unlinked and not previously reviewed publications
     pub_df['pmid'] = pub_df['pmid'].astype(str)
-    unlinked_pubs = pub_df[~pub_df['pmid'].isin(linked_pmids)].copy()
-    print(f"   - {len(unlinked_pubs)} unlinked publications to mine")
+    all_to_exclude = linked_pmids.union(previously_reviewed)
+    unlinked_pubs = pub_df[~pub_df['pmid'].isin(all_to_exclude)].copy()
+    print(f"   - {len(pub_df) - len(unlinked_pubs)} publications excluded (already linked or reviewed)")
+    print(f"   - {len(unlinked_pubs)} new publications to mine")
 
     # Check for previously mined publications to avoid re-mining
     previously_mined_pmids = set()
@@ -1392,6 +1861,11 @@ Note: Run run_publication_reviews.py separately for AI validation
             'total_tool_count': existing_count + novel_count,
             'is_gff': mining_result['is_gff']
         })
+
+    # Save newly reviewed PMIDs to cache
+    if summary:
+        reviewed_pmids = set(s['pmid'] for s in summary if s.get('pmid'))
+        save_reviewed_pmids(reviewed_pmids)
 
     print("\n\n" + "=" * 80)
     print("5. Mining Results:")

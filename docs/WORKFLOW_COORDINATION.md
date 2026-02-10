@@ -15,34 +15,21 @@ The automated workflows in this repository run in a coordinated sequence where e
 
 ```mermaid
 graph TD
-    A[mine-pubmed-nf<br/>Sunday 9 AM UTC] -->|Creates PR| B[PR Review & Merge]
-    B -->|Triggers| C[review-tool-annotations]
+    A[review-tool-annotations<br/>Monday 9 AM UTC] -->|Creates PR| B[PR Review & Merge]
+    B -->|Triggers| C[check-tool-coverage]
     C -->|Creates PR| D[PR Review & Merge]
-    D -->|Triggers| E[check-tool-coverage]
+    D -->|Triggers| E[link-tool-datasets]
     E -->|Creates PR| F[PR Review & Merge]
-    F -->|Triggers| G[link-tool-datasets]
-    G -->|Creates PR| H[PR Review & Merge]
-    H -->|Triggers| I[score-tools]
-    I -->|workflow_run| J[update-observation-schema]
-    J -->|Creates PR if changes| K[Final Review]
+    F -->|Triggers| G[score-tools]
+    G -->|workflow_run| H[update-observation-schema]
+    H -->|Creates PR if changes| I[Final Review]
 ```
 
 ## Detailed Flow
 
-### 1. Mine PubMed (Entry Point)
-**Workflow**: `mine-pubmed-nf.yml`
-**Trigger**: Schedule (Sunday 9 AM UTC)
-**Creates PR**: Yes (label: `pubmed-mining`)
-
-Discovers new NF-related publications from PubMed.
-
-**Next Step**: When PR is merged → triggers `review-tool-annotations`
-
----
-
-### 2. Review Tool Annotations
+### 1. Review Tool Annotations (Entry Point)
 **Workflow**: `review-tool-annotations.yml`
-**Trigger**: PR merge with label `pubmed-mining`
+**Trigger**: Schedule (Monday 9 AM UTC)
 **Creates PR**: Yes (label: `automated-annotation-review`)
 
 Analyzes individualID annotations from Synapse, suggests new cell lines and synonyms.
@@ -53,18 +40,22 @@ Analyzes individualID annotations from Synapse, suggests new cell lines and syno
 
 ---
 
-### 3. Check Tool Coverage
+### 2. Check Tool Coverage
 **Workflow**: `check-tool-coverage.yml`
 **Trigger**: PR merge with label `automated-annotation-review`
 **Creates PR**: Yes (label: `automated-mining`)
 
-Mines publications for novel tools, validates with AI (optional).
+Mines NF Portal and PubMed publications for novel tools:
+- Filters for research-focused publications (excludes clinical case reports, reviews)
+- Checks PMC full text availability
+- Maintains cache of reviewed publications for incremental processing
+- Validates findings with AI (optional)
 
 **Next Step**: When PR is merged → triggers `link-tool-datasets`
 
 ---
 
-### 4. Link Tool Datasets
+### 3. Link Tool Datasets
 **Workflow**: `link-tool-datasets.yml`
 **Trigger**: PR merge with label `automated-mining`
 **Creates PR**: Yes (label: `dataset-linking`)
@@ -75,7 +66,7 @@ Links datasets to tools via publication relationships.
 
 ---
 
-### 5. Calculate Completeness Scores
+### 4. Calculate Completeness Scores
 **Workflow**: `score-tools.yml`
 **Trigger**: PR merge with label `dataset-linking`
 **Creates PR**: No (uploads directly to Synapse)
@@ -86,7 +77,7 @@ Calculates tool completeness scores and uploads to Synapse tables.
 
 ---
 
-### 6. Update Observation Schema
+### 5. Update Observation Schema
 **Workflow**: `update-observation-schema.yml`
 **Trigger**: `workflow_run` (after `score-tools` completes)
 **Creates PR**: Only if schema changes detected
@@ -125,8 +116,7 @@ Each workflow checks for specific labels to ensure correct chaining:
 
 | Workflow | Checks for Label | Creates PR with Label |
 |----------|-----------------|----------------------|
-| mine-pubmed-nf | N/A (entry point) | `pubmed-mining` |
-| review-tool-annotations | `pubmed-mining` | `automated-annotation-review` |
+| review-tool-annotations | N/A (entry point - scheduled) | `automated-annotation-review` |
 | check-tool-coverage | `automated-annotation-review` | `automated-mining` |
 | link-tool-datasets | `automated-mining` | `dataset-linking` |
 | score-tools | `dataset-linking` | N/A (no PR) |
@@ -176,23 +166,25 @@ All workflows support manual triggers via `workflow_dispatch`:
 
 ### To Run Entire Chain Manually:
 
-1. **Trigger**: `mine-pubmed-nf`
-   - Go to Actions → Mine PubMed → Run workflow
+1. **Trigger**: `review-tool-annotations`
+   - Go to Actions → Weekly Tool Annotation Review → Run workflow
    - Wait for completion
 
 2. **Review & Merge PR**
+   - Fill in required fields (organ for cell lines)
    - Check the created PR
    - Merge when ready
 
-3. **Automatic**: `review-tool-annotations` triggers
+3. **Automatic**: `check-tool-coverage` triggers
    - Runs automatically after merge
+   - Mines NF Portal and PubMed publications
    - Wait for completion
 
 4. **Review & Merge PR**
-   - Fill in required fields (organ for cell lines)
+   - Check mined tools and AI validation results
    - Merge when ready
 
-5. **Automatic**: `check-tool-coverage` triggers
+5. **Automatic**: `link-tool-datasets` triggers
    - Continues automatically
    - Repeat review & merge pattern
 
@@ -226,7 +218,7 @@ If a workflow doesn't trigger:
 
 ## Schedule vs. PR Triggers
 
-Only `mine-pubmed-nf` has a schedule (entry point). All others are triggered by PR merges.
+Only `review-tool-annotations` has a schedule (entry point). All others are triggered by PR merges.
 
 ### Why Only One Schedule?
 
@@ -238,19 +230,19 @@ Only `mine-pubmed-nf` has a schedule (entry point). All others are triggered by 
 ### Schedule Pattern
 
 ```
-Sunday 9 AM UTC: mine-pubmed-nf runs
+Monday 9 AM UTC: review-tool-annotations runs
     ↓
-Monday: Review & merge pubmed PR
+Monday/Tuesday: Review & merge annotation PR
     ↓
-Monday/Tuesday: Annotation review runs & merges
+Tuesday: Tool coverage runs (mines NF Portal + PubMed)
     ↓
-Tuesday: Tool coverage runs & merges
+Tuesday/Wednesday: Review & merge tool coverage PR
     ↓
-Tuesday/Wednesday: Dataset linking runs & merges
+Wednesday: Dataset linking runs & merges
     ↓
-Wednesday: Scoring runs (no PR)
+Wednesday/Thursday: Scoring runs (no PR)
     ↓
-Wednesday: Schema update runs (if changes)
+Thursday: Schema update runs (if changes)
 ```
 
 Actual timing depends on:
