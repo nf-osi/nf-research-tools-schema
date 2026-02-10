@@ -127,14 +127,14 @@ jobs:
       - name: Create Pull Request
         if: steps.mining.outputs.mining_success == 'true'
         env:
-          GH_TOKEN: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          GH_TOKEN: ${{ secrets.NF_TOOLS_GIT_TOKEN }}
         run: |
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           # Set up remote with token authentication
-          git remote set-url origin "https://x-access-token:${{ secrets.NF_SERVICE_GIT_TOKEN }}@github.com/nf-osi/nf-research-tools-schema.git"
+          git remote set-url origin "https://x-access-token:${{ secrets.NF_TOOLS_GIT_TOKEN }}@github.com/nf-osi/nf-research-tools-schema.git"
 
           # Create a new branch
           BRANCH_NAME="pubmed-mining-${{ github.run_number }}"
