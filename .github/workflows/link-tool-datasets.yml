@@ -61,9 +61,9 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.changes == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.NF_SERVICE_GIT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore: link datasets to tool publications'
           title: 'Link Datasets to Tool Publications'
           assignees: BelindaBGarana
