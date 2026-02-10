@@ -33,8 +33,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -126,42 +124,24 @@ jobs:
 
       - name: Create Pull Request
         if: steps.mining.outputs.mining_success == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.NF_TOOLS_GIT_TOKEN }}
-        run: |
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-          # Set up remote with token authentication
-          git remote set-url origin "https://x-access-token:${{ secrets.NF_TOOLS_GIT_TOKEN }}@github.com/nf-osi/nf-research-tools-schema.git"
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            Add PubMed mining results for NF publications
 
-          # Create a new branch
-          BRANCH_NAME="pubmed-mining-${{ github.run_number }}"
-          git checkout -b "$BRANCH_NAME"
-
-          # Add the generated files
-          git add tool_coverage/outputs/pubmed_nf_publications.csv
-          git add tool_coverage/outputs/pubmed_nf_publications_synapse.csv
-
-          # Commit the changes
-          git commit -m "Add PubMed mining results for NF publications
-
-          - Mined ${{ steps.mining.outputs.pub_count }} neurofibromatosis publications
-          - Filtered for Journal Article type only (exact match)
-          - Filtered for free full text availability
-          - Ready for review and Synapse upload
-
-          Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
-
-          # Push the branch
-          git push -u origin "$BRANCH_NAME"
-
-          # Create PR using gh CLI
-          gh pr create \
-            --title "📚 PubMed Mining Results - ${{ steps.mining.outputs.pub_count }} NF Publications" \
-            --body-file pr_body.md \
-            --base main \
-            --head "$BRANCH_NAME" \
-            --assignee BelindaBGarana \
-            --label "pubmed-mining,publications"
+            - Mined ${{ steps.mining.outputs.pub_count }} neurofibromatosis publications
+            - Filtered for Journal Article type only (exact match)
+            - Filtered for free full text availability
+            - Ready for review and Synapse upload
+          branch: pubmed-mining-${{ github.run_number }}
+          delete-branch: true
+          title: "📚 PubMed Mining Results - ${{ steps.mining.outputs.pub_count }} NF Publications"
+          body-path: pr_body.md
+          assignees: BelindaBGarana
+          labels: |
+            pubmed-mining
+            publications
+          add-paths: |
+            tool_coverage/outputs/pubmed_nf_publications.csv
+            tool_coverage/outputs/pubmed_nf_publications_synapse.csv
