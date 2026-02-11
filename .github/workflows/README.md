@@ -81,32 +81,38 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ### 2. Check Tool Coverage (check-tool-coverage.yml)
 
-**Purpose**: Mine NF Portal + PubMed publications for novel tools with AI validation (supports 9 tool types)
+**Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation
 
 **Trigger**:
 - When PR from `review-tool-annotations` is merged
 - Manual: workflow_dispatch
 
 **What it does**:
-1. Loads NF Portal publications from Synapse
-2. Applies query-specific filters using **bench science query** (default):
-   - Excludes clinical case reports, reviews, clinical trials
-   - Focuses on laboratory research publications
-3. Checks PMC full text availability for NF Portal publications
-4. Queries PubMed for additional research-focused NF publications
-5. Maintains cache of reviewed publications (`previously_reviewed_pmids.csv`)
-6. Mines full text (Methods, Introduction, Results, Discussion sections)
-7. Searches for **9 tool types**:
+1. **Runs TWO PubMed queries in parallel** to capture all tool types:
+   - **Bench science query**: Lab tools, computational tools, organoids, PDX models
+   - **Clinical assessment query**: Questionnaires, scales, patient-reported outcomes
+2. **Merges publication lists** by PMID, preserving query_type tags:
+   - Publications in both queries tagged: `query_type: "bench,clinical"`
+   - Used as hint for AI validation (but all 9 types always scanned)
+3. **Title screening with Haiku**: Pre-filters publications (INCLUDES clinical studies)
+4. **Full text mining**: Fetches and mines Methods, Introduction, Results, Discussion
+5. **Searches for ALL 9 tool types** in every publication:
    - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
-   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, etc.)
-   - **Model systems:** Organoids, PDX/xenografts
-   - **Note:** Clinical assessment tools require separate clinical query (not in default workflow)
-8. AI validation using Goose (optional, requires ANTHROPIC_API_KEY)
-9. Formats results into SUBMIT_*.csv files
+   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
+   - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
+   - **Patient-derived:** PDX, xenografts, humanized mice
+   - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
+6. **AI validation with Sonnet** (via Goose):
+   - Uses query_type as hint for expected tool categories
+   - Independently classifies publication type
+   - Validates all 9 tool types regardless of query_type
+   - Handles publications with multiple tool types
+7. **Formats results into 9 SUBMIT_*.csv files** (one per tool type)
+8. **Validates and cleans** submission files
 
-**Query Type**: Uses bench science query by default
-- For clinical assessment tools (SF-36, PROMIS, PedsQL), run clinical query separately
-- See [`tool_coverage/MULTI_QUERY_IMPLEMENTATION.md`](../../tool_coverage/MULTI_QUERY_IMPLEMENTATION.md) for query strategies
+**Multi-Query Strategy**: Runs BOTH queries every time to discover all tool types
+- No separate runs needed - comprehensive coverage in single workflow execution
+- Expected monthly discovery: 69-83 tools (vs 18 with old single-query system)
 
 **Outputs**:
 - `tool_coverage/outputs/processed_publications.csv`
