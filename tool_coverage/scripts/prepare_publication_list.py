@@ -31,7 +31,7 @@ PUBMED_QUERY_FILTERS = [
     'NOT trial[Title] NOT "novel mutation"[Title] NOT presenting[Title] NOT overview[Title]',
     'NOT pregnancy[Title] NOT lady[Title] NOT female[Title] NOT woman[Title] NOT women[Title]',
     'NOT "hearing loss"[Title] NOT "pictorial essay"[Title] NOT healthcare[Title] NOT CT[Title]',
-    'NOT "rare occurence"[Title] NOT update*[Title] NOT initiative*[Title] NOT male[Title]',
+    'NOT "rare occurence"[Title] NOT update*[Title] NOT initiative*[Title] NOT male[Title] NOT social[Title]',
     'NOT people[Title] NOT decision*[Title] NOT autopsy*[Title] NOT isolated[Title] NOT solitary[Title]',
     'NOT "JA clinical reports"[Journal])',
     'AND (hasabstract)',

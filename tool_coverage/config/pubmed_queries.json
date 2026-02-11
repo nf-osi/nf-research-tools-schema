@@ -1,0 +1,107 @@
+{
+  "version": "2.0",
+  "description": "Tool-type-specific PubMed queries for NF research tools mining",
+  "queries": {
+    "bench_science": {
+      "description": "Primary query for computational tools, animal models, PDX, organoids, cell lines",
+      "expected_tools": ["computational_tools", "patient_derived_models", "advanced_cellular_models"],
+      "filters": [
+        "(neurofibroma*[Abstract]",
+        "NOT case*[Title/Journal] NOT review[Title] NOT pain[Title] NOT tomography[Title]",
+        "NOT outcomes[Title] NOT individiual*[Title] NOT patient*[Title] NOT population[Title]",
+        "NOT clinic*[Title] NOT cohort*[Title] NOT child*[Title] NOT current[Title] NOT MRI*[Title]",
+        "NOT guideline*[Title] NOT perspective*[Title] NOT retrospective[Title] NOT after[Title]",
+        "NOT \"quality of life\"[Title] NOT pediatric*[Title] NOT adult*[Title] NOT resection[Title]",
+        "NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title] NOT giant[Title]",
+        "NOT prevalence[Title] NOT experience[Title] NOT famil*[Title] NOT presentation[Title]",
+        "NOT trial[Title] NOT \"novel mutation\"[Title] NOT presenting[Title] NOT overview[Title]",
+        "NOT pregnancy[Title] NOT lady[Title] NOT female[Title] NOT woman[Title] NOT women[Title]",
+        "NOT \"hearing loss\"[Title] NOT \"pictorial essay\"[Title] NOT healthcare[Title] NOT CT[Title]",
+        "NOT \"rare occurence\"[Title] NOT update*[Title] NOT initiative*[Title] NOT male[Title] NOT social[Title]",
+        "NOT people[Title] NOT decision*[Title] NOT autopsy*[Title] NOT isolated[Title] NOT solitary[Title]",
+        "NOT \"JA clinical reports\"[Journal])",
+        "AND (hasabstract)",
+        "AND (free full text[Filter])",
+        "AND (Journal Article[Publication Type])"
+      ],
+      "run_frequency": "monthly",
+      "priority": "high"
+    },
+    "clinical_assessment": {
+      "description": "Query for clinical assessment tools, questionnaires, patient-reported outcomes",
+      "expected_tools": ["clinical_assessment_tools"],
+      "filters": [
+        "(neurofibromatosis[MeSH Terms] OR neurofibromatosis type 1[Text] OR NF1[Text] OR MPNST[Text]",
+        "OR plexiform neurofibroma[Text] OR cutaneous neurofibroma[Text])",
+        "AND (",
+        "  \"quality of life\"[Title/Abstract] OR",
+        "  questionnaire*[Title/Abstract] OR",
+        "  \"patient-reported outcome*\"[Title/Abstract] OR",
+        "  PRO[Title/Abstract] OR",
+        "  PROM[Title/Abstract] OR",
+        "  \"patient reported\"[Title/Abstract] OR",
+        "  SF-36[Text] OR",
+        "  PedsQL[Text] OR",
+        "  PROMIS[Text] OR",
+        "  \"visual analog* scale\"[Text] OR",
+        "  VAS[Title/Abstract] OR",
+        "  \"pain scale\"[Title/Abstract] OR",
+        "  \"symptom assessment\"[Title/Abstract] OR",
+        "  \"functional assessment\"[Title/Abstract] OR",
+        "  \"outcome measure*\"[Title/Abstract] OR",
+        "  \"clinical assessment\"[Title/Abstract] OR",
+        "  \"health status\"[Title/Abstract] OR",
+        "  \"patient assessment\"[Title/Abstract]",
+        ")",
+        "AND (hasabstract)",
+        "AND (free full text[Filter])",
+        "AND (",
+        "  Clinical Trial[Publication Type] OR",
+        "  Observational Study[Publication Type] OR",
+        "  Journal Article[Publication Type]",
+        ")"
+      ],
+      "run_frequency": "quarterly",
+      "priority": "medium",
+      "notes": "Clinical studies publish less frequently than bench science. Run quarterly to capture patient outcome studies."
+    },
+    "organoid_focused": {
+      "description": "Optional targeted query for organoid/3D culture studies if not captured by bench query",
+      "expected_tools": ["advanced_cellular_models"],
+      "filters": [
+        "(neurofibromatosis[MeSH Terms] OR NF1[Gene] OR MPNST[Text])",
+        "AND (",
+        "  organoid*[Title/Abstract] OR",
+        "  assembloid*[Title/Abstract] OR",
+        "  spheroid*[Title/Abstract] OR",
+        "  \"3D culture\"[Title/Abstract] OR",
+        "  \"three-dimensional culture\"[Title/Abstract] OR",
+        "  neurosphere*[Title/Abstract]",
+        ")",
+        "AND (hasabstract)",
+        "AND (free full text[Filter])"
+      ],
+      "run_frequency": "as_needed",
+      "priority": "low",
+      "notes": "Use only if organoid extraction remains at 0% after bench science query. May not be needed."
+    }
+  },
+  "workflow": {
+    "description": "Recommended execution workflow",
+    "steps": [
+      "1. Run bench_science query monthly (primary corpus)",
+      "2. Run clinical_assessment query quarterly",
+      "3. Run organoid_focused query only if needed (check bench results first)",
+      "4. Deduplicate PMIDs across queries (same paper in multiple queries is OK)",
+      "5. Mine all papers with appropriate tool type expectations",
+      "6. Merge results by publication (one publication can have multiple tool types)",
+      "7. Format for submission"
+    ]
+  },
+  "implementation_notes": {
+    "deduplication": "A paper can appear in multiple queries - that's expected. Deduplicate at the publication level, not query level.",
+    "cost_optimization": "Clinical query returns fewer papers and should be run less frequently (quarterly vs monthly).",
+    "monitoring": "Track tool extraction rate by query type to validate query effectiveness.",
+    "validation": "If clinical_assessment extraction rate stays <5%, revisit query filters."
+  }
+}
