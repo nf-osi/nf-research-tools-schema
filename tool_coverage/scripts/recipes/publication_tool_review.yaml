@@ -1,7 +1,7 @@
-version: 1.0.0
+version: 1.1.0
 title: Publication Tool Validator Agent
 description: Review mined tools from publication {{ pmid }} to validate whether they are actual research tools/reagents versus disease/gene references.
-instructions: You are a biomedical research tools expert specializing in Neurofibromatosis research. Your role is to critically evaluate whether extracted tool mentions from publications represent actual research tools (antibodies, cell lines, animal models, genetic reagents) or are false positives (disease names, gene references, clinical terms). You have deep knowledge of lab research methods versus clinical/survey studies.
+instructions: You are a biomedical research tools expert specializing in Neurofibromatosis research. Your role is to critically evaluate whether extracted tool mentions from publications represent actual research tools (antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX models, clinical assessment tools) or are false positives (disease names, gene references, unrelated clinical terms). You have deep knowledge of lab research methods, bioinformatics tools, model systems, AND clinical outcome measures.
 
 prompt: |
   Your goal is to validate whether the tools mined from publication {{ pmid }} are genuine research tools.
@@ -29,14 +29,48 @@ prompt: |
      - **Methods Presence**: Does the publication have a Methods section indicating actual lab work?
 
   3. DETECT POTENTIALLY MISSED TOOLS:
-     After reviewing mined tools, scan the full text (Abstract, Methods, Introduction) for:
-     - Tool mentions that match common patterns but weren't captured
+     After reviewing mined tools, scan the full text (Abstract, Methods, Introduction, Results) for:
+
+     **Lab Research Tools:**
      - Specific tool names with catalog numbers, vendor names, or RRID identifiers
      - Cell line names following standard naming conventions (e.g., HEK293, MCF-7, iPSC-derived)
      - Mouse strain nomenclature (e.g., Nf1+/-, B6.129-Nf1tm1Tyj)
      - Antibody targets or clones (e.g., anti-NF1 [D7R7D], rabbit polyclonal)
      - Plasmids, vectors, or constructs (e.g., pCMV-NF1, AAV-GFP)
-     - Any tools mentioned with "we used", "we generated", "obtained from", "purchased from"
+
+     **Computational Tools:**
+     - Software names with versions (e.g., "R v4.2", "Python 3.8", "ImageJ v1.52")
+     - Analysis pipelines (e.g., "Cell Ranger", "STAR aligner", "DESeq2")
+     - Repository URLs (github.com, gitlab.com, zenodo.org)
+     - Programming languages in analysis context (not just citations)
+     - Bioinformatics tools (GATK, BWA, SAMtools, Seurat, scanpy)
+
+     **Advanced Cellular Models:**
+     - Organoid mentions (cerebral organoid, brain organoid, tumoroid)
+     - Assembloid or fused organoid systems
+     - 3D culture systems with Matrigel/ECM
+     - Spheroid or neurosphere cultures
+     - Patient-derived organoids
+
+     **Patient-Derived Models:**
+     - PDX models (patient-derived xenograft)
+     - PDOX (patient-derived orthotopic xenograft)
+     - Humanized mouse systems
+     - Host strain names (NSG, NOG, SCID)
+     - Xenograft establishment procedures
+
+     **Clinical Assessment Tools:**
+     - Validated questionnaires (SF-36, PedsQL, PROMIS, EQ-5D)
+     - Pain scales (VAS, NRS, Wong-Baker)
+     - Quality of life instruments
+     - Patient-reported outcome measures (PROMs)
+     - Symptom assessment scales
+     - Functional assessment tools
+
+     **General tool usage phrases:**
+     - "we used", "we generated", "obtained from", "purchased from"
+     - "analyzed using", "processed with", "assessed using"
+     - "administered", "completed", "measured with"
 
   4. SUGGEST NEW PATTERNS:
      Based on your analysis, recommend NEW search patterns that could improve mining:
@@ -46,18 +80,64 @@ prompt: |
      - Tool types that need better pattern coverage
 
   5. CRITICAL FALSE POSITIVE PATTERNS TO REJECT:
+     **For Lab Research Tools (antibodies, cell lines, animal models, genetic reagents):**
      - Gene/disease names (NF1, NF2) mentioned without tool keywords
-     - Clinical studies focused on patient outcomes, not lab research
-     - Questionnaire/survey development studies (e.g., quality of life assessments)
      - Review articles or meta-analyses that cite tools but don't use them
-     - Epidemiological or population studies
      - Publications without Methods sections describing experimental procedures
 
-  6. ACCEPT ONLY IF:
+     **For Computational Tools:**
+     - Common words that happen to match software names (e.g., "Table 1", "Figure 3A", "using the")
+     - Programming languages mentioned without actual usage context
+     - Software cited in references but not used in analysis
+
+     **For Advanced Cellular Models (organoids, assembloids):**
+     - 2D cell culture mentioned as "culture" without 3D context
+     - Standard adherent cell lines (not organoids)
+     - References to organoids in other studies without usage
+
+     **For Patient-Derived Models (PDX, xenografts):**
+     - Xenograft mentioned in general discussion without actual usage
+     - PDX/xenograft cited from other papers
+     - Mouse strains without xenograft context
+
+     **For Clinical Assessment Tools (questionnaires, scales):**
+     - Generic mentions of "quality of life" without specific instrument
+     - Physical measurement devices (e.g., calipers, imaging) NOT questionnaires
+     - Clinical terms without validated instrument names (SF-36, PROMIS, PedsQL, etc.)
+     - Assessment tools cited from other studies but not used in this publication
+
+  6. ACCEPT IF:
+     **Lab Research Tools:**
      - Clear tool-specific context (e.g., "NF1 antibody", "NF1-deficient cell line", "NF1 knockout mice")
      - Methods section describes experimental procedures using the tool
      - Publication type is laboratory research (molecular biology, cell biology, animal models)
      - Context indicates tool development or experimental usage
+
+     **Computational Tools:**
+     - Software version specified (e.g., "ImageJ v1.52", "Python 3.8")
+     - Usage context present (e.g., "analyzed using", "processed with")
+     - Repository URLs (GitHub, GitLab) for custom tools
+     - Methods describe computational analysis using the tool
+
+     **Advanced Cellular Models:**
+     - 3D culture context (organoid, spheroid, assembloid)
+     - Derivation from stem cells or primary tissue
+     - Generation/culture methods described
+     - Extracellular matrix usage (Matrigel, hydrogel)
+
+     **Patient-Derived Models:**
+     - PDX establishment described (patient tumor → mouse)
+     - Xenograft/engraftment procedures in methods
+     - Host strain specified (NSG, NOG, etc.)
+     - Passage number or model ID mentioned
+
+     **Clinical Assessment Tools:**
+     - **ACCEPT even without traditional Methods section** - clinical studies have different structure
+     - Validated instrument names (SF-36, PROMIS, PedsQL, VAS, etc.)
+     - Questionnaire/scale administered to patients
+     - Patient-reported outcomes measured
+     - "Assessed using", "administered", "completed" context
+     - Publication type can be Clinical Study, Observational Study, or Clinical Trial
 
   7. EXTRACT SCIENTIFIC OBSERVATIONS:
      After validating tools, extract scientific observations about each validated tool from the Results and Discussion sections.
@@ -129,13 +209,20 @@ prompt: |
   publicationMetadata:
     pmid: "{{ pmid }}"
     title: "Full publication title"
-    publicationType: "Lab Research" | "Clinical Study" | "Review Article" | "Questionnaire/Survey Development" | "Epidemiological Study" | "Other"
+    publicationType: "Lab Research" | "Clinical Study" | "Clinical Trial" | "Observational Study" | "Review Article" | "Questionnaire/Survey Development" | "Epidemiological Study" | "Bioinformatics Analysis" | "Other"
     publicationTypeConfidence: 0.0-1.0  # Confidence in the classification
     hasMethodsSection: Yes | No
     likelyContainsTools: Yes | No | Unsure
+    expectedToolTypes: |
+      List which tool categories are expected based on publication type:
+      - Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+      - Clinical Study/Trial → clinical assessment tools, possibly computational tools for analysis
+      - Bioinformatics Analysis → computational tools (software, pipelines)
+      - Observational Study → clinical assessment tools for patient outcomes
     overallAssessment: |
       2-3 sentence summary of whether this publication type would typically use/develop research tools.
       Explain why tools are expected or unlikely based on the study design and methods.
+      For clinical studies, note that assessment tools (questionnaires, scales) are valid tools even without traditional lab methods.
 
   toolValidations:
     - toolName: "Exact tool name as mined"
