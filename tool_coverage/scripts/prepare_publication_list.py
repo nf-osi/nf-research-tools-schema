@@ -252,7 +252,8 @@ def main():
 
     # Load publications from Synapse
     print("\n3. Loading NF Portal publications from Synapse...")
-    pub_query = syn.tableQuery("SELECT pmid, title, doi, journal, year FROM syn16857542")
+    # Note: 'year' must be quoted because YEAR is an SQL keyword
+    pub_query = syn.tableQuery('SELECT pmid, title, doi, journal, "year" FROM syn16857542')
     pub_df = pub_query.asDataFrame()
 
     # Standardize PMID format

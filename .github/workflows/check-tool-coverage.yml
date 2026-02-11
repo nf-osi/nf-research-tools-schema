@@ -102,14 +102,17 @@ jobs:
           # Create outputs directory
           mkdir -p tool_coverage/outputs
 
-          # Run preparation script
-          python tool_coverage/scripts/prepare_publication_list.py 2>&1 | tee tool_coverage/outputs/prep_list_output.log
+          # Run preparation script with error handling
+          python tool_coverage/scripts/prepare_publication_list.py 2>&1 | tee tool_coverage/outputs/prep_list_output.log || echo "prep_failed=true" >> $GITHUB_OUTPUT
 
-          echo "prep_complete=true" >> $GITHUB_OUTPUT
+          # Only mark complete if no errors
+          if [ ! -f $GITHUB_OUTPUT ] || ! grep -q "prep_failed=true" $GITHUB_OUTPUT; then
+            echo "prep_complete=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Screen publication titles with Haiku
         id: screening
-        if: steps.check_api_key.outputs.api_key_exists == 'true'
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.prep_list.outputs.prep_complete == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
@@ -131,6 +134,7 @@ jobs:
 
       - name: Fetch full text and mine for tools
         id: mining
+        if: steps.prep_list.outputs.prep_complete == 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
@@ -198,6 +202,7 @@ jobs:
 
       - name: Analyze tool coverage
         id: coverage
+        if: steps.prep_list.outputs.prep_complete == 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
@@ -232,6 +237,8 @@ jobs:
           retention-days: 30
 
       - name: Create Pull Request with results
+        # Only create PR if mining step completed successfully
+        if: steps.mining.outputs.mining_complete == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
