@@ -155,6 +155,24 @@ def fetch_unlinked_publications(syn):
         print("\n✅ No candidate publications found")
         return pd.DataFrame(columns=['pmid', 'title', 'doi', 'source'])
 
+def sanitize_pmid_for_filename(pmid: str) -> str:
+    """
+    Sanitize PMID for use in filenames by removing invalid characters.
+
+    GitHub Actions artifacts don't allow: " : < > | * ? \r \n
+
+    Args:
+        pmid: Publication PMID (may include 'PMID:' prefix)
+
+    Returns:
+        Sanitized PMID (numeric only)
+    """
+    # Remove 'PMID:' prefix if present
+    clean_pmid = pmid.replace('PMID:', '').strip()
+    # Remove any other invalid characters (keep only alphanumeric and underscore)
+    clean_pmid = ''.join(c for c in clean_pmid if c.isalnum() or c == '_')
+    return clean_pmid
+
 def load_cached_text(pmid, cache_dir='tool_reviews/publication_cache'):
     """
     Load cached publication text if available.
@@ -166,7 +184,8 @@ def load_cached_text(pmid, cache_dir='tool_reviews/publication_cache'):
     Returns:
         Dict with cached text, or None if not found
     """
-    cache_file = Path(cache_dir) / f'{pmid}_text.json'
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    cache_file = Path(cache_dir) / f'{clean_pmid}_text.json'
 
     if cache_file.exists():
         with open(cache_file, 'r', encoding='utf-8') as f:
@@ -315,10 +334,13 @@ def run_goose_review(pmid, input_file, results_dir):
         # Build goose command
         recipe_path = Path(RECIPE_PATH).resolve()
 
+        # Sanitize PMID for filename (remove colons and invalid chars)
+        clean_pmid = sanitize_pmid_for_filename(pmid)
+
         cmd = [
             'goose', 'run',
             '--recipe', str(recipe_path),
-            '--params', f'pmid={pmid}',
+            '--params', f'pmid={clean_pmid}',
             '--params', f'inputFile={input_file}',
             '--no-session'  # Don't create session files for automated runs
         ]
@@ -340,8 +362,8 @@ def run_goose_review(pmid, input_file, results_dir):
             safe_print(result.stderr)
             return None
 
-        # Look for generated YAML file
-        yaml_file = results_path / f'{pmid}_tool_review.yaml'
+        # Look for generated YAML file (clean_pmid already set above)
+        yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
         if yaml_file.exists():
             safe_print(f"✅ Review completed: {yaml_file}")
             return yaml_file
@@ -370,7 +392,8 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
     safe_print(f"\n📊 Progress: {current_num}/{total_pubs} ({current_num/total_pubs*100:.1f}%)")
 
     # Check if already reviewed
-    yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
     if yaml_path.exists() and not force_rereviews:
         safe_print(f"⏭️  Skipping {pmid} (already reviewed)")
         return (pmid, 'skipped', None)
@@ -414,7 +437,8 @@ def compile_validation_results(mining_df, results_dir):
         doi = row.get('doi', '')
 
         # Check if YAML file exists
-        yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
+        clean_pmid = sanitize_pmid_for_filename(pmid)
+        yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
         if not yaml_path.exists():
             print(f"\nSkipping {pmid} (no review YAML found)")
             continue

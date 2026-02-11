@@ -629,6 +629,24 @@ def extract_discussion_section(fulltext_xml: str) -> str:
         return ""
 
 
+def sanitize_pmid_for_filename(pmid: str) -> str:
+    """
+    Sanitize PMID for use in filenames by removing invalid characters.
+
+    GitHub Actions artifacts don't allow: " : < > | * ? \r \n
+
+    Args:
+        pmid: Publication PMID (may include 'PMID:' prefix)
+
+    Returns:
+        Sanitized PMID (numeric only)
+    """
+    # Remove 'PMID:' prefix if present
+    clean_pmid = pmid.replace('PMID:', '').strip()
+    # Remove any other invalid characters (keep only alphanumeric and underscore)
+    clean_pmid = ''.join(c for c in clean_pmid if c.isalnum() or c == '_')
+    return clean_pmid
+
 def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str,
                           results: str = "", discussion: str = "",
                           cache_dir: str = 'tool_reviews/publication_cache'):
@@ -664,8 +682,9 @@ def cache_publication_text(pmid: str, abstract: str, methods: str, intro: str,
         'discussion_length': len(discussion) if discussion else 0
     }
 
-    # Write to cache file
-    cache_file = cache_path / f'{pmid}_text.json'
+    # Write to cache file (sanitize PMID for filename)
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    cache_file = cache_path / f'{clean_pmid}_text.json'
     with open(cache_file, 'w', encoding='utf-8') as f:
         json.dump(cache_data, f, indent=2, ensure_ascii=False)
 
