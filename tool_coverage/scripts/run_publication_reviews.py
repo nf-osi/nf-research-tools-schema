@@ -253,9 +253,15 @@ def prepare_goose_input(pub_row, inputs_dir):
     tool_metadata = json.loads(pub_row.get('tool_metadata', '{}'))
     tool_sources = json.loads(pub_row.get('tool_sources', '{}'))
 
-    # Prepare tool list with context
+    # Prepare tool list with context - include ALL 9 tool types
     tools_list = []
-    for tool_type in ['antibodies', 'cell_lines', 'animal_models', 'genetic_reagents']:
+    all_tool_types = [
+        'antibodies', 'cell_lines', 'animal_models', 'genetic_reagents',
+        'computational_tools', 'advanced_cellular_models',
+        'patient_derived_models', 'clinical_assessment_tools'
+    ]
+
+    for tool_type in all_tool_types:
         tool_names = novel_tools.get(tool_type, [])
         for tool_name in tool_names:
             tool_key = f"{tool_type}:{tool_name}"
@@ -278,7 +284,8 @@ def prepare_goose_input(pub_row, inputs_dir):
             'title': pub_row.get('title', pub_row.get('publicationTitle', '')),
             'journal': pub_row.get('journal', ''),
             'year': pub_row.get('year', ''),
-            'fundingAgency': pub_row.get('fundingAgency', '')
+            'fundingAgency': pub_row.get('fundingAgency', ''),
+            'queryType': pub_row.get('query_type', 'unknown')  # Hint for expected tool types
         },
         'abstractText': abstract_text,
         'methodsText': methods_text,
@@ -297,7 +304,11 @@ def prepare_goose_input(pub_row, inputs_dir):
                 'antibodies': len(novel_tools.get('antibodies', [])),
                 'cellLines': len(novel_tools.get('cell_lines', [])),
                 'animalModels': len(novel_tools.get('animal_models', [])),
-                'geneticReagents': len(novel_tools.get('genetic_reagents', []))
+                'geneticReagents': len(novel_tools.get('genetic_reagents', [])),
+                'computationalTools': len(novel_tools.get('computational_tools', [])),
+                'advancedCellularModels': len(novel_tools.get('advanced_cellular_models', [])),
+                'patientDerivedModels': len(novel_tools.get('patient_derived_models', [])),
+                'clinicalAssessmentTools': len(novel_tools.get('clinical_assessment_tools', []))
             }
         }
     }

@@ -11,7 +11,7 @@ prompt: |
 
   WORKFLOW:
   1. Read the input file at {{ inputFile }} which contains:
-     - Publication metadata (PMID, title, DOI, journal, year)
+     - Publication metadata (PMID, title, DOI, journal, year, queryType)
      - Abstract text
      - Full text sections (if available):
        * Methods (tool usage details)
@@ -19,6 +19,13 @@ prompt: |
        * Results (experimental findings and observations)
        * Discussion (interpretation and conclusions)
      - List of mined tools with their types and context
+
+     **Query Type Hint:** The publication's queryType field indicates which PubMed query found it:
+     - "bench" → Likely contains lab tools (antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX)
+     - "clinical" → Likely contains clinical assessment tools (questionnaires, scales, outcome measures)
+     - "bench,clinical" → May contain multiple tool types across both categories
+
+     However, **always independently assess** what tool types are actually present. The queryType is only a hint - publications can contain tools from any category regardless of how they were discovered.
 
   2. For each mined tool, evaluate:
      - **Publication Type**: Is this a lab research study, clinical study, questionnaire development, review article, or other?
@@ -209,20 +216,26 @@ prompt: |
   publicationMetadata:
     pmid: "{{ pmid }}"
     title: "Full publication title"
+    queryType: "bench" | "clinical" | "bench,clinical" | "unknown"  # From PubMed query (hint only)
     publicationType: "Lab Research" | "Clinical Study" | "Clinical Trial" | "Observational Study" | "Review Article" | "Questionnaire/Survey Development" | "Epidemiological Study" | "Bioinformatics Analysis" | "Other"
     publicationTypeConfidence: 0.0-1.0  # Confidence in the classification
     hasMethodsSection: Yes | No
     likelyContainsTools: Yes | No | Unsure
     expectedToolTypes: |
-      List which tool categories are expected based on publication type:
+      List which tool categories are expected based on publication type (NOT queryType):
       - Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
       - Clinical Study/Trial → clinical assessment tools, possibly computational tools for analysis
       - Bioinformatics Analysis → computational tools (software, pipelines)
       - Observational Study → clinical assessment tools for patient outcomes
+
+      Note: Publications can contain MULTIPLE tool types. A clinical study may use computational tools
+      for analysis. A lab study may use clinical assessment tools to measure phenotypes. Always scan
+      for ALL 9 tool types regardless of publication type or queryType.
     overallAssessment: |
       2-3 sentence summary of whether this publication type would typically use/develop research tools.
       Explain why tools are expected or unlikely based on the study design and methods.
       For clinical studies, note that assessment tools (questionnaires, scales) are valid tools even without traditional lab methods.
+      Consider that publications may contain multiple tool types across different categories.
 
   toolValidations:
     - toolName: "Exact tool name as mined"
