@@ -252,12 +252,8 @@ def main():
 
     # Load publications from Synapse
     print("\n3. Loading NF Portal publications from Synapse...")
-    pub_query = syn.tableQuery("SELECT pmid, publicationTitle, title, doi, journal, year FROM syn16857542")
+    pub_query = syn.tableQuery("SELECT pmid, title, doi, journal, year FROM syn16857542")
     pub_df = pub_query.asDataFrame()
-
-    # Standardize columns
-    if 'publicationTitle' in pub_df.columns and 'title' not in pub_df.columns:
-        pub_df['title'] = pub_df['publicationTitle']
 
     # Standardize PMID format
     if 'pmid' in pub_df.columns:
