@@ -87,6 +87,16 @@ prompt: |
      - Disease Susceptibility - Disease predisposition
      - Tumor Growth - Tumor formation and progression
 
+     **System-Level:**
+     - Behavior - Behavioral phenotypes (general)
+     - Metabolism - Metabolic characteristics
+     - Nervous System - Nervous system phenotypes
+     - Cardiovascular System - Cardiovascular phenotypes
+     - Immune System - Immune system phenotypes
+     - Developmental - Developmental characteristics
+     - Cellular - Cellular phenotypes
+     - Molecular - Molecular-level observations
+
      **Practical/Documentation:**
      - Usage Instructions - Best practices, protocols
      - Issue - Problems, limitations, caveats
@@ -103,6 +113,9 @@ prompt: |
      - **Only extract explicit observations** - do not infer beyond what's stated
      - **Multiple observations per tool are allowed** - extract all relevant findings
      - **Skip if no observations found** - empty list is acceptable
+     - **Assign MP Ontology IDs** - Use tool_coverage/config/observation_ontology_mappings.json to map observationType to MP ID
+     - **MP ID format validation** - Must match pattern MP:[0-9]{7} (e.g., MP:0001262)
+     - **Leave MP ID empty** for non-phenotypic observations (Issue, Usage Instructions, Depositor Comment, General Comment or Review, Other)
 
      EXAMPLE OBSERVATIONS:
      - "Nf1+/- mice showed significantly reduced body weight (15% decrease) compared to wild-type littermates at 8 weeks (p<0.01)"
@@ -126,7 +139,7 @@ prompt: |
 
   toolValidations:
     - toolName: "Exact tool name as mined"
-      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
       minedFrom: "abstract" | "methods" | "introduction"
       verdict: "Accept" | "Reject" | "Uncertain"
       confidence: 0.0-1.0
@@ -148,7 +161,7 @@ prompt: |
 
   potentiallyMissedTools:
     - toolName: "Exact tool name found in text"
-      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
       foundIn: "abstract" | "methods" | "introduction"
       contextSnippet: "...text showing this tool mention..."
       whyMissed: "Explanation of why this wasn't caught by initial mining"
@@ -159,15 +172,16 @@ prompt: |
   suggestedPatterns:
     - patternType: "term" | "context_phrase" | "naming_convention" | "vendor_indicator"
       pattern: "Specific pattern or regex to add"
-      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "general"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool" | "general"
       examples: ["Example 1 from this paper", "Example 2 from this paper"]
       reasoning: "Why this pattern would improve mining accuracy"
     # Include all pattern suggestions (if any)
 
   observations:
     - resourceName: "Exact tool name (must match a validated tool)"
-      resourceType: "Animal Model" | "Antibody" | "Cell Line" | "Genetic Reagent"
-      observationType: "Body Length" | "Body Weight" | "Coat Color" | "Organ Development" | "Growth Rate" | "Lifespan" | "Feed Intake" | "Feeding Behavior" | "Motor Activity" | "Swimming Behavior" | "Social Behavior" | "Reproductive Behavior" | "Reflex Development" | "Disease Susceptibility" | "Tumor Growth" | "Usage Instructions" | "Issue" | "Depositor Comment" | "General Comment or Review" | "Other"
+      resourceType: "Animal Model" | "Antibody" | "Cell Line" | "Genetic Reagent" | "Computational Tool" | "Advanced Cellular Model" | "Patient-Derived Model" | "Clinical Assessment Tool"
+      observationType: "Body Length" | "Body Weight" | "Coat Color" | "Organ Development" | "Growth Rate" | "Lifespan" | "Feed Intake" | "Feeding Behavior" | "Motor Activity" | "Swimming Behavior" | "Social Behavior" | "Reproductive Behavior" | "Reflex Development" | "Disease Susceptibility" | "Tumor Growth" | "Behavior" | "Metabolism" | "Nervous System" | "Cardiovascular System" | "Immune System" | "Developmental" | "Cellular" | "Molecular" | "Usage Instructions" | "Issue" | "Depositor Comment" | "General Comment or Review" | "Other"
+      observationTypeOntologyId: "MP:XXXXXXX"  # Optional MP ontology term ID (use tool_coverage/config/observation_ontology_mappings.json as reference)
       details: |
         Detailed observation text including:
         - Specific findings (quantitative data preferred)

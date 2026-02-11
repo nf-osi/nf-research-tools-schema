@@ -1,0 +1,166 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Patient-Derived Model",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": ["firstandlastName", "email", "isDeveloper"]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "title": "Name of Patient-Derived Model"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
+        "modelSystemType": {
+          "type": "string",
+          "title": "Model System Type",
+          "enum": [
+            "PDX (Patient-Derived Xenograft)",
+            "Humanized Mouse",
+            "Patient-Derived Organoid",
+            "Patient-Derived Cell Line",
+            "Other"
+          ]
+        },
+        "patientDiagnosis": {
+          "type": "string",
+          "title": "Patient Diagnosis/Condition"
+        },
+        "hostStrain": {
+          "type": "string",
+          "title": "Host Strain (for xenografts)",
+          "enum": [
+            "",
+            "NSG",
+            "NOD-SCID",
+            "nude",
+            "SCID",
+            "Other"
+          ]
+        },
+        "passageNumber": {
+          "type": "string",
+          "title": "Current Passage Number"
+        },
+        "tumorType": {
+          "type": "string",
+          "title": "Tumor Type (if applicable)",
+          "enum": [
+            "",
+            "cutaneous neurofibroma",
+            "plexiform neurofibroma",
+            "atypical neurofibroma",
+            "schwannoma",
+            "meningioma",
+            "malignant peripheral nerve sheath tumor",
+            "low grade glioma",
+            "high grade glioma",
+            "pheochromocytoma",
+            "optic nerve glioma",
+            "Other"
+          ]
+        },
+        "engraftmentSite": {
+          "type": "string",
+          "title": "Engraftment Site",
+          "enum": [
+            "Subcutaneous",
+            "Orthotopic",
+            "Intracranial",
+            "Mammary Fat Pad",
+            "Other"
+          ]
+        },
+        "establishmentRate": {
+          "type": "string",
+          "title": "Establishment/Success Rate"
+        },
+        "molecularCharacterization": {
+          "type": "array",
+          "title": "Molecular Characterization Performed",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Genomic Sequencing",
+              "RNA-seq",
+              "Proteomics",
+              "Immunohistochemistry",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "clinicalData": {
+          "type": "string",
+          "title": "Available Clinical Data from Patient"
+        },
+        "humanizationMethod": {
+          "type": "string",
+          "title": "Humanization Method (if applicable)"
+        },
+        "immuneSystemComponents": {
+          "type": "array",
+          "title": "Human Immune System Components Present",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validationMethods": {
+          "type": "array",
+          "title": "Validation Methods Used",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "howToAcquire": {
+          "type": "string",
+          "title": "How to Acquire This Model"
+        }
+      },
+      "required": ["modelName", "modelSystemType", "patientDiagnosis", "howToAcquire"]
+    }
+  },
+  "required": ["userInfo", "basicInfo"]
+}

@@ -36,12 +36,53 @@ db_config = [
                 "column_name": "animalModelId",
                 "foreign_table_name": "AnimalModelDetails",
                 "foreign_column_name": "animalModelId"
+            },
+            {
+                "column_name": "biobankId",
+                "foreign_table_name": "BiobankDetails",
+                "foreign_column_name": "biobankId"
+            },
+            {
+                "column_name": "computationalToolId",
+                "foreign_table_name": "ComputationalToolDetails",
+                "foreign_column_name": "computationalToolId"
+            },
+            {
+                "column_name": "advancedCellularModelId",
+                "foreign_table_name": "AdvancedCellularModelDetails",
+                "foreign_column_name": "advancedCellularModelId"
+            },
+            {
+                "column_name": "patientDerivedModelId",
+                "foreign_table_name": "PatientDerivedModelDetails",
+                "foreign_column_name": "patientDerivedModelId"
+            },
+            {
+                "column_name": "clinicalAssessmentToolId",
+                "foreign_table_name": "ClinicalAssessmentToolDetails",
+                "foreign_column_name": "clinicalAssessmentToolId"
             }
         ]
     },
     {
         "name": "GeneticReagentDetails",
         "primary_key": "geneticReagentId"
+    },
+    {
+        "name": "ComputationalToolDetails",
+        "primary_key": "computationalToolId"
+    },
+    {
+        "name": "AdvancedCellularModelDetails",
+        "primary_key": "advancedCellularModelId"
+    },
+    {
+        "name": "PatientDerivedModelDetails",
+        "primary_key": "patientDerivedModelId"
+    },
+    {
+        "name": "ClinicalAssessmentToolDetails",
+        "primary_key": "clinicalAssessmentToolId"
     },
     {
         "name": "VendorItem",

@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Computational Tool",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": ["firstandlastName", "email", "isDeveloper"]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "softwareName": {
+          "type": "string",
+          "title": "Name of Software/Tool"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Alternative Names"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
+        "softwareType": {
+          "type": "string",
+          "title": "Type of Computational Tool",
+          "enum": [
+            "Analysis Software",
+            "Pipeline",
+            "Package/Library",
+            "Workflow",
+            "Database",
+            "Web Application",
+            "Command-line Tool",
+            "Plugin",
+            "Other"
+          ]
+        },
+        "softwareVersion": {
+          "type": "string",
+          "title": "Current Version"
+        },
+        "programmingLanguage": {
+          "type": "array",
+          "title": "Programming Language(s)",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Python",
+              "R",
+              "Java",
+              "C++",
+              "MATLAB",
+              "Julia",
+              "Perl",
+              "Shell Script",
+              "JavaScript",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "sourceRepository": {
+          "type": "string",
+          "title": "Source Code Repository URL (e.g., GitHub, GitLab)",
+          "format": "uri"
+        },
+        "documentation": {
+          "type": "string",
+          "title": "Documentation/User Manual URL",
+          "format": "uri"
+        },
+        "licenseType": {
+          "type": "string",
+          "title": "Software License",
+          "enum": [
+            "MIT",
+            "Apache 2.0",
+            "GPL",
+            "BSD",
+            "Creative Commons",
+            "Proprietary",
+            "Other",
+            "Unknown"
+          ]
+        },
+        "containerized": {
+          "type": "string",
+          "title": "Containerized Version Available?",
+          "enum": [
+            "Yes",
+            "No",
+            "Unknown"
+          ]
+        },
+        "dependencies": {
+          "type": "array",
+          "title": "Key Software Dependencies",
+          "items": {
+            "type": "string"
+          }
+        },
+        "systemRequirements": {
+          "type": "string",
+          "title": "System Requirements (OS, memory, compute)"
+        },
+        "lastUpdate": {
+          "type": "string",
+          "title": "Date of Last Update",
+          "format": "date"
+        },
+        "maintainer": {
+          "type": "string",
+          "title": "Maintainer Name or Organization"
+        },
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "howToAcquire": {
+          "type": "string",
+          "title": "How to Access/Download This Tool"
+        }
+      },
+      "required": ["softwareName", "softwareType", "howToAcquire"]
+    }
+  },
+  "required": ["userInfo", "basicInfo"]
+}
