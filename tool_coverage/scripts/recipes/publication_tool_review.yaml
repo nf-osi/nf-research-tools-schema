@@ -146,7 +146,29 @@ prompt: |
      - "Assessed using", "administered", "completed" context
      - Publication type can be Clinical Study, Observational Study, or Clinical Trial
 
-  7. EXTRACT SCIENTIFIC OBSERVATIONS:
+  7. USE SCHEMA-VALIDATED VALUES:
+     When extracting tool metadata, use EXACT values from submission schemas to ensure consistency:
+
+     **Computational Tools - softwareType (REQUIRED):**
+     - Analysis Software, Pipeline, Package/Library, Workflow, Database,
+       Web Application, Command-line Tool, Plugin, Other
+
+     **Advanced Cellular Models - modelType (REQUIRED):**
+     - Organoid, Assembloid, Spheroid, 3D Culture, Other
+
+     **Patient-Derived Models - modelSystemType (REQUIRED):**
+     - PDX (Patient-Derived Xenograft), Humanized Mouse,
+       Patient-Derived Organoid, Patient-Derived Cell Line, Other
+
+     **Clinical Assessment Tools - assessmentType (REQUIRED):**
+     - Quality of Life, Pain Assessment, Functional Assessment,
+       Cognitive Assessment, Symptom Scale, Psychological Assessment,
+       Patient-Reported Outcome, Other
+
+     **IMPORTANT**: Use EXACT values as listed. Do not invent new categories.
+     If uncertain, use "Other" and explain in tool notes.
+
+  8. EXTRACT SCIENTIFIC OBSERVATIONS:
      After validating tools, extract scientific observations about each validated tool from the Results and Discussion sections.
 
      OBSERVATION TYPES (from Synapse schema syn26486836):
@@ -210,7 +232,7 @@ prompt: |
      - "Cell line exhibited slow proliferation and required extended culture time"
      - "Antibody showed strong cross-reactivity with mouse NF2, use with caution"
 
-  8. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
+  9. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
 
   ```yaml
   publicationMetadata:
