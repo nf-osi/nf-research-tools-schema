@@ -1735,6 +1735,22 @@ Note: Run run_publication_reviews.py separately for AI validation
         if old_col in pub_df.columns and new_col not in pub_df.columns:
             pub_df = pub_df.rename(columns={old_col: new_col})
 
+    # Check for pre-screened publications (title screening with Haiku)
+    screened_file = Path('tool_coverage/outputs/screened_publications.csv')
+    if screened_file.exists():
+        print("\n   Step 3e-extra: Using pre-screened publications (title screening)...")
+        try:
+            screened_df = pd.read_csv(screened_file)
+            if 'pmid' in screened_df.columns and 'is_research' in screened_df.columns:
+                research_pmids = set(screened_df[screened_df['is_research'] == True]['pmid'].astype(str).unique())
+                before_screening = len(pub_df)
+                pub_df = pub_df[pub_df['pmid'].isin(research_pmids)].copy()
+                excluded_clinical = before_screening - len(pub_df)
+                print(f"   - ✅ Filtered to {len(pub_df)} research publications")
+                print(f"   - ❌ Excluded {excluded_clinical} clinical publications (via title screening)")
+        except Exception as e:
+            print(f"   - ⚠️  Could not load screened publications: {e}")
+
     # Load existing links
     print("\n   Step 3f: Filtering out already-linked and previously reviewed publications...")
     link_query = syn.tableQuery("SELECT * FROM syn51735450")

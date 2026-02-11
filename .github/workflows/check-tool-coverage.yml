@@ -92,25 +92,59 @@ jobs:
           echo "$HOME/goose-bin" >> $GITHUB_PATH
           ~/goose-bin/goose --version
 
-      - name: Mine publications for novel tools
-        id: mining
+      - name: Prepare publication list
+        id: prep_list
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          echo "Mining publications for novel tools..."
+          echo "Step 1: Preparing publication list (titles only - fast)..."
 
-          # Build command with optional flags
-          CMD="python tool_coverage/scripts/fetch_fulltext_and_mine.py"
+          # Create outputs directory
+          mkdir -p tool_coverage/outputs
+
+          # Run preparation script
+          python tool_coverage/scripts/prepare_publication_list.py 2>&1 | tee tool_coverage/outputs/prep_list_output.log
+
+          echo "prep_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Screen publication titles with Haiku
+        id: screening
+        if: steps.check_api_key.outputs.api_key_exists == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Step 2: Pre-screening titles with Haiku (research vs clinical)..."
+
+          # Build command
+          CMD="python tool_coverage/scripts/screen_publication_titles.py"
 
           # Add max publications limit if specified
           if [ -n "${{ github.event.inputs.max_publications }}" ]; then
             CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
           fi
 
-          # Create outputs directory
-          mkdir -p tool_coverage/outputs
+          # Run screening (uses cheap Haiku model via direct API)
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/screening_output.log || echo "screening_failed=true" >> $GITHUB_OUTPUT
 
-          # Run mining
+          echo "screening_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Fetch full text and mine for tools
+        id: mining
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Step 3: Fetching full text for screened publications..."
+
+          # Use new focused script for full text fetching
+          CMD="python tool_coverage/scripts/fetch_publication_fulltext.py"
+
+          # Add max publications limit if specified
+          if [ -n "${{ github.event.inputs.max_publications }}" ]; then
+            CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
+          fi
+
+          # Run mining (fetches full text and mines for tools)
           echo "Running: $CMD"
           $CMD 2>&1 | tee tool_coverage/outputs/mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
 
