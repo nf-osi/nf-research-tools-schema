@@ -74,28 +74,33 @@ def extract_computational_tools(text: str, patterns: Dict = None) -> List[Dict]:
                 })
                 seen_tools.add(tool_name.lower())
 
-    # Pattern 2: Software indicators (version numbers, etc.)
-    software_indicators = patterns.get('software_indicators', [])
-    for pattern in software_indicators:
-        for match in re.finditer(pattern, text, re.IGNORECASE):
-            candidate = match.group(0)
-            context = extract_context(text, candidate, 200)
+    # Pattern 2: Software name with version (e.g., "ImageJ v1.52", "Python 3.8")
+    version_pattern = r'(\w+(?:\s+\w+)?)\s+(?:v\.?|version\s+)?(\d+(?:\.\d+)*[a-z]*)'
+    for match in re.finditer(version_pattern, text, re.IGNORECASE):
+        tool_name = match.group(1).strip()
+        version = match.group(2)
+        full_match = match.group(0)
 
-            # Check for context phrases
-            context_phrases = patterns.get('context_phrases', [])
-            has_context = any(re.search(phrase, context, re.IGNORECASE)
-                            for phrase in context_phrases)
+        # Skip if looks like a year or just numbers
+        if len(tool_name) < 3 or tool_name.isdigit():
+            continue
 
-            if has_context and candidate.lower() not in seen_tools:
-                # Try to extract fuller tool name from context
-                tool_name = extract_tool_name_from_context(context, candidate)
-                tools.append({
-                    'name': tool_name,
-                    'type': 'computational_tools',
-                    'context': context,
-                    'confidence': 0.7
-                })
-                seen_tools.add(tool_name.lower())
+        context = extract_context(text, full_match, 200)
+
+        # Check for usage context
+        context_phrases = patterns.get('context_phrases', [])
+        has_context = any(re.search(phrase, context, re.IGNORECASE)
+                        for phrase in context_phrases)
+
+        if has_context and tool_name.lower() not in seen_tools:
+            tools.append({
+                'name': tool_name,
+                'type': 'computational_tools',
+                'context': context,
+                'confidence': 0.75,
+                'version': version
+            })
+            seen_tools.add(tool_name.lower())
 
     # Pattern 3: Known tool names
     tool_names = patterns.get('tool_names', [])
@@ -122,14 +127,18 @@ def extract_tool_name_from_url(url: str) -> str:
     # Extract from GitHub/GitLab URLs
     match = re.search(r'(?:github|gitlab|bitbucket)\.(?:com|org)/[\w-]+/([\w-]+)', url)
     if match:
-        return match.group(1).replace('-', ' ').title()
+        repo_name = match.group(1)
+        # Clean up common suffixes
+        repo_name = re.sub(r'(-analysis|-analyzer|-tool|-pipeline)$', '', repo_name, flags=re.IGNORECASE)
+        return repo_name.replace('-', ' ').replace('_', ' ').title()
 
     # Extract from DOI
     match = re.search(r'doi\.org/[^/]+/(.+)', url)
     if match:
         return match.group(1).replace('.', ' ').title()
 
-    return "Unknown Tool"
+    # Return URL as fallback (better than "Unknown Tool")
+    return url
 
 
 def extract_tool_name_from_context(context: str, version_str: str) -> str:
@@ -172,7 +181,9 @@ def extract_advanced_cellular_models(text: str, patterns: Dict = None) -> List[D
     )
 
     for pattern in all_indicators:
-        for match in re.finditer(pattern, text, re.IGNORECASE):
+        # Make pattern case-insensitive and handle word boundaries
+        search_pattern = r'\b' + pattern + r's?\b'  # Handle plural
+        for match in re.finditer(search_pattern, text, re.IGNORECASE):
             candidate = match.group(0)
             context = extract_context(text, candidate, 200)
 
@@ -181,17 +192,20 @@ def extract_advanced_cellular_models(text: str, patterns: Dict = None) -> List[D
             has_context = any(re.search(phrase, context, re.IGNORECASE)
                             for phrase in context_phrases)
 
-            if has_context and candidate.lower() not in seen_models:
+            if has_context:
                 # Try to extract fuller model description
                 model_desc = extract_model_description(context, candidate)
 
-                models.append({
-                    'name': model_desc,
-                    'type': 'advanced_cellular_models',
-                    'context': context,
-                    'confidence': 0.8
-                })
-                seen_models.add(candidate.lower())
+                # Deduplicate based on base term (organoid, assembloid, etc.)
+                base_term = candidate.lower().rstrip('s')
+                if base_term not in seen_models:
+                    models.append({
+                        'name': model_desc,
+                        'type': 'advanced_cellular_models',
+                        'context': context,
+                        'confidence': 0.8
+                    })
+                    seen_models.add(base_term)
 
     return models
 
@@ -233,7 +247,9 @@ def extract_patient_derived_models(text: str, patterns: Dict = None) -> List[Dic
     # PDX indicators
     pdx_indicators = patterns.get('pdx_indicators', [])
     for pattern in pdx_indicators:
-        for match in re.finditer(pattern, text, re.IGNORECASE):
+        # Handle word boundaries and optional hyphens
+        search_pattern = pattern.replace('-', r'[-\s]?')  # Allow hyphen or space
+        for match in re.finditer(search_pattern, text, re.IGNORECASE):
             candidate = match.group(0)
             context = extract_context(text, candidate, 200)
 
@@ -242,18 +258,22 @@ def extract_patient_derived_models(text: str, patterns: Dict = None) -> List[Dic
             has_context = any(re.search(phrase, context, re.IGNORECASE)
                             for phrase in context_phrases)
 
-            if has_context and candidate.lower() not in seen_models:
+            if has_context:
                 # Try to extract model ID/name from context
                 model_name = extract_pdx_model_name(context, candidate)
 
-                models.append({
-                    'name': model_name,
-                    'type': 'patient_derived_models',
-                    'subtype': 'PDX',
-                    'context': context,
-                    'confidence': 0.85
-                })
-                seen_models.add(model_name.lower())
+                # Normalize for deduplication (PDX/PDX model are same)
+                base_name = re.sub(r'\s+(model|xenograft)$', '', model_name, flags=re.IGNORECASE).lower()
+
+                if base_name not in seen_models:
+                    models.append({
+                        'name': model_name,
+                        'type': 'patient_derived_models',
+                        'subtype': 'PDX',
+                        'context': context,
+                        'confidence': 0.85
+                    })
+                    seen_models.add(base_name)
 
     # Humanized mouse indicators
     humanized_indicators = patterns.get('humanized_indicators', [])
@@ -327,7 +347,13 @@ def extract_clinical_assessment_tools(text: str, patterns: Dict = None) -> List[
     # Validated instruments (high confidence)
     validated_instruments = patterns.get('validated_instruments', [])
     for instrument in validated_instruments:
-        if instrument.lower() in text.lower() and instrument.lower() not in seen_tools:
+        # Use word boundary matching for better precision
+        pattern = r'\b' + re.escape(instrument) + r'\b'
+        if re.search(pattern, text, re.IGNORECASE):
+            # Check if already seen (avoid duplicates)
+            if instrument.lower() in seen_tools:
+                continue
+
             context = extract_context(text, instrument, 200)
 
             # Check for administration context
@@ -347,24 +373,36 @@ def extract_clinical_assessment_tools(text: str, patterns: Dict = None) -> List[
     # Generic questionnaire/scale indicators (lower confidence)
     questionnaire_indicators = patterns.get('questionnaire_indicators', [])
     for pattern in questionnaire_indicators:
-        # Look for "X questionnaire", "Y scale", etc.
-        search_pattern = rf'([\w\s-]+)\s+{pattern}'
+        # Look for "X questionnaire", "Y scale", etc. (max 4 words before indicator)
+        search_pattern = rf'((?:\w+\s+){{1,4}}){pattern}(?:s)?\b'
         for match in re.finditer(search_pattern, text, re.IGNORECASE):
             candidate = match.group(0).strip()
-            if candidate.lower() not in seen_tools:
-                context = extract_context(text, candidate, 200)
 
-                # Must have administration context
-                context_phrases = patterns.get('context_phrases', [])
-                if any(re.search(phrase, context, re.IGNORECASE)
-                      for phrase in context_phrases):
-                    tools.append({
-                        'name': candidate,
-                        'type': 'clinical_assessment_tools',
-                        'context': context,
-                        'confidence': 0.7
-                    })
-                    seen_tools.add(candidate.lower())
+            # Skip if too long (likely caught whole sentence)
+            if len(candidate.split()) > 6:
+                continue
+
+            # Skip if already seen (including validated instruments)
+            if candidate.lower() in seen_tools:
+                continue
+
+            # Skip if this is just "quality of life" without instrument context
+            if re.match(r'^quality\s+of\s+life', candidate, re.IGNORECASE):
+                continue
+
+            context = extract_context(text, candidate, 200)
+
+            # Must have administration context
+            context_phrases = patterns.get('context_phrases', [])
+            if any(re.search(phrase, context, re.IGNORECASE)
+                  for phrase in context_phrases):
+                tools.append({
+                    'name': candidate,
+                    'type': 'clinical_assessment_tools',
+                    'context': context,
+                    'confidence': 0.7
+                })
+                seen_tools.add(candidate.lower())
 
     return tools
 
