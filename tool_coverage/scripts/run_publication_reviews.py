@@ -672,22 +672,41 @@ def main():
         print(f"Running Goose Reviews for {len(mining_df)} publications")
         print(f"{'='*80}")
 
+        total_pubs = len(mining_df)
+        reviewed_count = 0
+        skipped_count = 0
+
         for idx, row in mining_df.iterrows():
             pmid = row['pmid']
+            current_num = idx + 1
+
+            # Show progress
+            print(f"\n📊 Progress: {current_num}/{total_pubs} ({current_num/total_pubs*100:.1f}%)")
 
             # Check if already reviewed (unless force flag is set)
             yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
             if yaml_path.exists() and not args.force_rereviews:
-                print(f"\n⏭️  Skipping {pmid} (already reviewed, use --force-rereviews to override)")
+                print(f"⏭️  Skipping {pmid} (already reviewed, use --force-rereviews to override)")
+                skipped_count += 1
                 continue
             elif yaml_path.exists() and args.force_rereviews:
-                print(f"\n🔄 Re-reviewing {pmid} (force flag set)")
+                print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
             # Prepare input file
             input_file = prepare_goose_input(row, inputs_dir)
 
             # Run goose review
-            run_goose_review(pmid, input_file, results_dir)
+            result = run_goose_review(pmid, input_file, results_dir)
+            if result:
+                reviewed_count += 1
+
+        # Print final summary
+        print(f"\n{'='*80}")
+        print(f"Review Summary:")
+        print(f"  ✅ Reviewed: {reviewed_count}")
+        print(f"  ⏭️  Skipped (cached): {skipped_count}")
+        print(f"  📊 Total processed: {total_pubs}")
+        print(f"{'='*80}")
 
     # Compile validation results
     validation_results, all_missed_tools, all_suggested_patterns, all_observations = compile_validation_results(mining_df, results_dir)
