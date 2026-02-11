@@ -21,17 +21,19 @@ TOOL_NAME = "nf-research-tools-miner"
 
 # PubMed query filters
 PUBMED_QUERY_FILTERS = [
-    '(neurofibroma*[Abstract] NOT case[Title] NOT review[Title] NOT pain[Title] NOT tomography[Title]',
+    '(neurofibroma*[Abstract] NOT case*[Title/Journal] NOT review[Title] NOT pain[Title] NOT tomography[Title]',
     'NOT outcomes[Title] NOT individiual*[Title] NOT patient*[Title] NOT population[Title]',
     'NOT clinic*[Title] NOT cohort*[Title] NOT child*[Title] NOT current[Title] NOT MRI*[Title]',
     'NOT guideline*[Title] NOT perspective*[Title] NOT retrospective[Title] NOT after[Title]',
     'NOT "quality of life"[Title] NOT pediatric*[Title] NOT adult*[Title] NOT resection[Title]',
-    'NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title]',
+    'NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title] NOT giant[Title]',
     'NOT prevalence[Title] NOT experience[Title] NOT famil*[Title] NOT presentation[Title]',
     'NOT trial[Title] NOT "novel mutation"[Title] NOT presenting[Title] NOT overview[Title]',
     'NOT pregnancy[Title] NOT lady[Title] NOT female[Title] NOT woman[Title] NOT women[Title]',
-    'NOT "hearing loss"[Title] NOT "pictorial essay"[Title]',
-    'NOT "Clinical case reports"[Journal] NOT "JA clinical reports"[Journal])',
+    'NOT "hearing loss"[Title] NOT "pictorial essay"[Title] NOT healthcare[Title] NOT CT[Title]',
+    'NOT "rare occurence"[Title] NOT update*[Title] NOT initiative*[Title] NOT male[Title]',
+    'NOT people[Title] NOT decision*[Title] NOT autopsy*[Title] NOT isolated[Title] NOT solitary[Title]',
+    'NOT "JA clinical reports"[Journal])',
     'AND (hasabstract)',
     'AND (free full text[Filter])',
     'AND (Journal Article[Publication Type])'

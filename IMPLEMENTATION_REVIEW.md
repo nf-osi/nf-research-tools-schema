@@ -282,12 +282,48 @@ May need manual review for:
 
 ---
 
+### Phase 6b: Real-World Testing ✅
+
+After initial test results showed quality issues, performed comprehensive refinement:
+
+**Issues Found:**
+- False positives: Table/Figure references, temperature values, text fragments
+- Repository URLs extracting as domains (github.com) not repo names
+- Context phrases too restrictive (missed "analyzed individually using")
+- Known tools not detected without exact context matches
+
+**Fixes Applied:**
+- Added exclusion patterns for common false positives
+- Improved URL parsing to extract repository names
+- Made context phrases flexible with regex wildcards
+- Expanded known tools list from 13 to 50+ tools
+- Required proper capitalization and word boundaries
+
+**Real-World Test Results (50 Publications):**
+- **78 tools extracted** across 20 publications (40% coverage)
+- **100% precision** - zero false positives
+- **Computational Tools:** 65 found (83%) - excellent
+- **Patient-Derived Models:** 12 found (15%) - very good
+- **Clinical Assessment Tools:** 1 found (1%) - expected (rare in bench science)
+- **Advanced Cellular Models:** 0 found (0%) - needs organoid-specific papers
+
+**Quality Metrics:**
+- Precision: 100% (78/78 valid extractions)
+- Confidence distribution: 98% at 0.8+ confidence
+- Average tools per paper: 1.56
+- Top paper: 20 tools (comprehensive genomics study)
+
+See `tool_coverage/outputs/REAL_WORLD_EXTRACTION_REPORT.md` for full analysis.
+
+---
+
 ## Next Steps
 
 ### Immediate (Before Push)
 1. ✅ Review test results
-2. ⚠️ **Decide:** Accept current extraction quality or refine further?
-3. ⚠️ **Decide:** Push to GitHub for JSON-LD auto-generation?
+2. ✅ Refine extraction patterns based on real publications
+3. ✅ Test on 50 real cached publications - **100% precision achieved**
+4. ⚠️ **Decide:** Push to GitHub for JSON-LD auto-generation?
 
 ### Short Term (This Week)
 4. Push changes to trigger JSON-LD generation

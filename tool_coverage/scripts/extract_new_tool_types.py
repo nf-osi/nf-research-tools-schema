@@ -32,6 +32,25 @@ def extract_context(text: str, match_text: str, window_size: int = 150) -> str:
     return text[start:end]
 
 
+def is_excluded_term(name: str) -> bool:
+    """Check if name matches exclusion patterns for computational tools."""
+    exclude_patterns = [
+        r'^(Table|Figure|Fig|Suppl?|Panel)\b',
+        r'^(and|the|using|with|from|into|onto|upon|at|in|for|to|of)\b',
+        r'^\d+[A-Z]$',  # Figure references like "3A", "7E"
+        r'°[CF]\b',  # Temperature units
+        r'\b(min|sec|hr|mL|μL|ng|mg|μg)\b',  # Units
+        r'^\d+S$',  # RNA like "18S", "28S"
+        r'^[A-Z](\d+)?$',  # Single letters with optional number
+        r'normalized|staining|analyzed|processed|measured',  # Common method verbs
+    ]
+
+    for pattern in exclude_patterns:
+        if re.search(pattern, name, re.IGNORECASE):
+            return True
+    return False
+
+
 def extract_computational_tools(text: str, patterns: Dict = None) -> List[Dict]:
     """
     Extract computational tools (software, pipelines) from text.
@@ -56,33 +75,48 @@ def extract_computational_tools(text: str, patterns: Dict = None) -> List[Dict]:
     tools = []
     seen_tools = set()
 
-    # Pattern 1: Repository URLs
+    # Pattern 1: Repository URLs (high confidence)
     repo_patterns = patterns.get('repository_indicators', [])
     for pattern in repo_patterns:
         for match in re.finditer(pattern, text, re.IGNORECASE):
             url = match.group(0)
             # Extract tool name from URL
             tool_name = extract_tool_name_from_url(url)
-            if tool_name and tool_name.lower() not in seen_tools:
-                context = extract_context(text, url)
-                tools.append({
-                    'name': tool_name,
-                    'type': 'computational_tools',
-                    'context': context,
-                    'confidence': 0.9,
-                    'repository': url
-                })
-                seen_tools.add(tool_name.lower())
 
-    # Pattern 2: Software name with version (e.g., "ImageJ v1.52", "Python 3.8")
-    version_pattern = r'(\w+(?:\s+\w+)?)\s+(?:v\.?|version\s+)?(\d+(?:\.\d+)*[a-z]*)'
-    for match in re.finditer(version_pattern, text, re.IGNORECASE):
+            # Only add if it's a proper repository path (has owner/repo structure)
+            if tool_name and '/' in url:
+                # Verify it's not just a domain
+                path_parts = url.split('/')
+                if len(path_parts) >= 5:  # protocol://domain/owner/repo/...
+                    if tool_name.lower() not in seen_tools:
+                        context = extract_context(text, url)
+                        tools.append({
+                            'name': tool_name,
+                            'type': 'computational_tools',
+                            'context': context,
+                            'confidence': 0.9,
+                            'repository': url
+                        })
+                        seen_tools.add(tool_name.lower())
+
+    # Pattern 2: Software name with explicit version keyword
+    # Require "v" or "version" to reduce false positives
+    version_pattern = r'\b([A-Z][A-Za-z0-9]+(?:[-_][A-Z][A-Za-z0-9]+)?)\s+(?:v\.?|version\s+)(\d+(?:\.\d+)*[a-z]?)\b'
+    for match in re.finditer(version_pattern, text):
         tool_name = match.group(1).strip()
         version = match.group(2)
         full_match = match.group(0)
 
-        # Skip if looks like a year or just numbers
-        if len(tool_name) < 3 or tool_name.isdigit():
+        # Skip excluded terms
+        if is_excluded_term(tool_name):
+            continue
+
+        # Skip if looks like a year
+        if len(version) == 4 and version.isdigit() and int(version) >= 1990:
+            continue
+
+        # Must be at least 3 characters and start with capital
+        if len(tool_name) < 3 or not tool_name[0].isupper():
             continue
 
         context = extract_context(text, full_match, 200)
@@ -97,16 +131,19 @@ def extract_computational_tools(text: str, patterns: Dict = None) -> List[Dict]:
                 'name': tool_name,
                 'type': 'computational_tools',
                 'context': context,
-                'confidence': 0.75,
+                'confidence': 0.8,
                 'version': version
             })
             seen_tools.add(tool_name.lower())
 
-    # Pattern 3: Known tool names
+    # Pattern 3: Known tool names (from validated list)
     tool_names = patterns.get('tool_names', [])
     for tool_name in tool_names:
-        if tool_name.lower() in text.lower() and tool_name.lower() not in seen_tools:
+        # Use word boundary for exact matching
+        pattern = r'\b' + re.escape(tool_name) + r'\b'
+        if re.search(pattern, text, re.IGNORECASE) and tool_name.lower() not in seen_tools:
             context = extract_context(text, tool_name, 200)
+
             # Must have usage context
             context_phrases = patterns.get('context_phrases', [])
             if any(re.search(phrase, context, re.IGNORECASE)
@@ -124,21 +161,25 @@ def extract_computational_tools(text: str, patterns: Dict = None) -> List[Dict]:
 
 def extract_tool_name_from_url(url: str) -> str:
     """Extract tool name from repository URL."""
-    # Extract from GitHub/GitLab URLs
-    match = re.search(r'(?:github|gitlab|bitbucket)\.(?:com|org)/[\w-]+/([\w-]+)', url)
+    # Extract from GitHub/GitLab URLs - get repository name
+    match = re.search(r'(?:github|gitlab|bitbucket)\.(?:com|org)/[^/]+/([^/\s?#]+)', url, re.IGNORECASE)
     if match:
         repo_name = match.group(1)
         # Clean up common suffixes
-        repo_name = re.sub(r'(-analysis|-analyzer|-tool|-pipeline)$', '', repo_name, flags=re.IGNORECASE)
+        repo_name = re.sub(r'(-analysis|-analyzer|-tool|-pipeline|\.git)$', '', repo_name, flags=re.IGNORECASE)
+        # Convert to title case, replace separators
         return repo_name.replace('-', ' ').replace('_', ' ').title()
 
-    # Extract from DOI
-    match = re.search(r'doi\.org/[^/]+/(.+)', url)
+    # Extract from DOI/Zenodo
+    match = re.search(r'(?:zenodo\.org/records?|doi\.org)/[^/]+/([^/\s?#]+)', url, re.IGNORECASE)
     if match:
-        return match.group(1).replace('.', ' ').title()
+        identifier = match.group(1)
+        # If it's just a number, return generic name
+        if identifier.isdigit():
+            return None
+        return identifier.replace('.', ' ').replace('-', ' ').title()
 
-    # Return URL as fallback (better than "Unknown Tool")
-    return url
+    return None
 
 
 def extract_tool_name_from_context(context: str, version_str: str) -> str:
@@ -374,8 +415,8 @@ def extract_clinical_assessment_tools(text: str, patterns: Dict = None) -> List[
     questionnaire_indicators = patterns.get('questionnaire_indicators', [])
     for pattern in questionnaire_indicators:
         # Look for "X questionnaire", "Y scale", etc. (max 4 words before indicator)
-        search_pattern = rf'((?:\w+\s+){{1,4}}){pattern}(?:s)?\b'
-        for match in re.finditer(search_pattern, text, re.IGNORECASE):
+        search_pattern = rf'((?:[A-Z][\w-]+\s+){{1,4}}){pattern}(?:s)?\b'
+        for match in re.finditer(search_pattern, text):
             candidate = match.group(0).strip()
 
             # Skip if too long (likely caught whole sentence)
