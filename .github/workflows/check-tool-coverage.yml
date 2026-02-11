@@ -27,11 +27,19 @@ permissions:
   contents: read
   issues: write
 
+# Cancel previous runs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze-coverage:
     runs-on: ubuntu-latest
     # Only run if: (1) manual trigger, OR (2) PR was merged from annotation review workflow
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'automated-annotation-review'))
+
+    env:
+      ENABLE_AI_VALIDATION: ${{ github.event.inputs.ai_validation != 'false' }}
 
     steps:
       - name: Checkout repository
@@ -58,25 +66,31 @@ jobs:
             echo "⚠️  ANTHROPIC_API_KEY not found - AI validation will be skipped"
           fi
 
+      - name: Cache Goose CLI
+        if: steps.check_api_key.outputs.api_key_exists == 'true'
+        id: cache-goose
+        uses: actions/cache@v4
+        with:
+          path: ~/goose-bin
+          key: goose-1.23.2-linux-x86_64
+
       - name: Install Goose CLI
-        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.cache-goose.outputs.cache-hit != 'true'
         run: |
           echo "Installing Goose CLI for AI validation..."
-          # Install Go if needed
-          sudo apt-get update
-          sudo apt-get install -y golang-go
-          # Install Goose
-          go install github.com/block/goose@latest
-          # Add to PATH
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          # Download pre-built binary from GitHub releases
+          GOOSE_VERSION="1.23.2"
+          mkdir -p ~/goose-bin
+          wget -q https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2
+          tar -xjf goose-x86_64-unknown-linux-gnu.tar.bz2 -C ~/goose-bin
+          chmod +x ~/goose-bin/goose
+          rm goose-x86_64-unknown-linux-gnu.tar.bz2
 
-      - name: Configure Goose
-        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Add Goose to PATH
+        if: steps.check_api_key.outputs.api_key_exists == 'true'
         run: |
-          echo "Configuring Goose with Anthropic API..."
-          # Goose will use ANTHROPIC_API_KEY from environment
+          echo "$HOME/goose-bin" >> $GITHUB_PATH
+          ~/goose-bin/goose --version
 
       - name: Mine publications for novel tools
         id: mining
@@ -104,7 +118,7 @@ jobs:
 
       - name: Run AI validation on mined tools
         id: validation
-        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' }}
+        if: steps.check_api_key.outputs.api_key_exists == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
@@ -127,7 +141,7 @@ jobs:
 
       - name: Apply pattern improvements
         id: pattern_improvements
-        if: ${{ github.event.inputs.ai_validation != 'false' && steps.check_api_key.outputs.api_key_exists == 'true' && steps.validation.outputs.validation_complete == 'true' }}
+        if: steps.validation.outputs.validation_complete == 'true'
         run: |
           echo "Applying AI-suggested pattern improvements..."
           python tool_coverage/scripts/apply_pattern_suggestions.py 2>&1 | tee pattern_improvements_output.log
@@ -172,22 +186,16 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload reports as artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tool-coverage-reports
           path: |
             tool_coverage/outputs/
-            tool_reviews/validation_report.xlsx
-            tool_reviews/validation_summary.json
-            tool_reviews/potentially_missed_tools.csv
-            tool_reviews/suggested_patterns.csv
-            tool_reviews/results/*.yaml
-            tool_coverage/config/mining_patterns.json
-            PATTERN_IMPROVEMENTS.md
+            tool_reviews/
             pr_body.md
-            formatting_output.log
-            pattern_improvements_output.log
-          retention-days: 90
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Create Pull Request with results
         uses: peter-evans/create-pull-request@v7
