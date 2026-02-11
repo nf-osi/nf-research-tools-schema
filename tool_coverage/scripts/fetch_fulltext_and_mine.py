@@ -185,31 +185,48 @@ def check_pmc_availability(pmids: List[str], max_retries: int = 3) -> Set[str]:
     return available_pmids
 
 
-def load_previously_reviewed_pmids(cache_file: str = 'tool_coverage/outputs/previously_reviewed_pmids.csv') -> Set[str]:
+def load_previously_reviewed_pmids(cache_file: str = 'tool_coverage/outputs/previously_reviewed_pmids.csv',
+                                   review_results_dir: str = 'tool_reviews/results') -> Set[str]:
     """
-    Load set of previously reviewed PMIDs from cache file.
+    Load set of previously reviewed PMIDs from cache file and YAML review files.
 
     Args:
         cache_file: Path to CSV file with previously reviewed PMIDs
+        review_results_dir: Directory containing *_tool_review.yaml files
 
     Returns:
         Set of previously reviewed PMIDs (with 'PMID:' prefix)
     """
-    if not os.path.exists(cache_file):
-        return set()
+    reviewed_pmids = set()
 
-    try:
-        df = pd.read_csv(cache_file)
-        if 'pmid' in df.columns:
-            pmids = set(df['pmid'].dropna().astype(str).unique())
-            # Ensure PMID: prefix
-            pmids = {f"PMID:{p.replace('PMID:', '')}" for p in pmids if p and p != 'nan'}
-            return pmids
-    except Exception as e:
-        print(f"  ⚠️  Could not load previously reviewed PMIDs: {e}")
-        return set()
+    # First, try loading from CSV cache
+    if os.path.exists(cache_file):
+        try:
+            df = pd.read_csv(cache_file)
+            if 'pmid' in df.columns:
+                pmids = set(df['pmid'].dropna().astype(str).unique())
+                # Ensure PMID: prefix
+                pmids = {f"PMID:{p.replace('PMID:', '')}" for p in pmids if p and p != 'nan'}
+                reviewed_pmids.update(pmids)
+        except Exception as e:
+            print(f"  ⚠️  Could not load previously reviewed PMIDs from cache: {e}")
 
-    return set()
+    # Also check YAML review files (in case cache is missing/outdated)
+    if os.path.exists(review_results_dir):
+        try:
+            yaml_files = Path(review_results_dir).glob('*_tool_review.yaml')
+            for yaml_file in yaml_files:
+                # Extract PMID from filename (format: 12345678_tool_review.yaml)
+                filename = yaml_file.stem  # Gets filename without extension
+                pmid = filename.replace('_tool_review', '')
+                # Add PMID: prefix if not present
+                if not pmid.startswith('PMID:'):
+                    pmid = f"PMID:{pmid}"
+                reviewed_pmids.add(pmid)
+        except Exception as e:
+            print(f"  ⚠️  Could not scan review YAML files: {e}")
+
+    return reviewed_pmids
 
 
 def save_reviewed_pmids(pmids: Set[str], cache_file: str = 'tool_coverage/outputs/previously_reviewed_pmids.csv'):
