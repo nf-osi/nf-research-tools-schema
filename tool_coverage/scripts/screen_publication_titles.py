@@ -80,7 +80,7 @@ Example:
 
     try:
         message = client.messages.create(
-            model="claude-haiku-3-5-20241022",
+            model="claude-3-5-haiku-20241022",
             max_tokens=8000,  # Haiku max - enough for ~200 titles
             temperature=0,
             messages=[{"role": "user", "content": prompt}]
