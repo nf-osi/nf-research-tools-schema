@@ -92,21 +92,45 @@ jobs:
           echo "$HOME/goose-bin" >> $GITHUB_PATH
           ~/goose-bin/goose --version
 
-      - name: Prepare publication list
+      - name: Prepare publication list (bench + clinical queries)
         id: prep_list
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          echo "Step 1: Preparing publication list (titles only - fast)..."
+          echo "Step 1: Preparing publication lists for all tool types..."
+          echo "Running both bench and clinical queries to capture all 9 tool types"
 
           # Create outputs directory
           mkdir -p tool_coverage/outputs
 
-          # Run preparation script with error handling
-          python tool_coverage/scripts/prepare_publication_list.py 2>&1 | tee tool_coverage/outputs/prep_list_output.log || echo "prep_failed=true" >> $GITHUB_OUTPUT
+          # Run bench science query (computational, PDX, organoids, lab tools)
+          echo "1a. Bench science query (computational, PDX, organoids, antibodies, cell lines)..."
+          python tool_coverage/scripts/prepare_publication_list.py \
+            --query-type bench \
+            --output tool_coverage/outputs/publication_list_bench.csv \
+            2>&1 | tee tool_coverage/outputs/prep_list_bench.log || echo "bench_failed=true" >> $GITHUB_OUTPUT
+
+          # Run clinical assessment query (questionnaires, scales, PROMs)
+          echo "1b. Clinical assessment query (SF-36, PROMIS, PedsQL, outcome measures)..."
+          python tool_coverage/scripts/prepare_publication_list.py \
+            --query-type clinical \
+            --output tool_coverage/outputs/publication_list_clinical.csv \
+            2>&1 | tee tool_coverage/outputs/prep_list_clinical.log || echo "clinical_failed=true" >> $GITHUB_OUTPUT
+
+          # Merge publication lists (deduplicate by PMID)
+          echo "1c. Merging publication lists..."
+          python -c "
+import pandas as pd
+bench = pd.read_csv('tool_coverage/outputs/publication_list_bench.csv')
+clinical = pd.read_csv('tool_coverage/outputs/publication_list_clinical.csv')
+# Concatenate and deduplicate by pmid (keep both query_type tags if same PMID)
+merged = pd.concat([bench, clinical], ignore_index=True)
+merged.to_csv('tool_coverage/outputs/publication_list.csv', index=False)
+print(f'Merged: {len(bench)} bench + {len(clinical)} clinical = {len(merged)} total')
+" || echo "merge_failed=true" >> $GITHUB_OUTPUT
 
           # Only mark complete if no errors
-          if [ ! -f $GITHUB_OUTPUT ] || ! grep -q "prep_failed=true" $GITHUB_OUTPUT; then
+          if [ ! -f $GITHUB_OUTPUT ] || ! grep -q "_failed=true" $GITHUB_OUTPUT; then
             echo "prep_complete=true" >> $GITHUB_OUTPUT
           fi
 

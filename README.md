@@ -3,6 +3,25 @@
 
 This repository contains the released versions of the JSON-LD schema for the NF Research Tools Central. You can learn more about the schema/data model and other aspects of this project in our [project documentation](https://help.nf.synapse.org/NFdocs/Data-Model-&-Schema.2463596640.html).
 
+## Tool Types Supported
+
+The schema supports **9 resource types** for cataloging research tools:
+
+**Established Types (v1.0):**
+- **Antibodies** - Immunological reagents for detection/purification
+- **Cell Lines** - Immortalized cell cultures
+- **Animal Models** - Genetically modified organisms (mice, zebrafish, etc.)
+- **Genetic Reagents** - Plasmids, constructs, CRISPR reagents
+- **Biobanks** - Collections of biological samples
+
+**New Types (v2.0):**
+- **Computational Tools** - Software, pipelines, analysis tools (50+ known tools)
+- **Advanced Cellular Models** - Organoids, assembloids, 3D cultures
+- **Patient-Derived Models** - PDX, xenografts, humanized systems
+- **Clinical Assessment Tools** - Questionnaires, scales, patient-reported outcomes (SF-36, PROMIS, PedsQL)
+
+Each tool type has specific metadata fields and validation rules. See [`tool_coverage/MULTI_QUERY_IMPLEMENTATION.md`](tool_coverage/MULTI_QUERY_IMPLEMENTATION.md) for details on tool mining strategies.
+
 Learn more about the goals for this project by checking out the following documents and presentations: 
 
 > Ashley Clayton, Mialy DeFelice, Brynn Zalmanek, Jay Hodgson, Caroline Morin, Stockard Simon, Julie A Bletz, James A Eddy, Milen Nikolov, Jineta Banerjee, Kalyan Vinnakota, Marco Marasca, Kevin J Boske, Bruce Hoff, Ljubomir Bradic, YooRi Kim, James R Goss, Robert J Allaway, Centralizing neurofibromatosis experimental tool knowledge with the NF Research Tools Database, Database, Volume 2022, 2022, baac045, https://doi.org/10.1093/database/baac045

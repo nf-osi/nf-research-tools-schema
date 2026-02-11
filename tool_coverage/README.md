@@ -2,7 +2,67 @@
 
 ## Overview
 
-This repository includes an automated workflow to monitor tool coverage in the NF research tools database and suggest novel tools to add from publications. The workflow runs weekly and creates GitHub issues with findings.
+This repository includes an automated workflow to monitor tool coverage in the NF research tools database and suggest novel tools to add from publications. The workflow supports **9 resource types** across different publication categories using tool-type-specific mining strategies.
+
+## Supported Tool Types
+
+**Established Types (v1.0) - Lab Research:**
+- 🔬 **Antibodies** - Immunological reagents
+- 🧫 **Cell Lines** - Immortalized cell cultures
+- 🐭 **Animal Models** - Genetically modified organisms
+- 🧬 **Genetic Reagents** - Plasmids, constructs, CRISPR
+- 🏦 **Biobanks** - Biological sample collections
+
+**New Types (v2.0) - Expanded Coverage:**
+- 💻 **Computational Tools** - Software, pipelines, analysis tools (50+ known tools)
+- 🧪 **Advanced Cellular Models** - Organoids, assembloids, 3D cultures
+- 🐁 **Patient-Derived Models** - PDX, xenografts, humanized systems
+- 📋 **Clinical Assessment Tools** - Questionnaires, scales, PROMs (SF-36, PROMIS, PedsQL)
+
+## Multi-Query Mining Strategy
+
+The system uses **tool-type-specific PubMed queries** to maximize discovery across different publication types:
+
+### Query Types
+
+**1. Bench Science Query (Default)**
+- **Targets:** Computational tools, PDX models, organoids, antibodies, cell lines, genetic reagents
+- **Excludes:** Clinical studies, outcomes, quality of life, trials
+- **Frequency:** Monthly
+- **Papers:** ~1000/month
+- **Use case:** Laboratory research publications with Methods sections
+
+**2. Clinical Assessment Query**
+- **Targets:** Clinical assessment tools (SF-36, PROMIS, PedsQL, VAS, outcome measures)
+- **Includes:** Quality of life, questionnaires, patient-reported outcomes
+- **Publication types:** Clinical Trial, Observational Study, Journal Article
+- **Frequency:** Quarterly (planned)
+- **Papers:** ~150/quarter
+- **Use case:** Clinical studies, patient outcome research
+- **Note:** Clinical tools accepted even WITHOUT traditional Methods sections
+
+**3. Organoid Focused Query (Optional)**
+- **Targets:** Advanced cellular models (organoids, assembloids, 3D cultures)
+- **Includes:** Organoid-specific terminology, 3D culture systems
+- **Use case:** Targeted search if bench query insufficient
+
+### Query Selection
+
+```bash
+# Default: Bench science query (computational, PDX, organoids, lab tools)
+python prepare_publication_list.py
+
+# Clinical assessment query (questionnaires, QoL measures)
+python prepare_publication_list.py --query-type clinical
+
+# Organoid focused query (3D cellular models)
+python prepare_publication_list.py --query-type organoid
+
+# Test mode (sample)
+python prepare_publication_list.py --query-type clinical --test-sample 50
+```
+
+**📚 See [`MULTI_QUERY_IMPLEMENTATION.md`](MULTI_QUERY_IMPLEMENTATION.md) for complete architecture and deployment details.**
 
 ## Components
 
@@ -354,15 +414,27 @@ python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
 
 ### Tool Mining Results
 
-The mining process identifies potential tools in four categories:
+The mining process identifies potential tools in **nine categories**:
+
+**Lab Research Tools:**
 - **Cell Lines** (🧫) - Cell culture resources
 - **Antibodies** (🔬) - Immunological reagents
 - **Animal Models** (🐭) - Transgenic/knockout models
 - **Genetic Reagents** (🧬) - Plasmids, vectors, constructs
+- **Biobanks** (🏦) - Sample collections
+
+**Computational & Model Systems:**
+- **Computational Tools** (💻) - Software (ImageJ, R, Python, STAR, Cell Ranger, etc.)
+- **Advanced Cellular Models** (🧪) - Organoids, assembloids, 3D cultures
+- **Patient-Derived Models** (🐁) - PDX, xenografts, humanized mice
+
+**Clinical Tools:**
+- **Clinical Assessment Tools** (📋) - Questionnaires, scales, PROMs (SF-36, PROMIS, PedsQL, VAS)
 
 Each tool is tagged with:
 - **Development Status** - Whether the tool was developed in this publication or just used
-- **Context Metadata** - Extracted characteristics (species, strain, clonality, etc.)
+- **Context Metadata** - Extracted characteristics (species, strain, clonality, version, etc.)
+- **Query Source** - Which query type discovered the tool (bench/clinical/organoid)
 
 ### Observation Mining
 

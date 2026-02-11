@@ -81,7 +81,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ### 2. Check Tool Coverage (check-tool-coverage.yml)
 
-**Purpose**: Mine NF Portal + PubMed publications for novel tools with AI validation
+**Purpose**: Mine NF Portal + PubMed publications for novel tools with AI validation (supports 9 tool types)
 
 **Trigger**:
 - When PR from `review-tool-annotations` is merged
@@ -89,14 +89,24 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 **What it does**:
 1. Loads NF Portal publications from Synapse
-2. Applies research-focused filters (excludes clinical case reports, reviews, etc.)
+2. Applies query-specific filters using **bench science query** (default):
+   - Excludes clinical case reports, reviews, clinical trials
+   - Focuses on laboratory research publications
 3. Checks PMC full text availability for NF Portal publications
 4. Queries PubMed for additional research-focused NF publications
 5. Maintains cache of reviewed publications (`previously_reviewed_pmids.csv`)
 6. Mines full text (Methods, Introduction, Results, Discussion sections)
-7. Searches for cell lines, antibodies, animal models, genetic reagents
+7. Searches for **9 tool types**:
+   - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
+   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, etc.)
+   - **Model systems:** Organoids, PDX/xenografts
+   - **Note:** Clinical assessment tools require separate clinical query (not in default workflow)
 8. AI validation using Goose (optional, requires ANTHROPIC_API_KEY)
 9. Formats results into SUBMIT_*.csv files
+
+**Query Type**: Uses bench science query by default
+- For clinical assessment tools (SF-36, PROMIS, PedsQL), run clinical query separately
+- See [`tool_coverage/MULTI_QUERY_IMPLEMENTATION.md`](../../tool_coverage/MULTI_QUERY_IMPLEMENTATION.md) for query strategies
 
 **Outputs**:
 - `tool_coverage/outputs/processed_publications.csv`
