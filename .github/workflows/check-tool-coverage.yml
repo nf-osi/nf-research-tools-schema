@@ -117,16 +117,30 @@ jobs:
             --output tool_coverage/outputs/publication_list_clinical.csv \
             2>&1 | tee tool_coverage/outputs/prep_list_clinical.log || echo "clinical_failed=true" >> $GITHUB_OUTPUT
 
-          # Merge publication lists (deduplicate by PMID)
+          # Merge publication lists (deduplicate by PMID, merge query_types)
           echo "1c. Merging publication lists..."
           python -c "
 import pandas as pd
 bench = pd.read_csv('tool_coverage/outputs/publication_list_bench.csv')
 clinical = pd.read_csv('tool_coverage/outputs/publication_list_clinical.csv')
-# Concatenate and deduplicate by pmid (keep both query_type tags if same PMID)
+
+# Concatenate both query results
 merged = pd.concat([bench, clinical], ignore_index=True)
+
+# Deduplicate by PMID, merging query_types for publications in both queries
+# Example: If PMID appears in both bench and clinical, query_type becomes 'bench,clinical'
+merged = merged.groupby('pmid', as_index=False).agg({
+    'title': 'first',
+    'doi': 'first',
+    'journal': 'first',
+    'year': 'first',
+    'query_type': lambda x: ','.join(sorted(set(x))),  # Merge query types
+    'source': 'first'
+})
+
 merged.to_csv('tool_coverage/outputs/publication_list.csv', index=False)
-print(f'Merged: {len(bench)} bench + {len(clinical)} clinical = {len(merged)} total')
+print(f'Merged: {len(bench)} bench + {len(clinical)} clinical → {len(merged)} unique publications')
+print(f'  Publications in both queries: {len(bench) + len(clinical) - len(merged)}')
 " || echo "merge_failed=true" >> $GITHUB_OUTPUT
 
           # Only mark complete if no errors

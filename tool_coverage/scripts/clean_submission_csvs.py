@@ -17,10 +17,19 @@ from typing import List, Dict, Tuple
 
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
+    # Existing tool types (v1.0)
     'CLEAN_animal_models.csv': 'syn26486808',
     'CLEAN_antibodies.csv': 'syn26486811',
     'CLEAN_cell_lines.csv': 'syn26486823',
     'CLEAN_genetic_reagents.csv': 'syn26486832',
+
+    # New tool types (v2.0) - Tables need to be created in Synapse
+    'CLEAN_computational_tools.csv': 'TBD',  # ComputationalToolDetails table
+    'CLEAN_advanced_cellular_models.csv': 'TBD',  # AdvancedCellularModelDetails table
+    'CLEAN_patient_derived_models.csv': 'TBD',  # PatientDerivedModelDetails table
+    'CLEAN_clinical_assessment_tools.csv': 'TBD',  # ClinicalAssessmentToolDetails table
+
+    # Common tables
     'CLEAN_resources.csv': 'syn26450069',
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
     'CLEAN_usage.csv': 'syn26486841',  # Publications where tools were USED
@@ -48,10 +57,19 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
 
     # Define required columns for each type
     required_columns = {
+        # Existing tool types (v1.0)
         'animal_models': ['name', 'species'],
         'antibodies': ['targetAntigen'],
         'cell_lines': ['organ'],
         'genetic_reagents': ['insertName'],
+
+        # New tool types (v2.0)
+        'computational_tools': ['softwareName', 'softwareType'],
+        'advanced_cellular_models': ['modelType', 'derivationSource'],
+        'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
+        'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation'],
+
+        # Common tables
         'publications': ['publicationId', 'pmid'],
         'usage': ['usageId', 'publicationId', 'resourceId'],
         'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
@@ -140,6 +158,13 @@ def upsert_to_synapse(syn, clean_file, df_clean):
 
     if not table_id:
         print(f"      ⚠️  No Synapse table mapping for {os.path.basename(clean_file)}")
+        return False
+
+    # Check for TBD (tables not yet created in Synapse)
+    if table_id == 'TBD':
+        print(f"      ⚠️  Synapse table not yet created for {os.path.basename(clean_file)}")
+        print(f"         This is a new tool type (v2.0) - table must be created first")
+        print(f"         See build_db/build_db.py for table configuration")
         return False
 
     if df_clean.empty:
