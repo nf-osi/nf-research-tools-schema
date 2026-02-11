@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Advanced Cellular Model",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": ["firstandlastName", "email", "isDeveloper"]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "title": "Name of Advanced Cellular Model"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
+        "modelType": {
+          "type": "string",
+          "title": "Type of Model",
+          "enum": [
+            "Organoid",
+            "Assembloid",
+            "Spheroid",
+            "3D Culture",
+            "Other"
+          ]
+        },
+        "derivationSource": {
+          "type": "string",
+          "title": "Derivation Source",
+          "enum": [
+            "iPSC",
+            "ESC",
+            "Primary Tissue",
+            "Cell Line",
+            "Patient-Derived",
+            "Other"
+          ]
+        },
+        "cellTypes": {
+          "type": "array",
+          "title": "Cell Types Present",
+          "items": {
+            "type": "string"
+          }
+        },
+        "organoidType": {
+          "type": "string",
+          "title": "Organoid Type (if applicable)",
+          "enum": [
+            "",
+            "Cerebral",
+            "Intestinal",
+            "Liver",
+            "Kidney",
+            "Cardiac",
+            "Retinal",
+            "Lung",
+            "Pancreatic",
+            "Other"
+          ]
+        },
+        "matrixType": {
+          "type": "string",
+          "title": "Matrix/Scaffold Type",
+          "enum": [
+            "Matrigel",
+            "BME",
+            "Hydrogel",
+            "Synthetic Matrix",
+            "Scaffold-Free",
+            "Other"
+          ]
+        },
+        "cultureSystem": {
+          "type": "string",
+          "title": "Culture System",
+          "enum": [
+            "Static",
+            "Spinning Bioreactor",
+            "Microfluidic",
+            "Air-Liquid Interface",
+            "Other"
+          ]
+        },
+        "maturationTime": {
+          "type": "string",
+          "title": "Time Required for Maturation"
+        },
+        "characterizationMethods": {
+          "type": "array",
+          "title": "Characterization Methods Used",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Immunofluorescence",
+              "RNA-seq",
+              "scRNA-seq",
+              "Electrophysiology",
+              "Imaging",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "passageNumber": {
+          "type": "string",
+          "title": "Passage Number (if applicable)"
+        },
+        "cryopreservationProtocol": {
+          "type": "string",
+          "title": "Cryopreservation Protocol (if available)"
+        },
+        "qualityControlMetrics": {
+          "type": "array",
+          "title": "Quality Control Metrics",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "howToAcquire": {
+          "type": "string",
+          "title": "How to Acquire This Model"
+        }
+      },
+      "required": ["modelName", "modelType", "derivationSource", "cellTypes", "howToAcquire"]
+    }
+  },
+  "required": ["userInfo", "basicInfo"]
+}

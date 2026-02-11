@@ -2,6 +2,11 @@
 """
 Prepare list of publications for screening by fetching titles from Synapse and PubMed.
 Fast operation - only gets metadata, not full text.
+
+Supports multiple query types for different tool categories:
+- bench: Computational tools, PDX models, organoids (default)
+- clinical: Clinical assessment tools (QoL, questionnaires)
+- organoid: Advanced cellular models (3D cultures)
 """
 
 import synapseclient
@@ -9,33 +14,103 @@ import pandas as pd
 import requests
 import time
 import os
+import json
 import argparse
 from pathlib import Path
 from xml.etree import ElementTree as ET
-from typing import List, Set
+from typing import List, Set, Dict, Tuple
 
 # PubMed API configuration
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 EMAIL = "your.email@example.com"
 TOOL_NAME = "nf-research-tools-miner"
 
-# PubMed query filters
+# Legacy query filters (bench science) - kept for backward compatibility
 PUBMED_QUERY_FILTERS = [
-    '(neurofibroma*[Abstract] NOT case[Title] NOT review[Title] NOT pain[Title] NOT tomography[Title]',
+    '(neurofibroma*[Abstract] NOT case*[Title/Journal] NOT review[Title] NOT pain[Title] NOT tomography[Title]',
     'NOT outcomes[Title] NOT individiual*[Title] NOT patient*[Title] NOT population[Title]',
     'NOT clinic*[Title] NOT cohort*[Title] NOT child*[Title] NOT current[Title] NOT MRI*[Title]',
     'NOT guideline*[Title] NOT perspective*[Title] NOT retrospective[Title] NOT after[Title]',
     'NOT "quality of life"[Title] NOT pediatric*[Title] NOT adult*[Title] NOT resection[Title]',
-    'NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title]',
+    'NOT parent*[Title] NOT prognostic[Title] NOT surg*[Title] NOT facial[Title] NOT giant[Title]',
     'NOT prevalence[Title] NOT experience[Title] NOT famil*[Title] NOT presentation[Title]',
     'NOT trial[Title] NOT "novel mutation"[Title] NOT presenting[Title] NOT overview[Title]',
     'NOT pregnancy[Title] NOT lady[Title] NOT female[Title] NOT woman[Title] NOT women[Title]',
-    'NOT "hearing loss"[Title] NOT "pictorial essay"[Title]',
-    'NOT "Clinical case reports"[Journal] NOT "JA clinical reports"[Journal])',
+    'NOT "hearing loss"[Title] NOT "pictorial essay"[Title] NOT healthcare[Title] NOT CT[Title]',
+    'NOT "rare occurence"[Title] NOT update*[Title] NOT initiative*[Title] NOT male[Title] NOT social[Title]',
+    'NOT people[Title] NOT decision*[Title] NOT autopsy*[Title] NOT isolated[Title] NOT solitary[Title]',
+    'NOT "JA clinical reports"[Journal])',
     'AND (hasabstract)',
     'AND (free full text[Filter])',
     'AND (Journal Article[Publication Type])'
 ]
+
+
+def load_query_config() -> Dict:
+    """Load query configurations from JSON file."""
+    config_path = Path(__file__).parent.parent / 'config' / 'pubmed_queries.json'
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"⚠️  Warning: Could not load query config: {e}")
+        print(f"   Using legacy bench science query")
+        return None
+
+
+def get_query_filters(query_type: str = 'bench') -> Tuple[List[str], List[str]]:
+    """
+    Get PubMed query filters and title exclusions for a specific query type.
+
+    Returns:
+        (pubmed_filters, title_exclusions)
+    """
+    # Map CLI query types to config keys
+    query_type_map = {
+        'bench': 'bench_science',
+        'clinical': 'clinical_assessment',
+        'organoid': 'organoid_focused'
+    }
+
+    config = load_query_config()
+    config_key = query_type_map.get(query_type, query_type)
+
+    if config is None or config_key not in config.get('queries', {}):
+        # Fallback to legacy bench query
+        print(f"   ⚠️  Using legacy bench science filters (config not found)")
+        return (
+            PUBMED_QUERY_FILTERS,
+            ['case report', 'clinical case', 'patient outcome', 'surgical',
+             'clinical trial', 'retrospective', 'prospective study',
+             'case series', 'clinical experience', 'treatment outcome']
+        )
+
+    print(f"   ✓ Loaded {query_type} query from config")
+    query_config = config['queries'][config_key]
+    filters = query_config.get('filters', [])
+
+    # Determine title exclusions based on query type
+    if query_type == 'clinical':
+        # Clinical query: minimal exclusions (keep clinical studies!)
+        exclusions = [
+            'case report', 'case series', 'pictorial essay',
+            'autopsy', 'letter to editor', 'erratum'
+        ]
+    elif query_type == 'organoid':
+        # Organoid query: exclude clinical but not bench
+        exclusions = [
+            'case report', 'clinical case', 'case series',
+            'patient outcome', 'treatment outcome'
+        ]
+    else:  # bench
+        # Bench query: exclude clinical studies
+        exclusions = [
+            'case report', 'clinical case', 'patient outcome', 'surgical',
+            'clinical trial', 'retrospective', 'prospective study',
+            'case series', 'clinical experience', 'treatment outcome'
+        ]
+
+    return (filters, exclusions)
 
 
 def query_pubmed(query: str, max_results: int = 10000) -> List[str]:
@@ -192,7 +267,7 @@ def load_previously_reviewed_pmids() -> Set[str]:
     return reviewed_pmids
 
 
-def should_exclude_publication(title: str, journal: str) -> bool:
+def should_exclude_publication(title: str, journal: str, exclude_keywords: List[str]) -> bool:
     """Check if publication should be excluded based on title/journal filters."""
     if not title:
         return True
@@ -200,19 +275,13 @@ def should_exclude_publication(title: str, journal: str) -> bool:
     title_lower = title.lower()
     journal_lower = journal.lower() if journal else ''
 
-    # Exclude clinical/case report keywords
-    exclude_keywords = [
-        'case report', 'clinical case', 'patient outcome', 'surgical',
-        'clinical trial', 'retrospective', 'prospective study',
-        'case series', 'clinical experience', 'treatment outcome'
-    ]
-
+    # Check exclusion keywords
     for keyword in exclude_keywords:
         if keyword in title_lower:
             return True
 
-    # Exclude specific journals
-    exclude_journals = ['clinical case reports', 'ja clinical reports']
+    # Exclude specific journals (universal across all query types)
+    exclude_journals = ['ja clinical reports']
     if any(j in journal_lower for j in exclude_journals):
         return True
 
@@ -224,87 +293,131 @@ def main():
         description='Prepare list of publications for title screening (fast - metadata only)'
     )
     parser.add_argument(
+        '--query-type',
+        choices=['bench', 'clinical', 'organoid'],
+        default='bench',
+        help='Type of query to run (default: bench)'
+    )
+    parser.add_argument(
         '--skip-pubmed-query',
         action='store_true',
         help='Skip PubMed query (only use Synapse publications)'
     )
     parser.add_argument(
+        '--skip-synapse',
+        action='store_true',
+        help='Skip Synapse publications (PubMed query only)'
+    )
+    parser.add_argument(
+        '--test-sample',
+        type=int,
+        help='Test mode: limit to N publications'
+    )
+    parser.add_argument(
         '--output',
-        default='tool_coverage/outputs/publication_list.csv',
-        help='Output file for publication list'
+        default=None,
+        help='Output file for publication list (auto-generated if not specified)'
     )
 
     args = parser.parse_args()
 
+    # Auto-generate output filename based on query type
+    if args.output is None:
+        args.output = f'tool_coverage/outputs/publication_list_{args.query_type}.csv'
+
     print("=" * 80)
-    print("Prepare Publication List (Step 1: Metadata Only)")
+    print(f"Prepare Publication List - {args.query_type.upper()} Query")
     print("=" * 80)
 
-    # Login to Synapse
-    print("\n1. Connecting to Synapse...")
-    syn = synapseclient.Synapse()
-    syn.login(silent=True)
+    # Get query-specific filters
+    pubmed_filters, title_exclusions = get_query_filters(args.query_type)
 
-    # Load previously reviewed PMIDs
-    print("\n2. Loading previously reviewed publications...")
-    previously_reviewed = load_previously_reviewed_pmids()
-    print(f"   - {len(previously_reviewed)} previously reviewed publications")
+    print(f"\nQuery Type: {args.query_type}")
+    print(f"Title Exclusions: {len(title_exclusions)} keywords")
+    if args.test_sample:
+        print(f"🧪 TEST MODE: Limited to {args.test_sample} publications")
 
-    # Load publications from Synapse
-    print("\n3. Loading NF Portal publications from Synapse...")
-    # Note: 'year' must be quoted because YEAR is an SQL keyword
-    pub_query = syn.tableQuery('SELECT pmid, title, doi, journal, "year" FROM syn16857542')
-    pub_df = pub_query.asDataFrame()
+    all_publications = []
 
-    # Standardize PMID format
-    if 'pmid' in pub_df.columns:
-        pub_df['pmid'] = pub_df['pmid'].astype(str)
-        pub_df.loc[~pub_df['pmid'].str.startswith('PMID:'), 'pmid'] = 'PMID:' + pub_df['pmid']
+    # Login to Synapse (unless skipped)
+    if not args.skip_synapse:
+        print("\n1. Connecting to Synapse...")
+        syn = synapseclient.Synapse()
+        syn.login(silent=True)
 
-    print(f"   - {len(pub_df)} total NF Portal publications")
+        # Load previously reviewed PMIDs
+        print("\n2. Loading previously reviewed publications...")
+        previously_reviewed = load_previously_reviewed_pmids()
+        print(f"   - {len(previously_reviewed)} previously reviewed publications")
 
-    # Apply title/journal filters
-    print("\n4. Applying title/journal filters...")
-    initial_count = len(pub_df)
-    pub_df['exclude'] = pub_df.apply(
-        lambda row: should_exclude_publication(
-            row.get('title', ''),
-            row.get('journal', '')
-        ),
-        axis=1
-    )
-    excluded_count = pub_df['exclude'].sum()
-    pub_df = pub_df[~pub_df['exclude']].drop(columns=['exclude'])
-    print(f"   - Excluded {excluded_count} publications based on title/journal filters")
-    print(f"   - {len(pub_df)} publications remain")
+        # Load publications from Synapse
+        print("\n3. Loading NF Portal publications from Synapse...")
+        pub_query = syn.tableQuery('SELECT pmid, title, doi, journal, "year" FROM syn16857542')
+        pub_df = pub_query.asDataFrame()
 
-    # Check PMC availability
-    print("\n5. Checking PMC full text availability...")
-    nf_portal_pmids = pub_df['pmid'].dropna().unique().tolist()
-    print(f"   - Checking {len(nf_portal_pmids)} PMIDs...")
+        # Standardize PMID format
+        if 'pmid' in pub_df.columns:
+            pub_df['pmid'] = pub_df['pmid'].astype(str)
+            pub_df.loc[~pub_df['pmid'].str.startswith('PMID:'), 'pmid'] = 'PMID:' + pub_df['pmid']
 
-    pmc_available = set()
-    batch_size = 500
-    for i in range(0, len(nf_portal_pmids), batch_size):
-        batch = nf_portal_pmids[i:i + batch_size]
-        batch_available = check_pmc_availability(batch)
-        pmc_available.update(batch_available)
-        print(f"     Checked {min(i + batch_size, len(nf_portal_pmids))}/{len(nf_portal_pmids)} PMIDs... ({len(pmc_available)} with full text)")
+        print(f"   - {len(pub_df)} total NF Portal publications")
 
-    print(f"   - {len(pmc_available)} publications have full text in PMC")
+        # Apply title/journal filters
+        print(f"\n4. Applying {args.query_type} title/journal filters...")
+        initial_count = len(pub_df)
+        pub_df['exclude'] = pub_df.apply(
+            lambda row: should_exclude_publication(
+                row.get('title', ''),
+                row.get('journal', ''),
+                title_exclusions
+            ),
+            axis=1
+        )
+        excluded_count = pub_df['exclude'].sum()
+        pub_df = pub_df[~pub_df['exclude']].drop(columns=['exclude'])
+        print(f"   - Excluded {excluded_count} publications based on title/journal filters")
+        print(f"   - {len(pub_df)} publications remain")
 
-    # Filter to only PMC-available publications
-    before_pmc = len(pub_df)
-    pub_df = pub_df[pub_df['pmid'].isin(pmc_available)].copy()
-    print(f"   - Excluded {before_pmc - len(pub_df)} publications without PMC full text")
+        # Check PMC availability
+        print("\n5. Checking PMC full text availability...")
+        nf_portal_pmids = pub_df['pmid'].dropna().unique().tolist()
+
+        if args.test_sample:
+            nf_portal_pmids = nf_portal_pmids[:args.test_sample]
+            print(f"   🧪 TEST MODE: Checking first {len(nf_portal_pmids)} PMIDs")
+        else:
+            print(f"   - Checking {len(nf_portal_pmids)} PMIDs...")
+
+        pmc_available = set()
+        batch_size = 500
+        for i in range(0, len(nf_portal_pmids), batch_size):
+            batch = nf_portal_pmids[i:i + batch_size]
+            batch_available = check_pmc_availability(batch)
+            pmc_available.update(batch_available)
+            print(f"     Checked {min(i + batch_size, len(nf_portal_pmids))}/{len(nf_portal_pmids)} PMIDs... ({len(pmc_available)} with full text)")
+
+        print(f"   - {len(pmc_available)} publications have full text in PMC")
+
+        # Filter to only PMC-available publications
+        before_pmc = len(pub_df)
+        pub_df = pub_df[pub_df['pmid'].isin(pmc_available)].copy()
+        print(f"   - Excluded {before_pmc - len(pub_df)} publications without PMC full text")
+
+        # Add source tag
+        pub_df['source'] = 'synapse'
+        all_publications.append(pub_df)
+    else:
+        print("\n1-5. Skipping Synapse (--skip-synapse enabled)")
+        previously_reviewed = set()
 
     # Query PubMed for additional publications
     if not args.skip_pubmed_query:
-        print("\n6. Querying PubMed for additional publications...")
-        pubmed_query = ' '.join(PUBMED_QUERY_FILTERS)
-        print(f"   - Query: {pubmed_query[:200]}...")
+        print(f"\n6. Querying PubMed for {args.query_type} publications...")
+        pubmed_query = ' '.join(pubmed_filters)
+        print(f"   - Query: {pubmed_query[:150]}...")
 
-        pubmed_pmids = query_pubmed(pubmed_query, max_results=10000)
+        max_results = args.test_sample if args.test_sample else 10000
+        pubmed_pmids = query_pubmed(pubmed_query, max_results=max_results)
         print(f"   - Found {len(pubmed_pmids)} publications in PubMed")
 
         if pubmed_pmids:
@@ -312,7 +425,10 @@ def main():
             pubmed_pmids_formatted = [f"PMID:{p}" if not p.startswith('PMID:') else p for p in pubmed_pmids]
 
             # Filter out already loaded and reviewed
-            synapse_pmids = set(pub_df['pmid'].dropna().unique())
+            if all_publications:
+                synapse_pmids = set(pd.concat(all_publications)['pmid'].dropna().unique())
+            else:
+                synapse_pmids = set()
             all_existing = synapse_pmids.union(previously_reviewed)
             new_pmids = [p for p in pubmed_pmids_formatted if p not in all_existing]
 
@@ -326,29 +442,43 @@ def main():
                 print(f"   - Retrieved metadata for {len(pubmed_df)} publications")
 
                 if len(pubmed_df) > 0:
-                    pub_df = pd.concat([pub_df, pubmed_df], ignore_index=True)
-                    print(f"   - Total publications after merge: {len(pub_df)}")
+                    pubmed_df['source'] = 'pubmed'
+                    all_publications.append(pubmed_df)
     else:
         print("\n6. Skipping PubMed query (--skip-pubmed-query enabled)")
 
-    # Load existing links and exclude
-    print("\n7. Filtering out already-linked publications...")
-    link_query = syn.tableQuery("SELECT pmid FROM syn51735450")
-    link_df = link_query.asDataFrame()
+    # Merge all sources
+    if not all_publications:
+        print("\n❌ No publications found!")
+        return 1
 
-    linked_pmids = set()
-    if 'pmid' in link_df.columns:
-        linked_pmids = set(link_df['pmid'].dropna().astype(str).unique())
-        linked_pmids = {f"PMID:{p.replace('PMID:', '')}" for p in linked_pmids if p and p != 'nan'}
+    pub_df = pd.concat(all_publications, ignore_index=True)
+    print(f"\n   - Total publications after merge: {len(pub_df)}")
 
-    print(f"   - {len(linked_pmids)} publications already linked to tools")
+    # Load existing links and exclude (unless testing)
+    if not args.test_sample and not args.skip_synapse:
+        print("\n7. Filtering out already-linked publications...")
+        link_query = syn.tableQuery("SELECT pmid FROM syn51735450")
+        link_df = link_query.asDataFrame()
 
-    # Filter out linked and reviewed
-    all_to_exclude = linked_pmids.union(previously_reviewed)
-    before_filter = len(pub_df)
-    pub_df = pub_df[~pub_df['pmid'].isin(all_to_exclude)].copy()
-    print(f"   - Excluded {before_filter - len(pub_df)} publications (already linked/reviewed)")
-    print(f"   - {len(pub_df)} publications remain for screening")
+        linked_pmids = set()
+        if 'pmid' in link_df.columns:
+            linked_pmids = set(link_df['pmid'].dropna().astype(str).unique())
+            linked_pmids = {f"PMID:{p.replace('PMID:', '')}" for p in linked_pmids if p and p != 'nan'}
+
+        print(f"   - {len(linked_pmids)} publications already linked to tools")
+
+        # Filter out linked and reviewed
+        all_to_exclude = linked_pmids.union(previously_reviewed)
+        before_filter = len(pub_df)
+        pub_df = pub_df[~pub_df['pmid'].isin(all_to_exclude)].copy()
+        print(f"   - Excluded {before_filter - len(pub_df)} publications (already linked/reviewed)")
+        print(f"   - {len(pub_df)} publications remain for screening")
+    else:
+        print("\n7. Skipping already-linked filter (test mode or no Synapse)")
+
+    # Add query type metadata
+    pub_df['query_type'] = args.query_type
 
     # Save output
     output_file = Path(args.output)
@@ -356,13 +486,16 @@ def main():
     pub_df.to_csv(output_file, index=False)
 
     print("\n" + "=" * 80)
-    print("Publication List Prepared:")
+    print(f"Publication List Prepared ({args.query_type.upper()}):")
     print("=" * 80)
     print(f"   Total publications: {len(pub_df)}")
     print(f"   With PMC full text: {len(pub_df)}")
-    print(f"   Ready for title screening")
+    print(f"   Query type: {args.query_type}")
+    print(f"   Ready for mining")
     print(f"\n✅ Saved to {output_file}")
+
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    exit(main())

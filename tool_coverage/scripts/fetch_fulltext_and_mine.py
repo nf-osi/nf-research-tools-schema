@@ -21,6 +21,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 from extract_tool_metadata import extract_all_metadata
+from extract_new_tool_types import extract_all_new_tool_types
 
 # PubMed Central API configuration
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -1107,7 +1108,11 @@ def mine_abstract(abstract_text: str, tool_patterns: Dict[str, List[str]]) -> Tu
         'cell_lines': set(),
         'antibodies': set(),
         'animal_models': set(),
-        'genetic_reagents': set()
+        'genetic_reagents': set(),
+        'computational_tools': set(),
+        'advanced_cellular_models': set(),
+        'patient_derived_models': set(),
+        'clinical_assessment_tools': set()
     }
 
     tool_metadata = {}
@@ -1164,7 +1169,11 @@ def mine_introduction_section(intro_text: str, tool_patterns: Dict[str, List[str
         'cell_lines': set(),
         'antibodies': set(),
         'animal_models': set(),
-        'genetic_reagents': set()
+        'genetic_reagents': set(),
+        'computational_tools': set(),
+        'advanced_cellular_models': set(),
+        'patient_derived_models': set(),
+        'clinical_assessment_tools': set()
     }
 
     tool_metadata = {}
@@ -1254,7 +1263,11 @@ def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]])
         'cell_lines': set(),
         'antibodies': set(),
         'animal_models': set(),
-        'genetic_reagents': set()
+        'genetic_reagents': set(),
+        'computational_tools': set(),
+        'advanced_cellular_models': set(),
+        'patient_derived_models': set(),
+        'clinical_assessment_tools': set()
     }
 
     tool_metadata = {}
@@ -1305,6 +1318,35 @@ def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]])
             metadata['is_generic'] = False  # Already filtered generics
             tool_metadata[metadata_key] = metadata
 
+    # 3. Extract new tool types using pattern-based extraction
+    new_tool_results = extract_all_new_tool_types(methods_text)
+
+    for tool_type, tools_list in new_tool_results.items():
+        for tool_dict in tools_list:
+            tool_name = tool_dict['name']
+            confidence = tool_dict.get('confidence', 0.7)
+
+            # Only include tools with sufficient confidence
+            if confidence >= 0.7:
+                found_tools[tool_type].add(tool_name)
+
+                # Build metadata
+                metadata_key = f"{tool_type}:{tool_name}"
+                metadata = {
+                    'context': tool_dict.get('context', ''),
+                    'confidence': confidence,
+                    'is_development': False,  # Can enhance this later
+                    'is_generic': False
+                }
+
+                # Add type-specific metadata
+                if 'repository' in tool_dict:
+                    metadata['repository'] = tool_dict['repository']
+                if 'subtype' in tool_dict:
+                    metadata['subtype'] = tool_dict['subtype']
+
+                tool_metadata[metadata_key] = metadata
+
     return found_tools, tool_metadata
 
 
@@ -1327,7 +1369,11 @@ def merge_mining_results(abstract_results: Tuple, methods_results: Tuple,
         'cell_lines': set(),
         'antibodies': set(),
         'animal_models': set(),
-        'genetic_reagents': set()
+        'genetic_reagents': set(),
+        'computational_tools': set(),
+        'advanced_cellular_models': set(),
+        'patient_derived_models': set(),
+        'clinical_assessment_tools': set()
     }
 
     merged_metadata = {}

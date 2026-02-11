@@ -45,28 +45,31 @@ def screen_titles_batch_with_haiku(titles_batch: List[Dict], client: anthropic.A
 
     titles_text = "\n".join(titles_list)
 
-    prompt = f"""You are screening publication titles to identify basic science or translational neurofibromatosis research that might describe research tools (cell lines, antibodies, animal models, genetic reagents).
+    prompt = f"""You are screening publication titles to identify neurofibromatosis research that might describe research tools across 9 categories: antibodies, cell lines, animal models, genetic reagents, biobanks, computational tools, organoids/3D models, patient-derived xenografts (PDX), and clinical assessment tools.
 
 Screen each of the following {len(titles_batch)} publication titles:
 
 {titles_text}
 
-For each title, determine if it describes BASIC SCIENCE or TRANSLATIONAL RESEARCH (INCLUDE) or CLINICAL/PATIENT CARE (EXCLUDE).
+For each title, determine if it describes research that USES or DEVELOPS any research tools (INCLUDE) or is purely observational/review (EXCLUDE).
 
-**INCLUDE (Basic/Translational research):**
-- Laboratory experiments with cell lines, animal models
-- Development or use of research tools/reagents
-- Molecular biology, genetics, drug discovery
-- In vitro or in vivo studies
-- Mechanism of disease studies
+**INCLUDE (Research with tools):**
+- **Lab research:** Cell lines, antibodies, animal models, genetic reagents, biobanks
+- **Computational:** Software, bioinformatics pipelines, analysis tools, imaging tools
+- **Model systems:** Organoids, 3D cultures, assembloids, PDX/xenograft models
+- **Clinical tools:** Questionnaires (SF-36, PROMIS, PedsQL), outcome measures, assessment scales
+- Molecular biology, genetics, drug discovery, screening
+- In vitro or in vivo studies with experimental methods
+- Patient-reported outcomes using validated instruments
+- Quality of life studies using standardized questionnaires
 
-**EXCLUDE (Clinical research):**
-- Case reports, patient outcomes
-- Surgical procedures, treatment results
-- Clinical trials focused only on patient care
-- Diagnostic imaging studies
-- Epidemiology, population studies
-- Quality of life, patient experience
+**EXCLUDE (No research tools):**
+- Pure case reports without tools/methods
+- Surgical procedure descriptions only
+- Diagnostic imaging reports without analysis tools
+- Epidemiology without assessment tools
+- Review articles, meta-analyses, editorials
+- Opinion pieces, commentaries
 
 Respond in this exact format for each title:
 #1: INCLUDE|EXCLUDE - Brief reason (one phrase)

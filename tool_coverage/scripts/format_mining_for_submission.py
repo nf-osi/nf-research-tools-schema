@@ -388,6 +388,219 @@ def format_genetic_reagents(mining_df):
     return pd.DataFrame(genetic_reagent_rows)
 
 
+def format_computational_tools(mining_df):
+    """
+    Format computational tool suggestions for new Synapse table.
+
+    Processes NOVEL computational tools only (not existing tools).
+    """
+    tool_rows = []
+
+    for idx, row in mining_df.iterrows():
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
+            continue
+
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        tools = novel_tools.get('computational_tools', [])
+        if not tools:
+            continue
+
+        for tool_name in tools:
+            if not tool_name or not str(tool_name).strip():
+                continue
+
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'computational_tools', tool_name)
+
+            tool_rows.append({
+                'computationalToolId': generate_uuid(),
+                'softwareName': tool_name.strip(),
+                'softwareType': '',  # To be filled manually
+                'softwareVersion': metadata.get('version', ''),
+                'programmingLanguage': metadata.get('language', []),
+                'sourceRepository': metadata.get('repository', ''),
+                'documentation': '',
+                'licenseType': '',
+                'containerized': '',
+                'dependencies': [],
+                'systemRequirements': '',
+                'lastUpdate': '',
+                'maintainer': '',
+                # Tracking fields
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_context': metadata.get('context', '')[:500]
+            })
+
+    return pd.DataFrame(tool_rows)
+
+
+def format_advanced_cellular_models(mining_df):
+    """
+    Format advanced cellular model suggestions for new Synapse table.
+
+    Processes NOVEL models only (organoids, assembloids, etc.).
+    """
+    model_rows = []
+
+    for idx, row in mining_df.iterrows():
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
+            continue
+
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        models = novel_tools.get('advanced_cellular_models', [])
+        if not models:
+            continue
+
+        for model_name in models:
+            if not model_name or not str(model_name).strip():
+                continue
+
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'advanced_cellular_models', model_name)
+
+            model_rows.append({
+                'advancedCellularModelId': generate_uuid(),
+                'modelType': '',  # To be filled manually (Organoid/Assembloid/etc.)
+                'derivationSource': '',
+                'cellTypes': [],
+                'organoidType': '',
+                'matrixType': '',
+                'cultureSystem': '',
+                'maturationTime': '',
+                'characterizationMethods': [],
+                'passageNumber': '',
+                'cryopreservationProtocol': '',
+                'qualityControlMetrics': [],
+                # Tracking fields
+                '_modelName': model_name.strip(),
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_context': metadata.get('context', '')[:500]
+            })
+
+    return pd.DataFrame(model_rows)
+
+
+def format_patient_derived_models(mining_df):
+    """
+    Format patient-derived model suggestions for new Synapse table.
+
+    Processes NOVEL PDX models, humanized systems, etc.
+    """
+    model_rows = []
+
+    for idx, row in mining_df.iterrows():
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
+            continue
+
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        models = novel_tools.get('patient_derived_models', [])
+        if not models:
+            continue
+
+        for model_name in models:
+            if not model_name or not str(model_name).strip():
+                continue
+
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'patient_derived_models', model_name)
+
+            model_rows.append({
+                'patientDerivedModelId': generate_uuid(),
+                'modelSystemType': metadata.get('subtype', ''),  # PDX/Humanized Mouse
+                'patientDiagnosis': '',
+                'hostStrain': '',
+                'passageNumber': '',
+                'tumorType': '',
+                'engraftmentSite': '',
+                'establishmentRate': '',
+                'molecularCharacterization': [],
+                'clinicalData': '',
+                'humanizationMethod': '',
+                'immuneSystemComponents': [],
+                'validationMethods': [],
+                # Tracking fields
+                '_modelName': model_name.strip(),
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_context': metadata.get('context', '')[:500]
+            })
+
+    return pd.DataFrame(model_rows)
+
+
+def format_clinical_assessment_tools(mining_df):
+    """
+    Format clinical assessment tool suggestions for new Synapse table.
+
+    Processes NOVEL questionnaires, scales, and assessment tools.
+    """
+    tool_rows = []
+
+    for idx, row in mining_df.iterrows():
+        if 'novel_tools' not in row or pd.isna(row['novel_tools']):
+            continue
+
+        try:
+            novel_tools = json.loads(row['novel_tools'])
+        except:
+            continue
+
+        tools = novel_tools.get('clinical_assessment_tools', [])
+        if not tools:
+            continue
+
+        for tool_name in tools:
+            if not tool_name or not str(tool_name).strip():
+                continue
+
+            # Get extracted metadata
+            metadata = get_tool_metadata(row, 'clinical_assessment_tools', tool_name)
+
+            tool_rows.append({
+                'clinicalAssessmentToolId': generate_uuid(),
+                'assessmentName': tool_name.strip(),
+                'assessmentType': '',  # To be filled manually
+                'targetPopulation': '',
+                'diseaseSpecific': '',
+                'numberOfItems': '',
+                'scoringMethod': '',
+                'validatedLanguages': [],
+                'psychometricProperties': '',
+                'administrationTime': '',
+                'availabilityStatus': '',
+                'licensingRequirements': '',
+                'digitalVersion': '',
+                # Tracking fields
+                '_pmid': row.get('pmid', ''),
+                '_doi': row.get('doi', ''),
+                '_publicationTitle': row.get('title', ''),
+                '_year': row.get('year', ''),
+                '_context': metadata.get('context', '')[:500]
+            })
+
+    return pd.DataFrame(tool_rows)
+
+
 def format_publications(mining_df, tool_csvs):
     """
     Format base Publication table entries (syn26486839) for all publications
@@ -802,6 +1015,50 @@ def main():
         output_file = 'tool_coverage/outputs/SUBMIT_genetic_reagents.csv'
         genetic_reagent_df.to_csv(output_file, index=False)
         print(f" ✓ {len(genetic_reagent_df)} entries → {output_file}")
+    else:
+        print(" (none found)")
+
+    # Computational Tools
+    print("   - Computational Tools...", end='')
+    computational_tool_df = format_computational_tools(mining_df)
+    tool_csvs['Computational Tool'] = computational_tool_df
+    if not computational_tool_df.empty:
+        output_file = 'tool_coverage/outputs/SUBMIT_computational_tools.csv'
+        computational_tool_df.to_csv(output_file, index=False)
+        print(f" ✓ {len(computational_tool_df)} entries → {output_file}")
+    else:
+        print(" (none found)")
+
+    # Advanced Cellular Models
+    print("   - Advanced Cellular Models...", end='')
+    advanced_cellular_model_df = format_advanced_cellular_models(mining_df)
+    tool_csvs['Advanced Cellular Model'] = advanced_cellular_model_df
+    if not advanced_cellular_model_df.empty:
+        output_file = 'tool_coverage/outputs/SUBMIT_advanced_cellular_models.csv'
+        advanced_cellular_model_df.to_csv(output_file, index=False)
+        print(f" ✓ {len(advanced_cellular_model_df)} entries → {output_file}")
+    else:
+        print(" (none found)")
+
+    # Patient-Derived Models
+    print("   - Patient-Derived Models...", end='')
+    patient_derived_model_df = format_patient_derived_models(mining_df)
+    tool_csvs['Patient-Derived Model'] = patient_derived_model_df
+    if not patient_derived_model_df.empty:
+        output_file = 'tool_coverage/outputs/SUBMIT_patient_derived_models.csv'
+        patient_derived_model_df.to_csv(output_file, index=False)
+        print(f" ✓ {len(patient_derived_model_df)} entries → {output_file}")
+    else:
+        print(" (none found)")
+
+    # Clinical Assessment Tools
+    print("   - Clinical Assessment Tools...", end='')
+    clinical_assessment_tool_df = format_clinical_assessment_tools(mining_df)
+    tool_csvs['Clinical Assessment Tool'] = clinical_assessment_tool_df
+    if not clinical_assessment_tool_df.empty:
+        output_file = 'tool_coverage/outputs/SUBMIT_clinical_assessment_tools.csv'
+        clinical_assessment_tool_df.to_csv(output_file, index=False)
+        print(f" ✓ {len(clinical_assessment_tool_df)} entries → {output_file}")
     else:
         print(" (none found)")
 

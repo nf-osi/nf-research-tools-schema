@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""
+Comprehensive tests for new tool type extraction functions.
+"""
+
+import sys
+from extract_new_tool_types import (
+    extract_computational_tools,
+    extract_advanced_cellular_models,
+    extract_patient_derived_models,
+    extract_clinical_assessment_tools,
+    extract_all_new_tool_types
+)
+
+
+def test_computational_tools():
+    """Test computational tool extraction."""
+    print("Testing Computational Tools Extraction")
+    print("=" * 60)
+
+    test_cases = [
+        {
+            "name": "GitHub URL",
+            "text": "Analysis code is available at https://github.com/lab/nf-analysis",
+            "expected_count": 1,
+            "expected_tool": "Nf Analysis"
+        },
+        {
+            "name": "Software with version",
+            "text": "Images were processed using ImageJ v1.52p and analyzed with Python 3.8",
+            "expected_count": 2,
+            "expected_tool": "ImageJ"
+        },
+        {
+            "name": "Pipeline description",
+            "text": "RNA-seq data was analyzed using the STAR aligner v2.7.3a and DESeq2",
+            "expected_count": 2,
+            "expected_tool": "STAR"
+        },
+        {
+            "name": "No tools (just mentions)",
+            "text": "We studied neurofibromatosis type 1 in mice",
+            "expected_count": 0,
+            "expected_tool": None
+        }
+    ]
+
+    passed = 0
+    for tc in test_cases:
+        results = extract_computational_tools(tc["text"])
+        success = len(results) >= tc["expected_count"]
+
+        if tc["expected_tool"]:
+            found_names = [r["name"] for r in results]
+            success = success and any(tc["expected_tool"] in name for name in found_names)
+
+        status = "✓ PASS" if success else "✗ FAIL"
+        print(f"\n{status}: {tc['name']}")
+        print(f"  Expected: {tc['expected_count']}+ tools")
+        print(f"  Found: {len(results)} tools")
+        if results:
+            for r in results:
+                print(f"    - {r['name']} (confidence: {r['confidence']})")
+
+        if success:
+            passed += 1
+
+    print(f"\n{passed}/{len(test_cases)} tests passed\n")
+    return passed == len(test_cases)
+
+
+def test_advanced_cellular_models():
+    """Test advanced cellular model extraction."""
+    print("Testing Advanced Cellular Models Extraction")
+    print("=" * 60)
+
+    test_cases = [
+        {
+            "name": "Cerebral organoids",
+            "text": "Cerebral organoids were generated from patient-derived iPSCs and cultured in Matrigel",
+            "expected_count": 1,
+            "expected_term": "organoid"
+        },
+        {
+            "name": "Assembloid generation",
+            "text": "Assembloids were formed by fusing dorsal and ventral organoid regions",
+            "expected_count": 1,
+            "expected_term": "assembloid"
+        },
+        {
+            "name": "3D culture system",
+            "text": "Cells were maintained in 3D culture using a spinning bioreactor",
+            "expected_count": 1,
+            "expected_term": "3d culture"
+        },
+        {
+            "name": "No models (2D culture)",
+            "text": "Cells were cultured in standard 2D culture plates",
+            "expected_count": 0,
+            "expected_term": None
+        }
+    ]
+
+    passed = 0
+    for tc in test_cases:
+        results = extract_advanced_cellular_models(tc["text"])
+        success = len(results) >= tc["expected_count"]
+
+        if tc["expected_term"]:
+            found_names = [r["name"].lower() for r in results]
+            success = success and any(tc["expected_term"] in name for name in found_names)
+
+        status = "✓ PASS" if success else "✗ FAIL"
+        print(f"\n{status}: {tc['name']}")
+        print(f"  Expected: {tc['expected_count']}+ models")
+        print(f"  Found: {len(results)} models")
+        if results:
+            for r in results:
+                print(f"    - {r['name']} (confidence: {r['confidence']})")
+
+        if success:
+            passed += 1
+
+    print(f"\n{passed}/{len(test_cases)} tests passed\n")
+    return passed == len(test_cases)
+
+
+def test_patient_derived_models():
+    """Test patient-derived model extraction."""
+    print("Testing Patient-Derived Models Extraction")
+    print("=" * 60)
+
+    test_cases = [
+        {
+            "name": "PDX establishment",
+            "text": "PDX models were established from MPNST patient tumors and transplanted into NSG mice",
+            "expected_count": 2,  # "PDX" and "NSG"
+            "expected_term": "pdx"
+        },
+        {
+            "name": "Humanized mouse model",
+            "text": "Tumors were engrafted in humanized NSG-SGM3 mice to study immune response",
+            "expected_count": 1,
+            "expected_term": "humanized"
+        },
+        {
+            "name": "Patient-derived xenograft",
+            "text": "Patient-derived xenografts were generated by subcutaneous implantation",
+            "expected_count": 1,
+            "expected_term": "xenograft"
+        },
+        {
+            "name": "No PDX models",
+            "text": "Cell lines were cultured in standard media",
+            "expected_count": 0,
+            "expected_term": None
+        }
+    ]
+
+    passed = 0
+    for tc in test_cases:
+        results = extract_patient_derived_models(tc["text"])
+        success = len(results) >= tc["expected_count"]
+
+        if tc["expected_term"]:
+            found_names = [r["name"].lower() for r in results]
+            success = success and any(tc["expected_term"] in name for name in found_names)
+
+        status = "✓ PASS" if success else "✗ FAIL"
+        print(f"\n{status}: {tc['name']}")
+        print(f"  Expected: {tc['expected_count']}+ models")
+        print(f"  Found: {len(results)} models")
+        if results:
+            for r in results:
+                print(f"    - {r['name']} (subtype: {r.get('subtype', 'N/A')}, confidence: {r['confidence']})")
+
+        if success:
+            passed += 1
+
+    print(f"\n{passed}/{len(test_cases)} tests passed\n")
+    return passed == len(test_cases)
+
+
+def test_clinical_assessment_tools():
+    """Test clinical assessment tool extraction."""
+    print("Testing Clinical Assessment Tools Extraction")
+    print("=" * 60)
+
+    test_cases = [
+        {
+            "name": "SF-36 questionnaire",
+            "text": "Quality of life was assessed using the SF-36 questionnaire administered at baseline",
+            "expected_count": 1,
+            "expected_term": "sf-36"
+        },
+        {
+            "name": "Multiple validated instruments",
+            "text": "Patients completed the PedsQL questionnaire and VAS pain scale",
+            "expected_count": 2,
+            "expected_term": "pedsql"
+        },
+        {
+            "name": "PROMIS assessment",
+            "text": "Patient-reported outcomes were measured using PROMIS assessments",
+            "expected_count": 1,
+            "expected_term": "promis"
+        },
+        {
+            "name": "No assessment tools",
+            "text": "Tumors were measured using calipers",
+            "expected_count": 0,
+            "expected_term": None
+        }
+    ]
+
+    passed = 0
+    for tc in test_cases:
+        results = extract_clinical_assessment_tools(tc["text"])
+        success = len(results) >= tc["expected_count"]
+
+        if tc["expected_term"]:
+            found_names = [r["name"].lower() for r in results]
+            success = success and any(tc["expected_term"] in name for name in found_names)
+
+        status = "✓ PASS" if success else "✗ FAIL"
+        print(f"\n{status}: {tc['name']}")
+        print(f"  Expected: {tc['expected_count']}+ tools")
+        print(f"  Found: {len(results)} tools")
+        if results:
+            for r in results:
+                print(f"    - {r['name']} (confidence: {r['confidence']})")
+
+        if success:
+            passed += 1
+
+    print(f"\n{passed}/{len(test_cases)} tests passed\n")
+    return passed == len(test_cases)
+
+
+def test_integrated_extraction():
+    """Test integrated extraction of all tool types."""
+    print("Testing Integrated Multi-Tool Extraction")
+    print("=" * 60)
+
+    # Realistic methods section text
+    methods_text = """
+    Methods
+
+    Cell Culture and Organoid Generation
+    Patient-derived iPSCs were obtained with informed consent. Cerebral organoids
+    were generated using a modified protocol and cultured in Matrigel for 60 days.
+
+    Animal Models
+    PDX models were established from MPNST tumors by subcutaneous transplantation
+    into NSG mice (Jackson Laboratory). Tumor growth was monitored weekly.
+
+    Image Analysis
+    Organoid images were acquired using a confocal microscope and analyzed using
+    ImageJ v1.52p and Python 3.8. Analysis code is available at
+    https://github.com/lab/organoid-analyzer.
+
+    Patient Assessment
+    Quality of life was assessed using the SF-36 questionnaire and a custom pain
+    assessment scale administered at baseline and 3-month follow-up.
+    """
+
+    results = extract_all_new_tool_types(methods_text)
+
+    print("\nExtraction Results:")
+    print("-" * 60)
+
+    total_found = sum(len(tools) for tools in results.values())
+
+    for tool_type, tools in results.items():
+        print(f"\n{tool_type}: {len(tools)} found")
+        for tool in tools:
+            print(f"  - {tool['name']} (confidence: {tool['confidence']})")
+
+    # Expected counts (approximate)
+    expected = {
+        'computational_tools': 2,  # ImageJ, Python, GitHub repo
+        'advanced_cellular_models': 1,  # cerebral organoids
+        'patient_derived_models': 2,  # PDX, NSG
+        'clinical_assessment_tools': 1  # SF-36
+    }
+
+    success = True
+    for tool_type, expected_count in expected.items():
+        actual_count = len(results[tool_type])
+        if actual_count < expected_count:
+            print(f"\n✗ Expected at least {expected_count} {tool_type}, found {actual_count}")
+            success = False
+
+    status = "✓ PASS" if success else "✗ FAIL"
+    print(f"\n{status}: Integrated extraction test")
+    print(f"Total tools extracted: {total_found}")
+
+    return success
+
+
+def run_all_tests():
+    """Run all test suites."""
+    print("\n" + "=" * 70)
+    print("NEW TOOL TYPE EXTRACTION - TEST SUITE")
+    print("=" * 70 + "\n")
+
+    results = []
+
+    results.append(("Computational Tools", test_computational_tools()))
+    results.append(("Advanced Cellular Models", test_advanced_cellular_models()))
+    results.append(("Patient-Derived Models", test_patient_derived_models()))
+    results.append(("Clinical Assessment Tools", test_clinical_assessment_tools()))
+    results.append(("Integrated Extraction", test_integrated_extraction()))
+
+    # Summary
+    print("\n" + "=" * 70)
+    print("TEST SUMMARY")
+    print("=" * 70)
+
+    passed = sum(1 for _, result in results if result)
+    total = len(results)
+
+    for name, result in results:
+        status = "✓ PASS" if result else "✗ FAIL"
+        print(f"{status}: {name}")
+
+    print(f"\nOverall: {passed}/{total} test suites passed")
+
+    if passed == total:
+        print("\n✓ All tests passed!")
+        return 0
+    else:
+        print(f"\n✗ {total - passed} test suite(s) failed")
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(run_all_tests())

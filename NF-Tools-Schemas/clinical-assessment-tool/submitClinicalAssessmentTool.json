@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Clinical Assessment Tool",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "type": "object",
+      "title": "Your Information",
+      "properties": {
+        "firstandlastName": {
+          "type": "string",
+          "title": "First and Last Name"
+        },
+        "email": {
+          "type": "string",
+          "title": "Contact Email",
+          "format": "email"
+        },
+        "institution": {
+          "type": "string",
+          "title": "Institution/Affiliation",
+          "default": ""
+        },
+        "isDeveloper": {
+          "type": "string",
+          "title": "Are you the developer?",
+          "enum": [
+            "Yes",
+            "No"
+          ],
+          "default": "Yes"
+        }
+      },
+      "required": ["firstandlastName", "email", "isDeveloper"]
+    },
+    "basicInfo": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "assessmentName": {
+          "type": "string",
+          "title": "Name of Assessment Tool"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Abbreviations"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
+        "assessmentType": {
+          "type": "string",
+          "title": "Type of Assessment",
+          "enum": [
+            "Quality of Life",
+            "Pain Assessment",
+            "Functional Assessment",
+            "Cognitive Assessment",
+            "Symptom Scale",
+            "Psychological Assessment",
+            "Patient-Reported Outcome",
+            "Other"
+          ]
+        },
+        "targetPopulation": {
+          "type": "string",
+          "title": "Target Population",
+          "enum": [
+            "Pediatric",
+            "Adult",
+            "Elderly",
+            "General",
+            "Disease-Specific"
+          ]
+        },
+        "diseaseSpecific": {
+          "type": "string",
+          "title": "Disease-Specific or General?",
+          "enum": [
+            "Yes - NF-specific",
+            "No - General",
+            "Adapted for NF"
+          ]
+        },
+        "numberOfItems": {
+          "type": "string",
+          "title": "Number of Items/Questions"
+        },
+        "scoringMethod": {
+          "type": "string",
+          "title": "Scoring Method/Methodology"
+        },
+        "validatedLanguages": {
+          "type": "array",
+          "title": "Validated Languages",
+          "items": {
+            "type": "string"
+          }
+        },
+        "psychometricProperties": {
+          "type": "string",
+          "title": "Psychometric Properties (reliability, validity)"
+        },
+        "administrationTime": {
+          "type": "string",
+          "title": "Typical Administration Time"
+        },
+        "availabilityStatus": {
+          "type": "string",
+          "title": "Availability Status",
+          "enum": [
+            "Freely Available",
+            "License Required",
+            "Permission Required",
+            "Proprietary",
+            "Unknown"
+          ]
+        },
+        "licensingRequirements": {
+          "type": "string",
+          "title": "Licensing/Permission Requirements"
+        },
+        "digitalVersion": {
+          "type": "string",
+          "title": "Digital/Electronic Version Available?",
+          "enum": [
+            "Yes",
+            "No",
+            "In Development",
+            "Unknown"
+          ]
+        },
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "howToAcquire": {
+          "type": "string",
+          "title": "How to Access/Obtain This Tool"
+        }
+      },
+      "required": ["assessmentName", "assessmentType", "targetPopulation", "howToAcquire"]
+    }
+  },
+  "required": ["userInfo", "basicInfo"]
+}

@@ -2,7 +2,84 @@
 
 ## Overview
 
-This repository includes an automated workflow to monitor tool coverage in the NF research tools database and suggest novel tools to add from publications. The workflow runs weekly and creates GitHub issues with findings.
+This repository includes an automated workflow to monitor tool coverage in the NF research tools database and suggest novel tools to add from publications. The workflow supports **9 resource types** across different publication categories using tool-type-specific mining strategies.
+
+## Supported Tool Types
+
+**Established Types (v1.0) - Lab Research:**
+- 🔬 **Antibodies** - Immunological reagents
+- 🧫 **Cell Lines** - Immortalized cell cultures
+- 🐭 **Animal Models** - Genetically modified organisms
+- 🧬 **Genetic Reagents** - Plasmids, constructs, CRISPR
+- 🏦 **Biobanks** - Biological sample collections
+
+**New Types (v2.0) - Expanded Coverage:**
+- 💻 **Computational Tools** - Software, pipelines, analysis tools (50+ known tools)
+- 🧪 **Advanced Cellular Models** - Organoids, assembloids, 3D cultures
+- 🐁 **Patient-Derived Models** - PDX, xenografts, humanized systems
+- 📋 **Clinical Assessment Tools** - Questionnaires, scales, PROMs (SF-36, PROMIS, PedsQL)
+
+## Multi-Query Mining Strategy
+
+The system uses **tool-type-specific PubMed queries** to maximize discovery across different publication types. **Both bench and clinical queries run in EVERY workflow execution** to ensure comprehensive coverage of all 9 tool types.
+
+### How It Works
+
+1. **Workflow runs TWO queries in parallel:**
+   - Bench science query (lab tools, computational, organoids, PDX)
+   - Clinical assessment query (questionnaires, scales, outcome measures)
+
+2. **Publications are merged by PMID:**
+   - Each publication gets `query_type` tag: "bench", "clinical", or "bench,clinical"
+   - Publications found by both queries have both tags merged
+
+3. **ALL publications are mined for ALL 9 tool types:**
+   - query_type serves as hint for AI validation
+   - But every publication is scanned for all tool categories
+   - Publications can contain multiple tool types
+
+4. **Result: Complete coverage in single workflow run**
+   - No separate runs needed
+   - Expected: 69-83 tools/month (vs 18 with old system)
+
+### Query Details
+
+**1. Bench Science Query**
+- **Targets:** Computational tools, PDX models, organoids, antibodies, cell lines, genetic reagents
+- **Excludes:** Pure clinical case reports, clinical trials without lab methods
+- **Papers:** ~1000/month from NF Portal + PubMed
+- **Use case:** Laboratory research publications with Methods sections
+
+**2. Clinical Assessment Query**
+- **Targets:** Clinical assessment tools (SF-36, PROMIS, PedsQL, VAS, outcome measures)
+- **Includes:** Quality of life, questionnaires, patient-reported outcomes
+- **Publication types:** Clinical Trial, Observational Study, Clinical Research
+- **Papers:** ~150/month from NF Portal + PubMed
+- **Use case:** Clinical studies, patient outcome research
+- **Note:** Clinical tools accepted even WITHOUT traditional Methods sections
+
+**3. Organoid Focused Query (Optional, not in automated workflow)**
+- **Targets:** Advanced cellular models (organoids, assembloids, 3D cultures)
+- **Includes:** Organoid-specific terminology, 3D culture systems
+- **Use case:** Manual/ad-hoc targeted search if bench query proves insufficient
+
+### Query Selection
+
+```bash
+# Default: Bench science query (computational, PDX, organoids, lab tools)
+python prepare_publication_list.py
+
+# Clinical assessment query (questionnaires, QoL measures)
+python prepare_publication_list.py --query-type clinical
+
+# Organoid focused query (3D cellular models)
+python prepare_publication_list.py --query-type organoid
+
+# Test mode (sample)
+python prepare_publication_list.py --query-type clinical --test-sample 50
+```
+
+**📚 See [`MULTI_QUERY_IMPLEMENTATION.md`](MULTI_QUERY_IMPLEMENTATION.md) for complete architecture and deployment details.**
 
 ## Components
 
@@ -116,12 +193,20 @@ Generates markdown summary for GitHub Pull Request:
 #### `tool_coverage/scripts/run_publication_reviews.py`
 AI-powered validation of mined tools using Goose agent:
 - **Validates mined tools** to filter out false positives (gene/disease names misidentified as tools)
-- **Analyzes publication type** (lab research vs clinical studies vs questionnaires)
-- **Checks tool keywords** (antibody, plasmid, cell line, etc.) near mentions
+- **Analyzes publication type** (lab research vs clinical studies vs bioinformatics vs questionnaires)
+- **Uses query_type as hint** but independently assesses ALL 9 tool types in every publication
+- **Handles multi-type publications** (e.g., clinical study using computational tools for analysis)
+- **Checks tool keywords** (antibody, plasmid, cell line, software, questionnaire, etc.) near mentions
 - **Detects potentially missed tools** that mining didn't catch
 - **Suggests new patterns** to improve future mining accuracy
 - **Generates validation reports** with detailed reasoning for accept/reject decisions
-- **Creates VALIDATED_*.csv** files with rejected tools removed
+- **Creates VALIDATED_*.csv** files with rejected tools removed (9 files, one per tool type)
+
+**How query_type is used:**
+- Publications tagged with `query_type: "bench"` → Likely contains lab tools
+- Publications tagged with `query_type: "clinical"` → Likely contains clinical assessment tools
+- Publications tagged with `query_type: "bench,clinical"` → May contain both categories
+- **BUT:** AI always scans for ALL 9 tool types regardless of query_type (just a hint for prioritization)
 
 ⚠️ **Requires Anthropic API key** - See [tool_coverage/docs/AI_VALIDATION_README.md](tool_coverage/docs/AI_VALIDATION_README.md) for setup
 
@@ -199,16 +284,24 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
-4. Check for ANTHROPIC_API_KEY (skips validation if missing)
+4. Check for ANTHROPIC_API_KEY (skips AI validation if missing)
 5. Install Goose CLI (if AI validation enabled and API key present)
-6. Configure Goose with Anthropic API
-7. Mine publications for novel tools (caches text for validation)
-8. **Run AI validation** on mined tools (separate step, skips if API key missing)
-9. Format mining results into submission CSVs
-10. Run coverage analysis
-11. Generate summary report
-12. Upload all reports as artifacts including validation results (90-day retention)
-13. **Create Pull Request** with result files for review
+6. **Prepare publication lists:**
+   - Run bench science query → `publication_list_bench.csv`
+   - Run clinical assessment query → `publication_list_clinical.csv`
+   - Merge by PMID, preserving query_type tags → `publication_list.csv`
+7. **Screen titles with Haiku:** Filter to research publications (includes clinical studies)
+8. **Fetch full text and mine:** Extract all 9 tool types from Methods/Introduction/Results/Discussion
+9. **Run AI validation with Sonnet** (via Goose):
+   - Uses query_type as hint
+   - Validates all 9 tool types
+   - Handles multi-type publications
+10. **Format mining results:** Create 9 SUBMIT_*.csv files (one per tool type)
+11. **Clean and validate:** Remove tracking columns, validate schema
+12. Run coverage analysis
+13. Generate summary report
+14. Upload all reports as artifacts including validation results (90-day retention)
+15. **Create Pull Request** with result files for review
 
 ### 3. Synapse Upsert Workflow
 
@@ -240,14 +333,25 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - Skips if no CSV files found or validation fails
 
 **Synapse Tables Updated:**
+
+**Established Tool Types (v1.0):**
 - Animal Models: syn26486808
 - Antibodies: syn26486811
 - Cell Lines: syn26486823
 - Genetic Reagents: syn26486832
+
+**New Tool Types (v2.0) - ✅ Created 2026-02-11:**
+- Computational Tools: syn73709226
+- Advanced Cellular Models: syn73709227
+- Patient-Derived Models: syn73709228
+- Clinical Assessment Tools: syn73709229
+
+**Common Tables:**
 - Resources: syn26450069
 - Publications: syn26486839
-- Usage: syn26486841
-- Development: syn26486807
+- Usage: syn26486841 (where tools were USED)
+- Development: syn26486807 (where tools were DEVELOPED)
+- Observations: syn26486836 (scientific observations about tools)
 
 ## Configuration
 
@@ -354,15 +458,27 @@ python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
 
 ### Tool Mining Results
 
-The mining process identifies potential tools in four categories:
+The mining process identifies potential tools in **nine categories**:
+
+**Lab Research Tools:**
 - **Cell Lines** (🧫) - Cell culture resources
 - **Antibodies** (🔬) - Immunological reagents
 - **Animal Models** (🐭) - Transgenic/knockout models
 - **Genetic Reagents** (🧬) - Plasmids, vectors, constructs
+- **Biobanks** (🏦) - Sample collections
+
+**Computational & Model Systems:**
+- **Computational Tools** (💻) - Software (ImageJ, R, Python, STAR, Cell Ranger, etc.)
+- **Advanced Cellular Models** (🧪) - Organoids, assembloids, 3D cultures
+- **Patient-Derived Models** (🐁) - PDX, xenografts, humanized mice
+
+**Clinical Tools:**
+- **Clinical Assessment Tools** (📋) - Questionnaires, scales, PROMs (SF-36, PROMIS, PedsQL, VAS)
 
 Each tool is tagged with:
 - **Development Status** - Whether the tool was developed in this publication or just used
-- **Context Metadata** - Extracted characteristics (species, strain, clonality, etc.)
+- **Context Metadata** - Extracted characteristics (species, strain, clonality, version, etc.)
+- **Query Source** - Which query type discovered the tool (bench/clinical/organoid)
 
 ### Observation Mining
 
