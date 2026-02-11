@@ -126,7 +126,7 @@ jobs:
 
           # Build command with optional flags
           # Note: --include-unlinked is now the default (fetches from NF portal + unlinked tools pubs)
-          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file tool_coverage/outputs/processed_publications.csv"
+          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file tool_coverage/outputs/processed_publications.csv --parallel-workers 4"
 
           # Add force re-reviews flag if specified
           if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then

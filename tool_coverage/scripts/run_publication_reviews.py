@@ -14,6 +14,8 @@ from datetime import datetime
 import os
 import argparse
 import synapseclient
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 # Configuration
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
@@ -289,20 +291,29 @@ def prepare_goose_input(pub_row, inputs_dir):
     print(f"  Created input file: {input_file}")
     return str(input_file.resolve())
 
+# Thread-safe print lock
+print_lock = threading.Lock()
+
+def safe_print(*args, **kwargs):
+    """Thread-safe print function."""
+    with print_lock:
+        print(*args, **kwargs)
+
 def run_goose_review(pmid, input_file, results_dir):
     """Run goose tool validation for a single publication."""
-    print(f"\n{'='*80}")
-    print(f"Reviewing {pmid}")
-    print(f"Input: {input_file}")
-    print(f"{'='*80}")
+    safe_print(f"\n{'='*80}")
+    safe_print(f"Reviewing {pmid}")
+    safe_print(f"Input: {input_file}")
+    safe_print(f"{'='*80}")
 
-    # Change to results directory
+    # Change to results directory (thread-safe since each uses different files)
     original_dir = os.getcwd()
-    os.chdir(results_dir)
+    # Don't change directory - use absolute paths instead
+    results_path = Path(results_dir).resolve()
 
     try:
         # Build goose command
-        recipe_path = Path(original_dir) / RECIPE_PATH
+        recipe_path = Path(RECIPE_PATH).resolve()
 
         cmd = [
             'goose', 'run',
@@ -312,39 +323,70 @@ def run_goose_review(pmid, input_file, results_dir):
             '--no-session'  # Don't create session files for automated runs
         ]
 
-        print(f"Running: {' '.join(cmd)}")
+        safe_print(f"Running: {' '.join(cmd)}")
 
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
-            timeout=600  # 10 minute timeout
+            timeout=600,  # 10 minute timeout
+            cwd=str(results_path)  # Run in results directory
         )
 
-        print(result.stdout)
+        safe_print(result.stdout)
 
         if result.returncode != 0:
-            print(f"❌ Error (exit code {result.returncode}):")
-            print(result.stderr)
+            safe_print(f"❌ Error (exit code {result.returncode}):")
+            safe_print(result.stderr)
             return None
 
         # Look for generated YAML file
-        yaml_file = Path(f'{pmid}_tool_review.yaml')
+        yaml_file = results_path / f'{pmid}_tool_review.yaml'
         if yaml_file.exists():
-            print(f"✅ Review completed: {yaml_file}")
+            safe_print(f"✅ Review completed: {yaml_file}")
             return yaml_file
         else:
-            print(f"⚠️  No YAML file generated")
+            safe_print(f"⚠️  No YAML file generated")
             return None
 
     except subprocess.TimeoutExpired:
-        print(f"❌ Timeout after 10 minutes")
+        safe_print(f"❌ Timeout after 10 minutes")
         return None
     except Exception as e:
-        print(f"❌ Error: {e}")
+        safe_print(f"❌ Error: {e}")
         return None
-    finally:
-        os.chdir(original_dir)
+
+def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, force_rereviews):
+    """
+    Process a single publication (for parallel execution).
+
+    Returns:
+        tuple: (pmid, status, result) where status is 'skipped', 'reviewed', or 'failed'
+    """
+    pmid = row['pmid']
+    current_num = idx + 1
+
+    # Show progress
+    safe_print(f"\n📊 Progress: {current_num}/{total_pubs} ({current_num/total_pubs*100:.1f}%)")
+
+    # Check if already reviewed
+    yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
+    if yaml_path.exists() and not force_rereviews:
+        safe_print(f"⏭️  Skipping {pmid} (already reviewed)")
+        return (pmid, 'skipped', None)
+    elif yaml_path.exists() and force_rereviews:
+        safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
+
+    # Prepare input file
+    input_file = prepare_goose_input(row, inputs_dir)
+
+    # Run goose review
+    result = run_goose_review(pmid, input_file, results_dir)
+
+    if result:
+        return (pmid, 'reviewed', result)
+    else:
+        return (pmid, 'failed', None)
 
 def parse_review_yaml(yaml_path):
     """Parse goose review YAML file."""
@@ -605,6 +647,12 @@ def main():
         action='store_true',
         help='Force re-review of publications even if YAML files already exist'
     )
+    parser.add_argument(
+        '--parallel-workers',
+        type=int,
+        default=1,
+        help='Number of parallel workers for AI validation (default: 1, recommended: 3-5)'
+    )
 
     args = parser.parse_args()
 
@@ -670,41 +718,56 @@ def main():
     if not args.skip_goose and not args.compile_only:
         print(f"\n{'='*80}")
         print(f"Running Goose Reviews for {len(mining_df)} publications")
+        if args.parallel_workers > 1:
+            print(f"Using {args.parallel_workers} parallel workers")
         print(f"{'='*80}")
 
         total_pubs = len(mining_df)
         reviewed_count = 0
         skipped_count = 0
+        failed_count = 0
 
-        for idx, row in mining_df.iterrows():
-            pmid = row['pmid']
-            current_num = idx + 1
+        # Use parallel processing if requested
+        if args.parallel_workers > 1:
+            with ThreadPoolExecutor(max_workers=args.parallel_workers) as executor:
+                # Submit all tasks
+                futures = {}
+                for idx, row in mining_df.iterrows():
+                    future = executor.submit(
+                        process_single_publication,
+                        row, idx, total_pubs, results_dir, inputs_dir, args.force_rereviews
+                    )
+                    futures[future] = row['pmid']
 
-            # Show progress
-            print(f"\n📊 Progress: {current_num}/{total_pubs} ({current_num/total_pubs*100:.1f}%)")
-
-            # Check if already reviewed (unless force flag is set)
-            yaml_path = Path(results_dir) / f'{pmid}_tool_review.yaml'
-            if yaml_path.exists() and not args.force_rereviews:
-                print(f"⏭️  Skipping {pmid} (already reviewed, use --force-rereviews to override)")
-                skipped_count += 1
-                continue
-            elif yaml_path.exists() and args.force_rereviews:
-                print(f"🔄 Re-reviewing {pmid} (force flag set)")
-
-            # Prepare input file
-            input_file = prepare_goose_input(row, inputs_dir)
-
-            # Run goose review
-            result = run_goose_review(pmid, input_file, results_dir)
-            if result:
-                reviewed_count += 1
+                # Process results as they complete
+                for future in as_completed(futures):
+                    pmid, status, result = future.result()
+                    if status == 'reviewed':
+                        reviewed_count += 1
+                    elif status == 'skipped':
+                        skipped_count += 1
+                    elif status == 'failed':
+                        failed_count += 1
+        else:
+            # Sequential processing (original behavior)
+            for idx, row in mining_df.iterrows():
+                pmid, status, result = process_single_publication(
+                    row, idx, total_pubs, results_dir, inputs_dir, args.force_rereviews
+                )
+                if status == 'reviewed':
+                    reviewed_count += 1
+                elif status == 'skipped':
+                    skipped_count += 1
+                elif status == 'failed':
+                    failed_count += 1
 
         # Print final summary
         print(f"\n{'='*80}")
         print(f"Review Summary:")
         print(f"  ✅ Reviewed: {reviewed_count}")
         print(f"  ⏭️  Skipped (cached): {skipped_count}")
+        if failed_count > 0:
+            print(f"  ❌ Failed: {failed_count}")
         print(f"  📊 Total processed: {total_pubs}")
         print(f"{'='*80}")
 
