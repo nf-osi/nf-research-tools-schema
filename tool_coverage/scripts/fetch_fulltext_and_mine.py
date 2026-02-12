@@ -842,16 +842,22 @@ def extract_abstract_text(pub_row: pd.Series) -> str:
     """
     Extract abstract text from publication row.
 
-    Note: Synapse publications table (syn16857542) does NOT contain abstracts.
-    This function fetches abstracts from PubMed API using the PMID.
+    First checks if the row has an 'abstract' column (e.g., from syn26486839).
+    If not available, fetches from PubMed API using the PMID.
 
     Args:
         pub_row: DataFrame row from publications table (must have 'pmid' column)
 
     Returns:
-        Abstract text from PubMed API, or empty string if not available
+        Abstract text from table or PubMed API, or empty string if not available
     """
-    # Get PMID from row
+    # First, check if row has 'abstract' column with data
+    if 'abstract' in pub_row and not pd.isna(pub_row['abstract']):
+        abstract = str(pub_row['abstract']).strip()
+        if abstract:
+            return abstract
+
+    # Fallback: Get PMID and fetch from PubMed API
     if 'pmid' not in pub_row or pd.isna(pub_row['pmid']):
         return ""
 
