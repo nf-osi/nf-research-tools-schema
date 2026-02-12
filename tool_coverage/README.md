@@ -97,12 +97,27 @@ Analyzes current tool coverage against GFF-funded publications:
 - `gff_publications_MISSING_tools.csv` - Publications without tools
 
 #### `tool_coverage/scripts/fetch_fulltext_and_mine.py`
-Mines abstracts and full text for tools:
-- **Mines ALL publications via abstracts** (fetched from PubMed API using PMID) - no PMC requirement
+Mines abstracts and full text for tools with intelligent pre-filtering:
+
+**NEW: Abstract Pre-filtering (Step 3g)** ⭐
+- **Pre-filters publications** based on abstract content BEFORE full-text mining
+- Checks for **exact matches** (case-insensitive) of:
+  - resourceName from syn51730943
+  - **synonyms** from syn51730943 (parsed from comma-separated column)
+- Detects **tool signs** in abstracts:
+  - 'mice'/'mouse' → animal models
+  - 'cells'/'fibroblasts' → cell lines
+  - 'antibodies' → antibodies
+- **Only mines full text** if exact matches OR tool signs found
+- **Efficiency gain:** 60% reduction in full-text API calls (based on testing)
+
+**Mining Pipeline:**
+- **Mines ALL publications via abstracts** (fetched from PubMed API or syn26486839 'abstract' column)
 - **Enhances with full text when available:** Fetches PMC XML and extracts 5 sections:
   - **Methods + Introduction** (for tool mining)
   - **Results + Discussion** (for observation extraction)
-- **Matches against existing tools** using fuzzy matching (88% threshold) before creating new entries
+- **Matches against existing tools** using **exact matching** (case-insensitive) before creating new entries
+- Checks both **resourceName AND synonyms** (1,700+ synonyms loaded from syn51730943)
 - Uses existing tools as training data (1,142+ tools) for pattern matching
 - Extracts cell line names via regex patterns (no name field in database)
 - **Distinguishes development vs usage** using keyword context analysis (100-300 char windows)
@@ -112,13 +127,14 @@ Mines abstracts and full text for tools:
 - **Caches ALL 5 sections** for efficient AI validation and observation extraction
 
 **Tool Matching Process:**
-1. Mine abstract (always available)
-2. Mine Methods + Introduction sections (when PMC full text available)
-3. Merge results with deduplication
-4. Match tool names against existing database tools (fuzzy, 88%)
-5. **If match found:** Link to existing tool (reuse resourceId)
-6. **If no match:** Create new tool entry (generate UUID)
-7. Cache fetched text for AI validation step
+1. **Pre-filter by abstract** (exact resource match OR tool signs)
+2. Mine abstract (always available)
+3. Mine Methods + Introduction sections (when PMC full text available AND passed pre-filter)
+4. Merge results with deduplication
+5. Match tool names against existing database tools (**exact match, case-insensitive**)
+6. **If match found:** Link to existing tool (reuse resourceId)
+7. **If no match:** Create new tool entry (generate UUID)
+8. Cache fetched text for AI validation step
 
 **Command-line options:**
 ```bash
@@ -352,6 +368,64 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - Usage: syn26486841 (where tools were USED)
 - Development: syn26486807 (where tools were DEVELOPED)
 - Observations: syn26486836 (scientific observations about tools)
+
+## Recent Improvements (2026-02-12)
+
+### Exact Matching & Synonym Support
+
+**Changed from fuzzy to exact matching:**
+- **Before:** Fuzzy matching with ~88% similarity threshold
+- **After:** Exact matching (case-insensitive) with word boundaries
+- **Why:** Reduces false positives, more precise tool identification
+
+**Synonym support added:**
+- Loads **1,700+ synonyms** from syn51730943 'synonyms' column
+- Synonyms parsed from comma-separated format (e.g., "syn1, syn2, syn3")
+- Matches both resourceName AND all synonyms
+- **Example:** Cell lines have 1,200+ synonyms for improved matching
+
+**Distribution of synonyms by tool type:**
+| Tool Type | Resources | Synonyms |
+|-----------|-----------|----------|
+| Cell Lines | 638 | 1,200 |
+| Antibodies | 261 | 261 |
+| Animal Models | 123 | 137 |
+| Genetic Reagents | 122 | 123 |
+
+### Abstract Pre-filtering
+
+**New Step 3g - Pre-filtering based on abstract content:**
+
+Runs AFTER Haiku title screening and BEFORE full-text mining to improve efficiency.
+
+**What it checks:**
+1. **Exact resource matches** (case-insensitive):
+   - resourceName from syn51730943
+   - All synonyms from syn51730943
+   - Uses word boundaries (e.g., 'NF1' won't match 'NF10')
+
+2. **Tool signs** in abstracts:
+   - 'mice' or 'mouse' → suggests animal models
+   - 'cells', 'cell lines', or 'fibroblasts' → suggests cell lines
+   - 'antibody' or 'antibodies' → suggests antibodies
+
+**Benefits:**
+- ⚡ **60% reduction** in full-text mining workload (based on 10-publication test)
+- ⚡ **60% fewer PMC API calls** - only fetch full text for promising publications
+- ⚡ **Faster workflow** - skip publications without tool evidence
+- 🎯 **Better focus** - spend resources on publications with tool mentions
+
+**Test results (10 publications):**
+- ✅ 4 publications passed (40%) - had tool signs in abstracts
+- ❌ 6 publications excluded (60%) - no tool signs
+- Result: Only 4 publications mined instead of 10
+
+**Workflow:**
+```
+Haiku Title Screening → Abstract Pre-filtering → Full Text Mining
+     (research vs          (tool signs?)        (only passed)
+      clinical)
+```
 
 ## Configuration
 

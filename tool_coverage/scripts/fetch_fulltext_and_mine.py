@@ -769,17 +769,19 @@ def load_existing_tools(syn) -> Dict[str, List[str]]:
     return tool_patterns
 
 
-def load_existing_tools_for_matching(syn) -> Dict[str, Dict[str, str]]:
+def load_existing_tools_for_matching(syn) -> Dict[str, Dict[str, Dict[str, str]]]:
     """
     Load existing tools from Resource table for matching against found tools.
+    Includes resourceName and synonyms for matching.
 
     Returns:
-        Dict mapping tool_type -> {resourceId: resourceName}
+        Dict mapping tool_type -> {resourceId: {'name': resourceName, 'synonyms': [list of synonyms]}}
     """
     print("\n2b. Loading existing tools from Resource table for matching...")
 
     # Load Resource table (syn51730943 is the materialized view)
-    resource_query = syn.tableQuery("SELECT resourceId, resourceName, resourceType FROM syn51730943")
+    # Include synonyms column
+    resource_query = syn.tableQuery("SELECT resourceId, resourceName, resourceType, synonyms FROM syn51730943")
     resource_df = resource_query.asDataFrame()
 
     # Map resource types to internal naming
@@ -795,26 +797,49 @@ def load_existing_tools_for_matching(syn) -> Dict[str, Dict[str, str]]:
     for _, row in resource_df.iterrows():
         resource_type = type_mapping.get(row['resourceType'])
         if resource_type and pd.notna(row['resourceId']) and pd.notna(row['resourceName']):
-            existing_tools[resource_type][str(row['resourceId'])] = str(row['resourceName'])
+            resource_id = str(row['resourceId'])
+            resource_name = str(row['resourceName'])
+
+            # Parse synonyms (comma-separated, with space after comma)
+            synonyms = []
+            try:
+                if 'synonyms' in row:
+                    synonyms_val = row['synonyms']
+                    # Check if it's not None and not NaN
+                    if synonyms_val is not None:
+                        synonyms_str = str(synonyms_val).strip()
+                        if synonyms_str and synonyms_str not in ['nan', 'None', '']:
+                            # Split by ', ' (comma + space)
+                            synonyms = [s.strip() for s in synonyms_str.split(', ') if s.strip()]
+            except (ValueError, TypeError):
+                # Skip if there's an issue with the synonyms value
+                pass
+
+            existing_tools[resource_type][resource_id] = {
+                'name': resource_name,
+                'synonyms': synonyms
+            }
 
     # Print summary
     for tool_type, tools in existing_tools.items():
-        print(f"   - {tool_type}: {len(tools)} existing tools")
+        total_synonyms = sum(len(tool_data['synonyms']) for tool_data in tools.values())
+        print(f"   - {tool_type}: {len(tools)} existing tools ({total_synonyms} synonyms)")
 
     return existing_tools
 
 
 def match_to_existing_tool(tool_name: str, tool_type: str,
-                          existing_tools: Dict[str, Dict[str, str]],
+                          existing_tools: Dict[str, Dict[str, Dict[str, str]]],
                           threshold: float = 0.88) -> str:
     """
-    Match a found tool name against existing tools in the database.
+    Match a found tool name against existing tools in the database using exact matching.
+    Checks both resourceName and synonyms (case-insensitive).
 
     Args:
         tool_name: Name of the found tool
         tool_type: Type category
         existing_tools: Dict from load_existing_tools_for_matching()
-        threshold: Fuzzy match threshold
+        threshold: Not used (kept for compatibility)
 
     Returns:
         resourceId of matching existing tool, or empty string if no match
@@ -822,17 +847,17 @@ def match_to_existing_tool(tool_name: str, tool_type: str,
     if tool_type not in existing_tools:
         return ""
 
-    # Get list of existing tool names for this type
-    existing_names = list(existing_tools[tool_type].values())
+    tool_name_lower = tool_name.lower()
 
-    # Use existing fuzzy_match function
-    matches = fuzzy_match(tool_name, existing_names, threshold=threshold)
+    # Check for exact matches (case-insensitive) against resourceName and synonyms
+    for resource_id, tool_data in existing_tools[tool_type].items():
+        # Check resourceName
+        if tool_data['name'].lower() == tool_name_lower:
+            return resource_id
 
-    if matches:
-        # Return resourceId of first match
-        matched_name = matches[0]
-        for resource_id, name in existing_tools[tool_type].items():
-            if name == matched_name:
+        # Check synonyms
+        for synonym in tool_data['synonyms']:
+            if synonym.lower() == tool_name_lower:
                 return resource_id
 
     return ""
@@ -868,6 +893,125 @@ def extract_abstract_text(pub_row: pd.Series) -> str:
     # Fetch abstract from PubMed API
     abstract = fetch_pubmed_abstract(pmid)
     return abstract
+
+
+def check_tool_signs_in_abstract(abstract: str) -> Dict[str, bool]:
+    """
+    Check for signs of specific tool types in abstract text.
+
+    Tool signs:
+    - 'mice' (or 'mouse') for animal models
+    - 'cells' or 'fibroblasts' for cell lines
+    - 'antibod*' (antibody, antibodies) for antibodies
+
+    Args:
+        abstract: Abstract text to search
+
+    Returns:
+        Dict with tool types as keys and boolean values indicating if signs were found
+    """
+    if not abstract:
+        return {}
+
+    abstract_lower = abstract.lower()
+
+    signs = {}
+
+    # Animal models: look for 'mice' or 'mouse'
+    if re.search(r'\b(mice|mouse)\b', abstract_lower):
+        signs['animal_models'] = True
+
+    # Cell lines: look for 'cells' or 'fibroblasts'
+    if re.search(r'\b(cells|cell\s+lines?|fibroblasts?)\b', abstract_lower):
+        signs['cell_lines'] = True
+
+    # Antibodies: look for 'antibod*' (antibody, antibodies)
+    if re.search(r'\bantibod(y|ies)\b', abstract_lower):
+        signs['antibodies'] = True
+
+    return signs
+
+
+def check_exact_resource_matches_in_abstract(abstract: str,
+                                             existing_tools: Dict[str, Dict[str, Dict[str, str]]]) -> Dict[str, List[str]]:
+    """
+    Check for exact matches (case-insensitive) of resourceName or synonyms in abstract.
+
+    Args:
+        abstract: Abstract text to search
+        existing_tools: Dict from load_existing_tools_for_matching()
+
+    Returns:
+        Dict mapping tool_type -> list of matched resourceIds
+    """
+    if not abstract:
+        return {}
+
+    abstract_lower = abstract.lower()
+    matches = {}
+
+    for tool_type, tools_dict in existing_tools.items():
+        matched_ids = []
+
+        for resource_id, tool_data in tools_dict.items():
+            # Check resourceName (exact match, case-insensitive, word boundaries)
+            resource_name = tool_data['name']
+            # Use word boundaries for exact matching
+            pattern = r'\b' + re.escape(resource_name.lower()) + r'\b'
+            if re.search(pattern, abstract_lower):
+                matched_ids.append(resource_id)
+                continue  # Already matched, no need to check synonyms
+
+            # Check synonyms
+            for synonym in tool_data['synonyms']:
+                pattern = r'\b' + re.escape(synonym.lower()) + r'\b'
+                if re.search(pattern, abstract_lower):
+                    matched_ids.append(resource_id)
+                    break  # Found a match, move to next resource
+
+        if matched_ids:
+            matches[tool_type] = matched_ids
+
+    return matches
+
+
+def should_mine_publication_abstract(pub_row: pd.Series,
+                                    existing_tools: Dict[str, Dict[str, Dict[str, str]]]) -> Tuple[bool, str]:
+    """
+    Determine if a publication should be mined based on abstract content.
+
+    Checks for:
+    1. Exact matches (case-insensitive) of resourceName or synonyms
+    2. Tool signs ('mice', 'cells', 'fibroblasts', 'antibod*')
+
+    Args:
+        pub_row: Publication DataFrame row
+        existing_tools: Dict from load_existing_tools_for_matching()
+
+    Returns:
+        Tuple of (should_mine: bool, reason: str)
+    """
+    # Extract abstract
+    abstract = extract_abstract_text(pub_row)
+
+    if not abstract or len(abstract) < 50:
+        return False, "No abstract available"
+
+    # Check for exact resource matches
+    resource_matches = check_exact_resource_matches_in_abstract(abstract, existing_tools)
+    if resource_matches:
+        match_summary = []
+        for tool_type, matched_ids in resource_matches.items():
+            match_summary.append(f"{len(matched_ids)} {tool_type}")
+        return True, f"Exact resource matches: {', '.join(match_summary)}"
+
+    # Check for tool signs
+    tool_signs = check_tool_signs_in_abstract(abstract)
+    if tool_signs:
+        signs_summary = ', '.join(tool_signs.keys())
+        return True, f"Tool signs found: {signs_summary}"
+
+    return False, "No resource matches or tool signs in abstract"
 
 
 def fuzzy_match(text: str, patterns: List[str], threshold: float = 0.88) -> List[str]:
@@ -1424,7 +1568,7 @@ def merge_mining_results(abstract_results: Tuple, methods_results: Tuple,
 
 
 def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
-                    existing_tools: Dict[str, Dict[str, str]]) -> Dict:
+                    existing_tools: Dict[str, Dict[str, Dict[str, str]]]) -> Dict:
     """
     Mine a single publication from abstract + full text (if available).
 
@@ -1434,13 +1578,13 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     3. Mine Methods section if found
     4. Mine Introduction section if found
     5. Merge results with deduplication
-    6. Match against existing tools
+    6. Match against existing tools (exact match with resourceName and synonyms)
     7. Categorize as existing-link or new-tool
 
     Args:
         pub_row: Publication DataFrame row
         tool_patterns: Tool patterns for fuzzy matching
-        existing_tools: Existing tools from Resource table
+        existing_tools: Existing tools from Resource table (with synonyms)
 
     Returns:
         Dict with mining results and categorization
@@ -1853,6 +1997,32 @@ Note: Run run_publication_reviews.py separately for AI validation
     unlinked_pubs['is_gff'] = unlinked_pubs['fundingAgency'].astype(str).str.contains('GFF', na=False)
     gff_unlinked = unlinked_pubs[unlinked_pubs['is_gff']]
     print(f"   - {len(gff_unlinked)} GFF-funded unlinked publications")
+
+    # Pre-filter publications based on abstract content
+    print("\n   Step 3g: Pre-filtering publications based on abstract content...")
+    print("   - Checking for exact resource matches (resourceName, synonyms) and tool signs...")
+
+    publications_to_mine = []
+    abstract_filter_reasons = []
+
+    for idx, row in unlinked_pubs.iterrows():
+        should_mine, reason = should_mine_publication_abstract(row, existing_tools)
+        if should_mine:
+            publications_to_mine.append(idx)
+            abstract_filter_reasons.append(reason)
+
+    # Filter to publications that passed abstract screening
+    before_abstract_filter = len(unlinked_pubs)
+    unlinked_pubs = unlinked_pubs.loc[publications_to_mine].copy()
+    unlinked_pubs['abstract_filter_reason'] = abstract_filter_reasons
+
+    excluded_by_abstract = before_abstract_filter - len(unlinked_pubs)
+    print(f"   - ✅ {len(unlinked_pubs)} publications with tool signs in abstract")
+    print(f"   - ❌ {excluded_by_abstract} publications excluded (no tool signs in abstract)")
+
+    if len(unlinked_pubs) == 0:
+        print("\n   No publications to mine after abstract filtering!")
+        return
 
     # Mine publications
     print("\n4. Mining publications (abstract + full text when available)...")
