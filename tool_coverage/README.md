@@ -108,6 +108,7 @@ Mines abstracts and full text for tools with intelligent pre-filtering:
   - 'mice'/'mouse' → animal models
   - 'cells'/'fibroblasts' → cell lines
   - 'antibodies' → antibodies
+  - 'models'/'modeling'/'causal modeling'/'statistical analysis'/'software' → computational tools
 - **Only mines full text** if exact matches OR tool signs found
 - **Efficiency gain:** 60% reduction in full-text API calls (based on testing)
 

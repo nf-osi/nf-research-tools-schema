@@ -863,6 +863,81 @@ def match_to_existing_tool(tool_name: str, tool_type: str,
     return ""
 
 
+def load_known_computational_tools_config() -> Dict:
+    """
+    Load configuration of known computational tools.
+
+    Returns:
+        Dict with categories of known tools and novel tool indicators
+    """
+    config_file = Path(__file__).parent.parent / 'config' / 'known_computational_tools.json'
+
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            return json.load(f)
+
+    return {'categories': {}, 'excluded_tools': {}, 'novel_tool_indicators': {}}
+
+
+def is_known_computational_tool(tool_name: str, config: Dict) -> bool:
+    """
+    Check if a computational tool is in the known tools list.
+
+    Args:
+        tool_name: Name of the tool
+        config: Configuration from load_known_computational_tools_config()
+
+    Returns:
+        True if tool is in the known tools list
+    """
+    tool_lower = tool_name.lower()
+
+    for category, tools in config.get('categories', {}).items():
+        for known_tool in tools:
+            if tool_lower == known_tool.lower():
+                return True
+
+    return False
+
+
+def is_excluded_computational_tool(tool_name: str, config: Dict) -> bool:
+    """
+    Check if a computational tool should be excluded (programming languages, generic terms, etc.).
+
+    Args:
+        tool_name: Name of the tool
+        config: Configuration from load_known_computational_tools_config()
+
+    Returns:
+        True if tool should be excluded from results
+    """
+    tool_lower = tool_name.lower()
+
+    for category, tools in config.get('excluded_tools', {}).items():
+        for excluded_tool in tools:
+            if tool_lower == excluded_tool.lower():
+                return True
+
+    return False
+
+
+def is_tool_in_title(tool_name: str, title: str) -> bool:
+    """
+    Check if a tool name appears in the publication title.
+
+    Args:
+        tool_name: Name of the tool
+        title: Publication title
+
+    Returns:
+        True if tool name is found in title (case-insensitive)
+    """
+    if not title:
+        return False
+
+    return tool_name.lower() in title.lower()
+
+
 def extract_abstract_text(pub_row: pd.Series) -> str:
     """
     Extract abstract text from publication row.
@@ -903,6 +978,7 @@ def check_tool_signs_in_abstract(abstract: str) -> Dict[str, bool]:
     - 'mice' (or 'mouse') for animal models
     - 'cells' or 'fibroblasts' for cell lines
     - 'antibod*' (antibody, antibodies) for antibodies
+    - 'models', 'modeling', 'software', 'analysis' for computational tools
 
     Args:
         abstract: Abstract text to search
@@ -928,6 +1004,12 @@ def check_tool_signs_in_abstract(abstract: str) -> Dict[str, bool]:
     # Antibodies: look for 'antibod*' (antibody, antibodies)
     if re.search(r'\bantibod(y|ies)\b', abstract_lower):
         signs['antibodies'] = True
+
+    # Computational tools: look for modeling, analysis software patterns
+    if re.search(r'\b(modeling|models|causal\s+model|statistical\s+analysis|'
+                 r'software|algorithm|pipeline|computational|bioinformatics|'
+                 r'image\s+processing|data\s+analysis)\b', abstract_lower):
+        signs['computational_tools'] = True
 
     return signs
 
@@ -1673,15 +1755,39 @@ def mine_publication(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
     result['discussion_text'] = discussion_text
 
     # 6. Match against existing tools
+    # Load known computational tools config for special handling
+    known_tools_config = load_known_computational_tools_config()
+    title = result['title']
+
     for tool_type, tools in merged_tools.items():
         result['existing_tools'][tool_type] = {}
         result['novel_tools'][tool_type] = set()
 
         for tool_name in tools:
+            # Special handling for computational tools: check if excluded first
+            if tool_type == 'computational_tools':
+                # Filter out excluded tools (programming languages, generic terms, etc.)
+                if is_excluded_computational_tool(tool_name, known_tools_config):
+                    continue  # Skip this tool entirely
+
+            # First check against database (exact match with resourceName/synonyms)
             resource_id = match_to_existing_tool(tool_name, tool_type, existing_tools)
             if resource_id:
                 result['existing_tools'][tool_type][tool_name] = resource_id
+            # Special handling for computational tools
+            elif tool_type == 'computational_tools':
+                # Check if it's a known tool
+                is_known = is_known_computational_tool(tool_name, known_tools_config)
+                in_title = is_tool_in_title(tool_name, title)
+
+                if is_known and not in_title:
+                    # Known tool, not in title → mark as existing/usage
+                    result['existing_tools'][tool_type][tool_name] = "KNOWN_TOOL"
+                else:
+                    # Unknown tool OR in title → could be novel
+                    result['novel_tools'][tool_type].add(tool_name)
             else:
+                # Other tool types: if not in database, it's novel
                 result['novel_tools'][tool_type].add(tool_name)
 
     return result
