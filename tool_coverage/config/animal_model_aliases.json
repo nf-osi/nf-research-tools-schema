@@ -1,0 +1,45 @@
+{
+  "description": "Alias mappings for animal model nomenclature to descriptive text",
+  "version": "1.0",
+  "aliases": {
+    "Nf1+/-": [
+      "heterozygous Nf1",
+      "Nf1 heterozygous",
+      "heterozygous Nf1 knockout",
+      "heterozygous Nf1 mice",
+      "Nf1+/- mice",
+      "Nf1(+/-)",
+      "Nf1 +/-"
+    ],
+    "Nf1-/-": [
+      "Nf1 knockout",
+      "Nf1 null",
+      "homozygous Nf1 knockout",
+      "Nf1-/- mice",
+      "Nf1(-/-)"
+    ],
+    "Nf2+/-": [
+      "heterozygous Nf2",
+      "Nf2 heterozygous",
+      "heterozygous Nf2 knockout",
+      "heterozygous Nf2 mice",
+      "Nf2+/- mice"
+    ],
+    "Nf2-/-": [
+      "Nf2 knockout",
+      "Nf2 null",
+      "homozygous Nf2 knockout",
+      "Nf2-/- mice"
+    ]
+  },
+  "patterns": {
+    "heterozygous_pattern": {
+      "regex": "heterozygous\\s+(Nf1|Nf2)\\s+(knockout|mice|null|mutant)?",
+      "maps_to": "{gene}+/-"
+    },
+    "homozygous_pattern": {
+      "regex": "(homozygous\\s+)?(Nf1|Nf2)\\s+(knockout|null)\\s+(mice)?",
+      "maps_to": "{gene}-/-"
+    }
+  }
+}

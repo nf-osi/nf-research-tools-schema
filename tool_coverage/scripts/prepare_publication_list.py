@@ -42,7 +42,8 @@ PUBMED_QUERY_FILTERS = [
     'NOT "JA clinical reports"[Journal])',
     'AND (hasabstract)',
     'AND (free full text[Filter])',
-    'AND (Journal Article[Publication Type])'
+    'AND (Journal Article[Publication Type])',
+    'NOT (preprint[Publication Type])'  # Exclude preprints (bioRxiv, medRxiv, arXiv, etc.)
 ]
 
 
@@ -267,6 +268,58 @@ def load_previously_reviewed_pmids() -> Set[str]:
     return reviewed_pmids
 
 
+def is_preprint(journal: str, doi: str = None) -> bool:
+    """
+    Check if publication is a preprint.
+
+    Args:
+        journal: Journal name
+        doi: DOI (optional, for additional checking)
+
+    Returns:
+        True if preprint, False otherwise
+    """
+    if pd.isna(journal):
+        journal = ""
+    else:
+        journal = str(journal).lower()
+
+    # Preprint server patterns
+    preprint_patterns = [
+        'biorxiv',
+        'medrxiv',
+        'arxiv',
+        'preprint',
+        'ssrn',
+        'researchsquare',
+        'research square',
+        'authorea',
+        'preprints.org',
+        'chemrxiv',
+        'psyarxiv',
+        'socarxiv'
+    ]
+
+    # Check journal name
+    for pattern in preprint_patterns:
+        if pattern in journal:
+            return True
+
+    # Check DOI if available
+    if doi and not pd.isna(doi):
+        doi_str = str(doi).lower()
+        doi_preprint_patterns = [
+            '10.1101',  # bioRxiv, medRxiv
+            '10.48550',  # arXiv
+            '10.2139',  # SSRN
+        ]
+        for pattern in doi_preprint_patterns:
+            if pattern in doi_str:
+                return True
+
+    return False
+
+
 def should_exclude_publication(title: str, journal: str, exclude_keywords: List[str]) -> bool:
     """Check if publication should be excluded based on title/journal filters."""
     if not title:
@@ -378,6 +431,18 @@ def main():
         print(f"   - Excluded {excluded_count} publications based on title/journal filters")
         print(f"   - {len(pub_df)} publications remain")
 
+        # Filter out preprints
+        print(f"\n4a. Filtering out preprints (bioRxiv, medRxiv, arXiv, etc.)...")
+        before_preprint_filter = len(pub_df)
+        pub_df['is_preprint'] = pub_df.apply(
+            lambda row: is_preprint(row.get('journal'), row.get('doi')),
+            axis=1
+        )
+        preprint_count = pub_df['is_preprint'].sum()
+        pub_df = pub_df[~pub_df['is_preprint']].drop(columns=['is_preprint'])
+        print(f"   - Excluded {preprint_count} preprints")
+        print(f"   - {len(pub_df)} publications remain")
+
         # Check PMC availability
         print("\n5. Checking PMC full text availability...")
         nf_portal_pmids = pub_df['pmid'].dropna().unique().tolist()
@@ -442,6 +507,17 @@ def main():
                 print(f"   - Retrieved metadata for {len(pubmed_df)} publications")
 
                 if len(pubmed_df) > 0:
+                    # Filter out preprints (in case query didn't catch them)
+                    before_preprint = len(pubmed_df)
+                    pubmed_df['is_preprint'] = pubmed_df.apply(
+                        lambda row: is_preprint(row.get('journal'), row.get('doi')),
+                        axis=1
+                    )
+                    preprint_count = pubmed_df['is_preprint'].sum()
+                    pubmed_df = pubmed_df[~pubmed_df['is_preprint']].drop(columns=['is_preprint'])
+                    if preprint_count > 0:
+                        print(f"   - Filtered {preprint_count} preprints from PubMed results")
+
                     pubmed_df['source'] = 'pubmed'
                     all_publications.append(pubmed_df)
     else:
