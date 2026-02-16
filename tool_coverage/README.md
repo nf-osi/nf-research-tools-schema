@@ -155,11 +155,43 @@ python tool_coverage/scripts/screen_publication_abstracts.py --batch-size 50
 - `abstract_screening_cache.csv` - Cached screening results
 - `abstract_screening_detailed_report.csv` - Full report with verdicts
 
+**Domain Knowledge Integration:**
+
+The script loads `config/ai_screening_knowledge.json` containing domain knowledge from tool mining logic:
+
+- **175 known computational tools** across 8 categories (statistics/graphing, image analysis, sequencing, etc.)
+  - Examples: GraphPad Prism, ImageJ, STAR, DESeq2, Seurat, FlowJo, Cytoscape
+  - Distinguishes established tools from novel tool development
+
+- **113 excluded false positives**
+  - Programming languages (R, Python, Java, C++) - not tools themselves
+  - IDEs/environments (RStudio, Jupyter, PyCharm) - not research tools
+  - Generic terms ("software", "tool", "pipeline" without specific names)
+
+- **NF-specific animal models and aliases**
+  - Include: Nf1+/-, Nf1-/-, Nf2+/-, Nf2-/- and variants (heterozygous Nf1, Nf1 knockout, etc.)
+  - Exclude: Generic strains (C57BL/6, BALB/c, nude mice) unless combined with NF mutation
+
+- **Novel tool indicators**
+  - Tool name in publication title + development language ("novel", "new", "introduces")
+  - Context patterns ("we developed", "we created", "we designed")
+
+**Screening Improvements:**
+
+| Scenario | Before | After |
+|----------|--------|-------|
+| Programming language | "Analysis using R" → INCLUDE ❌ | → EXCLUDE ✅ |
+| Novel vs established | "ImageJ analysis" → novel ❌ | → established tool ✅ |
+| Novel tool in title | "TumorTracker: novel plugin" → maybe | → novel tool ✅ |
+| Generic strain | "C57BL/6 mice" → INCLUDE ❌ | → EXCLUDE ✅ |
+| NF-specific model | "C57BL/6 Nf1+/- mice" → maybe | → INCLUDE ✅ |
+
 **Benefits:**
 - 🎯 **Better targeting:** Filters publications before expensive full-text extraction
 - 💰 **Cost efficient:** Cheap Haiku screening saves Sonnet tokens later
 - ⚡ **Faster workflow:** Skip publications without tool evidence
 - 📊 **Higher precision:** Two-stage filtering (title → abstract) improves accuracy
+- 🧠 **Smarter screening:** Uses domain knowledge to reduce false positives
 
 #### `tool_coverage/scripts/mine_publications_improved.py`
 Extracts publication sections for AI review (tool mining disabled by default):
@@ -539,6 +571,52 @@ All dependencies are listed in `requirements.txt`:
 - pyyaml >= 6.0
 - biopython >= 1.83 (for PubMed abstract fetching)
 - rapidfuzz >= 3.0.0 (for fuzzy matching when tool mining enabled)
+
+### Configuration Files
+
+#### `config/ai_screening_knowledge.json`
+Domain knowledge for AI screening prompts (Haiku and Sonnet). Contains:
+
+**Computational Tools:**
+- Known established tools (175): GraphPad Prism, ImageJ, STAR, DESeq2, Seurat, FlowJo, etc.
+- Excluded false positives (113): Programming languages (R, Python), IDEs (RStudio, Jupyter), generic terms
+- Novel tool indicators: Title patterns, development language
+
+**Animal Models:**
+- NF-specific models: Nf1+/-, Nf1-/-, Nf2+/-, Nf2-/- with aliases
+- Generic strains to exclude: C57BL/6, BALB/c, nude mice (unless with NF mutation)
+
+**Cell Lines:**
+- NF-specific lines: ST88-14, sNF96.2, ipNF95.11
+- Generic line context rules
+
+**Usage:**
+- Automatically loaded by `screen_publication_abstracts.py`
+- Can be extended with new tools, exclusions, or aliases
+- Update when false positive patterns are identified
+
+**Updating the knowledge base:**
+```json
+{
+  "computational_tools": {
+    "known_established_tools": {
+      "new_category": ["Tool1", "Tool2"]
+    },
+    "excluded_false_positives": {
+      "new_exclusions": ["Term1", "Term2"]
+    }
+  }
+}
+```
+
+#### `config/known_computational_tools.json`
+Original computational tools configuration (used by tool mining when enabled).
+
+#### `config/animal_model_aliases.json`
+Animal model nomenclature aliases for pattern matching.
+
+#### `config/mining_patterns.json`
+Text patterns for tool detection when tool mining is enabled.
 
 ## Running Locally
 

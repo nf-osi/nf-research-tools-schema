@@ -1,0 +1,93 @@
+{
+  "description": "Domain knowledge for AI screening prompts (Haiku and Sonnet)",
+  "version": "1.0",
+
+  "computational_tools": {
+    "known_established_tools": {
+      "description": "Established tools that are NOT novel unless mentioned in paper title with development language",
+      "statistics_graphing": ["GraphPad Prism", "GraphPad", "Prism", "SPSS", "SAS", "Stata", "Excel", "SigmaPlot", "Origin", "JMP"],
+      "image_analysis": ["ImageJ", "Fiji", "CellProfiler", "Imaris", "MetaMorph", "ZEN", "NIS-Elements", "Volocity", "Huygens", "Arivis"],
+      "sequencing_analysis": ["STAR", "BWA", "Bowtie", "Bowtie2", "TopHat", "HISAT2", "Kallisto", "Salmon", "DESeq2", "edgeR", "limma", "Cufflinks", "HTSeq", "featureCounts", "GATK", "Picard", "SAMtools", "BEDTools", "IGV", "Cell Ranger", "Seurat", "Scanpy", "Monocle", "Monocle3", "CellChat", "clusterProfiler", "GSVA", "SoupX", "DoubletFinder"],
+      "scientific_software": ["MATLAB", "SPM", "FSL", "AFNI", "FreeSurfer"],
+      "structural_biology": ["PyMOL", "Chimera", "UCSF Chimera", "ChimeraX", "Rosetta", "SWISS-MODEL", "MODELLER", "Schrodinger"],
+      "flow_cytometry": ["FlowJo", "FCS Express", "Kaluza"],
+      "sequence_alignment": ["BLAST", "ClustalW", "ClustalOmega", "MUSCLE", "MAFFT", "MEGA", "PHYLIP"],
+      "pathway_network": ["Cytoscape", "STRING", "DAVID", "PANTHER", "GSEA", "Ingenuity", "IPA", "Reactome", "EnrichR"]
+    },
+
+    "excluded_false_positives": {
+      "description": "Terms that should NOT be marked as computational tools",
+      "programming_languages": ["R", "Python", "Perl", "Java", "C", "C++", "Julia", "JavaScript", "Ruby", "PHP", "Go", "Rust", "Swift"],
+      "ides_environments": ["RStudio", "Rstudio", "PyCharm", "Eclipse", "Visual Studio", "VS Code", "Jupyter", "Spyder", "Anaconda"],
+      "generic_terms": ["Software", "Kit", "Kits", "Analysis", "Tool", "Tools", "Package", "Packages", "Library", "Libraries", "Framework", "Platform", "System", "Pipeline", "Pipelines", "Workflow", "Workflows", "Script", "Scripts", "Code", "Program", "Programs", "Application", "Applications", "Flow", "Studio", "Suite", "Viewer", "Viewers", "Aligner", "Aligners", "Analyzer", "Analyzers", "Method", "Methods", "Approach", "Technique"]
+    },
+
+    "novel_tool_indicators": {
+      "description": "Signs that a computational tool is novel (being developed, not just used)",
+      "title_keywords": ["novel", "new", "introduces", "presents", "development of", "introducing"],
+      "development_language": ["we developed", "we created", "we designed", "we generated", "we established", "we built", "we constructed", "novel tool", "new tool", "newly developed"]
+    }
+  },
+
+  "animal_models": {
+    "nf_specific_models": {
+      "description": "NF-specific genetic models (NOT generic strains)",
+      "Nf1_models": ["Nf1+/-", "Nf1-/-", "Nf1 flox", "Nf1fl/fl", "heterozygous Nf1", "Nf1 knockout", "Nf1 conditional"],
+      "Nf2_models": ["Nf2+/-", "Nf2-/-", "Nf2 flox", "Nf2fl/fl", "heterozygous Nf2", "Nf2 knockout", "Nf2 conditional"],
+      "common_aliases": {
+        "Nf1+/-": ["heterozygous Nf1", "Nf1 heterozygous", "Nf1(+/-)", "Nf1 +/-"],
+        "Nf1-/-": ["Nf1 knockout", "Nf1 null", "homozygous Nf1 knockout", "Nf1(-/-)"],
+        "Nf2+/-": ["heterozygous Nf2", "Nf2 heterozygous", "Nf2(+/-)", "Nf2 +/-"],
+        "Nf2-/-": ["Nf2 knockout", "Nf2 null", "homozygous Nf2 knockout", "Nf2(-/-)"]
+      }
+    },
+
+    "generic_strains_exclude": {
+      "description": "Generic mouse strains that are NOT specific NF tools (exclude unless combined with NF mutation)",
+      "background_strains": ["C57BL/6", "C57BL/6J", "C57BL/6N", "BALB/c", "129", "FVB", "NOD", "nude mice", "athymic nude", "SCID"],
+      "note": "These are only relevant when combined with NF mutations (e.g., 'C57BL/6 Nf1+/- mice' is relevant, but 'C57BL/6 mice' alone is not)"
+    }
+  },
+
+  "cell_lines": {
+    "nf_specific_lines": {
+      "description": "Known NF-related cell lines",
+      "examples": ["ST88-14", "sNF96.2", "ipNF95.11", "S462", "T265", "STS26T", "NF1-associated cell lines"],
+      "note": "Look for cell lines derived from NF tumors or patients"
+    },
+
+    "generic_lines_context": {
+      "description": "Generic cell lines (HEK293, HeLa, etc.) are only relevant if used specifically for NF research",
+      "common_generic": ["HEK293", "HeLa", "CHO", "Vero", "COS-7", "NIH 3T3"],
+      "note": "Only include if abstract/title mentions NF context"
+    }
+  },
+
+  "screening_guidance": {
+    "include_signals": {
+      "strong": [
+        "Tool name in paper title + development language",
+        "NF-specific genetic models (Nf1+/-, Nf2-/-, etc.)",
+        "Novel computational tool development for NF",
+        "NF patient-derived cell lines or xenografts",
+        "Clinical assessment tools validated for NF"
+      ],
+      "moderate": [
+        "Established tools used for NF analysis (ImageJ, GraphPad, STAR, etc.)",
+        "Generic animal models with NF mutations",
+        "Antibodies targeting NF proteins",
+        "Plasmids/constructs for NF research"
+      ]
+    },
+
+    "exclude_signals": {
+      "strong": [
+        "Programming languages mentioned as tools (R, Python, etc.)",
+        "IDEs/environments (RStudio, Jupyter, etc.)",
+        "Generic terms without specific tool names",
+        "Generic mouse strains without NF mutations",
+        "Generic cell lines without NF context"
+      ]
+    }
+  }
+}

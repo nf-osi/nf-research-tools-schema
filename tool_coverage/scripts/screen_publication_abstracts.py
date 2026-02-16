@@ -10,12 +10,22 @@ import argparse
 from pathlib import Path
 import anthropic
 import time
+import json
 from typing import Set, List, Dict
 from Bio import Entrez
 import synapseclient
 
 # Set email for PubMed API
 Entrez.email = "neurofibromatosis.tools@sagebionetworks.org"
+
+
+def load_screening_knowledge() -> Dict:
+    """Load domain knowledge for AI screening."""
+    config_file = Path(__file__).parent.parent / 'config' / 'ai_screening_knowledge.json'
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    return {}
 
 
 def load_existing_cache() -> Set[str]:
@@ -121,23 +131,44 @@ def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient
     return publications_df
 
 
-def screen_abstracts_batch_with_haiku(abstracts_batch: List[Dict], client: anthropic.Anthropic) -> List[Dict]:
+def screen_abstracts_batch_with_haiku(abstracts_batch: List[Dict], client: anthropic.Anthropic,
+                                       knowledge: Dict = None) -> List[Dict]:
     """
     Screen multiple publication abstracts in one API call using Claude Haiku.
 
     Args:
         abstracts_batch: List of dicts with 'pmid', 'title', and 'abstract' keys
         client: Anthropic API client
+        knowledge: Domain knowledge dictionary for screening
 
     Returns:
         List of dicts with screening results: {'pmid': str, 'has_nf_tools': bool, 'reasoning': str}
     """
+    if knowledge is None:
+        knowledge = load_screening_knowledge()
+
     # Build numbered list of abstracts
     abstracts_list = []
     for i, item in enumerate(abstracts_batch, 1):
         abstracts_list.append(f"{i}. [{item['pmid']}] {item['title']}\n   Abstract: {item['abstract'][:500]}...")  # Truncate for token limit
 
     abstracts_text = "\n\n".join(abstracts_list)
+
+    # Build examples from knowledge base
+    comp_tools = knowledge.get('computational_tools', {})
+    known_tools = []
+    for category, tools in comp_tools.get('known_established_tools', {}).items():
+        known_tools.extend(tools[:3])  # Take first 3 from each category
+    known_tools_str = ", ".join(known_tools[:15])  # Limit to 15 examples
+
+    excluded_terms = []
+    for category, terms in comp_tools.get('excluded_false_positives', {}).items():
+        if category == 'programming_languages':
+            excluded_terms.extend(terms[:5])
+    excluded_str = ", ".join(excluded_terms)
+
+    animal_models = knowledge.get('animal_models', {})
+    nf_models_str = ", ".join(animal_models.get('nf_specific_models', {}).get('Nf1_models', [])[:3])
 
     prompt = f"""You are screening publication abstracts to identify neurofibromatosis (NF) research that USES or DEVELOPS research tools.
 
@@ -147,28 +178,39 @@ Screen each of the following {len(abstracts_batch)} publication abstracts for ev
 
 Research tools include these 9 categories:
 1. **Antibodies** - antibodies used for detection, immunostaining, Western blot
-2. **Cell lines** - established cell lines (e.g., ST88-14, sNF96.2, ipNF95.11)
-3. **Animal models** - mouse, rat, zebrafish, or other organism models of NF
+2. **Cell lines** - NF-specific lines (ST88-14, sNF96.2, ipNF95.11) or generic lines used for NF research
+3. **Animal models** - NF-specific genetic models ({nf_models_str}, etc.)
 4. **Genetic reagents** - plasmids, CRISPR constructs, shRNA, viral vectors
 5. **Biobanks** - tissue repositories, specimen collections
-6. **Computational tools** - software, pipelines, algorithms, analysis tools
+6. **Computational tools** - software, pipelines, algorithms (e.g., {known_tools_str})
 7. **Organoids/3D models** - organoids, spheroids, 3D cultures, assembloids
 8. **Patient-derived xenografts (PDX)** - PDX models, patient tissue grafts
-9. **Clinical assessment tools** - questionnaires (SF-36, PROMIS, PedsQL), outcome measures, assessment scales
+9. **Clinical assessment tools** - questionnaires (SF-36, PROMIS, PedsQL), outcome measures
+
+**IMPORTANT DISTINCTIONS:**
+
+**Computational Tools - Novel vs Established:**
+- **NOVEL tools** (INCLUDE): Tool name in title + "novel"/"new"/"developed" (e.g., "NovelToolName: a new analysis pipeline")
+- **ESTABLISHED tools** (INCLUDE): Using known tools for analysis (ImageJ, GraphPad Prism, STAR, Seurat, etc.)
+- **DO NOT include as tools**: Programming languages ({excluded_str}), IDEs (RStudio, Jupyter), or generic terms ("analysis", "software", "pipeline" without specific names)
+
+**Animal Models - NF-specific vs Generic:**
+- **INCLUDE**: NF-specific models (Nf1+/-, Nf2-/-, heterozygous Nf1 knockout, etc.)
+- **EXCLUDE**: Generic strains alone (C57BL/6, nude mice, BALB/c) UNLESS combined with NF mutation
 
 **INCLUDE if abstract mentions:**
 - Using ANY of the above tool types for NF research
-- Developing or validating ANY of the above tool types for NF
-- Experimental methods with cell lines, animal models, or reagents
-- Computational analysis with specific software/pipelines
+- Developing novel tools (check title for tool name + "novel"/"new"/"developed")
+- NF-specific animal models or cell lines
+- Specific computational tools by name (not just "software" or "R")
 - Patient assessments using standardized instruments
 
 **EXCLUDE if abstract:**
-- Is purely observational/epidemiological without tools
-- Is a review/meta-analysis/commentary
-- Clinical case report without research tools
-- Surgical procedures without experimental tools
-- Diagnostic imaging without analysis tools
+- Pure review/meta-analysis/commentary
+- Generic animal strains without NF mutations
+- Programming languages mentioned without specific tool names
+- Generic terms without specific tools ("we used software", "statistical analysis")
+- Purely observational without research tools
 
 Respond in this exact format for each abstract:
 #1: INCLUDE|EXCLUDE - Brief reason (one phrase)
@@ -263,6 +305,18 @@ def screen_abstracts(publications_df: pd.DataFrame, max_pubs: int = None, batch_
 
     client = anthropic.Anthropic(api_key=api_key)
 
+    # Load domain knowledge for screening
+    print("📚 Loading domain knowledge for screening...")
+    knowledge = load_screening_knowledge()
+    if knowledge:
+        comp_tools = knowledge.get('computational_tools', {})
+        known_count = sum(len(tools) for tools in comp_tools.get('known_established_tools', {}).values())
+        excluded_count = sum(len(terms) for terms in comp_tools.get('excluded_false_positives', {}).values())
+        print(f"   - {known_count} known computational tools")
+        print(f"   - {excluded_count} excluded terms (false positives)")
+    else:
+        print("   ⚠️  No domain knowledge loaded - using basic screening")
+
     # Load existing cache
     cached_pmids = load_existing_cache()
     print(f"📋 Found {len(cached_pmids)} previously screened abstracts in cache")
@@ -302,7 +356,7 @@ def screen_abstracts(publications_df: pd.DataFrame, max_pubs: int = None, batch_
         ]
 
         # Screen batch
-        batch_results = screen_abstracts_batch_with_haiku(abstracts_batch, client)
+        batch_results = screen_abstracts_batch_with_haiku(abstracts_batch, client, knowledge)
 
         # Display results
         for result in batch_results:
