@@ -96,62 +96,115 @@ Analyzes current tool coverage against GFF-funded publications:
 - `GFF_Tool_Coverage_Report.pdf` - Visual coverage analysis
 - `gff_publications_MISSING_tools.csv` - Publications without tools
 
-#### `tool_coverage/scripts/fetch_fulltext_and_mine.py`
-Mines abstracts and full text for tools with intelligent pre-filtering:
+#### `tool_coverage/scripts/screen_publication_titles.py`
+Pre-screens publication titles using Claude 3.5 Haiku to identify research publications:
+- **Purpose:** Filter out clinical case reports, reviews, and non-research publications
+- **Model:** Claude 3.5 Haiku (batch processing, ~100 titles per API call)
+- **Cost:** ~$0.001 per batch of 100 titles
+- **Caching:** Results cached to avoid re-screening
 
-**NEW: Abstract Pre-filtering (Step 3g)** ⭐
-- **Pre-filters publications** based on abstract content BEFORE full-text mining
-- Checks for **exact matches** (case-insensitive) of:
-  - resourceName from syn51730943
-  - **synonyms** from syn51730943 (parsed from comma-separated column)
-- Detects **tool signs** in abstracts:
-  - 'mice'/'mouse' → animal models
-  - 'cells'/'fibroblasts' → cell lines
-  - 'antibodies' → antibodies
-  - 'models'/'modeling'/'causal modeling'/'statistical analysis'/'software' → computational tools
-- **Only mines full text** if exact matches OR tool signs found
-- **Efficiency gain:** 60% reduction in full-text API calls (based on testing)
+**Screening Criteria:**
+- **INCLUDE:** Lab research, computational analysis, model systems, clinical tools, experimental methods
+- **EXCLUDE:** Pure case reports, surgical procedures, epidemiology without tools, reviews/editorials
 
-**Mining Pipeline:**
-- **Mines ALL publications via abstracts** (fetched from PubMed API or syn26486839 'abstract' column)
-- **Enhances with full text when available:** Fetches PMC XML and extracts 5 sections:
-  - **Methods + Introduction** (for tool mining)
-  - **Results + Discussion** (for observation extraction)
-- **Matches against existing tools** using **exact matching** (case-insensitive) before creating new entries
-- Checks both **resourceName AND synonyms** (1,700+ synonyms loaded from syn51730943)
-- Uses existing tools as training data (1,142+ tools) for pattern matching
-- Extracts cell line names via regex patterns (no name field in database)
-- **Distinguishes development vs usage** using keyword context analysis (100-300 char windows)
-- **Filters generic commercial tools** (e.g., C57BL/6, nude mice) unless NF-specific
-- **Tracks source sections** (abstract, methods, introduction) for each tool found
-- **Deduplicates** tools found in multiple sections, preferring Methods metadata
-- **Caches ALL 5 sections** for efficient AI validation and observation extraction
-
-**Tool Matching Process:**
-1. **Pre-filter by abstract** (exact resource match OR tool signs)
-2. Mine abstract (always available)
-3. Mine Methods + Introduction sections (when PMC full text available AND passed pre-filter)
-4. Merge results with deduplication
-5. Match tool names against existing database tools (**exact match, case-insensitive**)
-6. **If match found:** Link to existing tool (reuse resourceId)
-7. **If no match:** Create new tool entry (generate UUID)
-8. Cache fetched text for AI validation step
-
-**Command-line options:**
+**Usage:**
 ```bash
-# Mine publications (AI validation runs separately)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py
-
-# Limit publications for testing
-python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 50
+python tool_coverage/scripts/screen_publication_titles.py
+python tool_coverage/scripts/screen_publication_titles.py --max-publications 100
 ```
 
 **Outputs:**
-- `processed_publications.csv` - All findings with existing/novel categorization
-- `SUBMIT_*.csv` - Submission-ready CSVs (unvalidated)
-- `mining_summary_ALL_publications.csv` - Summary of all processed publications
-- `priority_publications_FULLTEXT.csv` - Top publications ranked by tool count
-- `tool_reviews/publication_cache/{PMID}_text.json` - Cached text for validation
+- `screened_publications.csv` - Research publications passing screening
+- `title_screening_cache.csv` - Cached screening results
+- `title_screening_detailed_report.csv` - Full report with verdicts
+
+#### `tool_coverage/scripts/screen_publication_abstracts.py`
+Screens publication abstracts using Claude 3.5 Haiku for NF tool usage or development:
+- **Purpose:** Second-stage filtering after title screening to identify publications with NF tools
+- **Model:** Claude 3.5 Haiku (batch processing, ~50 abstracts per API call)
+- **Cost:** ~$0.002 per batch of 50 abstracts (abstracts longer than titles)
+- **Abstract availability:** Ensures abstracts are available before screening
+  - First checks Synapse table for abstracts
+  - Falls back to PubMed API if not available
+  - Excludes publications without abstracts
+
+**Screening for 9 Tool Categories:**
+1. Antibodies - immunological reagents
+2. Cell lines - established cultures
+3. Animal models - transgenic/knockout organisms
+4. Genetic reagents - plasmids, CRISPR constructs
+5. Biobanks - tissue repositories
+6. Computational tools - software, pipelines
+7. Organoids/3D models - advanced cellular systems
+8. Patient-derived xenografts (PDX) - patient tissue models
+9. Clinical assessment tools - questionnaires, scales (SF-36, PROMIS, PedsQL)
+
+**Screening Criteria:**
+- **INCLUDE:** Using/developing any of the 9 tool types, experimental methods with tools
+- **EXCLUDE:** Purely observational studies, reviews/meta-analyses, clinical cases without research tools
+
+**Usage:**
+```bash
+python tool_coverage/scripts/screen_publication_abstracts.py
+python tool_coverage/scripts/screen_publication_abstracts.py --max-publications 100
+python tool_coverage/scripts/screen_publication_abstracts.py --batch-size 50
+```
+
+**Outputs:**
+- `abstract_screened_publications.csv` - Publications with NF tools
+- `abstract_screening_cache.csv` - Cached screening results
+- `abstract_screening_detailed_report.csv` - Full report with verdicts
+
+**Benefits:**
+- 🎯 **Better targeting:** Filters publications before expensive full-text extraction
+- 💰 **Cost efficient:** Cheap Haiku screening saves Sonnet tokens later
+- ⚡ **Faster workflow:** Skip publications without tool evidence
+- 📊 **Higher precision:** Two-stage filtering (title → abstract) improves accuracy
+
+#### `tool_coverage/scripts/mine_publications_improved.py`
+Extracts publication sections for AI review (tool mining disabled by default):
+
+**Section Extraction Mode (Default)**
+- **Primary purpose:** Extract all publication sections for later Sonnet review
+- **Tool mining disabled** by default (can be re-enabled with `--enable-tool-mining`)
+- **Focus on quality:** Haiku pre-filters publications, Sonnet reviews full text
+
+**Section Extraction Pipeline:**
+1. **Fetch abstracts** (from Synapse table or PubMed API)
+2. **Fetch full text** from PubMed Central (PMC) when available
+3. **Extract all sections:**
+   - Abstract
+   - Introduction
+   - Methods
+   - Results
+   - Discussion
+4. **Cache extracted text** for Sonnet review (publication_cache/)
+5. **Track section lengths** in output CSV
+
+**Optional: Tool Mining Mode** (use `--enable-tool-mining` flag)
+- Performs pattern-based tool mining from abstract + methods sections
+- Uses exact matching (case-insensitive) with synonyms
+- Distinguishes development vs usage contexts
+- Filters generic commercial tools unless NF-specific
+- Matches against existing database tools (1,700+ synonyms)
+
+**Command-line options:**
+```bash
+# Extract sections only (default, recommended)
+python tool_coverage/scripts/mine_publications_improved.py
+
+# Extract sections with tool mining enabled
+python tool_coverage/scripts/mine_publications_improved.py --enable-tool-mining
+
+# Limit publications for testing
+python tool_coverage/scripts/mine_publications_improved.py --max-publications 10
+```
+
+**Outputs:**
+- `processed_publications_improved.csv` - Section lengths and optional tool mining results
+  - Columns: pmid, title, abstract_length, intro_length, methods_length, results_length, discussion_length
+  - Optional (if mining enabled): existing_tools, novel_tools, tool_metadata, tool_sources
+- `tool_reviews/publication_cache/{PMID}_text.json` - Cached text with all 5 sections
 
 #### `tool_coverage/scripts/extract_tool_metadata.py`
 Extracts rich metadata from Methods section context:
@@ -239,14 +292,14 @@ python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_
 python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --force-rereviews
 ```
 
-⭐ **Smart Optimizations**:
+**Smart Optimizations**:
 - **Text Caching**: Fetched text cached during mining, reused in validation (50% fewer API calls)
 - **Skip Logic**: Publications with existing validation YAMLs automatically skipped (85-90% cost savings)
 - **Combined**: 80-85% reduction in API calls and costs for ongoing operations
 - Use `--force-rereviews` to override skip logic when needed
 
 **Outputs:**
-- `VALIDATED_*.csv` - Validated submissions (false positives removed) ⭐ USE THESE
+- `VALIDATED_*.csv` - Validated submissions (false positives removed, recommended)
 - `tool_reviews/validation_report.xlsx` - AI validation summary
 - `tool_reviews/validation_summary.json` - Machine-readable validation results
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
@@ -308,17 +361,26 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
    - Run clinical assessment query → `publication_list_clinical.csv`
    - Merge by PMID, preserving query_type tags → `publication_list.csv`
 7. **Screen titles with Haiku:** Filter to research publications (includes clinical studies)
-8. **Fetch full text and mine:** Extract all 9 tool types from Methods/Introduction/Results/Discussion
-9. **Run AI validation with Sonnet** (via Goose):
+8. **Screen abstracts with Haiku:** Filter for NF tool usage/development
+   - Ensures abstracts available (from Synapse or fetches from PubMed)
+   - Screens for 9 tool categories using Claude 3.5 Haiku
+   - Batch processing: ~50 abstracts per API call (~$0.002/batch)
+9. **Apply timeout protection:** Cap publications to fit within 6-hour GitHub Actions limit
+10. **Extract publication sections:** Fetch full text and extract all sections
+   - Abstract, Introduction, Methods, Results, Discussion
+   - Caches all sections for Sonnet review
+   - Tool mining disabled by default (focus on section extraction)
+11. **Run AI validation with Sonnet:**
+   - Reviews extracted sections for tools and observations
    - Uses query_type as hint
    - Validates all 9 tool types
    - Handles multi-type publications
-10. **Format mining results:** Create 9 SUBMIT_*.csv files (one per tool type)
-11. **Clean and validate:** Remove tracking columns, validate schema
-12. Run coverage analysis
-13. Generate summary report
-14. Upload all reports as artifacts including validation results (90-day retention)
-15. **Create Pull Request** with result files for review
+12. **Format mining results:** Create 9 SUBMIT_*.csv files (one per tool type)
+13. **Clean and validate:** Remove tracking columns, validate schema
+14. Run coverage analysis
+15. Generate summary report
+16. Upload all reports as artifacts including validation results (90-day retention)
+17. **Create Pull Request** with result files for review
 
 ### 3. Synapse Upsert Workflow
 
@@ -357,7 +419,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - Cell Lines: syn26486823
 - Genetic Reagents: syn26486832
 
-**New Tool Types (v2.0) - ✅ Created 2026-02-11:**
+**New Tool Types (v2.0):**
 - Computational Tools: syn73709226
 - Advanced Cellular Models: syn73709227
 - Patient-Derived Models: syn73709228
@@ -370,7 +432,29 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - Development: syn26486807 (where tools were DEVELOPED)
 - Observations: syn26486836 (scientific observations about tools)
 
-## Recent Improvements (2026-02-12)
+## Recent Improvements
+
+### Abstract Screening & Section Extraction
+
+**Two-stage Haiku screening:**
+1. **Title screening** - Filters research vs clinical publications
+2. **Abstract screening** - Filters for NF tool usage/development
+
+**Benefits:**
+- 🎯 **Better precision:** Two stages of filtering before full-text extraction
+- 💰 **Cost efficient:** Cheap Haiku screening (~$0.002/batch) saves expensive Sonnet tokens
+- ⚡ **Faster workflow:** Skip publications without tool evidence
+- 📊 **Higher quality:** Sonnet reviews only relevant publications
+
+**Workflow changes:**
+- **Before:** Title screening → Full-text mining → Sonnet review
+- **After:** Title screening → Abstract screening → Section extraction → Sonnet review
+
+**Section extraction mode:**
+- **Tool mining disabled by default** - focus on extracting all sections for AI review
+- Extracts: Abstract, Introduction, Methods, Results, Discussion
+- Sonnet reviews full text instead of relying on pattern matching
+- Can re-enable tool mining with `--enable-tool-mining` flag
 
 ### Exact Matching & Synonym Support
 
@@ -393,39 +477,31 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 | Animal Models | 123 | 137 |
 | Genetic Reagents | 122 | 123 |
 
-### Abstract Pre-filtering
+### Publication Filtering Workflow
 
-**New Step 3g - Pre-filtering based on abstract content:**
+The workflow uses a two-stage Haiku screening process to filter publications efficiently:
 
-Runs AFTER Haiku title screening and BEFORE full-text mining to improve efficiency.
+**Stage 1: Title Screening**
+- Filters research vs clinical publications
+- Excludes reviews, case reports, editorials
+- Cost: ~$0.001 per batch of 100 titles
 
-**What it checks:**
-1. **Exact resource matches** (case-insensitive):
-   - resourceName from syn51730943
-   - All synonyms from syn51730943
-   - Uses word boundaries (e.g., 'NF1' won't match 'NF10')
-
-2. **Tool signs** in abstracts:
-   - 'mice' or 'mouse' → suggests animal models
-   - 'cells', 'cell lines', or 'fibroblasts' → suggests cell lines
-   - 'antibody' or 'antibodies' → suggests antibodies
+**Stage 2: Abstract Screening**
+- Filters for NF tool usage or development
+- Ensures abstracts available (fetches from PubMed if needed)
+- Screens for all 9 tool categories
+- Cost: ~$0.002 per batch of 50 abstracts
 
 **Benefits:**
-- ⚡ **60% reduction** in full-text mining workload (based on 10-publication test)
-- ⚡ **60% fewer PMC API calls** - only fetch full text for promising publications
-- ⚡ **Faster workflow** - skip publications without tool evidence
-- 🎯 **Better focus** - spend resources on publications with tool mentions
+- Better precision through two stages of filtering
+- Reduces full-text extraction workload
+- Cost-efficient Haiku screening saves Sonnet tokens
+- Faster workflow by skipping publications without tool evidence
 
-**Test results (10 publications):**
-- ✅ 4 publications passed (40%) - had tool signs in abstracts
-- ❌ 6 publications excluded (60%) - no tool signs
-- Result: Only 4 publications mined instead of 10
-
-**Workflow:**
+**Complete Workflow:**
 ```
-Haiku Title Screening → Abstract Pre-filtering → Full Text Mining
-     (research vs          (tool signs?)        (only passed)
-      clinical)
+Title Screening → Abstract Screening → Section Extraction → Sonnet Review
+  (Haiku)            (Haiku)            (PMC fetch)         (Sonnet)
 ```
 
 ## Configuration
@@ -439,7 +515,7 @@ The workflow requires the following GitHub secrets to be configured:
    - Used to query publications and tools databases
    - Generate at: https://www.synapse.org/#!PersonalAccessTokens:
 
-2. **`ANTHROPIC_API_KEY`** ⭐ NEW
+2. **`ANTHROPIC_API_KEY`**
    - API key for Claude AI (used by Goose for tool validation)
    - Required for AI validation (enabled by default)
    - Generate at: https://console.anthropic.com/settings/keys
@@ -459,6 +535,10 @@ All dependencies are listed in `requirements.txt`:
 - matplotlib >= 3.7.0
 - seaborn >= 0.12.0
 - requests >= 2.31.0
+- anthropic >= 0.39.0 (for AI screening and validation)
+- pyyaml >= 6.0
+- biopython >= 1.83 (for PubMed abstract fetching)
+- rapidfuzz >= 3.0.0 (for fuzzy matching when tool mining enabled)
 
 ## Running Locally
 
@@ -476,14 +556,36 @@ export SYNAPSE_AUTH_TOKEN="your_token_here"
 python tool_coverage/scripts/analyze_missing_tools.py
 ```
 
-### Run Full Text Mining
+### Run Publication Screening and Section Extraction
 
+**Step 1: Screen publication titles** (requires ANTHROPIC_API_KEY)
 ```bash
-# Mine publications (fetches and caches text)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py
+# Filter to research publications
+python tool_coverage/scripts/screen_publication_titles.py
 
 # Or test with limited publications
-python tool_coverage/scripts/fetch_fulltext_and_mine.py --max-publications 10
+python tool_coverage/scripts/screen_publication_titles.py --max-publications 10
+```
+
+**Step 2: Screen publication abstracts** (requires ANTHROPIC_API_KEY)
+```bash
+# Filter for NF tool usage/development
+python tool_coverage/scripts/screen_publication_abstracts.py
+
+# Or test with limited publications
+python tool_coverage/scripts/screen_publication_abstracts.py --max-publications 10
+```
+
+**Step 3: Extract publication sections**
+```bash
+# Extract all sections (abstract, intro, methods, results, discussion)
+python tool_coverage/scripts/mine_publications_improved.py
+
+# Or test with limited publications
+python tool_coverage/scripts/mine_publications_improved.py --max-publications 10
+
+# Optional: Enable tool mining (pattern-based)
+python tool_coverage/scripts/mine_publications_improved.py --enable-tool-mining --max-publications 10
 ```
 
 ### Run AI Validation (Optional but Recommended)

@@ -1,0 +1,466 @@
+#!/usr/bin/env python3
+"""
+Screen publication abstracts using Claude Haiku to identify NF tool usage or development.
+This follows title screening and provides more targeted filtering before full-text mining.
+"""
+
+import pandas as pd
+import os
+import argparse
+from pathlib import Path
+import anthropic
+import time
+from typing import Set, List, Dict
+from Bio import Entrez
+import synapseclient
+
+# Set email for PubMed API
+Entrez.email = "neurofibromatosis.tools@sagebionetworks.org"
+
+
+def load_existing_cache() -> Set[str]:
+    """Load PMIDs that already have cached abstract screening results."""
+    cache_file = Path('tool_coverage/outputs/abstract_screening_cache.csv')
+    if not cache_file.exists():
+        return set()
+
+    try:
+        df = pd.read_csv(cache_file)
+        return set(df['pmid'].astype(str).tolist())
+    except Exception as e:
+        print(f"⚠️  Could not load abstract screening cache: {e}")
+        return set()
+
+
+def fetch_abstract_from_pubmed(pmid: str) -> str:
+    """
+    Fetch abstract from PubMed API.
+
+    Args:
+        pmid: PubMed ID
+
+    Returns:
+        Abstract text or empty string if not found
+    """
+    try:
+        handle = Entrez.efetch(db="pubmed", id=pmid, rettype="abstract", retmode="text")
+        abstract_text = handle.read()
+        handle.close()
+
+        # Clean up the abstract text
+        if abstract_text:
+            # Remove PMID header line
+            lines = abstract_text.split('\n')
+            # Find where abstract actually starts (after blank line)
+            abstract_lines = []
+            found_start = False
+            for line in lines:
+                if not found_start and line.strip() == '':
+                    found_start = True
+                    continue
+                if found_start:
+                    abstract_lines.append(line)
+
+            abstract = ' '.join(abstract_lines).strip()
+            return abstract
+
+        return ""
+    except Exception as e:
+        print(f"  ⚠️  Error fetching abstract for PMID {pmid}: {e}")
+        return ""
+
+
+def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient.Synapse = None) -> pd.DataFrame:
+    """
+    Ensure all publications have abstracts available.
+    First check if abstract is in DataFrame (from Synapse table).
+    If missing, fetch from PubMed API.
+
+    Args:
+        publications_df: DataFrame with publication info
+        syn: Synapse client (optional, for fetching from Synapse table)
+
+    Returns:
+        DataFrame with 'abstract' column populated
+    """
+    print("\n📄 Ensuring abstracts are available...")
+
+    # Check if abstract column exists
+    if 'abstract' not in publications_df.columns:
+        publications_df['abstract'] = ''
+
+    # Count how many abstracts we need to fetch
+    missing_abstracts = publications_df['abstract'].isna() | (publications_df['abstract'] == '')
+    num_missing = missing_abstracts.sum()
+
+    if num_missing == 0:
+        print(f"   ✅ All {len(publications_df)} publications already have abstracts")
+        return publications_df
+
+    print(f"   📥 Need to fetch {num_missing} abstracts from PubMed...")
+
+    # Fetch missing abstracts from PubMed
+    for idx, row in publications_df[missing_abstracts].iterrows():
+        pmid = str(row['pmid'])
+        abstract = fetch_abstract_from_pubmed(pmid)
+
+        if abstract:
+            publications_df.at[idx, 'abstract'] = abstract
+            print(f"     ✅ PMID {pmid}: Fetched abstract ({len(abstract)} chars)")
+        else:
+            print(f"     ⚠️  PMID {pmid}: No abstract available")
+
+        # Rate limiting for PubMed API (max 3 requests/second)
+        time.sleep(0.35)
+
+    # Final count
+    has_abstract = ~(publications_df['abstract'].isna() | (publications_df['abstract'] == ''))
+    print(f"\n   ✅ {has_abstract.sum()} publications have abstracts")
+    print(f"   ⚠️  {(~has_abstract).sum()} publications missing abstracts (will be excluded)")
+
+    return publications_df
+
+
+def screen_abstracts_batch_with_haiku(abstracts_batch: List[Dict], client: anthropic.Anthropic) -> List[Dict]:
+    """
+    Screen multiple publication abstracts in one API call using Claude Haiku.
+
+    Args:
+        abstracts_batch: List of dicts with 'pmid', 'title', and 'abstract' keys
+        client: Anthropic API client
+
+    Returns:
+        List of dicts with screening results: {'pmid': str, 'has_nf_tools': bool, 'reasoning': str}
+    """
+    # Build numbered list of abstracts
+    abstracts_list = []
+    for i, item in enumerate(abstracts_batch, 1):
+        abstracts_list.append(f"{i}. [{item['pmid']}] {item['title']}\n   Abstract: {item['abstract'][:500]}...")  # Truncate for token limit
+
+    abstracts_text = "\n\n".join(abstracts_list)
+
+    prompt = f"""You are screening publication abstracts to identify neurofibromatosis (NF) research that USES or DEVELOPS research tools.
+
+Screen each of the following {len(abstracts_batch)} publication abstracts for evidence of NF tool usage or development:
+
+{abstracts_text}
+
+Research tools include these 9 categories:
+1. **Antibodies** - antibodies used for detection, immunostaining, Western blot
+2. **Cell lines** - established cell lines (e.g., ST88-14, sNF96.2, ipNF95.11)
+3. **Animal models** - mouse, rat, zebrafish, or other organism models of NF
+4. **Genetic reagents** - plasmids, CRISPR constructs, shRNA, viral vectors
+5. **Biobanks** - tissue repositories, specimen collections
+6. **Computational tools** - software, pipelines, algorithms, analysis tools
+7. **Organoids/3D models** - organoids, spheroids, 3D cultures, assembloids
+8. **Patient-derived xenografts (PDX)** - PDX models, patient tissue grafts
+9. **Clinical assessment tools** - questionnaires (SF-36, PROMIS, PedsQL), outcome measures, assessment scales
+
+**INCLUDE if abstract mentions:**
+- Using ANY of the above tool types for NF research
+- Developing or validating ANY of the above tool types for NF
+- Experimental methods with cell lines, animal models, or reagents
+- Computational analysis with specific software/pipelines
+- Patient assessments using standardized instruments
+
+**EXCLUDE if abstract:**
+- Is purely observational/epidemiological without tools
+- Is a review/meta-analysis/commentary
+- Clinical case report without research tools
+- Surgical procedures without experimental tools
+- Diagnostic imaging without analysis tools
+
+Respond in this exact format for each abstract:
+#1: INCLUDE|EXCLUDE - Brief reason (one phrase)
+#2: INCLUDE|EXCLUDE - Brief reason
+... etc
+
+Example:
+#1: INCLUDE - Uses MPNST cell lines
+#2: EXCLUDE - Clinical observational study
+#3: INCLUDE - Mouse model development"""
+
+    try:
+        message = client.messages.create(
+            model="claude-3-5-haiku-20241022",
+            max_tokens=8000,
+            temperature=0,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        response_text = message.content[0].text.strip()
+
+        # Parse response line by line
+        results = []
+        for i, item in enumerate(abstracts_batch, 1):
+            # Look for line matching this number
+            pattern = f"#{i}:"
+            matching_lines = [line for line in response_text.split('\n') if line.strip().startswith(pattern)]
+
+            if matching_lines:
+                line = matching_lines[0].split(':', 1)[1].strip()  # Remove "#X:" prefix
+
+                # Parse verdict and reasoning
+                has_nf_tools = line.upper().startswith('INCLUDE')
+
+                # Extract reasoning (after dash)
+                if ' - ' in line:
+                    reasoning = line.split(' - ', 1)[1].strip()
+                else:
+                    reasoning = line.split(maxsplit=1)[1] if len(line.split()) > 1 else "No reason provided"
+
+                results.append({
+                    'pmid': item['pmid'],
+                    'title': item['title'],
+                    'abstract': item['abstract'],
+                    'has_nf_tools': has_nf_tools,
+                    'reasoning': reasoning
+                })
+            else:
+                # Couldn't find this abstract in response
+                results.append({
+                    'pmid': item['pmid'],
+                    'title': item['title'],
+                    'abstract': item['abstract'],
+                    'has_nf_tools': True,  # Default to including
+                    'reasoning': 'Parse error - defaulted to include'
+                })
+
+        return results
+
+    except Exception as e:
+        print(f"  ⚠️  Error screening batch: {e}")
+        # Return all as having tools (default to including on error)
+        return [{
+            'pmid': item['pmid'],
+            'title': item['title'],
+            'abstract': item['abstract'],
+            'has_nf_tools': True,
+            'reasoning': f"Error: {str(e)}"
+        } for item in abstracts_batch]
+
+
+def screen_abstracts(publications_df: pd.DataFrame, max_pubs: int = None, batch_size: int = 50) -> pd.DataFrame:
+    """
+    Screen publication abstracts using Claude Haiku (batch processing).
+
+    Args:
+        publications_df: DataFrame with 'pmid', 'title', and 'abstract' columns
+        max_pubs: Maximum number to screen (for testing)
+        batch_size: Number of abstracts to screen per API call (default: 50, abstracts are longer than titles)
+
+    Returns:
+        DataFrame with screening results
+    """
+    # Check for API key
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        print("❌ ANTHROPIC_API_KEY not found - cannot perform AI screening")
+        print("   Returning all publications unscreened")
+        publications_df['has_nf_tools'] = True
+        publications_df['abstract_screening_reasoning'] = 'No API key - unscreened'
+        return publications_df
+
+    client = anthropic.Anthropic(api_key=api_key)
+
+    # Load existing cache
+    cached_pmids = load_existing_cache()
+    print(f"📋 Found {len(cached_pmids)} previously screened abstracts in cache")
+
+    # Identify publications needing screening
+    to_screen = publications_df[~publications_df['pmid'].astype(str).isin(cached_pmids)].copy()
+
+    if max_pubs and len(to_screen) > max_pubs:
+        print(f"⚙️  Limiting to {max_pubs} publications for screening")
+        to_screen = to_screen.head(max_pubs)
+
+    # Filter out rows without abstracts
+    to_screen = to_screen[to_screen['abstract'].notna() & (to_screen['abstract'] != '')].copy()
+
+    num_batches = (len(to_screen) + batch_size - 1) // batch_size
+    print(f"\n🤖 Screening {len(to_screen)} publication abstracts with Claude Haiku...")
+    print(f"   Using batch processing: {num_batches} batches of ~{batch_size} abstracts")
+    print(f"   Estimated cost: ${num_batches * 0.002:.3f} (abstracts use more tokens than titles)")
+
+    all_results = []
+
+    # Process in batches
+    for batch_idx in range(0, len(to_screen), batch_size):
+        batch = to_screen.iloc[batch_idx:batch_idx + batch_size]
+        batch_num = (batch_idx // batch_size) + 1
+
+        print(f"\n  📦 Batch {batch_num}/{num_batches} ({len(batch)} abstracts)...")
+
+        # Prepare batch
+        abstracts_batch = [
+            {
+                'pmid': row['pmid'],
+                'title': row.get('title', row.get('publicationTitle', '')),
+                'abstract': row.get('abstract', '')
+            }
+            for _, row in batch.iterrows()
+        ]
+
+        # Screen batch
+        batch_results = screen_abstracts_batch_with_haiku(abstracts_batch, client)
+
+        # Display results
+        for result in batch_results:
+            verdict = "✅ INCLUDE" if result['has_nf_tools'] else "❌ EXCLUDE"
+            print(f"     {result['pmid']}: {verdict} - {result['reasoning']}")
+
+        all_results.extend(batch_results)
+
+        # Rate limiting: Haiku tier 1 = 50 requests/min
+        # Be conservative with 5 seconds between batches
+        if batch_num < num_batches:
+            time.sleep(5)
+
+    # Save to cache (append mode)
+    if all_results:
+        results_df = pd.DataFrame(all_results)
+        cache_file = Path('tool_coverage/outputs/abstract_screening_cache.csv')
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Append to existing cache
+        if cache_file.exists():
+            existing_df = pd.read_csv(cache_file)
+            combined_df = pd.concat([existing_df, results_df], ignore_index=True)
+            combined_df.drop_duplicates(subset=['pmid'], keep='last', inplace=True)
+            combined_df.to_csv(cache_file, index=False)
+        else:
+            results_df.to_csv(cache_file, index=False)
+
+        print(f"\n💾 Saved screening results to {cache_file}")
+
+        # Also save full detailed report (includes excluded publications for review)
+        report_file = Path('tool_coverage/outputs/abstract_screening_detailed_report.csv')
+        full_report_df = results_df[['pmid', 'title', 'has_nf_tools', 'reasoning']].copy()
+        full_report_df['verdict'] = full_report_df['has_nf_tools'].apply(lambda x: 'INCLUDE' if x else 'EXCLUDE')
+        full_report_df = full_report_df[['pmid', 'title', 'verdict', 'reasoning']]
+        full_report_df.to_csv(report_file, index=False)
+        print(f"📋 Saved detailed report to {report_file}")
+
+    # Merge with original DataFrame
+    if all_results:
+        screening_df = pd.DataFrame(all_results)
+        publications_df = publications_df.merge(
+            screening_df[['pmid', 'has_nf_tools', 'reasoning']],
+            on='pmid',
+            how='left'
+        )
+        # Rename for consistency
+        if 'reasoning' in publications_df.columns:
+            publications_df.rename(columns={'reasoning': 'abstract_screening_reasoning'}, inplace=True)
+
+    # Load from cache for previously screened
+    if len(cached_pmids) > 0:
+        cache_df = pd.read_csv('tool_coverage/outputs/abstract_screening_cache.csv')
+        publications_df = publications_df.merge(
+            cache_df[['pmid', 'has_nf_tools', 'abstract_screening_reasoning']],
+            on='pmid',
+            how='left',
+            suffixes=('', '_cached')
+        )
+        # Use cached values where available
+        publications_df['has_nf_tools'] = publications_df['has_nf_tools_cached'].fillna(publications_df['has_nf_tools'])
+        publications_df['abstract_screening_reasoning'] = publications_df['abstract_screening_reasoning_cached'].fillna(publications_df['abstract_screening_reasoning'])
+        publications_df.drop(columns=['has_nf_tools_cached', 'abstract_screening_reasoning_cached'], inplace=True, errors='ignore')
+
+    return publications_df
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Screen publication abstracts to identify NF tool usage or development'
+    )
+    parser.add_argument(
+        '--max-publications',
+        type=int,
+        default=None,
+        help='Maximum number of publications to screen (for testing)'
+    )
+    parser.add_argument(
+        '--output',
+        default='tool_coverage/outputs/abstract_screened_publications.csv',
+        help='Output file for screened publications'
+    )
+    parser.add_argument(
+        '--batch-size',
+        type=int,
+        default=50,
+        help='Number of abstracts per API call (default: 50, abstracts are longer)'
+    )
+    parser.add_argument(
+        '--input',
+        default='tool_coverage/outputs/screened_publications.csv',
+        help='Input file with title-screened publications'
+    )
+
+    args = parser.parse_args()
+
+    print("=" * 80)
+    print("Publication Abstract Screening with Claude Haiku")
+    print("=" * 80)
+
+    # Load publications from title screening
+    print("\n1. Loading title-screened publications...")
+    input_file = Path(args.input)
+
+    if not input_file.exists():
+        print(f"❌ Input file not found: {input_file}")
+        print("   Run screen_publication_titles.py first!")
+        return
+
+    pubs_df = pd.read_csv(input_file)
+
+    # Standardize title column
+    if 'publicationTitle' in pubs_df.columns and 'title' not in pubs_df.columns:
+        pubs_df['title'] = pubs_df['publicationTitle']
+
+    print(f"   Loaded {len(pubs_df)} publications from {input_file}")
+
+    # Login to Synapse (for potential abstract fetching from Synapse table)
+    print("\n2. Connecting to Synapse...")
+    syn = synapseclient.Synapse()
+    auth_token = os.getenv('SYNAPSE_AUTH_TOKEN')
+    if auth_token:
+        syn.login(authToken=auth_token, silent=True)
+        print("   ✅ Connected to Synapse")
+    else:
+        print("   ⚠️  No SYNAPSE_AUTH_TOKEN - will only use PubMed for abstracts")
+        syn = None
+
+    # Ensure abstracts are available
+    print("\n3. Ensuring abstracts are available...")
+    pubs_df = ensure_abstracts_available(pubs_df, syn)
+
+    # Screen abstracts
+    print("\n4. Screening publication abstracts...")
+    screened_df = screen_abstracts(pubs_df, max_pubs=args.max_publications, batch_size=args.batch_size)
+
+    # Filter to publications with NF tools
+    if 'has_nf_tools' in screened_df.columns:
+        tool_pubs = screened_df[screened_df['has_nf_tools'] == True].copy()
+        excluded_pubs = screened_df[screened_df['has_nf_tools'] == False].copy()
+
+        print("\n" + "=" * 80)
+        print("Abstract Screening Results:")
+        print("=" * 80)
+        print(f"   ✅ Publications with NF tools: {len(tool_pubs)}")
+        print(f"   ❌ Publications without NF tools (excluded): {len(excluded_pubs)}")
+        print(f"   📊 Total screened: {len(screened_df)}")
+        print(f"   💰 Estimated cost: ${len(screened_df) * 0.0002:.4f}")
+
+        # Save filtered list
+        output_file = Path(args.output)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        tool_pubs.to_csv(output_file, index=False)
+        print(f"\n✅ Saved {len(tool_pubs)} publications with NF tools to {output_file}")
+    else:
+        print("\n⚠️  No screening performed (API key missing)")
+        screened_df.to_csv(args.output, index=False)
+
+
+if __name__ == '__main__':
+    main()

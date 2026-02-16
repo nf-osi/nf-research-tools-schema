@@ -372,8 +372,16 @@ def mine_text_section_improved(text: str, tool_patterns: Dict[str, List[str]],
 
 
 def mine_publication_improved(pub_row: pd.Series, tool_patterns: Dict[str, List[str]],
-                              existing_tools: Dict[str, Dict[str, str]]) -> Dict:
-    """Mine publication with improved logic."""
+                              existing_tools: Dict[str, Dict[str, str]], enable_tool_mining: bool = False) -> Dict:
+    """
+    Mine publication with improved logic.
+
+    Args:
+        pub_row: Publication row from DataFrame
+        tool_patterns: Tool patterns by type
+        existing_tools: Existing tools from database
+        enable_tool_mining: If True, perform tool mining. If False, only extract sections.
+    """
     pmid = str(pub_row.get('pmid', ''))
     title = pub_row.get('title', '')
     result = {
@@ -385,6 +393,8 @@ def mine_publication_improved(pub_row: pd.Series, tool_patterns: Dict[str, List[
         'abstract_length': 0,
         'methods_length': 0,
         'intro_length': 0,
+        'results_length': 0,
+        'discussion_length': 0,
         'existing_tools': {},
         'novel_tools': {},
         'tool_metadata': {},
@@ -396,154 +406,172 @@ def mine_publication_improved(pub_row: pd.Series, tool_patterns: Dict[str, List[
     config = load_known_computational_tools()
     known_tools = get_all_known_tools(config)
 
-    # 1. Mine abstract (relaxed - no context requirement)
+    # 1. Extract abstract
     abstract_text = extract_abstract_text(pub_row)
     if abstract_text:
         result['abstract_length'] = len(abstract_text)
-        abstract_results = mine_text_section_improved(
-            abstract_text, tool_patterns, 'abstract', require_context=False, config=config
-        )
-    else:
-        abstract_results = ({t: set() for t in tool_patterns.keys()}, {})
 
     # 2. Fetch full text
     fulltext = fetch_pmc_fulltext(pmid)
 
-    # 3. Mine Methods (relaxed - no strict context requirement)
+    # 3. Extract all sections (needed for Sonnet review later)
+    intro_text = extract_introduction_section(fulltext) if fulltext else ""
     methods_text = extract_methods_section(fulltext) if fulltext else ""
-    if methods_text and len(methods_text) >= 50:
+    results_text = extract_results_section(fulltext) if fulltext else ""
+    discussion_text = extract_discussion_section(fulltext) if fulltext else ""
+
+    if intro_text:
+        result['intro_length'] = len(intro_text)
+    if methods_text:
         result['methods_length'] = len(methods_text)
-        methods_results = mine_text_section_improved(
-            methods_text, tool_patterns, 'methods', require_context=False, config=config
-        )
-    else:
-        methods_results = ({t: set() for t in tool_patterns.keys()}, {})
+    if results_text:
+        result['results_length'] = len(results_text)
+    if discussion_text:
+        result['discussion_length'] = len(discussion_text)
 
-    # 4. Skip intro/results/discussion for mining phase
-    # These sections are used later for observation mining during AI validation
-    # For tool detection, abstract + methods are sufficient and more reliable
-
-    # 5. Merge results (abstract + methods only)
-    all_tools = {}
-    all_metadata = {}
-    tool_sources = {}
-
-    for source_name, (tools_dict, metadata_dict) in [
-        ('abstract', abstract_results),
-        ('methods', methods_results)
-    ]:
-        for tool_type, tools in tools_dict.items():
-            if tool_type not in all_tools:
-                all_tools[tool_type] = set()
-
-            for tool_name in tools:
-                all_tools[tool_type].add(tool_name)
-
-                # Track sources
-                tool_key = f"{tool_type}:{tool_name}"
-                if tool_key not in tool_sources:
-                    tool_sources[tool_key] = set()
-                tool_sources[tool_key].add(source_name)
-
-                # Merge metadata (prefer methods > intro > abstract)
-                if tool_key in metadata_dict:
-                    if tool_key not in all_metadata:
-                        all_metadata[tool_key] = metadata_dict[tool_key]
-                    elif source_name == 'methods':
-                        # Methods has priority
-                        all_metadata[tool_key] = metadata_dict[tool_key]
-
-    result['tool_metadata'] = all_metadata
-    result['tool_sources'] = {k: list(v) for k, v in tool_sources.items()}
-
-    # Cache text (abstract + methods only for mining phase)
+    # Cache all extracted text for later Sonnet review
     cache_publication_text(
         pmid=pmid,
         abstract=abstract_text,
         methods=methods_text,
-        intro="",  # Not needed for mining, used later for observations
-        results="",
-        discussion=""
+        intro=intro_text,
+        results=results_text,
+        discussion=discussion_text
     )
 
-    # 6. Match against existing tools
-    for tool_type, tools in all_tools.items():
-        result['existing_tools'][tool_type] = {}
-        result['novel_tools'][tool_type] = set()
-
-        # Special handling for animal models with alias matching
-        if tool_type == 'animal_models':
-            # Combine abstract + methods text for better context
-            full_text = (abstract_text or "") + " " + (methods_text or "")
-
-            # Use improved alias-aware matching
-            matched_ids = match_animal_model_with_aliases(
-                full_text,
-                existing_tools.get('animal_models', {}),
-                threshold=0.85
+    # 4. Optionally perform tool mining (disabled by default)
+    if enable_tool_mining:
+        # Mine abstract (relaxed - no context requirement)
+        if abstract_text:
+            abstract_results = mine_text_section_improved(
+                abstract_text, tool_patterns, 'abstract', require_context=False, config=config
             )
-
-            # Map matched IDs back to tool names
-            # existing_tools structure: {resourceId: resourceName}
-            # So we don't need to reverse it
-            id_to_name = existing_tools.get('animal_models', {})
-
-            for resource_id in matched_ids:
-                if resource_id in id_to_name:
-                    resource_name = id_to_name[resource_id]
-                    # Find which detected tool name matched
-                    for tool_name in tools:
-                        # Check if this tool_name could have matched this resource
-                        # Use canonical name conversion (case-insensitive comparison)
-                        canonical = get_canonical_name(tool_name)
-                        if canonical and canonical.lower() == resource_name.lower():
-                            result['existing_tools'][tool_type][tool_name] = resource_id
-                            break
-                    else:
-                        # No specific tool name matched, use resource name
-                        result['existing_tools'][tool_type][resource_name] = resource_id
-
-            # Any tools not matched are novel
-            for tool_name in tools:
-                matched = False
-                for matched_name in result['existing_tools'][tool_type].keys():
-                    canonical = get_canonical_name(tool_name)
-                    if (tool_name == matched_name or
-                        (canonical and canonical.lower() == matched_name.lower())):
-                        matched = True
-                        break
-                if not matched:
-                    result['novel_tools'][tool_type].add(tool_name)
-        elif tool_type == 'computational_tools':
-            # Special handling for computational tools with known tools list
-            for tool_name in tools:
-                tool_lower = tool_name.lower()
-                tool_key = f"{tool_type}:{tool_name}"
-                tool_meta = all_metadata.get(tool_key, {})
-
-                # First check against existing tools in database
-                resource_id = match_to_existing_tool(tool_name, tool_type, existing_tools)
-                if resource_id:
-                    result['existing_tools'][tool_type][tool_name] = resource_id
-                # Then check against known tools list
-                elif tool_lower in known_tools:
-                    # Known tool but not in database - mark for review
-                    result['existing_tools'][tool_type][tool_name] = "NEEDS_REVIEW"
-                # Check if truly novel (in title, development language)
-                elif is_truly_novel(tool_name, title, tool_meta, config):
-                    result['novel_tools'][tool_type].add(tool_name)
-                else:
-                    # Likely an existing tool we don't know about
-                    # Mark for manual review rather than claiming it's novel
-                    result['existing_tools'][tool_type][tool_name] = "NEEDS_REVIEW"
         else:
-            # Standard matching for other tool types
-            for tool_name in tools:
-                resource_id = match_to_existing_tool(tool_name, tool_type, existing_tools)
-                if resource_id:
-                    result['existing_tools'][tool_type][tool_name] = resource_id
-                else:
-                    result['novel_tools'][tool_type].add(tool_name)
+            abstract_results = ({t: set() for t in tool_patterns.keys()}, {})
+
+        # Mine Methods (relaxed - no strict context requirement)
+        if methods_text and len(methods_text) >= 50:
+            methods_results = mine_text_section_improved(
+                methods_text, tool_patterns, 'methods', require_context=False, config=config
+            )
+        else:
+            methods_results = ({t: set() for t in tool_patterns.keys()}, {})
+
+        # Merge results (abstract + methods only)
+        all_tools = {}
+        all_metadata = {}
+        tool_sources = {}
+
+        for source_name, (tools_dict, metadata_dict) in [
+            ('abstract', abstract_results),
+            ('methods', methods_results)
+        ]:
+            for tool_type, tools in tools_dict.items():
+                if tool_type not in all_tools:
+                    all_tools[tool_type] = set()
+
+                for tool_name in tools:
+                    all_tools[tool_type].add(tool_name)
+
+                    # Track sources
+                    tool_key = f"{tool_type}:{tool_name}"
+                    if tool_key not in tool_sources:
+                        tool_sources[tool_key] = set()
+                    tool_sources[tool_key].add(source_name)
+
+                    # Merge metadata (prefer methods > intro > abstract)
+                    if tool_key in metadata_dict:
+                        if tool_key not in all_metadata:
+                            all_metadata[tool_key] = metadata_dict[tool_key]
+                        elif source_name == 'methods':
+                            # Methods has priority
+                            all_metadata[tool_key] = metadata_dict[tool_key]
+
+        result['tool_metadata'] = all_metadata
+        result['tool_sources'] = {k: list(v) for k, v in tool_sources.items()}
+    else:
+        # Tool mining disabled - initialize empty results
+        all_tools = {t: set() for t in tool_patterns.keys()}
+
+    # 5. Match against existing tools (only if tool mining enabled)
+    if enable_tool_mining:
+        for tool_type, tools in all_tools.items():
+            result['existing_tools'][tool_type] = {}
+            result['novel_tools'][tool_type] = set()
+
+            # Special handling for animal models with alias matching
+            if tool_type == 'animal_models':
+                # Combine abstract + methods text for better context
+                full_text = (abstract_text or "") + " " + (methods_text or "")
+
+                # Use improved alias-aware matching
+                matched_ids = match_animal_model_with_aliases(
+                    full_text,
+                    existing_tools.get('animal_models', {}),
+                    threshold=0.85
+                )
+
+                # Map matched IDs back to tool names
+                # existing_tools structure: {resourceId: resourceName}
+                # So we don't need to reverse it
+                id_to_name = existing_tools.get('animal_models', {})
+
+                for resource_id in matched_ids:
+                    if resource_id in id_to_name:
+                        resource_name = id_to_name[resource_id]
+                        # Find which detected tool name matched
+                        for tool_name in tools:
+                            # Check if this tool_name could have matched this resource
+                            # Use canonical name conversion (case-insensitive comparison)
+                            canonical = get_canonical_name(tool_name)
+                            if canonical and canonical.lower() == resource_name.lower():
+                                result['existing_tools'][tool_type][tool_name] = resource_id
+                                break
+                        else:
+                            # No specific tool name matched, use resource name
+                            result['existing_tools'][tool_type][resource_name] = resource_id
+
+                # Any tools not matched are novel
+                for tool_name in tools:
+                    matched = False
+                    for matched_name in result['existing_tools'][tool_type].keys():
+                        canonical = get_canonical_name(tool_name)
+                        if (tool_name == matched_name or
+                            (canonical and canonical.lower() == matched_name.lower())):
+                            matched = True
+                            break
+                    if not matched:
+                        result['novel_tools'][tool_type].add(tool_name)
+            elif tool_type == 'computational_tools':
+                # Special handling for computational tools with known tools list
+                for tool_name in tools:
+                    tool_lower = tool_name.lower()
+                    tool_key = f"{tool_type}:{tool_name}"
+                    tool_meta = all_metadata.get(tool_key, {})
+
+                    # First check against existing tools in database
+                    resource_id = match_to_existing_tool(tool_name, tool_type, existing_tools)
+                    if resource_id:
+                        result['existing_tools'][tool_type][tool_name] = resource_id
+                    # Then check against known tools list
+                    elif tool_lower in known_tools:
+                        # Known tool but not in database - mark for review
+                        result['existing_tools'][tool_type][tool_name] = "NEEDS_REVIEW"
+                    # Check if truly novel (in title, development language)
+                    elif is_truly_novel(tool_name, title, tool_meta, config):
+                        result['novel_tools'][tool_type].add(tool_name)
+                    else:
+                        # Likely an existing tool we don't know about
+                        # Mark for manual review rather than claiming it's novel
+                        result['existing_tools'][tool_type][tool_name] = "NEEDS_REVIEW"
+            else:
+                # Standard matching for other tool types
+                for tool_name in tools:
+                    resource_id = match_to_existing_tool(tool_name, tool_type, existing_tools)
+                    if resource_id:
+                        result['existing_tools'][tool_type][tool_name] = resource_id
+                    else:
+                        result['novel_tools'][tool_type].add(tool_name)
 
     return result
 
@@ -568,17 +596,31 @@ def main():
         default=None,
         help='Limit for testing'
     )
+    parser.add_argument(
+        '--enable-tool-mining',
+        action='store_true',
+        default=False,
+        help='Enable tool mining (disabled by default, only extracts sections)'
+    )
 
     args = parser.parse_args()
 
     print("=" * 80)
-    print("IMPROVED PUBLICATION MINING")
+    print("PUBLICATION TEXT EXTRACTION")
+    if args.enable_tool_mining:
+        print(" + TOOL MINING")
     print("=" * 80)
-    print("\nImprovements:")
-    print("  ✓ Less restrictive context requirements (higher recall)")
-    print("  ✓ Better development vs usage detection")
-    print("  ✓ Recognizes established tools (ImageJ, GraphPad, etc.)")
-    print("  ✓ Smarter pattern matching (lower threshold)")
+    if args.enable_tool_mining:
+        print("\nImprovements:")
+        print("  ✓ Less restrictive context requirements (higher recall)")
+        print("  ✓ Better development vs usage detection")
+        print("  ✓ Recognizes established tools (ImageJ, GraphPad, etc.)")
+        print("  ✓ Smarter pattern matching (lower threshold)")
+    else:
+        print("\nMode: Section extraction only (tool mining disabled)")
+        print("  ✓ Extracts abstract, introduction, methods, results, discussion")
+        print("  ✓ Caches text for later Sonnet review")
+        print("  ✓ No tool mining performed (use --enable-tool-mining to enable)")
     print()
 
     # Login to Synapse
@@ -655,7 +697,8 @@ def main():
     print(f"   - Total tool types loaded: {len(tool_patterns)}")
 
     # Mine publications
-    print(f"\n3. Mining {len(pubs_df)} publications with IMPROVED logic...\n")
+    action_verb = "Mining" if args.enable_tool_mining else "Extracting sections from"
+    print(f"\n3. {action_verb} {len(pubs_df)} publications...\n")
 
     results = []
     Path('tool_reviews/publication_cache').mkdir(parents=True, exist_ok=True)
@@ -667,17 +710,39 @@ def main():
 
         print(f"   [{idx+1}/{len(pubs_df)}] PMID {pmid}...")
 
-        result = mine_publication_improved(row, tool_patterns, existing_tools)
+        result = mine_publication_improved(row, tool_patterns, existing_tools, enable_tool_mining=args.enable_tool_mining)
 
-        # Count tools
-        existing_count = sum(len(tools) for tools in result['existing_tools'].values())
-        novel_count = sum(len(tools) for tools in result['novel_tools'].values())
-        total_count = existing_count + novel_count
+        # Report on what was extracted
+        sections_extracted = []
+        if result['abstract_length'] > 0:
+            sections_extracted.append(f"abstract:{result['abstract_length']}")
+        if result['intro_length'] > 0:
+            sections_extracted.append(f"intro:{result['intro_length']}")
+        if result['methods_length'] > 0:
+            sections_extracted.append(f"methods:{result['methods_length']}")
+        if result['results_length'] > 0:
+            sections_extracted.append(f"results:{result['results_length']}")
+        if result['discussion_length'] > 0:
+            sections_extracted.append(f"discussion:{result['discussion_length']}")
 
-        if total_count > 0:
-            print(f"     ✓ Found {total_count} tools ({existing_count} existing, {novel_count} novel)")
+        if sections_extracted:
+            print(f"     ✓ Extracted: {', '.join(sections_extracted)}")
 
-            # Store result
+        # Count tools (if mining enabled)
+        if args.enable_tool_mining:
+            existing_count = sum(len(tools) for tools in result['existing_tools'].values())
+            novel_count = sum(len(tools) for tools in result['novel_tools'].values())
+            total_count = existing_count + novel_count
+
+            if total_count > 0:
+                print(f"     ✓ Found {total_count} tools ({existing_count} existing, {novel_count} novel)")
+        else:
+            existing_count = 0
+            novel_count = 0
+            total_count = 0
+
+        # Store result (always store when sections extracted or tools found)
+        if sections_extracted or total_count > 0:
             result_row = {
                 'pmid': result['pmid'],
                 'doi': result['doi'],
@@ -687,6 +752,8 @@ def main():
                 'abstract_length': result['abstract_length'],
                 'methods_length': result['methods_length'],
                 'intro_length': result['intro_length'],
+                'results_length': result.get('results_length', 0),
+                'discussion_length': result.get('discussion_length', 0),
                 'existing_tool_count': existing_count,
                 'novel_tool_count': novel_count,
                 'total_tool_count': total_count,
@@ -698,7 +765,7 @@ def main():
             }
             results.append(result_row)
         else:
-            print(f"     ⊘ No tools found")
+            print(f"     ⊘ No sections extracted")
 
     # Save results
     print(f"\n4. Saving results...")
@@ -707,17 +774,28 @@ def main():
         output_file.parent.mkdir(parents=True, exist_ok=True)
         results_df = pd.DataFrame(results)
         results_df.to_csv(output_file, index=False)
-        print(f"   ✓ Saved {len(results_df)} publications with tools to {output_file}")
+        if args.enable_tool_mining:
+            print(f"   ✓ Saved {len(results_df)} publications with tools to {output_file}")
+        else:
+            print(f"   ✓ Saved {len(results_df)} publications with extracted sections to {output_file}")
     else:
-        print("   ⚠️  No tools found in any publications")
+        if args.enable_tool_mining:
+            print("   ⚠️  No tools found in any publications")
+        else:
+            print("   ⚠️  No sections extracted from any publications")
 
     # Summary
     print("\n" + "=" * 80)
     print("SUMMARY")
     print("=" * 80)
     print(f"  Total publications: {len(pubs_df)}")
-    print(f"  Publications with tools: {len(results)}")
-    print(f"  Hit rate: {len(results)/len(pubs_df)*100:.1f}%")
+    if args.enable_tool_mining:
+        print(f"  Publications with tools: {len(results)}")
+        print(f"  Hit rate: {len(results)/len(pubs_df)*100:.1f}%")
+    else:
+        print(f"  Publications with extracted sections: {len(results)}")
+        print(f"  Extraction rate: {len(results)/len(pubs_df)*100:.1f}%")
+        print("\n  Note: Tool mining disabled. To enable, use --enable-tool-mining flag")
     print()
 
 

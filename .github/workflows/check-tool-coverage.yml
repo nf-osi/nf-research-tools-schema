@@ -173,9 +173,36 @@ jobs:
 
           echo "screening_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Screen publication abstracts with Haiku
+        id: abstract_screening
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.screening.outputs.screening_complete == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Step 2b: Screening abstracts with Haiku (NF tool usage/development)..."
+
+          # Build command
+          CMD="python tool_coverage/scripts/screen_publication_abstracts.py"
+
+          # Add max publications limit if specified
+          if [ -n "${{ github.event.inputs.max_publications }}" ]; then
+            CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
+          fi
+
+          # Run abstract screening (uses Haiku to check for NF tool usage)
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/abstract_screening_output.log || echo "abstract_screening_failed=true" >> $GITHUB_OUTPUT
+
+          # Update the screened_publications.csv to be the output of abstract screening
+          if [ -f "tool_coverage/outputs/abstract_screened_publications.csv" ]; then
+            cp tool_coverage/outputs/abstract_screened_publications.csv tool_coverage/outputs/screened_publications.csv
+            echo "abstract_screening_complete=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Apply timeout protection
         id: timeout
-        if: steps.screening.outputs.screening_complete == 'true'
+        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true'
         run: |
           echo "Applying timeout protection to prevent workflow timeout..."
 
@@ -206,22 +233,23 @@ jobs:
             echo "capped=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Fetch full text and mine for tools
+      - name: Extract publication sections
         id: mining
         if: steps.prep_list.outputs.prep_complete == 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          echo "Step 3: Fetching full text for screened publications (with timeout protection)..."
+          echo "Step 3: Extracting publication sections for Sonnet review..."
 
-          # Use improved mining script with alias matching
+          # Use improved mining script (tool mining disabled by default)
           CMD="python tool_coverage/scripts/mine_publications_improved.py"
 
           # Input is already capped by timeout protection
           CMD="$CMD --input tool_coverage/outputs/screened_publications.csv"
           CMD="$CMD --output tool_coverage/outputs/processed_publications_improved.csv"
 
-          # Run mining (fetches full text and mines for tools with improved logic)
+          # Note: Tool mining is disabled by default. To enable, add --enable-tool-mining flag
+          # This extracts intro, methods, results, discussion for later Sonnet review
           echo "Running: $CMD"
           $CMD 2>&1 | tee tool_coverage/outputs/mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
 
@@ -232,13 +260,13 @@ jobs:
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
-      - name: Run AI validation on mined tools
+      - name: Run AI validation with Sonnet
         id: validation
         if: steps.check_api_key.outputs.api_key_exists == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          echo "Running AI validation on mined tools and candidate publications..."
+          echo "Running AI validation on publications (Sonnet review of full text)..."
 
           # Build command with optional flags
           # Note: --include-unlinked is now the default (fetches from NF portal + unlinked tools pubs)
