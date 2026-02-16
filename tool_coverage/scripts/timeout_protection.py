@@ -9,6 +9,7 @@ to fit within the 6-hour GitHub Actions limit with safety margin.
 import argparse
 import json
 import sys
+import pandas as pd
 from pathlib import Path
 
 
@@ -79,20 +80,18 @@ def apply_timeout_protection(publications_file: Path,
     Apply timeout protection by capping publication list.
 
     Args:
-        publications_file: Input file with list of PMIDs
-        output_file: Output file with capped list
-        deferred_file: Output file with deferred PMIDs
+        publications_file: Input CSV file with publications
+        output_file: Output CSV file with capped list
+        deferred_file: Output text file with deferred PMIDs
         time_per_publication: Estimated seconds per publication
         max_parallel: Number of parallel jobs
 
     Returns:
         Dict with results
     """
-    # Read publications
-    with open(publications_file, 'r') as f:
-        lines = [line.strip() for line in f if line.strip()]
-
-    total = len(lines)
+    # Read publications CSV
+    df = pd.read_csv(publications_file)
+    total = len(df)
 
     # Calculate safe limit
     result = calculate_safe_limit(
@@ -103,33 +102,32 @@ def apply_timeout_protection(publications_file: Path,
 
     # Split publications
     if result['capped']:
-        to_process = lines[:result['publications_to_process']]
-        deferred = lines[result['publications_to_process']:]
+        df_to_process = df.head(result['publications_to_process'])
+        df_deferred = df.tail(result['publications_deferred'])
 
-        # Write capped list
-        with open(output_file, 'w') as f:
-            f.write('\n'.join(to_process) + '\n')
+        # Write capped CSV
+        df_to_process.to_csv(output_file, index=False)
 
-        # Write deferred list
+        # Write deferred PMIDs (text file with one PMID per line)
         with open(deferred_file, 'w') as f:
-            f.write('\n'.join(deferred) + '\n')
+            for pmid in df_deferred['pmid']:
+                f.write(f"{pmid}\n")
 
-        print(f"⚠️  Capped to {len(to_process)} publications (deferred {len(deferred)})")
-        print(f"   Estimated time: {result['estimated_time_minutes']:.1f} minutes")
-        print(f"   Available time: {result['available_time_minutes']:.1f} minutes")
-        print(f"   Safety margin: {result['safety_margin_minutes']} minutes")
+        print(f"⚠️  Capped to {len(df_to_process)} publications (deferred {len(df_deferred)})", file=sys.stderr)
+        print(f"   Estimated time: {result['estimated_time_minutes']:.1f} minutes", file=sys.stderr)
+        print(f"   Available time: {result['available_time_minutes']:.1f} minutes", file=sys.stderr)
+        print(f"   Safety margin: {result['safety_margin_minutes']} minutes", file=sys.stderr)
     else:
         # All fit - copy input to output
-        with open(output_file, 'w') as f:
-            f.write('\n'.join(lines) + '\n')
+        df.to_csv(output_file, index=False)
 
         # Empty deferred file
         with open(deferred_file, 'w') as f:
             f.write('')
 
-        print(f"✓ All {total} publications fit within timeout")
-        print(f"   Estimated time: {result['estimated_time_minutes']:.1f} minutes")
-        print(f"   Available time: {result['available_time_minutes']:.1f} minutes")
+        print(f"✓ All {total} publications fit within timeout", file=sys.stderr)
+        print(f"   Estimated time: {result['estimated_time_minutes']:.1f} minutes", file=sys.stderr)
+        print(f"   Available time: {result['available_time_minutes']:.1f} minutes", file=sys.stderr)
 
     return result
 
