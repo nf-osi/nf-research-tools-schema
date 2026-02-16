@@ -656,7 +656,7 @@ def main():
 
     tool_patterns = {}
     for tool_type, tools_dict in existing_tools.items():
-        tool_patterns[tool_type] = list(tools_dict.values())
+        tool_patterns[tool_type] = list(tools_dict.keys())  # Use keys (tool names) not values (metadata)
 
     # Expand animal model patterns with aliases
     if 'animal_models' in tool_patterns:

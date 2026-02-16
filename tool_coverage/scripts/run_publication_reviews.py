@@ -330,7 +330,7 @@ def safe_print(*args, **kwargs):
     with print_lock:
         print(*args, **kwargs)
 
-def run_goose_review(pmid, input_file, results_dir):
+def run_goose_review(pmid, input_file, results_dir, doi=''):
     """Run goose tool validation for a single publication."""
     safe_print(f"\n{'='*80}")
     safe_print(f"Reviewing {pmid}")
@@ -354,6 +354,7 @@ def run_goose_review(pmid, input_file, results_dir):
             '--recipe', str(recipe_path),
             '--params', f'pmid={clean_pmid}',
             '--params', f'inputFile={input_file}',
+            '--params', f'doi={doi}',  # Add DOI parameter for observation attribution
             '--no-session'  # Don't create session files for automated runs
         ]
 
@@ -415,8 +416,11 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
     # Prepare input file
     input_file = prepare_goose_input(row, inputs_dir)
 
+    # Get DOI for observation attribution
+    doi = row.get('doi', '')
+
     # Run goose review
-    result = run_goose_review(pmid, input_file, results_dir)
+    result = run_goose_review(pmid, input_file, results_dir, doi)
 
     if result:
         return (pmid, 'reviewed', result)
