@@ -313,8 +313,9 @@ def prepare_goose_input(pub_row, inputs_dir):
         }
     }
 
-    # Save to JSON file
-    input_file = Path(inputs_dir) / f"{pmid}_input.json"
+    # Save to JSON file (sanitize pmid for filename)
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    input_file = Path(inputs_dir) / f"{clean_pmid}_input.json"
     with open(input_file, 'w') as f:
         json.dump(input_data, f, indent=2)
 
