@@ -162,11 +162,13 @@ def sanitize_pmid_for_filename(pmid: str) -> str:
     GitHub Actions artifacts don't allow: " : < > | * ? \r \n
 
     Args:
-        pmid: Publication PMID (may include 'PMID:' prefix)
+        pmid: Publication PMID (may include 'PMID:' prefix, may be int or str)
 
     Returns:
         Sanitized PMID (numeric only)
     """
+    # Convert to string if needed (some PMIDs come as integers from Synapse)
+    pmid = str(pmid)
     # Remove 'PMID:' prefix if present
     clean_pmid = pmid.replace('PMID:', '').strip()
     # Remove any other invalid characters (keep only alphanumeric and underscore)
