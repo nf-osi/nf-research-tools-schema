@@ -23,6 +23,16 @@ on:
         required: false
         type: boolean
         default: false
+      skip_title_screening:
+        description: 'Skip title screening (use existing screened_publications.csv)'
+        required: false
+        type: boolean
+        default: false
+      skip_abstract_screening:
+        description: 'Skip abstract screening (use existing abstract_screened_publications.csv)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -94,11 +104,27 @@ jobs:
           echo "$HOME/goose-bin" >> $GITHUB_PATH
           ~/goose-bin/goose --version
 
+      - name: Download artifacts from previous run (if skipping steps)
+        if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true'
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: check-tool-coverage.yml
+          name: tool-coverage-reports
+          path: .
+          if_no_artifact_found: warn
+        continue-on-error: true
+
       - name: Prepare publication list (bench + clinical queries)
         id: prep_list
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
+          if [ "${{ github.event.inputs.skip_title_screening }}" == "true" ] || [ "${{ github.event.inputs.skip_abstract_screening }}" == "true" ]; then
+            echo "⏭️  Skipping publication list preparation (using existing artifacts)"
+            echo "prep_complete=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           echo "Step 1: Preparing publication lists for all tool types..."
           echo "Running both bench and clinical queries to capture all 9 tool types"
 
@@ -153,7 +179,7 @@ jobs:
 
       - name: Screen publication titles with Haiku
         id: screening
-        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.prep_list.outputs.prep_complete == 'true'
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.prep_list.outputs.prep_complete == 'true' && github.event.inputs.skip_title_screening != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
@@ -173,9 +199,23 @@ jobs:
 
           echo "screening_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Use existing title screening results
+        id: screening_skipped
+        if: github.event.inputs.skip_title_screening == 'true'
+        run: |
+          echo "⏭️  Skipping title screening - using existing results"
+          if [ -f "tool_coverage/outputs/screened_publications.csv" ]; then
+            echo "   ✅ Found existing screened_publications.csv"
+            echo "screening_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "   ❌ ERROR: screened_publications.csv not found!"
+            echo "   Please upload artifacts from previous run or run without skip flag"
+            exit 1
+          fi
+
       - name: Screen publication abstracts with Haiku
         id: abstract_screening
-        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.screening.outputs.screening_complete == 'true'
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && (steps.screening.outputs.screening_complete == 'true' || steps.screening_skipped.outputs.screening_complete == 'true') && github.event.inputs.skip_abstract_screening != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
@@ -200,9 +240,25 @@ jobs:
             echo "abstract_screening_complete=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Use existing abstract screening results
+        id: abstract_screening_skipped
+        if: github.event.inputs.skip_abstract_screening == 'true'
+        run: |
+          echo "⏭️  Skipping abstract screening - using existing results"
+          if [ -f "tool_coverage/outputs/abstract_screened_publications.csv" ]; then
+            echo "   ✅ Found existing abstract_screened_publications.csv"
+            # Copy to screened_publications.csv for next steps
+            cp tool_coverage/outputs/abstract_screened_publications.csv tool_coverage/outputs/screened_publications.csv
+            echo "abstract_screening_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "   ❌ ERROR: abstract_screened_publications.csv not found!"
+            echo "   Please upload artifacts from previous run or run without skip flag"
+            exit 1
+          fi
+
       - name: Apply timeout protection
         id: timeout
-        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true'
+        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true' || steps.abstract_screening_skipped.outputs.abstract_screening_complete == 'true'
         run: |
           echo "Applying timeout protection to prevent workflow timeout..."
 
