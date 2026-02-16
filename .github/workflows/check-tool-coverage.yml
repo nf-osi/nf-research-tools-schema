@@ -406,6 +406,13 @@ jobs:
           path: tool_coverage/outputs/publications_deferred.txt
           retention-days: 90
 
+      - name: Clean up log files before PR
+        if: steps.mining.outputs.mining_complete == 'true'
+        run: |
+          echo "Removing log files from outputs (kept in artifacts)..."
+          find tool_coverage/outputs -name "*.log" -type f -delete
+          echo "Log files removed from working directory"
+
       - name: Create Pull Request with results
         # Only create PR if mining step completed successfully
         if: steps.mining.outputs.mining_complete == 'true'
