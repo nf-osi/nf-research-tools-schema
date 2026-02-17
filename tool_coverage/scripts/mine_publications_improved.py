@@ -708,7 +708,7 @@ def main():
         if not pmid:
             continue
 
-        print(f"   [{idx+1}/{len(pubs_df)}] PMID {pmid}...")
+        print(f"   [{idx+1}/{len(pubs_df)}] {pmid}...")
 
         result = mine_publication_improved(row, tool_patterns, existing_tools, enable_tool_mining=args.enable_tool_mining)
 
