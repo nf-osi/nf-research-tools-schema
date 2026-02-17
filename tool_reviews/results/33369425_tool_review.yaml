@@ -1,0 +1,224 @@
+publicationMetadata:
+  pmid: "33369425"
+  title: "Machine Learning of Allosteric Effects: The Analysis of Ligand-Induced Dynamics to Predict Functional Effects in TRAP1."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a computational biophysics study using machine learning to analyze molecular dynamics simulations.
+    Expected tool types:
+    - Computational tools (software, analysis pipelines, ML algorithms) - HIGHLY EXPECTED
+    - Potentially some lab reagents if experimental validation was performed
+    
+    The publication focuses on:
+    - Molecular dynamics simulations using AMBER16, Schrödinger suite
+    - Machine learning algorithms (Naive Bayes, SVM) implemented in MATLAB
+    - Structural analysis tools (VMD, GROMACS)
+    - Statistical analysis and visualization tools
+    
+    This type of study typically contains multiple computational tools for simulation, analysis, and visualization.
+  overallAssessment: |
+    This computational biophysics study extensively uses molecular dynamics simulations and machine learning
+    to analyze protein-ligand interactions. The detailed Methods section describes multiple software packages,
+    algorithms, and computational workflows. This publication type typically contains numerous computational
+    tools and should yield high-quality tool mining results. However, no tools were actually mined from this
+    publication, which represents a significant mining failure given the extensive computational methodology described.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "AMBER16"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Equilibration and production steps were performed using the AMBER16 MD engine, describing the protein with the ff99SB force field"
+    whyMissed: "Major molecular dynamics simulation software package explicitly mentioned with version number"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Schrödinger software suite"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Briefly, the Schrödinger software suite release 2017–1 was used for system setup."
+    whyMissed: "Commercial molecular modeling software suite with specific version mentioned"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Glide"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Flexible ligand docking into TRAP1 allosteric site was performed using Glide with default settings in SP mode."
+    whyMissed: "Molecular docking software component of Schrödinger suite"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VMD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Descriptors were generated with in-house scripts using VMD (version 1.9.3) to calculate solvent accessible surface area (SASA)"
+    whyMissed: "Molecular visualization and analysis software with specific version number"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "GROMACS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "g_mindist tool of gromacs (version 4.6) to get residue–residue contacts"
+    whyMissed: "Molecular dynamics simulation package with version number and specific tool mentioned"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "5-fold cross validation procedure available in MATLAB version 2019b, by randomly using 20% (14 400 records) of the training set"
+    whyMissed: "Statistical computing software with specific version used for machine learning analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Classification Learner app"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GNB, KNB and GDF-SVM were trained on the original and extended training sets by using the Classification Learner app available in the Statistics and Machine Learning Toolbox of MATLAB"
+    whyMissed: "Specific MATLAB toolbox application for machine learning"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Statistics and Machine Learning Toolbox"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Classification Learner app available in the Statistics and Machine Learning Toolbox of MATLAB"
+    whyMissed: "MATLAB toolbox for statistical analysis and machine learning"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Curve Fitting tool"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Linear regression models were generated on the predicted vs observed variables with the Curve Fitting tool of MATLAB"
+    whyMissed: "MATLAB tool for regression analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ff99SB force field"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "describing the protein with the ff99SB force field and employing GAFF parametrization for ligands"
+    whyMissed: "Molecular dynamics force field parameter set"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "GAFF"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "describing the protein with the ff99SB force field and employing GAFF parametrization for ligands"
+    whyMissed: "General AMBER Force Field for small molecules"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Naive Bayes algorithm"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Two supervised ML algorithms based on generative and discriminative approaches were used... Two variants of the NB classifier were chosen"
+    whyMissed: "Machine learning algorithm specifically implemented and used"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Support Vector Machine"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SVM based on Gaussian radial distribution functions (GDF-SVM) was chosen as representative of discriminative models"
+    whyMissed: "Machine learning algorithm specifically implemented and used"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "AMBER\\d+"
+    toolType: "computational_tool"
+    examples: ["AMBER16"]
+    reasoning: "Pattern to catch AMBER molecular dynamics software with version numbers"
+
+  - patternType: "term"
+    pattern: "Schrödinger.*suite"
+    toolType: "computational_tool"
+    examples: ["Schrödinger software suite"]
+    reasoning: "Pattern to catch Schrödinger molecular modeling software suite"
+
+  - patternType: "term"
+    pattern: "VMD.*version\\s+[\\d\\.]+|VMD\\s+\\(version\\s+[\\d\\.]+\\)"
+    toolType: "computational_tool"
+    examples: ["VMD (version 1.9.3)"]
+    reasoning: "Pattern to catch VMD molecular visualization software with version"
+
+  - patternType: "term"
+    pattern: "gromacs.*version\\s+[\\d\\.]+|GROMACS.*version\\s+[\\d\\.]+"
+    toolType: "computational_tool"
+    examples: ["gromacs (version 4.6)"]
+    reasoning: "Pattern to catch GROMACS molecular dynamics software with version"
+
+  - patternType: "term"
+    pattern: "MATLAB.*version\\s+\\d+[a-z]?|MATLAB.*\\d+[a-z]?"
+    toolType: "computational_tool"
+    examples: ["MATLAB version 2019b"]
+    reasoning: "Pattern to catch MATLAB with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+[A-Z][a-zA-Z]+\\s+\\(version\\s+[\\d\\.]+\\)"
+    toolType: "computational_tool"
+    examples: ["using VMD (version 1.9.3)"]
+    reasoning: "Context phrase indicating software usage with version numbers"
+
+  - patternType: "term"
+    pattern: "ff\\d+[A-Z]*\\s+force\\s+field"
+    toolType: "computational_tool"
+    examples: ["ff99SB force field"]
+    reasoning: "Pattern to catch molecular dynamics force fields"
+
+  - patternType: "context_phrase"
+    pattern: "performed\\s+using\\s+[A-Z][a-zA-Z0-9]+|analyzed\\s+using\\s+[A-Z][a-zA-Z0-9]+"
+    toolType: "computational_tool"
+    examples: ["performed using the AMBER16 MD engine", "analyzed using VMD"]
+    reasoning: "Context phrases indicating computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+\\s+Toolbox"
+    toolType: "computational_tool"
+    examples: ["Statistics and Machine Learning Toolbox"]
+    reasoning: "Pattern for MATLAB toolboxes and similar software modules"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 9
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    CRITICAL MINING FAILURE: This computational biophysics study contains extensive computational methodology
+    but NO TOOLS were mined. Major issues identified:
+    - Publication has detailed Methods section describing multiple software packages (AMBER16, Schrödinger, VMD, GROMACS, MATLAB)
+    - At least 13 computational tools were clearly missed during mining
+    - Tools are mentioned with specific version numbers and usage contexts
+    - This represents a significant failure of the computational tool mining patterns
+    - The study type (molecular dynamics + machine learning) should be high-yield for computational tools
+  recommendations: |
+    URGENT PATTERN UPDATES NEEDED:
+    - Add patterns for major MD software (AMBER, GROMACS, Schrödinger)
+    - Improve version number detection (e.g., "version X.X", "vX.X", "release YYYY-X")
+    - Add patterns for MATLAB and its toolboxes
+    - Include molecular visualization software (VMD, PyMOL, ChimeraX)
+    - Add force field parameter sets (ff99SB, GAFF, CHARMM, etc.)
+    - Improve context detection for "using", "performed with", "analyzed using"
+    
+    This publication demonstrates major gaps in computational tool mining that need immediate attention.
+    The mining system failed to detect any of the 13+ computational tools clearly present in the Methods section.
+    
+    No observations could be extracted since no tools were validated.
+    
+    PRIORITY: Update computational tool patterns based on this analysis to prevent similar mining failures.

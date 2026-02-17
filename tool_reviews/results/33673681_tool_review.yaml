@@ -1,0 +1,209 @@
+publicationMetadata:
+  pmid: "33673681"
+  title: "Hybrid Minigene Assay: An Efficient Tool to Characterize mRNA Splicing Profiles of NF1"
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study developing and using minigene assays to characterize NF1 gene variants.
+    Expected tools include: cell lines (for transfection), genetic reagents (vectors, constructs), 
+    computational tools (bioinformatics analysis), and laboratory reagents/kits.
+    
+    The study involves cloning, transfection, RNA analysis, and bioinformatics - all typical of 
+    laboratory research requiring multiple research tools.
+  overallAssessment: |
+    This is a clear laboratory research study that develops and uses a minigene assay system for 
+    functional characterization of NF1 gene variants. The detailed Methods section describes 
+    extensive experimental procedures including molecular cloning, cell transfection, RNA analysis, 
+    and bioinformatics analysis. This type of study would definitely use multiple research tools 
+    including cell lines, genetic reagents, and computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "HEK293"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "HEK293 cells (6 × 10^5) were transfected with 1 μg of the wild type or the mutated minigene using Lipofectamine 2000"
+    whyMissed: "Standard cell line name not detected by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "beta-globin vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "PCR fragments including the exon adjacent to each NF1 variant and at least 100 bp of the upstream and downstream introns were amplified from patients' genomic DNA and cloned into the beta-globin vector"
+    whyMissed: "Vector/plasmid naming pattern not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "minigene construct"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "In presence of short introns, a bigger portion of sequence including two adjacent exons was amplified and cloned in the minigene construct"
+    whyMissed: "Generic construct terminology not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Human Splicing Finder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Different complementary online software for splicing prediction were employed: Human Splicing Finder (HSF) Version 2.4.1 (http://www.umd.be/HSF/ Assessing on 21 December 2020)"
+    whyMissed: "Bioinformatics software name not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Mutation taster"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Mutation taster (http://www.mutationtaster.org/ Assessing on 21 December 2020)"
+    whyMissed: "Bioinformatics software name not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "CADD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Combined Annotation Dependent Depletion (CADD) v1.6 (https://cadd.gs.washington.edu/ Assessing on 21 December 2020)"
+    whyMissed: "Bioinformatics software acronym not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Multalin"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Protein sequence alignments were performed using Multalin (http://multalin.toulouse.inra.fr/multalin/ Assessing on 28 December 2020)"
+    whyMissed: "Bioinformatics software name not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Densitometric analyses were performed using the ImageJ (Image Processing and analysis in Java) software (https://imagej.nih.gov/ij/ Assessing on 28 December 2020)"
+    whyMissed: "Image analysis software not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "TOPO TA Cloning kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "When required, purified bands were subcloned using the TOPO TA Cloning kit (ThermoFisher Scientific, Watham, MA, USA)"
+    whyMissed: "Commercial cloning kit not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "HEK293|HeLa|MCF-7|A549|U2OS|293T|CHO"
+    toolType: "cell_line"
+    examples: ["HEK293 cells"]
+    reasoning: "Common cell line names that follow standard nomenclature should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "cloned into.*vector|vector.*cloned|minigene construct|construct.*cloned"
+    toolType: "genetic_reagent"
+    examples: ["cloned into the beta-globin vector", "minigene construct"]
+    reasoning: "Cloning context phrases reliably indicate genetic reagents/vectors"
+
+  - patternType: "naming_convention"
+    pattern: ".*vector$|.*construct$|.*plasmid$"
+    toolType: "genetic_reagent"
+    examples: ["beta-globin vector", "minigene construct"]
+    reasoning: "Vector/construct/plasmid suffixes indicate genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|performed using|analyses.*performed.*using|software.*employed"
+    toolType: "computational_tool"
+    examples: ["analyses were performed using ImageJ", "software for splicing prediction were employed"]
+    reasoning: "Analysis context phrases reliably indicate computational tool usage"
+
+  - patternType: "term"
+    pattern: "ImageJ|FIJI|CellProfiler|Prism|SPSS|R.*version|Python.*version"
+    toolType: "computational_tool"
+    examples: ["ImageJ software", "CADD v1.6"]
+    reasoning: "Common analysis software names with version indicators"
+
+  - patternType: "vendor_indicator"
+    pattern: "kit.*\\(.*\\)|reagent.*\\(.*\\)|system.*\\(.*\\)"
+    toolType: "genetic_reagent"
+    examples: ["TOPO TA Cloning kit (ThermoFisher Scientific)"]
+    reasoning: "Commercial kits with vendor information in parentheses"
+
+observations:
+  - resourceName: "HEK293"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      HEK293 cells were successfully transfected with minigene constructs at a density of 6 × 10^5 cells 
+      using Lipofectamine 2000 according to manufacturer's instructions. After 24 hours, total RNA was 
+      extracted for downstream analysis. This demonstrates the cell line's suitability for transient 
+      transfection experiments in minigene assays.
+    foundIn: "methods"
+    contextSnippet: "HEK293 cells (6 × 10^5) were transfected with 1 μg of the wild type or the mutated minigene using Lipofectamine 2000 (ThermoFisher Scientific, Watham, MA, USA) according to the manufacturer's instruction. After 24 h total RNA was extracted"
+    confidence: 0.95
+    doi: "10.3390/cancers13050999"
+
+  - resourceName: "beta-globin vector"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The beta-globin vector was successfully used as a cloning backbone for minigene constructs. 
+      PCR fragments containing NF1 exons and flanking intronic sequences (at least 100 bp upstream 
+      and downstream) were cloned into this vector. The vector allows for expression analysis using 
+      beta-globin specific primers designed on exon 2 and exon 3 to avoid amplification of endogenous 
+      NF1 transcripts.
+    foundIn: "methods"
+    contextSnippet: "PCR fragments including the exon adjacent to each NF1 variant and at least 100 bp of the upstream and downstream introns were amplified from patients' genomic DNA and cloned into the beta-globin vector... The resulting cDNA was then amplified using specific primers for the beta-globin gene, designed on exon 2 (forward) and exon 3 (reverse)"
+    confidence: 0.90
+    doi: "10.3390/cancers13050999"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ImageJ software was used for densitometric analyses of gel electrophoresis results. The software 
+      enabled quantitative analysis of PCR product bands to assess splicing patterns and relative 
+      abundance of different splice variants produced by the minigene assays.
+    foundIn: "methods"
+    contextSnippet: "Densitometric analyses were performed using the ImageJ (Image Processing and analysis in Java) software (https://imagej.nih.gov/ij/ Assessing on 28 December 2020)"
+    confidence: 0.95
+    doi: "10.3390/cancers13050999"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite clear laboratory research study
+    - Multiple obvious research tools present: cell lines (HEK293), genetic reagents (vectors, constructs, kits), computational tools (ImageJ, CADD, etc.)
+    - Mining patterns appear inadequate for detecting standard molecular biology tools
+    - Bioinformatics software tools completely missed despite explicit usage descriptions
+    - Commercial kits and reagents not detected despite vendor information provided
+  recommendations: |
+    This publication represents a significant mining failure - 9 clear research tools were completely missed 
+    by the mining system. The study is a typical molecular biology paper using standard tools that should 
+    have been easily detected. Key recommendations:
+    
+    1. All 9 missed tools should be added to the database as they represent genuine research tools used experimentally
+    2. Mining patterns need major improvement to capture: cell line names, vector/construct terminology, 
+       bioinformatics software, and commercial kits with vendor information
+    3. The suggested patterns should be implemented to prevent similar failures in future mining
+    4. This paper demonstrates the need for better coverage of molecular biology and bioinformatics tools
+    5. Quality control processes should flag publications with detailed Methods sections but zero detected tools
+    
+    The observations extracted show practical usage information that would be valuable for researchers 
+    using these tools in similar experimental contexts.

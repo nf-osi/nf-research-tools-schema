@@ -1,0 +1,159 @@
+publicationMetadata:
+  pmid: "27815398"
+  title: "Optic pathway glioma volume predicts retinal axon degeneration in neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # High confidence - this is clearly a clinical study with patient data
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study with imaging analysis):
+    - Clinical assessment tools: OCT measurements, MRI volumetric analysis (clinical imaging tools)
+    - Computational tools: Statistical analysis software for linear regression models, MRI analysis software
+    
+    This is a clinical study examining patients with NF1-associated optic pathway gliomas using imaging
+    techniques. While the queryType suggests "bench" research, the actual content is clinical research
+    using imaging-based assessment tools and computational analysis methods.
+  overallAssessment: |
+    This clinical study would typically use imaging-based clinical assessment tools (MRI, OCT) and 
+    computational tools for statistical analysis and image processing. The study involves quantitative
+    measurements of tumor volume and retinal nerve fiber layer thickness, which require specialized
+    imaging analysis software and statistical modeling tools.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "optical coherence tomography"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...who underwent both volumetric MRI analysis and optical coherence tomography (OCT) within 2 weeks of each other were included...OCT measured the average RNFL thickness around the optic nerve..."
+    whyMissed: "OCT is a clinical imaging tool used to measure retinal nerve fiber layer thickness - should be captured as clinical assessment tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "OCT"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...optical coherence tomography (OCT) within 2 weeks of each other were included. Volumetric measurement...OCT measured the average RNFL thickness around the optic nerve..."
+    whyMissed: "OCT abbreviation for optical coherence tomography - clinical imaging tool for retinal assessment"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "volumetric MRI analysis"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...who underwent both volumetric MRI analysis and optical coherence tomography (OCT) within 2 weeks..."
+    whyMissed: "Volumetric MRI analysis is a clinical imaging assessment method for measuring tumor volumes"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "high-resolution T1-weighted MRI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Volumetric measurement of the entire anterior visual pathway (AVP; optic nerve, chiasm, and tract) was performed using high-resolution T1-weighted MRI..."
+    whyMissed: "Specific MRI sequence used for volumetric measurements - clinical imaging tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Linear regression models"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...OCT measured the average RNFL thickness around the optic nerve. Linear regression models evaluated the relationship between RNFL thickness and AVP dimensions and volume."
+    whyMissed: "Statistical analysis method used for data analysis - computational tool for modeling relationships"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "optical coherence tomography|OCT"
+    toolType: "clinical_assessment_tool"
+    examples: ["optical coherence tomography (OCT)", "OCT measured the average RNFL thickness"]
+    reasoning: "OCT is a standard clinical imaging tool for retinal assessment, commonly used in ophthalmology studies"
+
+  - patternType: "context_phrase"
+    pattern: "volumetric MRI analysis|volumetric measurement.*MRI"
+    toolType: "clinical_assessment_tool"
+    examples: ["volumetric MRI analysis", "Volumetric measurement...was performed using high-resolution T1-weighted MRI"]
+    reasoning: "Volumetric MRI analysis is a specific clinical assessment technique for measuring tissue/tumor volumes"
+
+  - patternType: "term"
+    pattern: "T1-weighted MRI|T2-weighted MRI|FLAIR MRI"
+    toolType: "clinical_assessment_tool"
+    examples: ["high-resolution T1-weighted MRI"]
+    reasoning: "Specific MRI sequences are clinical imaging tools used for different tissue contrasts and measurements"
+
+  - patternType: "context_phrase"
+    pattern: "(linear|logistic|multiple) regression model"
+    toolType: "computational_tool"
+    examples: ["Linear regression models evaluated the relationship"]
+    reasoning: "Statistical modeling approaches are computational tools used for data analysis in clinical studies"
+
+  - patternType: "naming_convention"
+    pattern: "RNFL thickness|retinal nerve fiber layer"
+    toolType: "clinical_assessment_tool"
+    examples: ["RNFL thickness", "retinal nerve fiber layer (RNFL) thickness"]
+    reasoning: "RNFL thickness measurement is a specific clinical assessment parameter, often measured using OCT"
+
+observations:
+  - resourceName: "optical coherence tomography"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Other"
+    observationTypeOntologyId: ""  # No MP ID for clinical measurement techniques
+    details: |
+      OCT was used to measure average retinal nerve fiber layer (RNFL) thickness around the optic nerve.
+      RNFL thickness showed a significant negative relationship to total anterior visual pathway (AVP) 
+      volume and total brain volume (p < 0.05, all comparisons). For every 1 mL increase in AVP volume, 
+      RNFL thickness declined by approximately 5 microns. All participants with optic chiasm volume 
+      >1.3 mL demonstrated axonal damage (RNFL thickness <80 microns).
+    foundIn: "both"
+    contextSnippet: "RNFL thickness had a significant negative relationship to total AVP volume and total brain volume (p < 0.05, all comparisons). For every 1 mL increase in AVP volume, RNFL thickness declined by approximately 5 microns."
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000003402"
+
+  - resourceName: "volumetric MRI analysis"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Other"
+    observationTypeOntologyId: ""  # No MP ID for imaging measurements
+    details: |
+      Volumetric MRI analysis was performed on the entire anterior visual pathway (AVP; optic nerve, 
+      chiasm, and tract) using high-resolution T1-weighted MRI. Greater AVP volume of optic pathway 
+      gliomas involving the optic nerve and chiasm, but not the tracts, was independently associated 
+      with lower RNFL thickness (p < 0.05). All participants with optic chiasm volume >1.3 mL 
+      demonstrated axonal damage.
+    foundIn: "both"
+    contextSnippet: "A greater AVP volume of OPGs involving the optic nerve and chiasm, but not the tracts, was independently associated with a lower RNFL thickness (p < 0.05). All participants with an optic chiasm volume >1.3 mL demonstrated axonal damage"
+    confidence: 0.9
+    doi: "10.1212/WNL.0000000000003402"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # OCT, volumetric MRI analysis, high-resolution T1-weighted MRI, Linear regression models, and OCT abbreviation
+  newPatternsCount: 5  # OCT patterns, volumetric MRI patterns, MRI sequence patterns, regression model patterns, RNFL patterns
+  observationsExtracted: 2  # Observations for OCT and volumetric MRI analysis
+  observationsByType:
+    Other: 2  # Both are clinical measurement/imaging techniques
+  majorIssuesFound: |
+    - No tools were initially mined despite clear usage of clinical imaging tools (OCT, MRI)
+    - Publication was classified as "bench" research but is actually a clinical study
+    - Clinical assessment tools (imaging-based measurements) were completely missed
+    - Statistical analysis methods were not captured as computational tools
+  recommendations: |
+    This publication contains several clinical assessment tools that were completely missed by the initial mining:
+    - OCT (optical coherence tomography) is a standard clinical imaging tool for retinal assessment
+    - Volumetric MRI analysis and specific MRI sequences are clinical imaging assessment methods
+    - Linear regression models represent computational tools used for statistical analysis
+    
+    The mining patterns need improvement to capture:
+    1. Clinical imaging tools and their abbreviations (OCT, MRI sequences)
+    2. Volumetric analysis techniques as clinical assessment tools
+    3. Statistical modeling approaches as computational tools
+    4. Clinical measurement parameters (RNFL thickness) that indicate tool usage
+    
+    Two high-quality scientific observations were extracted showing quantitative relationships
+    between imaging measurements and clinical outcomes, with statistical significance reported.
+    
+    The queryType classification as "bench" research appears incorrect - this is clearly a 
+    clinical study that should have been classified as "clinical" research.

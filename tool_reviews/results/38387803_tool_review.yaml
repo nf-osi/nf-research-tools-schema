@@ -1,0 +1,153 @@
+publicationMetadata:
+  pmid: "38387803"
+  title: "Development of a vestibular schwannoma tumor slice model for pharmacological testing."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes developing experimental model
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research developing 3D tumor slice model):
+    - Advanced cellular models (3D tumor slice model being developed)
+    - Antibodies (CC3 for apoptosis, Ki67 for proliferation markers mentioned)
+    - Computational tools (likely for image analysis and data processing)
+    - Potentially patient-derived models (using patient tumor tissue)
+    
+    This is clearly a laboratory research study developing a new experimental model system
+    for drug testing, which would typically involve multiple research tool categories.
+  overallAssessment: |
+    This is a laboratory research publication describing the development of a 3D tumor slice model
+    for vestibular schwannomas. The study involves experimental procedures including tissue culture,
+    drug testing, and molecular marker analysis. Such publications typically contain multiple research
+    tools including cellular models, antibodies, and computational analysis tools.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "3D tumor slice model"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "Our goal was to develop a 3D tumor slice model, replicating the individual tumor microenvironment and for individual pharmaceutical testing in vestibular schwannomas"
+    whyMissed: "The mining patterns may not recognize '3D tumor slice model' as an advanced cellular model - this is a specific type of ex vivo culture system"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CC3"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Treatment responses were assessed using CC3 as an apoptosis marker and Ki67 as a proliferation marker"
+    whyMissed: "CC3 (cleaved caspase-3) is a commonly used antibody marker for apoptosis detection but may not be in the antibody pattern database"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Ki67"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Treatment responses were assessed using CC3 as an apoptosis marker and Ki67 as a proliferation marker"
+    whyMissed: "Ki67 is a standard proliferation marker antibody but may not be recognized by current patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Lapatinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Common drugs - Lapatinib (10 µM), Nilotinib (20 µM), and Bevacizumab (10 µg/ml) - known for their responses in VS were used for treatment"
+    whyMissed: "Pharmaceutical compounds used as research reagents may not be captured by current genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Nilotinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Common drugs - Lapatinib (10 µM), Nilotinib (20 µM), and Bevacizumab (10 µg/ml) - known for their responses in VS were used for treatment"
+    whyMissed: "Pharmaceutical compounds used as research reagents may not be captured by current genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Bevacizumab"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Common drugs - Lapatinib (10 µM), Nilotinib (20 µM), and Bevacizumab (10 µg/ml) - known for their responses in VS were used for treatment"
+    whyMissed: "Bevacizumab is a therapeutic monoclonal antibody used in research - may not be recognized as research antibody"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "2D cell culture models"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Standard 2D cell culture models of the same tumors served as controls"
+    whyMissed: "Generic reference to cell culture models without specific cell line names may not be captured"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "3D tumor slice model|tumor slice model|3D slice model"
+    toolType: "advanced_cellular_model"
+    examples: ["3D tumor slice model"]
+    reasoning: "Tumor slice models are a specific type of ex vivo 3D culture system that maintains tissue architecture and should be captured as advanced cellular models"
+
+  - patternType: "term"
+    pattern: "CC3|cleaved caspase-3|cleaved caspase 3"
+    toolType: "antibody"
+    examples: ["CC3 as an apoptosis marker"]
+    reasoning: "CC3 (cleaved caspase-3) is a standard apoptosis marker antibody commonly used in research"
+
+  - patternType: "term"
+    pattern: "Ki67|Ki-67|MKI67"
+    toolType: "antibody"
+    examples: ["Ki67 as a proliferation marker"]
+    reasoning: "Ki67 is a widely used proliferation marker antibody that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "as an? (apoptosis|proliferation|differentiation|activation) marker"
+    toolType: "antibody"
+    examples: ["CC3 as an apoptosis marker", "Ki67 as a proliferation marker"]
+    reasoning: "Phrases indicating markers are often antibodies used for immunostaining or flow cytometry"
+
+  - patternType: "term"
+    pattern: "Bevacizumab|bevacizumab"
+    toolType: "antibody"
+    examples: ["Bevacizumab (10 µg/ml)"]
+    reasoning: "Bevacizumab is a therapeutic monoclonal antibody commonly used in research studies"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+nib\\b"
+    toolType: "genetic_reagent"
+    examples: ["Lapatinib", "Nilotinib"]
+    reasoning: "Drugs ending in '-nib' are typically kinase inhibitors used as research reagents"
+
+  - patternType: "context_phrase"
+    pattern: "were used for treatment|used for treatment|for treatment"
+    toolType: "genetic_reagent"
+    examples: ["known for their responses in VS were used for treatment"]
+    reasoning: "Context indicating therapeutic compounds being used experimentally"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - The publication describes development of a 3D tumor slice model (advanced cellular model)
+    - Multiple antibody markers are mentioned (CC3, Ki67, Bevacizumab)
+    - Pharmaceutical compounds used as research reagents (Lapatinib, Nilotinib)
+    - This represents a significant mining failure - 6-7 legitimate tools were missed
+  recommendations: |
+    Overall recommendations for this publication:
+    - This is a clear case of mining failure - multiple legitimate research tools were missed
+    - The 3D tumor slice model is the primary tool being developed and should definitely be captured
+    - Standard research antibodies (CC3, Ki67) and therapeutic antibody (Bevacizumab) should be detected
+    - Pharmaceutical compounds used as research reagents need better pattern coverage
+    - The suggested patterns should be implemented to improve future mining of similar publications
+    - This publication should be re-processed with improved patterns to capture the missed tools
+    - No observations could be extracted since no tools were validated, but the abstract suggests
+      multiple experimental findings that would be valuable if tools were properly captured

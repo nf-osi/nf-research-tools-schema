@@ -1,0 +1,200 @@
+publicationMetadata:
+  pmid: "28848060"
+  title: "Genetic Severity Score predicts clinical phenotype in NF2."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical study design, expected tool types include:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY
+    - Computational tools (statistical software for data analysis) - SECONDARY
+    
+    This is a clinical validation study of a genetic severity scoring system for NF2 patients.
+    The study uses validated clinical assessment instruments to measure patient outcomes
+    and statistical software for analysis. Lab research tools (antibodies, cell lines, etc.)
+    are not expected in this type of clinical phenotyping study.
+  overallAssessment: |
+    This clinical study validates the UK NF2 Genetic Severity Score using patient data analysis.
+    Clinical assessment tools are expected and present, including quality of life measures and hearing assessments.
+    Statistical analysis software is also expected for data processing. The study design strongly supports
+    the use of clinical assessment tools even without traditional laboratory methods.
+
+toolValidations: []  # No tools were mined, but several should have been found
+
+potentiallyMissedTools:
+  - toolName: "UK NF2 Genetic Severity Score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "We have assessed NF2 clinical phenotype in 142 patients in relation to the UK NF2 Genetic Severity Score to validate its use as a clinical and research tool."
+    whyMissed: "This is the primary clinical assessment tool being validated in the study but was not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "8-item NF2 disease-specific quality of life score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Quality of life was assessed using the 8-item NF2 disease-specific quality of life score (0–24), with good internal reliability (Cronbach's α=0.87)."
+    whyMissed: "Specific validated quality of life instrument with scoring range and reliability data, but not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Hearing grade score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Hearing grade was assigned based on a score of 1–6, as used within the English NF2 service to indicate suitability for a hearing implant"
+    whyMissed: "Standardized 6-point hearing assessment scale used in clinical practice, but not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Speech Discrimination Score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "grades 1, 2 and 3/4 hearing equating to optimum Speech Discrimination Score (SDS) in the better hearing ear >70%, 50%–70% and below 50%, respectively"
+    whyMissed: "Standardized hearing assessment tool (SDS) with specific percentage thresholds, but not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS V.23"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were undertaken using SPSS V.23."
+    whyMissed: "Statistical analysis software with version number explicitly mentioned, but not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][A-Za-z0-9\\s-]+ (Score|Scale|Questionnaire|Assessment|Inventory)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["UK NF2 Genetic Severity Score", "8-item NF2 disease-specific quality of life score", "Hearing grade score"]
+    reasoning: "Pattern to catch clinical assessment instruments with 'Score', 'Scale', 'Questionnaire', 'Assessment', or 'Inventory' in the name"
+
+  - patternType: "context_phrase"
+    pattern: "(assessed using|measured with|administered|completed|scored using|evaluated with)\\s+(?:the\\s+)?([A-Z][A-Za-z0-9\\s-]+(?:Score|Scale|Questionnaire|Assessment|Inventory))"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed using the 8-item NF2 disease-specific quality of life score", "assigned based on a score of 1–6"]
+    reasoning: "Context phrases that indicate clinical assessment tool usage in patient evaluation"
+
+  - patternType: "term"
+    pattern: "SPSS\\s+V?\\.?\\s*\\d+(?:\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["SPSS V.23", "SPSS 23", "SPSS v23"]
+    reasoning: "Pattern to catch SPSS statistical software with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "(reliability|Cronbach's\\s+α|internal\\s+consistency|validity).*=.*\\d+\\.\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["good internal reliability (Cronbach's α=0.87)"]
+    reasoning: "Psychometric properties mentioned indicate validated clinical assessment instruments"
+
+  - patternType: "naming_convention"
+    pattern: "\\b\\d+-item\\s+[A-Za-z0-9\\s-]+\\s+(score|scale|questionnaire|assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["8-item NF2 disease-specific quality of life score"]
+    reasoning: "Pattern for multi-item clinical assessment tools with item count specified"
+
+observations:
+  - resourceName: "UK NF2 Genetic Severity Score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The UK NF2 Genetic Severity Score consists of a 3-point classification system (tissue mosaicism, classic, and severe disease) 
+      that successfully stratifies patients across multiple clinical domains. The score showed significant correlations across 10 measures 
+      including age at diagnosis, bilateral vestibular schwannomas, intracranial meningioma presence, spinal tumors, hearing grade, 
+      and intervention timing. Strong negative correlation with age at diagnosis (rs=-0.68, p<0.001) and current age (rs=-0.67, p<0.001) 
+      validates its clinical utility for prognostic discussions and natural history studies.
+    foundIn: "results"
+    contextSnippet: "The Genetic Severity Score showed significant correlations across 10 measures, including mean age at diagnosis, proportion of patients with bilateral vestibular schwannomas, presence of intracranial meningioma, spinal meningioma and spinal schwannoma, NF2 eye features, hearing grade, age at first radiotherapy, age at first surgery and age starting bevacizumab."
+    confidence: 1.0
+    doi: "10.1136/jmedgenet-2017-104519"
+
+  - resourceName: "8-item NF2 disease-specific quality of life score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The 8-item NF2 disease-specific quality of life score (range 0-24) demonstrated good internal reliability (Cronbach's α=0.87). 
+      The tool showed weak but significant positive correlation with genetic severity (rs=0.23, p=0.01), indicating deteriorating 
+      quality of life with increased genetic severity. Mean scores ranged from 5.67 in tissue mosaic patients to 8.5 in moderate patients, 
+      with severe patients scoring 8.0. Each item consists of four statements rated 0-3, with 0 indicating no problems across different 
+      dimensions (mobility, hearing, sight, etc.).
+    foundIn: "results"
+    contextSnippet: "There was a weak positive correlation (rs(118)=.23, p=0.01) demonstrating a deteriorating quality of life with increased genetic severity."
+    confidence: 0.95
+    doi: "10.1136/jmedgenet-2017-104519"
+
+  - resourceName: "Hearing grade score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The 6-point hearing grade score (1-6) is used within the English NF2 service to indicate suitability for hearing implants. 
+      Grades correlate with Speech Discrimination Score thresholds: grades 1, 2, and 3/4 correspond to SDS >70%, 50-70%, and <50% 
+      respectively in the better hearing ear. Grade 5 represents patients with hearing implants and grade 6 those with bilaterally 
+      dead ears. The score showed significant linear association with genetic severity (p<0.001), with 85.5% of tissue mosaic patients 
+      having grade 1 hearing compared to only 50% of severe patients.
+    foundIn: "results"
+    contextSnippet: "A linear association was demonstrated between genetic severity and hearing grade (p<0.001), with increased genetic severity associated with advanced hearing grades and a higher proportion of tissue mosaic patients having useful hearing compared with severe ones."
+    confidence: 0.90
+    doi: "10.1136/jmedgenet-2017-104519"
+
+  - resourceName: "Speech Discrimination Score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      Speech Discrimination Score (SDS) measures hearing function with specific percentage thresholds used for clinical classification. 
+      The tool showed moderate negative correlation with genetic severity (rs=-0.25, p=0.004). Mean latest SDS scores decreased with 
+      increasing severity: 86.78% in tissue mosaic patients, 58.95% in mild patients, 64.56% in moderate patients, and 53.19% in 
+      severe patients. In severe patients, only 55.6% had optimum SDS >70% compared to 90.3% in tissue mosaic patients, indicating 
+      progressive hearing deterioration with genetic severity.
+    foundIn: "results"
+    contextSnippet: "In group 3, 55.6% had optimum SDS >70% compared with 90.3% in group 1."
+    confidence: 0.85
+    doi: "10.1136/jmedgenet-2017-104519"
+
+  - resourceName: "SPSS V.23"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      SPSS version 23 was used for all statistical analyses in this study. The software was employed for multiple statistical tests 
+      including χ² statistics for comparing distributions, Mantel-Haenszel linear-by-linear χ² tests for trends with genetic severity, 
+      Spearman's rank-order correlations for relationships between continuous variables, and z-tests with Bonferroni corrections for 
+      multiple comparisons. The comprehensive statistical analysis validated the UK NF2 Genetic Severity Score across 142 patients 
+      and multiple clinical domains.
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were undertaken using SPSS V.23. Genetic severity and hearing grades were treated as ordinal variables."
+    confidence: 1.0
+    doi: "10.1136/jmedgenet-2017-104519"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - CRITICAL: Mining completely failed to detect any tools despite this being a clinical study with multiple validated assessment instruments
+    - The primary tool being validated (UK NF2 Genetic Severity Score) was not detected
+    - Multiple standardized clinical assessment tools with psychometric properties were missed
+    - Statistical analysis software (SPSS V.23) was not detected despite explicit mention with version number
+    - Mining patterns appear inadequate for clinical assessment tools and need significant improvement
+  recommendations: |
+    - ALL 5 missed tools should be added to the database as they are legitimate research tools
+    - Mining patterns for clinical assessment tools need major enhancement to catch:
+      * Disease-specific scoring systems and severity scales
+      * Quality of life instruments with psychometric data
+      * Standardized clinical assessment tools used in healthcare
+      * Statistical software with version numbers
+    - The current mining approach appears biased toward laboratory tools and misses clinical research tools
+    - This publication demonstrates the need for clinical assessment tool patterns in mining algorithms
+    - Future mining should include context phrases like "assessed using", "scored with", "reliability", "Cronbach's α"
+    - All 5 observations provide valuable usage instructions and validation data for these clinical tools

@@ -1,0 +1,225 @@
+publicationMetadata:
+  pmid: "18413802"
+  title: "Sorafenib inhibits growth and mitogen-activated protein kinase signaling in malignant peripheral nerve sheath cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study investigating sorafenib treatment effects on MPNST cell lines.
+    Expected tools include:
+    - Cell lines (human tumor cell lines are explicitly mentioned)
+    - Genetic reagents (siRNA mentioned for B-Raf and C-Raf depletion)
+    - Potentially antibodies (for detecting phospho-proteins, cyclins, pRb)
+    - Drug compounds (sorafenib as therapeutic agent)
+    
+    The study involves molecular biology techniques, cell culture, and protein analysis, making multiple
+    tool types highly likely despite none being initially mined.
+  overallAssessment: |
+    This laboratory research study clearly uses multiple research tools including human tumor cell lines
+    and siRNA reagents for functional studies. The publication describes experimental procedures involving
+    cell culture, drug treatment, and molecular analysis that would require various research tools.
+    Tools are expected and likely present but were missed during initial mining.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell line"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "MPNST (MPNST and ST8814) and dedifferentiated liposarcoma (LS141 and DDLS) human tumor cell lines were characterized"
+    whyMissed: "Cell line name matches disease acronym (MPNST), may have been filtered out as disease reference"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ST8814"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "MPNST (MPNST and ST8814) and dedifferentiated liposarcoma (LS141 and DDLS) human tumor cell lines were characterized"
+    whyMissed: "Standard cell line nomenclature not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "LS141"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "MPNST (MPNST and ST8814) and dedifferentiated liposarcoma (LS141 and DDLS) human tumor cell lines were characterized"
+    whyMissed: "Standard cell line nomenclature not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DDLS"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "MPNST (MPNST and ST8814) and dedifferentiated liposarcoma (LS141 and DDLS) human tumor cell lines were characterized"
+    whyMissed: "Cell line acronym not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "B-Raf siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Small interfering RNA-mediated depletion of B-Raf in MPNSTs also induced a G(1) cell cycle arrest"
+    whyMissed: "siRNA reagents not captured, may need specific patterns for 'siRNA-mediated depletion'"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "C-Raf siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "whereas depletion of C-Raf did not affect either"
+    whyMissed: "siRNA reagents not captured, implied from depletion context"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "sorafenib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Tumor cells were treated with sorafenib and examined for growth inhibition"
+    whyMissed: "Drug compounds may not be captured as genetic reagents, could be separate category"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "siRNA-mediated depletion of [GENE]"
+    toolType: "genetic_reagent"
+    examples: ["siRNA-mediated depletion of B-Raf", "depletion of C-Raf"]
+    reasoning: "This phrase pattern reliably indicates use of siRNA reagents for gene knockdown experiments"
+
+  - patternType: "context_phrase"
+    pattern: "human tumor cell lines"
+    toolType: "cell_line"
+    examples: ["MPNST and ST8814) and dedifferentiated liposarcoma (LS141 and DDLS) human tumor cell lines"]
+    reasoning: "Context phrase that indicates cell lines are being described, helps capture cell line names in parentheses"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,6}[0-9]{2,4}"
+    toolType: "cell_line"
+    examples: ["ST8814", "LS141", "DDLS"]
+    reasoning: "Common cell line naming pattern with letters followed by numbers, would catch many standard cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "treated with [COMPOUND]"
+    toolType: "genetic_reagent"
+    examples: ["treated with sorafenib"]
+    reasoning: "Indicates experimental use of chemical compounds/drugs as research reagents"
+
+  - patternType: "term"
+    pattern: "small interfering RNA|siRNA"
+    toolType: "genetic_reagent"
+    examples: ["Small interfering RNA-mediated depletion"]
+    reasoning: "Direct terms for siRNA reagents that are commonly used in functional studies"
+
+observations:
+  - resourceName: "MPNST cell line"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      MPNST cell lines were sensitive to sorafenib at nanomolar concentrations, showing growth inhibition.
+      This sensitivity appeared to be due to inhibition of phospho-MEK and phospho-ERK, suppression of 
+      cyclin D1, and hypophosphorylation of pRb at CDK4-specific sites, resulting in G1 cell cycle arrest.
+    foundIn: "results"
+    contextSnippet: "MPNSTs were sensitive to sorafenib at nanomolar concentrations. This appeared to be due to inhibition of p-MEK, p-ERK, suppression of cyclin D1, hypophosphorylation of pRb at the CDK4 specific sites, resulting in a G1 cell cycle arrest."
+    confidence: 0.95
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+  - resourceName: "ST8814"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      ST8814 MPNST cell line showed sensitivity to sorafenib treatment with growth inhibition at 
+      nanomolar concentrations, similar to the MPNST cell line, demonstrating consistent response
+      across MPNST cell line models.
+    foundIn: "results"
+    contextSnippet: "MPNSTs were sensitive to sorafenib at nanomolar concentrations"
+    confidence: 0.9
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+  - resourceName: "LS141"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      LS141 liposarcoma cell line did not show the same effects as MPNST cells when treated with sorafenib.
+      These cells either did not express B-Raf or showed decreased Ras activation, explaining the lack
+      of response to sorafenib treatment.
+    foundIn: "results"
+    contextSnippet: "These effects were not seen in the liposarcoma cells, which either did not express B-Raf or showed decreased Ras activation."
+    confidence: 0.9
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+  - resourceName: "DDLS"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      DDLS dedifferentiated liposarcoma cell line did not respond to sorafenib treatment like MPNST cells.
+      Similar to LS141, these cells either did not express B-Raf or showed decreased Ras activation,
+      serving as a negative control for the MPNST-specific effects.
+    foundIn: "results"
+    contextSnippet: "These effects were not seen in the liposarcoma cells, which either did not express B-Raf or showed decreased Ras activation."
+    confidence: 0.9
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+  - resourceName: "B-Raf siRNA"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      siRNA-mediated depletion of B-Raf in MPNST cells induced G1 cell cycle arrest with marked 
+      inhibition of cyclin D1 expression and Rb phosphorylation, phenocopying the effects of 
+      sorafenib treatment and confirming B-Raf as the relevant target.
+    foundIn: "results"
+    contextSnippet: "SiRNA-mediated depletion of B-Raf in MPNSTs also induced a G1 cell cycle arrest in these cells, with a marked inhibition of cyclin D1 expression and Rb phosphorylation"
+    confidence: 0.95
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+  - resourceName: "C-Raf siRNA"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      siRNA-mediated depletion of C-Raf did not affect cell cycle progression or cyclin D1 expression
+      and Rb phosphorylation in MPNST cells, demonstrating specificity for B-Raf in mediating the
+      observed phenotypes and sorafenib sensitivity.
+    foundIn: "results"
+    contextSnippet: "whereas depletion of C-Raf did not affect either"
+    confidence: 0.9
+    doi: "10.1158/1535-7163.MCT-07-0518"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 6
+  observationsByType:
+    Cellular: 6
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple cell lines (MPNST, ST8814, LS141, DDLS) were completely missed
+    - siRNA reagents for B-Raf and C-Raf depletion were not captured
+    - Drug compound (sorafenib) used as research reagent was not identified
+    - Mining patterns appear inadequate for capturing standard cell line nomenclature
+    - Context phrases indicating tool usage ("treated with", "siRNA-mediated depletion") not recognized
+  recommendations: |
+    This publication demonstrates significant gaps in the current mining approach:
+    
+    1. All 7 potentially missed tools should be added - they represent genuine research tools used experimentally
+    2. The 5 suggested patterns should be implemented to catch similar tools in future mining
+    3. Cell line detection needs improvement, especially for:
+       - Standard alphanumeric naming (ST8814, LS141)
+       - Disease-related names that are also cell lines (MPNST)
+       - Context phrases like "human tumor cell lines"
+    4. siRNA reagent detection is completely missing and needs dedicated patterns
+    5. Drug compounds used as research reagents should be considered for inclusion
+    6. High-quality observations were extracted showing specific cellular phenotypes and drug responses
+    7. This paper serves as an excellent test case for improving mining sensitivity while maintaining specificity

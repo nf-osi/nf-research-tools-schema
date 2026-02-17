@@ -1,0 +1,219 @@
+publicationMetadata:
+  pmid: "40304934"
+  title: "Development of patient reported outcome measures assessing tumor pain intensity and tumor pain interference for individuals with neurofibromatosis type 1 and plexiform neurofibromas: qualitative findings."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study focused on creating patient-reported outcome measures (PROMs).
+    Expected tool types:
+    - Clinical assessment tools: The primary focus is developing and validating pain assessment instruments (PAINS-pNF, PII-pNF)
+    - Computational tools: Qualitative analysis software (NVivo) for transcript analysis
+    - Existing clinical assessment tools: NRS-11 and PII scales used as foundation for new instruments
+    
+    This publication type typically develops new clinical assessment tools and uses computational tools for data analysis.
+    No lab research tools (antibodies, cell lines, animal models) are expected given the qualitative, clinical nature.
+  overallAssessment: |
+    This publication is highly likely to contain research tools, specifically clinical assessment tools and computational analysis software.
+    The study develops new patient-reported outcome measures (PAINS-pNF and PII-pNF) and uses existing validated scales (NRS-11, PII).
+    Qualitative analysis software (NVivo) is used for transcript coding and thematic analysis. Clinical assessment tools are valid research tools
+    even without traditional laboratory methods, as they are validated instruments for measuring patient outcomes in clinical research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NVivo software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Qualitative concept elicitation data from transcripts were coded, analyzed using NVivo software, and thematic analysis was conducted using both deductive and inductive techniques."
+    whyMissed: "Computational tool for qualitative data analysis was not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Numeric Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "also provided feedback about existing pain measures (Numeric Rating Scale-11 and Pain Interference Index) assessing these domains (cognitive debriefing)"
+    whyMissed: "Established clinical assessment tool used as foundation for new instrument development was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NRS-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The self-report NRS-11 has been used in numerous studies, including as a primary outcome measure, to assess pain intensity. This reliable and valid measure has been recommended for use in clinical trials"
+    whyMissed: "Abbreviated form of Numeric Rating Scale-11, established pain assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Pain Interference Index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "also provided feedback about existing pain measures (Numeric Rating Scale-11 and Pain Interference Index) assessing these domains (cognitive debriefing)"
+    whyMissed: "Established clinical assessment tool used as foundation for new instrument development was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PII"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The PII is a 6-item questionnaire developed to assess the extent to which pain interferes with six different aspects of daily functioning on a 7-point Likert-type scale"
+    whyMissed: "Abbreviated form of Pain Interference Index, established pain interference assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PAINS-pNF"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "the measures' instructions, items, and formatting were modified to create the PAin INtensity Scale for plexiform neurofibromas (PAINS-pNF)"
+    whyMissed: "Newly developed clinical assessment tool was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PII-pNF"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "and the Pain Interference Index for plexiform neurofibromas (PII-pNF) for administration on a mobile app or web-based platform"
+    whyMissed: "Newly developed clinical assessment tool was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NVivo"
+    toolType: "computational_tool"
+    examples: ["analyzed using NVivo software"]
+    reasoning: "NVivo is a widely used qualitative data analysis software that should be captured when mentioned in research contexts"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}-\\d+\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["NRS-11", "SF-36", "EQ-5D"]
+    reasoning: "Many clinical assessment tools follow abbreviated naming conventions with letters and numbers"
+
+  - patternType: "context_phrase"
+    pattern: "(?:developed|created|modified).*(?:scale|index|measure|questionnaire|instrument)"
+    toolType: "clinical_assessment_tool"
+    examples: ["modified to create the PAin INtensity Scale", "developed to assess the extent"]
+    reasoning: "Phrases indicating development or modification of assessment instruments should trigger clinical tool detection"
+
+  - patternType: "context_phrase"
+    pattern: "(?:reliable|valid|validated).*(?:measure|scale|instrument|questionnaire)"
+    toolType: "clinical_assessment_tool"
+    examples: ["reliable and valid measure", "validated specifically to assess"]
+    reasoning: "References to reliability and validity are strong indicators of established clinical assessment tools"
+
+  - patternType: "term"
+    pattern: "(?:Pain Interference Index|Numeric Rating Scale)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Interference Index", "Numeric Rating Scale-11"]
+    reasoning: "Specific names of established clinical assessment tools should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "patient[- ]reported outcome measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcome measures", "patient reported outcome measures"]
+    reasoning: "PROM terminology is a strong indicator of clinical assessment tools"
+
+observations:
+  - resourceName: "PAINS-pNF"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PAINS-pNF (PAin INtensity Scale for plexiform neurofibromas) was developed through qualitative patient engagement
+      including concept elicitation and cognitive debriefing with 56 individuals (26 children, 30 adults) with NF1 and pNF.
+      The scale was modified based on patient feedback regarding difficulty comprehending some items and preferences for
+      alternative wording and formatting. It is designed for administration on mobile app or web-based platforms.
+    foundIn: "both"
+    contextSnippet: "Based on these qualitative results, the measures' instructions, items, and formatting were modified to create the PAin INtensity Scale for plexiform neurofibromas (PAINS-pNF)"
+    confidence: 0.95
+    doi: "10.1186/s41687-025-00877-2"
+
+  - resourceName: "PII-pNF"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PII-pNF (Pain Interference Index for plexiform neurofibromas) was developed through qualitative patient engagement
+      including concept elicitation and cognitive debriefing with 56 individuals (26 children, 30 adults) with NF1 and pNF.
+      The scale was modified based on patient feedback and is designed for administration on mobile app or web-based platforms.
+      It assesses how pain interferes with daily activities in NF1 patients with plexiform neurofibromas.
+    foundIn: "both"
+    contextSnippet: "and the Pain Interference Index for plexiform neurofibromas (PII-pNF) for administration on a mobile app or web-based platform"
+    confidence: 0.95
+    doi: "10.1186/s41687-025-00877-2"
+
+  - resourceName: "NRS-11"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The NRS-11 (Numeric Rating Scale-11) is a reliable and valid 0-10 pain intensity scale that has been recommended
+      for use in clinical trials by consensus groups and pain experts, suitable for individuals ≥8 years. In this study,
+      it was used as a foundation for developing the PAINS-pNF, with participants providing feedback about existing
+      pain measures during cognitive debriefing sessions.
+    foundIn: "methods"
+    contextSnippet: "The self-report NRS-11 has been used in numerous studies, including as a primary outcome measure, to assess pain intensity. This reliable and valid measure has been recommended for use in clinical trials"
+    confidence: 0.90
+    doi: "10.1186/s41687-025-00877-2"
+
+  - resourceName: "Pain Interference Index"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PII is a 6-item questionnaire that assesses the extent to which pain interferes with six different aspects
+      of daily functioning on a 7-point Likert-type scale from 0 (not at all) to 6 (completely). It is a reliable,
+      valid, feasible measure for chronically ill youth and adults, including those with NF1. It was used as a
+      foundation for developing the PII-pNF in this study.
+    foundIn: "methods"
+    contextSnippet: "The PII is a 6-item questionnaire developed to assess the extent to which pain interferes with six different aspects of daily functioning on a 7-point Likert-type scale"
+    confidence: 0.90
+    doi: "10.1186/s41687-025-00877-2"
+
+  - resourceName: "NVivo software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NVivo software was used for coding and analyzing qualitative concept elicitation data from interview transcripts.
+      Thematic analysis was conducted using both deductive and inductive techniques. The software facilitated the
+      systematic analysis of qualitative data from 56 participants across multiple waves of data collection.
+    foundIn: "methods"
+    contextSnippet: "Qualitative concept elicitation data from transcripts were coded, analyzed using NVivo software, and thematic analysis was conducted using both deductive and inductive techniques"
+    confidence: 0.95
+    doi: "10.1186/s41687-025-00877-2"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - Complete failure to detect clinical assessment tools: The mining system missed all 7 research tools present in this publication
+    - No patterns for clinical assessment tool detection: The system lacks patterns to identify established scales (NRS-11, PII) and newly developed instruments (PAINS-pNF, PII-pNF)
+    - Missing computational tool detection: NVivo qualitative analysis software was not captured
+    - Inadequate coverage of questionnaire/survey development studies: This publication type is rich in clinical assessment tools but was completely missed
+  recommendations: |
+    This publication demonstrates a critical gap in the mining system's ability to detect clinical assessment tools.
+    All 7 tools identified should be added to the database:
+    - 5 clinical assessment tools (NRS-11, Numeric Rating Scale-11, PII, Pain Interference Index, PAINS-pNF, PII-pNF)
+    - 1 computational tool (NVivo software)
+    
+    The suggested patterns should be implemented to improve detection of:
+    - Established clinical scales and questionnaires
+    - Newly developed patient-reported outcome measures
+    - Qualitative analysis software
+    - Assessment tool development terminology
+    
+    This publication type (questionnaire/survey development) should be prioritized for pattern development as it consistently
+    produces clinical assessment tools that are valuable research resources. The observations extracted provide important
+    usage instructions and validation information for these tools.

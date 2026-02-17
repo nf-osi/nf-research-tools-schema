@@ -1,0 +1,123 @@
+publicationMetadata:
+  pmid: "1946460"
+  title: "Identification and characterization of the neurofibromatosis type 1 protein product."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a molecular biology/biochemistry study from 1991 focused on protein characterization.
+    Expected tools include antibodies (antisera), cell lines for protein expression/detection, and potentially
+    genetic reagents (bacterially synthesized peptides, expression constructs). The study involves
+    immunoprecipitation, protein detection, subcellular fractionation, and proteolysis - all typical
+    lab research techniques requiring specific reagents and cell lines.
+  overallAssessment: |
+    This is a classic molecular biology study from 1991 characterizing the NF1 protein product using
+    biochemical approaches. The study clearly describes experimental work including antibody generation,
+    protein detection in cell lines, immunoprecipitation, and subcellular fractionation. Despite lacking
+    a formal Methods section (common in older publications), the abstract contains sufficient detail to
+    identify multiple research tools that were used experimentally.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "rabbit antisera to NF1-GRD"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "We have raised rabbit antisera to a bacterially synthesized 48-kDa peptide corresponding to the GAP-related domain of NF1 (NF1-GRD). These antisera immunoprecipitated the NF1-GRD peptide"
+    whyMissed: "The mining system may not have recognized 'rabbit antisera' as equivalent to 'antibody' - this is a legitimate antibody reagent that was developed and characterized in this study"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NIH 3T3"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The sera specifically detected a 280-kDa protein in lysates of mouse NIH 3T3 and human HeLa cells"
+    whyMissed: "Standard cell line nomenclature should have been detected - NIH 3T3 is a well-established mouse fibroblast cell line used experimentally"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "HeLa"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The sera specifically detected a 280-kDa protein in lysates of mouse NIH 3T3 and human HeLa cells"
+    whyMissed: "HeLa is one of the most famous cell lines in research - should be easily detected by standard cell line patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Schwannoma cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "NF1 was present in a large molecular mass complex in fibroblast and Schwannoma cell lines and appears to associate with a very large (400-500 kDa) protein in both cell types"
+    whyMissed: "Generic reference to 'Schwannoma cell lines' without specific names - mining patterns may require more specific cell line nomenclature"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "bacterially synthesized 48-kDa peptide"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have raised rabbit antisera to a bacterially synthesized 48-kDa peptide corresponding to the GAP-related domain of NF1 (NF1-GRD)"
+    whyMissed: "This represents a recombinant protein/peptide reagent that was synthesized for the study - genetic reagent patterns may not capture 'bacterially synthesized peptide' phrasing"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "rabbit antisera|rabbit antiserum|mouse antisera|mouse antiserum"
+    toolType: "antibody"
+    examples: ["rabbit antisera to a bacterially synthesized 48-kDa peptide"]
+    reasoning: "Antisera/antiserum are legitimate antibody reagents but may not be captured by patterns focused on 'antibody' terminology. This is especially important for older publications."
+
+  - patternType: "naming_convention"
+    pattern: "NIH 3T3|HeLa|HEK293|MCF-7|A549|U87|PC12"
+    toolType: "cell_line"
+    examples: ["mouse NIH 3T3 and human HeLa cells"]
+    reasoning: "Standard cell line names should be explicitly included in patterns. These are among the most commonly used cell lines in research."
+
+  - patternType: "context_phrase"
+    pattern: "bacterially synthesized.*peptide|recombinant.*peptide|expressed.*peptide"
+    toolType: "genetic_reagent"
+    examples: ["bacterially synthesized 48-kDa peptide corresponding to the GAP-related domain"]
+    reasoning: "Recombinant proteins and peptides are important genetic reagents that may be described with various synthesis terminology rather than standard cloning language."
+
+  - patternType: "context_phrase"
+    pattern: "raised.*antisera|generated.*antisera|produced.*antisera"
+    toolType: "antibody"
+    examples: ["We have raised rabbit antisera to a bacterially synthesized 48-kDa peptide"]
+    reasoning: "Context phrases indicating antibody development/generation are strong indicators of antibody tools being described."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Mining system appears to have missed standard cell lines (NIH 3T3, HeLa) and antibody reagents (rabbit antisera)
+    - Publication lacks formal Methods section but contains sufficient experimental detail in abstract
+    - This represents a significant mining failure for a classic molecular biology study
+  recommendations: |
+    This publication should have yielded multiple validated tools:
+    - At least 2-3 cell lines (NIH 3T3, HeLa, Schwannoma cell lines)
+    - At least 1 antibody reagent (rabbit antisera to NF1-GRD)
+    - Potentially 1 genetic reagent (bacterially synthesized NF1-GRD peptide)
+    
+    The complete absence of mined tools suggests major gaps in the mining patterns, particularly:
+    1. Recognition of "antisera" as antibody terminology
+    2. Detection of standard cell line names
+    3. Handling of older publication formats without formal Methods sections
+    
+    Recommended actions:
+    - Add the 4 suggested patterns to improve future mining
+    - Consider manual curation of this publication to capture missed tools
+    - Review mining performance on other 1990s publications for similar issues
+    - No observations could be extracted due to lack of Results/Discussion sections

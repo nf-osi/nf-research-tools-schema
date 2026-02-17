@@ -1,0 +1,168 @@
+publicationMetadata:
+  pmid: "39225289"
+  title: "Comparing 3D imaging devices for the measurement of cutaneous neurofibromas in patients with Neurofibromatosis Type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (imaging devices for outcome measurement), 
+    computational tools for statistical analysis. This study specifically compares 3D imaging 
+    systems as standardized outcome measures for clinical trials, which qualifies as clinical 
+    assessment tools. Statistical software (IBM SPSS) is also used for data analysis.
+  overallAssessment: |
+    This clinical study compares three 3D imaging devices (Vectra-H1, LifeViz-Micro, Cherry-Imaging) 
+    for measuring cutaneous neurofibromas as standardized outcome measures in NF1 clinical trials. 
+    The imaging devices function as clinical assessment tools for objective measurement of tumor 
+    characteristics. Statistical analysis software (IBM SPSS) is also used, representing a 
+    computational tool. Tools are expected and present in this publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Vectra-H1"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images of up to eight cNFs from each participant were captured and analysed using each 3D imaging system: Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA)"
+    whyMissed: "3D imaging device used as standardized outcome measure for clinical assessment - should be captured as clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "LifeViz-Micro"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images of up to eight cNFs from each participant were captured and analysed using each 3D imaging system: Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA), LifeViz Micro (QuantifiCare, Biot, France)"
+    whyMissed: "3D imaging device used as standardized outcome measure for clinical assessment - should be captured as clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Cherry-Imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images of up to eight cNFs from each participant were captured and analysed using each 3D imaging system: Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA), LifeViz Micro (QuantifiCare, Biot, France) and Cherry Imaging (Yokneam, Israel)"
+    whyMissed: "3D imaging device used as standardized outcome measure for clinical assessment - should be captured as clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "IBM SPSS Statistics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were conducted using IBM SPSS Statistics (version 27.01). Friedman tests and Dunn–Bonferroni post hoc tests were performed"
+    whyMissed: "Statistical analysis software with specific version number - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "3D imaging system|3D imaging device|imaging system"
+    toolType: "clinical_assessment_tool"
+    examples: ["Vectra H1 3D imaging system", "LifeViz Micro imaging system", "Cherry Imaging system"]
+    reasoning: "3D imaging devices used for clinical outcome measurement should be captured as clinical assessment tools, especially when used for standardized measurements in clinical trials"
+
+  - patternType: "context_phrase"
+    pattern: "captured and analysed using|measured using|imaged using|assessed using.*imaging"
+    toolType: "clinical_assessment_tool"
+    examples: ["captured and analysed using each 3D imaging system", "measured using imaging systems"]
+    reasoning: "Context phrases indicating use of imaging devices for clinical measurement and assessment"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*Inc[^)]*\\)|\\([^)]*France[^)]*\\)|\\([^)]*Israel[^)]*\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["(Canfield Scientific Inc, Fairfield, NJ, USA)", "(QuantifiCare, Biot, France)", "(Yokneam, Israel)"]
+    reasoning: "Vendor information in parentheses often indicates commercial tools/devices being used in research"
+
+  - patternType: "term"
+    pattern: "IBM SPSS Statistics|SPSS|statistical software"
+    toolType: "computational_tool"
+    examples: ["IBM SPSS Statistics (version 27.01)"]
+    reasoning: "Statistical analysis software should be captured as computational tools, especially when version numbers are specified"
+
+observations:
+  - resourceName: "Vectra-H1"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Vectra-H1 demonstrated excellent reliability for measuring cutaneous neurofibromas. 
+      Better suited for imaging larger areas compared to smaller individual lesions. 
+      Unable to provide tumor height measurements unlike other systems. 
+      Showed no significant difference in accuracy for length or surface area measurements 
+      compared to other devices (p > 0.05).
+    foundIn: "both"
+    contextSnippet: "There was no significant difference in accuracy between the three devices for length or surface area measurements (p > 0.05)... LifeViz-Micro was better for imaging smaller number of cNFs (1-3), Vectra-H1 better for larger areas"
+    confidence: 0.85
+    doi: "e70020"
+
+  - resourceName: "LifeViz-Micro"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      LifeViz-Micro demonstrated the least measurement variability for surface area measurements 
+      and fastest image capture and analysis times. Better suited for imaging smaller numbers 
+      of cutaneous neurofibromas (1-3 lesions). Showed excellent reliability and precision 
+      similar to other devices. Previously used in past NF1 studies measuring cNFs.
+    foundIn: "both"
+    contextSnippet: "Volume measurements demonstrated the most variability compared to other measurements; LifeViz-Micro demonstrated the least measurement variability for surface area and image capture and analysis were fastest with LifeViz-Micro"
+    confidence: 0.90
+    doi: "e70020"
+
+  - resourceName: "Cherry-Imaging"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Cherry-Imaging system better suited for imaging uneven surfaces compared to other devices. 
+      Showed excellent reliability similar to other systems. Contraindicated in patients with 
+      history of epilepsy and severe migraines. Measurements accessed via debug console to 
+      obtain millimeter units (default was centimeters).
+    foundIn: "both"
+    contextSnippet: "LifeViz-Micro was better for imaging smaller number of cNFs (1-3), Vectra-H1 better for larger areas and Cherry for uneven surfaces... Participants were excluded if they had a history of epilepsy and severe migraines, as this is a contraindication for Cherry Imaging"
+    confidence: 0.85
+    doi: "e70020"
+
+  - resourceName: "IBM SPSS Statistics"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      IBM SPSS Statistics version 27.01 used for statistical analyses including Friedman tests 
+      and Dunn-Bonferroni post hoc tests for comparing measurements between imaging systems. 
+      Also used for Wilcoxon signed-rank tests and intraclass correlation coefficient (ICC) 
+      calculations for reliability assessment.
+    foundIn: "both"
+    contextSnippet: "Statistical analyses were conducted using IBM SPSS Statistics (version 27.01). Friedman tests and Dunn–Bonferroni post hoc tests were performed to assess accuracy... The intra- and inter-rater reliability for image acquisition was assessed using intraclass correlation coefficients (ICC)"
+    confidence: 0.95
+    doi: "e70020"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 4
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear presence of research tools
+    - Three 3D imaging devices (Vectra-H1, LifeViz-Micro, Cherry-Imaging) used as clinical assessment tools were completely missed
+    - Statistical analysis software (IBM SPSS Statistics v27.01) was not captured as computational tool
+    - Mining patterns appear inadequate for capturing clinical imaging devices and statistical software
+  recommendations: |
+    All four missed tools should be added to the database:
+    1. Vectra-H1 (clinical assessment tool) - 3D imaging device for standardized outcome measurement
+    2. LifeViz-Micro (clinical assessment tool) - 3D imaging device with fastest analysis time
+    3. Cherry-Imaging (clinical assessment tool) - 3D imaging device best for uneven surfaces
+    4. IBM SPSS Statistics v27.01 (computational tool) - statistical analysis software
+    
+    The mining patterns need significant improvement to capture:
+    - 3D imaging systems used for clinical assessment
+    - Statistical software with version numbers
+    - Vendor information as tool indicators
+    - Clinical measurement devices used as outcome measures
+    
+    This represents a major gap in clinical assessment tool detection, as the entire purpose 
+    of this study was to evaluate these imaging devices as standardized tools for clinical trials.

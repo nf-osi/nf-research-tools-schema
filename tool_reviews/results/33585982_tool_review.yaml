@@ -1,0 +1,219 @@
+publicationMetadata:
+  pmid: "33585982"
+  title: "Integrated molecular and clinical analysis of low-grade gliomas in children with neurofibromatosis type 1 (NF1)."
+  queryType: "unknown"  # Not specified in input (NaN)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive molecular biology study investigating FGFR1 mutations in low-grade gliomas.
+    Based on the extensive Methods section, it should contain multiple tool categories:
+    - Cell lines (HEK293, HOG, MO3.13 mentioned in methods)
+    - Antibodies (extensive list in reagents table)
+    - Genetic reagents (plasmids, vectors, primers)
+    - Computational tools (R, ImageJ, STAR, limma, etc.)
+    - Various molecular biology reagents and chemicals
+    
+    The publication includes BioID-MS experiments, CRISPR genome editing, RNA-seq analysis,
+    western blotting, immunofluorescence, and other advanced molecular techniques.
+  overallAssessment: |
+    This is a high-quality lab research publication that extensively uses research tools across multiple categories.
+    The Methods section contains a comprehensive "Reagents and tools table" listing dozens of research tools
+    with catalog numbers and vendors. The complete absence of mined tools (0 tools) represents a major
+    mining failure, as this publication clearly contains numerous antibodies, cell lines, genetic reagents,
+    and computational tools that should have been detected.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HEK293 T-REx Flp-In"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The Flp-In T-REx HEK293 (Thermo Fisher®) cell line was purchased from Thermo Fisher Scientific"
+    whyMissed: "Standard cell line name with vendor information - should be detected by cell line patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HOG"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human Oligodendroglioma (HOG) cell line and the MO3.13 hybrid cell line were generous gifts"
+    whyMissed: "Human oligodendroglioma cell line - standard cell line nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MO3.13"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MO3.13 hybrid cell line were generous gifts from Dr. Lopez Guerrero and Dr. Querol Gutierrez"
+    whyMissed: "Standard cell line naming convention - should be detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-FLAG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-FLAG Merck #F3165"
+    whyMissed: "Standard antibody naming with catalog number - should be detected by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-FGFR1"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-FGFR1 Abcam #ab76464"
+    whyMissed: "Standard antibody naming with vendor and catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-phospho-FGFR1 Tyr653/654"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-phospho-FGFR1 Tyr653/654 Cell Signaling Technology #52928"
+    whyMissed: "Phospho-specific antibody with full vendor information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pDONR-223 vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "pDONR-223 vector Addgene"
+    whyMissed: "Standard plasmid naming convention with repository information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PX458 vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "PX458 vector Addgene #48138"
+    whyMissed: "CRISPR plasmid with Addgene catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "R software v4.3.3 https://www.r-project.org/"
+    whyMissed: "Standard computational tool with version and URL"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ImageJ software https://imagej.net/ij/"
+    whyMissed: "Well-known image analysis software with URL"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "STAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "STAR v2.7.0a"
+    whyMissed: "RNA-seq alignment tool with version number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "limma"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "limma package version 1.8.2 Bioconductor"
+    whyMissed: "R/Bioconductor package with version and repository"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SAINTexpress"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SAINTexpress v3.6.1 Teo et al, 2014"
+    whyMissed: "Proteomics analysis software with version and citation"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AlphaFold 3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "AlphaFold 3 DeepMind"
+    whyMissed: "Protein structure prediction tool with developer"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "Reagents and tools table"
+    toolType: "general"
+    examples: ["Reagents and tools table Reagent/resource Reference or source Identifier or catalog number"]
+    reasoning: "This publication has a comprehensive reagents table that lists tools systematically - mining should specifically target such structured tool listings"
+
+  - patternType: "vendor_indicator"
+    pattern: "Thermo Fisher #[A-Z0-9]+"
+    toolType: "general"
+    examples: ["Thermo Fisher # R78007", "Thermofisher #21126"]
+    reasoning: "Vendor names with catalog numbers are strong indicators of research tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "Addgene #[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["Addgene #48138"]
+    reasoning: "Addgene catalog numbers specifically indicate plasmids and genetic reagents"
+
+  - patternType: "vendor_indicator"
+    pattern: "Cell Signaling Technology #[0-9]+"
+    toolType: "antibody"
+    examples: ["Cell Signaling Technology #52928", "CST #5690"]
+    reasoning: "CST is a major antibody vendor - catalog numbers indicate antibodies"
+
+  - patternType: "naming_convention"
+    pattern: "Anti-[A-Z0-9]+\\s+[A-Za-z]+\\s+#[A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["Anti-FLAG Merck #F3165", "Anti-FGFR1 Abcam #ab76464"]
+    reasoning: "Standard antibody naming pattern with vendor and catalog number"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z0-9-]+\\s+vector"
+    toolType: "genetic_reagent"
+    examples: ["pDONR-223 vector", "PX458 vector"]
+    reasoning: "Standard plasmid naming convention with 'vector' keyword"
+
+  - patternType: "term"
+    pattern: "v[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["R software v4.3.3", "SAINTexpress v3.6.1", "STAR v2.7.0a"]
+    reasoning: "Version numbers are strong indicators of software tools"
+
+  - patternType: "context_phrase"
+    pattern: "purchased from|obtained from|generous gifts from"
+    toolType: "general"
+    examples: ["purchased from Thermo Fisher Scientific", "generous gifts from Dr. Lopez Guerrero"]
+    reasoning: "These phrases indicate tool acquisition and usage"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL MINING FAILURE: This publication contains extensive research tools but 0 were mined
+    - The Methods section includes a comprehensive "Reagents and tools table" with dozens of tools
+    - Multiple tool categories are present: cell lines, antibodies, genetic reagents, computational tools
+    - All tools have proper vendor information, catalog numbers, and standard naming conventions
+    - This represents a complete failure of the mining system to detect obvious research tools
+  recommendations: |
+    - URGENT: Investigate why mining completely failed for this publication
+    - The Methods section is extremely well-structured with a formal reagents table
+    - All major tool categories should have been detected (antibodies, cell lines, genetic reagents, software)
+    - Implement the suggested patterns to catch vendor/catalog number combinations
+    - Add specific patterns for structured reagent tables
+    - This publication should serve as a positive control for mining validation
+    - Consider manual curation of this publication as it contains high-quality tool information
+    - The 14 potentially missed tools represent only a fraction of the actual tools present
+    - Full manual review would likely identify 50+ research tools in this publication

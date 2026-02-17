@@ -1,0 +1,146 @@
+publicationMetadata:
+  pmid: "40352015"
+  title: "Development of a Machine Learning Algorithm for the Prediction of WHO Grade 1 Meningioma Recurrence."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, programming languages, machine learning frameworks)
+    - Statistical analysis tools
+    - Data processing and modeling software
+    
+    This is a machine learning study developing a predictive algorithm, so computational tools
+    are highly expected. The methods section mentions specific techniques (Risk-SLIM, cross-validation)
+    and Python programming, indicating active use of computational tools for analysis.
+  overallAssessment: |
+    This is a bioinformatics/machine learning study that developed a predictive algorithm for meningioma
+    recurrence. Such studies typically use multiple computational tools including programming languages,
+    statistical software, and machine learning frameworks. The methods section confirms use of Python
+    and specific modeling techniques, indicating genuine computational tool usage.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All statistics and models were conducted in Python version 3.10 (Python Software Foundation, Wilmington, Delaware, US)."
+    whyMissed: "Python with specific version (3.10) and vendor information was mentioned but not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Risk-SLIM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A new modeling method known as the Risk-Calibrated Superspase Linear Integer Model (Risk-SLIM) was created to reduce the variability in risk assessment using machine learning techniques."
+    whyMissed: "Specific machine learning algorithm/method mentioned as being used for model creation"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "five-fold cross-validation"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we used a Risk-calibrated Superspase Linear Integer Model (Risk-SLIM) with a five-fold cross-validation (CV) to create a predictive model"
+    whyMissed: "Statistical validation technique specifically mentioned as part of the methodology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ROC curve"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A receiver operating characteristic (ROC) curve was conducted to evaluate the predictive ability of the proposed model."
+    whyMissed: "Statistical analysis method used for model evaluation"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Mann-Whitney U test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Continuous and categorical variables were initially analyzed using either the Mann-Whitney U test or Fisher's exact test."
+    whyMissed: "Statistical test method specifically mentioned as being used for analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Fisher's exact test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Continuous and categorical variables were initially analyzed using either the Mann-Whitney U test or Fisher's exact test."
+    whyMissed: "Statistical test method specifically mentioned as being used for analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Python version [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Python version 3.10"]
+    reasoning: "Programming languages with version numbers are clear computational tools and should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "conducted in [A-Z][a-z]+ version"
+    toolType: "computational_tool"
+    examples: ["conducted in Python version 3.10"]
+    reasoning: "Phrase pattern indicating software usage with version specification"
+
+  - patternType: "term"
+    pattern: "Risk-SLIM|Risk-Calibrated Superspase Linear Integer Model"
+    toolType: "computational_tool"
+    examples: ["Risk-SLIM", "Risk-Calibrated Superspase Linear Integer Model"]
+    reasoning: "Specific machine learning algorithms and methods should be captured as computational tools"
+
+  - patternType: "term"
+    pattern: "cross-validation|CV"
+    toolType: "computational_tool"
+    examples: ["five-fold cross-validation", "five-fold CV"]
+    reasoning: "Statistical validation techniques are computational methods that should be captured"
+
+  - patternType: "term"
+    pattern: "ROC curve|receiver operating characteristic"
+    toolType: "computational_tool"
+    examples: ["ROC curve", "receiver operating characteristic (ROC) curve"]
+    reasoning: "Statistical analysis methods for model evaluation should be captured"
+
+  - patternType: "term"
+    pattern: "Mann-Whitney U test|Fisher's exact test"
+    toolType: "computational_tool"
+    examples: ["Mann-Whitney U test", "Fisher's exact test"]
+    reasoning: "Statistical tests are computational analysis tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|conducted using|performed using"
+    toolType: "computational_tool"
+    examples: ["analyzed using either the Mann-Whitney U test", "conducted to evaluate"]
+    reasoning: "Context phrases indicating active use of statistical/computational methods"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No computational tools were mined despite this being a clear bioinformatics/machine learning study
+    - Python version 3.10 with vendor information was explicitly mentioned but not captured
+    - Multiple statistical methods and machine learning techniques were used but not identified
+    - The mining patterns appear to miss computational tools in bioinformatics contexts
+  recommendations: |
+    This publication represents a significant gap in computational tool mining. Despite being a 
+    bioinformatics study that explicitly uses Python, machine learning algorithms, and statistical
+    methods, zero tools were captured. The following should be addressed:
+    
+    1. Add patterns for programming languages with version numbers (Python 3.10)
+    2. Include machine learning algorithm names (Risk-SLIM) as computational tools
+    3. Capture statistical methods (cross-validation, ROC curves, statistical tests)
+    4. Improve context phrase detection for "analyzed using", "conducted in", etc.
+    
+    All 6 potentially missed tools should be added as they represent genuine computational
+    tools used in the analysis. The suggested patterns would significantly improve mining
+    accuracy for bioinformatics and machine learning publications.

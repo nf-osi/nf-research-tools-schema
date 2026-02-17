@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "8544190"
+  title: "Characterisation of germline mutations in the neurofibromatosis type 1 (NF1) gene."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - molecular genetics research with SSCP/HA techniques
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (molecular genetics research):
+    - Genetic reagents (primers, probes, microsatellite markers)
+    - Computational tools (sequence analysis software, mutation detection tools)
+    - Potentially antibodies (for protein analysis, though not evident in abstract)
+    - Cell lines (for functional studies, though not evident in abstract)
+    
+    The abstract mentions specific molecular techniques (SSCP, heteroduplex analysis, microsatellite markers)
+    which typically require specialized reagents and equipment. However, only abstract is available,
+    limiting tool detection capability.
+  overallAssessment: |
+    This is a molecular genetics research paper focused on mutation detection in the NF1 gene using
+    laboratory techniques like SSCP and heteroduplex analysis. Such studies typically use genetic
+    reagents (primers, markers) and computational tools for sequence analysis. The lack of full-text
+    sections significantly limits tool detection, but the research type strongly suggests tool usage.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "single strand conformation polymorphism (SSCP)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have identified five new mutations using single strand conformation polymorphism (SSCP) and heteroduplex analysis (HA)"
+    whyMissed: "SSCP is a molecular technique that requires specific reagents and protocols, but may not have been recognized as a 'tool' by the mining algorithm"
+    confidence: 0.7  # Moderate confidence - it's a technique rather than a specific reagent
+    shouldBeAdded: Maybe
+    
+  - toolName: "heteroduplex analysis (HA)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have identified five new mutations using single strand conformation polymorphism (SSCP) and heteroduplex analysis (HA)"
+    whyMissed: "HA is a molecular technique for mutation detection, but may not have been recognized as a specific tool"
+    confidence: 0.7  # Moderate confidence - it's a technique rather than a specific reagent
+    shouldBeAdded: Maybe
+    
+  - toolName: "microsatellite markers"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "three intragenic deletions with the microsatellite markers"
+    whyMissed: "Microsatellite markers are specific genetic reagents used for mapping and deletion detection"
+    confidence: 0.9  # High confidence - these are specific molecular tools
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "microsatellite markers?"
+    toolType: "genetic_reagent"
+    examples: ["microsatellite markers"]
+    reasoning: "Microsatellite markers are commonly used genetic reagents for mapping and mutation detection studies"
+    
+  - patternType: "context_phrase"
+    pattern: "(using|with|by) (single strand conformation polymorphism|SSCP)"
+    toolType: "genetic_reagent"
+    examples: ["using single strand conformation polymorphism (SSCP)"]
+    reasoning: "SSCP is a standard molecular technique that could be captured when mentioned in usage context"
+    
+  - patternType: "context_phrase"
+    pattern: "(using|with|by) (heteroduplex analysis|HA)"
+    toolType: "genetic_reagent"
+    examples: ["using single strand conformation polymorphism (SSCP) and heteroduplex analysis (HA)"]
+    reasoning: "Heteroduplex analysis is a molecular technique for mutation detection that should be captured in usage context"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # SSCP, HA, and microsatellite markers
+  newPatternsCount: 3  # Patterns for microsatellite markers, SSCP, and HA
+  observationsExtracted: 0  # No observations possible without validated tools and full text
+  observationsByType: {}
+  majorIssuesFound: |
+    - Only abstract text available - no Methods, Introduction, Results, or Discussion sections
+    - Limited ability to detect tools without full experimental details
+    - No tools were initially mined despite this being molecular genetics research
+    - Molecular techniques mentioned (SSCP, HA, microsatellite markers) were not captured as tools
+  recommendations: |
+    This publication represents molecular genetics research that likely uses genetic reagents and
+    computational tools, but the mining captured no tools. The most significant missed tool is
+    "microsatellite markers" which are specific genetic reagents. SSCP and heteroduplex analysis
+    are techniques that may or may not qualify as "tools" depending on interpretation.
+    
+    Key recommendations:
+    1. Add "microsatellite markers" as a genetic reagent - high confidence
+    2. Consider whether molecular techniques like SSCP and HA should be captured as tools
+    3. Full-text access would significantly improve tool detection for this type of research
+    4. The absence of any mined tools from a clear lab research paper suggests mining patterns
+       may need improvement for molecular genetics terminology

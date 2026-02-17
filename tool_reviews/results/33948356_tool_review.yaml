@@ -1,0 +1,91 @@
+publicationMetadata:
+  pmid: "33948356"
+  title: "Cordycepin inhibits the proliferation of malignant peripheral nerve sheath tumor cells through the p53/Sp1/tubulin pathway."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence based on cell line testing mentioned
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract mentioning "MPNST cell lines" and pathway analysis (p53/Sp1/tubulin), 
+    this lab research study would be expected to contain:
+    - Cell lines (MPNST cell lines mentioned)
+    - Potentially antibodies (for pathway protein detection)
+    - Potentially computational tools (for data analysis)
+    - Potentially genetic reagents (for pathway manipulation)
+    
+    However, only the abstract is available, which limits tool detection. Full methods 
+    section would likely contain specific cell line names, antibodies, and experimental reagents.
+  overallAssessment: |
+    This is clearly a laboratory research study testing cordycepin's anti-proliferative effects 
+    on MPNST cell lines and investigating the p53/Sp1/tubulin pathway. Such studies typically 
+    use multiple research tools including specific cell lines, antibodies for protein detection, 
+    and various reagents. However, with only the abstract available, specific tool identification 
+    is severely limited.
+
+toolValidations: []
+  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we evaluated cordycepin's anti-proliferative effect on MPNST cell lines both..."
+    whyMissed: "Generic mention of 'MPNST cell lines' without specific cell line names - mining patterns likely require specific nomenclature"
+    confidence: 0.8  # High confidence these are real tools but generic mention
+    shouldBeAdded: Maybe
+  - toolName: "cordycepin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Cordycepin or 3'-deoxyadenosine is an extract from cordyceps militaris, which has been reported as an anti-inflammation and anti-tumor agent"
+    whyMissed: "Cordycepin (3'-deoxyadenosine) is a specific chemical compound/reagent used experimentally, but may not match standard genetic reagent patterns"
+    confidence: 0.7  # Moderate confidence - could be considered a chemical reagent
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "cell lines both"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines both"]
+    reasoning: "The phrase 'cell lines both' suggests experimental testing on multiple cell lines, indicating actual tool usage rather than just citation"
+  - patternType: "term"
+    pattern: "cordycepin|3'-deoxyadenosine"
+    toolType: "genetic_reagent"
+    examples: ["Cordycepin or 3'-deoxyadenosine"]
+    reasoning: "Specific chemical compounds used as experimental agents should be captured as genetic reagents, especially when described as extracts used for treatment"
+  - patternType: "context_phrase"
+    pattern: "anti-proliferative effect on .+ cell lines"
+    toolType: "cell_line"
+    examples: ["anti-proliferative effect on MPNST cell lines"]
+    reasoning: "This pattern indicates experimental testing on cell lines, suggesting actual tool usage in proliferation assays"
+
+observations: []
+  # No observations can be extracted since only abstract is available and no tools were validated
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # MPNST cell lines and cordycepin
+  newPatternsCount: 3  # Three new patterns suggested
+  observationsExtracted: 0  # No observations possible from abstract only
+  observationsByType: {}
+  majorIssuesFound: |
+    - Only abstract available - no Methods, Results, or Discussion sections
+    - Generic mention of "MPNST cell lines" without specific cell line names
+    - Potential chemical reagent (cordycepin) not captured by current mining patterns
+    - Limited context prevents detailed tool validation
+    - Full text would likely contain specific cell line names, antibodies, and experimental details
+  recommendations: |
+    This publication appears to be legitimate laboratory research that would contain multiple 
+    research tools, but the abstract-only availability severely limits tool detection. The 
+    mining patterns should be enhanced to capture:
+    1. Generic cell line mentions when in experimental context ("cell lines both")
+    2. Chemical compounds used as experimental agents (cordycepin/3'-deoxyadenosine)
+    3. Context phrases indicating actual experimental usage vs. citation
+    
+    For future similar cases, consider flagging publications with experimental language 
+    but no specific tools detected for manual review, as they may contain tools not 
+    captured by current patterns. The full text of this paper would likely yield 
+    multiple validated tools including specific MPNST cell line names and experimental reagents.

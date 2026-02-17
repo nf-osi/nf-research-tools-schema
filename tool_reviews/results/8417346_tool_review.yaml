@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "8417346"
+  title: "A conserved alternative splice in the von Recklinghausen neurofibromatosis (NF1) gene produces two neurofibromin isoforms, both of which have GTPase-activating protein activity."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This 1993 molecular biology paper describes sequence analysis, PCR amplification, yeast expression 
+    experiments, and functional assays. Expected tools include:
+    - Genetic reagents (PCR primers, expression constructs)
+    - Computational tools (sequence analysis software, GenBank)
+    - Cell lines/organisms (yeast strains for expression studies)
+    - Potentially antibodies for protein detection (though not mentioned in abstract)
+  overallAssessment: |
+    This is a classic molecular biology research paper that would typically use multiple research tools.
+    The study involves PCR amplification, sequence analysis, yeast expression systems, and functional
+    assays - all requiring specific reagents and tools. However, only the abstract is available, limiting
+    tool detection to high-level mentions. The absence of Methods section significantly hampers comprehensive
+    tool identification, as detailed protocols would contain specific reagent information.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "RNA polymerase chain reaction"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Using the RNA polymerase chain reaction with primers flanking the NF1-GRD, we have identified evidence for alternative splicing"
+    whyMissed: "PCR is a fundamental molecular biology technique that should be captured as a genetic reagent/method"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "primers flanking the NF1-GRD"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Using the RNA polymerase chain reaction with primers flanking the NF1-GRD, we have identified evidence"
+    whyMissed: "Specific primers are genetic reagents essential for PCR amplification"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "GenBank"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "GenBank searches have failed to identify significant similarity between the inserted sequence and known DNA or protein sequences"
+    whyMissed: "GenBank is a major sequence database used for computational analysis"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "yeast expression system"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Yeast expression experiments have confirmed that a 381-amino-acid segment of neurofibromin...Expression studies in yeasts show"
+    whyMissed: "Yeast strains used for heterologous protein expression are important model organisms/cell lines"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "RNA polymerase chain reaction|PCR"
+    toolType: "genetic_reagent"
+    examples: ["RNA polymerase chain reaction with primers"]
+    reasoning: "PCR is a fundamental molecular biology technique that should be consistently captured"
+
+  - patternType: "context_phrase"
+    pattern: "primers flanking|primers specific to|oligonucleotide primers"
+    toolType: "genetic_reagent"
+    examples: ["primers flanking the NF1-GRD"]
+    reasoning: "Primer mentions with specific targeting context indicate genetic reagents"
+
+  - patternType: "term"
+    pattern: "GenBank|NCBI|sequence database"
+    toolType: "computational_tool"
+    examples: ["GenBank searches"]
+    reasoning: "Major sequence databases are computational tools used for analysis"
+
+  - patternType: "context_phrase"
+    pattern: "yeast expression|expression in yeast|yeast complementation"
+    toolType: "cell_line"
+    examples: ["yeast expression experiments", "Expression studies in yeasts"]
+    reasoning: "Yeast expression systems are important model organisms for functional studies"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+[0-9]+ gene|[A-Z]+[0-9]+ protein"
+    toolType: "general"
+    examples: ["NF1 gene", "IRA1", "IRA2"]
+    reasoning: "Need to distinguish gene/protein names from actual tools - these should generally be excluded unless in tool context"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - Methods section would contain detailed tool information
+    - Mining patterns appear to miss fundamental molecular biology techniques (PCR, primers)
+    - Database searches (GenBank) not captured as computational tools
+    - Yeast expression systems not recognized as model organisms/cell lines
+  recommendations: |
+    This publication clearly uses research tools but none were detected by the mining system.
+    Key recommendations:
+    1. Add patterns for fundamental molecular biology techniques (PCR, primers, cloning)
+    2. Include major sequence databases (GenBank, NCBI) as computational tools
+    3. Recognize yeast expression systems as model organisms
+    4. Improve detection of genetic reagents mentioned in experimental context
+    5. Consider that 1993 papers may use different terminology than modern publications
+    
+    The mining system needs significant improvement for detecting basic molecular biology tools.
+    This represents a major gap in tool coverage for fundamental research techniques.
+    
+    No observations were extracted as only the abstract was available and no tools were validated.
+    Full-text access would be needed for comprehensive observation extraction.

@@ -1,0 +1,124 @@
+publicationMetadata:
+  pmid: "35467749"
+  title: "Selumetinib in children with neurofibromatosis type 1 and asymptomatic inoperable plexiform neurofibroma at risk for developing tumor-related morbidity."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (patient-reported outcomes, functional measures), 
+    computational tools for imaging analysis (volumetric MRI analysis mentioned).
+    
+    This is a phase II clinical trial with clinical trial registration NCT01362803. Such studies
+    typically use validated clinical assessment tools to measure patient outcomes, functional
+    status, and treatment response. The mention of "volumetric magnetic resonance imaging analysis"
+    suggests computational tools for image processing and volume measurement.
+  overallAssessment: |
+    This is a phase II clinical trial evaluating selumetinib treatment in children with NF1.
+    Clinical trials routinely use validated assessment tools including patient-reported outcome
+    measures (PROs), functional assessments, and imaging analysis software. The study mentions
+    "patient-reported (PRO), observer-reported, and functional outcome measures" which are
+    legitimate clinical assessment tools that should have been captured by mining algorithms.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Patient-Reported Outcome Measures (PRO)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...outcome assessments, including patient-reported (PRO), observer-reported, and functional outcome measures were performed every 4 cycles..."
+    whyMissed: "Generic term 'PRO' used instead of specific validated instrument names. Mining patterns may not capture abbreviated forms or general categories."
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "Observer-Reported Outcome Measures"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...outcome assessments, including patient-reported (PRO), observer-reported, and functional outcome measures were performed every 4 cycles..."
+    whyMissed: "Generic term without specific instrument name. Clinical assessment tools often mentioned generically in abstracts."
+    confidence: 0.7
+    shouldBeAdded: Maybe
+    
+  - toolName: "Functional Outcome Measures"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...outcome assessments, including patient-reported (PRO), observer-reported, and functional outcome measures were performed every 4 cycles..."
+    whyMissed: "Generic functional assessment category. Specific validated instruments not named in available text."
+    confidence: 0.7
+    shouldBeAdded: Maybe
+    
+  - toolName: "Volumetric Magnetic Resonance Imaging Analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Volumetric magnetic resonance imaging analysis and outcome assessments, including patient-reported (PRO)..."
+    whyMissed: "Computational analysis method mentioned but specific software/algorithm not named. May require more detailed methods section to identify specific tools."
+    confidence: 0.6
+    shouldBeAdded: Maybe
+    
+  - toolName: "Target Tumor Pain Assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "...Approximately half of the children rated having some target tumor pain at baseline, which significantly decreased by pre-cycle 13..."
+    whyMissed: "Pain assessment mentioned but specific pain scale or instrument not identified. Could be VAS, NRS, or other validated pain measure."
+    confidence: 0.5
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome|PRO measures?|observer-reported"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported (PRO)", "PRO measures indicated"]
+    reasoning: "Clinical trials frequently use abbreviated forms (PRO) for patient-reported outcomes. These are legitimate clinical assessment tools even when not named specifically."
+    
+  - patternType: "context_phrase"
+    pattern: "functional outcome measures?|functional assessments?"
+    toolType: "clinical_assessment_tool"
+    examples: ["functional outcome measures were performed"]
+    reasoning: "Functional assessments are standard clinical tools in NF1 trials to measure motor, visual, and other functional domains."
+    
+  - patternType: "context_phrase"
+    pattern: "volumetric.*imaging analysis|volumetric.*MRI analysis"
+    toolType: "computational_tool"
+    examples: ["Volumetric magnetic resonance imaging analysis"]
+    reasoning: "Volumetric analysis requires specialized software for image processing and volume calculation, representing computational tools."
+    
+  - patternType: "context_phrase"
+    pattern: "pain.*rated|pain.*assessment|tumor pain"
+    toolType: "clinical_assessment_tool"
+    examples: ["children rated having some target tumor pain"]
+    reasoning: "Pain rating/assessment implies use of validated pain scales (VAS, NRS, etc.) which are clinical assessment tools."
+
+observations:
+  # No validated tools to extract observations from since no tools were mined and 
+  # potentially missed tools are uncertain without specific instrument names
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this clinical trial despite clear evidence of clinical assessment tool usage
+    - Generic terms used for assessment tools (PRO, functional measures) without specific instrument names
+    - Computational tools for volumetric imaging analysis mentioned but not captured
+    - Pain assessment methods referenced but specific scales not identified
+    - Mining patterns may be too restrictive for clinical trial terminology
+  recommendations: |
+    This publication represents a significant gap in clinical assessment tool mining. The study clearly
+    uses patient-reported outcomes, functional assessments, and imaging analysis tools but none were
+    captured. Recommendations:
+    
+    1. Expand patterns to capture generic clinical assessment terms (PRO, functional measures)
+    2. Include computational imaging analysis patterns (volumetric analysis)
+    3. Add pain assessment detection patterns
+    4. Consider that clinical trials often use abbreviated or generic terms for validated instruments
+    5. Manual review recommended to identify specific instruments used (may require full text access)
+    
+    The absence of any mined tools from a clinical trial is concerning and suggests systematic
+    under-detection of clinical assessment tools. Future mining should be more sensitive to
+    clinical trial terminology and assessment categories.

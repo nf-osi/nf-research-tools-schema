@@ -1,0 +1,101 @@
+publicationMetadata:
+  pmid: "26478990"
+  title: "A novel diagnostic method to detect truncated neurofibromin in neurofibromatosis 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content analysis:
+    - Primary expectation: antibodies (for Western blot analysis mentioned in abstract)
+    - Secondary expectation: genetic reagents (for mutation analysis)
+    - Possible: computational tools (for genetic analysis)
+    
+    The abstract explicitly mentions "Western blot analysis was carried out on protein extracts 
+    from patients' leukocytes" which strongly indicates antibody usage, even though no Methods 
+    section is present. This is a diagnostic method development study that should contain 
+    laboratory tools.
+  overallAssessment: |
+    This publication describes development of a diagnostic Western blot method to detect truncated 
+    neurofibromin protein, which would require antibodies and laboratory reagents. Despite lacking 
+    a formal Methods section, the abstract clearly describes experimental procedures (Western blot 
+    on patient leukocytes, n=336 patients), indicating genuine laboratory research that should 
+    contain research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Western blot"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Western blot analysis was carried out on protein extracts from patients' leukocytes to highlight the possible presence of altered neurofibromin"
+    whyMissed: "Western blot is mentioned as the core analytical method but may not have been recognized as a computational/analytical tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "neurofibromin antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Western blot analysis was carried out on protein extracts from patients' leukocytes to highlight the possible presence of altered neurofibromin"
+    whyMissed: "Western blot for neurofibromin detection requires specific antibodies, but no explicit antibody mention found in available text"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "genetic testing"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "genetic testing revealed two unique germline mutations in the neurofibromin (NF1) gene"
+    whyMissed: "Genetic testing methods mentioned but no specific tools or platforms identified"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "Western blot analysis"
+    toolType: "antibody"
+    examples: ["Western blot analysis was carried out on protein extracts"]
+    reasoning: "Western blot analysis strongly implies antibody usage, even when antibodies aren't explicitly named. This context phrase could trigger searches for associated antibody tools."
+  
+  - patternType: "context_phrase"
+    pattern: "protein extracts.*to.*detect|highlight.*protein"
+    toolType: "antibody"
+    examples: ["protein extracts from patients' leukocytes to highlight the possible presence of altered neurofibromin"]
+    reasoning: "Protein detection from extracts typically requires antibodies. This pattern could help identify implied antibody usage."
+  
+  - patternType: "term"
+    pattern: "diagnostic method.*protein"
+    toolType: "antibody"
+    examples: ["novel diagnostic method to detect truncated neurofibromin"]
+    reasoning: "Diagnostic methods for protein detection often involve antibodies, even when not explicitly stated."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of laboratory research
+    - Publication lacks a formal Methods section, which may have hindered tool detection
+    - Western blot analysis is explicitly mentioned but no associated antibodies were identified
+    - This appears to be a case where the mining patterns failed to capture implied tool usage
+    - The publication structure (case report format) may not fit typical research paper patterns
+  recommendations: |
+    This publication represents a significant mining failure. The abstract clearly describes:
+    1. Western blot analysis on 336 patient samples - requires antibodies
+    2. Protein extraction from leukocytes - requires reagents
+    3. Detection of truncated neurofibromin - requires specific antibodies
+    
+    Recommendations:
+    - Investigate why Western blot context didn't trigger antibody detection
+    - Consider that diagnostic method papers may use different language patterns
+    - The lack of a Methods section may require mining from abstract/results text
+    - Add patterns for implied tool usage (Western blot → antibodies)
+    - Manual curator should review this paper for missed antibodies and reagents
+    - Consider expanding mining to cover case reports and diagnostic method papers

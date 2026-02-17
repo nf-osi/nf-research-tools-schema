@@ -1,0 +1,76 @@
+publicationMetadata:
+  pmid: "32352002"
+  title: "Human Organ-Specific 3D Cancer Models Produced by the Stromal Self-Assembly Method of Tissue Engineering for the Study of Solid Tumors."
+  queryType: "bench"
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does not contain actual research tools used by the authors.
+    Review articles cite and discuss tools used by other researchers but do not report
+    original experimental work. This publication reviews 3D cancer models and tissue
+    engineering methods but does not describe the authors conducting experiments with
+    specific tools. Any tools mentioned would be citations from other studies rather
+    than tools used in original research by these authors.
+  overallAssessment: |
+    This is a review article that discusses various 3D cancer modeling approaches and tissue
+    engineering methods. Review articles typically cite tools from other studies but do not
+    report original experimental work using research tools. The absence of a Methods section
+    and Results/Discussion sections confirms this is not an experimental study that would use
+    research tools directly.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "self-assembly method"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "...complex 3D human cell culture systems have gained much popularity over in vivo models...in vitrohuman 3D tissue constructs, produced by the self-assembly method of tissue engineering..."
+    whyMissed: "This is a tissue engineering methodology rather than a specific research tool"
+    confidence: 0.2
+    shouldBeAdded: No
+  - toolName: "ascorbate (vitamin C)"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...it has been reported that ascorbate (vitamin C) can help mesenchymal cells produce their own ECM, to form a tissue highly similar to what is found in vivo..."
+    whyMissed: "This is mentioned as a general reagent used in tissue engineering but not as a specific tool used by the authors"
+    confidence: 0.3
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "review of|overview of|we describe|we present|we highlight"
+    toolType: "general"
+    examples: ["we describe the importance", "we present the existing", "we highlight the relevance"]
+    reasoning: "These phrases indicate review/discussion content rather than experimental usage, helping to filter out false positives from review articles"
+  - patternType: "context_phrase"
+    pattern: "has been reported|have been employed|have been instrumental"
+    toolType: "general"
+    examples: ["it has been reported that ascorbate", "various approaches have been employed", "Animal models have been instrumental"]
+    reasoning: "These phrases indicate citation of other work rather than direct usage by the authors, helping distinguish review content from experimental work"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not original experimental research
+    - No Methods section present, confirming lack of experimental procedures
+    - No Results or Discussion sections with experimental findings
+    - Content focuses on reviewing and citing work from other studies
+    - Any tools mentioned are in the context of discussing other researchers' work
+  recommendations: |
+    This publication should not be expected to contain research tools as it is a review article.
+    The mining correctly identified zero tools. The few potential tools identified (self-assembly
+    method, ascorbate) are general methodologies or reagents discussed in the context of reviewing
+    other work, not specific tools used by these authors. No tools should be added from this
+    publication. The suggested patterns could help filter out similar review articles in future
+    mining to reduce false positives.

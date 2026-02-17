@@ -1,0 +1,219 @@
+publicationMetadata:
+  pmid: "29925695"
+  title: "A porcine model of neurofibromatosis type 1 that mimics the human disease."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, cell lines, antibodies, computational tools
+    
+    This publication describes the development and characterization of a novel porcine animal model
+    of neurofibromatosis type 1 (NF1). Based on the abstract, it involves:
+    - Animal model development (NF1+/ex42del miniswine)
+    - Cell culture work (fibroblasts)
+    - Molecular analyses (protein expression, signaling pathways)
+    - Behavioral/neurological testing
+    
+    Expected tools include the animal model itself, cell lines derived from the model,
+    antibodies for protein detection, and potentially computational tools for analysis.
+    The publication may also contain genetic reagents used in model development.
+  overallAssessment: |
+    This is a clear lab research publication focused on animal model development and characterization.
+    The study describes creating and validating a porcine model of NF1, which inherently involves
+    multiple research tools. The absence of full-text sections limits detailed analysis, but the
+    abstract indicates extensive experimental work that would typically use various research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF1+/ex42del miniswine"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We describe a potentially novel Yucatan miniswine model bearing a heterozygotic mutation in NF1 (exon 42 deletion) orthologous to a mutation found in NF1 patients. NF1+/ex42del miniswine phenocopy the wide range of manifestations"
+    whyMissed: "This is the primary animal model developed and characterized in this study - a genetically modified porcine model with NF1 exon 42 deletion"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Yucatan miniswine"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We describe a potentially novel Yucatan miniswine model bearing a heterozygotic mutation in NF1"
+    whyMissed: "This is the background strain/breed used for the genetic modification - a specific pig breed commonly used in research"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NF1+/ex42del fibroblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Molecular analyses verified reduced neurofibromin expression in swine NF1+/ex42del fibroblasts"
+    whyMissed: "Primary cell line derived from the animal model, used for molecular characterization studies"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "phosphorylated ERK1/2 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "hyperactivation of Ras, as measured by increased expression of its downstream effectors, phosphorylated ERK1/2"
+    whyMissed: "Implied antibody usage for detecting phosphorylated ERK1/2 protein levels in molecular analyses"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "SIAH antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "increased expression of its downstream effectors, phosphorylated ERK1/2, SIAH, and the checkpoint regulators p53 and p21"
+    whyMissed: "Implied antibody usage for detecting SIAH protein expression"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "p53 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "increased expression of its downstream effectors, phosphorylated ERK1/2, SIAH, and the checkpoint regulators p53 and p21"
+    whyMissed: "Implied antibody usage for detecting p53 protein expression"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "p21 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "increased expression of its downstream effectors, phosphorylated ERK1/2, SIAH, and the checkpoint regulators p53 and p21"
+    whyMissed: "Implied antibody usage for detecting p21 protein expression"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "neurofibromin antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Molecular analyses verified reduced neurofibromin expression in swine NF1+/ex42del fibroblasts"
+    whyMissed: "Implied antibody usage for detecting neurofibromin protein expression levels"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+[+/-]+/[a-zA-Z0-9]+(del|ins|mut)\\s+(miniswine|pig|porcine|swine)"
+    toolType: "animal_model"
+    examples: ["NF1+/ex42del miniswine"]
+    reasoning: "Pattern to capture genetically modified porcine models with specific mutation nomenclature commonly used in pig research"
+
+  - patternType: "naming_convention"
+    pattern: "(Yucatan|Göttingen|Sinclair|Hanford)\\s+(miniswine|minipig|pig)"
+    toolType: "animal_model"
+    examples: ["Yucatan miniswine"]
+    reasoning: "Pattern to capture specific pig breeds commonly used in biomedical research"
+
+  - patternType: "context_phrase"
+    pattern: "(fibroblasts?|cells?)\\s+(derived from|isolated from|obtained from)\\s+[A-Z0-9+/-]+"
+    toolType: "cell_line"
+    examples: ["NF1+/ex42del fibroblasts"]
+    reasoning: "Pattern to capture primary cell lines derived from genetically modified animal models"
+
+  - patternType: "context_phrase"
+    pattern: "(increased|decreased|reduced|elevated)\\s+(expression|levels?)\\s+of\\s+([A-Z0-9]+|phosphorylated\\s+[A-Z0-9/]+)"
+    toolType: "antibody"
+    examples: ["reduced neurofibromin expression", "increased expression of phosphorylated ERK1/2"]
+    reasoning: "Pattern to capture implied antibody usage when protein expression changes are measured"
+
+  - patternType: "term"
+    pattern: "miniswine|minipig"
+    toolType: "animal_model"
+    examples: ["miniswine"]
+    reasoning: "General terms for miniature pig models used in biomedical research"
+
+observations:
+  - resourceName: "NF1+/ex42del miniswine"
+    resourceType: "Animal Model"
+    observationType: "Disease Susceptibility"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The NF1+/ex42del miniswine model successfully phenocopies the wide range of manifestations 
+      seen in NF1 patients, including café au lait spots, neurofibromas, axillary freckling, 
+      and neurological defects in learning and memory. This demonstrates the model's utility 
+      for studying neurofibromatosis type 1 pathology and validates its disease susceptibility.
+    foundIn: "abstract"
+    contextSnippet: "NF1+/ex42del miniswine phenocopy the wide range of manifestations seen in NF1 patients, including café au lait spots, neurofibromas, axillary freckling, and neurological defects in learning and memory"
+    confidence: 0.95
+    doi: "10.1172/jci.insight.120402"
+
+  - resourceName: "NF1+/ex42del miniswine"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Neurological defects in learning and memory were observed in the NF1+/ex42del miniswine,
+      consistent with cognitive deficits seen in NF1 patients. Additionally, dysregulation of
+      calcium and sodium channels was observed in dorsal root ganglia expressing mutant NF1,
+      consistent with altered pain signaling in NF1.
+    foundIn: "abstract"
+    contextSnippet: "neurological defects in learning and memory. Consistent with altered pain signaling in NF1, dysregulation of calcium and sodium channels was observed in dorsal root ganglia expressing mutant NF1"
+    confidence: 0.90
+    doi: "10.1172/jci.insight.120402"
+
+  - resourceName: "NF1+/ex42del fibroblasts"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Molecular analyses verified reduced neurofibromin expression in swine NF1+/ex42del fibroblasts,
+      confirming the functional impact of the exon 42 deletion mutation on protein expression levels.
+      This validates the cellular model for studying NF1 molecular mechanisms.
+    foundIn: "abstract"
+    contextSnippet: "Molecular analyses verified reduced neurofibromin expression in swine NF1+/ex42del fibroblasts"
+    confidence: 0.95
+    doi: "10.1172/jci.insight.120402"
+
+  - resourceName: "NF1+/ex42del fibroblasts"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Hyperactivation of Ras signaling was demonstrated in NF1+/ex42del fibroblasts, as measured
+      by increased expression of downstream effectors including phosphorylated ERK1/2, SIAH,
+      and checkpoint regulators p53 and p21. This confirms the expected molecular consequence
+      of NF1 loss-of-function mutations.
+    foundIn: "abstract"
+    contextSnippet: "hyperactivation of Ras, as measured by increased expression of its downstream effectors, phosphorylated ERK1/2, SIAH, and the checkpoint regulators p53 and p21"
+    confidence: 0.90
+    doi: "10.1172/jci.insight.120402"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Disease Susceptibility: 1
+    Nervous System: 1
+    Molecular: 2
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a clear lab research study
+    - Missing full-text sections (Methods, Introduction, Results, Discussion) limits comprehensive analysis
+    - The abstract alone contains multiple research tools that should have been detected
+    - Primary animal model (NF1+/ex42del miniswine) and derived cell line were completely missed
+    - Implied antibody usage for protein expression studies not captured
+  recommendations: |
+    This publication represents a significant mining failure - multiple genuine research tools were missed:
+    
+    DEFINITELY ADD:
+    - NF1+/ex42del miniswine (primary animal model developed in study)
+    - Yucatan miniswine (background strain)
+    - NF1+/ex42del fibroblasts (derived cell line)
+    
+    CONSIDER ADDING (implied usage):
+    - Antibodies for neurofibromin, phosphorylated ERK1/2, SIAH, p53, p21
+    
+    The mining patterns need improvement to capture:
+    1. Genetically modified pig models with mutation nomenclature
+    2. Specific pig breeds used in research
+    3. Primary cell lines derived from animal models
+    4. Implied antibody usage when protein expression is measured
+    
+    This is a high-quality lab research publication that should yield multiple validated tools.
+    The observations extracted demonstrate the scientific value of the animal model and cell line.
+    Full-text access would likely reveal additional tools and more detailed experimental protocols.

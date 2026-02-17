@@ -1,0 +1,102 @@
+publicationMetadata:
+  pmid: "33507559"
+  title: "Purinergic signaling in peripheral nervous system glial cells."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is primarily a review article that catalogs purinergic receptor expression, but contains some original experimental data:
+    - Cell lines: The authors mention "cultured mouse Schwann cells (SCs)" which indicates use of primary cell cultures
+    - Computational tools: qPCR is mentioned for analyzing receptor expression
+    - Animal models: Mouse-derived cells are used (embryonic day E12.5-derived cultured mouse SCs)
+    
+    While primarily a review, the authors performed original qPCR experiments to catalog purinergic receptor mRNA expression in cultured mouse Schwann cells, indicating some experimental work was conducted.
+  overallAssessment: |
+    This publication is primarily a review article that synthesizes existing literature on purinergic signaling in peripheral nervous system glial cells. However, it contains original experimental data where the authors performed qPCR analysis on cultured mouse Schwann cells to catalog purinergic receptor expression. The experimental component involves cell culture techniques and molecular biology methods, suggesting some research tools were likely used but not captured in the mining process.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "cultured mouse Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...catalog purinergic receptor mRNA expression in cultured mouse Schwann cells (SCs). Purinergic signaling can decrease..."
+    whyMissed: "Primary cell culture system mentioned in abstract but not captured by mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "qPCR"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "...To summarize purinergic receptor expression in SCs, we performed qPCR. Cultured mouse SCs expressed detectable mRNA..."
+    whyMissed: "Molecular biology technique mentioned as experimental method but not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "wildtype (WT) embryonic day (E12.5)-derived cultured mouse SCs"
+    toolType: "cell_line"
+    foundIn: "introduction"
+    contextSnippet: "...mRNA expression levels in wildtype (WT) embryonic day (E12.5)-derived cultured mouse SCs are expressed as ΔCT± SD..."
+    whyMissed: "Specific primary cell culture system with developmental stage specification not captured"
+    confidence: 0.7
+    shouldBeAdded: Yes
+
+  - toolName: "neuron/Schwann cell co-cultures"
+    toolType: "cell_line"
+    foundIn: "introduction"
+    contextSnippet: "...Cells were plated as neuron/Schwann cell co-cultures in serum-free N2 medium with nerve growth factor..."
+    whyMissed: "Co-culture system mentioned in methods description but not captured"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "we performed qPCR"
+    toolType: "computational_tool"
+    examples: ["To summarize purinergic receptor expression in SCs, we performed qPCR"]
+    reasoning: "Indicates actual experimental usage of qPCR technique, not just citation"
+
+  - patternType: "term"
+    pattern: "cultured.*cells"
+    toolType: "cell_line"
+    examples: ["cultured mouse Schwann cells", "cultured mouse SCs"]
+    reasoning: "Pattern to capture primary cell culture systems that are research tools"
+
+  - patternType: "naming_convention"
+    pattern: "embryonic day.*derived.*cells"
+    toolType: "cell_line"
+    examples: ["embryonic day (E12.5)-derived cultured mouse SCs"]
+    reasoning: "Captures developmentally-staged primary cell cultures with specific derivation"
+
+  - patternType: "context_phrase"
+    pattern: "co-cultures"
+    toolType: "cell_line"
+    examples: ["neuron/Schwann cell co-cultures"]
+    reasoning: "Co-culture systems are specialized cell culture tools used in research"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite containing experimental data
+    - Publication is primarily a review but includes original qPCR experiments on cultured cells
+    - Mining patterns failed to capture primary cell culture systems and molecular biology techniques
+    - The experimental component involves cell culture and qPCR analysis that should have been detected
+  recommendations: |
+    This publication demonstrates a significant gap in mining coverage for review articles that contain original experimental data. While primarily a review, the authors performed qPCR analysis on cultured mouse Schwann cells, representing legitimate research tools that were completely missed. The mining patterns should be enhanced to:
+    1. Capture primary cell culture systems (cultured mouse Schwann cells)
+    2. Detect molecular biology techniques when used experimentally (qPCR)
+    3. Identify co-culture systems as specialized research tools
+    4. Better handle publications that combine review content with original experimental data
+    
+    All 4 potentially missed tools should be added to improve future mining accuracy, particularly for hybrid review/experimental publications.

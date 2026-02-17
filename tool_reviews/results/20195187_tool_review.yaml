@@ -1,0 +1,170 @@
+publicationMetadata:
+  pmid: "20195187"
+  title: "Merlin knockdown in human Schwann cells: clues to vestibular schwannoma tumorigenesis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study with experimental methods including:
+    - Primary cell culture (human Schwann cells)
+    - Genetic manipulation (siRNA knockdown)
+    - Molecular analysis (qPCR, Western blot, immunofluorescence)
+    - Cell-based assays (proliferation, radiation sensitivity)
+    
+    Expected tool types: cell lines (primary cultures), genetic reagents (siRNA), 
+    antibodies (for Western/immunofluorescence), computational tools (qPCR analysis),
+    and various reagents/assay systems.
+  overallAssessment: |
+    This is a laboratory research study investigating merlin knockdown in human Schwann cells
+    to model vestibular schwannoma tumorigenesis. The study clearly uses multiple research tools
+    including primary cell cultures, genetic reagents (siRNA), antibodies for protein detection,
+    and analytical methods. The presence of a detailed Methods section and experimental procedures
+    strongly indicates this publication should contain numerous research tools that were missed
+    by the initial mining process.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "human Schwann cell primary cultures"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Merlin knockdown was performed using small interfering RNA transfection into human Schwann cell primary cultures."
+    whyMissed: "Primary cell cultures are legitimate cell-based research tools but may not have been captured by standard cell line naming patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "small interfering RNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Merlin knockdown was performed using small interfering RNA (siRNA) transfection into human Schwann cell primary cultures."
+    whyMissed: "siRNA is a standard genetic reagent but may have been missed due to generic terminology rather than specific product names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "real-time quantitative PCR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Knockdown was confirmed by real-time quantitative PCR (qPCR), immunofluorescence, and Western analysis."
+    whyMissed: "qPCR is both a method and often involves specific software/instruments for analysis, but may have been missed due to methodological rather than tool-specific language"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "BrdU"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Proliferation rate was assessed with BrdU incorporation and radiation sensitivity was assessed using the Annexin assay"
+    whyMissed: "BrdU (bromodeoxyuridine) is a specific reagent used for proliferation assays but may have been missed due to abbreviation"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Annexin assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "radiation sensitivity was assessed using the Annexin assay in knockdowns versus controls"
+    whyMissed: "Annexin assays involve specific reagents (typically Annexin V) for apoptosis detection but may have been missed due to assay-focused rather than reagent-focused terminology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "primary cultures?|primary cell cultures?"
+    toolType: "cell_line"
+    examples: ["human Schwann cell primary cultures"]
+    reasoning: "Primary cell cultures are legitimate research tools that should be captured alongside established cell lines"
+
+  - patternType: "term"
+    pattern: "small interfering RNA|siRNA"
+    toolType: "genetic_reagent"
+    examples: ["small interfering RNA transfection", "siRNA"]
+    reasoning: "siRNA is a standard genetic reagent used for gene knockdown experiments"
+
+  - patternType: "term"
+    pattern: "BrdU|bromodeoxyuridine"
+    toolType: "genetic_reagent"
+    examples: ["BrdU incorporation"]
+    reasoning: "BrdU is a specific reagent used in proliferation assays and should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "assessed using.*assay|performed using.*assay"
+    toolType: "genetic_reagent"
+    examples: ["assessed using the Annexin assay"]
+    reasoning: "Assay-specific language often indicates use of specific reagent systems that should be captured"
+
+  - patternType: "term"
+    pattern: "Annexin V?|annexin assay"
+    toolType: "genetic_reagent"
+    examples: ["Annexin assay"]
+    reasoning: "Annexin-based assays involve specific reagents for apoptosis/cell death detection"
+
+observations:
+  - resourceName: "human Schwann cell primary cultures"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""  # No specific MP ID for cellular behavior
+    details: |
+      Merlin knockdown in human Schwann cell primary cultures resulted in increased proliferation rate
+      compared to controls. This demonstrates that loss of merlin function promotes cell division
+      in human Schwann cells, which is a key step in schwannoma tumorigenesis.
+    foundIn: "results"
+    contextSnippet: "Merlin knockdowns demonstrated increased proliferation rate, upregulation of EGFR, ErbB2, and ErbB3, CD44, and nestin."
+    confidence: 0.90
+    doi: "10.1097/MAO.0b013e3181d2777f"
+
+  - resourceName: "human Schwann cell primary cultures"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""  # No specific MP ID for molecular changes
+    details: |
+      Merlin knockdown resulted in upregulation of multiple growth factor receptors (EGFR, ErbB2, ErbB3)
+      and stem cell markers (CD44, nestin). This suggests that merlin depletion promotes a
+      dedifferentiated state and deregulates growth factor receptor signaling pathways.
+    foundIn: "results"
+    contextSnippet: "Merlin knockdowns demonstrated increased proliferation rate, upregulation of EGFR, ErbB2, and ErbB3, CD44, and nestin."
+    confidence: 0.95
+    doi: "10.1097/MAO.0b013e3181d2777f"
+
+  - resourceName: "human Schwann cell primary cultures"
+    resourceType: "Cell Line"
+    observationType: "Other"
+    observationTypeOntologyId: ""  # No MP ID for radiation sensitivity
+    details: |
+      Short-term merlin depletion had no effect on gamma irradiation sensitivity compared with controls.
+      This indicates that merlin loss does not immediately affect DNA damage response or apoptotic
+      pathways in response to radiation, at least in the short term.
+    foundIn: "results"
+    contextSnippet: "Short-term merlin depletion had no effect on gamma irradiation sensitivity compared with controls."
+    confidence: 0.85
+    doi: "10.1097/MAO.0b013e3181d2777f"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 3  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Cellular: 1
+    Molecular: 1
+    Other: 1
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite it being a clear laboratory research study
+    - Multiple obvious research tools were missed including primary cell cultures, siRNA, BrdU, and assay reagents
+    - The mining system appears to have failed to capture tools described in methodological language rather than product-specific names
+    - Standard laboratory reagents and techniques were not recognized as research tools
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded multiple research tools, not zero
+    - At minimum 5 tools should be added: human Schwann cell primary cultures, siRNA, BrdU, Annexin assay reagents, and potentially qPCR systems
+    - The mining patterns need significant improvement to capture methodological descriptions of tools
+    - Primary cell cultures should be recognized as legitimate cell-based research tools
+    - Standard genetic reagents (siRNA, BrdU) need better pattern coverage
+    - Assay-based language should trigger reagent detection
+    - This represents a significant failure of the mining system for a straightforward laboratory research paper
+    - Three high-quality scientific observations were extracted showing cellular, molecular, and functional phenotypes

@@ -1,0 +1,99 @@
+publicationMetadata:
+  pmid: "24249804"
+  title: "Recommendations for imaging tumor response in neurofibromatosis clinical trials."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Guidelines/Consensus Statement"
+  publicationTypeConfidence: 0.95  # Very confident - this is clearly a consensus guidelines paper
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a clinical guidelines/consensus statement paper that reviews existing imaging methods
+    and proposes standardized response criteria for neurofibromatosis clinical trials.
+    
+    Expected tool types based on publication type:
+    - Clinical assessment tools: Potentially imaging response criteria or outcome measures
+    - Computational tools: Possibly imaging analysis software mentioned in methods
+    
+    However, this appears to be a consensus/guidelines paper that DEVELOPS recommendations
+    rather than USES specific research tools. The focus is on proposing standardized
+    imaging response evaluation criteria rather than describing specific tools or software.
+    
+    The paper mentions "MRI with volumetric analysis" and "validated clinical outcome measures"
+    but these are general methodological approaches rather than specific named tools.
+  overallAssessment: |
+    This is a consensus guidelines paper that develops recommendations for imaging tumor
+    response evaluation in neurofibromatosis clinical trials. While it mentions imaging
+    methods and clinical outcome measures, it does not appear to use or develop specific
+    named research tools. The paper focuses on proposing standardized criteria (20% volume
+    change threshold) rather than describing specific software, assessment instruments, or
+    other research tools. Any tools mentioned would likely be general methodological
+    approaches rather than specific named research instruments.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "MRI with volumetric analysis"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "MRI with volumetric analysis is recommended to sensitively and reproducibly evaluate changes in tumor size in clinical trials"
+    whyMissed: "This is mentioned as a recommended imaging method, but it's a general methodological approach rather than a specific named tool or software"
+    confidence: 0.2  # Low confidence - this is a general method, not a specific tool
+    shouldBeAdded: No
+  
+  - toolName: "RECIST (Response Evaluation Criteria in Solid Tumors)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "response criteria used for solid cancers (1-dimensional/RECIST [Response Evaluation Criteria in Solid Tumors] and bidimensional/World Health Organization) have limited applicability"
+    whyMissed: "RECIST is mentioned as an existing clinical assessment tool, but only in the context of explaining why it has limited applicability for NF tumors"
+    confidence: 0.3  # Low-moderate confidence - it's a real clinical tool but only mentioned as having limited applicability
+    shouldBeAdded: No
+  
+  - toolName: "World Health Organization criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "response criteria used for solid cancers (1-dimensional/RECIST [Response Evaluation Criteria in Solid Tumors] and bidimensional/World Health Organization) have limited applicability"
+    whyMissed: "WHO criteria mentioned as existing assessment method but only in context of limited applicability for NF tumors"
+    confidence: 0.3  # Low-moderate confidence - real clinical tool but only mentioned negatively
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "validated clinical outcome measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["validated clinical outcome measures, will maximize the ability to identify potentially active agents"]
+    reasoning: "This phrase suggests the existence of specific clinical assessment tools, but in this case it's used generically without naming specific instruments. Pattern could help identify when specific validated tools are mentioned."
+  
+  - patternType: "context_phrase"
+    pattern: "consensus recommendations|consensus guidelines|standardized criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["Consensus recommendations for response evaluation", "standardized response criteria"]
+    reasoning: "These phrases often indicate development of new clinical assessment tools or criteria, though in this case they refer to imaging guidelines rather than specific named tools."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 2  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - This is a consensus guidelines/recommendations paper, not an experimental study
+    - No specific named research tools are described or used
+    - The paper develops imaging response criteria rather than using existing tools
+    - Methods section describes review process, not experimental procedures
+    - General methodological approaches (MRI, volumetric analysis) mentioned but no specific software or tools named
+    - RECIST and WHO criteria mentioned only in context of limited applicability, not actual usage
+  recommendations: |
+    Overall recommendations for this publication:
+    - Correctly identified as having no research tools - the mining was accurate
+    - This type of consensus/guidelines paper typically would not contain specific research tools
+    - The few methodological approaches mentioned (MRI with volumetric analysis) are too general to be considered specific tools
+    - RECIST and WHO criteria are mentioned but only negatively (limited applicability), not as tools being used
+    - No tools should be added from this publication
+    - The mining patterns appear to be working correctly for this type of publication
+    - Future mining could potentially flag "consensus recommendations" or "standardized criteria" as potential clinical assessment tools, but would need careful context analysis to avoid false positives

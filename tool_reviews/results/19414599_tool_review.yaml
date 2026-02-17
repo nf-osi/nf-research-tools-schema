@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "19414599"
+  title: "Ral overactivation in malignant peripheral nerve sheath tumors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental language and cell line usage
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating Ral signaling in MPNST cell lines.
+    The abstract describes experimental manipulations including gene silencing, dominant-negative constructs,
+    cell proliferation assays, invasiveness assays, and in vivo tumorigenicity studies. Expected tools include:
+    - Cell lines (MPNST cell lines, Schwann cells)
+    - Genetic reagents (dominant-negative Ral construct, NF1-GRD construct)
+    - Potentially antibodies for protein detection
+    - Animal models for in vivo tumorigenicity studies
+  overallAssessment: |
+    This is a laboratory research study that would typically use multiple research tools including cell lines,
+    genetic reagents, and potentially animal models. The study describes experimental manipulations of Ral
+    signaling in MPNST cells using molecular tools like dominant-negative constructs and gene silencing.
+    However, only the abstract is available, which limits detailed tool identification. The mining found zero
+    tools, but several potential tools are mentioned in the abstract that should have been captured.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...overactivation of Ras and many of its downstream effectors occurred in only a fraction of MPNST cell lines. RalA, however, was overactivated in all MPNST cells..."
+    whyMissed: "Generic term 'MPNST cell lines' not captured by specific cell line name patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...RalA, however, was overactivated in all MPNST cells and tumor samples compared to nontransformed Schwann cells..."
+    whyMissed: "Primary cell type not captured by established cell line naming patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Ral S28N"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Silencing Ral or inhibiting it with a dominant-negative Ral (Ral S28N) caused a significant reduction in proliferation..."
+    whyMissed: "Dominant-negative construct with specific mutation notation not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-GRD"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Expression of the NF1-GTPase-related domain (NF1-GRD) diminished the levels of Ral activation..."
+    whyMissed: "Protein domain construct abbreviation not captured by current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z]+\\s+cell\\s+lines?\\b"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines"]
+    reasoning: "Captures cell lines described by disease/tissue type rather than specific names"
+
+  - patternType: "term"
+    pattern: "\\b\\w+\\s+cells?\\b(?=.*(?:nontransformed|primary|cultured))"
+    toolType: "cell_line"
+    examples: ["nontransformed Schwann cells"]
+    reasoning: "Captures primary or nontransformed cell types used as controls"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\s+[A-Z]\\d+[A-Z]\\b"
+    toolType: "genetic_reagent"
+    examples: ["Ral S28N"]
+    reasoning: "Captures dominant-negative or mutant constructs with specific amino acid substitutions"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z0-9]+-[A-Z]{2,}\\b"
+    toolType: "genetic_reagent"
+    examples: ["NF1-GRD"]
+    reasoning: "Captures protein domain constructs with hyphenated abbreviations"
+
+  - patternType: "context_phrase"
+    pattern: "dominant-negative\\s+\\w+"
+    toolType: "genetic_reagent"
+    examples: ["dominant-negative Ral"]
+    reasoning: "Context phrase that reliably indicates genetic reagent usage"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined despite clear evidence of tool usage in the abstract
+    - Only abstract available - no Methods section to provide detailed tool information
+    - Multiple obvious research tools mentioned in abstract were not captured by mining patterns
+    - Cell lines, genetic reagents, and experimental constructs clearly present but missed
+  recommendations: |
+    This publication clearly contains research tools that were completely missed by the mining process.
+    The abstract describes a laboratory study using MPNST cell lines, Schwann cells, dominant-negative
+    constructs, and protein domain constructs. All four potentially missed tools should be added:
+    
+    1. MPNST cell lines - clearly used in experiments
+    2. Schwann cells - used as control cells
+    3. Ral S28N - dominant-negative construct used for functional studies
+    4. NF1-GRD - protein domain construct used for rescue experiments
+    
+    The suggested patterns would help capture similar tools in future mining. The lack of a Methods
+    section limits detailed validation, but the abstract provides sufficient evidence of tool usage.
+    This case highlights the need for better pattern coverage of cell line types and genetic constructs.

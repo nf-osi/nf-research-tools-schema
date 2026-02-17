@@ -1,0 +1,146 @@
+publicationMetadata:
+  pmid: "38115252"
+  title: "Identification of hub genes and drug candidates for NF2-related vestibular schwannoma by bioinformatics tools."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # Very clear from title and abstract
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, packages, databases, pipelines) - PRIMARY EXPECTATION
+    - Possibly some databases and web applications for analysis
+    
+    This is a pure bioinformatics study using publicly available datasets (GSE108524, GSE141801)
+    to identify hub genes and drug candidates. The study involves multiple computational analyses
+    including weighted correlation network analysis, differential expression analysis, pathway
+    enrichment, protein-protein interaction analysis, and drug connectivity mapping.
+    
+    No lab research tools (antibodies, cell lines, animal models) are expected since this is
+    a computational analysis of existing datasets.
+  overallAssessment: |
+    This is a bioinformatics study that should contain multiple computational tools and databases.
+    The abstract explicitly mentions several R packages, databases, and analytical methods used
+    for gene expression analysis, network construction, and drug discovery. Despite being classified
+    as "bench" research, this is purely computational work that would not use traditional lab tools.
+
+toolValidations: []  # No tools were initially mined, but several should have been found
+
+potentiallyMissedTools:
+  - toolName: "limma"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Differentially expressed genes (DEGs) were identified via the R package \"limma\" in both datasets"
+    whyMissed: "R package name in quotes was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STRING database"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "The STRING database was employed for protein-protein interaction (PPI) axis construction"
+    whyMissed: "Database name with specific usage context not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "miRTarBase database"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "The mRNA-miRNA modulatory network was generated via the miRTarBase database"
+    whyMissed: "Specialized database name not in mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "connectivity map database"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "common DEGs were uploaded onto the connectivity map database to determine drug candidates"
+    whyMissed: "Database name in lowercase not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Gene Ontology"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "we conducted gene ontology term and Kyoto Encyclopedia of Genes and Genomes signaling network enrichment analyses"
+    whyMissed: "Standard bioinformatics resource name not captured"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "KEGG"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "gene ontology term and Kyoto Encyclopedia of Genes and Genomes signaling network enrichment analyses"
+    whyMissed: "Acronym form of database name not captured"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "weighted correlation network analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "selected the leading 25% genes with the most variance across samples for weighted correlation network analysis"
+    whyMissed: "Analytical method name not captured as tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\bR package\\s+[\"']([^\"']+)[\"']"
+    toolType: "computational_tool"
+    examples: ["R package \"limma\""]
+    reasoning: "R packages are commonly mentioned in quotes and represent specific computational tools"
+
+  - patternType: "term"
+    pattern: "\\b(\\w+)\\s+database\\b"
+    toolType: "computational_tool"
+    examples: ["STRING database", "miRTarBase database", "connectivity map database"]
+    reasoning: "Databases are fundamental computational resources that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(employed|used|utilized|via)\\s+(the\\s+)?([A-Z][\\w\\s]+)\\s+(database|tool|software|package)"
+    toolType: "computational_tool"
+    examples: ["employed for protein-protein interaction", "generated via the miRTarBase database"]
+    reasoning: "Usage context phrases reliably indicate computational tool usage"
+
+  - patternType: "term"
+    pattern: "\\b(Gene Ontology|GO|KEGG|Kyoto Encyclopedia of Genes and Genomes)\\b"
+    toolType: "computational_tool"
+    examples: ["Gene Ontology", "KEGG"]
+    reasoning: "Standard bioinformatics resources should be captured regardless of case"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}[a-z]*[A-Z][a-z]*\\s+(database|DB)\\b"
+    toolType: "computational_tool"
+    examples: ["miRTarBase database"]
+    reasoning: "Bioinformatics databases often follow CamelCase naming conventions"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - Complete failure to mine computational tools from a bioinformatics study
+    - Multiple explicitly mentioned R packages, databases, and analytical methods were missed
+    - The mining patterns appear inadequate for capturing bioinformatics tools
+    - Abstract contains clear usage context for 6-7 computational tools that should have been captured
+    - This represents a significant gap in computational tool mining capabilities
+  recommendations: |
+    Overall recommendations for this publication:
+    - All 6-7 missed computational tools should be added to the mining results
+    - This publication demonstrates major gaps in computational tool mining patterns
+    - Need better patterns for R packages (especially those in quotes)
+    - Need better patterns for bioinformatics databases (STRING, miRTarBase, etc.)
+    - Need patterns for standard resources (Gene Ontology, KEGG)
+    - Consider case-insensitive matching for database names
+    - The "bench" query classification was misleading - this is pure computational work
+    - No traditional lab tools are expected or present in this bioinformatics analysis
+    - Mining patterns should be updated to capture the suggested patterns above
+    - This publication should be re-processed with improved computational tool patterns

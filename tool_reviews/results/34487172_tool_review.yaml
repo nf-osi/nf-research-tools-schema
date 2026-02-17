@@ -1,0 +1,137 @@
+publicationMetadata:
+  pmid: "34487172"
+  title: "Machine learning approach to differentiation of peripheral schwannomas and neurofibromas: A multi-center study."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # High confidence - clear ML/radiomics analysis
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, packages, pipelines) - EXPECTED
+    - Machine learning frameworks and algorithms - EXPECTED
+    - Image analysis software - EXPECTED
+    - Statistical analysis tools - EXPECTED
+    
+    This is a radiomics and machine learning study that should contain multiple computational tools
+    for image feature extraction, statistical analysis, and machine learning model development.
+    The methods mention specific tools like "PyRadiomics package" and "Quantitative Imaging Feature Pipeline".
+  overallAssessment: |
+    This is a bioinformatics/machine learning study focused on developing radiomics-based classifiers
+    to differentiate schwannomas from neurofibromas using MRI imaging data. Such studies typically
+    use multiple computational tools for image processing, feature extraction, statistical analysis,
+    and machine learning model development. The mining appears to have missed several computational tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "PyRadiomics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...extracted high-dimensional radiomic features from gadolinium-enhanced, T1-weighted MRI using the PyRadiomics package on Quantitative Imaging Feature Pipeline..."
+    whyMissed: "This is a well-known Python package for radiomics feature extraction, clearly mentioned as being used for analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Quantitative Imaging Feature Pipeline"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...extracted high-dimensional radiomic features from gadolinium-enhanced, T1-weighted MRI using the PyRadiomics package on Quantitative Imaging Feature Pipeline..."
+    whyMissed: "This appears to be a computational pipeline/platform used for image analysis, mentioned in conjunction with PyRadiomics"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Support Vector Machine"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...whereas the Support Vector Machine (0.929), Logistic Regression (0.929), and Random Forest (0.905) classifiers exceeded the NIR..."
+    whyMissed: "Machine learning algorithm/classifier used in the analysis, mentioned with performance metrics"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Logistic Regression"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...whereas the Support Vector Machine (0.929), Logistic Regression (0.929), and Random Forest (0.905) classifiers exceeded the NIR..."
+    whyMissed: "Machine learning algorithm/classifier used in the analysis, mentioned with performance metrics"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Random Forest"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...whereas the Support Vector Machine (0.929), Logistic Regression (0.929), and Random Forest (0.905) classifiers exceeded the NIR..."
+    whyMissed: "Machine learning algorithm/classifier used in the analysis, mentioned with performance metrics"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "K Nearest Neighbor"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...the AUCs for the Logistic Regression (AUC = 0.923) and K Nearest Neighbor (AUC = 0.923) classifiers were significantly greater than the human evaluators..."
+    whyMissed: "Machine learning algorithm/classifier used in the analysis, mentioned with performance metrics"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PyRadiomics"
+    toolType: "computational_tool"
+    examples: ["PyRadiomics package"]
+    reasoning: "Well-known Python package for radiomics feature extraction, should be captured as computational tool"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(Support Vector Machine|Logistic Regression|Random Forest|K Nearest Neighbor)\\b.*classifiers?"
+    toolType: "computational_tool"
+    examples: ["Support Vector Machine (0.929), Logistic Regression (0.929), and Random Forest (0.905) classifiers", "K Nearest Neighbor (AUC = 0.923) classifiers"]
+    reasoning: "Machine learning algorithms mentioned as classifiers with performance metrics indicate actual usage in analysis"
+
+  - patternType: "term"
+    pattern: "Quantitative Imaging Feature Pipeline"
+    toolType: "computational_tool"
+    examples: ["PyRadiomics package on Quantitative Imaging Feature Pipeline"]
+    reasoning: "Computational pipeline/platform for image analysis, mentioned in methods as analysis platform"
+
+  - patternType: "context_phrase"
+    pattern: "using the (\\w+) package"
+    toolType: "computational_tool"
+    examples: ["using the PyRadiomics package"]
+    reasoning: "Pattern to catch software packages mentioned with 'using the X package' phrasing"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(classifier|algorithm)s?\\s+(\\w+(?:\\s+\\w+)*)"
+    toolType: "computational_tool"
+    examples: ["classifiers exceeded", "algorithm performance"]
+    reasoning: "Pattern to identify machine learning algorithms and classifiers mentioned in performance contexts"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear computational tool usage
+    - This is a bioinformatics/machine learning study that uses multiple computational tools
+    - PyRadiomics package is explicitly mentioned as being used for feature extraction
+    - Multiple machine learning algorithms (SVM, Logistic Regression, Random Forest, KNN) are used
+    - Quantitative Imaging Feature Pipeline is mentioned as analysis platform
+    - The mining system appears to have completely missed computational tools in this domain
+  recommendations: |
+    Overall recommendations for this publication:
+    - All 6 identified computational tools should be added to the database
+    - The mining patterns need significant improvement for computational tools, especially:
+      * Machine learning algorithms mentioned with performance metrics
+      * Python packages mentioned with "using the X package" phrasing
+      * Analysis pipelines and platforms
+    - This publication represents a clear case where computational tool mining failed completely
+    - The suggested patterns should be implemented to catch similar tools in future mining
+    - No observations could be extracted since no tools were validated, but the Results section
+      would likely contain performance metrics and comparative analyses if available
+    - This highlights the need for better computational tool detection in bioinformatics studies

@@ -1,0 +1,288 @@
+publicationMetadata:
+  pmid: "32839340"
+  title: "Brain-wide structural and functional disruption in mice with oligodendrocyte-specific Nf1 deletion is rescued by inhibition of nitric oxide synthase"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study with extensive Methods section describing:
+    - Mouse genetic models (Plp-Cre, Nf1fl/+)
+    - Pharmacological reagents (tamoxifen, L-NAME)
+    - Behavioral testing equipment (Rotarod)
+    - Advanced imaging systems (9.4-T MRI)
+    - Computational analysis tools (ExplorDTI, ANTs, etc.)
+    
+    Expected tools: animal models, genetic reagents, computational tools, and potentially antibodies for genotyping.
+  overallAssessment: |
+    This is a comprehensive laboratory research study investigating oligodendrocyte-specific Nf1 deletion in mice using advanced neuroimaging and behavioral testing. The publication contains extensive experimental methods including mouse genetic models, pharmacological treatments, behavioral assays, and sophisticated brain imaging with computational analysis. This type of study would typically contain multiple research tools including animal models, genetic reagents, computational software, and potentially antibodies for genotyping. The absence of mined tools suggests significant under-detection by the mining algorithms.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Plp-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Inducible Plp-Cre (66) and Nf1fl/+ (67) mice were maintained on a pure C57BL/6 background and genotyped by PCR"
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1fl/+ mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Inducible Plp-Cre (66) and Nf1fl/+ (67) mice were maintained on a pure C57BL/6 background and genotyped by PCR"
+    whyMissed: "Floxed allele nomenclature not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Inducible Plp-Cre (66) and Nf1fl/+ (67) mice were maintained on a pure C57BL/6 background"
+    whyMissed: "Standard inbred strain nomenclature not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Plp-Nf1fl/+ mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "oligodendrocyte-specific Nf1 deletion (Plp-Nf1fl/+ mice) results in a motor coordination deficit"
+    whyMissed: "Compound genotype nomenclature not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "tamoxifen"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tamoxifen (100 mg) was dissolved with 1 mL of ethanol and 9 mL of sunflower seed oil (Sigma-Aldrich). At age 8 wk, both controls and Plp-Nf1fl/+ mice were intraperitoneally injected with tamoxifen"
+    whyMissed: "Pharmacological reagent for genetic induction not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "L-NAME"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Fresh solution of L-NAME (L-NG-nitroarginine methyl ester, 100 μM in 1× PBS; Sigma-Aldrich) was administered daily at 0.4 mg/kg"
+    whyMissed: "Pharmacological inhibitor not recognized as research reagent"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Rotarod"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Gross motor coordination function was evaluated using the Rotarod (Med Associates)"
+    whyMissed: "Behavioral testing equipment not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ExplorDTI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Diffusion-weighted images were preprocessed using ExplorDTI (68), with tensors calculated using a robust estimation algorithm"
+    whyMissed: "Specialized neuroimaging software not in mining vocabulary"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Advanced Normalization Tools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Brain extraction was performed, and a template, B0, for both controls and Plp-Nf1fl/+ animals was created using Advanced Normalization Tools (ANTs)"
+    whyMissed: "Full software name not captured, only abbreviation ANTs might be recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ANTs"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "created using Advanced Normalization Tools (ANTs) (70)"
+    whyMissed: "Software abbreviation not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Allen Brain Atlas"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The control template was registered to the Allen Brain Atlas (71)"
+    whyMissed: "Neuroanatomical reference atlas not recognized as computational tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "BioSpec 94/20 USR MRI"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Imaging was performed with a 9.4-T BioSpec 94/20 USR MRI (Bruker BioSpin MRI)"
+    whyMissed: "Specialized imaging equipment not captured"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+-[A-Z][a-z0-9]+\\b"
+    toolType: "animal_model"
+    examples: ["Plp-Cre", "Plp-Nf1fl/+"]
+    reasoning: "Mouse strain nomenclature with promoter-gene combinations commonly used in conditional knockout models"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+fl/[+\\-]\\b"
+    toolType: "animal_model"
+    examples: ["Nf1fl/+"]
+    reasoning: "Floxed allele nomenclature indicating conditional knockout alleles"
+
+  - patternType: "naming_convention"
+    pattern: "\\bC57BL/6\\b"
+    toolType: "animal_model"
+    examples: ["C57BL/6"]
+    reasoning: "Standard inbred mouse strain nomenclature"
+
+  - patternType: "term"
+    pattern: "\\btamoxifen\\b"
+    toolType: "genetic_reagent"
+    examples: ["tamoxifen"]
+    reasoning: "Commonly used reagent for inducible Cre-lox systems in mouse genetics"
+
+  - patternType: "term"
+    pattern: "\\bL-NAME\\b"
+    toolType: "genetic_reagent"
+    examples: ["L-NAME"]
+    reasoning: "Specific nitric oxide synthase inhibitor commonly used in research"
+
+  - patternType: "term"
+    pattern: "\\bRotarod\\b"
+    toolType: "genetic_reagent"
+    examples: ["Rotarod"]
+    reasoning: "Standard behavioral testing equipment for motor coordination assessment"
+
+  - patternType: "term"
+    pattern: "\\bExplorDTI\\b"
+    toolType: "computational_tool"
+    examples: ["ExplorDTI"]
+    reasoning: "Specialized diffusion tensor imaging analysis software"
+
+  - patternType: "term"
+    pattern: "\\bAdvanced Normalization Tools\\b|\\bANTs\\b"
+    toolType: "computational_tool"
+    examples: ["Advanced Normalization Tools", "ANTs"]
+    reasoning: "Widely used neuroimaging registration and normalization software"
+
+  - patternType: "term"
+    pattern: "\\bAllen Brain Atlas\\b"
+    toolType: "computational_tool"
+    examples: ["Allen Brain Atlas"]
+    reasoning: "Standard neuroanatomical reference atlas used in mouse brain research"
+
+  - patternType: "context_phrase"
+    pattern: "maintained on.*background"
+    toolType: "animal_model"
+    examples: ["maintained on a pure C57BL/6 background"]
+    reasoning: "Context phrase indicating mouse strain background information"
+
+  - patternType: "context_phrase"
+    pattern: "preprocessed using|analyzed using|processed with"
+    toolType: "computational_tool"
+    examples: ["preprocessed using ExplorDTI", "created using Advanced Normalization Tools"]
+    reasoning: "Context phrases indicating computational tool usage in data analysis"
+
+observations:
+  - resourceName: "Plp-Nf1fl/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Motor Activity"
+    observationTypeOntologyId: "MP:0001405"
+    details: |
+      Plp-Nf1fl/+ mice demonstrated impaired initial performance on the rotating rod test (first run; Mann–Whitney U test: U = 31, P = 0.0013) but then caught up to controls by the last run (U = 89, P = 0.4956). The mice showed reduced initial motor coordination (U = 42, P = 0.006) but normal learning rate (U = 73, P = 0.17). Overall, the animals showed differential performance with impaired initial motor coordination but normal learning rate, leading them to learn the task by the end of the eighth run and perform at the same level as controls.
+    foundIn: "results"
+    contextSnippet: "Plp-Nf1fl/+ mice demonstrated impaired initial performance (first run; Mann–Whitney U test: U = 31, P = 0.0013) in the test and then caught up to controls (last run: U = 89, P = 0.4956)"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+  - resourceName: "Plp-Nf1fl/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      DTI analysis revealed widespread, mostly symmetrical reduction in fractional anisotropy (FA) across the brain in Plp-Nf1fl/+ mice compared to controls, similar to that reported in NF1 patients. The reduction was observed in multiple white matter structures including brachium of superior colliculus, fasciculus reticulata, internal capsule, medial lemniscus, posterior commissure, and anterior corpus callosum. Treatment with L-NAME for seven consecutive days resulted in reliable recovery of FA to control levels in six out of seven regions examined.
+    foundIn: "results"
+    contextSnippet: "We observed a widespread, mostly symmetrical, reduction in FA across the brain (Fig. 3), similar to that reported in NF1 patients"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+  - resourceName: "Plp-Nf1fl/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Functional MRI analysis showed reduced interhemispheric connectivity in the motor cortex of Plp-Nf1fl/+ mice compared to controls (Mann–Whitney U test: U = 15, P = 0.037). This reduced connectivity was rescued by L-NAME administration (Wilcoxon signed-rank test: Z = 2.134, P = 0.033). The changes in interhemispheric connectivity were not global but specific to the motor cortex, reflecting the structural changes quantified using DTI.
+    foundIn: "results"
+    contextSnippet: "Plp-Nf1fl/+ mice showed reduced interhemispheric connectivity (Fig. 4; Mann–Whitney A and B U test: U = 15, P = 0.037). This reduced connectivity was rescued by L-NAME administration"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+  - resourceName: "Plp-Nf1fl/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Plp-Nf1fl/+ mice, but not controls, showed a significant correlation between fractional anisotropy (FA) and functional connectivity results (control: r = 0.36, P = 0.48; Plp-Nf1fl/+: r = 0.9, P = 0.005) before L-NAME administration. After L-NAME treatment, Plp-Nf1fl/+ mice showed a significant correlation between changes in FA and functional connectivity (r = 0.87, P = 0.01), but controls did not (r = −0.0332, P = 0.95).
+    foundIn: "results"
+    contextSnippet: "Plp-Nf1fl/+ mice, but not controls, showed a significant correlation between FA and rs-fMRI results (control: r = 0.36, P = 0.48; Plp-Nf1fl/+: r = 0.9, P = 0.005)"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+  - resourceName: "L-NAME"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      L-NAME (L-NG-nitroarginine methyl ester) was administered daily at 0.4 mg/kg for seven consecutive days to rescue myelin decompaction and functional connectivity deficits in Plp-Nf1fl/+ mice. The treatment successfully rescued fractional anisotropy to control levels in six out of seven white matter regions examined and restored interhemispheric functional connectivity in the motor cortex. The authors note that L-NAME is not commonly used in humans due to potential adverse effects including systemic and pulmonary hypertension and teratogenicity during pregnancy.
+    foundIn: "both"
+    contextSnippet: "Fresh solution of L-NAME (L-NG-nitroarginine methyl ester, 100 μM in 1× PBS; Sigma-Aldrich) was administered daily at 0.4 mg/kg"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+  - resourceName: "tamoxifen"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Tamoxifen (100 mg dissolved in 1 mL ethanol and 9 mL sunflower seed oil from Sigma-Aldrich) was administered to induce Cre-mediated recombination in oligodendrocytes. At age 8 weeks, both control and Plp-Nf1fl/+ mice were intraperitoneally injected with tamoxifen (100 μL) twice daily for 3 days at the same time of day. This protocol successfully induced oligodendrocyte-specific Nf1 deletion as confirmed by subsequent phenotypic analysis.
+    foundIn: "methods"
+    contextSnippet: "Tamoxifen (100 mg) was dissolved with 1 mL of ethanol and 9 mL of sunflower seed oil (Sigma-Aldrich). At age 8 wk, both controls and Plp-Nf1fl/+ mice were intraperitoneally injected with tamoxifen (100 μL) twice daily for 3 d"
+    confidence: 1.0
+    doi: "10.1073/pnas.2008391117"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12  # Number of tools that might have been missed
+  newPatternsCount: 11  # Number of new patterns suggested
+  observationsExtracted: 6  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Motor Activity: 1
+    Nervous System: 3
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete failure of mining algorithms to detect any tools despite this being a comprehensive laboratory research study
+    - Multiple mouse genetic models (Plp-Cre, Nf1fl/+, C57BL/6, Plp-Nf1fl/+) completely missed
+    - Pharmacological reagents (tamoxifen, L-NAME) not captured
+    - Behavioral testing equipment (Rotarod) not detected
+    - Computational analysis tools (ExplorDTI, ANTs, Allen Brain Atlas) not found
+    - Standard research reagents and equipment nomenclature not recognized by mining patterns
+  recommendations: |
+    This publication represents a significant failure of the mining algorithms to detect research tools. Despite being a comprehensive laboratory study with extensive Methods section and clear experimental procedures, zero tools were detected. The study contains at least 12 legitimate research tools across multiple categories:
+    
+    - Animal Models: Plp-Cre mice, Nf1fl/+ mice, C57BL/6 mice, Plp-Nf1fl/+ mice
+    - Genetic Reagents: tamoxifen, L-NAME, Rotarod
+    - Computational Tools: ExplorDTI, ANTs, Allen Brain Atlas, BioSpec MRI
+    
+    All of these tools should be added to the database. The mining patterns need significant enhancement to capture:
+    1. Mouse strain nomenclature (including conditional knockout notation)
+    2. Pharmacological reagents used in genetic research
+    3. Behavioral testing equipment
+    4. Specialized neuroimaging software and atlases
+    
+    The extracted observations provide valuable phenotypic data for the animal models, particularly regarding motor coordination deficits and brain connectivity changes that are rescued by NOS inhibition. This publication demonstrates the critical need for improved mining algorithms to capture the full spectrum of research tools used in modern neuroscience research.

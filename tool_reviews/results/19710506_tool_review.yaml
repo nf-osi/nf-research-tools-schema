@@ -1,0 +1,114 @@
+publicationMetadata:
+  pmid: "19710506"
+  title: "Nf1 deficiency cooperates with oncogenic K-RAS to induce acute myeloid leukemia in mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes mouse model experiments involving Nf1 deficiency and oncogenic K-RAS expression
+    in hematopoietic cells, leading to acute myeloid leukemia development. Expected tools include:
+    - Animal models (Nf1 knockout/deficient mice, K-RAS transgenic mice)
+    - Genetic reagents (K-RAS(G12D) construct)
+    - Potentially cell lines (hematopoietic cells)
+    
+    The study involves transplantation experiments and model characterization, which are typical of
+    lab research using genetically modified mouse models.
+  overallAssessment: |
+    This is clearly a laboratory research study involving genetically modified mouse models to study
+    leukemogenesis. The publication describes experimental work with Nf1-deficient mice and oncogenic
+    K-RAS expression, including transplantation studies. Such studies typically use multiple research
+    tools including animal models and genetic reagents, even though only abstract text is available.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1-deficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "expression of oncogenic K-RAS or inactivation of Nf1 in hematopoietic cells results in myeloproliferative disorders (MPDs)"
+    whyMissed: "The mining may have focused on specific strain names rather than functional descriptions. 'Nf1 deficiency' and 'inactivation of Nf1' clearly refer to genetically modified mouse models."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "K-RAS(G12D) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "simultaneous inactivation of Nf1 and expression of K-RAS(G12D) in mouse hematopoietic cells results in AML"
+    whyMissed: "The specific oncogenic K-RAS(G12D) mutation represents a genetically modified mouse model. The notation K-RAS(G12D) indicates a specific genetic construct/model."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "K-RAS(G12D) construct"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "expression of K-RAS(G12D) in mouse hematopoietic cells"
+    whyMissed: "The K-RAS(G12D) represents a specific genetic construct used to express oncogenic K-RAS. This is a genetic reagent used in the mouse model generation."
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+-deficient mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1-deficient mice"]
+    reasoning: "Pattern to catch gene-deficient mouse models described functionally rather than by strain name"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z-]+\\([A-Z0-9]+\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["K-RAS(G12D) mice"]
+    reasoning: "Pattern to catch mouse models with specific mutations indicated in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "inactivation of [A-Z][a-z0-9]+ in .* cells"
+    toolType: "animal_model"
+    examples: ["inactivation of Nf1 in hematopoietic cells"]
+    reasoning: "Functional description of gene inactivation in specific cell types indicates genetically modified models"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z-]+\\([A-Z0-9]+\\)\\s+construct\\b"
+    toolType: "genetic_reagent"
+    examples: ["K-RAS(G12D) construct"]
+    reasoning: "Pattern to catch genetic constructs with specific mutations for model generation"
+
+  - patternType: "context_phrase"
+    pattern: "expression of oncogenic [A-Z-]+"
+    toolType: "genetic_reagent"
+    examples: ["expression of oncogenic K-RAS"]
+    reasoning: "Context indicating use of genetic reagents to express oncogenic proteins"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of animal model usage
+    - Only abstract text available - full Methods section would likely contain more detailed tool information
+    - Mining patterns may be too restrictive for functional descriptions of genetically modified mice
+    - The publication clearly describes experimental use of Nf1-deficient and K-RAS(G12D) mouse models
+  recommendations: |
+    This publication should have identified at least 2-3 research tools:
+    1. Nf1-deficient mouse model - clearly described as experimental tool for studying myeloproliferative disorders
+    2. K-RAS(G12D) mouse model - specific oncogenic mutation model used in experiments
+    3. K-RAS(G12D) genetic construct - the reagent used to generate the oncogenic expression
+    
+    The mining patterns need improvement to catch:
+    - Functional descriptions of genetically modified mice (e.g., "Nf1-deficient")
+    - Specific mutation nomenclature (e.g., "K-RAS(G12D)")
+    - Context phrases indicating genetic manipulation ("inactivation of", "expression of oncogenic")
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the abstract
+    indicates these models would have phenotypic data (AML development, survival times, transplantability).
+    
+    This represents a significant gap in the mining coverage for animal model detection.

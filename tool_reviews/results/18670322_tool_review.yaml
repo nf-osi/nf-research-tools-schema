@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "18670322"
+  title: "Vestibular schwannoma quantitative polymerase chain reaction expression of estrogen and progesterone receptors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - this is clearly molecular biology research
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a quantitative RT-PCR study analyzing gene expression in human tissue samples. Expected tools include:
+    - Genetic reagents: RT-PCR primers, probes, reverse transcriptase enzymes
+    - Computational tools: qRT-PCR analysis software, normalization algorithms
+    - Potentially antibodies if protein validation was performed (not mentioned in available text)
+    
+    The study compares gene expression between different tissue types (control nerves vs. tumor tissues),
+    which is typical molecular biology research requiring specialized reagents and analysis tools.
+  overallAssessment: |
+    This is a molecular biology research study using quantitative RT-PCR to analyze estrogen and progesterone
+    receptor expression in vestibular schwannoma tissues. Such studies typically require genetic reagents
+    (primers, probes, enzymes) and computational tools for data analysis and normalization. The brief Methods
+    section mentions normalization with cyclophylin as a control gene, suggesting standard qRT-PCR protocols
+    were used. Tools are expected but may not be explicitly named in the available text sections.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "cyclophylin"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The qRT-PCR data were normalized with standardization to a single constitutively expressed control gene, human cyclophylin."
+    whyMissed: "Control gene used for normalization in qRT-PCR - this represents primers/probes for cyclophylin gene expression analysis"
+    confidence: 0.8  # High confidence this represents genetic reagents
+    shouldBeAdded: Yes
+    
+  - toolName: "qRT-PCR"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Quantitative real-time polymerase chain reaction (qRT-PCR) for ER and PR messenger RNA was performed"
+    whyMissed: "While qRT-PCR is mentioned as a technique, the specific software/instrumentation for quantitative analysis was not captured"
+    confidence: 0.6  # Moderate confidence - technique vs. specific tool
+    shouldBeAdded: Maybe
+    
+  - toolName: "RT Q-PCR"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "Reverse transcription of messenger RNA from control and tumor specimens followed by RT Q-PCR demonstrated differences"
+    whyMissed: "Alternative naming for qRT-PCR analysis - represents the same analytical approach"
+    confidence: 0.5  # Lower confidence - duplicate of qRT-PCR
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "normalized with.*control gene"
+    toolType: "genetic_reagent"
+    examples: ["normalized with standardization to a single constitutively expressed control gene, human cyclophylin"]
+    reasoning: "Control genes used for normalization represent specific primer/probe sets that are research tools"
+    
+  - patternType: "context_phrase"
+    pattern: "constitutively expressed.*gene"
+    toolType: "genetic_reagent"
+    examples: ["constitutively expressed control gene, human cyclophylin"]
+    reasoning: "Housekeeping/control genes mentioned in qRT-PCR context typically represent primer/probe reagents"
+    
+  - patternType: "naming_convention"
+    pattern: "human [A-Z][a-z]+"
+    toolType: "genetic_reagent"
+    examples: ["human cyclophylin"]
+    reasoning: "Species-specific gene names in molecular biology context often represent primers/probes for that target"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}  # Empty since no observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite it being a clear molecular biology study
+    - The Methods section is extremely brief and lacks detail about specific reagents, instruments, or software used
+    - Control gene (cyclophylin) mentioned for normalization represents genetic reagents that were missed
+    - qRT-PCR technique mentioned but specific analysis tools/software not captured
+    - Limited text available may have contributed to poor tool detection
+  recommendations: |
+    Overall recommendations for this publication:
+    - This is a legitimate lab research study that should contain research tools
+    - The control gene "cyclophylin" should be added as a genetic reagent (primers/probes)
+    - Mining patterns should be improved to capture control genes and normalization standards
+    - More detailed Methods sections would improve tool detection
+    - Consider that brief/incomplete text sections may limit tool mining effectiveness
+    - The publication represents the type of molecular biology research that definitely uses tools, even if not explicitly detailed
+    - Future mining should look for housekeeping genes, control genes, and normalization standards as genetic reagents

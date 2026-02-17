@@ -1,0 +1,188 @@
+publicationMetadata:
+  pmid: "32869517"
+  title: "Genome-wide association study of café-au-lait macule number in neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis - GWAS study):
+    - Computational tools (software, pipelines) → HIGHLY EXPECTED for GWAS analysis
+    - Clinical assessment tools → POSSIBLE for phenotype measurement (CALM counting)
+    - Lab tools (antibodies, cell lines, animal models, genetic reagents) → UNLIKELY for pure GWAS
+    - Advanced cellular models (organoids) → UNLIKELY for GWAS
+    - Patient-derived models (PDX) → UNLIKELY for GWAS
+
+    This is a genome-wide association study (GWAS) analyzing café-au-lait macule counts in NF1 patients.
+    Such studies heavily rely on computational tools for genotyping, quality control, association testing,
+    meta-analysis, and visualization. The extensive Methods section describes multiple software tools
+    that should have been captured by mining.
+  overallAssessment: |
+    This is a computational genomics study (GWAS) that would be expected to use numerous computational
+    tools for data analysis. The extensive Methods section describes genotyping platforms, statistical
+    software, and bioinformatics tools. The complete absence of mined tools (0 found) suggests significant
+    mining failures rather than a true absence of research tools. GWAS studies are tool-intensive and
+    should yield multiple computational tool mentions.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "PLINK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Cryptic relatedness and population stratification were checked with multidimensional scaling (MDS) analysis estimating pairwise identity by descent (IBD) for all pairs of founders using independent SNPs in PLINK (Purcell et al., 2007)..."
+    whyMissed: "Standard bioinformatics tool name not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "EMMAX"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...tests of association between each SNP and log‐transformed CALM number, adjusted for age, sex, and body surface area, were performed with EMMAX (Kang et al., 2010) with an IBS kinship matrix..."
+    whyMissed: "Specialized GWAS software not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "METAL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Meta‐analyses between the CALM1 and CALM2 cohort studies were performed with METAL (Willer, Li, & Abecasis, 2010) with weights proportional to the square‐root of the sample size..."
+    whyMissed: "Meta-analysis software not caught by current patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ComPaSS-GWAS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...ComPaSS‐GWAS (Sabourin et al., 2018), a method based on complementary pairs stability selection (Shah & Samworth, 2013) with a regression based GWAS analysis..."
+    whyMissed: "Specialized GWAS method with hyphenated name not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Haploview"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Haploview 4.2 (Barrett, Fry, Maller, & Daly, 2005) was used to generate LD plots across the genome based on D′ and r2 values to evaluate LD structures..."
+    whyMissed: "Linkage disequilibrium analysis software with version number not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Differences in age, sex, body surface, and CALM number were compared by two‐sided t‐test in R assuming unequal variance between cohorts..."
+    whyMissed: "Single letter software name (R) likely filtered out as too generic"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SNP & Variation Suite"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Quality control for targeted gene sequencing data was done using SNP & Variation Suite v8.3.4 (http://goldenhelix.com/products/SNP_Variation/index.html) and PLINK..."
+    whyMissed: "Commercial software with ampersand and version number not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "LocusZoom"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "...Figure 2 presents a regional visualization of EMMAX results for RPS6KA2 in CALM1 samples (LocusZoom [Pruim et al., 2010])..."
+    whyMissed: "Genomics visualization tool not caught by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "LiftOver"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...LiftOver (Hinrichs et al., 2006) was used to convert genome positions in the CALM1 cohort (NCBI build 36, UCSC hg18) to corresponding positions in the CALM2 cohort..."
+    whyMissed: "UCSC genome coordinate conversion tool not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GTEx"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...eQTL results for all CALM‐associated SNPs and collated genes based on 749 normal skin tissues...were then extracted from GTEx (V7, dbGaP Accession phs000424.v7.p2)..."
+    whyMissed: "Database/resource name not caught as computational tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina Infinium HumanOmni1Quad"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Genotyping for the CALM1 samples was performed on Illumina Infinium HumanOmni‐1Quad bead‐chips..."
+    whyMissed: "Genotyping platform/array name not recognized as computational tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Illumina Infinium Omni2.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Genotyping for the replication cohort CALM2 samples was performed on Illumina Infinium Omni2.5 bead‐chips..."
+    whyMissed: "Genotyping platform/array name not recognized as computational tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(PLINK|EMMAX|METAL|Haploview|LocusZoom|LiftOver)\\b"
+    toolType: "computational_tool"
+    examples: ["PLINK (Purcell et al., 2007)", "EMMAX (Kang et al., 2010)", "METAL (Willer, Li, & Abecasis, 2010)"]
+    reasoning: "Standard bioinformatics software names commonly used in GWAS studies"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(analyzed using|performed with|was done using|were performed with)\\s+([A-Z][A-Za-z0-9\\-_]+)"
+    toolType: "computational_tool"
+    examples: ["performed with EMMAX", "was done using SNP & Variation Suite", "analyzed using R"]
+    reasoning: "Context phrases indicating software usage in analysis"
+
+  - patternType: "naming_convention"
+    pattern: "\\b([A-Z][A-Za-z]+)\\s+v?\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["Haploview 4.2", "SNP & Variation Suite v8.3.4"]
+    reasoning: "Software names followed by version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(ComPaSS-GWAS|[A-Z][A-Za-z]+-[A-Z][A-Za-z]+)"
+    toolType: "computational_tool"
+    examples: ["ComPaSS-GWAS analysis", "Meta-analysis"]
+    reasoning: "Hyphenated method/software names common in bioinformatics"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Illumina\\s+[A-Za-z0-9\\-]+|AmpliSeq/IonTorrent)"
+    toolType: "computational_tool"
+    examples: ["Illumina Infinium HumanOmni‐1Quad", "AmpliSeq/IonTorrent platform"]
+    reasoning: "Commercial platform names with vendor prefixes"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - COMPLETE MINING FAILURE: Zero tools found despite this being a computational genomics study
+    - Publication is a GWAS analysis that heavily relies on computational tools for data processing
+    - Methods section explicitly describes 10+ software tools that should have been captured
+    - Mining patterns appear inadequate for bioinformatics/genomics terminology
+    - Standard GWAS software (PLINK, EMMAX, METAL, Haploview) completely missed
+    - Statistical software (R) and specialized tools (LocusZoom, LiftOver) not caught
+    - Commercial platforms (Illumina arrays) not recognized as computational tools
+  recommendations: |
+    - ALL MINED RESULTS INVALID: No tools were found when 10+ computational tools are clearly present
+    - URGENT PATTERN UPDATES NEEDED: Current mining completely fails for bioinformatics studies
+    - Add patterns for standard GWAS software names (PLINK, EMMAX, METAL, Haploview, etc.)
+    - Include context phrases like "performed with", "analyzed using", "was done using"
+    - Recognize software version patterns (Tool v1.2.3, Tool 4.2)
+    - Add hyphenated method names (ComPaSS-GWAS, Meta-analysis)
+    - Include commercial platform names (Illumina products, vendor/product combinations)
+    - Consider single-letter software names (R) in statistical contexts
+    - This publication demonstrates major gaps in computational tool mining coverage
+    - Manual curator review recommended for all bioinformatics/GWAS publications
+    - No observations could be extracted due to absence of validated tools

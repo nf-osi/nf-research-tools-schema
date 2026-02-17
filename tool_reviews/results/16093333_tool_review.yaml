@@ -1,0 +1,113 @@
+publicationMetadata:
+  pmid: "16093333"
+  title: "Sensory neurons from Nf1 haploinsufficient mice exhibit increased excitability."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This electrophysiology study should contain:
+    - Animal models (Nf1+/- mice, wild-type controls)
+    - Genetic reagents (nerve growth factor, capsaicin)
+    - Potentially computational tools for data analysis
+    
+    Despite lacking a Methods section in the available text, the abstract clearly describes experimental procedures using research tools.
+  overallAssessment: |
+    This is a laboratory research publication using patch-clamp electrophysiology to study sensory neurons from genetically modified mice. The study clearly uses animal models (Nf1+/- mice) and reagents (nerve growth factor, capsaicin) for experimental procedures. Even without a Methods section, the abstract provides sufficient evidence of tool usage. The complete absence of mined tools represents a significant mining failure for this publication type.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...sensory neurons isolated from the dorsal root ganglia of adult mice with a heterozygous mutation of the Nf1 gene (Nf1+/-), analogous to the human mutation..."
+    whyMissed: "Standard genetic nomenclature for heterozygous knockout mice not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "wild-type mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...in comparison to wildtype sensory neurons...Nf1+/- neurons had lower firing thresholds, lower rheobase currents, and shorter firing latencies than wild-type neurons..."
+    whyMissed: "Control animal model terminology not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "nerve growth factor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...nerve growth factor augmented the excitability of wild-type neurons in a concentration-related manner but did not further alter the excitability of the Nf1+/- sensory neurons..."
+    whyMissed: "Growth factor reagent not recognized as research tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "capsaicin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we examined the excitability of capsaicin-sensitive sensory neurons isolated from the dorsal root ganglia..."
+    whyMissed: "Chemical reagent used for neuron identification not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+[+/-]+ mice|[A-Za-z0-9]+[+/-]+ mouse"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "p53+/- mice", "BRCA1+/- mouse"]
+    reasoning: "Genetic nomenclature for heterozygous knockout mice is standard in research but not captured by current patterns"
+
+  - patternType: "term"
+    pattern: "wild-type mice|wildtype mice|wild-type mouse|wildtype mouse|WT mice|WT mouse"
+    toolType: "animal_model"
+    examples: ["wild-type neurons", "wildtype sensory neurons"]
+    reasoning: "Control animal models are essential research tools but often missed by mining patterns"
+
+  - patternType: "term"
+    pattern: "nerve growth factor|NGF|brain-derived neurotrophic factor|BDNF|epidermal growth factor|EGF"
+    toolType: "genetic_reagent"
+    examples: ["nerve growth factor augmented the excitability"]
+    reasoning: "Growth factors are commonly used reagents in neuroscience research"
+
+  - patternType: "context_phrase"
+    pattern: "capsaicin-sensitive|capsaicin-responsive|TRPV1-positive"
+    toolType: "genetic_reagent"
+    examples: ["capsaicin-sensitive sensory neurons"]
+    reasoning: "Capsaicin is used as a reagent to identify specific neuron populations in pain research"
+
+  - patternType: "context_phrase"
+    pattern: "isolated from|neurons from|cells from|tissue from"
+    toolType: "general"
+    examples: ["sensory neurons isolated from the dorsal root ganglia"]
+    reasoning: "Context phrases indicating primary cell/tissue isolation often accompany animal model usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - 0 tools detected from clear lab research publication
+    - Missing animal models: Nf1+/- mice and wild-type controls are essential tools
+    - Missing reagents: nerve growth factor and capsaicin used experimentally
+    - Genetic nomenclature not recognized: Standard Nf1+/- notation missed
+    - Control models ignored: Wild-type mice not detected as research tools
+  recommendations: |
+    This publication represents a significant mining failure. Despite being a clear laboratory research study using multiple research tools, zero tools were detected. Key recommendations:
+    
+    1. IMMEDIATE ACTION NEEDED: Add all 4 missed tools to the database
+    2. PATTERN UPDATES: Implement suggested patterns for genetic nomenclature and growth factors
+    3. MINING REVIEW: This failure suggests systematic issues with animal model detection
+    4. QUALITY CONTROL: Publications with queryType="bench" and zero tools should be flagged for manual review
+    5. VALIDATION: Test new patterns against similar electrophysiology/neuroscience publications
+    
+    The absence of Methods/Results sections limited observation extraction, but the tools themselves are clearly identifiable from the abstract. This publication should be used as a test case for improving mining accuracy in neuroscience research.

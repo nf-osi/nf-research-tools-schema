@@ -1,0 +1,134 @@
+publicationMetadata:
+  pmid: "20551058"
+  title: "Cyclic AMP suppression is sufficient to induce gliomagenesis in a mouse model of neurofibromatosis-1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is clearly laboratory research involving genetically engineered mouse models,
+    genetic constructs for ectopic expression, and pharmacological reagents. Despite lacking a
+    Methods section in the available text, the abstract describes experimental procedures using
+    multiple research tools including NF1 GEM mouse models, PDE4A1 expression constructs, and
+    the PDE4 inhibitor rolipram.
+  overallAssessment: |
+    This is a laboratory research publication that extensively uses research tools including genetically
+    engineered mouse models, genetic reagents for ectopic expression, and pharmacological compounds.
+    The study describes experimental manipulation of cAMP levels in mouse brain tissue and in vivo
+    tumor growth studies, which clearly indicates active tool usage rather than observational research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 GEM"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromatosis-1 (NF1) genetically engineered mouse (GEM) models to understand the spatial restriction of glioma formation...cortex of Nf1 GEM strains. Ectopic PDE4A1 expression..."
+    whyMissed: "Standard abbreviation 'GEM' for genetically engineered mouse not recognized, and 'Nf1 GEM' pattern not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibromatosis-1 genetically engineered mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Previous studies from our laboratories have used neurofibromatosis-1 (NF1) genetically engineered mouse (GEM) models to understand the spatial restriction..."
+    whyMissed: "Long descriptive phrase not captured by existing patterns, likely too specific for current regex"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 GEM strains"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Focal cAMP reduction was achieved by forced expression of phosphodiesterase 4A1 (PDE4A1) in the cortex of Nf1 GEM strains. Ectopic PDE4A1 expression produced..."
+    whyMissed: "Specific strain terminology not recognized, 'strains' keyword may not be in animal model patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PDE4A1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Focal cAMP reduction was achieved by forced expression of phosphodiesterase 4A1 (PDE4A1) in the cortex of Nf1 GEM strains. Ectopic PDE4A1 expression produced..."
+    whyMissed: "Genetic construct for ectopic expression not recognized, may lack patterns for 'forced expression' or 'ectopic expression' context"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "phosphodiesterase 4A1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Focal cAMP reduction was achieved by forced expression of phosphodiesterase 4A1 (PDE4A1) in the cortex of Nf1 GEM strains..."
+    whyMissed: "Full protein name for expression construct not captured, patterns may focus on abbreviated forms"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "rolipram"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Conversely, pharmacologic elevation of cAMP with the PDE4 inhibitor rolipram dramatically inhibited optic glioma growth and tumor size in Nf1 GEM in vivo..."
+    whyMissed: "Pharmacological reagent not recognized, may lack patterns for 'inhibitor' context or specific drug names"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-z0-9]+\\s+GEM\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 GEM", "Apc GEM", "Trp53 GEM"]
+    reasoning: "GEM (genetically engineered mouse) is a standard abbreviation for transgenic mouse models, often preceded by gene name"
+
+  - patternType: "context_phrase"
+    pattern: "genetically engineered mouse \\(GEM\\) models?"
+    toolType: "animal_model"
+    examples: ["neurofibromatosis-1 (NF1) genetically engineered mouse (GEM) models"]
+    reasoning: "Full descriptive phrase for GEM models that includes the standard abbreviation in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+GEM\\s+strains?\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 GEM strains", "Apc GEM strain"]
+    reasoning: "Specific strain terminology for genetically engineered mouse models"
+
+  - patternType: "context_phrase"
+    pattern: "(?:forced|ectopic)\\s+expression\\s+of\\s+([A-Z0-9]+[A-Za-z0-9]*)"
+    toolType: "genetic_reagent"
+    examples: ["forced expression of phosphodiesterase 4A1 (PDE4A1)", "ectopic PDE4A1 expression"]
+    reasoning: "Context phrases indicating genetic constructs used for overexpression experiments"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+inhibitor\\s+(\\w+)\\b"
+    toolType: "genetic_reagent"
+    examples: ["PDE4 inhibitor rolipram"]
+    reasoning: "Pharmacological reagents described as inhibitors of specific targets"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[0-9]+[A-Z]*[0-9]*\\b"
+    toolType: "genetic_reagent"
+    examples: ["PDE4A1", "EGFR", "TP53"]
+    reasoning: "Standard protein/gene nomenclature that may represent expression constructs or targets"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete mining failure: No tools were detected despite clear presence of multiple research tools
+    - Missing animal model detection: Multiple references to Nf1 GEM (genetically engineered mouse) models not captured
+    - Missing genetic reagent detection: PDE4A1 expression constructs and rolipram inhibitor not detected
+    - Pattern gaps: Current patterns appear to miss standard GEM nomenclature and expression construct terminology
+    - Abstract-only limitation: Only abstract available, but contains sufficient tool information for detection
+  recommendations: |
+    - CRITICAL: All 6 identified tools should be added to the mining results as they represent genuine research tools
+    - Implement suggested patterns to capture GEM models, expression constructs, and pharmacological reagents
+    - Review and expand animal model patterns to include "GEM" abbreviation and "strains" terminology
+    - Add context patterns for "forced expression", "ectopic expression", and "inhibitor" to capture genetic reagents
+    - This publication demonstrates significant gaps in current mining patterns for mouse models and genetic tools
+    - No observations could be extracted due to lack of Results/Discussion sections, but tools are clearly present and used

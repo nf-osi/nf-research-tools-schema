@@ -1,0 +1,203 @@
+publicationMetadata:
+  pmid: "32642741"
+  title: "Effect of age and neurofibromatosis type 1 status on white matter integrity in the optic radiations"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a neuroimaging research study using diffusion tensor imaging (DTI) to analyze white matter integrity.
+    Expected tool types:
+    - Computational tools: MRI analysis software (FSL, PROBTRACKX, TBSS), statistical analysis tools
+    - Potentially clinical assessment tools: Visual acuity measurements (logMAR)
+    
+    The study involves sophisticated image processing and statistical analysis, so computational tools are highly expected.
+    Clinical assessment tools may be present for measuring visual outcomes.
+  overallAssessment: |
+    This is a quantitative neuroimaging study with extensive computational analysis using DTI data from 93 children.
+    The Methods section describes detailed image processing pipelines, statistical modeling, and specialized neuroimaging software.
+    Multiple computational tools should be present for MRI data processing, tractography, and statistical analysis.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "FSL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Briefly, using FSL version 5.0.7 (FMRIB), b = 0 maps were registered to a standard space"
+    whyMissed: "Specific software name with version number mentioned in methods - clear computational tool usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROBTRACKX"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Probabilistic streamline fiber tracking (PROBTRACKX) was used with 1000 starting points seeded in each voxel"
+    whyMissed: "Specific tractography software tool mentioned in methods section"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TBSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Voxelwise statistical analysis of FA data was accomplished using Tract-Based Spatial Statistics (TBSS)"
+    whyMissed: "Specific neuroimaging analysis software with full name and acronym"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Siemens Trio"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DTI was obtained on 4 different Siemens 3T MR scanners: Trio (n = 40 scans), Verio (n = 41 scans)"
+    whyMissed: "Specific MRI scanner model used for data acquisition"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Siemens Verio"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DTI was obtained on 4 different Siemens 3T MR scanners: Trio (n = 40 scans), Verio (n = 41 scans)"
+    whyMissed: "Specific MRI scanner model used for data acquisition"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Siemens Skyra"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Skyra (n = 12 scans), and Prisma (n = 2)"
+    whyMissed: "Specific MRI scanner model used for data acquisition"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Siemens Prisma"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Skyra (n = 12 scans), and Prisma (n = 2)"
+    whyMissed: "Specific MRI scanner model used for data acquisition"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "logMAR"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Of 24 patients with normal visual acuity (logMAR < 0.2 compared to age-based norms)"
+    whyMissed: "Standard clinical visual acuity assessment tool used to measure outcomes"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FSL version [0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["FSL version 5.0.7"]
+    reasoning: "FSL is a major neuroimaging software suite, version numbers indicate actual usage"
+
+  - patternType: "term"
+    pattern: "PROBTRACKX"
+    toolType: "computational_tool"
+    examples: ["Probabilistic streamline fiber tracking (PROBTRACKX)"]
+    reasoning: "Specific FSL tractography tool commonly used in DTI studies"
+
+  - patternType: "term"
+    pattern: "TBSS|Tract-Based Spatial Statistics"
+    toolType: "computational_tool"
+    examples: ["Tract-Based Spatial Statistics (TBSS)"]
+    reasoning: "Standard neuroimaging analysis method for DTI data"
+
+  - patternType: "term"
+    pattern: "Siemens (Trio|Verio|Skyra|Prisma|Avanto|Sonata)"
+    toolType: "computational_tool"
+    examples: ["Siemens Trio", "Siemens Verio", "Siemens Skyra", "Siemens Prisma"]
+    reasoning: "Specific MRI scanner models are research tools for data acquisition"
+
+  - patternType: "term"
+    pattern: "logMAR"
+    toolType: "clinical_assessment_tool"
+    examples: ["logMAR < 0.2", "logMAR ≥ 0.4"]
+    reasoning: "Standard logarithmic visual acuity measurement scale used in clinical research"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|obtained on|acquired with"
+    toolType: "general"
+    examples: ["analyzed using FSL", "obtained on Siemens scanners"]
+    reasoning: "These phrases often precede tool names and indicate actual usage"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}[0-9]*X?\\b"
+    toolType: "computational_tool"
+    examples: ["PROBTRACKX", "TBSS"]
+    reasoning: "Many neuroimaging tools use all-caps naming conventions"
+
+observations:
+  - resourceName: "FSL"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FSL version 5.0.7 was used for DTI preprocessing and analysis. The software was used to register b=0 maps to standard space (Montreal Neurologic Institute 152 T1 map with 2mm slice thickness). The inverse transformation matrix was applied to map standard space regions to participant data.
+    foundIn: "methods"
+    contextSnippet: "using FSL version 5.0.7 (FMRIB), b = 0 maps were registered to a standard space (Montreal Neurologic Institute 152 T1 map with 2 mm slice thickness)"
+    confidence: 0.9
+    doi: "10.1093/noajnl/vdaa037"
+
+  - resourceName: "PROBTRACKX"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PROBTRACKX was used for probabilistic streamline fiber tracking with 1000 starting points seeded in each voxel of the lateral geniculate nucleus, with waypoints in the occipital pole and exclusion masks. No connectivity threshold was used and tracts were not manually trimmed.
+    foundIn: "methods"
+    contextSnippet: "Probabilistic streamline fiber tracking (PROBTRACKX) was used with 1000 starting points seeded in each voxel of the lateral geniculate nucleus, a waypoint in the occipital pole, and exclusion masks"
+    confidence: 0.9
+    doi: "10.1093/noajnl/vdaa037"
+
+  - resourceName: "TBSS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      TBSS was used for voxelwise statistical analysis of FA data in all participants, adjusting for the natural logarithm of age. A nonlinear registration tool aligned all participants' FA data to common space, and a mean FA skeleton was created to represent white matter tract cores. Individual FA data were projected onto this skeleton for cross-subject statistical analysis.
+    foundIn: "methods"
+    contextSnippet: "Voxelwise statistical analysis of FA data was accomplished using Tract-Based Spatial Statistics (TBSS) in all participants adjusting for the natural logarithm of age"
+    confidence: 0.9
+    doi: "10.1093/noajnl/vdaa037"
+
+  - resourceName: "logMAR"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      logMAR visual acuity measurements were used to classify patients into three groups: normal visual acuity (logMAR < 0.2), moderate visual acuity loss (0.2 ≥ logMAR > 0.4), and severe visual acuity loss (logMAR ≥ 0.4). The tool was effective in correlating with DTI measures, with 91% of patients with severe visual acuity loss having RD above the 95% CI for age.
+    foundIn: "results"
+    contextSnippet: "Of 24 patients with normal visual acuity (logMAR < 0.2 compared to age-based norms), 20 (83.3%) had mean RD of the optic radiations below the upper 95% CI for age"
+    confidence: 0.85
+    doi: "10.1093/noajnl/vdaa037"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 7
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear computational tool usage
+    - Multiple neuroimaging software tools (FSL, PROBTRACKX, TBSS) with version numbers were missed
+    - Specific MRI scanner models used for data acquisition were not captured
+    - Clinical assessment tool (logMAR) for visual acuity measurement was missed
+    - The mining system appears to have completely failed to detect any tools in this neuroimaging study
+  recommendations: |
+    This publication should have yielded multiple computational tools and at least one clinical assessment tool:
+    - FSL v5.0.7, PROBTRACKX, and TBSS are standard neuroimaging analysis tools that should be captured
+    - Siemens MRI scanner models (Trio, Verio, Skyra, Prisma) are research instruments
+    - logMAR is a validated clinical visual acuity assessment tool
+    - The complete absence of mined tools suggests systematic issues with the mining patterns
+    - Neuroimaging publications require specialized patterns to capture software tools and scanner models
+    - Clinical assessment tools like logMAR need better pattern coverage
+    - All 8 potentially missed tools should be added to improve mining accuracy
+    - The suggested patterns would significantly improve detection of neuroimaging and clinical assessment tools

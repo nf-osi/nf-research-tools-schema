@@ -1,0 +1,357 @@
+publicationMetadata:
+  pmid: "37246765"
+  title: "Ex vivo to in vivo model of malignant peripheral nerve sheath tumors for precision oncology."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research publication focused on developing patient-derived xenograft (PDX) models
+    and 3D microtissue platforms for MPNST drug screening. Expected tool types include:
+    - Patient-derived models (PDX models, which are explicitly described)
+    - Advanced cellular models (3D microtissues, organoid-like structures)
+    - Animal models (NRG mice, NOD-Rag1 null IL2rg mice)
+    - Cell lines (ST88-14 MPNST cell line mentioned)
+    - Antibodies (multiple antibodies listed for flow cytometry and immunofluorescence)
+    - Computational tools (multiple bioinformatics tools and software mentioned)
+    - Genetic reagents (various kits and reagents for cell processing)
+    
+    The publication spans multiple tool categories as it involves both model development and
+    computational analysis of genomic data.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that extensively uses and develops multiple types of research tools.
+    The detailed Methods section describes PDX model establishment, 3D microtissue fabrication, genomic analysis pipelines,
+    and drug screening protocols. The complete absence of mined tools suggests significant gaps in the mining algorithm,
+    as this publication clearly contains numerous antibodies, computational tools, animal models, and advanced cellular models.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NRG mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Tumor tissue was implanted dorsally into 5- to 6-week-old NOD-Rag1 null IL2rg (NRG) mice."
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NOD-Rag1 null IL2rg mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Tumor tissue was implanted dorsally into 5- to 6-week-old NOD-Rag1 null IL2rg (NRG) mice."
+    whyMissed: "Complex mouse strain nomenclature not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ST88-14"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "PDX cells and the MPNST cell line, ST88-14 (gift from Dr. Nancy Ratner, PhD, University of Cincinnati)"
+    whyMissed: "Cell line name pattern not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-human HLA-A,B,C"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "following Biolegend antibodies and stains: anti-human HLA-A,B,C (311405)"
+    whyMissed: "Antibody naming pattern with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-mouse H-2"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-mouse H-2 (125505), Mouse IgG1, κ Isotype Ctrl (FC) Antibody (400113)"
+    whyMissed: "Antibody naming pattern not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Ki-67 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Ki-67 (RM9106S1, Fisher Scientific), S-100 b (sc-393919, Santa Cruz Biotechnology)"
+    whyMissed: "Antibody target name without 'anti-' prefix not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "S-100 b antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "S-100 b (sc-393919, Santa Cruz Biotechnology), H3K27me3 (9733, Cell Signaling Technologies)"
+    whyMissed: "Antibody target name without 'anti-' prefix not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "H3K27me3 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "H3K27me3 (9733, Cell Signaling Technologies), pERK (4370, Cell Signaling Technologies)"
+    whyMissed: "Antibody target name without 'anti-' prefix not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pERK antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "pERK (4370, Cell Signaling Technologies). Microtissues were assessed for compaction"
+    whyMissed: "Antibody target name without 'anti-' prefix not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "human nuclei antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "using the following antibodies: human nuclei (ab254080, Abcam), Ki-67 (RM9106S1, Fisher Scientific)"
+    whyMissed: "Antibody target description not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Trimmomatic"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "WES sequencing FASTQ files were trimmed using Trimmomatic v 0.39"
+    whyMissed: "Bioinformatics tool name not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BWA-MEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "aligned against reference sequence hg38 via BWA-MEM"
+    whyMissed: "Bioinformatics alignment tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GATK V4.2 base quality score recalibration (BQSR) was used to process BAM files"
+    whyMissed: "Major bioinformatics toolkit not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Xenosplit"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For PDX sequence data, Xenosplit was used to filter mouse-derived reads"
+    whyMissed: "Specialized bioinformatics tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "VarScan2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Somatic single nucleotide variants (SNVs) and small insertions or deletions (indels) were detected using VarScan2, Strelka2, MuTect2"
+    whyMissed: "Variant calling tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Strelka2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "detected using VarScan2, Strelka2, MuTect2, and Pindel"
+    whyMissed: "Variant calling tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MuTect2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "detected using VarScan2, Strelka2, MuTect2, and Pindel"
+    whyMissed: "Variant calling tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pindel"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "detected using VarScan2, Strelka2, MuTect2, and Pindel"
+    whyMissed: "Indel detection tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CNVkit"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CNVkit V2.0 was used to infer and visualize copy number"
+    whyMissed: "Copy number analysis tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Salmon"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "which includes quantitation with the Salmon algorithm"
+    whyMissed: "RNA-seq quantification tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene counts and transcript counts were normalized by using the DESeq2 package"
+    whyMissed: "RNA-seq analysis package not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cellpose"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "images were further analyzed using Cellpose (Stringer et al., 2021) and ImageJ (NIH)"
+    whyMissed: "Cell segmentation software not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "images were further analyzed using Cellpose (Stringer et al., 2021) and ImageJ (NIH)"
+    whyMissed: "Image analysis software not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were analyzed with GraphPad Prism and dose–response curves generated"
+    whyMissed: "Statistical analysis software not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "3D microtissues"
+    toolType: "advanced_cellular_model"
+    foundIn: "methods"
+    contextSnippet: "We successfully assembled PDX into 3D microtissues, categorized as robust (>90% viability at 48 h)"
+    whyMissed: "3D culture model terminology not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST-PDX models"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "We developed 13 NF1-associated MPNST-PDX and identified mutations"
+    whyMissed: "PDX model terminology not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Human Tumor Dissociation Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "immediately digested using the human Tumor Dissociation Kit (130-095-929, Miltenyi Biotec)"
+    whyMissed: "Commercial kit with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Dead Cell Removal Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Dead cells were removed from the digested PDX using a Dead Cell Removal Kit (130-090-101, Miltenyi Biotec)"
+    whyMissed: "Commercial kit with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Mouse Cell Depletion Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Murine cells were removed from the dead cell depleted fraction using a Mouse Cell Depletion Kit (130-104-694, Miltenyi Biotec)"
+    whyMissed: "Commercial kit with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,4}[0-9-]+\\b mice"
+    toolType: "animal_model"
+    examples: ["NRG mice", "NOD-Rag1 null IL2rg mice"]
+    reasoning: "Mouse strain nomenclature patterns with alphanumeric codes followed by 'mice'"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,4}[0-9]{2}-[0-9]{2}\\b"
+    toolType: "cell_line"
+    examples: ["ST88-14"]
+    reasoning: "Cell line naming convention with letters followed by numbers and hyphens"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies and stains: ([^.]+)"
+    toolType: "antibody"
+    examples: ["anti-human HLA-A,B,C (311405)", "anti-mouse H-2 (125505)"]
+    reasoning: "Context phrase that introduces lists of antibodies with catalog numbers"
+
+  - patternType: "context_phrase"
+    pattern: "using the following antibodies: ([^.]+)"
+    toolType: "antibody"
+    examples: ["human nuclei (ab254080, Abcam)", "Ki-67 (RM9106S1, Fisher Scientific)"]
+    reasoning: "Context phrase that introduces antibody lists for immunofluorescence"
+
+  - patternType: "term"
+    pattern: "\\b(Ki-67|S-100|H3K27me3|pERK|human nuclei)\\b \\([^)]+\\)"
+    toolType: "antibody"
+    examples: ["Ki-67 (RM9106S1, Fisher Scientific)", "S-100 b (sc-393919, Santa Cruz Biotechnology)"]
+    reasoning: "Antibody targets without 'anti-' prefix but with catalog numbers in parentheses"
+
+  - patternType: "term"
+    pattern: "\\b(Trimmomatic|BWA-MEM|GATK|Xenosplit|VarScan2|Strelka2|MuTect2|Pindel|CNVkit|Salmon|DESeq2|Cellpose|ImageJ)\\b"
+    toolType: "computational_tool"
+    examples: ["Trimmomatic v 0.39", "BWA-MEM", "GATK V4.2", "DESeq2 package"]
+    reasoning: "Common bioinformatics and analysis software names"
+
+  - patternType: "context_phrase"
+    pattern: "were (trimmed|aligned|detected|analyzed|normalized) using ([A-Za-z0-9]+)"
+    toolType: "computational_tool"
+    examples: ["were trimmed using Trimmomatic", "were analyzed using Cellpose"]
+    reasoning: "Context phrases indicating computational tool usage in analysis pipelines"
+
+  - patternType: "term"
+    pattern: "\\b3D microtissues?\\b"
+    toolType: "advanced_cellular_model"
+    examples: ["3D microtissues"]
+    reasoning: "3D culture model terminology"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z]+-PDX\\b"
+    toolType: "patient_derived_model"
+    examples: ["MPNST-PDX"]
+    reasoning: "PDX model naming convention with disease prefix"
+
+  - patternType: "context_phrase"
+    pattern: "using (a|the) ([A-Za-z ]+Kit) \\([0-9-]+, [A-Za-z ]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["using the human Tumor Dissociation Kit (130-095-929, Miltenyi Biotec)"]
+    reasoning: "Commercial kits with catalog numbers and vendor information"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([0-9-]+, (Miltenyi Biotec|Abcam|Fisher Scientific|Santa Cruz Biotechnology|Cell Signaling Technologies|Biolegend)\\)"
+    toolType: "general"
+    examples: ["(130-095-929, Miltenyi Biotec)", "(ab254080, Abcam)"]
+    reasoning: "Catalog number and vendor patterns that indicate research reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 28
+  newPatternsCount: 10
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - zero tools detected from a publication rich in research tools
+    - Publication contains extensive Methods section with detailed protocols using numerous research tools
+    - Multiple tool categories present: antibodies (10+), computational tools (12+), animal models (2), cell lines (1), advanced cellular models (1), patient-derived models (1), genetic reagents (3)
+    - Mining patterns appear to miss standard bioinformatics tools, antibody naming conventions, mouse strain nomenclature, and commercial kit terminology
+    - No Results or Discussion sections provided, preventing observation extraction
+  recommendations: |
+    - URGENT: Review and expand mining patterns to capture the tool types identified in this publication
+    - Add patterns for bioinformatics software (Trimmomatic, GATK, BWA-MEM, etc.)
+    - Add patterns for antibody targets without 'anti-' prefix but with catalog numbers
+    - Add patterns for mouse strain nomenclature (NRG, NOD-Rag1 null IL2rg)
+    - Add patterns for commercial kits with catalog numbers and vendor information
+    - Add patterns for 3D culture models and PDX terminology
+    - Consider context-based mining around phrases like "using", "analyzed with", "antibodies and stains"
+    - This publication demonstrates significant gaps in current mining coverage
+    - All 28 potentially missed tools should be added to improve future mining accuracy
+    - The 10 suggested patterns would significantly improve tool detection for similar publications

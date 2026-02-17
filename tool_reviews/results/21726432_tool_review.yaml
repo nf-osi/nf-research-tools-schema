@@ -1,0 +1,313 @@
+publicationMetadata:
+  pmid: "21726432"
+  title: "MIA is a potential biomarker for tumour load in neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study combining mouse genetics, molecular biology, and clinical analysis.
+    Expected tool types:
+    - Animal models: Nf1Prx1 mice (conditional knockout), C57BL/6J background strain
+    - Antibodies: anti-human MIA antibody for immunohistochemistry
+    - Genetic reagents: Nf1flox mice, Prx1-Cre transgenic mice
+    - Computational tools: AxioVision software, analySIS software for microscopy
+    - Clinical assessment tools: potentially MIA ELISA for biomarker measurement
+    
+    The study involves both bench research (mouse models, molecular techniques) and clinical
+    sample analysis, so multiple tool categories are expected.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that should contain numerous research tools.
+    The study uses mouse genetic models, molecular biology techniques (in situ hybridization, qRT-PCR),
+    immunohistochemistry, and clinical sample analysis. The complete absence of mined tools indicates
+    major gaps in the mining patterns, as this publication clearly describes experimental usage of
+    multiple antibodies, animal models, genetic reagents, and computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1Prx1 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...mice bearing conditional inactivation of NF1 in the developing limbs. These mice do not develop tumours but recapitulate aspects of NF1 bone dysplasia..."
+    whyMissed: "Conditional knockout mouse model not recognized - needs pattern for 'Nf1Prx1' or 'conditional inactivation' context"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6J mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...The mice were continuously back-crossed to wild-type C57BL/6J to minimize the variation of genetic background..."
+    whyMissed: "Standard inbred mouse strain not recognized - needs pattern for 'C57BL/6J' strain nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1flox mice"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...The female Nf1flox mice were crossed to male Nf1flox heterozygous Prx1-Cre-positive males..."
+    whyMissed: "Floxed allele notation not recognized - needs pattern for 'flox' or conditional allele nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Prx1-Cre mice"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...male Nf1flox heterozygous Prx1-Cre-positive males and the offspring genotyped..."
+    whyMissed: "Cre recombinase transgenic line not recognized - needs pattern for 'Cre' transgenic nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-human MIA antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...stained with monoclonal anti-human MIA antibody (R&D Systems, McKinley Place NE, Minneapolis) diluted at 1:40..."
+    whyMissed: "Antibody with vendor information not recognized - needs pattern for 'anti-[target] antibody' with vendor context"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AxioVision 4.1 software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...equipped with an AxioCam HRc camera (Zeiss, Jena, Germany) and evaluated using AxioVision 4.1 software (Zeiss, Jena, Germany)..."
+    whyMissed: "Microscopy software with version not recognized - needs pattern for software names with versions"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "analySIS 5.0 software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Stained sections were analyzed using the BX51 microscope (Olimpus, Hamburg, Germany) and analySIS 5.0 software (Soft imaging system GmbH, Münster, Germany)..."
+    whyMissed: "Image analysis software with version not recognized - needs pattern for analysis software with versions"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MIA ELISA kit"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...The MIA ELISA kit was purchased from (Roche Diagnostics, Indianapolis, IN, USA) and the measurements were conducted in duplicate..."
+    whyMissed: "ELISA kit for biomarker measurement not recognized - needs pattern for 'ELISA kit' with vendor context"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TechMate automated staining system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The streptavidin-biotin method was performed using an automated staining system TechMate (Dako, Hamburg, Germany)..."
+    whyMissed: "Automated laboratory equipment not recognized - needs pattern for automated systems with vendor"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ABI PRISM 7900 Cycler"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...TaqMan Universal PCR Master Mix was then performed on an ABI PRISM 7900 Cycler (Applied Biosystems)..."
+    whyMissed: "PCR cycler instrument not recognized - needs pattern for laboratory instruments with model numbers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[A-Z][a-z0-9]+ mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1Prx1 mice", "C57BL/6J mice"]
+    reasoning: "Mouse strain/line nomenclature pattern - captures both transgenic lines and inbred strains"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+flox\\b"
+    toolType: "genetic_reagent"
+    examples: ["Nf1flox mice"]
+    reasoning: "Floxed allele nomenclature - standard notation for conditional knockout alleles"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+-Cre\\b"
+    toolType: "genetic_reagent"
+    examples: ["Prx1-Cre mice"]
+    reasoning: "Cre recombinase transgenic line nomenclature - standard for conditional knockout systems"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z0-9]+ antibody.*\\([^)]+\\)"
+    toolType: "antibody"
+    examples: ["anti-human MIA antibody (R&D Systems, McKinley Place NE, Minneapolis)"]
+    reasoning: "Antibody mentions with vendor information in parentheses - high confidence tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Za-z]+ software.*v?[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["AxioVision 4.1 software", "analySIS 5.0 software"]
+    reasoning: "Software names with version numbers - indicates actual usage rather than citation"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z]+ ELISA kit.*\\([^)]+\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["MIA ELISA kit was purchased from (Roche Diagnostics, Indianapolis, IN, USA)"]
+    reasoning: "ELISA kits with vendor information - biomarker measurement tools"
+
+  - patternType: "context_phrase"
+    pattern: "automated.*system [A-Z][a-zA-Z0-9]+.*\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["automated staining system TechMate (Dako, Hamburg, Germany)"]
+    reasoning: "Automated laboratory systems with vendor - laboratory instrumentation"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]+ [A-Z]+ [0-9]+ [A-Za-z]+\\b"
+    toolType: "computational_tool"
+    examples: ["ABI PRISM 7900 Cycler"]
+    reasoning: "Laboratory instrument model nomenclature - manufacturer + model + type"
+
+  - patternType: "context_phrase"
+    pattern: "conditional inactivation of [A-Z0-9]+"
+    toolType: "animal_model"
+    examples: ["mice bearing conditional inactivation of NF1"]
+    reasoning: "Conditional knockout description - indicates genetically modified animal model"
+
+  - patternType: "vendor_indicator"
+    pattern: "purchased from.*\\([^)]+\\)"
+    toolType: "general"
+    examples: ["purchased from (Roche Diagnostics, Indianapolis, IN, USA)"]
+    reasoning: "Vendor purchase information - strong indicator of actual tool usage rather than citation"
+
+observations:
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005382"
+    details: |
+      Increased expression of Mia was found in Nf1-deficient cartilage in mice. qRT-PCR revealed 
+      a more than twofold increase of Mia expression in Nf1Prx1-deficient cartilage compared to 
+      wild-type tissue, normalized to GAPDH expression. This demonstrates that conditional 
+      inactivation of Nf1 in developing limbs leads to upregulation of the SOX9 target gene Mia.
+    foundIn: "results"
+    contextSnippet: "...qRT-PCR revealed a more than twofold increase of Mia expression in Nf1Prx1-deficient cartilage..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002164"
+    details: |
+      These mice do not develop tumours but recapitulate aspects of NF1 bone dysplasia, including 
+      deregulation of cartilage differentiation. The model shows upregulation and persistently 
+      nuclear localization of the transcription factor SOX9 in Nf1-deficient embryonic cartilage.
+    foundIn: "methods"
+    contextSnippet: "...These mice do not develop tumours but recapitulate aspects of NF1 bone dysplasia, including deregulation of cartilage differentiation..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+  - resourceName: "anti-human MIA antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Monoclonal anti-human MIA antibody (R&D Systems) used at 1:40 dilution for immunohistochemical 
+      detection. Sections were boiled in citrate buffer (pH 6.1) for antigen retrieval. The 
+      streptavidin-biotin method was performed using automated staining system. Negative controls 
+      were performed with normal serum or antibody preincubated with excess recombinant human MIA.
+    foundIn: "methods"
+    contextSnippet: "...stained with monoclonal anti-human MIA antibody (R&D Systems, McKinley Place NE, Minneapolis) diluted at 1:40..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+  - resourceName: "anti-human MIA antibody"
+    resourceType: "Antibody"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005382"
+    details: |
+      MIA was immunohistochemically detected in all NF1-related tumours tested (cutaneous and 
+      plexiform neurofibromas, and MPNSTs). The typical pattern showed a mixture of positive and 
+      negative nuclei side-by-side, with 50-90% of cells being MIA-positive. The most intense 
+      staining was obtained in MPNSTs due to high nuclear density.
+    foundIn: "results"
+    contextSnippet: "...MIA was immunohistochemically detected on the paraffin sections of six cutaneous and three plexiform neurofibromas and in seven MPNSTs..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+  - resourceName: "MIA ELISA kit"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MIA ELISA kit (Roche Diagnostics) used for serum biomarker measurement. Measurements were 
+      conducted in duplicate according to supplied protocol. Internal negative and positive quality 
+      controls were provided in each kit and run in triplicate in each assay. Serum samples were 
+      prepared using standardized protocol and stored at -80°C in 100-μL aliquots.
+    foundIn: "methods"
+    contextSnippet: "...The MIA ELISA kit was purchased from (Roche Diagnostics, Indianapolis, IN, USA) and the measurements were conducted in duplicate..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+  - resourceName: "MIA ELISA kit"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005382"
+    details: |
+      MIA serum concentration was significantly higher in NF1 patients than in healthy controls: 
+      15.16 ± 1.26 pg/mL versus 4.54 ± 0.40 pg/mL (P < 0.001). Among NF1 patients, those with 
+      plexiform neurofibromas had significantly higher MIA levels (P = 0.032). Linear regression 
+      analysis revealed strong association between total internal tumour load and MIA serum level 
+      (P = 1.95E-7, R² = ~0.64).
+    foundIn: "results"
+    contextSnippet: "...MIA serum concentration was independent of age and sex (data not shown), but was significantly higher in NF1 patients than in healthy controls..."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-9-82"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 10
+  observationsExtracted: 6
+  observationsByType:
+    Molecular: 4
+    Developmental: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - Mining patterns completely failed to detect multiple clear research tools including:
+      * Genetically modified mouse models (Nf1Prx1, Nf1flox, Prx1-Cre)
+      * Inbred mouse strains (C57BL/6J)
+      * Commercial antibodies with vendor information
+      * Laboratory software with version numbers
+      * Clinical biomarker assays (ELISA kits)
+      * Laboratory instrumentation and automated systems
+    - This represents a major gap in mining coverage for animal models and genetic reagents
+    - Vendor information and version numbers were ignored, which are strong indicators of tool usage
+    - Standard genetic nomenclature (flox, Cre, strain names) not recognized
+  recommendations: |
+    URGENT: This publication demonstrates critical gaps in the mining patterns that need immediate attention:
+    
+    1. **Animal Model Patterns**: Add comprehensive patterns for mouse genetic nomenclature including:
+       - Conditional knockout notation (Nf1Prx1, gene+tissue patterns)
+       - Floxed allele notation (geneflox patterns)
+       - Cre recombinase lines (gene-Cre patterns)
+       - Standard inbred strain names (C57BL/6J, BALB/c, etc.)
+    
+    2. **Vendor Context Patterns**: Implement patterns that capture tools mentioned with vendor information:
+       - "purchased from (Company, Location)" context
+       - Catalog numbers and company names in parentheses
+       - "obtained from" and "acquired from" phrases
+    
+    3. **Software Version Patterns**: Add patterns for software with version numbers:
+       - "Software v1.2" or "Software 1.2" patterns
+       - Laboratory analysis software names
+       - Microscopy and imaging software
+    
+    4. **Laboratory Instrumentation**: Add patterns for laboratory equipment:
+       - PCR cyclers, microscopes, automated systems
+       - Model numbers and manufacturer information
+       - "performed on" and "using" context phrases
+    
+    5. **Clinical Assay Patterns**: Add patterns for biomarker measurement tools:
+       - ELISA kit patterns with target analyte
+       - Clinical laboratory assays and measurement tools
+    
+    This publication should have yielded 10+ validated tools but yielded zero, indicating systematic 
+    mining failures that likely affect many other publications. The suggested patterns would 
+    significantly improve mining accuracy for laboratory research publications.
+    
+    The extracted observations demonstrate the scientific value that can be captured when tools are 
+    properly identified, including quantitative phenotypic data and methodological details.

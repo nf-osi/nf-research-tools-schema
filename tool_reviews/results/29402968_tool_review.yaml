@@ -1,0 +1,313 @@
+publicationMetadata:
+  pmid: "29402968"
+  title: "Integrating Functional Analysis in the Next-Generation Sequencing Diagnostic Pipeline of RASopathies."
+  queryType: "bench,clinical"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication combines NGS sequencing with functional analysis using cell culture (HEK-293T cells) 
+    and zebrafish embryo models. Expected tools include:
+    - Cell lines (HEK-293T cells explicitly mentioned)
+    - Animal models (zebrafish embryos for functional validation)
+    - Genetic reagents (expression plasmids, reporter constructs)
+    - Computational tools (NextGENe software, ImageJ for analysis)
+    - Antibodies (anti-DDK antibodies mentioned)
+    
+    The study involves molecular cloning, transfection, luciferase assays, and morphometric analysis,
+    indicating extensive use of research tools across multiple categories.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that integrates NGS with functional validation.
+    The methods section describes extensive experimental procedures including cell culture, molecular
+    cloning, transfection assays, and zebrafish embryo injections. Multiple research tools should
+    be present across several categories, making this an ideal candidate for tool mining.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "HEK-293T"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "mutant transcripts were expressed in HEK-293T cells. The phosphorylation level of ELK1...HEK-293T cells were cultured in DMEM and transfected"
+    whyMissed: "Standard cell line name not detected - should be caught by cell line patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "zebrafish"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "In vivo transient expression in zebrafish embryos...zebrafish were used according to the methods previously described"
+    whyMissed: "Common model organism name not detected by animal model patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Danio rerio"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "in vivo zebrafish (Danio rerio) modelling"
+    whyMissed: "Scientific species name not caught by animal model patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NextGENe software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were analysed using NextGENe software v.2.3.4.1 (Softgenetics, PA, USA) with the default settings"
+    whyMissed: "Software name with version not detected by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The width and length of the cranio-cartilage were measured using ImageJ software"
+    whyMissed: "Common analysis software not detected"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "pGal-LUC"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We introduced pGal-LUC (Clontech), pGal-ELK1 and the expression plasmids into HEK-293T cells"
+    whyMissed: "Reporter plasmid name not caught by genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pGal-ELK1"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We introduced pGal-LUC (Clontech), pGal-ELK1 and the expression plasmids into HEK-293T cells"
+    whyMissed: "Reporter plasmid name not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pSV-RLuc"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Transfection efficiencies were normalised to the control plasmid, which was pSV-RLuc (Promega, WI, USA) expressing Renilla luciferase"
+    whyMissed: "Control plasmid with vendor info not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pCMV6-AC-GFP"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "the in-frame coding sequence of RAF1, A2ML1 and RIT1 were subcloned into the pCMV6-AC-GFP vector"
+    whyMissed: "Expression vector name not caught by genetic reagent patterns"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "anti-DDK antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The expression of the DDK-tagged transcript was validated by Western blot using anti-DDK antibodies"
+    whyMissed: "Antibody mention not detected by antibody patterns"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "Q5 Site-Directed Mutagenesis Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We introduced a single-base substitution into the corresponding expression vector using Q5® Site-Directed Mutagenesis Kit (NEB, UK)"
+    whyMissed: "Commercial kit with vendor not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Dual-Luciferase Reporter assay system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The luciferase activity was measured using a Dual-Luciferase® Reporter assay system (Promega, WI, USA)"
+    whyMissed: "Commercial assay system not detected"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "mMESSAGE mMACHINE T7 Transcription Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "GFP-tagged RNA transcripts were synthesised using the mMESSAGE mMACHINE T7 Transcription Kit (Thermo Fisher Scientific, MA, USA)"
+    whyMissed: "Commercial transcription kit not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "HEK-?293T?"
+    toolType: "cell_line"
+    examples: ["HEK-293T cells", "HEK293T"]
+    reasoning: "Common cell line that appears frequently in functional studies but wasn't detected"
+
+  - patternType: "term"
+    pattern: "zebrafish|Danio rerio"
+    toolType: "animal_model"
+    examples: ["zebrafish embryos", "Danio rerio"]
+    reasoning: "Major model organism for developmental studies, should be consistently detected"
+
+  - patternType: "context_phrase"
+    pattern: "measured using [A-Z][a-zA-Z]+ software"
+    toolType: "computational_tool"
+    examples: ["measured using ImageJ software"]
+    reasoning: "Analysis software mentioned in measurement context often missed"
+
+  - patternType: "context_phrase"
+    pattern: "analysed using [A-Z][a-zA-Z]+ software v?[0-9.]+"
+    toolType: "computational_tool"
+    examples: ["analysed using NextGENe software v.2.3.4.1"]
+    reasoning: "Software with version numbers in analysis context should be detected"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z][a-zA-Z0-9-]+"
+    toolType: "genetic_reagent"
+    examples: ["pGal-LUC", "pGal-ELK1", "pSV-RLuc", "pCMV6-AC-GFP"]
+    reasoning: "Plasmid naming convention starting with 'p' followed by construct name"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z0-9]+ antibod(y|ies)"
+    toolType: "antibody"
+    examples: ["anti-DDK antibodies"]
+    reasoning: "Antibody mentions with 'anti-' prefix should be consistently detected"
+
+  - patternType: "vendor_indicator"
+    pattern: "[A-Z][a-zA-Z]+ Kit \\([A-Z][a-zA-Z]+,"
+    toolType: "genetic_reagent"
+    examples: ["Q5® Site-Directed Mutagenesis Kit (NEB, UK)"]
+    reasoning: "Commercial kits with vendor information should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "(using|with) [A-Z][a-zA-Z]+ [Kk]it"
+    toolType: "genetic_reagent"
+    examples: ["using Q5® Site-Directed Mutagenesis Kit", "using mMESSAGE mMACHINE T7 Transcription Kit"]
+    reasoning: "Commercial kits mentioned in usage context should be detected"
+
+observations:
+  - resourceName: "zebrafish"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      RAF1:p.R391S mutation caused significant craniofacial dysmorphism in zebrafish embryos.
+      Morphometric analysis showed altered width-to-length ratio of cranio-cartilage structures.
+      Statistical significance achieved with p<0.01 compared to wild-type controls.
+    foundIn: "results"
+    contextSnippet: "A significant portion of zebrafish embryos injected with human mRNA transcripts with novel mutations in RAF1 and RIT1 developed atypical craniofacial and heart structures"
+    confidence: 0.95
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "zebrafish"
+    resourceType: "Animal Model"
+    observationType: "Cardiovascular System"
+    observationTypeOntologyId: "MP:0005385"
+    details: |
+      RAF1:p.R391S and RIT1:p.D87H mutations caused cardiac abnormalities in zebrafish embryos.
+      In situ hybridization with cmlc1 cardiac marker showed deformed heart tube structures.
+      Statistical significance p<0.01 for RAF1 mutation effects on cardiac development.
+    foundIn: "results"
+    contextSnippet: "Structural assessment of cardiac tubes by in situ hybridization of cmlc1...The proportion of zebrafish embryos with a normal or deformed heart tube structure"
+    confidence: 0.92
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "zebrafish"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      RIT1:p.D87H mutation caused significant developmental abnormalities in zebrafish embryos.
+      Craniofacial assessment showed altered ceratohyal to Meckel's cartilage ratio (p<0.0001).
+      Morphological analysis revealed gross malformations and cardiac edema in affected embryos.
+    foundIn: "results"
+    contextSnippet: "A significant portion of zebrafish embryos injected with human mRNA transcripts with novel mutations in RAF1 and RIT1 developed atypical craniofacial and heart structures"
+    confidence: 0.95
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "zebrafish"
+    resourceType: "Animal Model"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      A2ML1 mutations (p.P86S and p.Q1421X) did not affect zebrafish embryonic development.
+      No significant morphological changes observed compared to wild-type controls.
+      Results suggest these variants do not activate RAS/MAPK pathway via gain-of-function mechanism.
+    foundIn: "results"
+    contextSnippet: "the expression of the A2ML1 mutations did not affect zebrafish development"
+    confidence: 0.88
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "HEK-293T"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      RAF1:p.R391S mutation significantly increased phosphorylated ELK1 (pELK1) expression in HEK-293T cells.
+      Dual luciferase reporter assay showed statistically significant activation (p<0.01) compared to wild-type.
+      Results indicate activation of RAS/MAPK signaling pathway by this variant.
+    foundIn: "results"
+    contextSnippet: "Both RAF1:p.R391S and RIT1:p.D87H significantly increased pELK1 expression compared with the WT transcripts"
+    confidence: 0.95
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "HEK-293T"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      RIT1:p.D87H mutation significantly increased phosphorylated ELK1 (pELK1) expression in HEK-293T cells.
+      Dual luciferase reporter assay demonstrated pathway activation with high statistical significance (p<0.001).
+      Functional validation supports pathogenic classification of this variant.
+    foundIn: "results"
+    contextSnippet: "Both RAF1:p.R391S and RIT1:p.D87H significantly increased pELK1 expression compared with the WT transcripts"
+    confidence: 0.95
+    doi: "10.1038/s41598-018-20894-0"
+
+  - resourceName: "HEK-293T"
+    resourceType: "Cell Line"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      A2ML1 mutations (p.P86S and p.Q1421X) did not produce significant changes in pELK1 levels in HEK-293T cells.
+      Dual luciferase assay results were not statistically significant compared to wild-type controls.
+      Findings suggest these variants do not activate RAS/MAPK pathway through this mechanism.
+    foundIn: "results"
+    contextSnippet: "the two A2ML1 mutations did not produce a significant fold change in pELK1 levels in vitro"
+    confidence: 0.90
+    doi: "10.1038/s41598-018-20894-0"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 8
+  observationsExtracted: 7
+  observationsByType:
+    Developmental: 2
+    Cardiovascular System: 1
+    Molecular: 2
+    General Comment or Review: 2
+  majorIssuesFound: |
+    - Complete failure of tool mining despite extensive experimental methods
+    - No tools detected in a publication with comprehensive lab research methodology
+    - Multiple categories of tools present but completely missed (cell lines, animal models, genetic reagents, computational tools, antibodies)
+    - Standard research tools like HEK-293T cells and zebrafish models not detected
+    - Commercial kits and reagents with vendor information not caught
+    - Analysis software explicitly mentioned but not identified
+  recommendations: |
+    This publication represents a major failure of the mining system. Despite containing extensive
+    experimental methods with multiple tool categories, zero tools were detected. Key recommendations:
+    
+    1. IMMEDIATE PATTERN UPDATES NEEDED: Add patterns for HEK-293T, zebrafish/Danio rerio, ImageJ, 
+       plasmid naming conventions (p[Name]), and anti-[target] antibodies
+    
+    2. VENDOR DETECTION: Implement patterns for commercial kits with vendor information in parentheses
+    
+    3. SOFTWARE DETECTION: Improve detection of analysis software mentioned with "using" or "measured with"
+    
+    4. CONTEXT ANALYSIS: The mining system should prioritize Methods sections where tool usage is explicit
+    
+    5. QUALITY CONTROL: This publication should be used as a test case for validating mining improvements
+    
+    All 13 missed tools should be added to the database. The functional analysis provided rich
+    phenotypic observations that were successfully extracted, demonstrating the value of this
+    publication for the research community.

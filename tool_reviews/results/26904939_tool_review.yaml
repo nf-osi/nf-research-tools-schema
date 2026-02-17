@@ -1,0 +1,133 @@
+publicationMetadata:
+  pmid: "26904939"
+  title: "Insertional Mutagenesis Identifies a STAT3/Arid1b/β-catenin Pathway Driving Neurofibroma Initiation."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental design described in abstract
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes insertional mutagenesis screening, mouse models, molecular analyses, 
+    genetic deletions, and in vivo transplantation experiments. These are classic laboratory research 
+    methods that would require multiple tool types including animal models (mouse strains), genetic 
+    reagents (knockout constructs, Cre lines), and likely computational tools for screening analysis.
+    
+    The abstract mentions specific mouse genetic models (Stat3(fl/fl);Nf1(fl/fl);DhhCre) which are 
+    sophisticated genetic reagents/animal models that should have been detected.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving sophisticated genetic experiments, 
+    insertional mutagenesis screening, and mouse model studies. The experimental design described 
+    would require numerous research tools including genetically modified mouse strains, molecular 
+    reagents, and computational analysis tools. The fact that no tools were mined suggests significant 
+    gaps in the mining process, particularly for genetic reagents and animal models.
+
+toolValidations: []
+  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Stat3(fl/fl);Nf1(fl/fl);DhhCre"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Knockdown of Arid1b or Gsk3β in Stat3(fl/fl);Nf1(fl/fl);DhhCre SCPs rescues neurofibroma formation after in vivo transplantation."
+    whyMissed: "Complex genetic nomenclature with multiple alleles and Cre recombinase not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DhhCre"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Genetic deletion of Stat3 in Schwann cell progenitors (SCPs) and Schwann cells (SCs) prevents neurofibroma formation"
+    whyMissed: "Cre recombinase line nomenclature not captured by current patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Stat3(fl/fl)"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Knockdown of Arid1b or Gsk3β in Stat3(fl/fl);Nf1(fl/fl);DhhCre SCPs rescues neurofibroma formation"
+    whyMissed: "Floxed allele nomenclature (fl/fl) not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(fl/fl)"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Knockdown of Arid1b or Gsk3β in Stat3(fl/fl);Nf1(fl/fl);DhhCre SCPs rescues neurofibroma formation"
+    whyMissed: "Floxed allele nomenclature (fl/fl) not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "insertional mutagenesis screening"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "To identify genes and signaling pathways that initiate Neurofibromatosis type 1 (NF1) neurofibromas, we used unbiased insertional mutagenesis screening"
+    whyMissed: "Screening methodology not captured as computational analysis tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\(fl/fl\\)"
+    toolType: "animal_model"
+    examples: ["Stat3(fl/fl)", "Nf1(fl/fl)"]
+    reasoning: "Floxed allele nomenclature is standard for conditional knockout mouse models and should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+Cre\\b"
+    toolType: "genetic_reagent"
+    examples: ["DhhCre"]
+    reasoning: "Cre recombinase lines are essential genetic tools and follow standard nomenclature patterns"
+
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\(fl/fl\\);\\w+\\(fl/fl\\);\\w+Cre\\b"
+    toolType: "animal_model"
+    examples: ["Stat3(fl/fl);Nf1(fl/fl);DhhCre"]
+    reasoning: "Complex genetic crosses with multiple conditional alleles and Cre lines represent sophisticated animal models"
+
+  - patternType: "context_phrase"
+    pattern: "insertional mutagenesis screening"
+    toolType: "computational_tool"
+    examples: ["unbiased insertional mutagenesis screening"]
+    reasoning: "Insertional mutagenesis screening involves computational analysis of insertion sites and should be captured as analysis methodology"
+
+  - patternType: "context_phrase"
+    pattern: "genetic deletion of \\w+ in"
+    toolType: "genetic_reagent"
+    examples: ["Genetic deletion of Stat3 in Schwann cell progenitors"]
+    reasoning: "Genetic deletion experiments indicate use of knockout/conditional alleles as research tools"
+
+observations: []
+  # Cannot extract observations without full text sections (Results/Discussion)
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted due to lack of full text
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of sophisticated laboratory research
+    - Missing full text sections (Methods, Introduction, Results, Discussion) prevented comprehensive analysis
+    - Abstract alone contains multiple genetic tools that should have been detected
+    - Mining patterns appear inadequate for genetic nomenclature and mouse model terminology
+    - Complex genetic crosses and conditional alleles were completely missed
+  recommendations: |
+    This publication represents a significant failure of the mining system to detect genetic research tools.
+    The abstract clearly describes sophisticated mouse genetic experiments using conditional knockouts,
+    Cre recombinase systems, and complex genetic crosses that are fundamental research tools.
+    
+    Immediate actions needed:
+    1. Add patterns for floxed allele nomenclature (gene(fl/fl))
+    2. Add patterns for Cre recombinase lines (geneCre, tissueCre)
+    3. Add patterns for complex genetic crosses with semicolon separators
+    4. Consider insertional mutagenesis screening as computational methodology
+    5. Obtain full text to enable comprehensive tool detection and observation extraction
+    
+    The mining system needs significant enhancement for genetic tool detection, particularly
+    for mouse model nomenclature which is standard in neuroscience and cancer research.
+    This publication should be re-processed after pattern improvements.

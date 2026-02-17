@@ -1,0 +1,84 @@
+publicationMetadata:
+  pmid: "6417334"
+  title: "Linkage analysis of neurofibromatosis (von Recklinghausen disease)."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis - genetic linkage analysis):
+    - Computational tools (statistical software, linkage analysis programs) - EXPECTED
+    - Genetic reagents (genetic markers, typing reagents) - POSSIBLE but likely not detailed
+    - Clinical assessment tools - UNLIKELY (this is genetic mapping, not clinical assessment)
+    - Lab tools (antibodies, cell lines, animal models) - UNLIKELY (this is family-based genetic analysis)
+    
+    This is a 1983 genetic linkage analysis study using family pedigrees and genetic markers.
+    The primary tools would be computational (LIPED programme for LOD score calculations)
+    and genetic markers for linkage analysis. Given the era (1983), these would be
+    classical protein/serological markers rather than DNA-based markers.
+  overallAssessment: |
+    This 1983 genetic linkage analysis study would be expected to use computational tools
+    for statistical analysis (LOD score calculations) and genetic markers for linkage mapping.
+    The study design involves family-based genetic analysis to map the neurofibromatosis gene
+    location, which requires specialized linkage analysis software and genetic typing methods.
+    While only abstract text is available, this type of study typically uses research tools
+    even without traditional wet lab methods.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "LIPED programme"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Lod scores were calculated using the standard LIPED programme for 49 combinations of theta male and theta female from 0.01 to 0.50."
+    whyMissed: "This computational tool was explicitly mentioned but not captured by the mining algorithm. LIPED was a standard linkage analysis software package in the 1980s."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "LIPED programme|LIPED program"
+    toolType: "computational_tool"
+    examples: ["LIPED programme for 49 combinations"]
+    reasoning: "LIPED was a widely used linkage analysis software in genetics research. The pattern should capture both British and American spelling variants."
+  - patternType: "context_phrase"
+    pattern: "calculated using.*programme|calculated using.*program|analyzed using.*programme|analyzed using.*program"
+    toolType: "computational_tool"
+    examples: ["calculated using the standard LIPED programme"]
+    reasoning: "This context phrase pattern would help identify computational tools used for calculations and analysis in genetics and other fields."
+  - patternType: "term"
+    pattern: "LOD score.*programme|LOD score.*program|linkage analysis.*programme|linkage analysis.*program"
+    toolType: "computational_tool"
+    examples: ["Lod scores were calculated using the standard LIPED programme"]
+    reasoning: "Linkage analysis and LOD score calculations are strong indicators of specialized genetic analysis software usage."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - One computational tool (LIPED programme) was missed by the mining algorithm
+    - Only abstract text available, limiting tool discovery potential
+    - Publication is from 1983, using older terminology that may not be captured by modern patterns
+    - No Methods section available to provide detailed tool usage information
+  recommendations: |
+    This publication contains at least one legitimate computational tool (LIPED programme) that
+    should be added to the database. The mining algorithm should be updated to capture:
+    1. LIPED programme/program - a standard linkage analysis software from the 1980s
+    2. Context phrases like "calculated using" that indicate computational tool usage
+    3. Genetics-specific software patterns for LOD score and linkage analysis tools
+    
+    While only abstract text is available, genetic linkage analysis studies typically use
+    specialized computational tools that are worth capturing. The suggested patterns would
+    help identify similar tools in other genetics publications from this era.
+    
+    No observations could be extracted since the Results and Discussion sections are not
+    available, and the abstract focuses on methodology rather than specific findings.

@@ -1,0 +1,316 @@
+publicationMetadata:
+  pmid: "32858845"
+  title: "Systems Biology Approaches Reveal Potential Phenotype-Modifier Genes in Neurofibromatosis Type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics/systems biology study that uses computational tools for:
+    - Network analysis and visualization (STRING, Cytoscape)
+    - Gene expression analysis (R packages, TCGA/GEO data)
+    - Mathematical modeling (random walk analysis)
+    - Database mining and ontology analysis
+    
+    Expected tool types: computational tools (software, databases, R packages, web applications)
+    Unlikely to contain: lab tools (antibodies, cell lines, animal models), clinical assessment tools
+    
+    The study is purely computational - no wet lab experiments or clinical assessments were performed.
+  overallAssessment: |
+    This is a computational systems biology study that extensively uses bioinformatics tools and databases to identify potential NF1 phenotype-modifier genes. The study relies heavily on public datasets (TCGA, GEO, STRING, HPO, GO) and computational analysis tools (R packages, Cytoscape, mathematical models). Multiple computational tools are explicitly mentioned with versions and usage contexts, making this a rich source for computational tool mining. No laboratory experiments or clinical assessments were conducted.
+
+toolValidations: []  # No tools were mined initially, but many computational tools are present
+
+potentiallyMissedTools:
+  - toolName: "STRING database v.11"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Networks were generated using STRING database v.11, comprising protein–protein interactions (PPI) for Homo sapiens"
+    whyMissed: "Specific database version mentioned with clear usage context for PPI network generation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cytoscape v.3.7.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The assembled networks were transferred to Cytoscape v.3.7.2 software, with which the network statistics was obtained"
+    whyMissed: "Network analysis software with specific version, extensively used throughout study"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DyNet application"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Comparison between networks was performed with DyNet application for Cytoscape v.3.7.2"
+    whyMissed: "Cytoscape plugin/application for network comparison analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PhenomeScape app"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Complex networks comprising HPO selected phenotypes, gene expression, and PPI networks were assembled using the PhenomeScape app, also in Cytoscape v.3.7.2"
+    whyMissed: "Cytoscape application for complex network assembly with phenotype data"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R v.3.6.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The robust multiarray averaging (RMA) normalization was applied using oligo or affy R packages (R v.3.6.2)"
+    whyMissed: "Programming language with specific version used for statistical analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "oligo R package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The robust multiarray averaging (RMA) normalization was applied using oligo or affy R packages (R v.3.6.2)"
+    whyMissed: "R package for microarray data normalization"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "affy R package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The robust multiarray averaging (RMA) normalization was applied using oligo or affy R packages (R v.3.6.2)"
+    whyMissed: "R package for Affymetrix microarray analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "limma package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The differentially expressed genes were obtained using the limma package (R v.3.6.2)"
+    whyMissed: "R package for differential gene expression analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TCGAbiolinks package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The gene expression analysis for TCGA data was performed by extracting the data with TCGAbiolinks package"
+    whyMissed: "R package for accessing and processing TCGA data"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "edgeR package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "evaluating differential gene expression with edgeR package. All analyses were performed in R v.3.6.2"
+    whyMissed: "R package for differential expression analysis of RNA-seq data"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "RandomWalkRestartMH package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The heterogeneous networks comprising both the genes and phenotypes selected were assembled in the RandomWalkRestartMH package, in R v.3.6.2"
+    whyMissed: "R package for random walk analysis on heterogeneous networks"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AmiGO database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The complete list of NF1 gene ontologies (GO) and phenotype ontologies were obtained in the AmiGO and Human Phenotype Ontology (HPO) databases"
+    whyMissed: "Gene Ontology database for obtaining GO terms"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Human Phenotype Ontology (HPO) database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The complete list of NF1 gene ontologies (GO) and phenotype ontologies were obtained in the AmiGO and Human Phenotype Ontology (HPO) databases"
+    whyMissed: "Phenotype ontology database for standardized phenotype terms"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Gene Expression Omnibus (GEO)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RNA-seq and microarray secondary analysis were performed using studies selected in Gene Expression Omnibus (GEO) and The Cancer Genome Atlas (TCGA) databases"
+    whyMissed: "Public gene expression database used for secondary analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "The Cancer Genome Atlas (TCGA)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RNA-seq and microarray secondary analysis were performed using studies selected in Gene Expression Omnibus (GEO) and The Cancer Genome Atlas (TCGA) databases"
+    whyMissed: "Cancer genomics database used for tumor expression analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "BioGrid database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Other databases consulted to obtain data for the potential NF1 phenotype-modifier genes were: (1) BioGrid, for curated protein interactions"
+    whyMissed: "Protein interaction database for curated interactions"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PINOT tool"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "(2) PINOT tool, for literature data on curated protein interactions"
+    whyMissed: "Literature mining tool for protein interactions"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "The Human Reference Protein Interactome (HuRI)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "(4) The Human Reference Protein Interactome (HuRI), for the binary protein–protein interactions"
+    whyMissed: "Binary protein-protein interaction database"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "The Genome Aggregation Database (gnomAD) v 2.1.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To explore variants in our candidate genes already reported in the general population or with clinical significance, we consulted The Genome Aggregation Database (gnomAD) v 2.1.1"
+    whyMissed: "Population genetics database with specific version for variant analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ClinVar archive"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we consulted The Genome Aggregation Database (gnomAD) v 2.1.1 and the ClinVar archive"
+    whyMissed: "Clinical variant database for pathogenicity assessment"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "cBioPortal for Cancer Genomics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the cBioPortal for Cancer Genomics. Samples were filtered according to their mutational status"
+    whyMissed: "Cancer genomics portal for mutation and clinical data analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "AACR Project GENIE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "an additional analysis was performed consulting the 79,720 tumor samples made available by the AACR Project GENIE"
+    whyMissed: "Cancer genomics database with tumor samples"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using\\s+([A-Z][a-zA-Z0-9]+)\\s+v?[0-9]+\\.[0-9]+(\\.[0-9]+)?"
+    toolType: "computational_tool"
+    examples: ["using STRING database v.11", "using R v.3.6.2", "using Cytoscape v.3.7.2"]
+    reasoning: "Pattern to catch software/tools with version numbers in usage context"
+
+  - patternType: "context_phrase"
+    pattern: "([A-Z][a-zA-Z0-9]+)\\s+(package|app|application|tool)\\s+.*\\s+(v[0-9]+\\.[0-9]+(\\.[0-9]+)?|for)"
+    toolType: "computational_tool"
+    examples: ["limma package (R v.3.6.2)", "PhenomeScape app, also in Cytoscape", "DyNet application for Cytoscape"]
+    reasoning: "Pattern to identify R packages, applications, and tools with context"
+
+  - patternType: "context_phrase"
+    pattern: "(performed|obtained|assembled|analyzed|extracted|evaluated)\\s+(using|with|in|by)\\s+([A-Z][a-zA-Z0-9\\s]+)(database|package|software|tool|app)"
+    toolType: "computational_tool"
+    examples: ["performed using STRING database", "obtained using limma package", "assembled in RandomWalkRestartMH package"]
+    reasoning: "Pattern to catch tools mentioned in experimental usage context"
+
+  - patternType: "naming_convention"
+    pattern: "([A-Z][a-zA-Z0-9]+)\\s+(database|archive)\\s+v?[0-9]+\\.[0-9]+(\\.[0-9]+)?"
+    toolType: "computational_tool"
+    examples: ["gnomAD database v 2.1.1", "STRING database v.11"]
+    reasoning: "Pattern for versioned databases commonly used in bioinformatics"
+
+  - patternType: "context_phrase"
+    pattern: "consulted\\s+([A-Z][a-zA-Z0-9\\s]+)(database|archive|portal)"
+    toolType: "computational_tool"
+    examples: ["consulted The Genome Aggregation Database", "consulted the ClinVar archive"]
+    reasoning: "Pattern for databases accessed for data retrieval"
+
+observations:
+  - resourceName: "STRING database v.11"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for generating protein-protein interaction (PPI) networks for Homo sapiens. Only experimental interactions were selected with minimum required interaction score set to 0.400 (default). Networks comprised 1561 nodes in the combined analysis.
+    foundIn: "methods"
+    contextSnippet: "Networks were generated using STRING database v.11, comprising protein–protein interactions (PPI) for Homo sapiens. Only experimental interactions were selected, with a minimum required interaction score set in 0.400 (default)."
+    confidence: 0.95
+    doi: "10.3390/cancers12092416"
+
+  - resourceName: "Cytoscape v.3.7.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for network visualization and statistics calculation. Big nodes represented proteins with high betweenness centrality scores and warm colors comprised proteins with high closeness centrality measures. Multiple applications (DyNet, PhenomeScape) were used within Cytoscape for specialized analyses.
+    foundIn: "methods"
+    contextSnippet: "The assembled networks were transferred to Cytoscape v.3.7.2 software, with which the network statistics was obtained. Big nodes represented proteins with high betweenness centrality scores and warm colors comprised proteins with high closeness centrality measures."
+    confidence: 0.95
+    doi: "10.3390/cancers12092416"
+
+  - resourceName: "R v.3.6.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used as the primary statistical computing environment for multiple analyses including: RMA normalization with oligo/affy packages, differential expression analysis with limma and edgeR packages, TCGA data extraction with TCGAbiolinks, and random walk analysis with RandomWalkRestartMH package.
+    foundIn: "methods"
+    contextSnippet: "The robust multiarray averaging (RMA) normalization was applied using oligo or affy R packages (R v.3.6.2). The differentially expressed genes were obtained using the limma package (R v.3.6.2)."
+    confidence: 0.95
+    doi: "10.3390/cancers12092416"
+
+  - resourceName: "RandomWalkRestartMH package"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for random walk analysis on heterogeneous networks comprising genes and phenotypes. The mathematical model showed that NF1 gene required only "one step" (one interaction) to reach the phenotype OMIM 162200, while SDC2 and VCP required only two steps, making them strong phenotype-modifier candidates.
+    foundIn: "results"
+    contextSnippet: "According to this mathematical model, the NF1 gene only had to take "one step" (one interaction) to reach the phenotype OMIM 162200. The genes SDC2 and VCP had to take only two steps (two interactions)"
+    confidence: 0.90
+    doi: "10.3390/cancers12092416"
+
+  - resourceName: "limma package"
+    resourceType: "Computational Tool"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Despite being used for differential expression analysis, few candidate genes were found to be significantly differentially expressed, demonstrating that expression of all candidates and the NF1 gene is strictly regulated. This limitation led to the need for alternative systems biology approaches.
+    foundIn: "results"
+    contextSnippet: "For both TCGA and GEO assays, few genes were evidenced to be significantly differentially expressed, demonstrating that the expression of all the candidates, and for the NF1 gene, is strictly regulated."
+    confidence: 0.85
+    doi: "10.3390/cancers12092416"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 21  # Number of computational tools that were missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 5  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Usage Instructions: 4
+    Issue: 1
+  majorIssuesFound: |
+    Major mining failure detected:
+    - This is a computational systems biology study that extensively uses 21+ bioinformatics tools
+    - No tools were initially mined despite clear tool usage throughout Methods section
+    - Multiple R packages, databases, and software tools with specific versions are mentioned
+    - Tools are used in clear experimental contexts with "using", "performed with", "obtained using" phrases
+    - This represents a significant gap in computational tool mining patterns
+  recommendations: |
+    Critical recommendations for this publication:
+    - ALL 21 identified computational tools should be added to the mining results
+    - This publication demonstrates major gaps in computational tool mining patterns
+    - The suggested patterns should be implemented to catch versioned software, R packages, and databases
+    - Focus on bioinformatics contexts: "using X package", "performed with X software", "obtained from X database"
+    - Version numbers are strong indicators of tool usage (v.3.7.2, v 2.1.1, etc.)
+    - R package ecosystem needs better coverage (limma, edgeR, TCGAbiolinks, etc.)
+    - Database mining patterns need improvement (STRING, TCGA, GEO, gnomAD, ClinVar)
+    - This type of systems biology study is rich in computational tools and should be prioritized for mining

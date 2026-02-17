@@ -1,0 +1,105 @@
+publicationMetadata:
+  pmid: "18984156"
+  title: "Nf1-dependent tumors require a microenvironment containing Nf1+/-- and c-kit-dependent bone marrow."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - Cell journal, genetic studies, animal models
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - Animal models (Nf1+/- mice)
+    - Genetic manipulations (Schwann cell Nf1 deficiency)
+    - Cell biology (bone marrow-derived cells, mast cells)
+    - Pharmacologic interventions (c-kit signaling attenuation)
+    
+    Expected tools: animal models (knockout mice), genetic reagents (targeting constructs), 
+    possibly antibodies for characterization, and computational tools for analysis.
+  overallAssessment: |
+    This is a high-impact laboratory research study published in Cell investigating the tumor 
+    microenvironment in neurofibromatosis. The study clearly involves sophisticated genetic 
+    mouse models, cell biology techniques, and pharmacologic interventions. Research tools 
+    are definitely expected, particularly animal models (Nf1+/- mice), genetic reagents for 
+    creating tissue-specific knockouts, and likely antibodies for cell characterization.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Nf1 heterozygosity of bone marrow-derived cells in the tumor microenvironment is sufficient to allow neurofibroma progression in the context of Schwann cell Nf1 deficiency. Further, genetic or pharmacologic attenuation of c-kit signaling in Nf1+/- hematopoietic cells..."
+    whyMissed: "Standard mouse strain nomenclature (Nf1+/-) indicating heterozygous knockout mice was not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Schwann cell Nf1-deficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Nf1 heterozygosity of bone marrow-derived cells in the tumor microenvironment is sufficient to allow neurofibroma progression in the context of Schwann cell Nf1 deficiency..."
+    whyMissed: "Tissue-specific knockout model (Schwann cell-specific Nf1 deletion) not detected - likely requires conditional knockout technology"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "c-kit inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Further, genetic or pharmacologic attenuation of c-kit signaling in Nf1+/- hematopoietic cells diminishes neurofibroma initiation and progression..."
+    whyMissed: "Pharmacologic agent for c-kit signaling attenuation mentioned but specific compound not named in abstract"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+[+/-]+[+/-]* mice|[A-Za-z0-9]+[+/-]+[+/-]* mouse"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "Nf1+/- hematopoietic cells"]
+    reasoning: "Standard mouse genetics nomenclature using +/- notation for heterozygous knockouts is commonly used but was missed"
+
+  - patternType: "context_phrase"
+    pattern: "(tissue|cell type)\\s+(specific|conditional)\\s+[A-Za-z0-9]+\\s+(deficiency|knockout|deletion)"
+    toolType: "animal_model"
+    examples: ["Schwann cell Nf1 deficiency"]
+    reasoning: "Tissue-specific knockout models are important research tools but may not follow standard strain nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "(genetic|pharmacologic)\\s+(attenuation|inhibition|blockade)\\s+of\\s+[A-Za-z0-9-]+\\s+signaling"
+    toolType: "genetic_reagent"
+    examples: ["pharmacologic attenuation of c-kit signaling"]
+    reasoning: "Pharmacologic interventions targeting specific signaling pathways represent research reagents/tools"
+
+  - patternType: "term"
+    pattern: "bone marrow-derived cells|hematopoietic cells|mast cells"
+    toolType: "cell_line"
+    examples: ["bone marrow-derived cells", "Nf1+/- hematopoietic cells", "mast cells"]
+    reasoning: "Primary cell populations used in research, especially when genetically modified, can be considered research tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication only has abstract text available (no Methods, Results, Discussion sections)
+    - Standard mouse genetics nomenclature (Nf1+/-) was completely missed
+    - Tissue-specific knockout models not detected
+    - This appears to be a significant mining failure for a high-quality research publication
+  recommendations: |
+    Overall recommendations for this publication:
+    - This is a clear case of under-mining - several research tools should have been detected
+    - The Nf1+/- mouse model is a standard research tool that should definitely be captured
+    - Tissue-specific knockout models (Schwann cell Nf1 deficiency) are sophisticated research tools
+    - Mining patterns need improvement for mouse genetics nomenclature
+    - Consider expanding patterns to catch pharmacologic interventions as research reagents
+    - This publication demonstrates the need for better pattern coverage of animal models
+    - The lack of full-text sections may have contributed to poor mining, but key tools are mentioned in abstract

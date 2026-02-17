@@ -1,0 +1,113 @@
+publicationMetadata:
+  pmid: "27527646"
+  title: "Neurocognitive outcomes in neurofibromatosis clinical trials: Recommendations for the domain of attention."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, cognitive tests)
+    This publication specifically focuses on evaluating and recommending standardized cognitive 
+    assessment tools for NF clinical trials. The abstract mentions specific assessment instruments
+    including the Digit Span subtest from Wechsler scales and Conners scales, which are validated
+    clinical assessment tools used for cognitive evaluation.
+  overallAssessment: |
+    This is a methodological/recommendation paper that evaluates cognitive assessment tools for use
+    in NF clinical trials. The publication specifically reviews and compares various performance 
+    measures and behavioral rating questionnaires, making specific recommendations for standardized
+    tools. Clinical assessment tools are highly expected and should be present.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Digit Span subtest"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Digit Span subtest from the Wechsler scales was given the highest ratings of the performance measures due to its good psychometrics, feasibility, utility across a wide age range, and extensive use in previous research."
+    whyMissed: "Specific cognitive assessment tool mentioned as highest-rated performance measure, but may have been missed due to subtest naming pattern"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Digit Span subtest from the Wechsler scales was given the highest ratings of the performance measures due to its good psychometrics, feasibility, utility across a wide age range, and extensive use in previous research."
+    whyMissed: "Well-known standardized cognitive assessment battery, but may have been missed due to generic 'scales' terminology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Conners scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Conners scales achieved the highest ratings of the behavioral questionnaires for similar reasons."
+    whyMissed: "Standardized behavioral rating questionnaire for ADHD/attention assessment, should have been detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(Digit Span|digit span)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Digit Span subtest"]
+    reasoning: "Digit Span is a specific, widely-used cognitive assessment subtest that should be captured"
+
+  - patternType: "term"
+    pattern: "\\b(Wechsler\\s+scales?|WAIS|WISC|WPPSI)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler scales"]
+    reasoning: "Wechsler intelligence scales are fundamental cognitive assessment tools used across age ranges"
+
+  - patternType: "term"
+    pattern: "\\b(Conners\\s+scales?|Conners\\s+rating|CPRS|CTRS)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Conners scales"]
+    reasoning: "Conners scales are standard behavioral rating tools for attention/ADHD assessment"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(performance measures?|behavioral rating questionnaires?|cognitive assessment tools?)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["performance measures", "behavioral rating questionnaires"]
+    reasoning: "These phrases often precede or describe clinical assessment tools in methodological papers"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(subtest from|achieved the highest ratings|standardized.*assessment)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["subtest from the Wechsler scales", "achieved the highest ratings"]
+    reasoning: "Context phrases that indicate evaluation and recommendation of assessment tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely missed clinical assessment tools despite this being a methodological paper
+      specifically about cognitive assessment tool evaluation and recommendations
+    - Three major clinical assessment tools were explicitly mentioned and evaluated:
+      Digit Span subtest, Wechsler scales, and Conners scales
+    - The abstract clearly states these tools were "reviewed" and "given highest ratings"
+      indicating systematic evaluation of assessment instruments
+    - No tools were detected despite clear presence of validated clinical assessment instruments
+  recommendations: |
+    This publication represents a significant mining failure for clinical assessment tools.
+    The paper explicitly evaluates and recommends specific cognitive assessment instruments
+    for use in NF clinical trials. All three missed tools should be added:
+    
+    1. Digit Span subtest - specific cognitive performance measure
+    2. Wechsler scales - comprehensive cognitive assessment battery  
+    3. Conners scales - behavioral rating questionnaire for attention
+    
+    The suggested patterns should be implemented to catch similar assessment tools in
+    methodological and clinical research papers. This type of tool evaluation/recommendation
+    paper is exactly where clinical assessment tools should be reliably detected.
+    
+    No observations were extracted since no tools were initially validated, but the
+    publication does contain evaluative information about the psychometric properties
+    and utility of these assessment tools that could be valuable for researchers.

@@ -1,0 +1,185 @@
+publicationMetadata:
+  pmid: "15570216"
+  title: "Targeted gene expression in the chicken eye by in ovo electroporation."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a clear experimental laboratory study using chicken embryos for gene expression analysis.
+    The publication has extensive Methods sections describing cell culture, transfection, electroporation,
+    immunohistochemistry, and molecular biology techniques. Multiple research tools should be present
+    including antibodies (for immunostaining), cell lines (DF-1 fibroblasts), genetic reagents (plasmids,
+    vectors), and computational tools (ImageJ, GraphPad Prism). The study involves primary research
+    with detailed experimental procedures, making it highly likely to contain multiple tool types.
+  overallAssessment: |
+    This is a laboratory research publication that extensively uses research tools for experimental
+    procedures including gene expression analysis, cell culture, and immunohistochemistry. The detailed
+    Methods section describes multiple antibodies, cell lines, genetic constructs, and software tools
+    that should have been detected by mining algorithms. The complete absence of mined tools represents
+    a significant failure in the mining process for this publication type.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "anti-NeuN antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubated with Alexa Fluor 488 conjugated anti-NeuN antibody (Cat. No. MAB377X, MilliporeSigma) at 4°C overnight..."
+    whyMissed: "Clear antibody mention with catalog number and vendor information was not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-GFP antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubated 4°C overnight with rabbit anti-GFP antibodies diluted 1:200 in blocking buffer..."
+    whyMissed: "Standard antibody terminology with species and dilution information was missed"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Alexa Fluor 488-conjugated secondary antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubated with Alexa Fluor 488-conjugated secondary antibody (Thermo Fisher Scientific) for 1 h at room temperature..."
+    whyMissed: "Fluorescent secondary antibody with vendor information was not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DF-1 fibroblast cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Chicken DF-1 fibroblast cells [CRL-12203; American Type Culture Collection (ATCC), Manassas, VA, USA] were maintained..."
+    whyMissed: "Established cell line with ATCC catalog number was completely missed"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pCAX plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...pCAX contains a chicken beta-actin promoter fused to the CMV IE enhancer to drive enhanced green fluorescent protein (EGFP) expression..."
+    whyMissed: "Named plasmid construct with detailed description was not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pMES-cNf2 plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...pMES-cNf2 uses the same chimeric promoter to drive the expression of the chicken neurofibromatosis 2 (cNf2) and EGFP proteins..."
+    whyMissed: "Named plasmid construct was missed despite clear experimental context"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "piggyBac vector system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...piggyBac TK NeoR CMV GFP FRT backbone vector generated as described previously...piggyBac EGFP vectors that express EGFP under four different promoters..."
+    whyMissed: "Transposon vector system with multiple variants was not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Mean EGFP intensity per transfected brain cell was measured using image J software (Wayne Rasband, National Institutes of Health, Bethesda, MD, USA)..."
+    whyMissed: "Widely used image analysis software with full attribution was missed"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism 9"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical analysis was performed using GraphPad Prism 9 (GraphPad Software, CA, USA)..."
+    whyMissed: "Statistical analysis software with version number and vendor was not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+, [A-Z]{2}, USA\\)"
+    toolType: "general"
+    examples: ["(Thermo Fisher Scientific, Waltham, MA, USA)", "(MilliporeSigma, Burlington, MA, USA)"]
+    reasoning: "Vendor information in parentheses with location details strongly indicates research tools"
+
+  - patternType: "term"
+    pattern: "anti-[A-Z][a-zA-Z0-9]+ antibod(y|ies)"
+    toolType: "antibody"
+    examples: ["anti-NeuN antibody", "anti-GFP antibodies"]
+    reasoning: "Standard antibody naming convention was completely missed"
+
+  - patternType: "context_phrase"
+    pattern: "Cat\\. No\\. [A-Z0-9]+"
+    toolType: "general"
+    examples: ["Cat. No. MAB377X"]
+    reasoning: "Catalog numbers are strong indicators of commercial research reagents"
+
+  - patternType: "term"
+    pattern: "\\[CRL-[0-9]+; American Type Culture Collection"
+    toolType: "cell_line"
+    examples: ["[CRL-12203; American Type Culture Collection (ATCC)"]
+    reasoning: "ATCC catalog format is standard for authenticated cell lines"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z][A-Z0-9]+ (plasmid|vector|construct)"
+    toolType: "genetic_reagent"
+    examples: ["pCAX contains", "pMES-cNf2 uses"]
+    reasoning: "Standard plasmid naming convention starting with 'p' followed by construct name"
+
+  - patternType: "term"
+    pattern: "piggyBac [A-Z]+ [A-Z]+ [A-Z]+ vector"
+    toolType: "genetic_reagent"
+    examples: ["piggyBac TK NeoR CMV GFP FRT backbone vector"]
+    reasoning: "Transposon vector systems with component descriptions"
+
+  - patternType: "context_phrase"
+    pattern: "measured using [A-Z][a-zA-Z]+ [0-9]* software"
+    toolType: "computational_tool"
+    examples: ["measured using image J software", "using GraphPad Prism 9"]
+    reasoning: "Software usage context with version information"
+
+  - patternType: "term"
+    pattern: "Alexa Fluor [0-9]+-conjugated"
+    toolType: "antibody"
+    examples: ["Alexa Fluor 488 conjugated anti-NeuN antibody", "Alexa Fluor 488-conjugated secondary antibody"]
+    reasoning: "Fluorescent antibody conjugates are commonly used research reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete mining failure: Zero tools detected despite extensive experimental methods
+    - Multiple clear antibodies with catalog numbers and vendors were missed
+    - Established cell line with ATCC catalog number was not detected
+    - Named plasmid constructs with detailed descriptions were ignored
+    - Standard computational tools (ImageJ, GraphPad Prism) with full attribution were missed
+    - Basic antibody naming conventions (anti-X antibody) were not recognized
+    - Vendor information patterns were not detected
+    - This represents a systematic failure across all major tool categories
+  recommendations: |
+    This publication demonstrates a critical failure in the mining algorithm for laboratory research papers.
+    Despite having a detailed Methods section with clear tool usage, vendor information, catalog numbers,
+    and standard nomenclature, zero tools were detected. All 9 potentially missed tools should be added
+    to the database as they represent genuine research tools with proper experimental context.
+    
+    The suggested patterns should be implemented immediately as they address fundamental gaps in:
+    1. Antibody detection (anti-X antibody format)
+    2. Cell line identification (ATCC catalog format)
+    3. Genetic reagent recognition (plasmid naming conventions)
+    4. Software tool detection (usage context phrases)
+    5. Vendor information parsing (location and catalog patterns)
+    
+    This publication type (experimental lab research with detailed methods) should be prioritized for
+    algorithm improvement as it represents the core use case for research tool mining. The complete
+    absence of detected tools in such a tool-rich publication indicates serious deficiencies in the
+    current mining approach that need immediate attention.

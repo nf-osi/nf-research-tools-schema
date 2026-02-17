@@ -1,0 +1,104 @@
+publicationMetadata:
+  pmid: "18188004"
+  title: "Real-time PCR analysis of candidate imprinted genes on mouse chromosome 11 shows balanced expression from the maternal and paternal chromosomes and strain-specific variation in expression levels."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - molecular biology study with PCR analysis
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study using real-time PCR to analyze gene expression in mouse models.
+    Expected tools include:
+    - Animal models (mouse strains for NF1 research)
+    - Genetic reagents (PCR primers, probes, potentially plasmids)
+    - Computational tools (real-time PCR analysis software, bioinformatics tools)
+    
+    The abstract mentions "mouse model of neurofibromatosis type 1 (NF1)" and "Taqman assays"
+    which are clear indicators of research tools being used.
+  overallAssessment: |
+    This is a laboratory research publication focused on molecular biology techniques (real-time PCR)
+    to study gene expression patterns in mouse models. The study clearly uses research tools including
+    mouse models, PCR reagents, and likely computational analysis tools. Despite having only abstract
+    text available, the experimental nature and mention of specific methodologies strongly indicate
+    tool usage. The lack of full-text sections limits comprehensive tool identification.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "mouse model of neurofibromatosis type 1 (NF1)"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We have shown previously in a mouse model of neurofibromatosis type 1 (NF1) that inheriting mutant alleles of Nf1 and Trp53 on chromosome 11 from the mother or father dramatically changes the tumor spectrum"
+    whyMissed: "Animal model mentioned in abstract but not captured by mining patterns - may need better pattern for 'mouse model of [disease]' format"
+    confidence: 0.9  # High confidence this is a real animal model
+    shouldBeAdded: Yes
+
+  - toolName: "Taqman assays"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "This manuscript includes supplementary data listing primer sequences for Taqman assays and Ct values for Taqman PCR."
+    whyMissed: "TaqMan assays are specific PCR reagents but may not have been recognized as genetic reagents"
+    confidence: 0.85  # High confidence - TaqMan is a specific PCR technology/reagent system
+    shouldBeAdded: Yes
+
+  - toolName: "Real-time PCR"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Real-time PCR analysis of candidate imprinted genes on mouse chromosome 11 shows balanced expression from the maternal and paternal chromosomes"
+    whyMissed: "Real-time PCR analysis requires specialized software/instruments for data analysis and quantification"
+    confidence: 0.7  # Moderate confidence - could be considered methodology rather than specific tool
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "mouse model of [disease/condition]"
+    toolType: "animal_model"
+    examples: ["mouse model of neurofibromatosis type 1 (NF1)"]
+    reasoning: "This pattern would catch disease-specific mouse models that are clearly research tools, not just disease references"
+
+  - patternType: "term"
+    pattern: "Taqman|TaqMan"
+    toolType: "genetic_reagent"
+    examples: ["Taqman assays", "TaqMan PCR"]
+    reasoning: "TaqMan is a specific PCR technology/reagent system widely used in molecular biology research"
+
+  - patternType: "context_phrase"
+    pattern: "primer sequences for [assay type]"
+    toolType: "genetic_reagent"
+    examples: ["primer sequences for Taqman assays"]
+    reasoning: "Indicates specific genetic reagents (primers) being used or developed for experimental assays"
+
+  - patternType: "naming_convention"
+    pattern: "[0-9]+[A-Za-z]+[0-9]+Rik"
+    toolType: "genetic_reagent"
+    examples: ["5730522E02Rik"]
+    reasoning: "Mouse gene nomenclature pattern that could indicate genetic reagents when used in experimental context"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - full Methods section would likely contain many more tools
+    - Mining patterns appear to miss common molecular biology tools and animal models
+    - Publication clearly describes experimental research using mouse models and PCR reagents
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded several research tools, particularly animal models and genetic reagents
+    - The mouse model of NF1 and TaqMan assays should definitely be added as validated tools
+    - Mining patterns need improvement to catch "mouse model of [disease]" format
+    - TaqMan/Taqman should be recognized as genetic reagents
+    - Consider adding patterns for common molecular biology techniques and reagents
+    - Full-text access would likely reveal many additional tools in Methods section
+    - This represents a significant gap in current mining effectiveness for molecular biology publications

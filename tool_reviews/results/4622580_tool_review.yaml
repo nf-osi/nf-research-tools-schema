@@ -1,0 +1,65 @@
+publicationMetadata:
+  pmid: "4622580"
+  title: "Recent advances in neuroblastoma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very confident - title says "Recent advances" and content is overview
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically NO research tools expected. Review articles summarize existing knowledge
+    and cite tools from other studies but do not use tools experimentally themselves.
+    
+    This 1972 review discusses neuroblastoma characteristics, spontaneous regression, diagnostic approaches,
+    and treatment strategies. It mentions "in vitro studies" and "serum factor" from other research but
+    does not describe original experimental work or tool usage.
+    
+    The publication predates most modern molecular biology tools and focuses on clinical observations
+    and treatment approaches rather than experimental methodology.
+  overallAssessment: |
+    This is clearly a 1972 review article summarizing the state of neuroblastoma research at that time.
+    Review articles typically do not use research tools experimentally but rather cite and discuss tools
+    from other studies. The absence of Methods, Results, and Discussion sections confirms this is not
+    original research. No research tools are expected in this type of publication.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "catecholamines"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Approximately 90 percent of patients with neuroblastoma excrete abnormally high quantities of various catecholamines, thus providing a useful diagnostic tool"
+    whyMissed: "The text mentions catecholamines as a 'diagnostic tool' but this refers to biomarkers/metabolites, not a research tool or clinical assessment instrument"
+    confidence: 0.2  # Low confidence - this is a biomarker, not a tool
+    shouldBeAdded: No
+
+suggestedPatterns: []  # No new patterns needed - this is a review article with no tools
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 0  # The catecholamines mention is not a genuine tool
+  newPatternsCount: 0
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a 1972 review article, not original research
+    - No Methods section indicating experimental work
+    - Only abstract available, no full text sections
+    - Content focuses on clinical observations and treatment approaches, not tool usage
+    - Predates most modern molecular biology and computational tools
+    - "Diagnostic tool" mention refers to biomarkers (catecholamines), not research tools
+  recommendations: |
+    This publication should not be expected to contain research tools. It is a historical review
+    article from 1972 that summarizes clinical knowledge about neuroblastoma without describing
+    original experimental work. The mining correctly found no tools.
+    
+    The mention of catecholamines as a "diagnostic tool" is not a research tool but rather refers
+    to biomarkers used for clinical diagnosis. This type of language could potentially create
+    false positives in mining, but the current mining approach correctly avoided this.
+    
+    No action needed - the empty mining result is appropriate for this publication type.

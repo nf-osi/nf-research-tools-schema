@@ -1,0 +1,115 @@
+publicationMetadata:
+  pmid: "37330719"
+  title: "Existing and Developing Preclinical Models for Neurofibromatosis Type 1-Related Cutaneous Neurofibromas."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very high confidence - title clearly indicates review
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review articles typically do NOT contain actual research tools for experimental usage.
+    Instead, they discuss and cite tools used in other studies. The abstract mentions:
+    - Cell cultures (2D/3D)
+    - Organoids
+    - Genetically engineered mice
+    - Patient-derived xenografts
+    - Porcine models
+    
+    However, these are discussed as existing models in the field, not tools used experimentally
+    in this publication. Review articles may occasionally contain computational tools used for
+    literature analysis, but this is uncommon.
+  overallAssessment: |
+    This is clearly a review article that discusses existing preclinical models for NF1 research.
+    Review articles do not typically use research tools experimentally but rather cite and discuss
+    tools used in other studies. The absence of Methods, Results, and Discussion sections confirms
+    this is not an experimental study. No genuine research tools are expected from this publication.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "two-dimensional cell cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...preclinical in vitro and in vivo model systems, including two- and three-dimensional cell cultures, organoids, genetically engineered mice..."
+    whyMissed: "Generic term for 2D cell culture methodology, not a specific cell line"
+    confidence: 0.1  # Very low confidence this is a specific tool
+    shouldBeAdded: No
+  
+  - toolName: "three-dimensional cell cultures"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "...preclinical in vitro and in vivo model systems, including two- and three-dimensional cell cultures, organoids, genetically engineered mice..."
+    whyMissed: "Generic term for 3D culture methodology, not a specific model system"
+    confidence: 0.1  # Very low confidence this is a specific tool
+    shouldBeAdded: No
+  
+  - toolName: "organoids"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "...including two- and three-dimensional cell cultures, organoids, genetically engineered mice, patient-derived xenografts..."
+    whyMissed: "Generic term for organoid methodology in review context, not specific organoid model"
+    confidence: 0.2  # Low confidence - could be specific but likely generic in review
+    shouldBeAdded: No
+  
+  - toolName: "genetically engineered mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...organoids, genetically engineered mice, patient-derived xenografts, and porcine models..."
+    whyMissed: "Generic term for GEM methodology, not specific mouse strain"
+    confidence: 0.1  # Very low confidence this is a specific tool
+    shouldBeAdded: No
+  
+  - toolName: "patient-derived xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...genetically engineered mice, patient-derived xenografts, and porcine models..."
+    whyMissed: "Generic term for PDX methodology, not specific PDX model"
+    confidence: 0.1  # Very low confidence this is a specific tool
+    shouldBeAdded: No
+  
+  - toolName: "porcine models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...patient-derived xenografts, and porcine models. We highlight the models' relationship to human cNFs..."
+    whyMissed: "Generic term for pig model methodology, not specific porcine strain"
+    confidence: 0.1  # Very low confidence this is a specific tool
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "exclude terms in review article context with phrases like 'We discuss', 'current state of', 'existing and developing'"
+    toolType: "general"
+    examples: ["We discuss the current state of cNF preclinical in vitro and in vivo model systems"]
+    reasoning: "Review articles often use generic methodology terms that should not be captured as specific tools. Adding context filters for review language would reduce false positives."
+  
+  - patternType: "naming_convention"
+    pattern: "require specific identifiers for model systems (strain names, catalog numbers, RRIDs) rather than generic terms"
+    toolType: "animal_model"
+    examples: ["genetically engineered mice" vs "Nf1flox/flox mice", "porcine models" vs "Yucatan miniature swine"]
+    reasoning: "Generic model system terms in reviews should be distinguished from specific, named model systems used experimentally."
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of generic model terms found but not recommended for addition
+  newPatternsCount: 2  # Number of new patterns suggested
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}  # Empty since no observations
+  majorIssuesFound: |
+    - Publication is a review article, not experimental research
+    - No Methods, Results, or Discussion sections available
+    - All model system mentions are generic terms in review context, not specific tools
+    - Abstract discusses existing models in the field rather than experimental usage
+    - No specific tool identifiers (strain names, catalog numbers, RRIDs) found
+  recommendations: |
+    This publication should not contribute any research tools to the database. It is a review article
+    that discusses model systems generically rather than using specific tools experimentally. The mining
+    correctly identified zero tools. The potentially missed tools are all generic methodology terms that
+    would be false positives if added. Future mining should implement context filters to distinguish
+    between review articles discussing methodologies and experimental papers using specific tools.
+    Patterns should require specific identifiers (strain names, catalog numbers) rather than accepting
+    generic terms like "genetically engineered mice" or "organoids" without further specification.

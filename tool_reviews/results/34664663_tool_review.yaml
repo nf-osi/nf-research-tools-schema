@@ -1,0 +1,109 @@
+publicationMetadata:
+  pmid: "34664663"
+  title: "Longitudinal Investigation of Early Motor Development in Neurofibromatosis Type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (validated questionnaires, scales, outcome measures), possibly computational tools for statistical analysis
+    
+    This longitudinal clinical study examining motor development in children with NF1 would be expected to use:
+    - Clinical assessment tools: Standardized motor assessment scales and developmental tests
+    - Computational tools: Statistical software for longitudinal analysis (mixed models, growth curves)
+    
+    Note: Despite being found by "bench" query, this is clearly a clinical study that would use clinical assessment tools, not laboratory research tools.
+  overallAssessment: |
+    This is a longitudinal clinical study examining motor development trajectories in children with NF1 compared to unaffected siblings. The study design involves repeated clinical assessments using standardized instruments over time, which would require validated clinical assessment tools (motor scales, developmental tests). Statistical analysis of longitudinal data would also require computational tools. The publication type strongly suggests clinical assessment tools should be present, despite no tools being initially mined.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Scales of Independent Behavior-Revised Motor Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Motor functioning was assessed longitudinally using the Scales of Independent Behavior-Revised Motor Scale and the Differential Ability Scales-II Copying subtest."
+    whyMissed: "This is a validated clinical assessment tool for measuring motor functioning, but may not have been recognized by mining patterns focused on laboratory tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Differential Ability Scales-II Copying subtest"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Motor functioning was assessed longitudinally using the Scales of Independent Behavior-Revised Motor Scale and the Differential Ability Scales-II Copying subtest."
+    whyMissed: "This is a standardized developmental assessment tool, specifically the copying subtest which measures fine motor skills and visual-motor integration"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Wilcoxon sign tests"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Wilcoxon sign tests were used to compare motor functioning at 3 or 4 years to 5 or 6 years old for children with NF1 seen during both time periods"
+    whyMissed: "Statistical test/method that would be implemented in statistical software, but may not be recognized as a computational tool"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "Linear mixed model growth curve analyses"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Linear mixed model growth curve analyses were used to compare trajectories for both children with NF1 (N = 62) and unaffected siblings (N = 37)."
+    whyMissed: "Advanced statistical analysis method that requires specialized software (R, SAS, SPSS), but may not be recognized as a computational tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Scales of Independent Behavior"
+    toolType: "clinical_assessment_tool"
+    examples: ["Scales of Independent Behavior-Revised Motor Scale"]
+    reasoning: "This is a well-established clinical assessment instrument that should be recognized as a tool"
+
+  - patternType: "term"
+    pattern: "Differential Ability Scales"
+    toolType: "clinical_assessment_tool"
+    examples: ["Differential Ability Scales-II Copying subtest"]
+    reasoning: "DAS-II is a standardized cognitive and developmental assessment battery widely used in clinical research"
+
+  - patternType: "context_phrase"
+    pattern: "assessed longitudinally using"
+    toolType: "clinical_assessment_tool"
+    examples: ["Motor functioning was assessed longitudinally using the Scales of Independent Behavior-Revised Motor Scale"]
+    reasoning: "This phrase pattern often precedes clinical assessment tool names in longitudinal studies"
+
+  - patternType: "context_phrase"
+    pattern: "growth curve analyses"
+    toolType: "computational_tool"
+    examples: ["Linear mixed model growth curve analyses were used"]
+    reasoning: "Growth curve analysis is a specialized statistical method requiring computational tools"
+
+  - patternType: "naming_convention"
+    pattern: "[Tool Name]-[Version/Revision] [Subtest/Scale]"
+    toolType: "clinical_assessment_tool"
+    examples: ["Scales of Independent Behavior-Revised Motor Scale", "Differential Ability Scales-II Copying subtest"]
+    reasoning: "Many clinical assessment tools follow this naming pattern with version numbers and specific subtests"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of clinical assessment tool usage
+    - Publication was found by "bench" query but is actually a clinical study
+    - Mining patterns appear to miss clinical assessment tools (validated questionnaires, scales, developmental tests)
+    - Statistical analysis methods may not be recognized as computational tools
+    - Limited text sections available (no full Results/Discussion) limits observation extraction
+  recommendations: |
+    - ADD the two clinical assessment tools that were clearly missed: "Scales of Independent Behavior-Revised Motor Scale" and "Differential Ability Scales-II Copying subtest"
+    - Consider adding statistical analysis methods as computational tools, though this may be debatable
+    - Improve mining patterns to better capture clinical assessment instruments
+    - Review query classification - this "bench" query found a clinical study
+    - The mining system needs better coverage of clinical assessment tools used in developmental and psychological research
+    - No observations could be extracted due to missing Results/Discussion sections in the provided text

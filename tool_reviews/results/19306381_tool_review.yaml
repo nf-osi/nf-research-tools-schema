@@ -1,0 +1,171 @@
+publicationMetadata:
+  pmid: "19306381"
+  title: "Neuregulin-1 beta and neuregulin-1 alpha differentially affect the migration and invasion of malignant peripheral nerve sheath tumor cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating MPNST cell migration and invasion using:
+    - Cell culture experiments with human and murine MPNST cell lines
+    - Immunoprecipitation and colocalization studies (requiring antibodies)
+    - Three-dimensional migration assays
+    - Signaling pathway analysis
+    - Multiple experimental substrates and reagents
+    
+    Expected tools: cell lines, antibodies, genetic reagents (recombinant proteins), computational tools for analysis.
+  overallAssessment: |
+    This is a laboratory research study that would typically use multiple research tools including cell lines, antibodies, and reagents.
+    The study describes experimental procedures like immunoprecipitation, migration assays, and protein analysis that require specific tools.
+    Despite lacking a Methods section in the provided text, the abstract clearly indicates extensive experimental work was performed.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...NRG-1 beta stimulated human and murine MPNST cell migration and invasion in a concentration-dependent manner in three-dimensional migration assays..."
+    whyMissed: "Generic reference to 'MPNST cell lines' without specific cell line names - mining patterns may require specific nomenclature"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "anti-erbB3 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...The NRG-1 receptors erbB3 and erbB4 were present in MPNST invadopodia...partially colocalized with focal adhesion kinase and the laminin receptor beta(1)-integrin and coimmunoprecipitated with beta(1)-integrin..."
+    whyMissed: "Immunoprecipitation and colocalization studies mentioned but specific antibodies not explicitly named - would require antibodies against erbB3, erbB4, FAK, β1-integrin"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-erbB4 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...The NRG-1 receptors erbB3 and erbB4 were present in MPNST invadopodia...partially colocalized with focal adhesion kinase and the laminin receptor beta(1)-integrin and coimmunoprecipitated with beta(1)-integrin..."
+    whyMissed: "Immunoprecipitation and colocalization studies mentioned but specific antibodies not explicitly named"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-focal adhesion kinase antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...partially colocalized with focal adhesion kinase and the laminin receptor beta(1)-integrin and coimmunoprecipitated with beta(1)-integrin..."
+    whyMissed: "Colocalization and immunoprecipitation studies require specific antibodies but not explicitly named"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "anti-β1-integrin antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...partially colocalized with focal adhesion kinase and the laminin receptor beta(1)-integrin and coimmunoprecipitated with beta(1)-integrin..."
+    whyMissed: "Immunoprecipitation studies require specific antibodies but not explicitly named"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "recombinant NRG-1 beta"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...NRG-1 beta promoted MPNST migration in a substrate-specific manner...NRG-1 beta stimulated human and murine MPNST cell migration and invasion in a concentration-dependent manner..."
+    whyMissed: "Recombinant protein reagents used in experiments but not explicitly identified as 'recombinant' - mining may miss protein names without reagent keywords"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "recombinant NRG-1 alpha"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...NRG-1 alpha had no effect on the migration and invasion of some MPNST lines and inhibited the migration of others...NRG-1 alpha did not activate Akt and activated these other kinases..."
+    whyMissed: "Recombinant protein reagents used in experiments but not explicitly identified as 'recombinant'"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "laminin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...markedly enhancing migration on laminin but not on collagen type I or fibronectin..."
+    whyMissed: "Extracellular matrix proteins used as experimental substrates but may not be recognized as reagents"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "collagen type I"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...markedly enhancing migration on laminin but not on collagen type I or fibronectin..."
+    whyMissed: "Extracellular matrix proteins used as experimental substrates but may not be recognized as reagents"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "fibronectin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...markedly enhancing migration on laminin but not on collagen type I or fibronectin..."
+    whyMissed: "Extracellular matrix proteins used as experimental substrates but may not be recognized as reagents"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "coimmunoprecipitated with|immunoprecipitated with|colocalized with"
+    toolType: "antibody"
+    examples: ["coimmunoprecipitated with beta(1)-integrin", "partially colocalized with focal adhesion kinase"]
+    reasoning: "These phrases strongly indicate antibody usage for immunoprecipitation and colocalization studies, even when antibodies aren't explicitly named"
+
+  - patternType: "context_phrase"
+    pattern: "stimulated.*cell.*migration|enhanced.*migration on|promoted.*migration"
+    toolType: "genetic_reagent"
+    examples: ["NRG-1 beta stimulated human and murine MPNST cell migration", "markedly enhancing migration on laminin"]
+    reasoning: "These phrases indicate experimental use of protein reagents or substrates in functional assays"
+
+  - patternType: "naming_convention"
+    pattern: "human and murine.*cell|.*cell lines"
+    toolType: "cell_line"
+    examples: ["human and murine MPNST cell", "some MPNST lines"]
+    reasoning: "Generic references to cell lines may be missed if patterns only look for specific cell line names"
+
+  - patternType: "term"
+    pattern: "recombinant [A-Z][A-Za-z0-9-]+"
+    toolType: "genetic_reagent"
+    examples: ["recombinant NRG-1 beta", "recombinant NRG-1 alpha"]
+    reasoning: "Recombinant proteins are commonly used reagents but may be mentioned without the 'recombinant' prefix"
+
+  - patternType: "context_phrase"
+    pattern: "migration on [a-z ]+|invasion.*assays|three-dimensional.*assays"
+    toolType: "genetic_reagent"
+    examples: ["migration on laminin", "three-dimensional migration assays"]
+    reasoning: "Functional assays often use specific substrates or reagents that should be captured as tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of extensive experimental work
+    - Publication lacks Methods section in provided text, limiting detailed tool identification
+    - Multiple experimental techniques described (immunoprecipitation, colocalization, migration assays) that require specific tools
+    - Cell lines, antibodies, and protein reagents clearly used but not detected by mining algorithms
+  recommendations: |
+    This publication represents a significant mining failure - it's a clear laboratory research study with extensive tool usage that went completely undetected.
+    
+    Key issues:
+    1. No tools were mined despite obvious experimental work described in abstract
+    2. Missing Methods section limits tool identification, but abstract contains sufficient evidence
+    3. Multiple tool types should have been detected: cell lines, antibodies, protein reagents
+    
+    Recommendations:
+    1. Implement suggested patterns to catch immunoprecipitation/colocalization contexts
+    2. Add patterns for generic cell line references ("human and murine MPNST cell")
+    3. Improve detection of protein reagents used in functional assays
+    4. Consider mining from abstracts when Methods sections unavailable
+    5. Add patterns for experimental substrate detection (laminin, collagen, fibronectin)
+    
+    This case highlights the need for more comprehensive pattern coverage, especially for publications where only abstracts are available.
+    The mining system should be able to infer tool usage from experimental descriptions even without explicit tool naming.

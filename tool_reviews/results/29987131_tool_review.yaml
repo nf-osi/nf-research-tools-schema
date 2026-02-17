@@ -1,0 +1,107 @@
+publicationMetadata:
+  pmid: "29987131"
+  title: "The biology of cutaneous neurofibromas: Consensus recommendations for setting research priorities"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a consensus review article that synthesizes existing literature and provides research recommendations.
+    Review articles typically:
+    - CITE tools from other studies but do not USE them experimentally
+    - Discuss model systems conceptually without direct usage
+    - Reference research approaches without implementing them
+    
+    Expected tool types for review articles: None (tools are cited, not used)
+    
+    However, review articles may mention tools from cited studies, which could be false positives
+    if mining algorithms don't distinguish between tool usage vs. tool citation.
+  overallAssessment: |
+    This is a consensus review article that summarizes existing knowledge and provides research recommendations
+    for cutaneous neurofibroma biology. Review articles do not typically use research tools directly but rather
+    cite and discuss tools used in other studies. Any tools mentioned would be citations from other work, not
+    actual tool usage, making them false positives for tool mining purposes.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Krox20Cre Nf1f/- mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "...the Parada laboratory showed that the Krox20Cre Nf1f/- pNF mice only developed pNF in a Nf1 background..."
+    whyMissed: "Specific mouse strain mentioned but likely not caught due to complex naming convention with multiple genetic elements"
+    confidence: 0.8
+    shouldBeAdded: No
+    
+  - toolName: "CMV-Cre ERT2;Nf1f/- mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "...implantation of Nf1-/- SKPs resulted in development of cNFs only in pregnant CMV-Cre ERT2;Nf1f/- mice..."
+    whyMissed: "Complex transgenic mouse strain name with multiple genetic elements not recognized"
+    confidence: 0.8
+    shouldBeAdded: No
+    
+  - toolName: "skin-derived precursor cells (SKPs)"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "...Nf1 skin-derived precursor cells (SKPs), a population of neural crest–derived progenitors in the murine dermis..."
+    whyMissed: "Cell type mentioned but may not have been recognized as a specific research tool"
+    confidence: 0.7
+    shouldBeAdded: No
+    
+  - toolName: "Schwann cell precursors (SCPs)"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "...described the migration of Schwann cell precursors (SCPs) along growing nerves..."
+    whyMissed: "Primary cell type mentioned but not recognized as research tool"
+    confidence: 0.6
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "IMPORTANT: Do not add patterns for review articles"
+    toolType: "general"
+    examples: []
+    reasoning: |
+      This is a review article that cites tools from other studies rather than using them experimentally.
+      Adding patterns based on review articles would increase false positives by capturing tool citations
+      rather than tool usage. Mining algorithms should focus on primary research papers with experimental
+      methods sections, not review articles that discuss tools conceptually.
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 0
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a consensus review article, not primary research
+    - No experimental methods section - only literature review methodology
+    - All tool mentions are citations from other studies, not direct usage
+    - Mining algorithms should exclude review articles to avoid false positives
+    - Tools mentioned (mouse models, cell types) are discussed conceptually, not used experimentally
+  recommendations: |
+    CRITICAL RECOMMENDATION: This publication should be EXCLUDED from tool mining entirely.
+    
+    Reasons:
+    1. This is a consensus review article that synthesizes existing literature
+    2. No experimental work was conducted - only literature review and consensus meetings
+    3. All tool mentions are citations from other studies, not actual tool usage
+    4. Including review articles in tool mining will generate false positives
+    
+    Action items:
+    1. Implement publication type filtering to exclude review articles, consensus statements, and meta-analyses
+    2. Focus mining efforts on primary research papers with experimental methods
+    3. Consider adding publication type classification as a pre-filtering step
+    4. Review other publications in the dataset to identify similar review articles that should be excluded
+    
+    The 4 potentially missed tools identified should NOT be added because:
+    - They represent citations from other studies, not tools used in this publication
+    - Adding them would create false positives in the tool database
+    - Review articles should not contribute tools to research tool databases

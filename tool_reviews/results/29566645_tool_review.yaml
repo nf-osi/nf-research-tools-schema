@@ -1,0 +1,224 @@
+publicationMetadata:
+  pmid: "29566645"
+  title: "Oscillatory motor patterning is impaired in neurofibromatosis type 1: a behavioural, EEG and fMRI study."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical neuroscience study using behavioral testing, EEG, and fMRI to examine motor deficits in NF1 patients.
+    Expected tool types:
+    - Clinical assessment tools: Wechsler Adult Intelligence Scale (WAIS-III), Stroop Colour and Word Test, Edinburgh Handedness Inventory
+    - Computational tools: BrainVoyager QX, EEGlab toolbox, Matlab, Psychophysics Toolbox 3
+    - Equipment/hardware: EEG systems, fMRI scanners, response recording devices
+    
+    Note: While queryType is "bench", this is actually a clinical study with human participants, not laboratory bench research.
+    The study contains both clinical assessment tools and computational analysis tools.
+  overallAssessment: |
+    This clinical neuroscience study clearly uses multiple research tools including validated clinical assessment instruments,
+    computational analysis software, and specialized equipment. The comprehensive Methods section describes detailed protocols
+    for behavioral testing, EEG recording, and fMRI acquisition/analysis. Tools are expected and extensively used throughout
+    the experimental procedures. The mining system appears to have missed multiple legitimate research tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Wechsler Adult Intelligence Scale-3rd edition (WAIS-III)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Intellectual function was assessed by using the Portuguese-adapted version of the Wechsler Adult Intelligence Scale-3rd edition (WAIS-III)"
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Stroop Colour and Word Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All the participants performed the standard Stroop Colour and Word Test [ 31 ] composed by two congruent conditions [word (W) and colour (C)] and one incongruent (interference) condition"
+    whyMissed: "Validated neuropsychological test not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Edinburgh Handedness Inventory"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All the participants but one were right-handed as assessed by the Edinburgh Handedness Inventory [ 29 ]"
+    whyMissed: "Clinical assessment inventory not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BrainVoyager QX 2.8.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The complete processing pipeline and analysis of the functional data was done using BrainVoyager QX 2.8.2 (Brain Innovation, Maastricht, The Netherlands)"
+    whyMissed: "Neuroimaging analysis software with version number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "EEGlab toolbox"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The processing was performed using the EEGlab toolbox [ 34 ] for Matlab (MathWorks, Natick, MA)"
+    whyMissed: "EEG analysis toolbox not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Psychophysics Toolbox 3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The paradigm was designed and presented using the Psychophysics Toolbox 3 [ 32 ,  33 ], running on Matlab R2013b"
+    whyMissed: "Experimental presentation software not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Matlab R2013b"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "running on Matlab R2013b (MathWorks, Natick, MA, USA)"
+    whyMissed: "Programming environment with version not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Scan 4.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were acquired using Scan 4.5 (NeuroScan, Compumedics, Charlotte, NC)"
+    whyMissed: "EEG acquisition software not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "WAIS-III|Wechsler Adult Intelligence Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler Adult Intelligence Scale-3rd edition (WAIS-III)"]
+    reasoning: "Standard intelligence assessment tool widely used in clinical research"
+
+  - patternType: "term"
+    pattern: "Stroop.*Test|Stroop.*Task"
+    toolType: "clinical_assessment_tool"
+    examples: ["Stroop Colour and Word Test"]
+    reasoning: "Classic neuropsychological assessment tool for executive function"
+
+  - patternType: "term"
+    pattern: "Edinburgh Handedness Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["Edinburgh Handedness Inventory"]
+    reasoning: "Standard handedness assessment tool in neuroscience research"
+
+  - patternType: "term"
+    pattern: "BrainVoyager.*QX|BrainVoyager"
+    toolType: "computational_tool"
+    examples: ["BrainVoyager QX 2.8.2"]
+    reasoning: "Major neuroimaging analysis software package"
+
+  - patternType: "term"
+    pattern: "EEGlab.*toolbox|EEGLAB"
+    toolType: "computational_tool"
+    examples: ["EEGlab toolbox"]
+    reasoning: "Widely used EEG analysis toolbox for Matlab"
+
+  - patternType: "term"
+    pattern: "Psychophysics Toolbox|PTB"
+    toolType: "computational_tool"
+    examples: ["Psychophysics Toolbox 3"]
+    reasoning: "Standard experimental presentation software in psychology/neuroscience"
+
+  - patternType: "context_phrase"
+    pattern: "assessed by using|assessed using|measured using|analyzed using|processed using"
+    toolType: "general"
+    examples: ["assessed by using the Portuguese-adapted version of the Wechsler Adult Intelligence Scale"]
+    reasoning: "Common phrases indicating tool usage in clinical and research contexts"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(.*,.*,.*\\)|\\[.*\\].*version"
+    toolType: "general"
+    examples: ["(MathWorks, Natick, MA, USA)", "(Brain Innovation, Maastricht, The Netherlands)"]
+    reasoning: "Vendor information in parentheses often indicates commercial tools/software"
+
+observations:
+  - resourceName: "Stroop Colour and Word Test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Groups did not differ regarding the Interference Index (independent-samples t tests, p > .05), 
+      indicating similar ability to control over the interference effect. This suggests that executive 
+      dysfunction did not underlie the observed motor deficits in NF1 patients, as both groups showed 
+      comparable performance on this executive function measure.
+    foundIn: "results"
+    contextSnippet: "Groups did not differ regarding this index (independent-samples t tests, p >.05), indicating similar ability to control over the interference effect"
+    confidence: 0.9
+    doi: "10.1186/s11689-018-9230-4"
+
+  - resourceName: "Wechsler Adult Intelligence Scale-3rd edition (WAIS-III)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Full-scale IQ values were in the normal range for the NF1 patients (mean IQ ± SD 104.4 ± 13.7). 
+      This indicates that the motor timing deficits observed in NF1 patients were not due to general 
+      intellectual impairment, as their IQ scores fell within the normal range.
+    foundIn: "results"
+    contextSnippet: "Full-scale IQ values were in the normal range for the NF1 patients (mean IQ ± SD 104.4 ± 13.7)"
+    confidence: 0.9
+    doi: "10.1186/s11689-018-9230-4"
+
+  - resourceName: "BrainVoyager QX 2.8.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      fMRI analysis revealed group differences only at the fastest frequency (5 Hz), with controls showing 
+      higher recruitment of extrapyramidal motor system regions (putamen, cerebellum, red nucleus) compared 
+      to NF1 patients. Analysis used t(76) > 3.26, p < 0.05, FDR corrected for multiple comparisons, 
+      minimum cluster size of 20 voxels.
+    foundIn: "results"
+    contextSnippet: "Our analysis only identified differences between healthy controls and patients with NF1 at 5 Hz, as presented in Fig. 5 ( t (76) > 3.26, p < 0.05, multiple comparison FDR corrected, minimum cluster size of 20 voxels)"
+    confidence: 0.8
+    doi: "10.1186/s11689-018-9230-4"
+
+  - resourceName: "EEGlab toolbox"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Time-frequency analysis revealed similar oscillatory patterns across NF1 and control groups that 
+      mirrored motor behavior. Both groups exhibited marked cyclic synchronization/desynchronization 
+      patterns in the mu and beta range (8-12 Hz and 20-26 Hz respectively), with no statistical 
+      differences in power between groups across motor pacing frequencies.
+    foundIn: "results"
+    contextSnippet: "We did not find statistical differences in the power between groups across any of these motor pacing frequencies"
+    confidence: 0.8
+    doi: "10.1186/s11689-018-9230-4"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 8
+  observationsExtracted: 4
+  observationsByType:
+    General Comment or Review: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Mining system completely failed to identify any tools despite this being a tool-rich publication
+    - Multiple validated clinical assessment tools were missed (WAIS-III, Stroop Test, Edinburgh Handedness Inventory)
+    - Several computational analysis tools were missed (BrainVoyager, EEGlab, Psychophysics Toolbox, Matlab)
+    - Publication was classified as "bench" research but is actually a clinical study with human participants
+    - No pattern recognition for clinical assessment tools or neuroimaging software
+  recommendations: |
+    This publication should have yielded 8+ research tools but the mining system found none. This represents
+    a major failure in tool detection. Recommendations:
+    
+    1. Add all 8 identified tools to the database - they are clearly legitimate research tools with proper usage context
+    2. Implement suggested patterns for clinical assessment tools (WAIS, Stroop, Edinburgh Handedness Inventory)
+    3. Improve detection of neuroimaging software (BrainVoyager, EEGlab) and experimental presentation tools
+    4. Add context phrase patterns for "assessed using", "analyzed using", "processed using"
+    5. Improve vendor/version detection patterns for software identification
+    6. Review classification system - "bench" query found a clinical study, suggesting query refinement needed
+    7. All missed tools have clear experimental usage context and should be prioritized for addition
+    8. The observations extracted show meaningful scientific findings related to tool performance and limitations

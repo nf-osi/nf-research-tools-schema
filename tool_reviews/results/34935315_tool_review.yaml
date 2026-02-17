@@ -1,0 +1,278 @@
+publicationMetadata:
+  pmid: "34935315"
+  title: "Analysis of muscle tissue in vivo using fiber-optic autofluorescence and diffuse reflectance spectroscopy."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, computational tools, genetic reagents
+    
+    This is a biomedical engineering/optical spectroscopy study that uses mouse models of genetic muscle disease.
+    Expected tools include:
+    - Animal models (multiple mouse strains and genetic models)
+    - Computational tools (MATLAB, analysis software, statistical packages)
+    - Genetic reagents (transgenic mouse lines, knockout constructs)
+    - Potentially antibodies or reagents for histological staining
+    
+    The publication involves experimental procedures, animal work, data analysis, and histological validation,
+    making it highly likely to contain multiple research tool types.
+  overallAssessment: |
+    This is a clear lab research publication involving biomedical engineering and optical spectroscopy applied to mouse models
+    of muscle disease. The study develops and validates a fiber-optic spectroscopy system using multiple mouse strains including
+    genetic knockout models. The presence of detailed Methods, Results, and histological validation strongly indicates extensive
+    use of research tools. The complete absence of mined tools represents a significant mining failure.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1Prx1-/-"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...two mouse models of genetic muscle disease: a type 1 neurofibromatosis (NF1) limb-mesenchyme knockout (Nf1Prx1−/−) and a muscular dystrophy mouse (mdx)..."
+    whyMissed: "Genetic mouse model notation not recognized - specific knockout strain designation"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "mdx mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...two mouse models of genetic muscle disease: a type 1 neurofibromatosis (NF1) limb-mesenchyme knockout (Nf1Prx1−/−) and a muscular dystrophy mouse (mdx)..."
+    whyMissed: "Standard mouse model name not captured by patterns"
+    confidence: 0.99
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...C57BL/6 mice (B6) and mice (NF1) were bred in-house at the Transgenic Facility..."
+    whyMissed: "Standard inbred mouse strain nomenclature not recognized"
+    confidence: 0.99
+    shouldBeAdded: Yes
+
+  - toolName: "B10 mdx mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...mdx mice (B10 mdx) were sourced from Australian Bioresources (ABR, Moss Vale)..."
+    whyMissed: "Specific strain designation with vendor information not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1Prx1-/- transgenic mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...NF1 mice bred from the Nf1Prx1−/− Prx1-Cre transgenic mice and the 42 mice..."
+    whyMissed: "Complex transgenic mouse nomenclature not recognized"
+    confidence: 0.97
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1flox/flox mice"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...NF1 mice bred from the Nf1Prx1−/− Prx1-Cre transgenic mice and the 42 mice. Nf1flox/flox were bred on a B6 background..."
+    whyMissed: "Floxed allele notation not captured by genetic reagent patterns"
+    confidence: 0.96
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...System control and data collection were performed on a PC laptop using MATLAB (Mathworks) via direct USB connection..."
+    whyMissed: "Common software name not captured despite clear usage context"
+    confidence: 0.99
+    shouldBeAdded: Yes
+
+  - toolName: "Arduino"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...An Arduino was used for transistor–transistor logic and pulse-width modulation signals for control of the LD and shutter servos..."
+    whyMissed: "Hardware/software platform not recognized in experimental context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Leica CM1950 Clinical Cryostat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...8-μm sections were cut on a Leica CM1950 Clinical Cryostat, captured on Superfrost™ Plus Microscope Slides..."
+    whyMissed: "Specialized laboratory equipment with model number not captured"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "USB 4000 spectrometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...before detection by a USB spectrometer with a wavelength range of 345 to 1041 nm (USB 4000, Ocean Optics)..."
+    whyMissed: "Scientific instrument with model number and vendor not recognized"
+    confidence: 0.94
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[A-Z][a-z0-9]+[-+/]+[-+/]+\\b"
+    toolType: "animal_model"
+    examples: ["Nf1Prx1-/-", "Nf1flox/flox"]
+    reasoning: "Captures genetic mouse model nomenclature with gene names, promoters, and allele designations"
+
+  - patternType: "naming_convention"
+    pattern: "\\bC57BL/[0-9]+\\b|\\bB[0-9]+\\s+\\w+\\b"
+    toolType: "animal_model"
+    examples: ["C57BL/6 mice", "B10 mdx mice"]
+    reasoning: "Standard inbred mouse strain nomenclature patterns"
+
+  - patternType: "context_phrase"
+    pattern: "mouse model[s]? of|transgenic mice|knockout mice|bred from|sourced from.*mice"
+    toolType: "animal_model"
+    examples: ["mouse models of genetic muscle disease", "transgenic mice", "sourced from Australian Bioresources"]
+    reasoning: "Context phrases that reliably indicate mouse model usage in research"
+
+  - patternType: "naming_convention"
+    pattern: "\\bmdx\\s+mice?\\b"
+    toolType: "animal_model"
+    examples: ["mdx mice", "B10 mdx mice"]
+    reasoning: "Standard muscular dystrophy mouse model designation"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-z]+\\s+[A-Z0-9]+\\s+(Clinical\\s+)?[A-Z][a-z]+\\b"
+    toolType: "computational_tool"
+    examples: ["Leica CM1950 Clinical Cryostat", "USB 4000 spectrometer"]
+    reasoning: "Scientific equipment with manufacturer and model number patterns"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+MATLAB|performed.*MATLAB|analyzed.*MATLAB"
+    toolType: "computational_tool"
+    examples: ["using MATLAB (Mathworks)", "performed on a PC laptop using MATLAB"]
+    reasoning: "Clear software usage context for MATLAB"
+
+  - patternType: "naming_convention"
+    pattern: "\\bflox/flox\\b|\\bfl/fl\\b"
+    toolType: "genetic_reagent"
+    examples: ["Nf1flox/flox"]
+    reasoning: "Floxed allele notation commonly used in conditional knockout systems"
+
+observations:
+  - resourceName: "Nf1Prx1-/-"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF1 quadriceps muscle showed significantly different autofluorescence spectra compared to wild-type controls 
+      (p < 0.05 between ~450 and 720 nm). Diffuse reflectance spectra showed more pronounced absorption feature 
+      between 500 and 600 nm. Classification accuracy achieved ROC-AUC of 0.99 (AF) and 0.97 (DR) for quadriceps 
+      muscle separation from controls.
+    foundIn: "results"
+    contextSnippet: "...Normalized AF spectra from B6 and NF1 quadricep muscles showed significantly different means (p < 0.05 between ∼450 and 720 nm)..."
+    confidence: 0.95
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "Nf1Prx1-/-"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Histopathology revealed endomysial fibrosis by H&E staining and intramyocellular lipid accumulation 
+      by Oil Red O staining in quadriceps muscle, consistent with metabolic myopathy phenotype.
+    foundIn: "results"
+    contextSnippet: "...NF1 muscle histology showed endomysial fibrosis and intramyocellular lipid by H&E and Oil Red O staining, respectively..."
+    confidence: 0.98
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "Nf1Prx1-/-"
+    resourceType: "Animal Model"
+    observationType: "Cardiovascular System"
+    observationTypeOntologyId: "MP:0005385"
+    details: |
+      Cardiac muscle showed no optical separability from controls with ROC-AUC of 0.67 (AF) and 0.63 (DR), 
+      consistent with Prx1 promoter not allowing expression in heart tissue. No pathological changes detected 
+      in cardiac muscle.
+    foundIn: "results"
+    contextSnippet: "...B6 and NF1 cardiac muscle showed similar spectral shapes...poor QDC classification performance with ROC-AUCs of 0.67 and 0.63..."
+    confidence: 0.92
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "mdx mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Strong temporal separability observed between 3-week and 10-week time points using autofluorescence 
+      (ROC-AUC = 0.96), indicating progressive dystrophic phenotype development. Changes attributed to 
+      accumulation of fluorescent lipofuscin granules in dystrophic muscle.
+    foundIn: "results"
+    contextSnippet: "...B10 mdx at 3 and 10 weeks showed differences in AF spectral features resulting in strong classifier performance, AUC = 0.96..."
+    confidence: 0.96
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "mdx mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Histopathology at 10 weeks revealed centralized nuclei and degenerating/regenerating muscle fibers 
+      characteristic of dystrophic muscle by H&E staining. 3-week-old mdx mice showed no pathological 
+      features, comparable to controls.
+    foundIn: "results"
+    contextSnippet: "...Histology of B10 mdx mouse quadricep muscle found features of dystrophy...centralized nuclei and degenerating/regenerating muscle fibers..."
+    confidence: 0.98
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "mdx mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0005380"
+    details: |
+      Early detection capability demonstrated - mdx mice were optically separable from controls at 3 weeks 
+      (ROC-AUC = 0.98 for AF) before histological features were apparent, indicating spectroscopic detection 
+      of pre-dystrophic changes.
+    foundIn: "results"
+    contextSnippet: "...B10WT versus B10 mdx at 3 weeks 0.982...3-week-old B10 mdx mouse muscle showed no pathological features..."
+    confidence: 0.94
+    doi: "10.1117/1.JBO.26.12.125001"
+
+  - resourceName: "MATLAB"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for system control, data collection, and all data processing and analysis. Implemented principal 
+      component analysis (PCA) for dimensionality reduction and quadratic discriminant classifier (QDC) 
+      with fivefold cross validation for tissue classification.
+    foundIn: "methods"
+    contextSnippet: "...System control and data collection were performed on a PC laptop using MATLAB...All data processing and analysis were performed in MATLAB..."
+    confidence: 0.99
+    doi: "10.1117/1.JBO.26.12.125001"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 7
+  observationsExtracted: 7
+  observationsByType:
+    Cellular: 4
+    Cardiovascular System: 1
+    Developmental: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Complete mining failure: Zero tools extracted from a publication rich in research tools
+    - Multiple mouse models not detected despite clear experimental usage
+    - Standard software (MATLAB) not captured despite extensive usage description
+    - Genetic reagent nomenclature (floxed alleles) not recognized
+    - Scientific equipment with model numbers not detected
+    - This represents a systematic failure of mining patterns for lab research publications
+  recommendations: |
+    This publication demonstrates critical gaps in mining patterns that need immediate attention:
+    
+    1. URGENT: Add mouse model nomenclature patterns - this is fundamental for biomedical research
+    2. Implement genetic reagent patterns for floxed alleles and transgenic constructs
+    3. Add software detection patterns with usage context (MATLAB, Arduino)
+    4. Include scientific equipment patterns with manufacturer/model numbers
+    5. Add context-based detection for "mouse models of", "transgenic mice", etc.
+    
+    All 10 missed tools should be added to the database as they represent genuine research tools
+    with clear experimental usage. The observations extracted show significant phenotypic findings
+    that demonstrate the scientific value of these animal models.
+    
+    This mining failure highlights the need for comprehensive pattern coverage in lab research domains.

@@ -1,0 +1,85 @@
+publicationMetadata:
+  pmid: "12082543"
+  title: "Mouse models of neurofibromatosis 1 and 2."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very confident - this is clearly a review based on title and abstract content
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does not contain actual research tools used by the authors.
+    Instead, reviews discuss and cite tools used in other studies. While the topic is about
+    mouse models (which are research tools), this publication appears to be a comprehensive
+    review of existing models rather than describing new tool development or experimental usage.
+    
+    Based on the abstract, this review discusses mouse models of NF1 and NF2, but does not
+    appear to describe specific experimental procedures or tool usage by the authors themselves.
+  overallAssessment: |
+    This is a review article discussing mouse models of neurofibromatosis, not a primary research
+    study. Review articles typically cite and discuss tools used in other studies but do not
+    use tools experimentally themselves. The absence of Methods, Results, and Discussion sections
+    confirms this is not primary research. Tools mentioned would likely be citations of models
+    developed by others, not tools used by these authors.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "homozygous knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The development of traditional homozygous knockout mice has provided insights into the roles of the NF1 and NF2 genes during development"
+    whyMissed: "Generic term 'homozygous knockout mice' mentioned but no specific strain names or identifiers provided"
+    confidence: 0.3  # Low confidence - too generic and in review context
+    shouldBeAdded: No
+  - toolName: "mouse targeting strategies"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Recent progress employing novel mouse targeting strategies has begun to illuminate the roles of the NF1 and NF2 gene products"
+    whyMissed: "Very generic term referring to techniques rather than specific tools"
+    confidence: 0.2  # Very low confidence - too vague
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "specific strain names with genetic modifications (e.g., Nf1+/-, Nf2flox/flox, B6.129-Nf1tm1Tyj)"
+    toolType: "animal_model"
+    examples: ["No specific examples found in this abstract"]
+    reasoning: "Review articles often mention mouse models but rarely provide specific strain identifiers. Future mining should look for formal strain nomenclature rather than generic terms like 'knockout mice'"
+  - patternType: "term"
+    pattern: "exclude generic terms in review context: 'mouse models', 'knockout mice', 'targeting strategies'"
+    toolType: "general"
+    examples: ["homozygous knockout mice", "mouse targeting strategies"]
+    reasoning: "These generic terms in review articles are not specific research tools and create false positives. Need context analysis to distinguish review citations from experimental usage"
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # Two generic terms identified but not recommended for addition
+  newPatternsCount: 2  # Two patterns suggested for improving mining
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}  # Empty since no observations
+  majorIssuesFound: |
+    - Publication is a review article, not primary research
+    - No Methods section indicating experimental work
+    - Only abstract available - no full text sections with detailed methodology
+    - Generic terms mentioned (knockout mice, targeting strategies) but no specific tool identifiers
+    - Publication discusses tools used by others rather than tools used by the authors
+  recommendations: |
+    This publication should not contribute any tools to the database. It is a review article
+    that discusses mouse models of neurofibromatosis but does not describe specific experimental
+    usage of research tools by the authors. The mining correctly identified zero tools.
+    
+    The generic terms found ("homozygous knockout mice", "mouse targeting strategies") are too
+    vague and appear in a review context rather than experimental usage context. These should
+    not be added as they would create false positives.
+    
+    For future mining, review articles should be filtered out or handled differently, as they
+    typically cite tools used by others rather than describing experimental tool usage.
+    Pattern improvements suggested focus on requiring specific strain nomenclature and
+    excluding generic terms in review contexts.
+    
+    No observations were extracted since no tools were validated for inclusion.

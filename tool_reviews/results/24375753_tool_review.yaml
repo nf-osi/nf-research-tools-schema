@@ -1,0 +1,159 @@
+publicationMetadata:
+  pmid: "24375753"
+  title: "Sex Is a major determinant of neuronal dysfunction in neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study using Nf1 genetically engineered mice (GEM) to investigate 
+    sexually dimorphic differences in neuronal dysfunction. The study involves experimental platforms
+    for testing learning/memory, visual acuity, retinal ganglion cell death, and signaling pathway
+    function. Expected tools include animal models (Nf1 GEM), potentially genetic reagents for
+    creating the models, and computational tools for data analysis. Clinical assessment tools
+    may also be present for measuring visual symptoms and cognitive function.
+  overallAssessment: |
+    This is a clear laboratory research study that should contain multiple research tools. The study
+    uses Nf1 genetically engineered mice as experimental platforms and measures various neuronal
+    functions, which typically requires specialized tools and reagents. The presence of a Methods
+    section and experimental design strongly indicates tool usage, making the empty mining results
+    concerning and suggesting significant tools were missed.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 GEM"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we leveraged Nf1 genetically engineered mice (GEM) to define the potential role of sex as a clinically relevant modifier of NF1-associated neuronal dysfunction..."
+    whyMissed: "The term 'Nf1 GEM' or 'Nf1 genetically engineered mice' was not recognized as an animal model despite being the primary experimental tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 genetically engineered mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...Nf1 GEM were employed as experimental platforms to investigate sexually dimorphic differences in learning/memory, visual acuity, retinal ganglion cell (RGC) death..."
+    whyMissed: "Full descriptive name for the animal model was not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "brain magnetic resonance imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Female patients with NF1-associated optic glioma were twice as likely to undergo brain magnetic resonance imaging for visual symptoms..."
+    whyMissed: "MRI as a clinical assessment tool for visual symptoms was not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "brain MRI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "...Female patients with NF1-associated optic glioma were twice as likely to undergo brain MRI for visual symptoms..."
+    whyMissed: "Abbreviated form of MRI was not captured as a clinical assessment tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-z0-9]+ (genetically engineered mice|GEM)\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 genetically engineered mice", "Nf1 GEM"]
+    reasoning: "Genetically engineered mice (GEM) are a common animal model format that should be captured, especially when preceded by a gene name"
+
+  - patternType: "context_phrase"
+    pattern: "employed as experimental platforms"
+    toolType: "animal_model"
+    examples: ["Nf1 GEM were employed as experimental platforms"]
+    reasoning: "This phrase strongly indicates the use of animal models or other experimental tools in research"
+
+  - patternType: "term"
+    pattern: "\\b(brain |)MRI\\b|\\bmagnetic resonance imaging\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["brain MRI", "brain magnetic resonance imaging"]
+    reasoning: "MRI used for clinical assessment of symptoms should be captured as a clinical assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "undergo .+ for .+ symptoms"
+    toolType: "clinical_assessment_tool"
+    examples: ["undergo brain magnetic resonance imaging for visual symptoms"]
+    reasoning: "This pattern indicates clinical assessment procedures used to evaluate patient symptoms"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+ (knockout|KO|heterozygous|homozygous) (mice|mouse)\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 knockout mice", "Nf1 heterozygous mice"]
+    reasoning: "Standard nomenclature for genetically modified mouse models that may not be captured by current patterns"
+
+observations:
+  - resourceName: "Nf1 GEM"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Female Nf1 GEM exhibited a decrement in optic glioma-associated visual acuity, shorter 
+      retinal ganglion cell (RGC) axons, and attenuated cAMP levels. This represents sexually
+      dimorphic neuronal dysfunction specific to female animals in the visual system.
+    foundIn: "results"
+    contextSnippet: "...only female Nf1 GEM exhibited a decrement in optic glioma-associated visual acuity, shorter RGC axons, and attenuated cAMP levels..."
+    confidence: 0.95
+    doi: "10.1002/ana.24093"
+
+  - resourceName: "Nf1 GEM"
+    resourceType: "Animal Model"
+    observationType: "Behavior"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Male Nf1 GEM showed spatial learning/memory deficits, increased Ras activity, and reduced
+      dopamine levels. This represents sexually dimorphic neuronal dysfunction specific to male
+      animals affecting cognitive function and neurotransmitter signaling.
+    foundIn: "results"
+    contextSnippet: "...only male Nf1 GEM showed spatial learning/memory deficits, increased Ras activity, and reduced dopamine levels..."
+    confidence: 0.95
+    doi: "10.1002/ana.24093"
+
+  - resourceName: "Nf1 GEM"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Sex-specific differences in Nf1 protein (neurofibromin)-regulated signaling pathways were
+      observed, including differential Ras activity, cyclic adenosine monophosphate (cAMP), and
+      dopamine levels between male and female animals.
+    foundIn: "both"
+    contextSnippet: "...investigate sexually dimorphic differences in...Nf1 protein (neurofibromin)-regulated signaling pathway function (Ras activity, cyclic adenosine monophosphate [cAMP], and dopamine levels)..."
+    confidence: 0.90
+    doi: "10.1002/ana.24093"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    Nervous System: 1
+    Behavior: 1
+    Molecular: 1
+  majorIssuesFound: |
+    - Critical mining failure: No tools were detected despite this being a clear laboratory research study
+    - Primary experimental tool (Nf1 GEM/genetically engineered mice) completely missed
+    - Clinical assessment tools (MRI) used for patient evaluation not captured
+    - Mining patterns appear inadequate for detecting genetically engineered mouse models
+    - Standard animal model nomenclature not recognized by current mining algorithms
+  recommendations: |
+    This publication represents a significant mining failure. The study clearly uses Nf1 genetically
+    engineered mice as the primary experimental tool, which should have been detected as an animal model.
+    Additionally, brain MRI used for clinical assessment was missed. The mining patterns need substantial
+    improvement to capture:
+    1. Genetically engineered mouse models with gene names (Nf1 GEM)
+    2. Clinical imaging tools used for symptom assessment
+    3. Context phrases indicating experimental tool usage
+    All identified missed tools should be added to the database, and the suggested patterns should be
+    implemented to prevent similar failures. The extracted observations provide valuable phenotypic
+    data about sex-specific differences in this NF1 mouse model.

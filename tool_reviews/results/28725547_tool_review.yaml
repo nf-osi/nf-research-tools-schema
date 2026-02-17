@@ -1,0 +1,235 @@
+publicationMetadata:
+  pmid: "28725547"
+  title: "Spatial working memory in neurofibromatosis 1: Altered neural activity and functional connectivity."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → computational tools (neuroimaging analysis software), clinical assessment tools (cognitive tests)
+    
+    This neuroimaging study uses fMRI to investigate cognitive deficits in NF1 patients. Expected tools include:
+    - Computational tools: FSL, SPSS, neuroimaging analysis software
+    - Clinical assessment tools: cognitive assessment batteries (WASI, WAIS-IV, working memory tasks)
+    
+    Note: While queryType is "bench", this study combines both computational neuroimaging analysis 
+    and clinical cognitive assessments, so tools from multiple categories are expected.
+  overallAssessment: |
+    This is a neuroimaging research study that clearly uses multiple research tools for data acquisition, 
+    analysis, and cognitive assessment. The extensive Methods section describes fMRI protocols, statistical 
+    analysis software, and standardized cognitive assessment instruments. Tools are expected and extensively 
+    used throughout the experimental workflow. The study combines computational neuroimaging analysis with 
+    clinical cognitive assessments, making it likely to contain both computational tools and clinical assessment tools.
+
+toolValidations: []  # No tools were mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "FSL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "FMRI data analyses were performed using the FMRIB software library (www.fmrib.ox.ac.uk/fsl), version 5.0 (Smith et al., 2004)"
+    whyMissed: "FSL is a major neuroimaging analysis software package with version number specified"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analyses of neuropsychological and clinical data were performed using SPSS software v. 21 (IBM)"
+    whyMissed: "SPSS is statistical analysis software with version number specified"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "WASI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "IQ data were obtained using either the Matrix Reasoning and Vocabulary subtests from the WASI (Wechsler, 2011) for the NF1 patients"
+    whyMissed: "Wechsler Abbreviated Scale of Intelligence is a standardized cognitive assessment tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "WAIS-IV"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "the same measures from the Wechsler Adult Intelligence Scale, Version 4 (WAIS-IV; Wechsler, 2014) for the healthy controls"
+    whyMissed: "WAIS-IV is a standardized cognitive assessment instrument with version specified"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Letter-Number Sequencing task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Working memory capacity was measured behaviorally using the University of Maryland Letter–Number Sequencing (LNS) task (Gold et al., 1997)"
+    whyMissed: "LNS is a standardized working memory assessment task"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SCAP task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Spatial capacity working memory (SCAP) task Participants viewed a visual array presenting 1, 3, 5, or 7 circles on the screen"
+    whyMissed: "SCAP is a spatial working memory assessment task used in cognitive research"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "FLAME"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed using a mixed-effects model with FMRIB's Local Analysis of Mixed Effects (FLAME)"
+    whyMissed: "FLAME is a specific statistical analysis method/tool within FSL for neuroimaging"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Harvard-Oxford atlas"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Brain regions were identified using the Harvard-Oxford cortical and subcortical probabilistic atlases"
+    whyMissed: "Harvard-Oxford atlas is a standardized brain atlas used in neuroimaging analysis"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FSL|FMRIB Software Library"
+    toolType: "computational_tool"
+    examples: ["FSL version 5.0", "FMRIB software library"]
+    reasoning: "FSL is a major neuroimaging analysis package that should be detected"
+
+  - patternType: "term"
+    pattern: "SPSS software|SPSS v\\.|SPSS version"
+    toolType: "computational_tool"
+    examples: ["SPSS software v. 21"]
+    reasoning: "SPSS statistical software with version numbers should be captured"
+
+  - patternType: "term"
+    pattern: "WASI|Wechsler Abbreviated Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["WASI (Wechsler, 2011)"]
+    reasoning: "WASI is a standardized cognitive assessment tool"
+
+  - patternType: "term"
+    pattern: "WAIS-IV|Wechsler Adult Intelligence Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["WAIS-IV (Wechsler, 2014)"]
+    reasoning: "WAIS-IV is a standardized cognitive assessment instrument"
+
+  - patternType: "context_phrase"
+    pattern: "measured behaviorally using|assessed via.*battery|cognitive functioning was assessed"
+    toolType: "clinical_assessment_tool"
+    examples: ["Working memory capacity was measured behaviorally using", "Cognitive functioning was assessed via a neuropsychological battery"]
+    reasoning: "These phrases often precede mentions of cognitive assessment tools"
+
+  - patternType: "term"
+    pattern: "Harvard-Oxford atlas|probabilistic atlas"
+    toolType: "computational_tool"
+    examples: ["Harvard-Oxford cortical and subcortical probabilistic atlases"]
+    reasoning: "Brain atlases are computational tools used in neuroimaging analysis"
+
+  - patternType: "term"
+    pattern: "FLAME|Local Analysis of Mixed Effects"
+    toolType: "computational_tool"
+    examples: ["FMRIB's Local Analysis of Mixed Effects (FLAME)"]
+    reasoning: "FLAME is a specific neuroimaging analysis method that should be captured"
+
+observations:
+  - resourceName: "FSL"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FSL version 5.0 was used for fMRI data analysis including image realignment, spatial smoothing, 
+      temporal filtering, registration, and statistical analysis. Specific parameters included: 
+      5-mm FWHM Gaussian kernel for smoothing, nonlinear high-pass filter with 66s cutoff, 
+      three-step registration process to MNI space. Group-level statistics used cluster-forming 
+      threshold of z>2.3 and z>3.1 with cluster probability p<0.05 corrected for multiple comparisons.
+    foundIn: "methods"
+    contextSnippet: "FMRI data analyses were performed using the FMRIB software library (www.fmrib.ox.ac.uk/fsl), version 5.0...Images for each participant were realigned...Data were spatially smoothed using a 5-mm, full-width-half-maximum Gaussian kernel"
+    confidence: 1.0
+    doi: "10.1016/j.nicl.2017.06.032"
+
+  - resourceName: "WASI"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      WASI Matrix Reasoning and Vocabulary subtests were used to assess IQ in NF1 patients. 
+      NF1 patients showed significantly lower Full Scale IQ (98.70 ± 14.10) compared to 
+      healthy controls (112.36 ± 21.32, p=0.012). Matrix Reasoning T-scores were also 
+      significantly lower in NF1 patients (50.74 ± 7.72) versus controls (55.84 ± 10.66, p=0.023).
+    foundIn: "results"
+    contextSnippet: "Full scale IQ (Mean, ± SD) 98.70 (14.10) [NF1] vs 112.36 (21.32) [controls] p = 0.012...Matrix Reasoning T-Score (Mean, ± SD) 50.74 (7.72) [NF1] vs 55.84 (10.66) [controls] p = 0.023"
+    confidence: 1.0
+    doi: "10.1016/j.nicl.2017.06.032"
+
+  - resourceName: "Letter-Number Sequencing task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      LNS task was used to measure working memory capacity behaviorally. No significant 
+      difference was found between NF1 patients (0.65 ± 0.06 proportion correct) and 
+      healthy controls (0.67 ± 0.09 proportion correct). PCC-parietal connectivity 
+      during fMRI was associated with better LNS performance in NF1 patients (β = 0.45, p<0.05) 
+      but not in controls.
+    foundIn: "results"
+    contextSnippet: "LNS (proportion correct; Mean, ± SD) 0.65 (0.06) [NF1] vs 0.67 (0.09) [controls] n.s....PCC-parietal connectivity was a significant predictor of LNS performance (β = 0.45, p<0.05) in NF1 patients but not in healthy controls"
+    confidence: 1.0
+    doi: "10.1016/j.nicl.2017.06.032"
+
+  - resourceName: "SCAP task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Due to a technical issue during scan acquisition, behavioral data from the SCAP task 
+      were only available for a subset of NF1 patients (n=5), although behavioral data 
+      were successfully collected on all 25 healthy controls. This limited the behavioral 
+      analysis capabilities for the primary working memory task.
+    foundIn: "methods"
+    contextSnippet: "Due to a technical issue during scan acquisition, behavioral data from the SCAP task were only available for a subset of NF1 patients (n = 5), although behavioral data were successfully collected on all 25 healthy controls"
+    confidence: 1.0
+    doi: "10.1016/j.nicl.2017.06.032"
+
+  - resourceName: "FLAME"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FLAME (FMRIB's Local Analysis of Mixed Effects) was used for group-level statistical 
+      analysis of fMRI data. According to cited research (Eklund et al., 2016), FSL's FLAME1 
+      clusterwise inference has much lower family-wise error rates than other parametric 
+      software packages, often being valid (under 5%), but comes at the expense of highly 
+      conservative voxelwise inference. FLAME1 at cluster threshold 2.3 has error rates 
+      comparable to permutation methods.
+    foundIn: "methods"
+    contextSnippet: "analyzed using a mixed-effects model with FMRIB's Local Analysis of Mixed Effects (FLAME)...According to Eklund et al. (2016, pp. 7902), 'among the parametric software packages, FSL's FLAME1 clusterwise inference stood out as having much lower FWE, often being valid (under 5%)'"
+    confidence: 0.9
+    doi: "10.1016/j.nicl.2017.06.032"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 2
+    Issue: 1
+  majorIssuesFound: |
+    - Mining process completely failed to detect any tools despite this being a tool-rich neuroimaging study
+    - Multiple computational tools (FSL, SPSS, FLAME, Harvard-Oxford atlas) were missed
+    - Several clinical assessment tools (WASI, WAIS-IV, LNS, SCAP) were not detected
+    - All missed tools have clear usage context and version/reference information
+    - This represents a significant mining failure for a publication that extensively uses research tools
+  recommendations: |
+    - All 8 identified tools should be added to the database - they represent genuine research tools with clear experimental usage
+    - The mining patterns need significant improvement to capture neuroimaging software and cognitive assessment tools
+    - FSL and SPSS are major analysis platforms that should never be missed when version numbers are provided
+    - Clinical assessment tools like WASI and WAIS-IV are standardized instruments that should be reliably detected
+    - The suggested patterns should be implemented to improve future mining of similar neuroimaging studies
+    - This publication demonstrates the need for better coverage of computational tools and clinical assessment instruments
+    - All observations extracted provide valuable information about tool performance and usage considerations

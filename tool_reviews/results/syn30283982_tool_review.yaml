@@ -1,0 +1,156 @@
+publicationMetadata:
+  pmid: "syn30283982"
+  title: "Protocol for high-intensity focused ultrasound (HIFU) treatment of cutaneous neurofibromas"
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.8
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content (breast cancer dendritic cell vaccine research), expected tools include:
+    - Cell lines (breast cancer cell lines, dendritic cells)
+    - Antibodies (CD80, CD86, CD83, CCR7 markers, HER-2, MUC-1 tetramers)
+    - Genetic reagents (TLR agonists, interferon cocktails)
+    - Computational tools (flow cytometry analysis software)
+    - Clinical assessment tools (potentially for patient recruitment/staging)
+    
+    Note: There's a major discrepancy between the title (HIFU treatment of neurofibromas) and 
+    abstract content (breast cancer vaccine research). This suggests data mismatch issues.
+  overallAssessment: |
+    This appears to be laboratory research involving dendritic cell vaccine development with 
+    in vitro efficacy testing. The study describes experimental procedures using cell culture, 
+    flow cytometry, and immunological assays, which typically require multiple research tools. 
+    However, no tools were mined, and there's a concerning mismatch between the title and abstract content.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "CD80"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Matured DCs (≥ 60% upregulation of CD80, CD86, CD83, and CCR7)"
+    whyMissed: "Flow cytometry marker antibodies not detected - likely missing antibody patterns for surface markers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CD86"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Matured DCs (≥ 60% upregulation of CD80, CD86, CD83, and CCR7)"
+    whyMissed: "Flow cytometry marker antibodies not detected - likely missing antibody patterns for surface markers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CD83"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Matured DCs (≥ 60% upregulation of CD80, CD86, CD83, and CCR7)"
+    whyMissed: "Flow cytometry marker antibodies not detected - likely missing antibody patterns for surface markers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CCR7"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Matured DCs (≥ 60% upregulation of CD80, CD86, CD83, and CCR7)"
+    whyMissed: "Flow cytometry marker antibodies not detected - likely missing antibody patterns for surface markers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "HER-2 tetramers"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "enhance antigen-specific CD8+ T-cell responses to HER-2 (4.5%; p < 0.005) and MUC-1 (19%; p < 0.05) tetramers"
+    whyMissed: "MHC tetramers are specialized reagents for T-cell analysis - pattern likely missing tetramer detection"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MUC-1 tetramers"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "enhance antigen-specific CD8+ T-cell responses to HER-2 (4.5%; p < 0.005) and MUC-1 (19%; p < 0.05) tetramers"
+    whyMissed: "MHC tetramers are specialized reagents for T-cell analysis - pattern likely missing tetramer detection"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TLR-3 agonist"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "matured their DCs with autologous tumour-specific lysate, a toll-like receptor (TLR)-3 and 7/8 agonist"
+    whyMissed: "Immunological reagents not detected - missing patterns for TLR agonists and immune modulators"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "TLR-7/8 agonist"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "matured their DCs with autologous tumour-specific lysate, a toll-like receptor (TLR)-3 and 7/8 agonist"
+    whyMissed: "Immunological reagents not detected - missing patterns for TLR agonists and immune modulators"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "interferon-containing cocktail"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "matured their DCs with autologous tumour-specific lysate, a toll-like receptor (TLR)-3 and 7/8 agonist, and an interferon-containing cocktail"
+    whyMissed: "Cytokine cocktails not detected - missing patterns for interferon and cytokine preparations"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "CD[0-9]+[a-zA-Z]*"
+    toolType: "antibody"
+    examples: ["CD80", "CD86", "CD83"]
+    reasoning: "Flow cytometry surface markers are commonly used antibodies in immunology research but weren't detected"
+
+  - patternType: "term"
+    pattern: "[A-Z0-9-]+ tetramers?"
+    toolType: "genetic_reagent"
+    examples: ["HER-2 tetramers", "MUC-1 tetramers"]
+    reasoning: "MHC tetramers are specialized reagents for T-cell specificity analysis but weren't caught"
+
+  - patternType: "context_phrase"
+    pattern: "TLR-?[0-9/]+ agonist"
+    toolType: "genetic_reagent"
+    examples: ["TLR-3 agonist", "TLR-7/8 agonist"]
+    reasoning: "Toll-like receptor agonists are important immunological reagents that should be captured"
+
+  - patternType: "term"
+    pattern: "interferon[- ]containing cocktail"
+    toolType: "genetic_reagent"
+    examples: ["interferon-containing cocktail"]
+    reasoning: "Cytokine cocktails and preparations are research reagents that weren't detected"
+
+  - patternType: "context_phrase"
+    pattern: "upregulation of [A-Z0-9, ]+"
+    toolType: "antibody"
+    examples: ["upregulation of CD80, CD86, CD83, and CCR7"]
+    reasoning: "Flow cytometry upregulation context often indicates antibody usage for marker detection"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL DATA MISMATCH: Title mentions "HIFU treatment of cutaneous neurofibromas" but abstract describes breast cancer dendritic cell vaccine research
+    - No tools were mined despite clear evidence of multiple research tools in the abstract
+    - Missing Methods section prevents full tool validation
+    - Abstract contains multiple antibodies (CD80, CD86, CD83, CCR7), genetic reagents (TLR agonists, tetramers, interferon cocktails) that weren't detected
+    - Flow cytometry markers and immunological reagents appear to be systematically missed by mining patterns
+  recommendations: |
+    - URGENT: Investigate data integrity - title and abstract don't match, suggesting database corruption or mislabeling
+    - Add patterns for flow cytometry surface markers (CD antigens) which are commonly used antibodies
+    - Include patterns for MHC tetramers, TLR agonists, and cytokine cocktails
+    - Improve detection of immunological reagents and specialized T-cell analysis tools
+    - Consider context phrases like "upregulation of" to identify antibody usage in flow cytometry
+    - This publication demonstrates significant gaps in immunology tool detection patterns
+    - All 9 potentially missed tools should be added to improve mining coverage
+    - No observations could be extracted due to lack of validated tools and missing Results/Discussion sections

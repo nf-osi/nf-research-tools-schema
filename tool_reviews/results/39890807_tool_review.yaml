@@ -1,0 +1,284 @@
+publicationMetadata:
+  pmid: "39890807"
+  title: "Global proteomics and affinity mass spectrometry analysis of human Schwann cells indicates that variation in and loss of neurofibromin (NF1) alters protein expression and cellular and mitochondrial metabolism."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a comprehensive laboratory research study involving:
+    - Cell line engineering (CRISPR/Cas9 knockout)
+    - Molecular cloning and transfection
+    - Proteomics and mass spectrometry
+    - Western blotting
+    - Mitochondrial respiratory function assays
+    
+    Expected tools include cell lines, genetic reagents (plasmids, cDNAs), antibodies, and computational tools for data analysis.
+  overallAssessment: |
+    This is a high-quality laboratory research publication with extensive Methods section describing experimental procedures.
+    The study involves cell line engineering, molecular cloning, proteomics, and functional assays, indicating high likelihood
+    of containing multiple research tools. The mining system appears to have missed numerous tools that are clearly present
+    in the detailed Methods section.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ipn97.4"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "ipn97.4 immortalized human Schwann cells were obtained from Peggy Wallace"
+    whyMissed: "Cell line name not caught by standard naming patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR Cas9"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "we utilized CRISPR Cas9 targeting of NF1 exon 2 to create inactivating indels"
+    whyMissed: "CRISPR system not detected as genetic reagent"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "mNf1 cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The wild type (WT) mNf1 cDNA plasmid was developed by GeneCopoeia and is commercially available"
+    whyMissed: "cDNA construct not detected by patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Trim Galore"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The raw sequence reads were first trimmed using Trim Galore (version 0.6.10)"
+    whyMissed: "Bioinformatics tool with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed using Broad's Genome Analysis ToolKit (version 4.6.0) following their Best Practices Guidelines"
+    whyMissed: "Major bioinformatics tool with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BWA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "BWA (version 0.7.17-r1188) was used to align the trimmed sequences"
+    whyMissed: "Sequence alignment tool with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Picard tools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Duplicate reads were removed with Picard tools (version 3.2.0)"
+    whyMissed: "Bioinformatics tool with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Delly"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Both Delly and Manta were used to identify structural variants"
+    whyMissed: "Structural variant detection tool not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Manta"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Both Delly and Manta were used to identify structural variants"
+    whyMissed: "Structural variant detection tool not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibromin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "probed overnight at 4°C with either the neurofibromin antibody (Cell Signaling Technologies Cat. #: 14623 S)"
+    whyMissed: "Antibody with catalog number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SEQUEST"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were searched using MACOT for the global studies, and SEQUEST (Thermo Fisher Scientific) for the PPI studies"
+    whyMissed: "Mass spectrometry search engine not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MASCOT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were searched using MACOT for the global studies, and SEQUEST (Thermo Fisher Scientific) for the PPI studies"
+    whyMissed: "Mass spectrometry search engine not detected (note: appears as MACOT in text, likely MASCOT)"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Scaffold"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The list of peptide IDs generated based on SEQUEST or MASCOT search results were filtered separately using Scaffold (Protein Sciences, Portland Oregon)"
+    whyMissed: "Proteomics analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Ingenuity Pathway Analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Further Pathway analysis was conducted using QIAGEN Ingenuity Pathway Analysis (IPA)"
+    whyMissed: "Pathway analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[a-z]+\\d+\\.\\d+\\b"
+    toolType: "cell_line"
+    examples: ["ipn97.4"]
+    reasoning: "Cell lines often use lowercase letters followed by numbers and decimal points"
+
+  - patternType: "context_phrase"
+    pattern: "\\bCRISPR\\s+Cas9\\b"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR Cas9"]
+    reasoning: "CRISPR/Cas9 system is a major genetic engineering tool that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+cDNA\\b"
+    toolType: "genetic_reagent"
+    examples: ["mNf1 cDNA"]
+    reasoning: "cDNA constructs are important genetic reagents in molecular biology"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(Cat\\.\\s*#?:?\\s*[A-Z0-9\\-#]+\\)"
+    toolType: "general"
+    examples: ["(Cat. #: 14623 S)", "(Cat.# 78501)"]
+    reasoning: "Catalog numbers in parentheses strongly indicate commercial research tools"
+
+  - patternType: "term"
+    pattern: "\\b(Trim Galore|GATK|BWA|Picard|Delly|Manta|SEQUEST|MASCOT|Scaffold)\\b"
+    toolType: "computational_tool"
+    examples: ["Trim Galore", "GATK", "BWA", "Picard tools", "Delly", "Manta", "SEQUEST", "MASCOT", "Scaffold"]
+    reasoning: "Major bioinformatics and proteomics analysis tools commonly used in genomics and proteomics research"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+antibody\\s*\\([^)]*Cat\\.\\s*#?:?\\s*[A-Z0-9\\-#]+[^)]*\\)"
+    toolType: "antibody"
+    examples: ["neurofibromin antibody (Cell Signaling Technologies Cat. #: 14623 S)"]
+    reasoning: "Antibodies mentioned with vendor and catalog information are clear research tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\bIngenuity Pathway Analysis\\b|\\bIPA\\b"
+    toolType: "computational_tool"
+    examples: ["Ingenuity Pathway Analysis", "IPA"]
+    reasoning: "IPA is a major pathway analysis platform widely used in omics research"
+
+observations:
+  - resourceName: "ipn97.4"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      CRISPR/Cas9 knockout of NF1 in ipn97.4 cells created isogenic NF1 null cell line with two variants: c.101delT and c.102delC. 
+      These cells do not express NF1 and show increased Ras activity in relation to WT parental cells. NF1-/- cells showed 
+      altered protein expression patterns with 148 proteins showing differential expression compared to NF1+/+ cells.
+    foundIn: "both"
+    contextSnippet: "These cells do not express NF1 and show increased Ras activity in relation to WT parental cells...We identified 148 proteins with differential expression levels based on genotype"
+    confidence: 1.0
+    doi: "10.1038/s41598-024-84493-y"
+
+  - resourceName: "ipn97.4"
+    resourceType: "Cell Line"
+    observationType: "Metabolism"
+    observationTypeOntologyId: "MP:0005266"
+    details: |
+      Global proteomics analysis revealed multiple metabolic pathways were altered in NF1-/- cells including decreases in 
+      "oxidative phosphorylation," increases in "mitochondrial dysfunction," and "glycolysis," as well as changes in 
+      "Myelination Signaling Pathway." Mitochondrial respiratory function analysis showed NF1 is required to maintain 
+      mitochondrial respiratory function by stabilizing NADH-linked oxidative phosphorylation and electron transfer.
+    foundIn: "both"
+    contextSnippet: "we found multiple pathways were altered including decreases in 'oxidative phosphorylation,' increases in 'mitochondrial dysfunction', and 'glycolysis'...NF1 is required to maintain mitochondrial respiratory function"
+    confidence: 1.0
+    doi: "10.1038/s41598-024-84493-y"
+
+  - resourceName: "mNf1 cDNA"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0010768"
+    details: |
+      Stable transfection of NF1-/- cells with tagged mNf1 cDNAs (both wild type and variants G848R, R1276Q, R1809C, delM992) 
+      showed metabolic differences pertaining to "oxidative phosphorylation", "mitochondria dysfunction", and "glycolysis" 
+      in the variant cDNA expressing cells compared to wild type. The full-length mNf1 cDNA produces a >250 kDa neurofibromin 
+      protein capable of modulating Ras signaling.
+    foundIn: "both"
+    contextSnippet: "we again identified an overall trend of metabolic differences pertaining to 'oxidative phosphorylation', 'mitochondria dysfunction', and 'glycolysis' in the variant cDNA expressing cells"
+    confidence: 1.0
+    doi: "10.1038/s41598-024-84493-y"
+
+  - resourceName: "mNf1 cDNA"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The mNf1 cDNA expression system allows examination of biochemical effects of any NF1 genetic variant. The full-length 
+      cDNA sequences of endogenous hNF1 and mNf1 have 92% sequence identity and amino acid sequences share 98% identity, 
+      making mNf1 cDNA appropriate for functional studies. Affinity tag was added to 3' end for purification studies.
+    foundIn: "both"
+    contextSnippet: "We have developed and validated an mNf1 cDNA expression system that allows us to examine the biochemical effects of any NF1 genetic variant...mNf1 cDNA is appropriate for study because the full-length cDNA sequences"
+    confidence: 1.0
+    doi: "10.1038/s41598-024-84493-y"
+
+  - resourceName: "neurofibromin antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Neurofibromin antibody (Cell Signaling Technologies Cat. #: 14623 S) was used for Western blot analysis to detect 
+      NF1 protein expression in cell lysates. Used for validation of NF1 knockout and confirmation of protein expression 
+      in transfected cells. Probed overnight at 4°C followed by appropriate secondary antibody detection.
+    foundIn: "both"
+    contextSnippet: "Blots were probed overnight at 4°C with either the neurofibromin antibody (Cell Signaling Technologies Cat. #: 14623 S)...harvested to test for NF1 protein expression via Western blot"
+    confidence: 1.0
+    doi: "10.1038/s41598-024-84493-y"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 1
+    Metabolism: 1
+    Molecular: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite rich Methods section
+    - Multiple clear research tools present: cell lines, genetic reagents, antibodies, computational tools
+    - Catalog numbers and vendor information present but not captured
+    - Major bioinformatics tools with version numbers missed
+    - CRISPR/Cas9 system not detected as genetic reagent
+  recommendations: |
+    This publication contains numerous high-quality research tools that were completely missed by the mining system.
+    The failure appears to be systematic rather than tool-specific, suggesting pattern coverage gaps.
+    
+    Recommended actions:
+    1. Add all 14 identified tools to the database - all have high confidence scores
+    2. Implement suggested patterns to catch similar tools in future mining
+    3. Review pattern coverage for cell lines with non-standard naming (ipn97.4)
+    4. Improve detection of cDNA constructs and CRISPR systems
+    5. Enhance catalog number recognition patterns
+    6. Add major bioinformatics tool names to computational tool patterns
+    
+    The observations extracted show clear functional impacts of the tools, particularly metabolic and cellular phenotypes
+    associated with NF1 loss and variant expression. This demonstrates the scientific value of properly capturing these tools.

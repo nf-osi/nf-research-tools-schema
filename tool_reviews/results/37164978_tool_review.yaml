@@ -1,0 +1,278 @@
+publicationMetadata:
+  pmid: "37164978"
+  title: "Multiplatform molecular profiling uncovers two subgroups of malignant peripheral nerve sheath tumors with distinct therapeutic vulnerabilities."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive molecular profiling study combining multiple experimental approaches:
+    - Cell lines (MPNST cell lines, immortalized Schwann cells)
+    - Animal models (xenograft models in immunodeficient mice)
+    - Computational tools (extensive bioinformatics pipeline for multi-omics analysis)
+    - Genetic reagents (CRISPR/Cas9 constructs, plasmids)
+    - Potentially advanced cellular models (single nuclei RNA sequencing suggests complex culture systems)
+    
+    The study spans bench research with extensive wet lab work, computational analysis, and preclinical models.
+    Multiple tool types are expected across all categories except clinical assessment tools.
+  overallAssessment: |
+    This is a high-quality molecular profiling study that extensively uses research tools across multiple categories.
+    The comprehensive methods section describes detailed experimental procedures using cell lines, animal models, 
+    genetic engineering tools, and sophisticated computational pipelines. The study design strongly indicates 
+    extensive tool usage that should have been captured by mining algorithms.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "HSC1λ"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized human Schwann cell (HSC1λ) and immortalized neurofibroma cell (ipNF06.2A) were obtained from Dr. Margaret Wallace's laboratory"
+    whyMissed: "Standard cell line nomenclature with Greek letter lambda - may need pattern for Greek characters"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ipNF06.2A"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized human Schwann cell (HSC1λ) and immortalized neurofibroma cell (ipNF06.2A) were obtained from Dr. Margaret Wallace's laboratory"
+    whyMissed: "Cell line with alphanumeric identifier - may need pattern for mixed alphanumeric cell line names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STS-26T"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MPNST cell lines (STS-26T, S462, S462TY, T265) were obtained from Dr. David Largaespada's laboratory"
+    whyMissed: "MPNST cell line with hyphenated name - may need pattern for hyphenated cell line names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "S462"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MPNST cell lines (STS-26T, S462, S462TY, T265) were obtained from Dr. David Largaespada's laboratory"
+    whyMissed: "Simple alphanumeric cell line name - basic pattern should catch this"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "S462TY"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MPNST cell lines (STS-26T, S462, S462TY, T265) were obtained from Dr. David Largaespada's laboratory"
+    whyMissed: "Cell line variant with suffix - may need pattern for cell line variants"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "T265"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MPNST cell lines (STS-26T, S462, S462TY, T265) were obtained from Dr. David Largaespada's laboratory"
+    whyMissed: "Simple alphanumeric cell line name - basic pattern should catch this"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NOD-Rag1 null IL2rg mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Immunodeficient NOD-Rag1 null IL2rg mice (The Jackson Laboratory) received approximately 3 million cells"
+    whyMissed: "Complex mouse strain name with null designation - may need pattern for immunodeficient strains"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NOD-SCID-Prkdc scid"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "non-obese diabetic severe combined immune deficiency spontaneous male mice (NOD-SCID-Prkdc scid)"
+    whyMissed: "Complex immunodeficient mouse strain - may need pattern for SCID variants"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pX330"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "sequences were subcloned into pX330: gGFP;5'-GGATACTTCTTCGAACGTTT, gPTCH1;5'-TGCTTTTAATCCCACCGCGA"
+    whyMissed: "CRISPR plasmid vector - may need pattern for pX### plasmid series"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pRNAT-H1.3"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cells were co-transfected with one pX330 construct and pRNAT-H1.3 (Hygro) control plasmid"
+    whyMissed: "Control plasmid with hygromycin resistance - may need pattern for pRNAT series"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STAR aligner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequence data was processed and aligned to human reference genome (hg38) using STAR aligner (v.2.6.0)"
+    whyMissed: "Bioinformatics alignment tool with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SamTools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reads were sorted using SamTools (v.1.3)"
+    whyMissed: "Standard bioinformatics tool with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BWA-MEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "read pairs were aligned to the hg19 reference genome using BWA-MEM v 0.7.12 with default parameters"
+    whyMissed: "Bioinformatics alignment tool with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PCR duplicate marking, indel realignment and base quality score recalibration were performed using Picard v1.72 and GATK v3.6.0"
+    whyMissed: "Genome Analysis Toolkit with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Mutect"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We identified somatic mutations using Mutect V1.1.6 and Strelka v1.0.13"
+    whyMissed: "Somatic mutation caller with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Strelka"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We identified somatic mutations using Mutect V1.1.6 and Strelka v1.0.13"
+    whyMissed: "Somatic mutation caller with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "edgeR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data was normalized by counts-per-million (CPM) and then subjected to trimmed means of M (TMM) using edgeR (v.3.22.3)"
+    whyMissed: "R package for differential expression with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FusionCatcher"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Fusion genes for cohort of PNSTs were identified using FusionCatcher v1.1.0 with default parameters"
+    whyMissed: "Fusion gene detection tool with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CellRanger"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CellRanger (10× Genomics) analysis pipeline was used for library demultiplexing, read alignment to human genome GRCh38"
+    whyMissed: "Single-cell RNA-seq analysis pipeline - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The raw gene expression matrix was normalized, and variance stabilized by SCTransform in Suerat version 3.0"
+    whyMissed: "Single-cell RNA-seq analysis package with version - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Monocle2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Pseudotime analysis was performed as previously described using Monocle2"
+    whyMissed: "Single-cell trajectory analysis tool - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Automated colony counts were done using ImageJ software using TKS Batch Count Colonies macro"
+    whyMissed: "Image analysis software - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "HSC1[λ]|HSC1lambda"
+    toolType: "cell_line"
+    examples: ["HSC1λ"]
+    reasoning: "Cell lines with Greek letters need special character handling"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+[0-9]+[A-Z]*\\.[0-9]+[A-Z]*"
+    toolType: "cell_line"
+    examples: ["ipNF06.2A"]
+    reasoning: "Cell lines with dot notation and mixed alphanumeric identifiers"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+-[0-9]+[A-Z]*"
+    toolType: "cell_line"
+    examples: ["STS-26T"]
+    reasoning: "Hyphenated cell line names with letter-number-letter pattern"
+
+  - patternType: "naming_convention"
+    pattern: "NOD-[A-Z0-9-]+\\s+(null|scid|mice)"
+    toolType: "animal_model"
+    examples: ["NOD-Rag1 null IL2rg mice", "NOD-SCID-Prkdc scid"]
+    reasoning: "Complex immunodeficient mouse strain nomenclature"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z]+[0-9-\\.]*"
+    toolType: "genetic_reagent"
+    examples: ["pX330", "pRNAT-H1.3"]
+    reasoning: "Plasmid naming conventions with p prefix and various suffixes"
+
+  - patternType: "context_phrase"
+    pattern: "obtained from Dr\\.|laboratory at the|were obtained from"
+    toolType: "general"
+    examples: ["obtained from Dr. Margaret Wallace's laboratory", "obtained from Dr. David Largaespada's laboratory"]
+    reasoning: "Context phrases indicating tool sourcing from specific laboratories"
+
+  - patternType: "context_phrase"
+    pattern: "using [A-Z][a-zA-Z]+ \\([v\\.]*[0-9\\.]+\\)"
+    toolType: "computational_tool"
+    examples: ["using STAR aligner (v.2.6.0)", "using SamTools (v.1.3)"]
+    reasoning: "Software usage with version numbers in parentheses"
+
+  - patternType: "term"
+    pattern: "STAR aligner|SamTools|BWA-MEM|GATK|Mutect|Strelka|edgeR|FusionCatcher|CellRanger|Seurat|Monocle2|ImageJ"
+    toolType: "computational_tool"
+    examples: ["STAR aligner", "SamTools", "BWA-MEM", "GATK", "Mutect", "Strelka", "edgeR", "FusionCatcher", "CellRanger", "Seurat", "Monocle2", "ImageJ"]
+    reasoning: "Common bioinformatics tools that should be explicitly recognized"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 22
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite extensive tool usage
+    - This is a comprehensive molecular profiling study with extensive methods section
+    - Multiple cell lines, animal models, genetic reagents, and computational tools are clearly described
+    - The mining algorithm appears to have completely failed for this publication
+    - 22 clear research tools were identified that should have been captured
+  recommendations: |
+    - URGENT: Review mining algorithm performance - complete failure to detect any tools
+    - This publication represents a gold standard for tool-rich content that should be easily detected
+    - All 22 identified tools should be added to the database with high confidence
+    - The suggested patterns should be implemented to prevent similar mining failures
+    - Consider this publication as a test case for mining algorithm validation
+    - No observations were extracted since no tools were initially validated, but this publication
+      likely contains extensive experimental observations that could be captured after tool validation
+    - Recommend manual curation of this publication given the mining failure

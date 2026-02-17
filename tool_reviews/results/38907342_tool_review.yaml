@@ -1,0 +1,415 @@
+publicationMetadata:
+  pmid: "38907342"
+  title: "snRNA-seq of human cutaneous neurofibromas before and after selumetinib treatment implicates role of altered Schwann cell states, inter-cellular signaling, and extracellular matrix in treatment response"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive laboratory research study involving:
+    - Single-nucleus RNA sequencing (snRNA-seq) → computational tools (Cell Ranger, Seurat, Python packages)
+    - Cell culture experiments → cell lines (immortalized Schwann cell lines)
+    - Immunofluorescence staining → antibodies (CD11b, SOX10, secondary antibodies)
+    - RT-qPCR analysis → genetic reagents (primers, kits)
+    - Western blotting → antibodies (pERK, total ERK)
+    - Flow cytometry → antibodies (hashtag antibodies, propidium iodide)
+    - Clinical trial samples → potentially clinical assessment tools for measuring outcomes
+    
+    Expected tool categories: antibodies, cell lines, genetic reagents, computational tools
+    Less likely but possible: clinical assessment tools (for measuring treatment response)
+  overallAssessment: |
+    This publication is a comprehensive laboratory research study that extensively uses research tools across multiple experimental approaches. The study involves single-nucleus RNA sequencing, cell culture, immunofluorescence, RT-qPCR, Western blotting, and flow cytometry - all of which require specific research tools. The fact that no tools were mined indicates a significant failure in the mining process, as this publication clearly contains numerous antibodies, cell lines, computational tools, and genetic reagents that should have been detected.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Cell Ranger pipeline v7.1.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...resulting sequencing files were run through the Cell Ranger pipeline v7.1.0. Data analysis was completed using R (v 4.3.0–v 4.3.1) Seurat..."
+    whyMissed: "Specific software version mentioned with clear usage context"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data analysis was completed using R (v 4.3.0–v 4.3.1) Seurat [24, 25] (v4.3.0–v5) and refdata-gex-GRCh38-2020-A..."
+    whyMissed: "R package with version and citation, clear analysis usage"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data analysis was completed using R (v 4.3.0–v 4.3.1) Seurat [24, 25] (v4.3.0–v5)..."
+    whyMissed: "Programming language with specific version for data analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Python conversion and ForceAtlas2 Upon the analysis we converted the finalized.h5Seurat object to.h5ad using SeuratDisk Convert() function for further Python-dependent analysis..."
+    whyMissed: "Programming language used for downstream analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "scanpy"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...By connecting scanpy [28], palantir, and scFates [29] packages, we generate an advanced version of ForceAtlas2..."
+    whyMissed: "Python package with citation, used for analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CellChat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...After processing our snRNA-seq dataset in Seurat, downstream analysis in CellChat was conducted. CellChat was run using all cell types..."
+    whyMissed: "Analysis software with clear usage description"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "scvelo"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...the downstream analysis was performed using the scanpy and scvelo [31] packages in Jupyter Notebook..."
+    whyMissed: "Python package with citation for RNA velocity analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Ingenuity Pathway Analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Ingenuity Pathway Analysis (IPA) [27] was utilized on the differentially expressed dataset..."
+    whyMissed: "Commercial analysis software with citation and clear usage"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Densitometry was performed using ImageJ and histograms were generated..."
+    whyMissed: "Image analysis software used for quantification"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CD11b antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...CD11b at 1:100 dilution (abcam Cat # ab52478) for myeloid cells..."
+    whyMissed: "Specific antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SOX10 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...SOX10 at 1:500 dilution (abcam Cat # ab155279) for Schwann cells..."
+    whyMissed: "Specific antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Goat anti-Rabbit Alexa Fluor 488"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...treated with secondary antibody Goat anti-Rabbit, Alexa Fluor™ 488 1:2000..."
+    whyMissed: "Secondary antibody with specific fluorophore"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Goat anti-Rabbit Alexa Fluor 594"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Goat anti-Rabbit, Alexa Fluor™ 594 1:2000 for 1 h at room temperature..."
+    whyMissed: "Secondary antibody with specific fluorophore"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TotalSeq anti-Nuclear Pore Complex Proteins Hashtag Antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...stained with 1–1.5ug (depending on pellet size) of TotalSeq™ anti-Nuclear Pore Complex Proteins Hashtag Antibody's (B0451, B0452, B0453, or B0457)..."
+    whyMissed: "Hashtag antibodies with specific catalog numbers"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "icNF 97.2a"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Immortalized cutaneous neurofibroma Schwann cell lines (icNF 97.2a, icNF 97.2b, and icNF 98.4d) were obtained from Dr. Margaret Wallace..."
+    whyMissed: "Specific immortalized cell line with genotype information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "icNF 97.2b"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Immortalized cutaneous neurofibroma Schwann cell lines (icNF 97.2a, icNF 97.2b, and icNF 98.4d) were obtained from Dr. Margaret Wallace..."
+    whyMissed: "Specific immortalized cell line with genotype information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "icNF 98.4d"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Immortalized cutaneous neurofibroma Schwann cell lines (icNF 97.2a, icNF 97.2b, and icNF 98.4d) were obtained from Dr. Margaret Wallace..."
+    whyMissed: "Specific immortalized cell line with genotype information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Luna Universal One-Step RT-qPCR kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...RT-qPCR was performed on a 384 well plate using a Luna Universal One-Step RT-qPCR kit (NEB cat# E3005)..."
+    whyMissed: "Commercial kit with catalog number for RT-qPCR"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Qiagen RNeasy Mini kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...RNA was harvested after 48 h using a Qiagen RNeasy Mini kit (Qiagen, Hilden, Germany)..."
+    whyMissed: "Commercial RNA extraction kit with vendor information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "KCNMA1 primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...with the following QuantiTech Qiagen primers: KCNMA1 (cat# QT00024157)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PRKCE primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...PRKCE (cat# QT00016352)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "OPCML primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...OPCML (cat# QT01005361)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GRIK2 primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...GRIK2 (cat# QT00016597)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CADM2 primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...CADM2 (cat# QT00048888)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CREB5 primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...CREB5 (cat# QT00054488)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CAMK1D primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...CAMK1D (cat# QT00036344)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ITGB8 primer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...ITGB8 (cat# QT00038507)..."
+    whyMissed: "Specific qPCR primer with catalog number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Cell Ranger.*v?[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Cell Ranger pipeline v7.1.0"]
+    reasoning: "Cell Ranger is a widely used single-cell analysis pipeline, often mentioned with version numbers"
+
+  - patternType: "term"
+    pattern: "Seurat.*\\[.*\\].*\\(v[0-9]+\\.[0-9]+\\.[0-9]+.*\\)"
+    toolType: "computational_tool"
+    examples: ["Seurat [24, 25] (v4.3.0–v5)"]
+    reasoning: "Seurat R package commonly cited with version information in single-cell studies"
+
+  - patternType: "context_phrase"
+    pattern: "analysis was completed using|performed using|analyzed using|processed with"
+    toolType: "computational_tool"
+    examples: ["Data analysis was completed using R", "RT-qPCR was performed using a Luna Universal One-Step RT-qPCR kit"]
+    reasoning: "These phrases reliably indicate tool usage in experimental contexts"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(.*[Cc]at#?\\s*[A-Z0-9]+\\)"
+    toolType: "general"
+    examples: ["(abcam Cat # ab52478)", "(NEB cat# E3005)", "(cat# QT00024157)"]
+    reasoning: "Catalog numbers with vendor information are strong indicators of research tools"
+
+  - patternType: "naming_convention"
+    pattern: "ic[A-Z]+\\s+[0-9]+\\.[0-9]+[a-z]?"
+    toolType: "cell_line"
+    examples: ["icNF 97.2a", "icNF 97.2b", "icNF 98.4d"]
+    reasoning: "Immortalized cell line naming convention commonly used in research"
+
+  - patternType: "term"
+    pattern: "Alexa Fluor.*[0-9]+"
+    toolType: "antibody"
+    examples: ["Alexa Fluor™ 488", "Alexa Fluor™ 594"]
+    reasoning: "Alexa Fluor fluorophores are commonly used secondary antibodies"
+
+  - patternType: "context_phrase"
+    pattern: "antibody.*1:[0-9]+.*dilution"
+    toolType: "antibody"
+    examples: ["CD11b at 1:100 dilution", "SOX10 at 1:500 dilution"]
+    reasoning: "Dilution ratios are specific to antibody usage in immunofluorescence/immunohistochemistry"
+
+  - patternType: "term"
+    pattern: "QuantiTech.*primers?"
+    toolType: "genetic_reagent"
+    examples: ["QuantiTech Qiagen primers"]
+    reasoning: "QuantiTech is a specific brand of qPCR primers"
+
+observations:
+  - resourceName: "icNF 97.2a"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Cell line showed no significant difference in gene expression after selumetinib treatment despite pERK inhibition. 
+      Genotype: germline c.233delA; somatic c.1929delG. Cell line was immortalized using normal human telomerase (hTERT) 
+      and murine Cdk4 genes. Cells were cultured in DMEM + 10% FBS with laminin coating.
+    foundIn: "results"
+    contextSnippet: "...data analysis from qPCR revealed no significant difference in gene expression after selumetinib treatment of these cultured Schwann cells..."
+    confidence: 0.9
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "icNF 97.2b"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Cell line showed no significant difference in gene expression after selumetinib treatment despite pERK inhibition.
+      Genotype: germline c.233delA; somatic c.1391+2delTA. Cell line was immortalized using normal human telomerase (hTERT) 
+      and murine Cdk4 genes. Cells were cultured in DMEM + 10% FBS with laminin coating.
+    foundIn: "results"
+    contextSnippet: "...data analysis from qPCR revealed no significant difference in gene expression after selumetinib treatment of these cultured Schwann cells..."
+    confidence: 0.9
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "icNF 98.4d"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Cell line showed no significant difference in gene expression after selumetinib treatment despite pERK inhibition.
+      Genotype: germline c.6641+1G>T; somatic c.6253delG. Cell line was immortalized using normal human telomerase (hTERT) 
+      and murine Cdk4 genes. Cells were cultured in DMEM + 10% FBS with laminin coating.
+    foundIn: "results"
+    contextSnippet: "...data analysis from qPCR revealed no significant difference in gene expression after selumetinib treatment of these cultured Schwann cells..."
+    confidence: 0.9
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "Seurat"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used for single-nucleus RNA-seq analysis of 11,545 nuclei from cutaneous neurofibromas. 
+      Nuclei were filtered based on having 200 < x < 4000 feature/genes per cell and having < 5% mitochondrial genes. 
+      All samples were integrated using top 2000 differentially expressed genes. PCA was conducted with 50 dimensions 
+      for UMAP construction. Harmony batch correction was applied for downstream analysis.
+    foundIn: "results"
+    contextSnippet: "...A total of 11,545 nuclei were used for analysis in Seurat. Using both mitochondrial content and number of features to filter out low quality nuclei..."
+    confidence: 1.0
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "Cell Ranger pipeline v7.1.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully processed single-nucleus RNA sequencing files from Illumina NovaSeq6000 system. 
+      Used with refdata-gex-GRCh38-2020-A (GRCh38 human genome reference) to analyze snRNA-seq data. 
+      Generated output files that were subsequently analyzed with Seurat.
+    foundIn: "methods"
+    contextSnippet: "...resulting sequencing files were run through the Cell Ranger pipeline v7.1.0. Data analysis was completed using R..."
+    confidence: 1.0
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "CD11b antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used at 1:100 dilution for immunofluorescence staining of myeloid cells in frozen cNF sections. 
+      Antibody from Abcam (Cat # ab52478) provided reliable staining with no significant difference in myeloid cell 
+      frequencies between control and treated samples, though showed high inter-patient variability.
+    foundIn: "results"
+    contextSnippet: "...there was no significant difference in the proportion of myeloid and Schwann cells after selumetinib treatment..."
+    confidence: 0.9
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+  - resourceName: "SOX10 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used at 1:500 dilution for immunofluorescence staining of Schwann cells in frozen cNF sections. 
+      Antibody from Abcam (Cat # ab155279) provided reliable staining with no significant difference in Schwann cell 
+      frequencies between control and treated samples, though showed high inter-patient variability with two of three 
+      patients having increased Schwann cells in neurofibromas.
+    foundIn: "results"
+    contextSnippet: "...there was no significant difference in the proportion of myeloid and Schwann cells after selumetinib treatment. Notably, there was significant variability..."
+    confidence: 0.9
+    doi: "https://doi.org/10.1186/s40478-024-01821-z"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 25
+  newPatternsCount: 8
+  observationsExtracted: 7
+  observationsByType:
+    Cellular: 3
+    Usage Instructions: 4
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - no tools were detected despite extensive tool usage
+    - Publication contains numerous clearly identifiable research tools with catalog numbers, versions, and vendors
+    - Missing computational tools: Cell Ranger v7.1.0, Seurat, R, Python, scanpy, CellChat, scvelo, IPA, ImageJ
+    - Missing antibodies: CD11b, SOX10, Alexa Fluor secondary antibodies, hashtag antibodies
+    - Missing cell lines: icNF 97.2a, icNF 97.2b, icNF 98.4d (immortalized Schwann cell lines)
+    - Missing genetic reagents: RT-qPCR kits, RNA extraction kits, multiple qPCR primers with catalog numbers
+    - This represents a systematic failure of the mining algorithm to detect standard research tools
+  recommendations: |
+    - URGENT: Complete overhaul of mining patterns needed - this publication should have yielded 25+ tools
+    - Implement patterns for software versions (e.g., "v7.1.0", "v4.3.0")
+    - Add patterns for catalog numbers with vendors (e.g., "Cat # ab52478", "cat# E3005")
+    - Include cell line naming conventions (e.g., "icNF 97.2a")
+    - Add context phrases like "analysis was completed using", "performed using"
+    - Include antibody dilution patterns (e.g., "1:100 dilution")
+    - Add primer naming patterns with catalog numbers
+    - This mining failure suggests fundamental issues with pattern coverage for basic research tools
+    - All 25 missed tools should be added to improve future mining accuracy
+    - The observations extracted show these tools were successfully used and provide valuable usage information

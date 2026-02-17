@@ -1,0 +1,96 @@
+publicationMetadata:
+  pmid: "3118034"
+  title: "Linkage analysis of peripheral neurofibromatosis to DNA markers on chromosome 8."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"  # Genetic linkage analysis using DNA markers
+  publicationTypeConfidence: 0.9  # High confidence - clear linkage analysis methodology
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a genetic linkage analysis study from 1987. Expected tool types:
+    - Genetic reagents: DNA markers, probes, restriction enzymes (typical for 1987 linkage studies)
+    - Computational tools: Statistical analysis software for linkage calculations (though likely not mentioned by name in 1987)
+    
+    However, this publication only contains an abstract with no detailed Methods section.
+    The abstract focuses on statistical results (lod scores, centimorgan distances) rather than
+    experimental procedures or specific reagents used.
+    
+    Note: While queryType is "bench", this appears to be a computational/statistical genetics
+    study rather than wet lab bench work. The "bench" classification may be due to the genetic
+    analysis nature, but no actual research tools are described.
+
+  overallAssessment: |
+    This 1987 genetic linkage study would typically use DNA markers, restriction enzymes, and 
+    statistical analysis methods, but the abstract-only format provides insufficient detail about
+    specific tools used. The focus is on statistical results (lod scores, exclusion mapping) 
+    rather than experimental methodology, making tool identification impossible from available text.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "thyroglobulin locus"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Linkage to the thyroglobulin locus, located at 8q24, was excluded (lod less than or equal to -2.0) to 21 cM."
+    whyMissed: "This is a chromosomal locus/DNA marker used for linkage analysis, but it's referenced as a genomic location rather than a specific reagent"
+    confidence: 0.3  # Low confidence - more of a genomic reference than a tool
+    shouldBeAdded: No
+
+  - toolName: "tissue plasminogen activator locus"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Data obtained for the tissue plasminogen activator locus, located at 8p12, excluded linkage to 4 cM."
+    whyMissed: "This is another chromosomal locus/DNA marker used for linkage analysis, but referenced as a genomic location"
+    confidence: 0.3  # Low confidence - more of a genomic reference than a tool
+    shouldBeAdded: No
+
+  - toolName: "DNA markers"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Linkage relationships of the gene for peripheral neurofibromatosis (NF) were assessed in a large American Caucasian pedigree using two DNA markers located on chromosome 8."
+    whyMissed: "Generic term 'DNA markers' mentioned but no specific markers named or described"
+    confidence: 0.4  # Moderate confidence this represents actual reagents
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "linkage analysis.*using.*DNA markers?"
+    toolType: "genetic_reagent"
+    examples: ["using two DNA markers located on chromosome 8"]
+    reasoning: "Could help identify genetic linkage studies that use DNA markers as tools, though would need careful validation to avoid false positives from genomic references"
+
+  - patternType: "context_phrase"
+    pattern: "lod score.*calculated|computed|analyzed"
+    toolType: "computational_tool"
+    examples: ["lod less than or equal to -2.0"]
+    reasoning: "Lod score calculations indicate statistical genetics software usage, though specific software names rarely mentioned in older papers"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # DNA markers and two loci mentioned
+  newPatternsCount: 2  # Linkage analysis and lod score patterns
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Abstract-only publication from 1987 with no Methods section
+    - No specific research tools mentioned by name or catalog number
+    - Generic references to "DNA markers" and chromosomal loci without tool-specific details
+    - Focus on statistical results rather than experimental methodology
+    - Genomic loci mentioned are reference points, not specific reagents
+  recommendations: |
+    This publication should not contribute any tools to the database because:
+    1. Only abstract available - insufficient detail for tool validation
+    2. No specific tools mentioned by name, vendor, or catalog number
+    3. References to "DNA markers" and chromosomal loci are too generic
+    4. 1987 publication predates modern tool naming/cataloging conventions
+    5. Statistical genetics focus rather than experimental tool usage
+    
+    The potentially missed "DNA markers" could be considered, but without specific
+    identification (names, sequences, vendors), they cannot be validated as discrete tools.
+    This type of older linkage study typically used anonymous DNA probes that are not
+    well-characterized enough for modern tool databases.

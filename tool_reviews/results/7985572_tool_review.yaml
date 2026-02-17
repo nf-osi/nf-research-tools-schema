@@ -1,0 +1,95 @@
+publicationMetadata:
+  pmid: "7985572"
+  title: "Neurofibromatosis type 1: the evolution of deep gray and white matter MR abnormalities."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (imaging modalities like MRI), possibly computational tools for image analysis
+    
+    This is a clinical imaging study examining MRI findings in NF-1 patients. While it doesn't use traditional
+    lab research tools (antibodies, cell lines, etc.), it does use MRI as a clinical assessment/imaging tool
+    to evaluate brain abnormalities. The study methodology involves systematic MR imaging evaluation,
+    which qualifies as a clinical assessment tool for neurological evaluation.
+  overallAssessment: |
+    This is a clinical imaging study that uses MRI/MR imaging as the primary assessment tool to evaluate
+    brain abnormalities in NF-1 patients. While no traditional laboratory research tools are expected,
+    the imaging modality (T2-weighted MR imaging) serves as a clinical assessment tool for neurological
+    evaluation and should have been captured by the mining system.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "T2-weighted MR imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...high-signal-intensity abnormalities of the brain on T2-weighted MR images of patients with neurofibromatosis type 1..."
+    whyMissed: "The mining system likely missed this because it may not recognize MRI/MR imaging as a clinical assessment tool, focusing instead on questionnaires and scales"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "MR imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...prospective MR evaluations of 20 asymptomatic NF-1 subjects from 14 families..."
+    whyMissed: "General MR imaging term may not have been recognized as a clinical assessment tool by the mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MR scans"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...retrospective evaluation of MR scans of 24 symptomatic NF-1 patients..."
+    whyMissed: "MR scans as a clinical evaluation method was not captured, possibly due to focus on questionnaire-type assessment tools"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MR imaging|MRI|magnetic resonance imaging|T2-weighted.*imaging|T1-weighted.*imaging"
+    toolType: "clinical_assessment_tool"
+    examples: ["T2-weighted MR images", "MR evaluations", "MR scans"]
+    reasoning: "Medical imaging modalities are clinical assessment tools used to evaluate patient conditions and should be captured alongside questionnaires and scales"
+  
+  - patternType: "context_phrase"
+    pattern: "(evaluation|assessment|examination).*using.*(MR|MRI|CT|ultrasound|imaging)"
+    toolType: "clinical_assessment_tool"
+    examples: ["evaluation of MR scans", "MR evaluations of subjects"]
+    reasoning: "Context phrases indicating clinical evaluation using imaging modalities help distinguish diagnostic usage from mere mentions"
+  
+  - patternType: "naming_convention"
+    pattern: "(T1|T2|FLAIR|DWI|DTI)-weighted.*imag(ing|es)"
+    toolType: "clinical_assessment_tool"
+    examples: ["T2-weighted MR images", "T1-weighted imaging"]
+    reasoning: "Specific MRI sequence types are distinct clinical assessment tools with different diagnostic capabilities"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear usage of MRI as a clinical assessment tool
+    - The mining system appears to miss medical imaging modalities as clinical assessment tools
+    - Focus may be too narrow on questionnaires/scales, missing other clinical evaluation methods
+  recommendations: |
+    This publication demonstrates a gap in the mining system's coverage of clinical assessment tools.
+    MRI/MR imaging is clearly used as a clinical assessment method to evaluate neurological abnormalities
+    in NF-1 patients, but was not captured. The mining patterns should be expanded to include:
+    
+    1. Medical imaging modalities (MRI, CT, ultrasound, etc.) as clinical assessment tools
+    2. Specific imaging sequences (T1-weighted, T2-weighted, FLAIR, etc.) as distinct tools
+    3. Context phrases that indicate clinical evaluation using imaging
+    
+    All three potentially missed tools should be added to improve coverage of clinical assessment tools
+    beyond traditional questionnaires and scales. No observations were extracted as no tools were
+    validated, but the imaging findings described in the results could be linked to the imaging tools
+    if they were properly captured.

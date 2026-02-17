@@ -1,0 +1,227 @@
+publicationMetadata:
+  pmid: "39858077"
+  title: "A Mixed Methods Study of Medication Adherence in Adults with Neurofibromatosis Type 1 (NF1) on a Clinical Trial of Selumetinib."
+  queryType: "unknown"  # Not specified in input data
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a mixed-methods clinical study examining medication adherence:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - EXPECTED
+    - Computational tools (statistical software for data analysis) - EXPECTED
+    - Lab research tools (antibodies, cell lines, animal models) - NOT EXPECTED
+    - Advanced cellular models or patient-derived models - NOT EXPECTED
+    
+    This is a clinical adherence study using validated questionnaires and technology-based monitoring,
+    so clinical assessment tools and computational analysis tools are the primary expected categories.
+  overallAssessment: |
+    This is a mixed-methods clinical study investigating medication adherence patterns in adults with NF1
+    taking selumetinib. The study design includes validated questionnaires, custom assessment tools, 
+    technology-based monitoring systems, and statistical analysis software. Clinical assessment tools
+    are highly expected and appropriate for this publication type, even without traditional laboratory methods.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Life Events Checklist (LEC)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Participants completed the Life Events Checklist, adapted from Elliott-DeSorbo et al. [ 30 ], to document stressful events in the past three months. The score is the number of stressful events endorsed (range 0–22)."
+    whyMissed: "Specific validated questionnaire name with scoring range - should have been detected as clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Rating of Overall Stress Scale (ROSS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Participants rated their stress in the past month from 0 (not stressed) to 10 (very stressed). This measure was adapted from Leidy et al. [ 31 ]."
+    whyMissed: "Named stress assessment scale with clear scoring system - should have been detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS depression"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The following PROMIS self-report short forms were administered: depression (8 items) [ 32 ], pain interference (6 items) [ 33 ], and cognitive function (8 items) [ 34 ]."
+    whyMissed: "PROMIS is a well-known validated patient-reported outcome measure system"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS pain interference"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The following PROMIS self-report short forms were administered: depression (8 items) [ 32 ], pain interference (6 items) [ 33 ], and cognitive function (8 items) [ 34 ]."
+    whyMissed: "PROMIS pain interference is a validated clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS cognitive function"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The following PROMIS self-report short forms were administered: depression (8 items) [ 32 ], pain interference (6 items) [ 33 ], and cognitive function (8 items) [ 34 ]."
+    whyMissed: "PROMIS cognitive function is a validated clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Barriers to Adherence Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The barriers to adherence measure was created by the study team; participants were asked to think of times they missed a dose of their study drug in the past month and marked which of 16 possible reasons caused them to miss a dose."
+    whyMissed: "Custom questionnaire developed for adherence assessment - valid clinical assessment tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MEMS™ (Medication Events Monitoring System)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Participants' study drug bottles were fitted with a MEMS™ cap at baseline. Having been given instructions to take the drug 12 h apart, adherence was defined as opening the bottle 11–13 h since their last dose."
+    whyMissed: "Technology-based medication adherence monitoring system - clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS 29.0.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quantitative analyses were conducted in SPSS 29.0.1. Pill count, diary, and MEMS™ cap data were grouped across cycles 1–4, 5–8, 9–12, and 13–18."
+    whyMissed: "Statistical analysis software with specific version number - should be detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Aardex MEMS™ Adherence Software (ElectronReader 0.9.9)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "diaries and pill bottles (including empty ones) were collected, and MEMS™ cap data were uploaded to Aardex MEMS™ Adherence Software (ElectronReader 0.9.9)."
+    whyMissed: "Specialized software for adherence data analysis with version number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PROMIS\\s+(?:depression|pain interference|cognitive function|anxiety|fatigue|sleep disturbance|physical function)"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS depression", "PROMIS pain interference", "PROMIS cognitive function"]
+    reasoning: "PROMIS (Patient-Reported Outcomes Measurement Information System) is a widely used validated assessment system with multiple domains"
+
+  - patternType: "context_phrase"
+    pattern: "(?:questionnaire|scale|inventory|checklist).*(?:administered|completed|assessed using)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Life Events Checklist, adapted from Elliott-DeSorbo et al.", "Rating of Overall Stress Scale"]
+    reasoning: "Clinical assessment tools are often described with these action verbs in methods sections"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}\\s+\\d+\\.\\d+(?:\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["SPSS 29.0.1"]
+    reasoning: "Software tools often follow pattern of NAME + version number"
+
+  - patternType: "term"
+    pattern: "MEMS™?\\s*(?:cap|system|adherence|monitoring)"
+    toolType: "clinical_assessment_tool"
+    examples: ["MEMS™ cap", "MEMS™ Adherence Software"]
+    reasoning: "MEMS (Medication Events Monitoring System) is a specific technology-based adherence assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "(?:analyses were conducted|analyzed using|processed with)\\s+(?:in\\s+)?([A-Z][a-zA-Z]+\\s+\\d+)"
+    toolType: "computational_tool"
+    examples: ["Quantitative analyses were conducted in SPSS 29.0.1"]
+    reasoning: "Statistical software is often mentioned in this context in methods sections"
+
+observations:
+  - resourceName: "PROMIS depression"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PROMIS depression short form (8 items) demonstrated excellent internal reliability (α = 0.916–0.972).
+      Raw scores were converted to T-scores (M = 50, SD = 10). Higher depression scores were correlated 
+      with poorer MEMS™ adherence rates, suggesting depression may be a risk factor for medication 
+      non-adherence in NF1 patients.
+    foundIn: "results"
+    contextSnippet: "Subscales had excellent internal reliability (α = 0.916–0.972)... Poorer MEMS™ adherence rates were correlated with higher depression scores"
+    confidence: 0.90
+    doi: "295"
+
+  - resourceName: "Rating of Overall Stress Scale (ROSS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Better adherence from MEMS™ and pill count data in cycles 1–4 was related to lower baseline 
+      overall stress scores. This suggests that baseline stress levels may predict early treatment 
+      adherence patterns in NF1 patients taking selumetinib.
+    foundIn: "results"
+    contextSnippet: "The better adherence from MEMS™ and pill count data in cycles 1–4 is related to lower baseline overall stress."
+    confidence: 0.85
+    doi: "295"
+
+  - resourceName: "MEMS™ (Medication Events Monitoring System)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MEMS™ caps proved feasible for adherence monitoring in NF1 patients, with 91.7% of participants 
+      completing at least the first two cycles. However, challenges included battery expiration (n=5), 
+      forgetting to replace caps (n=1), cap malfunction (n=1), and one participant withdrawal due to 
+      dislike of the system. Mean MEMS™ adherence rates were consistently lower than pill counts and 
+      diaries by at least 12 percentage points across all time periods.
+    foundIn: "both"
+    contextSnippet: "Eleven of twelve participants (91.7%) completed at least the first two cycles... Mean MEMS™ adherence rates in our sample were lower than the other methods by at least 12 points"
+    confidence: 0.95
+    doi: "295"
+
+  - resourceName: "Barriers to Adherence Questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The most endorsed barrier was "forgetting" (54.55% of participants), followed by "busy with other things" 
+      and "changes in daily routine" (36.36% each). Less frequent barriers included "being away from home" (27.2%) 
+      and "too tired or slept through dose time" (27.27%). The questionnaire successfully identified key 
+      adherence barriers in the NF1 population.
+    foundIn: "results"
+    contextSnippet: "the most endorsed barrier on the Barriers to Adherence Questionnaire was 'forgetting' (54.55% of participants). Both 'busy with other things' and 'changes in daily routine' were endorsed by 36.36%"
+    confidence: 0.90
+    doi: "295"
+
+  - resourceName: "SPSS 29.0.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SPSS 29.0.1 was used for quantitative analyses including grouping adherence data across treatment cycles, 
+      non-parametric tests (Spearman correlations) due to positively skewed adherence data, and exploratory 
+      correlation analyses. Alpha was set at 0.05 for statistical significance testing.
+    foundIn: "methods"
+    contextSnippet: "Quantitative analyses were conducted in SPSS 29.0.1. Pill count, diary, and MEMS™ cap data were grouped... Adherence data were positively skewed, so non-parametric tests were used"
+    confidence: 0.85
+    doi: "295"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - SIGNIFICANT MINING FAILURE: This clinical study contains multiple validated clinical assessment tools 
+      that were completely missed by the mining process
+    - All PROMIS instruments (depression, pain interference, cognitive function) were missed despite being 
+      well-known validated patient-reported outcome measures
+    - Technology-based adherence monitoring system (MEMS™) was missed
+    - Statistical analysis software (SPSS) was missed
+    - Custom questionnaires developed for the study were missed
+    - The mining appears to have failed to detect any tools despite this being a methods-rich clinical study
+  recommendations: |
+    - ALL 9 potentially missed tools should be added to the database - this represents a complete mining failure
+    - The clinical assessment tool mining patterns need significant improvement to catch PROMIS instruments
+    - Technology-based monitoring systems like MEMS™ should be included in clinical assessment tool patterns
+    - Software version detection needs improvement (SPSS 29.0.1 should have been caught)
+    - Custom questionnaires with clear descriptions should be detected
+    - This publication demonstrates the need for better clinical assessment tool mining in adherence studies
+    - The suggested patterns should be implemented to prevent similar mining failures in clinical studies
+    - Quality control processes should flag publications with detailed methods sections but zero mined tools

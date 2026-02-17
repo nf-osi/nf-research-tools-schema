@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "34604751"
+  title: "Feasibility of magnetic resonance-guided high-intensity focused ultrasound treatment targeting distinct nodular lesions in neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study with imaging analysis):
+    - Computational tools for image analysis and volumetric measurements (Osirix software mentioned)
+    - Clinical assessment tools for patient evaluation and outcome measures
+    - Potentially medical devices/equipment (MR-HIFU system, MRI scanners)
+    
+    Note: This is a clinical feasibility study using retrospective MRI analysis, so computational
+    tools for image processing and measurement are expected. Clinical assessment tools may be
+    present for patient selection criteria and outcome evaluation.
+  overallAssessment: |
+    This clinical feasibility study evaluates MR-HIFU treatment for NF1 patients using retrospective
+    MRI analysis. The study involves computational image analysis tools (Osirix software) and clinical
+    assessment methods for patient evaluation. Tools are expected for image processing, volumetric
+    analysis, and potentially clinical outcome measures, though the focus is on technical feasibility
+    rather than traditional lab research tools.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Osirix"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Osirix software (Pixmeo SARL; v10.0.0) was used for all evaluations and measurements. Whole-body MRIs were closely examined, identifying all lesions meeting criteria for DNL."
+    whyMissed: "Medical imaging software with specific version and vendor information - clear computational tool for image analysis and volumetric measurements"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Profound Sonalleve V2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we will be basing criteria for treatment on the clinical MR-HIFU system available at CNH (Profound Sonalleve V2; Profound Medical Inc., Mississauga, Ontario, Canada)"
+    whyMissed: "Medical device system with specific model and manufacturer - represents clinical treatment technology used for planning criteria"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "NIH diagnostic criteria for NF1"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Patients enrolled met the NIH diagnostic criteria for NF1."
+    whyMissed: "Standardized clinical diagnostic criteria used for patient selection - represents validated clinical assessment tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Chi-squared test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Categorical variables were reported as percentages and when compared using the Chi-squared test."
+    whyMissed: "Statistical analysis method used for data comparison - computational tool for statistical analysis"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Wilcoxon Rank Sum Test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Continuous measures were reported as means (SD) or Median (IQR) and assessed with the Wilcoxon Rank Sum Test or the Kruskal–Wallis Test."
+    whyMissed: "Statistical test method used for continuous data analysis - computational tool for statistical analysis"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Kruskal-Wallis Test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Continuous measures were reported as means (SD) or Median (IQR) and assessed with the Wilcoxon Rank Sum Test or the Kruskal–Wallis Test."
+    whyMissed: "Statistical test method used for continuous data analysis - computational tool for statistical analysis"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Osirix|OsiriX"
+    toolType: "computational_tool"
+    examples: ["Osirix software (Pixmeo SARL; v10.0.0)"]
+    reasoning: "Medical imaging software commonly used in clinical studies - should be captured as computational tool with vendor/version info"
+
+  - patternType: "context_phrase"
+    pattern: "software \\([^)]+; v[0-9.]+\\)"
+    toolType: "computational_tool"
+    examples: ["Osirix software (Pixmeo SARL; v10.0.0)"]
+    reasoning: "Pattern captures software with vendor and version information - strong indicator of computational tool usage"
+
+  - patternType: "term"
+    pattern: "NIH diagnostic criteria|diagnostic criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["NIH diagnostic criteria for NF1"]
+    reasoning: "Standardized diagnostic criteria represent clinical assessment tools used for patient evaluation"
+
+  - patternType: "context_phrase"
+    pattern: "(Chi-squared test|Wilcoxon Rank Sum Test|Kruskal[–-]Wallis Test)"
+    toolType: "computational_tool"
+    examples: ["Chi-squared test", "Wilcoxon Rank Sum Test", "Kruskal–Wallis Test"]
+    reasoning: "Statistical tests are computational tools used for data analysis - should be captured when explicitly mentioned in methods"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ [A-Z][a-z0-9]+ V[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Profound Sonalleve V2"]
+    reasoning: "Medical device naming convention with version numbers - indicates clinical/computational equipment"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear usage of computational tools
+    - Osirix imaging software with version info was completely missed - this is a clear computational tool
+    - Statistical analysis methods (Chi-squared, Wilcoxon, Kruskal-Wallis) were not captured
+    - Clinical diagnostic criteria (NIH criteria for NF1) represents a clinical assessment tool
+    - Medical device systems (MR-HIFU) mentioned but not captured as tools
+  recommendations: |
+    This publication should have yielded several computational tools and potentially clinical assessment tools:
+    
+    DEFINITELY ADD:
+    - Osirix software (v10.0.0) - clear computational tool with vendor/version info used for image analysis
+    
+    CONSIDER ADDING:
+    - Statistical tests (Chi-squared, Wilcoxon, Kruskal-Wallis) if statistical methods are considered tools
+    - NIH diagnostic criteria for NF1 as clinical assessment tool
+    - Profound Sonalleve V2 system as medical device/computational tool
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Add patterns for medical imaging software (Osirix, ImageJ, etc.)
+    - Include statistical test methods in computational tool patterns
+    - Capture diagnostic criteria as clinical assessment tools
+    - Improve detection of medical device systems with version numbers
+    
+    This represents a significant gap in tool mining - clear computational tools with specific versions
+    and vendors were completely missed, suggesting the current patterns are insufficient for clinical
+    imaging studies.

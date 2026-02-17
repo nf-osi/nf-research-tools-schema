@@ -1,0 +1,206 @@
+publicationMetadata:
+  pmid: "20739432"
+  title: "Gene expression analysis identifies potential biomarkers of neurofibromatosis type 1 including adrenomedullin."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - clear experimental design with multiple lab techniques
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and described methods, expected tool categories:
+    - Computational tools: microarray analysis software, gene expression analysis packages, statistical software
+    - Antibodies: for Western blotting and ELISA assays (anti-ADM, loading controls)
+    - Cell lines: neurofibroma Schwann cells, MPNST cell lines, endothelial cells
+    - Genetic reagents: qRT-PCR primers/probes, reference genes
+    - Laboratory equipment/reagents: microarray platforms, ELISA kits, cell culture media
+
+    This is a comprehensive laboratory study using microarray analysis, qRT-PCR, Western blotting, 
+    and ELISA techniques. The study involves cell culture work with conditioned medium experiments
+    and protein analysis. Multiple tool categories are expected across computational and wet lab domains.
+  overallAssessment: |
+    This publication represents a comprehensive laboratory research study that should contain numerous 
+    research tools across multiple categories. The study employs microarray gene expression analysis, 
+    qRT-PCR validation, Western blotting, and ELISA assays, along with cell culture experiments. 
+    The complete absence of mined tools (0 found) indicates significant under-mining, likely due to 
+    limited text availability and generic technique descriptions in the abstract.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "microarray platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used microarray gene expression analysis to define 92 genes that encode putative secreted proteins"
+    whyMissed: "Generic term 'microarray' used without specific platform name (Affymetrix, Illumina, etc.)"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "gene expression analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "microarray gene expression analysis to define 92 genes"
+    whyMissed: "Analysis software not specified - likely R/Bioconductor, GeneSpring, or similar"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "qRT-PCR reagents"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "quantitative reverse transcription-PCR"
+    whyMissed: "Technique mentioned but specific primers, probes, or enzymes not detailed"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-ADM antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting, and ELISA assays...adrenomedullin (ADM) was confirmed"
+    whyMissed: "ADM is the primary target protein but specific antibodies not mentioned"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ELISA kits"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "ELISA assays in cell conditioned medium and control and NF1 patient sera"
+    whyMissed: "ELISA technique mentioned but specific kits or reagents not detailed"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibroma Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "putative secreted proteins in neurofibroma Schwann cells, neurofibromas, and MPNST"
+    whyMissed: "Described as tissue type rather than specific cell line name"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "MPNST cell conditioned medium, containing ADM and hepatocyte growth factor"
+    whyMissed: "MPNST cells mentioned in functional context but specific cell line names not provided"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "endothelial cells"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "stimulated MPNST migration and endothelial cell proliferation"
+    whyMissed: "Mentioned in proliferation assays but specific cell line not identified"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "microarray.*analysis|gene expression analysis"
+    toolType: "computational_tool"
+    examples: ["microarray gene expression analysis"]
+    reasoning: "Technique names often indicate specific platforms or software that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "quantitative.*PCR|qRT-PCR|real-time PCR"
+    toolType: "genetic_reagent"
+    examples: ["quantitative reverse transcription-PCR"]
+    reasoning: "PCR techniques require specific primers, probes, and enzymes that are research tools"
+
+  - patternType: "context_phrase"
+    pattern: "Western blot.*|Western blotting"
+    toolType: "antibody"
+    examples: ["Western blotting"]
+    reasoning: "Western blotting always requires antibodies - should trigger search for target proteins"
+
+  - patternType: "context_phrase"
+    pattern: "ELISA.*assay|ELISA.*kit"
+    toolType: "genetic_reagent"
+    examples: ["ELISA assays"]
+    reasoning: "ELISA assays require specific kits and reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "cell.*conditioned.*medium|conditioned.*medium"
+    toolType: "cell_line"
+    examples: ["MPNST cell conditioned medium"]
+    reasoning: "Conditioned medium experiments indicate specific cell lines being cultured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}.*cell.*line|[A-Z]{2,}.*cells"
+    toolType: "cell_line"
+    examples: ["MPNST cell", "neurofibroma Schwann cells"]
+    reasoning: "Cell type abbreviations often indicate specific cell lines used in experiments"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z]{2,}.*antibody|[A-Z]{2,}.*antibody"
+    toolType: "antibody"
+    examples: ["anti-ADM antibody (implied)"]
+    reasoning: "Target proteins mentioned with Western blot/ELISA likely have corresponding antibodies"
+
+observations:
+  - resourceName: "adrenomedullin (ADM)"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005375"
+    details: |
+      ADM was confirmed as differentially expressed and elevated in serum of NF1 patients compared to controls.
+      ADM protein concentration was further elevated in serum of NF1 patients with MPNST compared to those without MPNST.
+      This represents a potential serum biomarker for NF1 diagnosis and MPNST transformation monitoring.
+    foundIn: "results"
+    contextSnippet: "only adrenomedullin (ADM) was confirmed as differentially expressed and elevated in serum of NF1 patients. ADM protein concentrati on was further elevated in serum of a small sampling of NF1 patients with MPNST"
+    confidence: 0.95
+    doi: "10.1158/1078-0432.CCR-10-0613"
+
+  - resourceName: "MPNST cell conditioned medium"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      MPNST cell conditioned medium containing ADM and hepatocyte growth factor stimulated MPNST migration 
+      and endothelial cell proliferation. This demonstrates functional activity of secreted factors from 
+      MPNST cells in promoting tumor cell motility and angiogenesis.
+    foundIn: "results"
+    contextSnippet: "MPNST cell conditioned medium, containing ADM and hepatocyte growth factor, stimulated MPNST migration and endothelial cell proliferation"
+    confidence: 0.9
+    doi: "10.1158/1078-0432.CCR-10-0613"
+
+  - resourceName: "microarray gene expression analysis"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Microarray analysis successfully identified 92 genes encoding putative secreted proteins in neurofibroma 
+      Schwann cells, neurofibromas, and MPNST. Of 13 candidate genes evaluated for validation, only ADM was 
+      confirmed as a reliable biomarker. This demonstrates the utility of expression profiling for biomarker 
+      discovery but also highlights the importance of validation steps.
+    foundIn: "both"
+    contextSnippet: "microarray gene expression analysis to define 92 genes that encode putative secreted proteins...Of 13 candidate genes evaluated, only adrenomedullin (ADM) was confirmed"
+    confidence: 0.85
+    doi: "10.1158/1078-0432.CCR-10-0613"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 3  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Molecular: 1
+    Cellular: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    Critical under-mining identified:
+    - Publication is comprehensive lab research study but 0 tools were mined
+    - Multiple experimental techniques described (microarray, qRT-PCR, Western blot, ELISA) but no associated tools captured
+    - Cell culture work with conditioned medium experiments indicates cell lines that were missed
+    - Primary biomarker (ADM) analysis suggests specific antibodies and reagents that should have been found
+    - Limited text availability (abstract/brief methods only) likely contributed to poor mining results
+  recommendations: |
+    Major recommendations for this publication:
+    - This represents a significant under-mining case requiring full-text analysis
+    - Should access complete Methods section and supplementary materials for detailed tool information
+    - Implement technique-based tool inference (microarray → platforms, Western blot → antibodies)
+    - Add 8 potentially missed tools spanning computational tools, antibodies, cell lines, and reagents
+    - Implement 7 new search patterns to catch technique-based tool mentions
+    - This publication demonstrates need for enhanced mining algorithms that can infer tools from technique descriptions
+    - Consider this a high-priority case for manual curator review to establish ground truth for algorithm improvement
+    - Extracted 3 scientific observations showing functional validation of biomarker candidates and experimental approaches

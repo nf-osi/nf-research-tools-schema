@@ -1,0 +1,259 @@
+publicationMetadata:
+  pmid: "30571760"
+  title: "Neurofibromin haploinsufficiency results in altered spermatogenesis in a mouse model of neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study examining spermatogenesis in a mouse model of NF1. Based on the detailed
+    Methods section describing experimental procedures including animal breeding, tissue isolation, histology,
+    Western blotting, and morphometric analysis, this publication should contain multiple research tools including:
+    - Animal models (Nf1+/- mice)
+    - Antibodies (for Western blotting)
+    - Computational tools (for image analysis and statistics)
+    - Genetic reagents (mouse strains)
+  overallAssessment: |
+    This publication is a laboratory research study with extensive experimental methods that would typically use
+    multiple research tools. The study involves animal breeding, tissue isolation, histological analysis, Western
+    blotting, and quantitative morphometric analysis - all procedures that require specific research tools.
+    The complete absence of mined tools suggests significant gaps in the mining process for this type of publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 Dsk9/+ mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The NF1 mouse model used in this study has been described elsewhere [29]. Dsk9 is a missense mutation in the GTPase-activating protein related domain of neurofibromin. Nf1 Dsk9/+ (subsequently referred to as "Nf1 +/-") mice were maintained on a mixed (C3HeB/FeJ x C57bl/6) background."
+    whyMissed: "Specific mouse strain name with genetic background information not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C3HeB/FeJ x C57bl/6 background"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 Dsk9/+ (subsequently referred to as "Nf1 +/-") mice were maintained on a mixed (C3HeB/FeJ x C57bl/6) background."
+    whyMissed: "Mouse strain background nomenclature not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "p44/42 MAPK (ERK1/2) antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K), along with anti-rabbit conjugated secondary antibody, all purchased from New England Biolabs"
+    whyMissed: "Antibody target names not detected, vendor information present but not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p-ERK1/2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K)"
+    whyMissed: "Phospho-specific antibody nomenclature not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PI3K antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K)"
+    whyMissed: "Antibody target abbreviation not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-rabbit secondary antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "along with anti-rabbit conjugated secondary antibody, all purchased from New England Biolabs (Whitby, Ontario, Canada)"
+    whyMissed: "Secondary antibody terminology not captured by patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Image-Pro Plus software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Computerized quantitative morphometric analysis was performed using Image-Pro Plus software (Media Cybernetics). Testicular morphometric analysis... using Image-Pro Plus software (Media Cybernetics, Inc., Rockville, MD)"
+    whyMissed: "Commercial image analysis software with vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The width and equatorial length of the testes were measured on testicular histological images using Image J1.45s, version 1.44p (NIH, Bethesda, MD)"
+    whyMissed: "Popular image analysis software with version number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "InVivo 3.2.0 software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sections were viewed and imaged using an Olympus BX61 upright light microscope and Q imaging Retiga Exi camera with InVivo 3.2.0 software (Media Cybernetics)"
+    whyMissed: "Imaging software with version number and vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism 5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differences between Nf1 +/+ and Nf1 +/- groups were analyzed by 2-tailed Student's t tests and were graphed using GraphPad 5 Prism software (San Diego, Calif., USA)"
+    whyMissed: "Statistical analysis software with version and vendor not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1\\s*[Dd]sk\\d+/\\+"
+    toolType: "animal_model"
+    examples: ["Nf1 Dsk9/+"]
+    reasoning: "Specific mouse strain nomenclature for NF1 research models with Dsk mutations"
+
+  - patternType: "naming_convention"
+    pattern: "C3HeB/FeJ\\s*x\\s*C57[Bb]l/6"
+    toolType: "animal_model"
+    examples: ["C3HeB/FeJ x C57bl/6"]
+    reasoning: "Mouse strain background crosses commonly used in NF1 research"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies for ([^,]+)(?:,|\\s+along with)"
+    toolType: "antibody"
+    examples: ["antibodies for p44/42 MAPK (ERK1/2)", "antibodies for phosphatidylinositol 3-kinase (PI3K)"]
+    reasoning: "Captures antibody targets in Western blotting method descriptions"
+
+  - patternType: "context_phrase"
+    pattern: "phosphorylated at ([^)]+)\\s*\\(([^)]+)\\)"
+    toolType: "antibody"
+    examples: ["phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2)"]
+    reasoning: "Identifies phospho-specific antibodies with modification sites"
+
+  - patternType: "vendor_indicator"
+    pattern: "purchased from New England Biolabs"
+    toolType: "antibody"
+    examples: ["all purchased from New England Biolabs"]
+    reasoning: "Major antibody vendor indicator that should trigger tool detection"
+
+  - patternType: "term"
+    pattern: "Image-Pro Plus software"
+    toolType: "computational_tool"
+    examples: ["Image-Pro Plus software (Media Cybernetics)"]
+    reasoning: "Commercial morphometric analysis software commonly used in research"
+
+  - patternType: "term"
+    pattern: "ImageJ\\d+\\.\\d+[a-z]?"
+    toolType: "computational_tool"
+    examples: ["ImageJ1.45s"]
+    reasoning: "ImageJ with version numbers should be captured as computational tools"
+
+  - patternType: "term"
+    pattern: "GraphPad\\s+\\d*\\s*Prism"
+    toolType: "computational_tool"
+    examples: ["GraphPad 5 Prism software"]
+    reasoning: "Statistical analysis software with version variations"
+
+  - patternType: "context_phrase"
+    pattern: "using ([A-Z][a-zA-Z]+\\s+[\\d\\.]+\\s+software)"
+    toolType: "computational_tool"
+    examples: ["using InVivo 3.2.0 software"]
+    reasoning: "Captures software tools with version numbers in usage context"
+
+observations:
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Reproductive Behavior"
+    observationTypeOntologyId: "MP:0001919"
+    details: |
+      Nf1+/- male mice showed significantly reduced fertility with average litter size of 4.00 ± 1.2 pups compared to 8.67 ± 0.76 pups from Nf1+/+ control males (p = 0.007). Time between litters was not significantly different (31.2 ± 4.9 vs 33.4 ± 4.7 days, p = 0.75).
+    foundIn: "results"
+    contextSnippet: "the average number of pups per litter from Nf1 +/- males was significantly reduced compared to that of Nf1 +/+ control male littermates (p = 0.007); however, the amount of time between litters was not significantly different (p = 0.75)"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0001156"
+    details: |
+      Epididymal sperm counts in Nf1+/- mice were significantly higher than controls (15 ± 2.3 vs 8.8 ± 5.5 x10^6 spermatozoa/ml, p = 0.02), despite reduced fertility. This suggests alterations in sperm quality rather than quantity.
+    foundIn: "results"
+    contextSnippet: "Epididymal sperm counts in Nf1 +/- mice were significantly higher than those of Nf1 +/+ control mice (p = 0.02)"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0001156"
+    details: |
+      Histological examination revealed mild to moderate degeneration of seminiferous tubules in all Nf1+/- males, including detachment of germinal epithelium from basal lamina, vacuolation, residual bodies, and exfoliation of germ cells and immature spermatids into the lumen.
+    foundIn: "results"
+    contextSnippet: "We found varying amounts of mild to moderate degeneration of seminiferous tubules in all Nf1 +/- males. Mild alterations include detachment of the germinal epithelium from the basal lamina, vacuolation, and residual bodies. Moderate alterations include disorganization of the seminiferous epithelium, with exfoliation of germ cells and immature spermatids into the lumen"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0001156"
+    details: |
+      Morphometric analysis showed significantly decreased Leydig cell numbers (24.2 ± 1.2 vs 28.2 ± 0.71, p = 0.02) and increased spermatid cell numbers (0.56 ± 0.008 vs 0.51 ± 0.02, p = 0.03) in Nf1+/- mice compared to controls.
+    foundIn: "results"
+    contextSnippet: "The number of Leydig cells present in Nf1 +/- mice was significantly lower than in Nf1 +/+ control littermates (p = 0.02)... the number of immature (round or elongated) spermatids was significantly increased in Nf1 +/- mice compared to Nf1 +/+ control (p = 0.03)"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Organ Development"
+    observationTypeOntologyId: "MP:0000537"
+    details: |
+      Testicular volume was significantly increased in Nf1+/- mice (3.11 ± 0.14 vs 2.73 ± 0.09, p = 0.05), but seminiferous tubule area was not significantly different (47990 ± 2138 vs 52720 ± 3208, p = 0.25).
+    foundIn: "results"
+    contextSnippet: "Testicular volume was also significantly increased among Nf1 +/- mice (p = 0.05). This difference does not appear to be a result of alterations in the size of the seminiferous tubules, as we did not observe a significant difference in the seminiferous tubule area"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1 Dsk9/+ mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0001764"
+    details: |
+      Western blot analysis revealed increased phosphorylation and activation of ERK in Nf1+/- mice with no effect on total ERK protein expression. Additionally, significant increase in total PI3K expression was observed in Nf1+/- mice compared to controls.
+    foundIn: "results"
+    contextSnippet: "Nf1 +/- mutation resulted in increased phosphorylation and activation of ERK, while having no effect on total ERK protein expression. In addition, we observed a significant increase in total PI3K expression in Nf1 +/- mice when compared to Nf1 +/+ control mice"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0208835"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 9
+  observationsExtracted: 6
+  observationsByType:
+    Reproductive Behavior: 1
+    Cellular: 3
+    Organ Development: 1
+    Molecular: 1
+  majorIssuesFound: |
+    - Complete failure to detect any research tools despite this being a comprehensive laboratory research study
+    - Missed critical animal model (Nf1 Dsk9/+ mice) which is the primary research tool
+    - Failed to capture multiple antibodies used in Western blotting with vendor information
+    - Did not detect several computational tools used for image analysis and statistics
+    - Mining patterns appear inadequate for mouse strain nomenclature and antibody terminology
+  recommendations: |
+    This publication demonstrates significant gaps in the mining system for laboratory research tools:
+    
+    1. All 10 potentially missed tools should be added - they represent genuine research tools with clear experimental usage
+    2. The animal model (Nf1 Dsk9/+ mice) is the central research tool and should have been detected
+    3. Antibodies with vendor information (New England Biolabs) should trigger detection
+    4. Popular computational tools (ImageJ, GraphPad Prism, Image-Pro Plus) need better pattern coverage
+    5. Mouse strain nomenclature patterns need significant improvement
+    6. The 9 suggested patterns would substantially improve mining accuracy for similar publications
+    7. Six high-quality scientific observations were extracted covering reproductive, cellular, developmental, and molecular phenotypes
+    8. This case highlights the need for comprehensive pattern coverage in laboratory research publications

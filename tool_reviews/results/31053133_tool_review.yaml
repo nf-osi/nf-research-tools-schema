@@ -1,0 +1,211 @@
+publicationMetadata:
+  pmid: "31053133"
+  title: "Burden of adult neurofibromatosis 1: development and validation of a burden assessment tool."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire development and validation study, which should contain:
+    - Clinical assessment tools (the newly developed BoN questionnaire and existing validated questionnaires used for comparison)
+    - Computational tools (statistical software used for analysis - SAS 9.4 is mentioned)
+    
+    The publication explicitly describes developing the "Burden of Neurofibromatosis (BoN)" questionnaire and validates it against existing tools like DLQI, PSS, and SF12. These are all legitimate clinical assessment tools that should have been captured by the mining process.
+  overallAssessment: |
+    This publication is a classic questionnaire development and validation study that clearly contains multiple clinical assessment tools. The study develops a new tool (BoN questionnaire) and validates it against established instruments (DLQI, PSS, SF12). The mining process appears to have completely failed to identify these tools, which is a significant oversight. Clinical assessment tools are legitimate research tools that enable standardized measurement of patient outcomes and should be captured in tool mining efforts.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Burden of Neurofibromatosis (BoN) questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "This study sought to develop a self-administered questionnaire in French to assess the burden of NF1 (BoN), then translate and linguistically and cross-culturally validate it into American English"
+    whyMissed: "This is the primary tool being developed in this study - a 15-item questionnaire with 4 domains measuring NF1 burden. Should have been captured as a newly developed clinical assessment tool."
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Dermatology Life Quality Index (DLQI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "all participants were asked to complete three previously validated self-administered questionnaires: the Dermatology Life Quality Index [DLQI] questionnaire"
+    whyMissed: "Established dermatology-specific quality of life questionnaire used for external validation. Clear clinical assessment tool with specific scoring (0-30 scale)."
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Perceived Stress Scale (PSS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The PSS is the most widely used psychological instrument for measuring the perception of stress. Composed of 10 items rated from 'never' to 'often', PSS measures the degree to which situations in one's life are perceived as stressful"
+    whyMissed: "Validated 10-item psychological stress assessment scale with specific scoring (10-50 range). Standard clinical assessment tool."
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SF12"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The SF12 is a short version of the SF-36, namely a generic instrument to measure population health, with a physical composite score and mental composite score calculated based on 12 questions"
+    whyMissed: "Well-established 12-item health survey instrument with physical and mental composite scores. Standard clinical assessment tool for health-related quality of life."
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SAS software Version 9.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were analyzed using SAS software Version 9.4 (SAS Institute, Cary, NC, USA), with the significance level set at 0.05"
+    whyMissed: "Statistical analysis software with specific version number and vendor information. Used for factor analysis, reliability testing, and correlation analysis."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "PROC CALIS procedure"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Higher order factor confirmatory analysis was performed to confirm that the dimensions created could be combined into one single score. PROC CALIS procedure, SAS 9.4, was employed"
+    whyMissed: "Specific SAS procedure for confirmatory factor analysis. This is a computational tool/procedure within SAS used for structural equation modeling."
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["BoN questionnaire", "DLQI questionnaire", "conceptual questionnaire"]
+    reasoning: "Many clinical assessment tools are questionnaires. This term should trigger evaluation for clinical assessment tools when found in methods or validation contexts."
+
+  - patternType: "term"
+    pattern: "scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Perceived Stress Scale", "visual analog scale", "Likert scale"]
+    reasoning: "Clinical scales are assessment instruments. 'Scale' in clinical contexts often indicates measurement tools."
+
+  - patternType: "term"
+    pattern: "index"
+    toolType: "clinical_assessment_tool"
+    examples: ["Dermatology Life Quality Index", "comparative fit index"]
+    reasoning: "Clinical indices are often standardized assessment tools, especially when mentioned with scoring ranges."
+
+  - patternType: "context_phrase"
+    pattern: "validated.*questionnaire|questionnaire.*validated"
+    toolType: "clinical_assessment_tool"
+    examples: ["three previously validated self-administered questionnaires"]
+    reasoning: "Validation context strongly indicates legitimate clinical assessment tools rather than ad-hoc surveys."
+
+  - patternType: "context_phrase"
+    pattern: "software Version [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["SAS software Version 9.4"]
+    reasoning: "Software with version numbers indicates specific computational tools used for analysis."
+
+  - patternType: "naming_convention"
+    pattern: "PROC [A-Z]+"
+    toolType: "computational_tool"
+    examples: ["PROC CALIS procedure"]
+    reasoning: "SAS procedures are specific computational tools/methods. PROC prefix is distinctive SAS syntax."
+
+  - patternType: "context_phrase"
+    pattern: "instrument.*measure|measure.*instrument"
+    toolType: "clinical_assessment_tool"
+    examples: ["instrument designed to assess", "psychological instrument for measuring"]
+    reasoning: "Clinical measurement instruments are assessment tools when used to evaluate patient outcomes."
+
+observations:
+  - resourceName: "Burden of Neurofibromatosis (BoN) questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The BoN questionnaire demonstrates excellent internal consistency (Cronbach's alpha: 0.91) and good external validity through significant correlations with established instruments. The 15-item questionnaire uses a 6-point Likert scale and can be scored from 0-75, where higher scores indicate greater disease burden. Mean BoN score was 28.42 (±16.87), with women scoring significantly higher than men (31.67 vs 22.48, p<0.001). The tool successfully discriminated between disease severity levels: low severity group scored 17.6 (±11.9), moderate severity 29.3 (±14.4), and high severity 45.5 (±18.2).
+    foundIn: "results"
+    contextSnippet: "Cronbach's alpha coefficient was 0.91 for the entire questionnaire, reflecting its excellent internal coherence...The BoN can be expressed as a total score between 0 and 75, where 0 represents no impact and 75 the highest possible impact"
+    confidence: 1.0
+    doi: "10.1186/s13023-019-1067-8"
+
+  - resourceName: "Burden of Neurofibromatosis (BoN) questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The BoN questionnaire was successfully translated and culturally adapted from French to US English using a rigorous 9-step validation process. Test-retest reliability was demonstrated with intraclass correlation >0.85 for each domain across 23 subjects tested 10 days apart. The questionnaire shows discriminant validity by differentiating patients with diagnostic delay (BoN score 30.3±15.4) from those without delay (23±13.9, p=0.04).
+    foundIn: "results"
+    contextSnippet: "The test-retest reliability was obtained on 23 evaluable subjects (Day 1 and Day 10), demonstrating good reproducibility. The intraclass correlation of each dimension was >0.85 for each domain"
+    confidence: 1.0
+    doi: "10.1186/s13023-019-1067-8"
+
+  - resourceName: "Dermatology Life Quality Index (DLQI)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The DLQI showed strong correlation with the BoN questionnaire (Pearson correlation coefficient: 0.69930, p<0.0001), supporting the external validity of the BoN instrument. DLQI scores varied by disease severity: low severity group scored 6.58, moderate severity 5.44, and high severity 10.73, demonstrating the tool's ability to discriminate between severity levels in NF1 patients.
+    foundIn: "results"
+    contextSnippet: "The BoN questionnaire highly correlated with the Dermatology Life Quality Index (DLQI)...DLQI 0.69930 <.0001"
+    confidence: 1.0
+    doi: "10.1186/s13023-019-1067-8"
+
+  - resourceName: "Perceived Stress Scale (PSS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The PSS demonstrated the strongest correlation with the BoN questionnaire (Pearson correlation coefficient: 0.72643, p<0.0001), indicating good convergent validity. PSS scores increased with disease severity: low severity group scored 24.34, moderate severity 25.23, and high severity 31.82, showing the tool's sensitivity to NF1 disease burden.
+    foundIn: "results"
+    contextSnippet: "PSS 0.72643 <.0001...The correlation coefficients between BoN and validated questionnaires were relatively high, confirming BoN's external validity"
+    confidence: 1.0
+    doi: "10.1186/s13023-019-1067-8"
+
+  - resourceName: "SF12"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The SF12 mental composite score (MCS) showed significant negative correlation with BoN (-0.57650, p<0.0001), while the physical composite score (PCS) showed weaker correlation (-0.26242, p=0.0347). Mental scores decreased with increasing disease severity (low: 45.63, moderate: 44.04, high: 40.08), while physical scores showed less clear patterns, suggesting the BoN primarily captures mental/psychological burden rather than physical limitations.
+    foundIn: "results"
+    contextSnippet: "SF12 -MCS −0.57650 <.0001 SF12 -Physical −0.26242 0.0347...the correlation with the SF12 physical score proved the weakest"
+    confidence: 1.0
+    doi: "10.1186/s13023-019-1067-8"
+
+  - resourceName: "SAS software Version 9.4"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SAS 9.4 was used for comprehensive statistical analysis including exploratory factor analysis, confirmatory factor analysis using PROC CALIS procedure, reliability testing with Cronbach's alpha, correlation analysis, and test-retest analysis. The software successfully handled the complex psychometric validation procedures required for questionnaire development, with significance level set at 0.05.
+    foundIn: "methods"
+    contextSnippet: "The data were analyzed using SAS software Version 9.4 (SAS Institute, Cary, NC, USA), with the significance level set at 0.05"
+    confidence: 0.9
+    doi: "10.1186/s13023-019-1067-8"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 7
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 4
+  majorIssuesFound: |
+    - Complete mining failure: No tools were identified despite this being a clear questionnaire development study
+    - Missing primary tool: The BoN questionnaire itself was not captured, despite being the main focus of the publication
+    - Missing validation tools: Three established clinical assessment tools (DLQI, PSS, SF12) used for validation were not identified
+    - Missing computational tools: SAS 9.4 and PROC CALIS procedure were not captured despite clear usage context
+    - Pattern gaps: Current mining patterns appear inadequate for clinical assessment tools and questionnaire development studies
+  recommendations: |
+    All 6 missed tools should be added to the database as they represent legitimate research tools:
+    1. BoN questionnaire - newly developed clinical assessment tool with full validation
+    2. DLQI - established dermatology quality of life instrument
+    3. PSS - validated psychological stress assessment scale  
+    4. SF12 - standard health survey instrument
+    5. SAS 9.4 - statistical analysis software with version specification
+    6. PROC CALIS - specific statistical procedure for confirmatory factor analysis
+    
+    The mining patterns need significant enhancement for clinical assessment tools, particularly:
+    - Terms like "questionnaire", "scale", "index" in clinical contexts
+    - Validation language indicating established instruments
+    - Software version patterns for computational tools
+    - SAS procedure naming conventions
+    
+    This publication demonstrates that clinical studies contain legitimate research tools that are currently being missed. The mining system needs better coverage of clinical assessment instruments and questionnaire development studies.

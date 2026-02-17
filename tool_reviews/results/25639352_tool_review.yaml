@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "25639352"
+  title: "Neural Crest-Specific TSC1 Deletion in Mice Leads to Sclerotic Craniofacial Bone Lesion"
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - Genetically modified mouse models (TSC1 deletion)
+    - Molecular biology techniques (gene deletion, lineage mapping)
+    - Pharmacological interventions (rapamycin treatment)
+    - Likely histological and molecular analyses
+    
+    Expected tools: animal models, genetic reagents, computational tools for analysis, potentially antibodies for detection/analysis.
+  overallAssessment: |
+    This is a laboratory research publication describing the generation and characterization of a genetically modified mouse model.
+    The study involves TSC1 gene deletion in neural crest cells, phenotypic analysis, and therapeutic intervention with rapamycin.
+    Such studies typically use multiple research tools including animal models, genetic reagents, analytical software, and detection reagents.
+    The absence of mined tools suggests significant gaps in the mining patterns for this type of research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "TSC1 knockout mouse model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we generated a mouse model of TSC with a deletion of Tsc1 in neural crest-derived (NCD) cells that recapitulated the sclerotic craniofacial bone lesions..."
+    whyMissed: "Mining patterns may not capture mouse model descriptions that use 'deletion' rather than standard knockout terminology"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Neural crest-specific TSC1 deletion"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Neural Crest-Specific TSC1 Deletion in Mice... we generated a mouse model of TSC with a deletion of Tsc1 in neural crest-derived (NCD) cells..."
+    whyMissed: "Genetic modification/deletion constructs may not be captured by current patterns, especially when described as 'deletion' rather than 'knockout' or 'construct'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "rapamycin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...early postnatal treatment with rapamycin, an mTORC1 inhibitor, can completely rescue the aberrant bone mass..."
+    whyMissed: "Pharmacological reagents/inhibitors may not be captured by current mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "lineage mapping"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Lineage mapping revealed that TSC1 deficient NCD cells overpopulated the NCD bones..."
+    whyMissed: "Computational analysis methods described as techniques rather than specific software names may be missed"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(\\w+)\\s+deletion\\b"
+    toolType: "genetic_reagent"
+    examples: ["TSC1 deletion", "neural crest-specific TSC1 deletion"]
+    reasoning: "Gene deletions are common genetic reagents but may be missed when not using standard 'knockout' terminology"
+
+  - patternType: "context_phrase"
+    pattern: "generated a mouse model.*with.*deletion"
+    toolType: "animal_model"
+    examples: ["generated a mouse model of TSC with a deletion of Tsc1"]
+    reasoning: "Mouse model generation phrases that use 'deletion' rather than 'knockout' are not being captured"
+
+  - patternType: "context_phrase"
+    pattern: "treatment with (\\w+),\\s*an?\\s*(\\w+\\s+)?inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["treatment with rapamycin, an mTORC1 inhibitor"]
+    reasoning: "Pharmacological inhibitors used as research reagents are being missed when described with their mechanism of action"
+
+  - patternType: "term"
+    pattern: "lineage mapping|fate mapping|cell tracking"
+    toolType: "computational_tool"
+    examples: ["Lineage mapping revealed"]
+    reasoning: "Computational analysis techniques for cell lineage studies may be missed when described as methods rather than specific software"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\s*-?\\s*specific\\s+[A-Z][A-Z0-9]+\\s+deletion"
+    toolType: "genetic_reagent"
+    examples: ["Neural crest-specific TSC1 deletion"]
+    reasoning: "Tissue-specific gene deletions follow this naming pattern and represent important genetic reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a clear laboratory research study
+    - Publication only has abstract text available, no Methods/Results/Discussion sections
+    - Multiple obvious research tools are present in the abstract but were not detected
+    - Mining patterns appear inadequate for detecting animal models described as "deletions"
+    - Pharmacological reagents (rapamycin) not detected
+    - Computational analysis methods (lineage mapping) not captured
+  recommendations: |
+    This publication represents a significant failure of the mining system to detect obvious research tools.
+    The mouse model with TSC1 deletion should definitely be captured as both an animal model and genetic reagent.
+    Rapamycin as a pharmacological inhibitor should be detected as a genetic reagent.
+    The suggested patterns should be implemented to improve detection of:
+    1. Gene deletion models and reagents
+    2. Mouse model generation descriptions
+    3. Pharmacological inhibitors
+    4. Computational analysis techniques
+    
+    Without access to Methods/Results sections, no scientific observations could be extracted.
+    This highlights the importance of full-text access for comprehensive tool mining and validation.
+    
+    All 4 potentially missed tools should be added to improve mining coverage for similar publications.

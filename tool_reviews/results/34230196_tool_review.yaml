@@ -1,0 +1,96 @@
+publicationMetadata:
+  pmid: "34230196"
+  title: "Reliability of Handheld Dynamometry to Measure Focal Muscle Weakness in Neurofibromatosis Types 1 and 2."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # High confidence - this is clearly a clinical validation study
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study), expected tool categories:
+    - Clinical assessment tools: Primary focus - handheld dynamometry (HHD) and manual muscle testing (MMT) are clinical assessment tools for measuring muscle strength
+    - Computational tools: Possible for statistical analysis (ICC calculations, coefficient of variation)
+    
+    This study validates handheld dynamometry as an outcome measure for NF clinical trials, which makes it a clinical assessment tool development/validation study. The publication should contain clinical assessment tools even though no traditional lab research tools are expected.
+
+  overallAssessment: |
+    This is a clinical validation study that develops consensus recommendations for using handheld dynamometry in NF clinical trials. Clinical studies of this type typically use and validate clinical assessment tools (measurement instruments, scales, protocols) rather than traditional lab research tools. The study specifically evaluates handheld dynamometry (HHD) and manual muscle testing (MMT) as outcome measures, which are legitimate clinical assessment tools that should have been captured by the mining process.
+
+toolValidations: []  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "Handheld Dynamometry"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "we evaluated the intraobserver reliability of handheld dynamometry (HHD) and developed consensus recommendations for its use in NF clinical trials"
+    whyMissed: "This is the primary clinical assessment tool being validated in the study. HHD is a standardized measurement technique for assessing muscle strength, which is a legitimate clinical assessment tool that should be captured."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Manual Muscle Testing"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Patients ≥5 years of age with weakness in at least 1 muscle group by manual muscle testing (MMT) were eligible"
+    whyMissed: "MMT is a standardized clinical assessment protocol for evaluating muscle strength. It's a well-established clinical assessment tool used for patient screening and outcome measurement."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Intraclass Correlation Coefficient"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Intrasession and intersession intraclass correlation coefficients (ICCs) and coefficients of variation (CVs) were calculated to assess reliability"
+    whyMissed: "ICC is a specific statistical method/computational tool used for reliability analysis. While it may be implemented in statistical software, it represents a distinct analytical approach."
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "handheld dynamometry|HHD"
+    toolType: "clinical_assessment_tool"
+    examples: ["handheld dynamometry (HHD)", "HHD performed by a trained examiner"]
+    reasoning: "Handheld dynamometry is a standardized clinical assessment tool for measuring muscle strength, commonly used in clinical trials and research studies."
+
+  - patternType: "term"
+    pattern: "manual muscle testing|MMT"
+    toolType: "clinical_assessment_tool"
+    examples: ["manual muscle testing (MMT)", "weakness in at least 1 muscle group by manual muscle testing"]
+    reasoning: "Manual muscle testing is a standardized clinical assessment protocol widely used in clinical practice and research for evaluating muscle strength."
+
+  - patternType: "context_phrase"
+    pattern: "outcome measure for|suitable outcome measure|consensus recommendations for its use"
+    toolType: "clinical_assessment_tool"
+    examples: ["suitable outcome measure for assessing muscle strength", "consensus recommendations for its use in NF clinical trials"]
+    reasoning: "These phrases often indicate clinical assessment tools being developed, validated, or recommended for use in clinical studies."
+
+  - patternType: "term"
+    pattern: "intraclass correlation coefficient|ICC"
+    toolType: "computational_tool"
+    examples: ["intraclass correlation coefficients (ICCs)", "Intersession ICCs"]
+    reasoning: "ICC is a specific statistical method used for reliability analysis, though it may be borderline whether this constitutes a distinct computational tool versus a statistical concept."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # HHD, MMT, and possibly ICC
+  newPatternsCount: 4  # Four new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - Primary clinical assessment tools were completely missed: Handheld Dynamometry (HHD) and Manual Muscle Testing (MMT) are the core tools being validated in this study
+    - This is a clinical assessment tool validation study, but no clinical assessment tools were captured by the mining process
+    - The mining patterns appear to lack coverage for clinical measurement techniques and assessment protocols
+    - Missing patterns for outcome measures and clinical trial assessment tools
+  recommendations: |
+    Critical recommendations for this publication:
+    - ADD Handheld Dynamometry (HHD) as a clinical assessment tool - this is the primary tool being validated
+    - ADD Manual Muscle Testing (MMT) as a clinical assessment tool - this is used for patient screening and comparison
+    - CONSIDER adding Intraclass Correlation Coefficient (ICC) as a computational tool, though this may be borderline
+    - UPDATE mining patterns to better capture clinical assessment tools, particularly measurement techniques and outcome measures
+    - The current mining completely missed the primary focus of this clinical validation study
+    - No observations can be extracted since no tools were validated, but the study contains reliability data for HHD that would be valuable if the tool were properly captured
+    - This represents a significant gap in clinical assessment tool mining that needs to be addressed

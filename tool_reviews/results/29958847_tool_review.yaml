@@ -1,0 +1,125 @@
+publicationMetadata:
+  pmid: "29958847"
+  title: "Radiomic biomarkers informative of cancerous transformation in neurofibromatosis-1 plexiform tumors."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, pipelines) - HIGHLY EXPECTED
+    - Image analysis software for MR, PET, CT processing
+    - Statistical analysis tools for feature extraction and comparison
+    - Registration and segmentation algorithms
+    - Radiomic feature extraction tools
+    
+    This is a medical imaging analysis study that should contain multiple computational tools
+    for image processing, registration, segmentation, and statistical analysis.
+  overallAssessment: |
+    This is a bioinformatics/medical imaging analysis study that developed radiomic biomarkers
+    from MR, PET, and CT imaging data. Such studies typically use extensive computational
+    pipelines including image registration software, segmentation tools, feature extraction
+    algorithms, and statistical analysis packages. The absence of any mined tools is highly
+    suspicious and suggests significant under-mining of computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "landmark-based registration"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The corrected MR datasets were registered to the corresponding PET-CT via landmark-based registration."
+    whyMissed: "Generic algorithm description not caught by specific software name patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "Law's texture energy measures"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "image texture was quantified using Law's texture energy measures, grey-level co-occurrence matrices, and neighborhood grey-tone difference matrices"
+    whyMissed: "Specific texture analysis algorithm not recognized as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "grey-level co-occurrence matrices"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "image texture was quantified using Law's texture energy measures, grey-level co-occurrence matrices, and neighborhood grey-tone difference matrices"
+    whyMissed: "Standard image analysis technique not caught by mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "neighborhood grey-tone difference matrices"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "image texture was quantified using Law's texture energy measures, grey-level co-occurrence matrices, and neighborhood grey-tone difference matrices"
+    whyMissed: "Image texture analysis method not recognized"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Law's texture energy measures"
+    toolType: "computational_tool"
+    examples: ["Law's texture energy measures"]
+    reasoning: "Specific texture analysis algorithm commonly used in medical imaging"
+  
+  - patternType: "term"
+    pattern: "grey-level co-occurrence matrices|GLCM"
+    toolType: "computational_tool"
+    examples: ["grey-level co-occurrence matrices"]
+    reasoning: "Standard image texture analysis technique that should be captured"
+  
+  - patternType: "term"
+    pattern: "neighborhood grey-tone difference matrices|NGTDM"
+    toolType: "computational_tool"
+    examples: ["neighborhood grey-tone difference matrices"]
+    reasoning: "Image texture analysis method used in radiomic studies"
+  
+  - patternType: "context_phrase"
+    pattern: "registration.*pipeline|segmentation.*pipeline"
+    toolType: "computational_tool"
+    examples: ["registration and segmentation pipeline"]
+    reasoning: "Image processing pipelines are computational tools even when not named specifically"
+  
+  - patternType: "context_phrase"
+    pattern: "quantitative.*features.*extracted|features.*extracted.*from"
+    toolType: "computational_tool"
+    examples: ["Quantitative imaging features were extracted from the MR, PET, and CT data"]
+    reasoning: "Feature extraction implies computational tools even when software not explicitly named"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - SIGNIFICANT UNDER-MINING: This is a computational imaging analysis study that should contain multiple computational tools
+    - No software names, versions, or specific tools mentioned despite clear computational methodology
+    - Image processing pipelines, registration algorithms, and texture analysis methods not captured
+    - Statistical analysis tools for feature comparison likely used but not mentioned
+    - Radiomic feature extraction implies specialized software that wasn't identified
+  recommendations: |
+    This publication represents a major gap in computational tool mining. The study clearly uses:
+    1. Image registration and segmentation algorithms
+    2. Texture analysis methods (Law's measures, GLCM, NGTDM)
+    3. Statistical analysis tools for feature comparison
+    4. Radiomic feature extraction pipelines
+    
+    However, the authors did not specify exact software names/versions, making tool identification challenging.
+    The mining patterns need significant enhancement to capture:
+    - Algorithm names as computational tools (Law's texture measures, GLCM, etc.)
+    - Image processing pipeline descriptions
+    - Feature extraction methodology terms
+    - Statistical analysis contexts
+    
+    This publication highlights the need for better pattern coverage of computational methods
+    in medical imaging and bioinformatics studies where specific software may not be named
+    but computational approaches are clearly described.

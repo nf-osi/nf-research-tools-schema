@@ -1,0 +1,132 @@
+publicationMetadata:
+  pmid: "26883872"
+  title: "3-D imaging mass spectrometry of protein distributions in mouse Neurofibromatosis 1 (NF1)-associated optic glioma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, computational tools, genetic reagents
+    
+    This is a laboratory study using advanced mass spectrometry techniques on mouse tissue samples.
+    Expected tools include:
+    - Animal models: NF1-associated optic glioma mouse models vs wild-type controls
+    - Computational tools: MALDI IMS software, 3-D reconstruction software, data analysis workflows
+    - Potentially genetic reagents: if specific NF1 mutations or constructs were used
+    
+    The study involves experimental tissue analysis, imaging, and data processing, which typically
+    requires multiple research tools across these categories.
+  overallAssessment: |
+    This laboratory research study clearly uses research tools for mass spectrometry imaging and
+    mouse model analysis. The absence of a Methods section limits tool identification, but the
+    abstract describes specific techniques (MALDI IMS), animal models (NF1 glioma mice), and
+    computational workflows that represent genuine research tools. Tools are expected and likely
+    present despite the mining results showing zero tools found.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MALDI IMS"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...we used 3-D matrix assisted laser desorption ionization imaging mass spectrometry (MALDI IMS) to measure the distributions of multiple molecular species..."
+    whyMissed: "Acronym form not recognized; full technique name 'matrix assisted laser desorption ionization imaging mass spectrometry' should be captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "3-D MALDI IMS"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...The current work addresses a number of challenges in 3-D MALDI IMS, driven by the small size of the mouse optic nerve..."
+    whyMissed: "Specific 3-D variant of MALDI IMS technique not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-associated optic glioma mouse model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...optic nerve tissue in mice with and without glioma...glioma-bearing and wild-type (WT) tissues..."
+    whyMissed: "Mouse model description scattered across text; pattern should capture 'mice with glioma' or 'glioma-bearing' mice"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "3-D data acquisition workflow"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...we present a workflow for 3-D data acquisition and volume reconstruction using mouse optic nerve tissue..."
+    whyMissed: "Computational workflow not recognized; should capture 'workflow for [analysis/acquisition/reconstruction]'"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "volume reconstruction"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...workflow for 3-D data acquisition and volume reconstruction using mouse optic nerve tissue..."
+    whyMissed: "3-D reconstruction technique not captured; important computational method"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MALDI IMS|matrix assisted laser desorption ionization imaging mass spectrometry"
+    toolType: "computational_tool"
+    examples: ["MALDI IMS", "3-D MALDI IMS"]
+    reasoning: "Mass spectrometry imaging techniques are important computational/analytical tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "mice with [condition/disease]|[condition]-bearing mice|[condition] mouse model"
+    toolType: "animal_model"
+    examples: ["mice with glioma", "glioma-bearing mice"]
+    reasoning: "Disease-specific mouse models are often described with these phrases rather than formal strain names"
+
+  - patternType: "context_phrase"
+    pattern: "workflow for [analysis|acquisition|reconstruction|processing]"
+    toolType: "computational_tool"
+    examples: ["workflow for 3-D data acquisition and volume reconstruction"]
+    reasoning: "Computational workflows and pipelines are research tools that should be captured"
+
+  - patternType: "term"
+    pattern: "volume reconstruction|3-D reconstruction|image reconstruction"
+    toolType: "computational_tool"
+    examples: ["volume reconstruction"]
+    reasoning: "3-D reconstruction techniques are computational methods commonly used in imaging studies"
+
+  - patternType: "naming_convention"
+    pattern: "[technique] IMS|imaging mass spectrometry"
+    toolType: "computational_tool"
+    examples: ["MALDI IMS", "3-D MALDI IMS"]
+    reasoning: "Various imaging mass spectrometry techniques should be recognized as analytical tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely failed to identify any tools despite clear laboratory research context
+    - No Methods section available, limiting detailed tool identification
+    - Mass spectrometry techniques (MALDI IMS) not recognized
+    - Animal models (NF1 glioma mice) not captured
+    - Computational workflows for 3-D reconstruction missed
+    - Abstract-only text limits comprehensive tool discovery
+  recommendations: |
+    This publication clearly contains research tools that were completely missed by the mining process.
+    The study describes:
+    1. MALDI IMS technique - should be added as computational tool
+    2. NF1-associated optic glioma mouse models - should be added as animal model
+    3. 3-D data acquisition and reconstruction workflows - should be added as computational tools
+    
+    The mining patterns need significant improvement to capture:
+    - Mass spectrometry techniques and their acronyms
+    - Disease-specific mouse model descriptions
+    - Computational workflows and analysis pipelines
+    
+    No observations could be extracted due to lack of Results/Discussion sections.
+    This represents a significant failure of the mining system for this publication type.

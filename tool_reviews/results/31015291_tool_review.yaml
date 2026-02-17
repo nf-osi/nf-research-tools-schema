@@ -1,0 +1,146 @@
+publicationMetadata:
+  pmid: "31015291"
+  title: "Proximity biotinylation identifies a set of conformation-specific interactions between Merlin and cell junction proteins."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - uses proximity biotinylation, mass spectrometry, binding assays
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes experimental molecular biology research using:
+    - Proximity biotinylation (technique requiring reagents)
+    - Mass spectrometry (computational analysis tools likely)
+    - Direct binding assays (likely antibodies or reagents)
+    - Immortalized Schwann cells (cell line)
+    - Various mutant forms of Merlin (genetic reagents/constructs)
+    
+    Expected tools: cell lines, genetic reagents, computational tools for mass spec analysis
+  overallAssessment: |
+    This is clearly a lab research publication using sophisticated molecular biology techniques including proximity biotinylation, mass spectrometry, and protein binding assays in immortalized Schwann cells. The study involves creating and testing various mutant forms of Merlin protein, which indicates genetic reagent usage. Despite having only abstract text available, this type of research typically requires multiple research tools including cell lines, genetic constructs, and computational analysis tools for mass spectrometry data processing.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "immortalized Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...identify proteins that associated with wild-type and various mutant forms of Merlin in immortalized Schwann cells. We defined a set of 52 proteins..."
+    whyMissed: "Cell line mentioned in experimental context but not caught by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "mass spectrometry"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...proximity biotinylation followed by mass spectrometry and direct binding assays to identify proteins..."
+    whyMissed: "Analytical technique that typically involves computational analysis software for data processing"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "wild-type Merlin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...proteins that associated with wild-type and various mutant forms of Merlin in immortalized Schwann cells..."
+    whyMissed: "Protein construct/reagent used in experiments but not recognized as tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "mutant forms of Merlin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...wild-type and various mutant forms of Merlin in immortalized Schwann cells. We defined a set of 52 proteins in close proximity to wild-type Merlin..."
+    whyMissed: "Multiple mutant protein constructs used as experimental reagents"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PIP2-binding mutant Merlin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...mutant forms of Merlin that cannot bind to phosphatidylinositol 4,5-bisphosphate (PIP2) or that constitutively adopt a closed conformation..."
+    whyMissed: "Specific mutant construct designed for functional studies"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "closed-conformation Merlin mutant"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...mutant forms of Merlin that cannot bind to phosphatidylinositol 4,5-bisphosphate (PIP2) or that constitutively adopt a closed conformation..."
+    whyMissed: "Specific mutant construct with defined conformational properties"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "immortalized [A-Za-z]+ cells?"
+    toolType: "cell_line"
+    examples: ["immortalized Schwann cells"]
+    reasoning: "Immortalized cell lines are commonly used research tools but may not be caught by standard cell line naming patterns"
+
+  - patternType: "context_phrase"
+    pattern: "wild-type (\\w+)"
+    toolType: "genetic_reagent"
+    examples: ["wild-type Merlin"]
+    reasoning: "Wild-type protein constructs are research reagents when used in experimental contexts"
+
+  - patternType: "context_phrase"
+    pattern: "mutant forms? of (\\w+)"
+    toolType: "genetic_reagent"
+    examples: ["mutant forms of Merlin"]
+    reasoning: "Mutant protein forms/constructs are genetic reagents used in functional studies"
+
+  - patternType: "context_phrase"
+    pattern: "(\\w+)-binding mutant"
+    toolType: "genetic_reagent"
+    examples: ["PIP2-binding mutant"]
+    reasoning: "Specific functional mutants designed for binding studies are research reagents"
+
+  - patternType: "context_phrase"
+    pattern: "(\\w+)-conformation (\\w+) mutant"
+    toolType: "genetic_reagent"
+    examples: ["closed-conformation Merlin mutant"]
+    reasoning: "Conformational mutants are engineered research reagents for structural-function studies"
+
+  - patternType: "term"
+    pattern: "mass spectrometry"
+    toolType: "computational_tool"
+    examples: ["mass spectrometry"]
+    reasoning: "Mass spectrometry typically involves computational analysis tools for data processing and protein identification"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication only has abstract text available (no Methods, Results, Discussion sections)
+    - Multiple research tools are clearly mentioned in abstract but were missed by mining:
+      * Immortalized Schwann cells (cell line)
+      * Wild-type and mutant Merlin constructs (genetic reagents)
+      * Mass spectrometry (computational analysis)
+    - Mining patterns appear insufficient for detecting:
+      * Immortalized cell lines with non-standard naming
+      * Protein constructs described as "wild-type" or "mutant forms"
+      * Analytical techniques that involve computational components
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded multiple research tools but mining found none
+    - The 6 potentially missed tools should be added, particularly:
+      * Immortalized Schwann cells (high confidence cell line)
+      * Wild-type and mutant Merlin constructs (genetic reagents)
+    - Mining patterns need improvement to catch:
+      * Immortalized cell lines beyond standard nomenclature
+      * Protein constructs described functionally rather than by standard names
+      * Analytical techniques with computational components
+    - This represents a significant gap in mining coverage for molecular biology tools
+    - Future mining should include patterns for "wild-type", "mutant forms", and "immortalized cells"
+    - No observations could be extracted due to lack of Results/Discussion sections

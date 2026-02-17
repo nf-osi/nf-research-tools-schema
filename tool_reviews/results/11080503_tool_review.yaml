@@ -1,0 +1,175 @@
+publicationMetadata:
+  pmid: "11080503"
+  title: "Neurofibromin GTPase-activating protein-related domains restore normal growth in Nf1-/- cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and content analysis:
+    - Animal models: Nf1 mutant mice are mentioned in abstract
+    - Cell lines: Primary Nf1-deficient cells from multiple lineages
+    - Genetic reagents: GRD constructs, mutant constructs mentioned
+    - Potentially computational tools for data analysis (though not explicitly mentioned)
+    
+    This is clearly a laboratory research study involving cell culture, animal models,
+    and genetic constructs, despite lacking a formal Methods section.
+  overallAssessment: |
+    This is a laboratory research study from 2001 investigating neurofibromin function using
+    primary cells from Nf1 mutant mice and genetic constructs. Despite lacking a formal Methods
+    section, the abstract clearly describes experimental work with cell culture, animal models,
+    and genetic reagents. The study would be expected to contain multiple research tools including
+    animal models, cell lines, and genetic constructs.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we expressed the GRDs of neurofibromin and p120GAP in primary cells from Nf1 mutant mice in vitro and in vivo..."
+    whyMissed: "Animal model mentioned in abstract but not caught by mining patterns - may need better pattern for 'mutant mice' terminology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1-/- cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Neurofibromin GTPase-activating protein-related domains restore normal growth in Nf1-/- cells..."
+    whyMissed: "Cell line with knockout notation (Nf1-/-) not caught - may need pattern for knockout cell line nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "primary Nf1-deficient cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...expression of neurofibromin GRD, but not the p120GAP GRD, restores normal growth and cytokine signaling in three lineages of primary Nf1-deficient cells..."
+    whyMissed: "Primary cell cultures not caught - may need pattern for 'primary [gene]-deficient cells'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibromin GRD"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we expressed the GRDs of neurofibromin and p120GAP in primary cells... expression of neurofibromin GRD, but not the p120GAP GRD, restores normal growth..."
+    whyMissed: "Genetic construct/domain not caught - may need pattern for protein domains used as constructs"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "p120GAP GRD"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we expressed the GRDs of neurofibromin and p120GAP in primary cells... expression of neurofibromin GRD, but not the p120GAP GRD..."
+    whyMissed: "Genetic construct/domain not caught - may need pattern for protein domains used as constructs"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "GAP-inactive mutant NF1 GRD"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...utilizing a GAP-inactive mutant NF1 GRD identified in a family with NF1, we demonstrate that growth restoration is a function of NF1 GRD GAP activity..."
+    whyMissed: "Mutant genetic construct not caught - may need pattern for mutant constructs"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "AAV"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...AAV, a widely used, safe gene delivery tool, has been widely explored in NF1 gene therapy recently..."
+    whyMissed: "Viral vector mentioned as gene delivery tool but not caught - may need pattern for viral vectors"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "membrane-targeted GRD constructs"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...current research prioritizes delivering the main functional domain of neurofibromin, especially the membrane-targeted GRD constructs..."
+    whyMissed: "Specific genetic construct not caught - may need pattern for targeted constructs"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "T-VEC"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...T-VEC has already been approved for melanoma as a safe and effective tool..."
+    whyMissed: "Oncolytic virus therapeutic not caught - may need pattern for therapeutic viral vectors"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "oHSV"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...oHSV has its own advantages in various aspects... oHSV also shows strong preclinical effects in treating NF1 tumors..."
+    whyMissed: "Oncolytic herpes simplex virus not caught - may need pattern for oncolytic viruses"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+[+/-]+\\s+(mice|cells)"
+    toolType: "animal_model"
+    examples: ["Nf1 mutant mice", "Nf1-/- cells"]
+    reasoning: "Pattern to catch knockout/mutant animal models and cell lines with genetic notation"
+
+  - patternType: "context_phrase"
+    pattern: "primary\\s+[A-Z][a-z0-9]+-deficient\\s+cells"
+    toolType: "cell_line"
+    examples: ["primary Nf1-deficient cells"]
+    reasoning: "Pattern to catch primary cell cultures derived from knockout animals"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-z0-9]+\\s+GRD\\b"
+    toolType: "genetic_reagent"
+    examples: ["neurofibromin GRD", "p120GAP GRD", "NF1 GRD"]
+    reasoning: "Pattern to catch GAP-related domain constructs commonly used in functional studies"
+
+  - patternType: "context_phrase"
+    pattern: "(mutant|inactive)\\s+[A-Z][a-z0-9]+\\s+(GRD|construct|domain)"
+    toolType: "genetic_reagent"
+    examples: ["GAP-inactive mutant NF1 GRD"]
+    reasoning: "Pattern to catch mutant versions of protein domains/constructs"
+
+  - patternType: "term"
+    pattern: "\\b(AAV|adeno-associated virus)\\b"
+    toolType: "genetic_reagent"
+    examples: ["AAV"]
+    reasoning: "Pattern to catch adeno-associated virus vectors commonly used for gene delivery"
+
+  - patternType: "term"
+    pattern: "\\b(oHSV|oncolytic.*virus|T-VEC)\\b"
+    toolType: "genetic_reagent"
+    examples: ["oHSV", "T-VEC"]
+    reasoning: "Pattern to catch oncolytic viruses used as therapeutic tools"
+
+  - patternType: "context_phrase"
+    pattern: "membrane-targeted\\s+[A-Z]+\\s+constructs?"
+    toolType: "genetic_reagent"
+    examples: ["membrane-targeted GRD constructs"]
+    reasoning: "Pattern to catch specifically targeted genetic constructs"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage
+    - Missing Methods section limits detailed tool validation
+    - Multiple research tools are clearly described in abstract and discussion
+    - Mining patterns appear to miss common laboratory nomenclature (knockout notation, primary cells, protein domains)
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the initial mining:
+    - At least 6-10 genuine research tools should be added (animal models, cell lines, genetic reagents)
+    - The abstract alone contains clear evidence of Nf1 mutant mice, Nf1-/- cells, and genetic constructs
+    - Mining patterns need significant improvement to catch knockout nomenclature and protein domain constructs
+    - Despite lacking a formal Methods section, this is clearly experimental research with tool usage
+    - All potentially missed tools should be manually reviewed and likely added to the database
+    - The suggested patterns would significantly improve future mining accuracy for similar publications
+    - No observations could be extracted due to missing Results section, but tools are clearly validated for usage

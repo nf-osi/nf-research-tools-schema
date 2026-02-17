@@ -1,0 +1,141 @@
+publicationMetadata:
+  pmid: "25113746"
+  title: "A murine model of neurofibromatosis type 2 that accurately phenocopies human schwannoma formation."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research - genetically engineered mouse model development):
+    - Animal models (primary focus - genetically engineered mice)
+    - Genetic reagents (Cre-lox system, promoter elements, floxed alleles)
+    - Clinical assessment tools (functional testing methods for hearing/balance)
+    - Potentially computational tools (data analysis, though not evident from abstract)
+    
+    This is clearly a laboratory research publication focused on developing and characterizing
+    a new mouse model. The abstract describes genetic engineering approaches and functional
+    testing methods, indicating multiple tool types should be present.
+  overallAssessment: |
+    This is a laboratory research publication describing the development and characterization
+    of a genetically engineered mouse model for NF2. The study clearly involves creating and
+    using research tools including animal models, genetic reagents, and functional assessment
+    methods. The absence of full text sections is concerning as it limits comprehensive tool
+    detection, but the abstract alone reveals several research tools that should have been mined.
+
+toolValidations: []
+  # No tools were mined to validate, but this appears to be an error in the mining process
+
+potentiallyMissedTools:
+  - toolName: "Postn-Cre; Nf2(flox/flox) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Here, we present a genetically engineered NF2 mouse model generated through excision of the Nf2 gene driven by Cre expression under control of a tissue-restricted 3.9kbPeriostin promoter element. By 10 months of age, 100% of Postn-Cre; Nf2(flox/flox) mice develop spinal, peripheral and cranial nerve tumors"
+    whyMissed: "Complex mouse strain nomenclature with multiple genetic elements may not have been recognized by standard patterns"
+    confidence: 1.0  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2(flox/flox)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "genetically engineered NF2 mouse model generated through excision of the Nf2 gene driven by Cre expression under control of a tissue-restricted 3.9kbPeriostin promoter element. By 10 months of age, 100% of Postn-Cre; Nf2(flox/flox) mice"
+    whyMissed: "Floxed allele notation may not be captured by current genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Postn-Cre"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "excision of the Nf2 gene driven by Cre expression under control of a tissue-restricted 3.9kbPeriostin promoter element. By 10 months of age, 100% of Postn-Cre; Nf2(flox/flox) mice develop"
+    whyMissed: "Cre driver line nomenclature may not be recognized by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "3.9kbPeriostin promoter"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "excision of the Nf2 gene driven by Cre expression under control of a tissue-restricted 3.9kbPeriostin promoter element"
+    whyMissed: "Specific promoter elements with size designations may not be captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "auditory brainstem response"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "development of cranial nerve VIII tumors correlates with functional impairments in hearing and balance, as measured by auditory brainstem response and vestibular testing"
+    whyMissed: "Clinical assessment tools may not be well-covered in bench research mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "vestibular testing"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "development of cranial nerve VIII tumors correlates with functional impairments in hearing and balance, as measured by auditory brainstem response and vestibular testing"
+    whyMissed: "General functional testing terms may not be captured by specific assessment tool patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+-Cre"
+    toolType: "genetic_reagent"
+    examples: ["Postn-Cre"]
+    reasoning: "Cre driver lines follow standard nomenclature with promoter/gene name followed by -Cre"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+\\(flox/flox\\)"
+    toolType: "genetic_reagent"
+    examples: ["Nf2(flox/flox)"]
+    reasoning: "Floxed alleles use standard notation with gene name followed by (flox/flox) or similar"
+
+  - patternType: "naming_convention"
+    pattern: "[0-9]+\\.?[0-9]*kb[A-Za-z0-9]+ promoter"
+    toolType: "genetic_reagent"
+    examples: ["3.9kbPeriostin promoter"]
+    reasoning: "Promoter elements often specified with size in kb followed by gene/promoter name"
+
+  - patternType: "context_phrase"
+    pattern: "auditory brainstem response|ABR"
+    toolType: "clinical_assessment_tool"
+    examples: ["auditory brainstem response"]
+    reasoning: "Standard neurophysiological assessment tool for hearing function"
+
+  - patternType: "context_phrase"
+    pattern: "vestibular testing|vestibular function"
+    toolType: "clinical_assessment_tool"
+    examples: ["vestibular testing"]
+    reasoning: "Functional assessment methods for balance/vestibular system"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+-Cre;\\s*[A-Za-z0-9]+\\([^)]+\\)"
+    toolType: "animal_model"
+    examples: ["Postn-Cre; Nf2(flox/flox)"]
+    reasoning: "Complex genetically modified mouse strains with multiple genetic elements"
+
+observations: []
+  # Cannot extract observations without full text Results/Discussion sections
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # Breakdown by observation type
+  majorIssuesFound: |
+    Critical mining failure identified:
+    - No tools were mined from this publication despite clear presence of multiple research tools
+    - Publication is laboratory research focused on genetically engineered mouse model development
+    - Abstract contains at least 6 clear research tools that should have been detected
+    - Missing full text sections (Methods, Results, Discussion) severely limits comprehensive analysis
+    - Current mining patterns appear inadequate for complex genetic nomenclature and functional assessment tools
+  recommendations: |
+    URGENT: Complete mining system failure for this publication
+    - All 6 identified tools should be added to the database
+    - Implement suggested patterns to capture genetic reagents and mouse model nomenclature
+    - Improve coverage of clinical assessment tools used in laboratory research
+    - Obtain full text to enable comprehensive tool mining and observation extraction
+    - Review mining patterns for complex genetically modified animal models
+    - This publication represents a significant gap in current mining capabilities

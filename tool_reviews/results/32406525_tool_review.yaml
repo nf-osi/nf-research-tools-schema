@@ -1,0 +1,92 @@
+publicationMetadata:
+  pmid: "32406525"
+  title: "Autism and attention-deficit/hyperactivity disorders and symptoms in children with neurofibromatosis type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical observational study design, expected tool types include:
+    - Clinical assessment tools: The study collected "parental reports of autism symptomatology, adaptive behavior, and behavioral problems" which would require validated questionnaires/scales
+    - Computational tools: Statistical analysis software for comparing groups and controlling for variables
+    
+    The study mentions collecting data on autism symptoms, ADHD symptoms, adaptive behavior, and behavioral problems, which typically require standardized assessment instruments. The comparison to Simons Simplex Collection controls suggests use of established clinical measures.
+  overallAssessment: |
+    This clinical study would be expected to use multiple clinical assessment tools for measuring autism symptoms, ADHD symptoms, adaptive behavior, and behavioral problems in children. The study design involves systematic data collection and statistical analysis comparing NF1 patients to controls, which typically requires validated questionnaires and scales. The absence of any mined tools suggests significant under-detection of clinical assessment instruments.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Simons Simplex Collection"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...compared to those of 360 age- and sex-matched controls from the Simons Simplex Collection (SSC) with autism spectrum disorder (ASD; SSC-ASD) or typically developing (SSC-TD)..."
+    whyMissed: "SSC is a well-established research database/collection with standardized assessment protocols, but may not have been recognized as a clinical assessment tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "International Classification of Diseases, 10th Revision"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...We searched hospital electronic medical records (EMR) for International Classification of Diseases, 10th Revision NF1 and co-occurring diagnoses codes..."
+    whyMissed: "ICD-10 is a standardized diagnostic classification system used for clinical assessment, but may not be recognized as a clinical tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  - toolName: "autism scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...the mean autism scale score for participants with NF1 was below cut-off for significant autism symptoms..."
+    whyMissed: "Generic reference to autism scale without specific instrument name - likely a validated autism assessment tool but not specifically named"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "International Classification of Diseases|ICD-10|ICD-11"
+    toolType: "clinical_assessment_tool"
+    examples: ["International Classification of Diseases, 10th Revision"]
+    reasoning: "ICD diagnostic codes are standardized clinical assessment tools used for systematic diagnosis and classification"
+  - patternType: "context_phrase"
+    pattern: "parental reports of.*symptomatology|collected.*reports.*behavior"
+    toolType: "clinical_assessment_tool"
+    examples: ["collected parental reports of autism symptomatology, adaptive behavior, and behavioral problems"]
+    reasoning: "Phrases indicating systematic collection of behavioral/symptom data typically involve validated assessment instruments"
+  - patternType: "term"
+    pattern: "Simons Simplex Collection|SSC"
+    toolType: "clinical_assessment_tool"
+    examples: ["Simons Simplex Collection (SSC)"]
+    reasoning: "SSC is a well-established research database with standardized assessment protocols for autism research"
+  - patternType: "context_phrase"
+    pattern: "scale score.*cut-off|questionnaire.*threshold|assessment.*cutoff"
+    toolType: "clinical_assessment_tool"
+    examples: ["autism scale score for participants with NF1 was below cut-off"]
+    reasoning: "References to scale scores with cut-offs indicate use of validated clinical assessment instruments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this clinical study despite clear evidence of clinical assessment tool usage
+    - The study collected "parental reports of autism symptomatology, adaptive behavior, and behavioral problems" which would require validated questionnaires/scales
+    - References to "autism scale score" and "cut-off" indicate use of standardized assessment instruments
+    - The study used ICD-10 diagnostic codes for systematic classification
+    - Comparison to Simons Simplex Collection suggests use of established clinical measures
+    - No Methods section available limits ability to identify specific assessment instruments used
+  recommendations: |
+    This publication represents a significant missed opportunity for clinical assessment tool mining. The study clearly used multiple assessment instruments to measure autism symptoms, ADHD symptoms, adaptive behavior, and behavioral problems, but none were detected. Key recommendations:
+    
+    1. Improve pattern detection for clinical assessment contexts like "parental reports of symptomatology"
+    2. Add ICD diagnostic classification systems as clinical assessment tools
+    3. Include research databases/collections like Simons Simplex Collection that have standardized protocols
+    4. Develop patterns for scale/questionnaire references even when specific instrument names aren't provided
+    5. Consider that clinical studies may not have traditional Methods sections but still use validated tools
+    
+    The mining system appears to be under-detecting clinical assessment tools, which is concerning given the "clinical" queryType that found this publication. No observations could be extracted due to lack of Results/Discussion sections and absence of validated tools.

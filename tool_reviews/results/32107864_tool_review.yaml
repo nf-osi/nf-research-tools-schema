@@ -1,0 +1,225 @@
+publicationMetadata:
+  pmid: "32107864"
+  title: "Expanding the Noonan spectrum/RASopathy NGS panel: Benefits of adding NF1 and SPRED1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical genetic testing study evaluating NGS panel performance. Expected tool types:
+    - Computational tools: NGS analysis software, bioinformatics pipelines, variant calling tools
+    - Genetic reagents: DNA extraction kits, sequencing reagents, PCR primers
+    - Clinical assessment tools: Potentially clinical diagnostic criteria or assessment forms
+    
+    The publication focuses on molecular diagnostics rather than traditional lab research, so antibodies,
+    cell lines, animal models, organoids, and PDX models are not expected. However, computational tools
+    for sequence analysis and genetic reagents for molecular testing are highly likely.
+  overallAssessment: |
+    This clinical genetic testing study would typically contain computational tools for NGS data analysis
+    and genetic reagents for molecular testing procedures. The study describes NGS sequencing, variant
+    calling, and confirmation methods, indicating use of bioinformatics software and laboratory reagents.
+    Clinical assessment may involve diagnostic criteria but likely not formal validated instruments.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PureGene Blood Core Kit B"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "DNA was extracted from peripheral blood samples using PureGene Blood Core Kit B (Qiagen)."
+    whyMissed: "Commercial DNA extraction kit with vendor name - clear genetic reagent for molecular testing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SureSelect"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NGS was performed by oligonucleotide hybridization‐based DNA capture (SureSelect; Agilent)"
+    whyMissed: "Commercial DNA capture/enrichment system with vendor name - genetic reagent for NGS"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MiSeq-M01450"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "followed by sequencing using the MiSeq‐M01450 instrument (150‐base paired end mode; Illumina)"
+    whyMissed: "Specific NGS sequencing instrument with model number and vendor - genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "bwa-mem"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequence reads were aligned to the reference sequence (GRCh37) using bwa‐mem v0.7.10"
+    whyMissed: "Bioinformatics alignment software with version number - computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "followed by variant calling using GATK, version 1.0.4705"
+    whyMissed: "Variant calling software with version number - well-known bioinformatics tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VisCap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Copy number variants (CNVs) were identified via an NGS‐based detection tool (VisCap)"
+    whyMissed: "CNV detection software tool - computational tool for genomic analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ddPCR"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Confirmation of CNVs was done using ddPCR as previously described"
+    whyMissed: "Digital droplet PCR technology - genetic reagent/method for molecular validation"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z0-9\\s]+)\\s*\\(([A-Z][a-zA-Z]+)\\)"
+    toolType: "genetic_reagent"
+    examples: ["PureGene Blood Core Kit B (Qiagen)", "SureSelect (Agilent)", "MiSeq-M01450 (Illumina)"]
+    reasoning: "Pattern to catch commercial reagents/instruments with vendor names in parentheses"
+
+  - patternType: "term"
+    pattern: "\\b(bwa-mem|BWA-MEM)\\s+v?[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["bwa-mem v0.7.10"]
+    reasoning: "Specific pattern for BWA alignment software with version numbers"
+
+  - patternType: "term"
+    pattern: "\\bGATK,?\\s+version\\s+[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["GATK, version 1.0.4705"]
+    reasoning: "Pattern for GATK variant calling software with version specification"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+([A-Z][a-zA-Z0-9\\-]+)\\s+v?[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["using bwa-mem v0.7.10", "using GATK, version 1.0.4705"]
+    reasoning: "Context phrase indicating software usage with version numbers"
+
+  - patternType: "term"
+    pattern: "\\b(ddPCR|digital droplet PCR)\\b"
+    toolType: "genetic_reagent"
+    examples: ["ddPCR", "digital droplet PCR"]
+    reasoning: "Digital droplet PCR technology used for molecular validation"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\-[A-Z][0-9]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["MiSeq-M01450"]
+    reasoning: "Instrument model naming convention with letters, dash, and alphanumeric code"
+
+observations:
+  - resourceName: "PureGene Blood Core Kit B"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      DNA extraction kit successfully used for peripheral blood samples from 533 patients (28 derivation + 505 validation cohorts).
+      Standard protocol yielded sufficient DNA quality for downstream NGS analysis.
+    foundIn: "results"
+    contextSnippet: "DNA was extracted from peripheral blood samples using PureGene Blood Core Kit B (Qiagen). For the derivation cohort, 28 DNA samples were tested..."
+    confidence: 0.90
+    doi: "10.1002/mgg3.1180"
+
+  - resourceName: "MiSeq-M01450"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NGS sequencing instrument used in 150-base paired end mode for all 505 validation cohort samples.
+      Successfully generated sequence data for 14-gene RASopathy panel analysis with sufficient coverage for variant calling.
+    foundIn: "results"
+    contextSnippet: "followed by sequencing using the MiSeq‐M01450 instrument (150‐base paired end mode; Illumina)"
+    confidence: 0.90
+    doi: "10.1002/mgg3.1180"
+
+  - resourceName: "bwa-mem"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Sequence alignment software (version 0.7.10) used to align NGS reads to GRCh37 reference genome.
+      Successfully processed all samples in both derivation and validation cohorts for downstream variant calling.
+    foundIn: "results"
+    contextSnippet: "Sequence reads were aligned to the reference sequence (GRCh37) using bwa‐mem v0.7.10, followed by variant calling using GATK"
+    confidence: 0.95
+    doi: "10.1002/mgg3.1180"
+
+  - resourceName: "GATK"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Variant calling software (version 1.0.4705) used for identifying genetic variants in NGS data.
+      Successfully identified pathogenic/likely pathogenic variants in 17 patients (6 derivation + 11 validation cohorts) and VUS in additional 15 patients.
+      Diagnostic yield increased from 23.5% to 25.7% when NF1/SPRED1 were added to panel.
+    foundIn: "results"
+    contextSnippet: "followed by variant calling using GATK, version 1.0.4705...Adding NF1 and SPRED1 to the panel increased the diagnostic yield from 23.5% (119/505) to 25.7% (130/505)"
+    confidence: 0.95
+    doi: "10.1002/mgg3.1180"
+
+  - resourceName: "VisCap"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NGS-based CNV detection tool used for copy number variant analysis.
+      Successfully analyzed 23/28 derivation cohort patients and 281/505 validation cohort patients (limited by NGS data quality).
+      Identified whole gene deletions in NF1 gene in multiple patients.
+    foundIn: "results"
+    contextSnippet: "Copy number variants (CNVs) were identified via an NGS‐based detection tool (VisCap)...but were only available for 23 patients in the derivation cohort and 281 patients in the validation cohort due to NGS data quality"
+    confidence: 0.85
+    doi: "10.1002/mgg3.1180"
+
+  - resourceName: "ddPCR"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Digital droplet PCR technology used for confirmation of copy number variants detected by VisCap.
+      Successfully validated CNV findings including whole gene deletions in NF1 gene.
+      Used as orthogonal method to confirm NGS-based CNV calls.
+    foundIn: "results"
+    contextSnippet: "Confirmation of CNVs was done using ddPCR as previously described...one full gene deletion, two frameshift variants, and two missense variants"
+    confidence: 0.85
+    doi: "10.1002/mgg3.1180"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 6
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of multiple research tools
+    - Mining patterns missed standard bioinformatics tools (bwa-mem, GATK) with version numbers
+    - Commercial reagent/instrument patterns with vendor names not captured
+    - NGS-specific tools and workflows not detected
+    - Digital droplet PCR (ddPCR) technology not recognized
+  recommendations: |
+    All 7 potentially missed tools should be added to the mining results:
+    - 4 computational tools: bwa-mem, GATK, VisCap, ddPCR (analysis software/methods)
+    - 3 genetic reagents: PureGene Blood Core Kit B, SureSelect, MiSeq-M01450 (lab reagents/instruments)
+    
+    The mining patterns need significant improvement for NGS/genomics studies:
+    - Add patterns for bioinformatics software with version numbers
+    - Include commercial reagent patterns with vendor names in parentheses
+    - Recognize NGS instrument model naming conventions
+    - Capture molecular validation methods like ddPCR
+    
+    This publication demonstrates successful use of multiple research tools with clear experimental context
+    and quantitative outcomes. The tools enabled a diagnostic yield increase from 23.5% to 25.7%.
+    All identified tools have strong usage evidence and should be included in the final mining results.

@@ -1,0 +1,106 @@
+publicationMetadata:
+  pmid: "19144871"
+  title: "Identification of erythrocyte p55/MPP1 as a binding partner of NF2 tumor suppressor protein/Merlin."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - protein interaction study with experimental methods
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology/biochemistry study investigating protein-protein interactions.
+    Expected tools include antibodies (monoclonal antibody mentioned), potentially cell lines
+    for protein expression, and analytical instruments/software for surface plasmon resonance.
+    The study involves protein purification, antibody development, and biophysical analysis.
+  overallAssessment: |
+    This is a laboratory research study focused on protein-protein interactions between NF2 and p55/MPP1.
+    The abstract mentions developing a monoclonal antibody and using surface plasmon resonance analysis,
+    indicating experimental tool usage. Despite lacking a Methods section, this type of study typically
+    uses multiple research tools including antibodies, expression systems, and analytical instruments.
+
+toolValidations: []
+  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "monoclonal antibody against human erythrocyte p55"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "We developed a specific monoclonal antibody against human erythrocyte p55, and found that both p55 and NF2 proteins are colocalized in the non-myelin-forming Schwann cells."
+    whyMissed: "The mining patterns may not have captured the phrase 'monoclonal antibody against' or may have filtered out this mention due to lack of specific antibody name/clone designation"
+    confidence: 0.95  # Very high confidence - explicitly states antibody development
+    shouldBeAdded: Yes
+
+  - toolName: "surface plasmon resonance"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "surface plasmon resonance analysis indicates a specific interaction with a kD value of 3.7 nM"
+    whyMissed: "SPR is an analytical technique/instrument that may not be covered by current computational tool patterns, or may be classified differently"
+    confidence: 0.85  # High confidence - analytical instrument used for quantitative measurements
+    shouldBeAdded: Yes
+
+  - toolName: "non-myelin-forming Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "found that both p55 and NF2 proteins are colocalized in the non-myelin-forming Schwann cells"
+    whyMissed: "This appears to be a cell type used for localization studies, but may be primary cells rather than an established cell line"
+    confidence: 0.60  # Moderate confidence - could be primary cells or established line
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "developed.*monoclonal antibody.*against"
+    toolType: "antibody"
+    examples: ["We developed a specific monoclonal antibody against human erythrocyte p55"]
+    reasoning: "This pattern would catch antibody development mentions that include the target protein but may not have specific clone names"
+
+  - patternType: "term"
+    pattern: "surface plasmon resonance|SPR analysis"
+    toolType: "computational_tool"
+    examples: ["surface plasmon resonance analysis indicates a specific interaction"]
+    reasoning: "SPR is a common analytical technique in protein interaction studies that should be captured as an analytical tool"
+
+  - patternType: "context_phrase"
+    pattern: "colocalized in.*cells|localization.*in.*cells"
+    toolType: "cell_line"
+    examples: ["colocalized in the non-myelin-forming Schwann cells"]
+    reasoning: "Cell localization studies often indicate use of specific cell types that may be research tools, though requires careful validation to distinguish primary cells from established lines"
+
+  - patternType: "naming_convention"
+    pattern: "kD value|KD value|dissociation constant"
+    toolType: "computational_tool"
+    examples: ["kD value of 3.7 nM"]
+    reasoning: "Quantitative binding measurements often indicate use of analytical instruments or software that should be captured"
+
+observations: []
+  # No validated tools to extract observations from, and only abstract available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of experimental tool usage
+    - Only abstract text available - full Methods section would likely reveal additional tools
+    - Monoclonal antibody development explicitly mentioned but not captured
+    - Surface plasmon resonance analysis mentioned but not captured as analytical tool
+    - Missing full text limits ability to identify all tools and extract detailed observations
+  recommendations: |
+    This publication clearly describes laboratory research with experimental tool usage that was completely
+    missed by the mining process. The abstract alone mentions antibody development and analytical techniques.
+    
+    Key recommendations:
+    1. Add the monoclonal antibody against p55 - this is explicitly described as developed by the authors
+    2. Add surface plasmon resonance as an analytical tool - used for quantitative binding measurements
+    3. Consider the Schwann cells mention, but verify if it's an established cell line or primary cells
+    4. Improve mining patterns to catch antibody development phrases and analytical techniques
+    5. This case highlights the importance of having full text for comprehensive tool identification
+    
+    The mining system appears to have significant gaps in detecting tools from abstracts, particularly
+    for antibody development and analytical instruments. The suggested patterns should help capture
+    similar tools in future mining efforts.

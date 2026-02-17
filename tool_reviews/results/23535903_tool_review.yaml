@@ -1,0 +1,130 @@
+publicationMetadata:
+  pmid: "23535903"
+  title: "Canonical Wnt/β-catenin signaling drives human schwann cell transformation, progression, and tumor maintenance."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental language in abstract
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool types include:
+    - Cell lines: "immortalized human Schwann cells", "human MPNST cell lines" mentioned
+    - Animal models: "Sleeping Beauty forward genetic screen" suggests transgenic mouse models
+    - Genetic reagents: Forward genetic screen implies genetic constructs/vectors
+    - Computational tools: Genetic screen analysis would require bioinformatics tools
+    - Small molecule compounds: "Small-molecule inhibition", "mTOR inhibitor, RAD-001" mentioned
+    
+    This is clearly a laboratory research study involving genetic screens, cell culture, 
+    and drug testing, so multiple tool types are expected despite only having abstract text.
+  overallAssessment: |
+    This is a laboratory research publication describing genetic screens, cell transformation 
+    assays, and drug testing experiments. The abstract mentions specific experimental approaches 
+    (Sleeping Beauty transposon screen, cell line studies, small molecule inhibitors) that 
+    would require multiple research tools. The absence of Methods/Results sections in the 
+    available text likely explains why no tools were initially mined, but the abstract 
+    contains clear evidence of tool usage that should be captured.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Sleeping Beauty"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Using a Sleeping Beauty forward genetic screen, we identified several genes involved in canonical Wnt signaling"
+    whyMissed: "Transposon system name not recognized - should be captured as genetic reagent for mutagenesis screens"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "immortalized human Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Induction of Wnt signaling was sufficient to induce transformed properties in immortalized human Schwann cells"
+    whyMissed: "Cell line described functionally rather than by specific name - pattern should capture 'immortalized [cell type] cells'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "human MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "downregulation of this pathway was sufficient to reduce the tumorigenic phenotype of human MPNST cell lines"
+    whyMissed: "Cell lines described by disease type rather than specific names - pattern should capture '[disease] cell lines'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "RAD-001"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "synergistically induced apoptosis when combined with an mTOR inhibitor, RAD-001"
+    whyMissed: "Small molecule inhibitor with specific name/code not captured - should be recognized as research reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Sleeping Beauty"
+    toolType: "genetic_reagent"
+    examples: ["Sleeping Beauty forward genetic screen"]
+    reasoning: "Sleeping Beauty is a well-known transposon system used for genetic screens and should be captured as a genetic reagent"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized .+ cells"
+    toolType: "cell_line"
+    examples: ["immortalized human Schwann cells"]
+    reasoning: "Immortalized cell lines are research tools even when not given specific names - this pattern would capture functionally described cell lines"
+
+  - patternType: "context_phrase"
+    pattern: ".+ cell lines"
+    toolType: "cell_line"
+    examples: ["human MPNST cell lines"]
+    reasoning: "Cell lines described by disease/tissue type are still research tools and should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "RAD-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["RAD-001"]
+    reasoning: "RAD compounds are common research inhibitors with standardized naming that should be recognized"
+
+  - patternType: "context_phrase"
+    pattern: "small-molecule inhibit(or|ion)"
+    toolType: "genetic_reagent"
+    examples: ["Small-molecule inhibition of Wnt signaling"]
+    reasoning: "Small molecule inhibitors are research reagents and this phrase indicates their usage"
+
+  - patternType: "context_phrase"
+    pattern: "forward genetic screen"
+    toolType: "genetic_reagent"
+    examples: ["Sleeping Beauty forward genetic screen"]
+    reasoning: "Forward genetic screens involve genetic tools/reagents and indicate experimental tool usage"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage in abstract
+    - Only abstract text available - missing Methods/Results sections likely contributed to poor tool detection
+    - Multiple research tools mentioned in abstract were not captured by mining patterns
+    - Transposon systems, cell lines, and small molecule inhibitors not recognized
+  recommendations: |
+    This publication clearly describes laboratory research involving multiple tool types but 
+    no tools were initially detected. Four specific tools should be added:
+    1. Sleeping Beauty transposon system (genetic reagent)
+    2. Immortalized human Schwann cells (cell line)  
+    3. Human MPNST cell lines (cell line)
+    4. RAD-001 mTOR inhibitor (genetic reagent)
+    
+    The mining patterns need improvement to capture:
+    - Transposon systems by name
+    - Cell lines described functionally rather than by specific names
+    - Small molecule inhibitors with drug codes
+    - Context phrases indicating genetic screens and cell culture work
+    
+    This case highlights the importance of analyzing abstracts when full text is unavailable,
+    as abstracts often contain key tool mentions that should be captured.

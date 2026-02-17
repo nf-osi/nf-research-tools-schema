@@ -1,0 +1,237 @@
+publicationMetadata:
+  pmid: "37174087"
+  title: "Vinblastine/Methotrexate for Debilitating and Progressive Plexiform Neurofibroma in Children and Young Adults with Neurofibromatosis Type 1: A Phase 2 Study"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (outcome measures, functional assessments, imaging protocols), 
+    computational tools for statistical analysis. This phase 2 clinical trial evaluates therapeutic efficacy 
+    using standardized clinical assessment tools including:
+    - Imaging response criteria (2D and 3D volumetric MRI analysis)
+    - Functional assessment tools (polysomnography, pulmonary function tests, video laryngoscopy)
+    - Toxicity grading systems (NCI CTCAE v4.0)
+    - Performance status scales (Lansky/Karnofsky)
+    - Statistical analysis software (Stata 15)
+    - Sleep study measures (apnea-hypopnea index)
+    - REiNS outcome recommendations
+  overallAssessment: |
+    This is a phase 2 clinical trial that extensively uses clinical assessment tools for patient evaluation,
+    outcome measurement, and safety monitoring. Clinical trials routinely employ validated assessment instruments,
+    imaging protocols, statistical software, and standardized grading systems. The study includes detailed
+    methods for functional assessments, sleep studies, imaging analysis, and toxicity monitoring - all of which
+    represent legitimate research tools that should have been captured by mining algorithms.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "National Cancer Institute Common Terminology Criteria for Adverse Events version 4.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Adverse events (AE) were graded according to the National Cancer Institute Common Terminology Criteria for Adverse Events version 4.0."
+    whyMissed: "Full formal name of standardized toxicity grading system not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NCI CTCAE v4.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Adverse events (AE) were graded according to the National Cancer Institute Common Terminology Criteria for Adverse Events version 4.0."
+    whyMissed: "Common abbreviation for toxicity grading system not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Lansky performance status"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Exclusion criteria included Lansky or Karnofsky performance statuses of less than 60"
+    whyMissed: "Pediatric performance status scale not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Karnofsky performance status"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Exclusion criteria included Lansky or Karnofsky performance statuses of less than 60"
+    whyMissed: "Adult performance status scale not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "polysomnography"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "For patients with tumors affecting the airway, video laryngoscopy, polysomnography, and pulmonary function tests (if age appropriate) were obtained"
+    whyMissed: "Sleep study assessment tool not recognized by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pulmonary function tests"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "For patients with tumors affecting the airway, video laryngoscopy, polysomnography, and pulmonary function tests (if age appropriate) were obtained"
+    whyMissed: "Respiratory assessment tool not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "video laryngoscopy"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "For patients with tumors affecting the airway, video laryngoscopy, polysomnography, and pulmonary function tests (if age appropriate) were obtained"
+    whyMissed: "Airway assessment procedure not recognized by mining patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "apnea-hypopnea index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The primary sleep endpoint evaluated on polysomnography was the apnea–hypopnea index. A clinically meaningful improvement was defined as an absolute decrease in AHI by ≥5 events per hour."
+    whyMissed: "Sleep study outcome measure (AHI) not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "REiNS sleep and pulmonary outcomes recommendations"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Analysis of functional responses for the cohort of participants with airway involvement were guided by the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) sleep and pulmonary outcomes recommendations"
+    whyMissed: "Disease-specific outcome guidelines not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Stata 15"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All analyses were performed using Stata 15 (StataCorp, College Station, TX, USA)."
+    whyMissed: "Statistical analysis software with version number not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Kaplan-Meier survival curve"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For assessment of TTP, a Kaplan–Meier survival curve was calculated for 2D imaging and/or functional progression and plotted with a 95% confidence interval around the median."
+    whyMissed: "Statistical analysis method not recognized as computational tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "impulse oscillometry"
+    toolType: "clinical_assessment_tool"
+    foundIn: "discussion"
+    contextSnippet: "Of note, impulse oscillometry was not routinely assessed clinically for the participants and was not required as part of the trial."
+    whyMissed: "Pulmonary function assessment tool mentioned in discussion not captured"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "National Cancer Institute Common Terminology Criteria for Adverse Events"
+    toolType: "clinical_assessment_tool"
+    examples: ["National Cancer Institute Common Terminology Criteria for Adverse Events version 4.0"]
+    reasoning: "Full formal name of widely used toxicity grading system in clinical trials"
+
+  - patternType: "term"
+    pattern: "NCI CTCAE"
+    toolType: "clinical_assessment_tool"
+    examples: ["NCI CTCAE v4.0", "NCI CTCAE version 4.0"]
+    reasoning: "Common abbreviation for toxicity grading system used in clinical trials"
+
+  - patternType: "term"
+    pattern: "(Lansky|Karnofsky) performance status"
+    toolType: "clinical_assessment_tool"
+    examples: ["Lansky performance status", "Karnofsky performance status"]
+    reasoning: "Standard performance status scales used in pediatric and adult oncology"
+
+  - patternType: "term"
+    pattern: "polysomnography"
+    toolType: "clinical_assessment_tool"
+    examples: ["polysomnography", "sleep study"]
+    reasoning: "Sleep study assessment tool commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "pulmonary function tests?"
+    toolType: "clinical_assessment_tool"
+    examples: ["pulmonary function tests", "pulmonary function test"]
+    reasoning: "Respiratory assessment tools used in clinical studies"
+
+  - patternType: "term"
+    pattern: "video laryngoscopy"
+    toolType: "clinical_assessment_tool"
+    examples: ["video laryngoscopy"]
+    reasoning: "Airway assessment procedure used in clinical evaluations"
+
+  - patternType: "term"
+    pattern: "apnea.hypopnea index"
+    toolType: "clinical_assessment_tool"
+    examples: ["apnea-hypopnea index", "apnea–hypopnea index"]
+    reasoning: "Primary outcome measure from sleep studies"
+
+  - patternType: "term"
+    pattern: "REiNS.*outcomes? recommendations?"
+    toolType: "clinical_assessment_tool"
+    examples: ["REiNS sleep and pulmonary outcomes recommendations"]
+    reasoning: "Disease-specific clinical outcome guidelines"
+
+  - patternType: "term"
+    pattern: "Stata \\d+"
+    toolType: "computational_tool"
+    examples: ["Stata 15", "Stata 16"]
+    reasoning: "Statistical analysis software with version numbers"
+
+  - patternType: "term"
+    pattern: "impulse oscillometry"
+    toolType: "clinical_assessment_tool"
+    examples: ["impulse oscillometry"]
+    reasoning: "Pulmonary function assessment tool used in respiratory research"
+
+  - patternType: "context_phrase"
+    pattern: "graded according to.*Criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["graded according to the National Cancer Institute Common Terminology Criteria"]
+    reasoning: "Context phrase indicating use of standardized grading systems"
+
+  - patternType: "context_phrase"
+    pattern: "analyses were performed using"
+    toolType: "computational_tool"
+    examples: ["All analyses were performed using Stata 15"]
+    reasoning: "Context phrase indicating computational tool usage for statistical analysis"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 12
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to mine any tools from a clinical trial that extensively uses clinical assessment tools
+    - Mining algorithms missed all standardized clinical assessment instruments (NCI CTCAE, performance status scales)
+    - Failed to capture sleep study tools (polysomnography, apnea-hypopnea index) despite detailed methods
+    - Statistical analysis software (Stata 15) with clear version number not detected
+    - Disease-specific outcome guidelines (REiNS recommendations) not recognized
+    - Functional assessment tools (pulmonary function tests, video laryngoscopy) completely missed
+  recommendations: |
+    This publication represents a significant mining failure - a phase 2 clinical trial with extensive use of 
+    clinical assessment tools yielded zero mined tools. At least 12 legitimate research tools were missed, 
+    including:
+    
+    CRITICAL MISSES:
+    - NCI CTCAE v4.0 (toxicity grading) - universally used in clinical trials
+    - Lansky/Karnofsky performance status - standard oncology assessment tools
+    - Stata 15 - statistical analysis software with clear version
+    - Polysomnography and sleep study measures - primary outcome tools
+    - REiNS outcome recommendations - disease-specific guidelines
+    
+    IMMEDIATE ACTIONS NEEDED:
+    1. Add all 12 suggested patterns to improve clinical assessment tool mining
+    2. Review mining algorithms for clinical trial publications specifically
+    3. Ensure computational tools with version numbers are captured
+    4. Add context-based patterns for "graded according to" and "analyzed using"
+    5. Include sleep study and pulmonary function assessment tools
+    
+    This publication should be re-mined after pattern improvements to validate effectiveness.
+    No observations could be extracted since no tools were validated for acceptance.

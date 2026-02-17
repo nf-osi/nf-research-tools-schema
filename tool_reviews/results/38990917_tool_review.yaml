@@ -1,0 +1,192 @@
+publicationMetadata:
+  pmid: "38990917"
+  title: "Optical coherence tomography of the macular ganglion cell layer in children with neurofibromatosis type 1 is a useful tool in the assessment for optic pathway gliomas."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical study design:
+    - Clinical assessment tools: Visual acuity measurement instruments, visual field analyzers, diagnostic imaging tools
+    - Computational tools: Statistical analysis software (SPSS, R), medical device software
+    - Medical devices: OCT machines, MRI scanners (though these are more equipment than research tools)
+    
+    This is a prospective clinical study comparing visual function parameters between children with NF1 
+    with and without optic pathway gliomas. The study uses standardized clinical assessment instruments
+    and statistical analysis software, making it likely to contain both clinical assessment tools and
+    computational tools.
+  overallAssessment: |
+    This clinical study should contain multiple research tools, particularly clinical assessment tools
+    for measuring visual function and computational tools for statistical analysis. The detailed methods
+    section describes specific instruments and software used for patient assessment and data analysis.
+    It's surprising that no tools were initially mined from this publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Teller acuity cards"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In the youngest group VA was assessed with Teller acuity cards or Cardiff acuity cards while older children were tested with Lea or KM (Konstantin Moutakis) cards"
+    whyMissed: "Specific clinical assessment tool for measuring visual acuity in young children - should be detected as validated clinical instrument"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cardiff acuity cards"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In the youngest group VA was assessed with Teller acuity cards or Cardiff acuity cards while older children were tested with Lea or KM (Konstantin Moutakis) cards"
+    whyMissed: "Specific clinical assessment tool for measuring visual acuity in young children - should be detected as validated clinical instrument"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Lea cards"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In the youngest group VA was assessed with Teller acuity cards or Cardiff acuity cards while older children were tested with Lea or KM (Konstantin Moutakis) cards"
+    whyMissed: "Specific clinical assessment tool for measuring visual acuity in children - should be detected as validated clinical instrument"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "KM cards"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In the youngest group VA was assessed with Teller acuity cards or Cardiff acuity cards while older children were tested with Lea or KM (Konstantin Moutakis) cards"
+    whyMissed: "Specific clinical assessment tool (Konstantin Moutakis cards) for measuring visual acuity - should be detected as validated clinical instrument"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Humphrey Field Analyzer"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Visual fields were assessed with the Humphrey Field Analyzer perimetry as previously described"
+    whyMissed: "Well-known clinical assessment tool for visual field testing - should be detected as medical device/clinical instrument"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "World Health Organization Categories of Childhood VI scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In children ≥4 years of age VA at initial visit was compared with World Health Organization Categories of Childhood VI scale for reference"
+    whyMissed: "Standardized clinical assessment scale for categorizing visual impairment - should be detected as clinical assessment tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cirrus HD-OCT"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Optical coherence tomography images were obtained using Cirrus HD-OCT device (Cirrus; Carl Zeiss Meditec, Dublin, CA, USA)"
+    whyMissed: "Clinical diagnostic/assessment device with specific model and manufacturer - should be detected as clinical assessment tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "visual field index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Outcome measures were VA in logMAR, visual field index (VFI), average thicknesses of the ganglion cell-inner plexiform layer (GC-IPL)"
+    whyMissed: "Standardized clinical outcome measure for visual field assessment - should be detected as clinical assessment tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Generalized Linear Mixed Models (GLMM) of statistical package SPSS (ver.26) was used to compare the groups"
+    whyMissed: "Statistical analysis software with version number - should be detected as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The follow-up analyses are made using a repeated measure correlation (rmc) script in R to evaluate for each subject"
+    whyMissed: "Statistical programming language used for analysis - should be detected as computational tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cirrus 6.0 software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Macular Cube 512×128 or 200×200 scan protocol and automated GC‐IPL analysis segmentation algorithm and optic disc 200×200 protocol incorporated into the Cirrus 6.0 software were used"
+    whyMissed: "Medical device software with version number used for image analysis - should be detected as computational tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "acuity cards"
+    toolType: "clinical_assessment_tool"
+    examples: ["Teller acuity cards", "Cardiff acuity cards"]
+    reasoning: "Visual acuity cards are standardized clinical assessment tools commonly used in pediatric ophthalmology"
+
+  - patternType: "term"
+    pattern: "Field Analyzer"
+    toolType: "clinical_assessment_tool"
+    examples: ["Humphrey Field Analyzer"]
+    reasoning: "Field analyzers are specific clinical instruments for visual field testing"
+
+  - patternType: "naming_convention"
+    pattern: "WHO.*scale|World Health Organization.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["World Health Organization Categories of Childhood VI scale"]
+    reasoning: "WHO scales and classification systems are standardized clinical assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "assessed with|measured using|obtained using.*device"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed with Teller acuity cards", "obtained using Cirrus HD-OCT device"]
+    reasoning: "These phrases indicate active use of clinical assessment instruments"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(.*; [A-Z][a-z]+ [A-Z][a-z]+.*\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["(Cirrus; Carl Zeiss Meditec, Dublin, CA, USA)"]
+    reasoning: "Parenthetical vendor information with location indicates commercial clinical instruments"
+
+  - patternType: "term"
+    pattern: "visual field index|VFI"
+    toolType: "clinical_assessment_tool"
+    examples: ["visual field index (VFI)"]
+    reasoning: "VFI is a standardized clinical outcome measure in ophthalmology"
+
+  - patternType: "context_phrase"
+    pattern: "statistical package.*\\(ver\\.|software.*version"
+    toolType: "computational_tool"
+    examples: ["statistical package SPSS (ver.26)", "Cirrus 6.0 software"]
+    reasoning: "Software with version numbers in statistical or analysis context indicates computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "script in R|using R|analyses.*in R"
+    toolType: "computational_tool"
+    examples: ["repeated measure correlation (rmc) script in R"]
+    reasoning: "R usage in analysis context clearly indicates computational tool usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to detect any tools despite this being a clinical study with extensive methodology
+    - Multiple clinical assessment tools missed: visual acuity measurement cards, visual field analyzer, WHO scale, OCT device
+    - Computational tools missed: SPSS statistical software, R programming language, medical device software
+    - The mining system appears to have poor coverage for clinical assessment tools and medical devices
+    - No pattern recognition for vendor information in parentheses (manufacturer, location)
+    - Missing detection of standardized clinical outcome measures (VFI)
+  recommendations: |
+    This publication should have yielded 11 research tools across clinical assessment and computational categories.
+    The complete absence of detected tools indicates major gaps in the mining patterns, particularly for:
+    1. Clinical assessment tools - need better patterns for visual assessment instruments, medical devices, and standardized scales
+    2. Computational tools - need better detection of statistical software and medical device software
+    3. Vendor information - parenthetical manufacturer details should trigger tool detection
+    4. Clinical outcome measures - standardized indices and scales need recognition
+    5. All 11 missed tools should be added to improve future mining accuracy
+    6. The 8 suggested patterns would significantly improve clinical tool detection
+    7. No observations were extracted as no tools were initially validated, but this publication likely contains clinical findings about the OCT assessment tool's performance

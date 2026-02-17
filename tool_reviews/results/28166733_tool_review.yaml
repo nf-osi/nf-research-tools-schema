@@ -1,0 +1,347 @@
+publicationMetadata:
+  pmid: "28166733"
+  title: "A machine learning classifier trained on cancer transcriptomes detects NF1 inactivation signal in glioblastoma."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis), expected tools include:
+    - Computational tools (software, pipelines, algorithms, databases)
+    - Cell lines (for validation experiments)
+    - Antibodies (for western blotting validation)
+    - Genetic reagents (potentially for cell line characterization)
+    
+    This study develops a machine learning classifier (computational tool) and validates it using
+    cell culture and western blotting experiments. The Methods section describes extensive
+    computational analysis, cell culture protocols, and protein analysis techniques.
+  overallAssessment: |
+    This bioinformatics study develops a machine learning classifier to predict NF1 inactivation
+    in glioblastoma using transcriptomic data. The publication contains extensive computational
+    methods and validation experiments using cell lines and western blotting. Multiple research
+    tools are expected across computational, cellular, and molecular categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "logistic regression classifier"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we trained logistic regression classifiers with an elastic net penalty using stochastic gradient descent to detect tumors with NF1 inactivation"
+    whyMissed: "This is the main computational tool developed in the study - a machine learning classifier for NF1 inactivation prediction"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ensemble classifier"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we constructed 500 classifiers that would compose our ensemble model...we constructed an ensemble classifier from the 500 models"
+    whyMissed: "This is the final computational tool - an ensemble of 500 logistic regression classifiers"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used python 3.5.1 and Sci-kit Learn for machine learning implementations"
+    whyMissed: "Programming language with specific version used for analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Scikit-Learn"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used python 3.5.1 and Sci-kit Learn for machine learning implementations"
+    whyMissed: "Machine learning library used for classifier implementation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Docker"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we performed all analyses in a Docker image...We also provide a docker image to replicate the computational environment"
+    whyMissed: "Containerization platform used for reproducible analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We performed all preprocessing steps using R version 3.2.3"
+    whyMissed: "Statistical software with specific version used for data preprocessing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "WGCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the 'collapseRows()' function with the 'maxmean' method from the R package WGCNA"
+    whyMissed: "R package used for gene expression data processing"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RMA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We summarized transcript intensities using robust multi-array analysis (RMA)"
+    whyMissed: "Microarray normalization algorithm used for data processing"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "U87-MG"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "U87-MG and HEK293T cells were purchased from ATCC...U87-MG cells treated for two hours with one micromolar bortezomib"
+    whyMissed: "Glioblastoma cell line used as NF1-deficient control in validation experiments"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HEK293T"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "U87-MG and HEK293T cells were purchased from ATCC"
+    whyMissed: "Human embryonic kidney cell line used in experiments"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-NF1 D7R7D"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-NF1 D7R7D #14624 (Cell Signaling, rabbit, 2% BSA, 1:1000, overnight, 4°C)"
+    whyMissed: "Primary antibody used for NF1 protein detection in western blotting"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-tubulin B-1-2-5"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-tubulin B-1-2-5 (Santa Cruz, mouse, 2% milk, 1:10000, 1 h, RT)"
+    whyMissed: "Loading control antibody used in western blotting"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-EGFR D38B1"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-EGFR D38B1 #4267 (Cell Signaling, rabbit, 2% milk, 1:1000–1:2000, 1 h, RT)"
+    whyMissed: "Primary antibody used for EGFR protein detection"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "p-ERK 1/2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "p-ERK ½ (p44/42 MAPK) #9101 (Cell Signaling, rabbit, 2% BSA, 1:2000, overnight, 4°C)"
+    whyMissed: "Primary antibody used for phospho-ERK detection"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SUZ12 D39F6"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "SUZ12 D39F6 #3737 (Cell Signaling, rabbit, 2% milk, 1:1000, overnight, 4°C)"
+    whyMissed: "Primary antibody used for SUZ12 protein detection"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "bortezomib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "U87-MG cells treated for two hours with one micromolar bortezomib (Selleckchem)"
+    whyMissed: "Proteasome inhibitor used as experimental reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MG132"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "ten micromolar MG132 (Selleckchem)"
+    whyMissed: "Proteasome inhibitor used as experimental reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Li-COR Image Studio Lite"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Densitometry was performed using Li-COR Image Studio Lite 5.0"
+    whyMissed: "Image analysis software used for western blot quantification"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TCGA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We downloaded RNAseq and mutation data from TCGA Pan Cancer project from the UCSC Xena data portal"
+    whyMissed: "Database/resource used as primary data source for classifier training"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "UCSC Xena"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We downloaded RNAseq and mutation data from TCGA Pan Cancer project from the UCSC Xena data portal"
+    whyMissed: "Data portal used to access TCGA data"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "we trained.*classifier"
+    toolType: "computational_tool"
+    examples: ["we trained logistic regression classifiers", "we trained an ensemble of 500 logistic regression classifiers"]
+    reasoning: "Phrases indicating development of machine learning classifiers"
+
+  - patternType: "context_phrase"
+    pattern: "using.*version.*"
+    toolType: "computational_tool"
+    examples: ["using R version 3.2.3", "We used python 3.5.1"]
+    reasoning: "Software tools with specific version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "purchased from ATCC"
+    toolType: "cell_line"
+    examples: ["U87-MG and HEK293T cells were purchased from ATCC"]
+    reasoning: "Cell lines obtained from ATCC repository"
+
+  - patternType: "naming_convention"
+    pattern: "anti-[A-Z0-9]+ [A-Z0-9]+.*#[0-9]+"
+    toolType: "antibody"
+    examples: ["anti-NF1 D7R7D #14624", "anti-EGFR D38B1 #4267"]
+    reasoning: "Antibody naming with clone names and catalog numbers"
+
+  - patternType: "context_phrase"
+    pattern: "performed using.*"
+    toolType: "computational_tool"
+    examples: ["Densitometry was performed using Li-COR Image Studio Lite", "performed all preprocessing steps using R"]
+    reasoning: "Software tools used for specific analytical procedures"
+
+  - patternType: "context_phrase"
+    pattern: "we constructed.*ensemble.*"
+    toolType: "computational_tool"
+    examples: ["we constructed 500 classifiers that would compose our ensemble model"]
+    reasoning: "Development of ensemble computational methods"
+
+observations:
+  - resourceName: "logistic regression classifier"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The classifier achieved test set AUROC mean = 0.77 (95% quantile = 0.53 - 0.95) over 50 random 
+      initializations for detecting NF1 mutated tumors. Optimal hyperparameters were identified at 
+      alpha = 0.15 and L1 mixing = 0.1 using 5-fold cross validation. The classifier consistently 
+      separated NF1 wildtype and NF1 inactivated GBM samples with high effect sizes (Training: mean 
+      Cohen's D = 3.07, 95% CI = 2.24 – 4.16; Testing: mean Cohen's D = 1.27, 95% CI = 0.19 – 2.67).
+    foundIn: "results"
+    contextSnippet: "the classifier detected NF1 mutated tumors (test set area under the receiver operating characteristic curve (AUROC) mean = 0.77, 95% quantile = 0.53 - 0.95)"
+    confidence: 0.95
+    doi: "10.1186/s12864-017-3519-7"
+
+  - resourceName: "ensemble classifier"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The ensemble classifier performed well for samples with very high or very low NF1 protein 
+      concentrations but had mixed performance in samples with intermediate NF1 concentrations. 
+      The classifier predicted four samples to have NF1 inactivation and eight samples to be NF1 
+      wildtype. A one-tailed Welch's t-test showed no significant difference in NF1 protein 
+      concentrations between predicted groups (t = −1.38, p = 0.098, effect size = 0.699).
+    foundIn: "results"
+    contextSnippet: "The ensemble classifier performed well for samples with very high or very low NF1 protein concentrations but had mixed performance in samples with intermediate NF1 concentrations"
+    confidence: 0.90
+    doi: "10.1186/s12864-017-3519-7"
+
+  - resourceName: "U87-MG"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      U87-MG cell line was characterized as NF1-deficient with elevated proteasome-mediated 
+      degradation of NF1. The cell line required loss of NF1 protein to promote tumorigenesis 
+      in xenograft tumor models. Used as control representing an NF1-deficient tumor cell line 
+      with low NF1 protein levels compared to proteasome inhibitor-treated controls.
+    foundIn: "methods"
+    contextSnippet: "Previous studies have shown that the U87MG cell line has elevated proteasome-mediated degradation of NF1 and that this cell line required the loss of NF1 protein to promote tumorigenesis"
+    confidence: 0.90
+    doi: "10.1186/s12864-017-3519-7"
+
+  - resourceName: "anti-NF1 D7R7D"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Primary antibody used for NF1 protein detection in western blotting. Used at 1:1000 dilution 
+      in 2% BSA, incubated overnight at 4°C. Detection required SuperSignal West Femto Maximum 
+      Sensitivity Substrate due to low NF1 protein levels in some samples. Successfully detected 
+      variable NF1 protein levels across 12 GBM samples, with two samples showing no apparent NF1 
+      protein and others showing similar or less signal than U87-MG control.
+    foundIn: "methods"
+    contextSnippet: "anti-NF1 D7R7D #14624 (Cell Signaling, rabbit, 2% BSA, 1:1000, overnight, 4°C)...detection of HRP activity using...SuperSignal West Femto Maximum Sensitivity Substrate"
+    confidence: 0.95
+    doi: "10.1186/s12864-017-3519-7"
+
+  - resourceName: "bortezomib"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Proteasome inhibitor used at 1 μM concentration for 2 hours to prevent NF1 protein degradation 
+      in U87-MG cells. When combined with MG132, treatment resulted in increased NF1 protein levels 
+      compared to untreated U87-MG cells, serving as positive control for NF1 protein detection. 
+      This treatment was used to establish baseline NF1 protein levels for normalization.
+    foundIn: "methods"
+    contextSnippet: "U87-MG cells treated for two hours with one micromolar bortezomib (Selleckchem) and ten micromolar MG132"
+    confidence: 0.85
+    doi: "10.1186/s12864-017-3519-7"
+
+  - resourceName: "MG132"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Proteasome inhibitor used at 10 μM concentration for 2 hours in combination with bortezomib 
+      to block proteasome-mediated degradation of NF1 protein in U87-MG cells. The combination 
+      treatment effectively prevented NF1 degradation and was used as positive control (U87 + PI) 
+      for western blot normalization and protein quantification.
+    foundIn: "methods"
+    contextSnippet: "U87-MG cells treated for two hours with one micromolar bortezomib (Selleckchem) and ten micromolar MG132 (Selleckchem)"
+    confidence: 0.85
+    doi: "10.1186/s12864-017-3519-7"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 20
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 3
+    Cellular: 3
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a tool-rich bioinformatics study
+    - The mining system completely missed the main computational tool (machine learning classifier) developed in the study
+    - Multiple computational tools (Python, R, Scikit-Learn, Docker, WGCNA, RMA) were not detected
+    - Cell lines (U87-MG, HEK293T) used in validation experiments were missed
+    - Multiple antibodies with catalog numbers and detailed protocols were not captured
+    - Chemical reagents (bortezomib, MG132) used in experiments were not detected
+  recommendations: |
+    This publication should have 20+ tools added to the database. The mining system failed to detect:
+    1. The primary computational tool developed (machine learning classifier for NF1 inactivation)
+    2. Multiple software tools and programming languages with version numbers
+    3. Well-characterized cell lines from ATCC
+    4. Antibodies with complete vendor information and protocols
+    5. Chemical reagents used in experimental procedures
+    
+    The mining patterns need significant improvement to capture:
+    - Machine learning classifier development phrases
+    - Software tools with version specifications
+    - Cell lines from standard repositories
+    - Antibodies with clone names and catalog numbers
+    - Chemical reagents used as experimental tools
+    
+    All 20 potentially missed tools should be added to improve database completeness for this important
+    bioinformatics study that develops a clinically relevant computational tool.

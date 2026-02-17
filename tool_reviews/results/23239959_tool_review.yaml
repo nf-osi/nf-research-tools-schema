@@ -1,0 +1,113 @@
+publicationMetadata:
+  pmid: "23239959"
+  title: "Partial Blindness to Submicron Topography in NF1 Haploinsufficient Cultured Fibroblasts Indicates a New Function of Neurofibromin in Regulation of Mechanosensoric."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating cellular responses to topography using cultured human fibroblasts from NF1 patients and controls. The study involves:
+    - Primary cell cultures (fibroblasts from patients and controls)
+    - Chemical inhibitors (FTI-277 and other pathway inhibitors)
+    - Specialized culture surfaces with submicron topography
+    - Cell orientation analysis methods
+    
+    Expected tools include: cell lines/primary cultures, genetic reagents (inhibitors), and computational tools for analysis.
+  overallAssessment: |
+    This is a laboratory research study that would typically use multiple research tools including primary cell cultures, chemical inhibitors, and analysis methods. The absence of a Methods section limits tool identification, but the abstract clearly describes experimental procedures using cultured human fibroblasts and pharmacological inhibitors. Tools are expected and likely present but may have been missed due to limited text availability.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "FTI-277"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Incubation of the NF1(+/-) fibroblasts with the farnesyltransferase inhibitor FTI-277 and other inhibitors of the neurofibromin pathway ameliorates significantly the cell orientation..."
+    whyMissed: "Specific chemical inhibitor with clear experimental usage context - should have been caught as a genetic reagent/chemical tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 haploinsufficient fibroblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...cell responses to surfaces with submicron topographies were investigated in cultured human NF1 haploinsufficient fibroblasts. Age-matched fibroblasts from 8 patients with neurofibromatosis type 1 (NF1(+/-))..."
+    whyMissed: "Primary cell cultures from patients - these are research tools used for experimental studies, should be captured as cell lines or primary cultures"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "control fibroblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Age-matched fibroblasts from 8 patients with neurofibromatosis type 1 (NF1(+/-)) and 9 controls (NF1(+/+)) were cultured on surfaces..."
+    whyMissed: "Control cell cultures from healthy donors - these are research tools used as experimental controls"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "microstructured grooves"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...were cultured on surfaces with grooves of 200 nm height and lateral distance of 2 μm. As cellular response indicator, the mean cell orientation along microstructured grooves was systematically examined..."
+    whyMissed: "Specialized culture surfaces with defined topography - these are engineered research tools/substrates used for mechanobiology studies"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FTI-277|farnesyltransferase inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["farnesyltransferase inhibitor FTI-277"]
+    reasoning: "Specific chemical inhibitors with catalog names should be captured as genetic reagents/chemical tools"
+
+  - patternType: "context_phrase"
+    pattern: "(cultured|primary) (human|patient|control) (fibroblasts|cells)"
+    toolType: "cell_line"
+    examples: ["cultured human NF1 haploinsufficient fibroblasts", "control fibroblasts"]
+    reasoning: "Primary cell cultures from patients or controls are research tools that should be captured, especially when described with experimental context"
+
+  - patternType: "context_phrase"
+    pattern: "(incubation|treatment) (with|using) .+ inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["Incubation of the NF1(+/-) fibroblasts with the farnesyltransferase inhibitor"]
+    reasoning: "Chemical treatments and inhibitors used in experimental contexts should be captured as genetic reagents"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-[0-9]{2,}"
+    toolType: "genetic_reagent"
+    examples: ["FTI-277"]
+    reasoning: "Chemical compound naming convention (letters-numbers) often indicates specific reagents with catalog numbers"
+
+  - patternType: "context_phrase"
+    pattern: "(microstructured|nanostructured|topographic) (surfaces|substrates|grooves)"
+    toolType: "genetic_reagent"
+    examples: ["microstructured grooves", "surfaces with grooves"]
+    reasoning: "Engineered culture surfaces and substrates are specialized research tools used in mechanobiology and cell biology studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear experimental content
+    - Only abstract available - no Methods, Results, or Discussion sections for detailed analysis
+    - Multiple research tools are clearly described in the abstract but were missed by mining
+    - FTI-277 (farnesyltransferase inhibitor) is a specific chemical reagent that should have been captured
+    - Primary cell cultures from patients and controls are research tools that were not identified
+    - Limited text availability may have contributed to poor mining performance
+  recommendations: |
+    - All potentially missed tools should be added to improve mining coverage
+    - The mining patterns need improvement to capture chemical inhibitors and primary cell cultures
+    - Consider expanding search patterns to include patient-derived primary cultures
+    - Chemical inhibitors with specific names (like FTI-277) should be reliably captured
+    - Even with limited text (abstract only), clear experimental tools should be identified
+    - The suggested patterns would significantly improve tool detection for similar publications
+    - No observations could be extracted due to lack of Results/Discussion sections

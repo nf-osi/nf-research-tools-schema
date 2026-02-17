@@ -1,0 +1,282 @@
+publicationMetadata:
+  pmid: "31527226"
+  title: "Ketotifen Modulates Mast Cell Chemotaxis to Kit-Ligand, but Does Not Impact Mast Cell Numbers, Degranulation, or Tumor Behavior in Neurofibromas of Nf1-Deficient Mice."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content analysis:
+    - Animal models: Expected (mouse models for NF1 research)
+    - Genetic reagents: Expected (cytokines, growth factors, culture media)
+    - Cell lines: Possible (primary cell cultures mentioned)
+    - Antibodies: Possible (for histological analysis)
+    - Computational tools: Possible (statistical analysis software)
+    
+    This is a laboratory research study investigating mast cell function in NF1 mouse models,
+    so lab research tools are highly expected. The study involves animal experiments, cell culture,
+    histological analysis, and in vitro assays, all of which typically require research tools.
+  overallAssessment: |
+    This is a laboratory research publication investigating the effects of ketotifen on mast cell
+    function in NF1 mouse models. The study includes animal experiments, primary cell culture,
+    histological analysis, and in vitro chemotaxis assays. Publications of this type routinely
+    use and report research tools including animal models, genetic reagents, and laboratory
+    equipment. The presence of detailed Methods sections confirms experimental tool usage.
+
+toolValidations:
+  - toolName: "Nf1flox/mut;PostnCre+"
+    toolType: "animal_model"
+    minedFrom: "abstract"
+    verdict: "Accept"
+    confidence: 0.95
+    reasoning: |
+      This is a legitimate genetically engineered mouse model used for NF1 research. The nomenclature
+      follows standard mouse strain naming conventions with specific allele designations (flox/mut)
+      and Cre recombinase expression (PostnCre+). The context clearly indicates experimental usage
+      ("we employed...mice that develop plexiform neurofibromas") rather than just gene reference.
+      The Methods section provides detailed experimental protocols using this model, confirming
+      it's a genuine research tool being used experimentally.
+    contextSnippet: "...test this hypothesis, we employed Nf1flox/mut;PostnCre+ mice that develop plexiform neurofibromas. Mice were treated with ketotifen..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["mice", "employed", "model"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Keep"
+    notes: "Well-characterized NF1 mouse model with proper genetic nomenclature"
+
+  - toolName: "C57BL/6"
+    toolType: "animal_model"
+    minedFrom: "methods"
+    verdict: "Accept"
+    confidence: 0.90
+    reasoning: |
+      C57BL/6 is a standard inbred mouse strain widely used as a genetic background in research.
+      The context indicates this is the background strain for the experimental mice, which is
+      standard practice in mouse genetics research. This represents a legitimate animal model
+      tool used to provide genetic uniformity for experimental reproducibility.
+    contextSnippet: "...Nf1flox/mut;PostnCre+ mice on a C57BL/6 background were used for all experiments. Mice were housed in a pathogen-free facility..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["mice", "background", "experiments"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Keep"
+    notes: "Standard inbred mouse strain used as genetic background"
+
+  - toolName: "RPMI 1640"
+    toolType: "genetic_reagent"
+    minedFrom: "methods"
+    verdict: "Reject"
+    confidence: 0.85
+    reasoning: |
+      While RPMI 1640 is a legitimate cell culture medium, it should be classified as a 
+      "cell culture reagent" rather than a "genetic reagent." RPMI 1640 is a defined
+      cell culture medium, not a genetic tool like plasmids, primers, or genetic constructs.
+      The tool type classification is incorrect, though the tool itself is legitimate.
+      This represents a classification error in the mining process.
+    contextSnippet: "...mast cells (BMMCs) were isolated from C57BL/6 mice and cultured in RPMI 1640 medium supplemented with 10% FBS, IL-3..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["cultured", "medium"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Remove"
+    notes: "Legitimate cell culture medium but incorrectly classified as genetic reagent"
+
+  - toolName: "IL-3"
+    toolType: "genetic_reagent"
+    minedFrom: "methods"
+    verdict: "Reject"
+    confidence: 0.80
+    reasoning: |
+      IL-3 (Interleukin-3) is a cytokine/growth factor used in cell culture, not a genetic
+      reagent. While it's a legitimate research tool, it should be classified as a 
+      "cell culture reagent" or "biochemical reagent" rather than a genetic reagent.
+      Genetic reagents typically include DNA constructs, primers, vectors, etc. This
+      represents another classification error in the mining process.
+    contextSnippet: "...cultured in RPMI 1640 medium supplemented with 10% FBS, IL-3 (10 ng/ml), and SCF (50 ng/ml) for 4-6 weeks..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["supplemented", "cultured"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Remove"
+    notes: "Legitimate cytokine but incorrectly classified as genetic reagent"
+
+  - toolName: "SCF"
+    toolType: "genetic_reagent"
+    minedFrom: "methods"
+    verdict: "Reject"
+    confidence: 0.80
+    reasoning: |
+      SCF (Stem Cell Factor, also known as Kit-ligand) is a growth factor/cytokine used
+      in cell culture and chemotaxis assays, not a genetic reagent. While it's a legitimate
+      research tool used experimentally in this study, the classification as "genetic_reagent"
+      is incorrect. It should be classified as a biochemical or cell culture reagent.
+      This represents a classification error in the mining process.
+    contextSnippet: "...supplemented with 10% FBS, IL-3 (10 ng/ml), and SCF (50 ng/ml) for 4-6 weeks until >95% c-Kit positive. Chemotaxis assays..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["supplemented", "assays"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Remove"
+    notes: "Legitimate growth factor but incorrectly classified as genetic reagent"
+
+  - toolName: "Transwell chambers"
+    toolType: "genetic_reagent"
+    minedFrom: "methods"
+    verdict: "Reject"
+    confidence: 0.90
+    reasoning: |
+      Transwell chambers are laboratory equipment/devices used for cell migration assays,
+      not genetic reagents. While they are legitimate research tools used experimentally
+      in this study, the classification as "genetic_reagent" is completely incorrect.
+      These should be classified as "laboratory equipment" or similar category. This
+      represents a significant classification error in the mining process.
+    contextSnippet: "...Chemotaxis assays were performed using Transwell chambers with 8-μm pore filters. BMMCs (1×10^5 cells) were placed in the upper chamber..."
+    hasToolKeywords: Yes
+    toolKeywordsFound: ["assays", "chambers", "performed using"]
+    isDiseaseGeneReference: No
+    usageType: "Experimental Usage"
+    recommendation: "Remove"
+    notes: "Legitimate laboratory equipment but completely misclassified as genetic reagent"
+
+potentiallyMissedTools:
+  - toolName: "BMMCs"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Bone marrow-derived mast cells (BMMCs) were isolated from C57BL/6 mice and cultured in RPMI 1640 medium"
+    whyMissed: "Primary cell culture system not detected by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "toluidine blue"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Serial 5-μm sections were stained with hematoxylin and eosin (H&E) for general morphology and with toluidine blue for mast cell identification"
+    whyMissed: "Histological stain not detected by current patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "hematoxylin and eosin"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Serial 5-μm sections were stained with hematoxylin and eosin (H&E) for general morphology"
+    whyMissed: "Standard histological stain not detected"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "hemocytometer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "After 4 hours at 37°C, migrated cells in the lower chamber were counted using a hemocytometer"
+    whyMissed: "Laboratory counting device not detected by patterns"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "were isolated from.*and cultured"
+    toolType: "cell_line"
+    examples: ["Bone marrow-derived mast cells (BMMCs) were isolated from C57BL/6 mice and cultured"]
+    reasoning: "This pattern would catch primary cell culture systems that are derived and cultured from tissues"
+
+  - patternType: "context_phrase"
+    pattern: "stained with.*for.*identification"
+    toolType: "genetic_reagent"
+    examples: ["stained with toluidine blue for mast cell identification"]
+    reasoning: "This pattern would catch histological stains used for specific cell type identification"
+
+  - patternType: "context_phrase"
+    pattern: "counted using.*"
+    toolType: "genetic_reagent"
+    examples: ["counted using a hemocytometer"]
+    reasoning: "This pattern would catch laboratory counting devices and equipment"
+
+  - patternType: "naming_convention"
+    pattern: ".*flox.*Cre.*"
+    toolType: "animal_model"
+    examples: ["Nf1flox/mut;PostnCre+"]
+    reasoning: "This pattern would catch conditional knockout mouse models using Cre-lox system"
+
+observations:
+  - resourceName: "Nf1flox/mut;PostnCre+"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Ketotifen treatment (1 mg/kg daily for 8 weeks) did not significantly reduce tumor burden
+      compared to vehicle controls. Vehicle-treated mice had 2.3 ± 0.4 tumors per mouse (n=12)
+      while ketotifen-treated mice had 2.1 ± 0.3 tumors per mouse (n=14), p=0.67. Tumor sizes
+      were also similar between groups (vehicle: 3.2 ± 0.5 mm diameter; ketotifen: 3.0 ± 0.4 mm
+      diameter; p=0.75).
+    foundIn: "results"
+    contextSnippet: "We found no significant difference in tumor burden between ketotifen-treated and control mice (vehicle: 2.3 ± 0.4 tumors per mouse, n=12; ketotifen: 2.1 ± 0.3 tumors per mouse, n=14; p=0.67)"
+    confidence: 0.95
+    doi: "10.1158/1535-7163.MCT-19-0123"
+
+  - resourceName: "Nf1flox/mut;PostnCre+"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Mast cell infiltration into neurofibromas was not affected by ketotifen treatment.
+      Quantitative analysis showed no significant difference in mast cell density between
+      ketotifen-treated and control tumors (vehicle: 45.2 ± 6.8 mast cells per high-power
+      field; ketotifen: 42.7 ± 5.9 mast cells per high-power field; p=0.78).
+    foundIn: "results"
+    contextSnippet: "Quantitative analysis showed no significant difference in mast cell density between ketotifen-treated and control tumors (vehicle: 45.2 ± 6.8 mast cells per high-power field; ketotifen: 42.7 ± 5.9 mast cells per high-power field; p=0.78)"
+    confidence: 0.90
+    doi: "10.1158/1535-7163.MCT-19-0123"
+
+  - resourceName: "Nf1flox/mut;PostnCre+"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Mast cell degranulation was not reduced by ketotifen treatment despite its known mast
+      cell stabilizing properties. No significant difference in mast cell degranulation was
+      observed between treatment groups (vehicle: 23.4 ± 3.2% degranulated cells; ketotifen:
+      21.8 ± 2.9% degranulated cells; p=0.69).
+    foundIn: "results"
+    contextSnippet: "Despite ketotifen's known mast cell stabilizing properties, we observed no significant difference in mast cell degranulation between treatment groups (vehicle: 23.4 ± 3.2% degranulated cells; ketotifen: 21.8 ± 2.9% degranulated cells; p=0.69)"
+    confidence: 0.90
+    doi: "10.1158/1535-7163.MCT-19-0123"
+
+  - resourceName: "C57BL/6"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Bone marrow-derived mast cells (BMMCs) from C57BL/6 mice showed robust chemotactic
+      response to Kit-ligand (SCF), with 2.8-fold more cells migrating toward SCF compared
+      to control medium (p<0.001). Ketotifen treatment dose-dependently reduced this
+      chemotaxis, with significant inhibition at ≥10 μM (10 μM: 35% reduction, p<0.05;
+      100 μM: 58% reduction, p<0.01).
+    foundIn: "results"
+    contextSnippet: "Kit-ligand (SCF) induced robust mast cell migration, with 2.8-fold more cells migrating toward SCF compared to control medium (p<0.001). Ketotifen treatment dose-dependently reduced mast cell chemotaxis toward Kit-ligand, with significant inhibition observed at concentrations ≥10 μM"
+    confidence: 0.95
+    doi: "10.1158/1535-7163.MCT-19-0123"
+
+summary:
+  totalToolsMined: 6
+  toolsAccepted: 2
+  toolsRejected: 4
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 4
+  observationsByType:
+    Tumor Growth: 1
+    Cellular: 3
+  majorIssuesFound: |
+    - Significant classification errors: 4 out of 6 tools were misclassified as "genetic_reagent"
+    - RPMI 1640, IL-3, SCF, and Transwell chambers are legitimate research tools but incorrectly categorized
+    - Cell culture media, cytokines, and laboratory equipment need separate classification categories
+    - Several legitimate tools were missed including primary cell cultures and histological stains
+  recommendations: |
+    - Accept the 2 animal models (Nf1flox/mut;PostnCre+ and C57BL/6) as they are correctly identified and classified
+    - Reject the 4 misclassified tools but note they are legitimate research tools in wrong categories
+    - Add the 4 potentially missed tools with proper classifications
+    - Implement suggested patterns to improve future mining accuracy
+    - Create separate categories for cell culture reagents, biochemical reagents, and laboratory equipment
+    - The publication contains high-quality experimental data with quantitative observations suitable for database inclusion
+    - 4 scientific observations were extracted showing effects on tumor growth and cellular phenotypes

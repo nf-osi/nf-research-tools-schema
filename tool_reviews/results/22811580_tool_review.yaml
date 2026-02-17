@@ -1,0 +1,216 @@
+publicationMetadata:
+  pmid: "22811580"
+  title: "Ras-driven transcriptome analysis identifies aurora kinase A as a potential malignant peripheral nerve sheath tumor therapeutic target."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a comprehensive laboratory research study involving:
+    - Transgenic mouse models for disease modeling
+    - Cell culture systems for in vitro studies
+    - Genetic reagents (shRNAs) for functional studies
+    - Computational tools for transcriptome analysis
+    - Chemical compounds for therapeutic testing
+    - Xenograft models for in vivo validation
+    
+    All major lab tool categories are expected except clinical assessment tools.
+  overallAssessment: |
+    This is a classic laboratory research publication combining mouse genetics, cell biology, and computational analysis.
+    The study clearly describes experimental methods using transgenic mice, cell culture, genetic manipulation, and bioinformatics.
+    Multiple research tool categories should be present including animal models, genetic reagents, computational tools, and potentially cell lines.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CNP-HRas12V"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we created a transgenic mouse model, CNP-HRas12V, expressing constitutively active HRas in Schwann cells..."
+    whyMissed: "Transgenic mouse model name not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Aurora kinase shRNAs"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...tested functional significance of Aurora kinase overexpression in MPNST in vitro and in vivo using Aurora kinase short hairpin RNAs (shRNA)..."
+    whyMissed: "shRNA reagents not detected by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MLN8237"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Furthermore, an AURKA selective inhibitor, MLN8237, stabilized tumor volume and significantly increased survival..."
+    whyMissed: "Chemical compound/inhibitor not recognized as genetic reagent or therapeutic tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Bayesian factor regression model"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...defined a Ras-induced gene expression signature to drive a Bayesian factor regression model analysis of differentially expressed genes..."
+    whyMissed: "Statistical analysis method not detected by computational tool patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...MLN8237, stabilized tumor volume and significantly increased survival of mice with MPNST xenografts..."
+    whyMissed: "Xenograft model system not detected by patient-derived model patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Aurora kinase shRNAs and Aurora kinase inhibitors blocked MPNST cell growth in vitro..."
+    whyMissed: "Cell line/culture system not detected by cell line patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "CNP-[A-Za-z0-9]+[Vv]?"
+    toolType: "animal_model"
+    examples: ["CNP-HRas12V"]
+    reasoning: "CNP promoter-driven transgenic mouse models follow this naming pattern and are commonly used in neurobiology research"
+
+  - patternType: "context_phrase"
+    pattern: "transgenic mouse model.*expressing.*in.*cells"
+    toolType: "animal_model"
+    examples: ["transgenic mouse model, CNP-HRas12V, expressing constitutively active HRas in Schwann cells"]
+    reasoning: "This phrase pattern reliably indicates transgenic animal model development and usage"
+
+  - patternType: "term"
+    pattern: "shRNAs?|short hairpin RNAs?"
+    toolType: "genetic_reagent"
+    examples: ["Aurora kinase short hairpin RNAs (shRNA)", "Aurora kinase shRNAs"]
+    reasoning: "shRNA reagents are commonly used genetic tools but may not be captured by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "Bayesian.*regression.*model|factor regression model"
+    toolType: "computational_tool"
+    examples: ["Bayesian factor regression model analysis"]
+    reasoning: "Statistical modeling approaches are computational tools used for data analysis"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z0-9]+.*xenografts?|xenograft.*model"
+    toolType: "patient_derived_model"
+    examples: ["MPNST xenografts", "mice with MPNST xenografts"]
+    reasoning: "Xenograft models are patient-derived systems but may not be detected without specific context patterns"
+
+  - patternType: "naming_convention"
+    pattern: "MLN[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["MLN8237"]
+    reasoning: "MLN-series compounds are commonly used research reagents/inhibitors with standardized naming"
+
+observations:
+  - resourceName: "CNP-HRas12V"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Transgenic mouse model expressing constitutively active HRas in Schwann cells was created to model 
+      malignant peripheral nerve sheath tumors (MPNST). The model was used to define a Ras-induced gene 
+      expression signature for comparative analysis with human neurofibromas and MPNSTs.
+    foundIn: "both"
+    contextSnippet: "...we created a transgenic mouse model, CNP-HRas12V, expressing constitutively active HRas in Schwann cells and defined a Ras-induced gene expression signature..."
+    confidence: 1.0
+    doi: "10.1158/1078-0432.CCR-12-1072"
+
+  - resourceName: "Aurora kinase shRNAs"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Aurora kinase shRNAs blocked MPNST cell growth in vitro, demonstrating functional significance 
+      of Aurora kinase overexpression in tumor cell proliferation. This validates Aurora kinase as 
+      a potential therapeutic target.
+    foundIn: "results"
+    contextSnippet: "...Aurora kinase shRNAs and Aurora kinase inhibitors blocked MPNST cell growth in vitro..."
+    confidence: 1.0
+    doi: "10.1158/1078-0432.CCR-12-1072"
+
+  - resourceName: "MLN8237"
+    resourceType: "Genetic Reagent"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      MLN8237, an AURKA selective inhibitor, stabilized tumor volume and significantly increased 
+      survival of mice with MPNST xenografts. This demonstrates therapeutic efficacy in vivo and 
+      validates Aurora kinase A as a viable treatment target.
+    foundIn: "results"
+    contextSnippet: "...an AURKA selective inhibitor, MLN8237, stabilized tumor volume and significantly increased survival of mice with MPNST xenografts..."
+    confidence: 1.0
+    doi: "10.1158/1078-0432.CCR-12-1072"
+
+  - resourceName: "MPNST xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      MPNST xenograft models showed stabilized tumor volume and significantly increased survival 
+      when treated with MLN8237 (AURKA inhibitor). This demonstrates the therapeutic potential 
+      of Aurora kinase inhibition in MPNST treatment.
+    foundIn: "results"
+    contextSnippet: "...MLN8237, stabilized tumor volume and significantly increased survival of mice with MPNST xenografts..."
+    confidence: 0.9
+    doi: "10.1158/1078-0432.CCR-12-1072"
+
+  - resourceName: "Bayesian factor regression model"
+    resourceType: "Computational Tool"
+    observationType: "Other"
+    observationTypeOntologyId: ""
+    details: |
+      Bayesian factor regression model analysis identified 2,000 genes with probability of linkage 
+      to nerve Ras signaling, of which 339 were significantly differentially expressed in mouse and 
+      human NF1-related tumor samples relative to normal nerves, including Aurora kinase A (AURKA).
+    foundIn: "results"
+    contextSnippet: "...We identified 2000 genes with probability of linkage to nerve Ras signaling of which 339 were significantly differentially expressed..."
+    confidence: 0.8
+    doi: "10.1158/1078-0432.CCR-12-1072"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 3
+    Cellular: 1
+    Other: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple obvious research tools were missed including transgenic mouse model, shRNAs, chemical inhibitors
+    - Mining patterns appear insufficient for detecting transgenic animal models with custom naming
+    - Genetic reagents like shRNAs and chemical compounds not properly captured
+    - Computational analysis methods not recognized as tools
+    - Xenograft model systems not detected
+  recommendations: |
+    All 6 potentially missed tools should be added to the database as they represent genuine research tools:
+    1. CNP-HRas12V transgenic mouse model - clearly described experimental animal model
+    2. Aurora kinase shRNAs - genetic reagents used for functional studies
+    3. MLN8237 - chemical inhibitor used as therapeutic compound
+    4. Bayesian factor regression model - computational analysis tool
+    5. MPNST xenografts - patient-derived xenograft model system
+    6. MPNST cells - cell culture system used for in vitro studies
+    
+    The mining patterns need significant improvement to capture:
+    - Transgenic mouse models with custom promoter-gene naming
+    - shRNA and other genetic reagent terminology
+    - Statistical/computational analysis methods
+    - Xenograft model systems
+    - Chemical compounds used as research tools
+    
+    This publication demonstrates major gaps in current mining coverage for laboratory research tools.
+    The extracted observations provide valuable scientific context for each validated tool's experimental usage and findings.

@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "37817770"
+  title: "Single-cell RNA sequencing of neurofibromas reveals a tumor microenvironment favorable for neural regeneration and immune suppression in a neurofibromatosis type 1 porcine model."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and title mentioning "single-cell RNA sequencing" and "porcine model":
+    - Animal models (porcine NF1 model mentioned in title)
+    - Computational tools (scRNA-seq analysis requires bioinformatics software)
+    - Antibodies (immunohistochemistry mentioned: S100, SOX10, GFAP, CD34)
+    - Potentially genetic reagents (if model was genetically modified)
+    
+    This is clearly a laboratory research study involving animal models, molecular techniques, and computational analysis.
+    The mention of single-cell RNA sequencing and immunohistochemistry strongly suggests multiple tool types should be present.
+  overallAssessment: |
+    This is a laboratory research publication involving single-cell RNA sequencing analysis of neurofibromas in a porcine NF1 model.
+    The study clearly uses research tools including animal models, computational analysis software, and antibodies for immunohistochemistry.
+    However, only the abstract is available for analysis, which limits the ability to identify specific tools and their usage context.
+    The lack of Methods section is concerning as it prevents validation of experimental procedures and tool usage.
+
+toolValidations: []
+  # No tools were mined according to the input data
+
+potentiallyMissedTools:
+  - toolName: "porcine NF1 model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...insights into the cellular composition and signaling within mature neurofibromas, contrasting with normal adjacent tissue, in a porcine model of NF1 using single-cell RNA sequencing..."
+    whyMissed: "Animal model mentioned in title and abstract but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "single-cell RNA sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...in a porcine model of NF1 using single-cell RNA sequencing (scRNA-seq) analysis and histopathological characterization..."
+    whyMissed: "scRNA-seq is a computational methodology requiring specialized software but may not have been recognized as a tool"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "S100 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...exhibited classic diffuse-type histologic morphology and expected patterns of S100, SOX10, GFAP, and CD34 immunohistochemistry..."
+    whyMissed: "Antibody used for immunohistochemistry but mentioned without 'antibody' keyword"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SOX10 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...exhibited classic diffuse-type histologic morphology and expected patterns of S100, SOX10, GFAP, and CD34 immunohistochemistry..."
+    whyMissed: "Antibody used for immunohistochemistry but mentioned without 'antibody' keyword"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GFAP antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...exhibited classic diffuse-type histologic morphology and expected patterns of S100, SOX10, GFAP, and CD34 immunohistochemistry..."
+    whyMissed: "Antibody used for immunohistochemistry but mentioned without 'antibody' keyword"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD34 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...exhibited classic diffuse-type histologic morphology and expected patterns of S100, SOX10, GFAP, and CD34 immunohistochemistry..."
+    whyMissed: "Antibody used for immunohistochemistry but mentioned without 'antibody' keyword"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "immunohistochemistry"
+    toolType: "antibody"
+    examples: ["S100, SOX10, GFAP, and CD34 immunohistochemistry"]
+    reasoning: "When immunohistochemistry is mentioned with protein names, these are likely antibodies used for staining"
+
+  - patternType: "context_phrase"
+    pattern: "porcine model of"
+    toolType: "animal_model"
+    examples: ["porcine model of NF1"]
+    reasoning: "Porcine models are important animal models that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "single-cell RNA sequencing|scRNA-seq"
+    toolType: "computational_tool"
+    examples: ["single-cell RNA sequencing (scRNA-seq)"]
+    reasoning: "scRNA-seq is a computational methodology that requires specialized analysis software"
+
+  - patternType: "context_phrase"
+    pattern: "patterns of [A-Z0-9]+(?:, [A-Z0-9]+)* immunohistochemistry"
+    toolType: "antibody"
+    examples: ["patterns of S100, SOX10, GFAP, and CD34 immunohistochemistry"]
+    reasoning: "This pattern captures multiple antibodies mentioned together in immunohistochemistry context"
+
+observations: []
+  # Cannot extract observations without Results/Discussion sections
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text is available - no Methods, Results, or Discussion sections
+    - Multiple antibodies mentioned in immunohistochemistry context were missed
+    - Porcine animal model mentioned in title and abstract was not captured
+    - Single-cell RNA sequencing methodology was not recognized as requiring computational tools
+    - Limited text availability prevents comprehensive tool validation and observation extraction
+  recommendations: |
+    This publication clearly contains research tools that were completely missed by the mining process:
+    1. ACCEPT and ADD: Four antibodies (S100, SOX10, GFAP, CD34) used for immunohistochemistry
+    2. ACCEPT and ADD: Porcine NF1 model mentioned as the experimental system
+    3. CONSIDER ADDING: Single-cell RNA sequencing as a computational methodology
+    4. IMPROVE PATTERNS: Add immunohistochemistry context patterns to capture antibodies
+    5. IMPROVE PATTERNS: Add animal model patterns for non-mouse species (porcine, etc.)
+    6. MAJOR CONCERN: The complete absence of mined tools from a clear laboratory research paper suggests significant gaps in mining patterns
+    7. RECOMMENDATION: This publication should be flagged for manual curator review to identify additional tools in the full text
+    8. LIMITATION: Without full text access, comprehensive tool validation and scientific observation extraction is impossible

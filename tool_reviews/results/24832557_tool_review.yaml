@@ -1,0 +1,126 @@
+publicationMetadata:
+  pmid: "24832557"
+  title: "Trp53 haploinsufficiency modifies EGFR-driven peripheral nerve sheath tumorigenesis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental design described
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content describing laboratory research, this publication should contain:
+    - Cell lines: HSC1λ cells (immortalized human Schwann cells) are explicitly mentioned
+    - Animal models: Transgenic mice with Trp53-null alleles and EGFR overexpression are described
+    - Genetic reagents: Trp53-null alleles and EGFR transgenes are mentioned
+    - Computational tools: Array comparative genome hybridization analysis suggests bioinformatics tools
+    - Antibodies: pAkt expression analysis likely requires antibodies for detection
+    
+    This is clearly a molecular biology/cancer research study with in vitro cell culture and in vivo 
+    mouse model experiments, so multiple lab tool types are expected.
+  overallAssessment: |
+    This is a laboratory research publication investigating cancer biology using both in vitro 
+    cell culture systems and transgenic mouse models. The study describes experimental approaches 
+    that would typically require multiple research tools including cell lines, animal models, 
+    genetic reagents, and likely antibodies for protein detection. Despite having no Methods 
+    section in the available text, the abstract clearly describes experimental work that would 
+    involve research tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HSC1λ cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Concurrent modulation of EGFR and TP53 expression in HSC1λ cells significantly increased proliferation and anchorage-independent growth in vitro."
+    whyMissed: "This immortalized human Schwann cell line is explicitly mentioned but wasn't caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Trp53-null allele transgenic mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Transgenic mice heterozygous for a Trp53-null allele and overexpressing EGFR in Schwann cells had a significant increase in neurofibroma and grade 3 PNST formation"
+    whyMissed: "Specific transgenic mouse model described but not captured by current patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "EGFR overexpressing transgenic mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Transgenic mice heterozygous for a Trp53-null allele and overexpressing EGFR in Schwann cells"
+    whyMissed: "EGFR transgenic component of the mouse model not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Trp53-null allele"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Transgenic mice heterozygous for a Trp53-null allele"
+    whyMissed: "Genetic construct/allele mentioned but not captured by current patterns"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "pAkt antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Histological analysis of tumors identified a significant increase in pAkt expression in grade 3 PNSTs"
+    whyMissed: "Protein expression analysis implies antibody usage but not explicitly stated"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "HSC1[λ|lambda]\\s+cells?"
+    toolType: "cell_line"
+    examples: ["HSC1λ cells"]
+    reasoning: "Specific immortalized Schwann cell line naming convention that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "transgenic mice\\s+(heterozygous for|overexpressing|with)\\s+[A-Za-z0-9-]+\\s+(allele|transgene)"
+    toolType: "animal_model"
+    examples: ["Transgenic mice heterozygous for a Trp53-null allele", "transgenic mice overexpressing EGFR"]
+    reasoning: "Pattern to capture transgenic mouse models with specific genetic modifications"
+
+  - patternType: "term"
+    pattern: "[A-Za-z0-9]+-null\\s+allele"
+    toolType: "genetic_reagent"
+    examples: ["Trp53-null allele"]
+    reasoning: "Pattern to capture knockout/null alleles as genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "(expression|levels?)\\s+of\\s+p[A-Z][a-z0-9]+"
+    toolType: "antibody"
+    examples: ["expression in pAkt"]
+    reasoning: "Phosphoprotein expression analysis often implies antibody usage for detection"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized\\s+(human|mouse)\\s+\\w+\\s+cells?"
+    toolType: "cell_line"
+    examples: ["immortalized human Schwann cells"]
+    reasoning: "Pattern to capture immortalized cell lines that may not follow standard naming"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available - full Methods section would likely contain more detailed tool information
+    - Mining patterns appear to miss specific cell line names (HSC1λ) and transgenic mouse descriptions
+    - Protein expression analysis mentions suggest antibody usage but this is implicit rather than explicit
+  recommendations: |
+    This publication clearly describes laboratory research using multiple tool types but none were captured by mining.
+    Key recommendations:
+    - HSC1λ cells should definitely be added as a validated cell line tool
+    - Transgenic mouse models (Trp53-null and EGFR overexpressing) should be captured as animal models
+    - Consider adding Trp53-null allele as a genetic reagent
+    - Improve mining patterns to capture transgenic mouse model descriptions
+    - Enhance cell line detection for non-standard naming conventions
+    - Consider implicit tool usage (protein expression analysis likely requires antibodies)
+    - Full text access would likely reveal additional tools in Methods section

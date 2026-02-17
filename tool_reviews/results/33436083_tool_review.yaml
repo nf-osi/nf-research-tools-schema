@@ -1,0 +1,306 @@
+publicationMetadata:
+  pmid: "33436083"
+  title: "Distinctive epigenomic alterations in NF1-deficient cutaneous and plexiform neurofibromas drive differential MKK/p38 signaling."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory research study involving:
+    - Methylation array analysis (Illumina EPIC 850K)
+    - Western blotting with multiple antibodies
+    - RNA-sequencing analysis
+    - Computational analysis using multiple software tools
+    - Copy number analysis
+    - Statistical analysis using R
+    
+    Expected tool types: antibodies (for Western blot), computational tools (R packages, analysis software), 
+    genetic reagents (arrays, kits), and potentially cell lines or tissue samples.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that extensively uses research tools across multiple categories.
+    The study involves epigenomic analysis of neurofibroma samples using methylation arrays, protein analysis via
+    Western blotting, RNA-sequencing, and extensive computational analysis. The detailed Methods section describes
+    numerous experimental procedures that would require antibodies, reagents, and computational tools. The complete
+    absence of mined tools indicates significant gaps in the mining patterns for this type of molecular biology research.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "MKK3 antibody (Cell Signaling #5674)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubated at 4°C overnight in primary antibody; MKK3 (Cell Signaling #5674), p38 (Cell Signaling #9219)..."
+    whyMissed: "Specific antibody with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p38 antibody (Cell Signaling #9219)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...MKK3 (Cell Signaling #5674), p38 (Cell Signaling #9219), phospho-p38 (Cell Signaling # 4511)..."
+    whyMissed: "Specific antibody with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "phospho-p38 antibody (Cell Signaling #4511)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...p38 (Cell Signaling #9219), phospho-p38 (Cell Signaling # 4511), phospho-ERK1/2 (Cell Signaling #9101)..."
+    whyMissed: "Specific antibody with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "phospho-ERK1/2 antibody (Cell Signaling #9101)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...phospho-p38 (Cell Signaling # 4511), phospho-ERK1/2 (Cell Signaling #9101), and β-Actin (Cell Signaling #3700)..."
+    whyMissed: "Specific antibody with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "β-Actin antibody (Cell Signaling #3700)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...phospho-ERK1/2 (Cell Signaling #9101), and β-Actin (Cell Signaling #3700). Densitometry was done in ImageJ..."
+    whyMissed: "Specific antibody with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina EPIC 850K methylation array"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...We interrogated the methylation profiles of 45 CNFs and 17 PNFs from NF1 subjects with the Illumina EPIC 850K methylation array..."
+    whyMissed: "Array platform not recognized as genetic reagent"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Zymo EZ DNA Methylation Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...500 ng of DNA from each sample was bisulfite converted using the Zymo EZ DNA Methylation Kit (Zymo Research, Irvine, CA USA)..."
+    whyMissed: "Commercial kit not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R (v3.5.1)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data were analyzed using a modified workflow that is similar to the ChAMP methylation array analysis procedure in R (v3.5.1)..."
+    whyMissed: "R version not caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ChAMP"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data were analyzed using a modified workflow that is similar to the ChAMP methylation array analysis procedure in R (v3.5.1)..."
+    whyMissed: "R package name not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "glmmTMB (v0.2.2)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...using a hierarchical generalized linear mixed model (GLMM) approach with a logit link function as implemented in glmmTMB (v0.2.2)..."
+    whyMissed: "R package with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DMRcate (v1.18.0)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Differentially methylated regions were called using DMRcate (v1.18.0). Results from glmmTMB were wrangled..."
+    whyMissed: "R package with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "compartmap (v1.65.71)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Chromatin compartments were computed at 100 kb resolution as previously described and implemented in compartmap (v1.65.71)..."
+    whyMissed: "R package with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "STAR (v2.7.0f)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Sequencing lanes were merged, followed by alignment with STAR (v2.7.0f) to b37..."
+    whyMissed: "Bioinformatics tool with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...and β-Actin (Cell Signaling #3700). Densitometry was done in ImageJ. Data availability..."
+    whyMissed: "Image analysis software not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SeSAMe (v1.3.2)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Copy number alterations were computed using SeSAMe (v1.3.2) with minor modifications for plotting functionality..."
+    whyMissed: "R package with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "edgeR (v3.27.14)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Reverse-stranded gene counts were read into R (v3.6.1) using edgeR (v3.27.14), excluding sample 2-025..."
+    whyMissed: "R package with version not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "Cell Signaling #[0-9]+"
+    toolType: "antibody"
+    examples: ["Cell Signaling #5674", "Cell Signaling #9219", "Cell Signaling #4511"]
+    reasoning: "Cell Signaling Technology antibodies with catalog numbers are commonly used in Western blotting"
+
+  - patternType: "term"
+    pattern: "Illumina.*array|EPIC.*array|methylation.*array"
+    toolType: "genetic_reagent"
+    examples: ["Illumina EPIC 850K methylation array"]
+    reasoning: "Methylation arrays are important genetic reagents for epigenomic studies"
+
+  - patternType: "naming_convention"
+    pattern: "R \\(v[0-9]+\\.[0-9]+\\.[0-9]+\\)"
+    toolType: "computational_tool"
+    examples: ["R (v3.5.1)", "R (v3.6.1)"]
+    reasoning: "R statistical software with version numbers should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z]+\\s*\\(v[0-9]+\\.[0-9]+\\.[0-9]+\\)"
+    toolType: "computational_tool"
+    examples: ["glmmTMB (v0.2.2)", "DMRcate (v1.18.0)", "STAR (v2.7.0f)"]
+    reasoning: "Software packages with version numbers in parentheses are standard format"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|implemented in|computed using|processed with"
+    toolType: "computational_tool"
+    examples: ["analyzed using ChAMP", "implemented in glmmTMB", "computed using SeSAMe"]
+    reasoning: "These phrases commonly precede computational tool mentions"
+
+  - patternType: "term"
+    pattern: "Kit|kit"
+    toolType: "genetic_reagent"
+    examples: ["Zymo EZ DNA Methylation Kit"]
+    reasoning: "Commercial kits are important genetic reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "incubated.*in primary antibody|primary antibody"
+    toolType: "antibody"
+    examples: ["incubated at 4°C overnight in primary antibody; MKK3"]
+    reasoning: "Primary antibody context reliably indicates antibody usage"
+
+observations:
+  - resourceName: "MKK3 antibody (Cell Signaling #5674)"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      MKK3 antibody was used for Western blot analysis at 4°C overnight incubation. 
+      Protein expression was quantified by densitometry using ImageJ software.
+      MKK3 protein expression was found to be highly correlated with MAP2K3 DMR methylation 
+      status (DMR1:MKK3 ρ = −0.85, p = 0.00018), demonstrating strong inverse correlation 
+      between methylation and protein expression.
+    foundIn: "results"
+    contextSnippet: "...Western blot of a representative subset of CNF and PNF tumors demonstrated that MKK3 protein expression was highly correlated to MAP2K3 DMR methylation status (DMR1:MKK3 ρ = −0.85, p = 0.00018)..."
+    confidence: 1.0
+    doi: "10.1186/s13072-020-00380-6"
+
+  - resourceName: "p38 antibody (Cell Signaling #9219)"
+    resourceType: "Antibody"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0008569"  # abnormal protein expression
+    details: |
+      p38 protein levels were negatively correlated with methylation at a significant DMR 
+      approximately 3.5 kb upstream of the MAPK14 gene (ρ = −0.56, p = 0.038). 
+      CNFs expressed p38 more abundantly than PNFs, with methylation higher in the PNF 
+      group leading to variable but overall decreased p38 protein expression.
+    foundIn: "results"
+    contextSnippet: "...p38 protein levels were negatively correlated with methylation at this site (ρ = −0.56, p = 0.038)...CNFs expressed both MKK3 and p38 more abundantly than PNFs..."
+    confidence: 1.0
+    doi: "10.1186/s13072-020-00380-6"
+
+  - resourceName: "phospho-p38 antibody (Cell Signaling #4511)"
+    resourceType: "Antibody"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0008569"  # abnormal protein expression
+    details: |
+      Phospho-p38 expression indicated consistent p38 activation in CNFs compared to PNFs.
+      p38 activation was strongly correlated with pERK expression regardless of tumor type 
+      (ρ = 0.70, p = 0.006), suggesting crosstalk between MKK3/p38 and RAS/ERK signaling 
+      pathways in the context of NF1 deficiency.
+    foundIn: "results"
+    contextSnippet: "...CNFs expressed both MKK3 and p38 more abundantly than PNFs, as well as phospho-p38 indicating consistent p38 activation...p38 activation was strongly correlated with pERK expression regardless of tumor type (ρ = 0.70, p = 0.006)..."
+    confidence: 1.0
+    doi: "10.1186/s13072-020-00380-6"
+
+  - resourceName: "Illumina EPIC 850K methylation array"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The EPIC array contains >850K probes querying methylation sites including CpG islands 
+      and non-island regions, RefSeq genes, ENCODE open chromatin, ENCODE transcription factor 
+      binding sites, and FANTOM5 enhancers. Successfully identified 31,201 significant 
+      differentially methylated probes (q < 0.05) between CNFs and PNFs, establishing 
+      distinct epigenetic signatures for each tumor type.
+    foundIn: "results"
+    contextSnippet: "...In total, we identified 31,201 significant differentially methylated probes (DMP; q < 0.05). By examining differentially methylated loci with an absolute odds ratio greater than 4 and clustering using a semi-supervised hierarchical approach, we establish a distinct, base-pair resolution epigenetic signature for CNF and PNFs..."
+    confidence: 1.0
+    doi: "10.1186/s13072-020-00380-6"
+
+  - resourceName: "R (v3.5.1)"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      R version 3.5.1 was used for methylation array data analysis using a modified workflow 
+      similar to the ChAMP methylation array analysis procedure. Successfully processed 
+      70 total samples after quality filtering, with 717,148 probes analyzed for 
+      differential methylation across tissue types.
+    foundIn: "results"
+    contextSnippet: "...Data were analyzed using a modified workflow that is similar to the ChAMP methylation array analysis procedure in R (v3.5.1)...resulting in 70 total samples...In total, 717,148 probes were analyzed for differential methylation across tissue types..."
+    confidence: 1.0
+    doi: "10.1186/s13072-020-00380-6"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 16  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 5  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Usage Instructions: 3
+    Molecular: 2
+  majorIssuesFound: |
+    - Complete failure to mine any tools despite extensive experimental methods
+    - Missing all 5 Western blot antibodies with specific catalog numbers
+    - Missing major computational tools (R, multiple R packages with versions)
+    - Missing genetic reagents (methylation array, commercial kits)
+    - Missing bioinformatics tools (STAR aligner, ImageJ)
+    - Current mining patterns appear inadequate for molecular biology research
+  recommendations: |
+    This publication demonstrates major gaps in the current mining patterns. Despite being a 
+    comprehensive laboratory research study with extensive use of research tools, zero tools 
+    were captured. Key recommendations:
+    
+    1. URGENT: Add patterns for Cell Signaling Technology antibodies with catalog numbers
+    2. Add patterns for R software and R packages with version numbers
+    3. Add patterns for commercial kits and arrays as genetic reagents
+    4. Add patterns for bioinformatics tools (STAR, ImageJ, etc.)
+    5. Improve context-based detection using phrases like "analyzed using", "implemented in"
+    6. This paper alone could provide 16+ validated tools across multiple categories
+    7. The extracted observations show high-quality scientific findings that should be captured
+    8. Consider this publication as a test case for pattern validation and improvement

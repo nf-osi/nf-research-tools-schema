@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "32439933"
+  title: "Translating current basic research into future therapies for neurofibromatosis type 1"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # High confidence - clear review structure with "Review criteria" section
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does not contain actual research tools used by the authors.
+    Instead, reviews cite and discuss tools used in other studies without direct usage.
+    May reference animal models, cell lines, computational tools, and clinical assessment tools
+    from the literature, but these are citations rather than experimental usage.
+    
+    This review focuses on therapeutic strategies and clinical trials for NF1, so it may
+    mention clinical assessment tools (diagnostic criteria) and reference animal models
+    from other studies, but is unlikely to contain lab research tools used experimentally.
+  overallAssessment: |
+    This is a comprehensive review article about NF1 therapeutic strategies, not an experimental study.
+    Review articles typically cite tools from other publications rather than using tools experimentally.
+    While the text mentions animal models and diagnostic criteria, these are references to tools
+    developed and used by other researchers, not tools used by the review authors themselves.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Krox20-Cre mouse line"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "The first neurofibroma mouse model was established by depletion of the Nf1 gene in Krox20 lineage Schwann cells."
+    whyMissed: "Specific Cre recombinase mouse line mentioned in Box 2, but this is a citation of tools used in other studies"
+    confidence: 0.3  # Low confidence - this is a review citing other work
+    shouldBeAdded: No
+    
+  - toolName: "Dhh-Cre mouse line"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "Subsequently, similar neurofibroma mouse models have been successfully created by ablation of Nf1 under various Schwann cell promotor Cre lines, such as Dhh"
+    whyMissed: "Cre recombinase line mentioned as example of tools used in other studies"
+    confidence: 0.3  # Low confidence - review context
+    shouldBeAdded: No
+    
+  - toolName: "P0A-Cre mouse line"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "Subsequently, similar neurofibroma mouse models have been successfully created by ablation of Nf1 under various Schwann cell promotor Cre lines, such as Dhh, P0A"
+    whyMissed: "Cre recombinase line mentioned as example from literature"
+    confidence: 0.3  # Low confidence - review context
+    shouldBeAdded: No
+    
+  - toolName: "Plp-Cre mouse line"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "Subsequently, similar neurofibroma mouse models have been successfully created by ablation of Nf1 under various Schwann cell promotor Cre lines, such as Dhh, P0A and Plp"
+    whyMissed: "Cre recombinase line mentioned as example from literature"
+    confidence: 0.3  # Low confidence - review context
+    shouldBeAdded: No
+    
+  - toolName: "NF1 diagnostic criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "introduction"
+    contextSnippet: "Currently, the diagnosis of NF1 requires two or more of the following criteria to be fulfilled: 1. The appearance of six or more café-au-lait spots..."
+    whyMissed: "Clinical diagnostic criteria presented in Box 1, but this is standard clinical practice rather than a research tool"
+    confidence: 0.4  # Moderate confidence - diagnostic criteria could be considered assessment tools
+    shouldBeAdded: Maybe
+    
+  - toolName: "Nf1 miniswine model"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "Miniswine with targeted deletion of Nf1 undergo loss of heterozygosity in neural-crest-derived cells, recapitulating human-like cNFs and OPGs"
+    whyMissed: "Pig model mentioned in Box 2, but cited from other research groups"
+    confidence: 0.2  # Low confidence - review citing other work
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "diagnostic criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["Currently, the diagnosis of NF1 requires two or more of the following criteria"]
+    reasoning: "Clinical diagnostic criteria could be considered assessment tools, though they may be standard practice rather than research tools"
+    
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+-Cre"
+    toolType: "animal_model"
+    examples: ["Krox20-Cre", "Dhh-Cre", "P0A-Cre", "Plp-Cre"]
+    reasoning: "Cre recombinase mouse lines are important research tools, but need to distinguish between actual usage vs literature citations in reviews"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Several animal models and diagnostic criteria mentioned
+  newPatternsCount: 2  # Patterns for diagnostic criteria and Cre lines
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not experimental research
+    - No Methods section indicating actual tool usage
+    - All tool mentions are citations of work done by other research groups
+    - Animal models mentioned in Box 2 are examples from literature, not tools used by authors
+    - Diagnostic criteria in Box 1 are standard clinical practice, not research tools
+    - No evidence of experimental work or tool development by the review authors
+  recommendations: |
+    This publication should have zero tools accepted. It is a comprehensive review article that
+    cites and discusses tools used in other studies but does not use any research tools experimentally.
+    
+    Key points:
+    - All animal model mentions (Krox20-Cre, Dhh-Cre, P0A-Cre, Plp-Cre, miniswine) are citations
+    - Diagnostic criteria are clinical standards, not research assessment tools
+    - No Methods section or experimental procedures described
+    - Review format focuses on summarizing other researchers' work
+    
+    The mining algorithm correctly identified this as having no tools. The potentially missed
+    tools are all false positives that would be inappropriate to include as they represent
+    citations rather than actual tool usage.
+    
+    For future mining: Consider adding context filters to distinguish between tool usage
+    ("we used", "we generated") vs tool citations ("has been developed", "was established")
+    in review articles.

@@ -1,0 +1,136 @@
+publicationMetadata:
+  pmid: "38173515"
+  title: "Development of a semi-automatic segmentation technique based on mean magnetic resonance imaging intensity thresholding for volumetric quantification of plexiform neurofibromas."
+  queryType: "bench,clinical"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a computational methods development paper that should contain:
+    - Computational tools (primary focus - image analysis software development)
+    - Possibly clinical assessment tools (volumetric measurement methods for clinical trials)
+    
+    The paper develops image segmentation algorithms for medical imaging analysis, which are
+    computational tools. It also describes methods for clinical volumetric assessment of
+    tumors, which could be considered clinical assessment tools for monitoring treatment response.
+  overallAssessment: |
+    This publication develops computational image analysis methods for medical imaging and should
+    definitely contain computational tools. The authors developed "SSTMean" and reference "SSTMini"
+    segmentation algorithms, implemented in MATLAB. The mining completely missed these tools, indicating
+    significant gaps in computational tool detection patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SSTMean"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "A semi-automatic segmentation technique based on mean magnetic resonance imaging (MRI) intensity thresholding (SSTMean) was developed and compared to a similar and previously published technique"
+    whyMissed: "Custom algorithm name not recognized by mining patterns - needs pattern for semi-automatic segmentation techniques and custom algorithm acronyms"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "SSTMini"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "SSTMean was developed and compared to a similar and previously published technique based on minimum image intensity thresholding (SSTMini)"
+    whyMissed: "Reference algorithm name not detected - needs pattern for comparative algorithm mentions"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The SSTMean method consisted of 4 main steps that were implemented in a Matlab script (Version 9.9.0, Natick, MA)"
+    whyMissed: "Common software with version number should have been detected - possible case sensitivity issue or version pattern gap"
+    confidence: 0.99
+    shouldBeAdded: Yes
+
+  - toolName: "FSLeyes"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For each MRI slice, the tumor was identified by drawing its contour(s) using the pencil tool from FSLeyes [25]"
+    whyMissed: "Neuroimaging software tool not recognized - needs pattern for FSL ecosystem tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Gaussian smoothing filter"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "a Gaussian smoothing filter with standard deviation σ = 0.5 was used and applied in both the horizontal and vertical directions to reduce the noise level"
+    whyMissed: "Image processing algorithm/filter not detected - needs pattern for image processing techniques"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "Bland-Altman plots"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Bland-Altman plots with 90% two-sided confidence intervals were used to visualize the differences between volumes"
+    whyMissed: "Statistical analysis method not recognized - needs pattern for statistical visualization techniques"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "SST[A-Z][a-z]+"
+    toolType: "computational_tool"
+    examples: ["SSTMean", "SSTMini"]
+    reasoning: "Custom algorithm acronyms following pattern of 'SST' + descriptive suffix are computational tools in image analysis"
+
+  - patternType: "context_phrase"
+    pattern: "implemented in a? (MATLAB|Matlab|matlab) script"
+    toolType: "computational_tool"
+    examples: ["implemented in a Matlab script (Version 9.9.0, Natick, MA)"]
+    reasoning: "MATLAB implementations with version numbers clearly indicate computational tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "(developed|implemented|created|built) (and compared to|versus|vs\\.?)"
+    toolType: "computational_tool"
+    examples: ["SSTMean was developed and compared to a similar and previously published technique"]
+    reasoning: "Algorithm development and comparison phrases indicate computational tool creation"
+
+  - patternType: "term"
+    pattern: "FSLeyes"
+    toolType: "computational_tool"
+    examples: ["using the pencil tool from FSLeyes"]
+    reasoning: "FSLeyes is a well-known neuroimaging visualization tool that should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "(semi-automatic|automatic) segmentation (technique|method|algorithm)"
+    toolType: "computational_tool"
+    examples: ["semi-automatic segmentation technique based on mean magnetic resonance imaging"]
+    reasoning: "Segmentation techniques are computational image analysis tools"
+
+  - patternType: "context_phrase"
+    pattern: "using (the \\w+ tool from|tools from) ([A-Z][a-zA-Z]+)"
+    toolType: "computational_tool"
+    examples: ["using the pencil tool from FSLeyes"]
+    reasoning: "Pattern captures software tools referenced by their specific functions"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Mining completely failed to detect any computational tools in a methods development paper
+    - Primary algorithm "SSTMean" (the main contribution) was not detected
+    - Comparison algorithm "SSTMini" was not detected  
+    - Standard software tools (MATLAB, FSLeyes) were not detected
+    - Image processing techniques and statistical methods were not detected
+    - This represents a major gap in computational tool mining patterns
+  recommendations: |
+    - ALL 4-6 missed tools should be added to the database (SSTMean, SSTMini, MATLAB, FSLeyes definitely; Gaussian filter and Bland-Altman plots possibly)
+    - Implement suggested patterns immediately to catch algorithm development papers
+    - Review mining patterns for computational tools - they appear inadequate for methods papers
+    - Add patterns for custom algorithm acronyms and comparative algorithm mentions
+    - Improve detection of software with version numbers and neuroimaging tools
+    - No observations were extracted as this is a methods paper without biological findings
+    - This publication demonstrates significant mining gaps that need urgent attention

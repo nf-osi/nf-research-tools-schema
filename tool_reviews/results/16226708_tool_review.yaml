@@ -1,0 +1,228 @@
+publicationMetadata:
+  pmid: "16226708"
+  title: "Therapy-induced malignant neoplasms in Nf1 mutant mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study using mouse models to investigate radiation-induced tumorigenesis.
+    Expected tool types include:
+    - Animal models (genetically modified mouse strains)
+    - Computational tools (statistical analysis software)
+    - Potentially genetic reagents (Cre recombinase systems)
+    
+    The study uses conditional knockout mice with specific genotypes (Nf1 fl/fl; PostnCre and Nf1 fl/-; PostnCre)
+    and employs statistical analysis software (Prizm/GraphPad). This is clearly experimental lab research that
+    should contain multiple research tools.
+  overallAssessment: |
+    This publication describes experimental laboratory research using genetically modified mouse models to study
+    radiation-induced cancer development. The presence of detailed Methods sections, specific mouse genotypes,
+    experimental protocols, and statistical analyses strongly indicates this study uses multiple research tools.
+    The mining system completely failed to identify any tools, which represents a significant false negative issue.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 fl/fl; PostnCre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "conditional knockout mouse models of NF1-associated PNs in 2 germline contexts: Nf1 fllfl ; PostnCre and + Nf1 fl/- ; PostnCre"
+    whyMissed: "Complex genotype notation with special characters and spacing not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 fl/-; PostnCre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "conditional knockout mouse models of NF1-associated PNs in 2 germline contexts: Nf1 fllfl ; PostnCre and + Nf1 fl/- ; PostnCre"
+    whyMissed: "Complex genotype notation with special characters and spacing not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We used heterozygous Nf1 mutant mice as a sensitized genetic background to investigate tumor induction by radiation (RAD) and cyclophosphamide (CY). Mutagen-exposed Nf1(+/-) mice developed secondary cancers"
+    whyMissed: "Parenthetical genotype notation not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6 background"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Mice were maintained in a mixed background (C57BL/6 and 129/S)"
+    whyMissed: "Standard mouse strain background notation not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "129/S background"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Mice were maintained in a mixed background (C57BL/6 and 129/S)"
+    whyMissed: "Standard mouse strain background notation not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Prizm (Graphpad)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were plotted and statistical tests were performed using Prizm (Graphpad)"
+    whyMissed: "Statistical analysis software with vendor name not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Aperio Imagescope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "H&E slides were scanned and visualized using Aperio Imagescope"
+    whyMissed: "Histology imaging software not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Leica rotary microtome"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Five-micron thick sections were cut on a Leica rotary microtome"
+    whyMissed: "Laboratory equipment with vendor name not captured"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\s*(fl/fl|fl/-|\\+/-|\\-/\\-|\\+/\\+)\\s*;?\\s*[A-Z][a-z]+Cre\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 fl/fl; PostnCre", "Nf1 fl/-; PostnCre"]
+    reasoning: "Captures conditional knockout mouse genotype notation with Cre recombinase systems"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\([+\\-/]+\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "Captures parenthetical genotype notation commonly used in mouse genetics"
+
+  - patternType: "naming_convention"
+    pattern: "\\b(C57BL/6|129/S|BALB/c|DBA/2|FVB/N)\\s+(background|strain)\\b"
+    toolType: "animal_model"
+    examples: ["C57BL/6 background", "129/S background"]
+    reasoning: "Captures standard inbred mouse strain backgrounds used in research"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Prizm|Prism)\\s*\\([Gg]raphpad\\)"
+    toolType: "computational_tool"
+    examples: ["Prizm (Graphpad)"]
+    reasoning: "Captures GraphPad Prism statistical software with common misspelling"
+
+  - patternType: "context_phrase"
+    pattern: "visualized using\\s+([A-Z][a-zA-Z\\s]+)"
+    toolType: "computational_tool"
+    examples: ["visualized using Aperio Imagescope"]
+    reasoning: "Captures imaging and visualization software mentioned in methods"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Leica|Zeiss|Olympus|Nikon)\\s+[a-zA-Z\\s]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["Leica rotary microtome"]
+    reasoning: "Captures laboratory equipment from major microscopy/instrumentation vendors"
+
+observations:
+  - resourceName: "Nf1(+/-) mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Mutagen-exposed Nf1(+/-) mice developed secondary cancers that are common in humans, including 
+      myeloid malignancies, sarcomas, and breast cancers. RAD cooperated strongly with heterozygous 
+      Nf1 inactivation in tumorigenesis. Most solid tumors showed loss of the wild-type Nf1 allele 
+      but retained two Trp53 alleles.
+    foundIn: "results"
+    contextSnippet: "Mutagen-exposed Nf1(+/-) mice developed secondary cancers that are common in humans, including myeloid malignancies, sarcomas, and breast cancers. RAD cooperated strongly with heterozygous Nf1 inactivation in tumorigenesis."
+    confidence: 1.0
+    doi: "10.1016/j.ccr.2005.08.011"
+
+  - resourceName: "Nf1 fl/fl; PostnCre mice"
+    resourceType: "Animal Model"
+    observationType: "Lifespan"
+    observationTypeOntologyId: "MP:0001661"
+    details: |
+      SI significantly decreased overall survival in Nf1 fl/fl mice at 15 Gy (P < .01, median survival 200 days) 
+      and 30 Gy (P < .01, median survival 284 days) compared to unirradiated controls (median survival 330 days). 
+      The wildtype Nf1 tumor microenvironment demonstrated greater radiosensitivity at the lower radiation dose.
+    foundIn: "results"
+    contextSnippet: "Survival analyses of Nf1 mice (fl/fl Figure 1C) showed a significantly worse survival following SI at 15 and 30 Gy compared to unirradiated controls (P < .01, median survival 330, 200, and 284 days for control, 15 and 30 Gy)."
+    confidence: 1.0
+    doi: "10.1016/j.ccr.2005.08.011"
+
+  - resourceName: "Nf1 fl/-; PostnCre mice"
+    resourceType: "Animal Model"
+    observationType: "Lifespan"
+    observationTypeOntologyId: "MP:0001661"
+    details: |
+      SI at 30 Gy decreased the overall survival of male Nf1 fl/- mice compared to controls (P < .01), 
+      but not at 15 Gy. Male Nf1 fl/- mice receiving 30 Gy experienced the worst survival with median 
+      survival of 118 days compared to 345 days for controls and 309 days for 15 Gy group.
+    foundIn: "results"
+    contextSnippet: "SI at 30 Gy decreased the overall survival of male Nf1 mice compared to controls (P < .01), but not at 15 Gy (Figure 1D, median survival 345, 309, and 118 days for control, 15 and 30 Gy). Male Nf1 mice receiving 30 Gy experienced the worse survival (median survival 118 days)."
+    confidence: 1.0
+    doi: "10.1016/j.ccr.2005.08.011"
+
+  - resourceName: "Nf1 fl/fl; PostnCre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Nf1 periostin-Cre mice develop extensive spinal plexiform neurofibromas by 5 months of age. 
+      These plexiform neurofibromas rarely spontaneously transform to higher grade MPSNTs, however 
+      transformation can be promoted by loss of CDKN2A as well as p53 knockdown. SI was associated 
+      with increasing worrisome histologic features along the PN-MPNST continuum in PNs irradiated 
+      to higher radiation doses.
+    foundIn: "results"
+    contextSnippet: "Nf1 periostin-Cre mice develop extensive spinal plexiform neurofibromas by 5 months of age. These plexiform neurofibromas rarely spontaneously transform to higher grade MPSNTs, however transformation can be promoted by loss of CDKN2A as well as p53 knockdown."
+    confidence: 1.0
+    doi: "10.1016/j.ccr.2005.08.011"
+
+  - resourceName: "Nf1 fl/fl; PostnCre mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Irradiated spinal plexiform neurofibromas developed increased cellularity and higher-grade 
+      histologic features. The frequency of PNs decreased as SI dose increased and correspondingly 
+      the frequency of higher-grade histologic changes increased. Widespread plexiform neurofibromas 
+      were visible throughout the spinal nerve tissues, with the majority being PNF (30/48), followed 
+      by cellular neurofibroma (CNF, 15/48), ANNUBP (1/48) and low-grade MPNST (2/48).
+    foundIn: "results"
+    contextSnippet: "The frequency of PNs decreased as SI dose increased and correspondingly the frequency of higher-grade histologic changes increased. As is typical of these mouse models, widespread plexiform neurofibromas were visible throughout the spinal nerve tissues, with the majority of neoplasms being PNF (30/48), followed by cellular neurofibroma (CNF, 15/48), atypical neurofibromatous neoplasm of uncertain biologic potential (ANNUBP, 1/48) and low-grade MPNST (2/48)."
+    confidence: 1.0
+    doi: "10.1016/j.ccr.2005.08.011"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Lifespan: 2
+    Cellular: 1
+  majorIssuesFound: |
+    - CRITICAL: Mining system completely failed to identify any tools despite this being a clear laboratory research study
+    - Multiple genetically modified mouse models with complex notation were missed
+    - Statistical analysis software (Prizm/GraphPad) was not captured
+    - Imaging software (Aperio Imagescope) was not identified
+    - Standard mouse strain backgrounds were not recognized
+    - Laboratory equipment with vendor names was not captured
+    - This represents a major false negative issue in the mining pipeline
+  recommendations: |
+    - ALL tools should be added to the database as this is clearly experimental lab research
+    - The mining patterns need significant improvement to capture complex mouse genotype notation
+    - Software tools mentioned in methods sections need better pattern coverage
+    - Mouse strain backgrounds should be systematically captured
+    - Laboratory equipment from major vendors should be included in patterns
+    - This publication demonstrates major gaps in the current mining approach for animal model research
+    - The 5 scientific observations extracted provide valuable phenotypic data about radiation effects on Nf1 mutant mice
+    - Future mining should specifically target conditional knockout mouse nomenclature and statistical software

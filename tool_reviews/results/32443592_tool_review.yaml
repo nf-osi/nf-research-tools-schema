@@ -1,0 +1,266 @@
+publicationMetadata:
+  pmid: "32443592"
+  title: "C-Fiber Loss as a Possible Cause of Neuropathic Pain in Schwannomatosis."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical research study investigating neuropathic pain in schwannomatosis patients using multiple assessment methods:
+    - Clinical assessment tools: Multiple validated questionnaires and scales (HADS, PainDETECT, FPI, SCL-90-R, SF-36)
+    - Computational tools: Statistical analysis software (eQUISTA, Fieldtrip), imaging analysis tools
+    - Laboratory reagents: Antibodies for immunohistochemistry (anti-PGP 9.5)
+    - Clinical measurement devices: Neurophysiological equipment, MRI systems, laser stimulation devices
+    
+    Expected tool types: clinical_assessment_tool, computational_tool, antibody, and potentially specialized medical devices.
+  overallAssessment: |
+    This clinical study extensively uses validated assessment tools to characterize pain and neurological function in schwannomatosis patients.
+    The study employs multiple standardized questionnaires, neurophysiological testing methods, and imaging techniques.
+    Clinical assessment tools are the primary research instruments, supported by computational analysis software and some laboratory reagents.
+    The comprehensive methods section indicates substantial tool usage that should have been captured by mining algorithms.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Hospital Depression and Anxiety Score (HADS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Hospital Depression and Anxiety Score (HADS) was used to screen for anxiety and depression"
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PainDETECT questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Pain perception was assessed by the PainDETECT questionnaire, which provides high sensitivity, specificity, and positive predictive value to detect neuropathic pain"
+    whyMissed: "Specific pain assessment questionnaire not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Freiburger Persönlichkeitsinventar (FPI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "In order to examine stable traits of patients' personality the multidimensional "Freiburger Persönlichkeitsinventar" (FPI) was used"
+    whyMissed: "German personality assessment tool not in mining vocabulary"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Symptom Checklist-90-R (SCL-90-R)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "By means of the Symptom Checklist-90-R (SCL-90-R), the patients' subjective strain through physical and psychological disorders were measured"
+    whyMissed: "Standardized psychological assessment tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SF-36 health survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The German Version of the SF-36 health survey was utilized to assess health-related quality of life"
+    whyMissed: "Well-known quality of life assessment tool missed"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "eQUISTA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "QST statistical analysis was performed using "eQUISTA" (Casquar GmbH, Bochum, Germany), which calculates a sensory profile by transformation of the absolute measured values"
+    whyMissed: "Specialized statistical analysis software not in computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Fieldtrip software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were analyzed offline using Fieldtrip software (Donders Centre for Cognitive Neuroimaging, AH Nijmegen, The Netherlands, www.ru.nl/fcdonders/fieldtrip)"
+    whyMissed: "Neuroimaging analysis software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-PGP 9.5"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The samples were then incubated with polyclonal rabbit anti-PGP 9.5 (Dako #Z5116, Glostrup, Denmark, antibody dilution 1:200) over night at room temperature"
+    whyMissed: "Antibody with catalog number not captured by antibody mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BigDye Terminator Cycle Sequencing Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sanger sequencing of the PCR products was performed using the BigDye Terminator Cycle Sequencing Kit (ABI, Life Technologies, Foster City, CA, USA)"
+    whyMissed: "Commercial sequencing kit not captured by genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SALSA MLPA P044 NF2 probemix"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Rearrangments involving the NF2 gene were investigated by MLPA (SALSA MLPA P044 NF2 probemix, MRC Holland, Amsterdam, The Netherlands)"
+    whyMissed: "MLPA probe set not recognized as genetic reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(HADS|Hospital Depression and Anxiety Score)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Hospital Depression and Anxiety Score (HADS)"]
+    reasoning: "HADS is a widely used clinical assessment tool that should be captured"
+
+  - patternType: "term"
+    pattern: "\\b(PainDETECT|painDETECT)\\s+questionnaire\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["PainDETECT questionnaire"]
+    reasoning: "Specific pain assessment questionnaire commonly used in neuropathic pain research"
+
+  - patternType: "term"
+    pattern: "\\bSF-36\\s+(health\\s+survey|questionnaire)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["SF-36 health survey"]
+    reasoning: "SF-36 is a standard quality of life assessment tool"
+
+  - patternType: "term"
+    pattern: "\\bSCL-90-R\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Symptom Checklist-90-R (SCL-90-R)"]
+    reasoning: "Standardized psychological symptom assessment checklist"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed\\s+(using|with)\\s+([A-Z][a-zA-Z]+)\\s+software"
+    toolType: "computational_tool"
+    examples: ["analyzed offline using Fieldtrip software"]
+    reasoning: "Pattern to capture software tools used for data analysis"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\banti-([A-Z0-9\\.\\s]+)\\s+\\([^)]+#[A-Z0-9]+[^)]*\\)"
+    toolType: "antibody"
+    examples: ["anti-PGP 9.5 (Dako #Z5116, Glostrup, Denmark)"]
+    reasoning: "Antibodies with vendor catalog numbers should be captured"
+
+  - patternType: "term"
+    pattern: "\\b(BigDye|Cycle\\s+Sequencing)\\s+Kit\\b"
+    toolType: "genetic_reagent"
+    examples: ["BigDye Terminator Cycle Sequencing Kit"]
+    reasoning: "Commercial sequencing kits are important genetic reagents"
+
+  - patternType: "term"
+    pattern: "\\bMLPA\\s+[A-Z0-9]+\\s+[A-Z0-9]+\\s+probemix\\b"
+    toolType: "genetic_reagent"
+    examples: ["SALSA MLPA P044 NF2 probemix"]
+    reasoning: "MLPA probe sets are specialized genetic analysis reagents"
+
+observations:
+  - resourceName: "Hospital Depression and Anxiety Score (HADS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Psychological Assessment"
+    observationTypeOntologyId: ""
+    details: |
+      Schwannomatosis patients showed significantly higher vulnerability for anxiety and depression compared to controls.
+      HADS depression: t(38) = −3.063, p = 0.004
+      HADS anxiety: U = 126.5, p = 0.046
+      This indicates that depression and anxiety are over-represented in schwannomatosis patients.
+    foundIn: "results"
+    contextSnippet: "Assessment of the HADS and SCL-90-R questionnaires showed a significantly higher vulnerability for anxiety and depression in the schwannomatosis cohort compared to controls (HADS: depression t(38) = −3.063, p = 0.004, anxiety U = 126.5, p = 0.046"
+    confidence: 0.95
+    doi: "10.3390/ijms21103569"
+
+  - resourceName: "PainDETECT questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Pain Assessment"
+    observationTypeOntologyId: ""
+    details: |
+      Six of 20 patients scored in the upper range (19–38 points), indicative of neuropathic pain syndrome.
+      Seven patients had low scores (0–12 points) showing no symptoms typically associated with neuropathic pain.
+      Seven patients reached mid-range scores (13–18 points), allowing no precise classification.
+      Results indicated neuropathic features in the pain syndrome observed in schwannomatosis patients.
+    foundIn: "results"
+    contextSnippet: "In the painDETECT, six of 20 patients scored in the upper range (19–38 points), which is indicative of a neuropathic pain syndrome. Seven patients had low scores (0–12 points) and, thus, showed no symptoms typically associated with neuropathic pain."
+    confidence: 0.95
+    doi: "10.3390/ijms21103569"
+
+  - resourceName: "SF-36 health survey"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Quality of Life"
+    observationTypeOntologyId: ""
+    details: |
+      Schwannomatosis patients showed lower values in all scales of the SF-36 health survey compared to normative data and to the control group.
+      This indicates a relevant impact on quality of life, with pain reducing quality of life considerably in patients with schwannomatosis.
+    foundIn: "results"
+    contextSnippet: "Schwannomatosis patients showed lower values in all scales of the SF-36 health survey compared to normative data and to the control group indicating a relevant impact on quality of life."
+    confidence: 0.90
+    doi: "10.3390/ijms21103569"
+
+  - resourceName: "Symptom Checklist-90-R (SCL-90-R)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Psychological Assessment"
+    observationTypeOntologyId: ""
+    details: |
+      SCL-90-R showed significantly higher psychological strain in schwannomatosis patients compared to controls.
+      SCL-90-R depression: t(37) = −3.255, p = 0.002
+      SCL-90-R anxiety: t(37) = −2.297, p = 0.027
+      Results support over-representation of anxiety and depression in schwannomatosis patients.
+    foundIn: "results"
+    contextSnippet: "Assessment of the HADS and SCL-90-R questionnaires showed a significantly higher vulnerability for anxiety and depression in the schwannomatosis cohort compared to controls... SCL-90-R depression t(37) = −3.255, p = 0.002, anxiety t(37) = −2.297, p = 0.027"
+    confidence: 0.95
+    doi: "10.3390/ijms21103569"
+
+  - resourceName: "anti-PGP 9.5"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Polyclonal rabbit anti-PGP 9.5 antibody (Dako #Z5116) was used at 1:200 dilution for immunohistochemical staining of skin biopsies.
+      Incubation was performed overnight at room temperature. Antibody labelling of dermal nerve fascicles served as internal positive control.
+      Successfully used to quantify intraepidermal nerve fiber density in schwannomatosis patients.
+    foundIn: "methods"
+    contextSnippet: "The samples were then incubated with polyclonal rabbit anti-PGP 9.5 (Dako #Z5116, Glostrup, Denmark, antibody dilution 1:200) over night at room temperature. Bound antibody was visualized... Antibody labelling of dermal nerve fascicles served as internal positive control"
+    confidence: 0.90
+    doi: "10.3390/ijms21103569"
+
+  - resourceName: "anti-PGP 9.5"
+    resourceType: "Antibody"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      Anti-PGP 9.5 staining revealed significantly reduced intraepidermal nerve fiber density (IENFD) in schwannomatosis patients.
+      13 of 14 patients showed significant reduction (1.85 ± 0.92/mm) compared to age-adjusted reference values (1.7–5.7/mm).
+      Mean deviation from age-dependent reference value was 1.84 ± 1.24/mm, indicating chronic small-fiber neuropathy.
+    foundIn: "results"
+    contextSnippet: "13 of 14 patients who underwent skin biopsy exhibited a significant reduction of intraepidermal nerve fiber density (1.85 ± 0.92/mm) in comparison to age-adjusted reference-values (1.7–5.7/mm) with a mean deviation from the age-dependent reference value of 1.84 ± 1.24/mm"
+    confidence: 0.95
+    doi: "10.3390/ijms21103569"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 8
+  observationsExtracted: 6
+  observationsByType:
+    Psychological Assessment: 2
+    Pain Assessment: 1
+    Quality of Life: 1
+    Usage Instructions: 1
+    Molecular: 1
+  majorIssuesFound: |
+    - Complete failure of mining algorithm to detect any tools despite extensive tool usage
+    - Multiple validated clinical assessment tools (HADS, PainDETECT, SF-36, SCL-90-R, FPI) completely missed
+    - Computational analysis software (eQUISTA, Fieldtrip) not captured
+    - Laboratory antibody with catalog number not detected
+    - Genetic reagents (sequencing kits, MLPA probes) not identified
+    - This represents a systematic failure across multiple tool categories
+  recommendations: |
+    This publication demonstrates a critical gap in the mining algorithm's ability to detect clinical assessment tools and specialized research software.
+    All 10 potentially missed tools should be added to the database as they represent genuine research instruments used in this study.
+    The suggested patterns should be implemented to improve detection of:
+    1. Standardized clinical questionnaires and assessment scales
+    2. Specialized analysis software with institutional affiliations
+    3. Antibodies with vendor catalog information
+    4. Commercial genetic analysis kits and probe sets
+    The observations extracted show meaningful scientific findings that validate the utility of these tools in schwannomatosis research.
+    This publication highlights the need for expanded pattern coverage in clinical research tool categories.

@@ -1,0 +1,215 @@
+publicationMetadata:
+  pmid: "22384355"
+  title: "The SPRED1 Variants Repository for Legius Syndrome."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis - database development):
+    - Computational tools (software, databases, web applications, programming languages)
+    - Potentially genetic reagents (reference sequences, gene variants)
+    
+    This publication describes the development of a web-based database for SPRED1 gene variants.
+    The methods section describes various computational tools and technologies used for database
+    construction, web development, and data management. While it's not traditional lab research,
+    it involves significant computational tool usage for bioinformatics database development.
+  overallAssessment: |
+    This publication describes the development of a web-based mutation database for SPRED1 gene variants
+    in Legius syndrome. While not traditional lab research, it involves substantial computational tool
+    usage including databases (MySQL), web technologies (PHP, Apache), analysis tools (Mutalyzer),
+    and graphics software (FusionCharts). The publication should contain multiple computational tools
+    used in database development and maintenance.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MySQL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Software SQL tables (MySQL, Inc.) were organized to represent SPRED1 mutation status, associated phenotype, literature references, and any known clinical information."
+    whyMissed: "Database management system explicitly mentioned with vendor name"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PHP"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PHP coding was performed in-house for dynamic HTML display to render pages and display SQL tables."
+    whyMissed: "Programming language used for web development"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FusionCharts v3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Graphics were generated using FusionCharts v3 ( www.fusioncharts.com )."
+    whyMissed: "Specific software with version number and website"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Apache"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Web pages are hosted on a Mac OS X Apache server."
+    whyMissed: "Web server software explicitly mentioned"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "phpmyadmin"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SPRED1 mutations were added to the database and edited using phpmyadmin ( www.phpmyadmin.net )."
+    whyMissed: "Database administration tool with website reference"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Mutalyzer 2.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To comply with sequence variant nomenclature according to the guidelines of the Human Genome Variation Society, the online batch position check tool Mutalyzer 2.0 ( http://www.mutalyzer.nl/ ) was used to confirm genomic position of all SPRED1 gene variants"
+    whyMissed: "Bioinformatics tool with version number and URL for sequence validation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PubMed"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To date, 78 sequence variants have been found by searching PubMed ( et al. 2007 http://www.ncbi.nlm.nih.gov/sites/entrez )"
+    whyMissed: "Database used for literature searching with URL"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Google"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To date, 78 sequence variants have been found by searching PubMed ( et al. 2007 http://www.ncbi.nlm.nih.gov/sites/entrez ) and Google ( http://google.com/ )."
+    whyMissed: "Search engine used for literature discovery with URL"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z]+)\\s+v?\\d+(\\.\\d+)*\\s*\\(\\s*[^)]*\\.(com|net|org|edu)\\s*\\)"
+    toolType: "computational_tool"
+    examples: ["FusionCharts v3 ( www.fusioncharts.com )", "phpmyadmin ( www.phpmyadmin.net )"]
+    reasoning: "Pattern to catch software with version numbers and website URLs in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "(?:using|with|via|through|by)\\s+([A-Z][a-zA-Z0-9]+(?:\\s+\\d+(?:\\.\\d+)*)?)"
+    toolType: "computational_tool"
+    examples: ["using FusionCharts v3", "using phpmyadmin", "using Mutalyzer 2.0"]
+    reasoning: "Context phrases that indicate software usage with tool names"
+
+  - patternType: "term"
+    pattern: "\\b(MySQL|PHP|Apache|PostgreSQL|Oracle)\\b"
+    toolType: "computational_tool"
+    examples: ["MySQL", "PHP", "Apache"]
+    reasoning: "Common database and web development technologies often mentioned without explicit tool context"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[A-Z][a-z]+\\s+\\d+(\\.\\d+)+\\b"
+    toolType: "computational_tool"
+    examples: ["Mutalyzer 2.0"]
+    reasoning: "CamelCase software names with version numbers"
+
+observations:
+  - resourceName: "MySQL"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MySQL database system was used to organize SQL tables representing SPRED1 mutation status,
+      associated phenotype, literature references, and clinical information. The database serves
+      as the backend storage system for the web-based SPRED1 variants repository.
+    foundIn: "results"
+    contextSnippet: "Software SQL tables (MySQL, Inc.) were organized to represent SPRED1 mutation status, associated phenotype, literature references, and any known clinical information."
+    confidence: 0.90
+    doi: "10.1534/g3.111.000687"
+
+  - resourceName: "PHP"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PHP programming language was used for in-house coding to create dynamic HTML display
+      functionality for rendering web pages and displaying SQL tables in the SPRED1 database
+      web interface.
+    foundIn: "results"
+    contextSnippet: "PHP coding was performed in-house for dynamic HTML display to render pages and display SQL tables."
+    confidence: 0.90
+    doi: "10.1534/g3.111.000687"
+
+  - resourceName: "FusionCharts v3"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FusionCharts v3 graphics software was used to generate dynamic graphical summaries
+      of variant classification and mutation types found in the SPRED1 database, providing
+      visual representation of the database contents.
+    foundIn: "results"
+    contextSnippet: "Graphics were generated using FusionCharts v3 ( www.fusioncharts.com ). Figure 2 summarizes the content of the SPRED1 database by variant classification and mutation types."
+    confidence: 0.95
+    doi: "10.1534/g3.111.000687"
+
+  - resourceName: "Mutalyzer 2.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Mutalyzer 2.0 online batch position check tool was used to confirm genomic positions
+      of all SPRED1 gene variants to comply with Human Genome Variation Society sequence
+      variant nomenclature guidelines. This ensures accurate positioning and naming of
+      variants in the database.
+    foundIn: "results"
+    contextSnippet: "To comply with sequence variant nomenclature according to the guidelines of the Human Genome Variation Society, the online batch position check tool Mutalyzer 2.0 ( http://www.mutalyzer.nl/ ) was used to confirm genomic position of all SPRED1 gene variants"
+    confidence: 0.95
+    doi: "10.1534/g3.111.000687"
+
+  - resourceName: "phpmyadmin"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      phpmyadmin database administration tool was used for adding and editing SPRED1
+      mutations in the database, providing a web-based interface for database management
+      and curation activities.
+    foundIn: "results"
+    contextSnippet: "SPRED1 mutations were added to the database and edited using phpmyadmin ( www.phpmyadmin.net )."
+    confidence: 0.90
+    doi: "10.1534/g3.111.000687"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 4
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - Mining completely missed this publication type: database/bioinformatics tool development
+    - No computational tools were detected despite extensive use of databases, programming languages, and web technologies
+    - Publication contains detailed methods section describing multiple software tools with versions and URLs
+    - Current mining patterns appear to focus on traditional lab tools but miss bioinformatics/computational tools
+  recommendations: |
+    This publication was significantly under-mined. It contains multiple computational tools that should have been detected:
+    - MySQL (database management system)
+    - PHP (programming language for web development)  
+    - FusionCharts v3 (graphics software with version)
+    - Apache (web server)
+    - phpmyadmin (database administration tool)
+    - Mutalyzer 2.0 (bioinformatics validation tool)
+    - PubMed (literature database)
+    
+    The mining patterns need significant enhancement for bioinformatics/database development publications.
+    These tools are clearly used for research purposes (database development and maintenance) and should be captured.
+    
+    All suggested tools should be added to improve coverage of computational tool types.
+    The suggested patterns would help catch similar tools in future database/bioinformatics publications.
+    
+    Five usage instruction observations were extracted describing how each tool was implemented in the database development process.

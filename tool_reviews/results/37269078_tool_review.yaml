@@ -1,0 +1,82 @@
+publicationMetadata:
+  pmid: "37269078"
+  title: "Perspectives of adolescents with neurofibromatosis 1 and cutaneous neurofibromas: Implications for clinical trials."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is an observational survey study examining patient perspectives and experiences.
+    Expected tool types:
+    - Clinical assessment tools: Survey instruments, questionnaires, or validated scales for measuring patient-reported outcomes
+    - Computational tools: Possibly statistical software for survey data analysis (though not typically reported in detail)
+    
+    NOT expected:
+    - Lab research tools (antibodies, cell lines, animal models, genetic reagents, organoids, PDX) - this is not laboratory research
+    - Advanced cellular models or patient-derived models - no experimental work described
+    
+    Note: While this study uses a survey methodology, the survey appears to be custom-designed rather than a validated clinical assessment tool.
+  overallAssessment: |
+    This is a survey-based observational study examining adolescent and caregiver perspectives on cutaneous neurofibromas in NF1. 
+    The study methodology involves distributing an online survey through an NF registry, which is primarily a data collection approach rather than tool usage.
+    While surveys can be considered clinical assessment tools when they are validated instruments, this appears to be a custom survey designed specifically for this study rather than a standardized, validated assessment tool that would be reusable by other researchers.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "online survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "An online survey was distributed through the world's largest NF registry. Eligibility criteria included self-reported neurofibromatosis I diagnosis, adolescent child ages 12–17 years, ≥1 cutaneous neurofibroma, and ability to read English. The survey was designed to collect details about the adolescent's cutaneous neurofibromas, views on morbidity related to cutaneous neurofibromas, social and emotional impact of cutaneous neurofibromas, communication regarding cutaneous neurofibromas, and views regarding current and potential future cutaneous neurofibroma treatment."
+    whyMissed: "The survey appears to be a custom-designed instrument rather than a validated clinical assessment tool. Mining patterns may focus on established, validated instruments rather than study-specific surveys."
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "NF registry"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "An online survey was distributed through the world's largest NF registry."
+    whyMissed: "Patient registries could be considered databases/computational tools, but this appears to be used as a recruitment platform rather than an analytical tool."
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "validated (questionnaire|survey|instrument|scale|assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["No examples found in this paper - this is a suggestion for future mining"]
+    reasoning: "This pattern would help distinguish validated clinical assessment tools from custom surveys. The current study uses a custom survey, but validated instruments would be more valuable as reusable research tools."
+  - patternType: "naming_convention"
+    pattern: "(SF-36|PedsQL|PROMIS|EQ-5D|VAS|NRS|Wong-Baker|PHQ-9|GAD-7)"
+    toolType: "clinical_assessment_tool"
+    examples: ["No examples found in this paper - these are common validated instruments"]
+    reasoning: "Adding specific validated instrument names would improve detection of clinical assessment tools in patient-reported outcome studies."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is an observational survey study, not laboratory research or clinical trial
+    - No validated clinical assessment tools were used - survey appears to be custom-designed for this study
+    - No experimental methods or tool usage described in Methods section
+    - Study focuses on patient perspectives and experiences rather than tool development or validation
+    - No statistical software or analysis tools explicitly mentioned
+  recommendations: |
+    This publication correctly had no tools mined from it. The study uses a custom survey methodology to collect patient-reported data, 
+    but does not employ validated clinical assessment tools that would be reusable by other researchers. The "online survey" and "NF registry" 
+    could theoretically be considered tools, but they are study-specific implementations rather than standardized research instruments.
+    
+    For future mining improvements:
+    1. Focus clinical assessment tool patterns on validated, standardized instruments (SF-36, PROMIS, etc.)
+    2. Distinguish between custom surveys (not tools) and validated assessment instruments (tools)
+    3. Consider whether patient registries used for recruitment should be classified as computational tools
+    
+    No manual curator review is needed for this publication - the absence of mined tools is appropriate.

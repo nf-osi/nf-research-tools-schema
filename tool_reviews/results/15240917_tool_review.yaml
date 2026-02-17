@@ -1,0 +1,243 @@
+publicationMetadata:
+  pmid: "15240917"
+  title: "Survival of Human Neurofibroma in Immunodeficient Mice and Initial Results of Therapy With Pirfenidone."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a xenograft study using human neurofibroma tissue transplanted into SCID mice to test pirfenidone therapy.
+    Expected tools include:
+    - Animal models (SCID mice)
+    - Patient-derived models (human neurofibroma xenografts)
+    - Antibodies (anti-S-100, secondary antibodies)
+    - Computational tools (statistical analysis, imaging software)
+    - Clinical assessment tools (potentially for patient tumor characterization)
+  overallAssessment: |
+    This is a clear laboratory research study involving xenotransplantation of human neurofibroma tissue into 
+    immunodeficient mice to test therapeutic efficacy of pirfenidone. The study includes detailed methods for 
+    surgical procedures, histological analysis, immunohistochemistry, and statistical analysis. Multiple research 
+    tools should be present including animal models, patient-derived xenograft models, antibodies, and analysis software.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SCID mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Mice with severe combined immunodeficiency (SCID) were used as recipients of human neurofibroma xenotransplants. SCID mice have a deficiency in the DNA-dependent protein kinase (DNA-PK)"
+    whyMissed: "Clear animal model mention with genetic background description - should have been caught by animal model patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Human neurofibroma xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "Two hundred twelve human neurofibromas were transplanted into various locations in 59 experimental animals...Human neurofibromas were obtained from four patients with neurofibromatosis"
+    whyMissed: "Patient-derived xenograft model - human tumor tissue transplanted into mice, classic PDX model"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit anti-S-100 antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Human S-100 A and B protein was detected using rabbit antiserum (Dako Corp, Carpinteria, Calif) diluted with phosphate-buffered saline"
+    whyMissed: "Primary antibody with vendor information - clear antibody tool mention"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "biotinylated F(ab')2 swine anti-rabbit IgG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The rabbit anti-S-100 antibodies were detected using affinity purified biotinylated F(ab')2 swine anti-rabbit IgG (Dako)"
+    whyMissed: "Secondary antibody with vendor information - should be caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "horseradish peroxidase-conjugated streptavidin"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "followed by horseradish peroxidase-conjugated streptavidin (Dako), both diluted in 5% PBS/BSA"
+    whyMissed: "Detection reagent with vendor - part of immunohistochemistry workflow"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Fluorescein-conjugated IB4"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Fluorescein-conjugated IB4 (Vector Laboratories, Burlingame, Calif) diluted in PBS, pH = 7.2, containing 5% BSA"
+    whyMissed: "Lectin-based detection reagent with vendor information - used for vascular staining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SPOT II software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "digital photomicrographs were obtained utilizing a high-resolution CCD digital camera (SPOT II, Diagnostic Instruments, Sterling Heights, Mich) mounted to the microscope...and SPOT II software"
+    whyMissed: "Image acquisition software with vendor - computational tool for microscopy"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Chi-square test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The frequency of surviving tumors was tabulated and compared using the Chi-square test"
+    whyMissed: "Statistical analysis method - computational tool for data analysis"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SCID mice|severe combined immunodeficiency.*mice"
+    toolType: "animal_model"
+    examples: ["SCID mice", "Mice with severe combined immunodeficiency (SCID)"]
+    reasoning: "SCID mice are a common immunodeficient mouse strain used for xenograft studies - should be recognized as animal model"
+
+  - patternType: "context_phrase"
+    pattern: "human.*xenograft|xenotransplant|patient.*transplant.*mice"
+    toolType: "patient_derived_model"
+    examples: ["human neurofibroma xenografts", "human neurofibroma xenotransplants"]
+    reasoning: "Patient-derived xenograft models are created by transplanting human tissue into mice - key PDX terminology"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(Dako.*\\)|\\(Vector Laboratories.*\\)|\\(Diagnostic Instruments.*\\)"
+    toolType: "antibody"
+    examples: ["(Dako Corp, Carpinteria, Calif)", "(Vector Laboratories, Burlingame, Calif)"]
+    reasoning: "Vendor information in parentheses often indicates research reagents, especially antibodies and detection reagents"
+
+  - patternType: "naming_convention"
+    pattern: "anti-[A-Z0-9-]+.*antibod|rabbit.*antiserum|[Ff]luorescein-conjugated"
+    toolType: "antibody"
+    examples: ["rabbit anti-S-100 antibodies", "Fluorescein-conjugated IB4"]
+    reasoning: "Standard antibody nomenclature patterns that indicate immunological reagents"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed.*using|compared.*using|software|statistical.*test"
+    toolType: "computational_tool"
+    examples: ["compared using the Chi-square test", "SPOT II software"]
+    reasoning: "Analysis and software usage phrases that indicate computational tools"
+
+observations:
+  - resourceName: "SCID mice"
+    resourceType: "Animal Model"
+    observationType: "Disease Susceptibility"
+    observationTypeOntologyId: "MP:0002020"
+    details: |
+      SCID mice showed successful engraftment of human neurofibroma xenografts with high survival rates:
+      - Overall survival rate of 84.9% (90/106) across all implantation sites
+      - Sciatic nerve implants: 86.7% survival (13/15)
+      - Subcutaneous implants: 84.6% survival (77/91)
+      - Neck implants: 89.2% survival (41/46)
+      - Back implants: 80.1% survival (33/41)
+      - Ear implants: 100% survival (4/4) maintained for 12 months
+      No immune rejection observed, confirming immunodeficient phenotype suitable for xenograft studies.
+    foundIn: "results"
+    contextSnippet: "The survival of the neurofibroma xenografts in the various locations ranged from 84.6% to 100% (Table 1). Implants which did not survive could not be found or could not be identified as neurofibromas by inspection."
+    confidence: 1.0
+    doi: "10.1155/S1110724304308107"
+
+  - resourceName: "Human neurofibroma xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Human neurofibroma xenografts showed stable growth characteristics:
+      - Maintained consistent size over 6 weeks of follow-up without aggressive growth
+      - No tissue invasion observed
+      - Ear implants remained stable in appearance and size for 12 months (P = 0.41)
+      - Tumors retained original histologic characteristics including collagen content and S-100 positivity
+      - Vascularization established within 7 days with host-derived blood vessels
+    foundIn: "results"
+    contextSnippet: "Implanted tumors showed no aggressive properties or tissue invasion and maintained the same size over the six weeks of the followup, as documented by measurement of tumor mass and volume. Neurofibroma xenotransplants in the ear were stable in appearance and size for twelve months postimplantation"
+    confidence: 1.0
+    doi: "10.1155/S1110724304308107"
+
+  - resourceName: "Human neurofibroma xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Other"
+    observationTypeOntologyId: ""
+    details: |
+      Pirfenidone treatment significantly reduced xenograft survival compared to controls:
+      - Treated group: 71.7% survival (76/106) vs Control group: 84.3% survival (86/102)
+      - Statistical significance: P = 0.0215
+      - No histologic differences observed between treated and control surviving tumors
+      - No drug toxicity observed in treated animals
+      - Effect was consistent across different implantation sites
+    foundIn: "results"
+    contextSnippet: "Survival of neurofibromas in animals treated with pirfenidone was lower than in control animals, irrespective of the location of implanted tumor (Table 2). No increased mortality or signs of drug toxicity was observed in animals treated with pirfenidone."
+    confidence: 1.0
+    doi: "10.1155/S1110724304308107"
+
+  - resourceName: "rabbit anti-S-100 antibodies"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Anti-S-100 antibody successfully detected Schwann cells in both original tumors and xenografts:
+      - Strong immunohistochemical reaction maintained in 6-week-old implants
+      - Confirmed persistence of Schwann cells in transplanted tumors
+      - Staining intensity not affected by pirfenidone treatment
+      - Antibody from Dako Corp worked reliably for human tissue detection in mouse xenografts
+    foundIn: "results"
+    contextSnippet: "The immunohistochemical reaction with anti-S-100 remained as strong as in the original tumor (Figure 3). The presence of S-100 in the xenografts confirms persistence of Schwann cells in implanted tumors. Positivity for S-100 was not changed by treatment with pirfenidone for 6 weeks."
+    confidence: 1.0
+    doi: "10.1155/S1110724304308107"
+
+  - resourceName: "Fluorescein-conjugated IB4"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      GS IB4 lectin successfully distinguished host vs. human blood vessels:
+      - Original human tumors showed no fluorescence (human vessels lack Gal α1-3Gal)
+      - Xenografts showed positive fluorescence, confirming host-derived vascularization
+      - Staining pattern unchanged by pirfenidone treatment
+      - Reliable method for determining vessel origin in xenograft studies
+      - Required microwave-assisted carbohydrate revealing (MCR) pretreatment for optimal results
+    foundIn: "results"
+    contextSnippet: "The blood vessels were of host origin since they bound GS IB4, a lectin recognizing Gal α 1-3Gal on cells of nonprimates (Figure 4). Original human tumor (a) does not show fluorescence. Human neurofibroma xenotransplant from nontreated animal (b) and human neurofibroma xenotransplant from animal treated with pirfenidone for 6 weeks (c) show fluorescence"
+    confidence: 1.0
+    doi: "10.1155/S1110724304308107"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Disease Susceptibility: 1
+    Tumor Growth: 1
+    Usage Instructions: 2
+    Other: 1
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a clear laboratory research study
+    - Multiple obvious research tools were completely missed including:
+      * SCID mice (animal model with detailed genetic background)
+      * Human neurofibroma xenografts (patient-derived model)
+      * Multiple antibodies with vendor information (anti-S-100, secondary antibodies, IB4 lectin)
+      * Computational tools (SPOT II software, Chi-square test)
+    - This represents a major failure of the mining system for laboratory research publications
+    - The publication has extensive Methods section with detailed protocols indicating active tool usage
+  recommendations: |
+    URGENT: This publication demonstrates critical gaps in the mining system for laboratory research tools.
+    
+    Immediate actions needed:
+    1. Add all 8 identified tools to the database - these are clear, validated research tools
+    2. Implement the 5 suggested patterns to catch similar tools in future mining
+    3. Review mining patterns for animal models - SCID mice should be automatically detected
+    4. Improve PDX model detection - human tissue xenografts are common and important
+    5. Enhance antibody detection for vendor-specified reagents
+    6. Add computational tool patterns for statistical methods and imaging software
+    
+    This publication yielded 5 high-quality scientific observations about tool performance and characteristics.
+    The xenograft model showed excellent engraftment rates and the antibodies performed reliably for 
+    cross-species detection. These observations provide valuable metadata for future researchers.
+    
+    The mining system needs significant improvement for laboratory research publications - this should
+    have been a high-yield publication for tool discovery.

@@ -1,0 +1,151 @@
+publicationMetadata:
+  pmid: "20858602"
+  title: "Oligodendrocyte progenitor cell numbers and migration are regulated by the zebrafish orthologs of the NF1 tumor suppressor gene."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This zebrafish developmental biology study clearly uses multiple research tools:
+    - Animal models (zebrafish strains, transgenic lines)
+    - Genetic reagents (morpholinos, expression constructs)
+    - Antibodies (for BrdU detection, ERK signaling analysis)
+    - Computational tools (time-lapse microscopy analysis, image quantification)
+    
+    The publication describes experimental procedures that require specific research tools,
+    even though detailed Methods are not available in this abstract-only version.
+  overallAssessment: |
+    This is a clear laboratory research study using zebrafish to investigate NF1 function in
+    oligodendrocyte development. The experimental approaches described (morpholino knockdowns,
+    BrdU labeling, TUNEL staining, time-lapse microscopy, transgenic reporter analysis) all
+    require specific research tools that should have been detected by mining algorithms.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "morpholinos"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we used morpholinos to knockdown the two nf1 orthologs in zebrafish and show that oligodendrocyte progenitor cell..."
+    whyMissed: "Generic term 'morpholinos' not caught - may need pattern for antisense oligonucleotides"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "zebrafish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we used morpholinos to knockdown the two nf1 orthologs in zebrafish and show that oligodendrocyte..."
+    whyMissed: "Common model organism name not detected - needs organism-specific patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "BrdU"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...increased proliferation, as detected by increased BrdU labeling, whereas TUNEL staining for apoptotic..."
+    whyMissed: "Abbreviation for bromodeoxyuridine not caught - needs nucleotide analog patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TUNEL"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...increased BrdU labeling, whereas TUNEL staining for apoptotic cells was unaffected..."
+    whyMissed: "TUNEL assay reagent/kit not detected - needs apoptosis assay patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "olig2-EGFP"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...demonstrated that olig2-EGFP(+) OPCs exhibit enhanced cell migration within the developing spinal cord..."
+    whyMissed: "Transgenic reporter line not caught - needs fluorescent reporter patterns"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "time-lapse microscopy"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...the in vivo analysis of OPC migration following nf1 loss using time-lapse microscopy demonstrated..."
+    whyMissed: "Imaging technique not detected - needs microscopy method patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "morpholino[s]?"
+    toolType: "genetic_reagent"
+    examples: ["morpholinos to knockdown"]
+    reasoning: "Morpholinos are commonly used antisense oligonucleotides for gene knockdown in zebrafish and other model organisms"
+
+  - patternType: "term"
+    pattern: "zebrafish|Danio rerio"
+    toolType: "animal_model"
+    examples: ["zebrafish and show", "Danio rerio"]
+    reasoning: "Zebrafish is a major model organism that should be consistently detected"
+
+  - patternType: "term"
+    pattern: "BrdU|bromodeoxyuridine"
+    toolType: "genetic_reagent"
+    examples: ["BrdU labeling", "bromodeoxyuridine incorporation"]
+    reasoning: "BrdU is a standard reagent for proliferation assays and should be detected"
+
+  - patternType: "term"
+    pattern: "TUNEL|terminal deoxynucleotidyl transferase"
+    toolType: "genetic_reagent"
+    examples: ["TUNEL staining", "TUNEL assay"]
+    reasoning: "TUNEL is a standard apoptosis detection method requiring specific reagents/kits"
+
+  - patternType: "naming_convention"
+    pattern: "[a-zA-Z0-9]+-[A-Z]{3,4}\\+?"
+    toolType: "animal_model"
+    examples: ["olig2-EGFP(+)", "sox10-GFP"]
+    reasoning: "Transgenic reporter lines follow gene-fluorophore naming convention"
+
+  - patternType: "context_phrase"
+    pattern: "time-lapse microscopy|live imaging|real-time imaging"
+    toolType: "computational_tool"
+    examples: ["using time-lapse microscopy", "live imaging analysis"]
+    reasoning: "Imaging techniques often require computational analysis tools for data processing"
+
+  - patternType: "context_phrase"
+    pattern: "(used|using|with|by)\\s+(morpholino[s]?|antisense oligonucleotide[s]?)"
+    toolType: "genetic_reagent"
+    examples: ["used morpholinos to knockdown", "using antisense oligonucleotides"]
+    reasoning: "Context phrases indicating active use of genetic reagents for knockdown experiments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Abstract-only access limits detailed tool extraction, but key tools are mentioned
+    - Mining patterns appear to miss common model organism names and standard reagents
+    - Genetic reagent patterns need improvement for morpholinos, BrdU, and TUNEL
+    - Animal model patterns miss transgenic reporter lines and species names
+    - Computational tool patterns miss imaging and analysis methods
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the mining process.
+    The tools identified (morpholinos, zebrafish, BrdU, TUNEL, olig2-EGFP transgenic line, time-lapse microscopy)
+    are standard research tools that should be consistently detected. The mining patterns need significant
+    improvement to catch:
+    1. Model organism names (zebrafish, Danio rerio)
+    2. Standard genetic reagents (morpholinos, BrdU, TUNEL)
+    3. Transgenic reporter lines (gene-fluorophore combinations)
+    4. Imaging techniques and computational methods
+    
+    All 6 potentially missed tools should be added to the database. The suggested patterns would significantly
+    improve mining accuracy for similar publications. No observations could be extracted due to lack of
+    Results/Discussion sections, but the abstract indicates this study would contain valuable phenotypic
+    observations about oligodendrocyte development and migration.

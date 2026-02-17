@@ -1,0 +1,219 @@
+publicationMetadata:
+  pmid: "36445254"
+  title: "LZTR1 Mutation Mediates Oncogenesis through Stabilization of EGFR and AXL"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Bioinformatics Analysis/Genomic Sequencing Study):
+    - Computational tools (software, pipelines, databases) - HIGHLY EXPECTED
+    - Genetic reagents (DNA samples, sequencing kits) - EXPECTED
+    - Clinical assessment tools (questionnaires for phenotype data) - POSSIBLE
+    
+    This is a genome sequencing study of 47 participants with congenital anomalies and pediatric cancer.
+    The Methods section describes extensive bioinformatics pipelines, software tools, databases, and
+    analysis approaches. Multiple computational tools should be present for sequencing analysis,
+    variant calling, annotation, and statistical analysis.
+  overallAssessment: |
+    This genomic sequencing study should contain numerous computational tools for bioinformatics analysis.
+    The extensive Methods section describes sequencing pipelines, variant calling software, annotation tools,
+    and statistical analysis packages. The complete absence of mined tools (0 tools found) suggests
+    significant under-mining of computational tools that are clearly described in the methodology.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Mercury (HgV) analysis pipeline"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...the post-sequencing analysis utilized the Mercury (HgV) analysis pipeline for a range of tasks, including base calling, mapping using Burrows-Wheeler Aligner-Maximal Exact Matches algorithm..."
+    whyMissed: "Pipeline name with specific abbreviation (HgV) not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Burrows-Wheeler Aligner-Maximal Exact Matches"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...mapping using Burrows-Wheeler Aligner-Maximal Exact Matches algorithm to the human genome reference sequence (hg38)..."
+    whyMissed: "Full algorithm name not recognized, commonly abbreviated as BWA-MEM"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Platypus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The single-nucleotide and small indel variant calling were performed using Platypus, and the results were annotated using ANNOVAR software..."
+    whyMissed: "Variant calling software name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ANNOVAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The single-nucleotide and small indel variant calling were performed using Platypus, and the results were annotated using ANNOVAR software..."
+    whyMissed: "Well-known annotation software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ClassifyCNV"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The results obtained were annotated using ClassifyCNV..."
+    whyMissed: "CNV annotation tool not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "dbscSNV"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...classified as intergenic, intronic, or synonymous without dbscSNV (Ada, RF) or spliceAI scores..."
+    whyMissed: "Splice site prediction tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "spliceAI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...without dbscSNV (Ada, RF) or spliceAI scores or any reports in clinical variant databases..."
+    whyMissed: "AI-based splice prediction tool not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "REVEL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Rare Exome Variant Ensemble Learner (REVEL) score > 0.5, Combined Annotation-Dependent Depletion (CADD) score > 25..."
+    whyMissed: "Variant pathogenicity prediction tool with full name provided"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CADD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Combined Annotation-Dependent Depletion (CADD) score > 25, dbscSNV Ada, RF scores..."
+    whyMissed: "Variant pathogenicity scoring tool with full name provided"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "integrative genomics viewer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...All identified variants were visually verified using integrative genomics viewer..."
+    whyMissed: "Genome visualization software (IGV) not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "BamTools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...De novo deletions and duplications were identified using BamTools..."
+    whyMissed: "BAM file manipulation toolkit not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Samplot"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...visually evaluated using integrative genomics viewer and/or Samplot..."
+    whyMissed: "Structural variant visualization tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "GLnexus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...we conducted joint-genotype calling for all samples using GLnexus (version 1.1.3)..."
+    whyMissed: "Joint genotyping software with version number not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cross-Platform Association Toolkit (XPAT)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...extensive data harmonization and quality control procedure using Cross-Platform Association Toolkit (XPAT)..."
+    whyMissed: "Data harmonization toolkit with full name and abbreviation not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "VAAST 2.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...we used Variant Annotation, Analysis, and Search Tool (VAAST) 2.1 to conduct gene-based association tests..."
+    whyMissed: "Gene-based association analysis tool with version and full name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Oragene DNA saliva kits"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Saliva samples were collected using Oragene DNA saliva kits following manufacturer guidelines..."
+    whyMissed: "DNA collection kit not captured as genetic reagent"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "HotStarTaqDNA polymerase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Targeted amplicons were amplified from genomic DNA using conventional polymerase chain reaction (HotStarTaqDNA polymerase, QIAGEN)..."
+    whyMissed: "PCR enzyme reagent with vendor information not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "analysis pipeline|analysis utilized|performed using|annotated using|conducted using|analyzed using"
+    toolType: "computational_tool"
+    examples: ["analysis utilized the Mercury (HgV) analysis pipeline", "performed using Platypus", "annotated using ANNOVAR software"]
+    reasoning: "These context phrases reliably indicate computational tool usage in bioinformatics studies"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[A-Z][a-z]*\\b|\\b[A-Z]{2,}\\b(?:\\s+\\d+\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["ANNOVAR", "ClassifyCNV", "VAAST 2.1", "GLnexus"]
+    reasoning: "Bioinformatics tools often use CamelCase or ALL CAPS naming with optional version numbers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z]+\\)|, [A-Z][a-zA-Z]+\\)|kits?\\b|reagent"
+    toolType: "genetic_reagent"
+    examples: ["(QIAGEN)", "Oragene DNA saliva kits"]
+    reasoning: "Vendor names in parentheses and kit/reagent terminology indicate genetic reagents"
+
+  - patternType: "term"
+    pattern: "polymerase|ligase|enzyme|buffer|primer|probe|antibody"
+    toolType: "genetic_reagent"
+    examples: ["HotStarTaqDNA polymerase"]
+    reasoning: "Molecular biology reagent terminology that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "version \\d+\\.\\d+|v\\d+\\.\\d+|\\(version [^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["GLnexus (version 1.1.3)", "VAAST 2.1"]
+    reasoning: "Version numbers strongly indicate software tools rather than general terms"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 17
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Complete failure to mine computational tools from a bioinformatics study
+    - 17+ computational tools and genetic reagents clearly described in Methods section were missed
+    - Tools include major bioinformatics software (ANNOVAR, Platypus, VAAST, GLnexus) with version numbers
+    - Genetic reagents (DNA kits, PCR enzymes) with vendor information were missed
+    - This represents a systematic failure of the mining pipeline for this publication type
+  recommendations: |
+    - ALL 17 identified tools should be added to the database
+    - Implement suggested patterns to capture bioinformatics tools and genetic reagents
+    - Review mining patterns for computational tools - current patterns are clearly inadequate
+    - This publication demonstrates the need for better coverage of genomics/bioinformatics terminology
+    - Consider separate mining strategies for different publication types (lab research vs bioinformatics)
+    - The extensive Methods section contains clear tool usage context that should be easily captured
+    - No observations could be extracted since no tools were validated (all were missed during mining)

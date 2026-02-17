@@ -1,0 +1,221 @@
+publicationMetadata:
+  pmid: "25246427"
+  title: "The impact of coexisting genetic mutations on murine optic glioma biology."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, computational tools
+    
+    This publication describes experimental work using genetically engineered mouse strains
+    to study optic glioma biology. Multiple mouse strains with specific genetic modifications
+    are described, which are classic research tools in cancer biology and neuroscience research.
+    The study involves crossing different mouse strains and analyzing tumor phenotypes.
+  overallAssessment: |
+    This is a laboratory research study that extensively uses genetically engineered mouse models
+    as research tools. The publication describes multiple mouse strains with specific genetic
+    modifications (Nf1+/-, Nf1(flox/flox), GFAP-Cre, KIAA1549:BRAF knock-in, Pten(flox/wt))
+    that are fundamental research tools for studying neurofibromatosis and brain tumor biology.
+    These mouse models should have been detected as animal model tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1+/- mice were intercrossed with Nf1(flox/flox) mice, which were then crossed with Nf1(flox/flox); GFAP-Cre mice"
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(flox/flox) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1+/- mice were intercrossed with Nf1(flox/flox) mice, which were then crossed with Nf1(flox/flox); GFAP-Cre mice"
+    whyMissed: "Floxed allele nomenclature not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GFAP-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "crossed with Nf1(flox/flox); GFAP-Cre mice, to generate Nf1(flox/mut); GFAP-Cre (FMC) mice"
+    whyMissed: "Cre recombinase driver line nomenclature not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "KIAA1549:BRAF knock-in mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "additionally mated with conditional KIAA1549:BRAF knock-in or Pten(flox/wt) mice"
+    whyMissed: "Fusion gene knock-in nomenclature not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pten(flox/wt) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "mated with conditional KIAA1549:BRAF knock-in or Pten(flox/wt) mice to generate"
+    whyMissed: "Heterozygous floxed allele nomenclature not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(flox/mut); GFAP-Cre (FMC) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "to generate Nf1(flox/mut); GFAP-Cre (FMC) mice. These mice were additionally mated"
+    whyMissed: "Complex genotype nomenclature with abbreviation not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(flox/mut); f-BRAF; GFAP-Cre (FMBC) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "to generate Nf1(flox/mut); f-BRAF; GFAP-Cre (FMBC) mice or Nf1(flox/mut); Pten(flox/wt)"
+    whyMissed: "Triple transgenic nomenclature with abbreviation not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(flox/mut); Pten(flox/wt); GFAP-Cre (FMPC) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "or Nf1(flox/mut); Pten(flox/wt); GFAP-Cre (FMPC) mice, respectively"
+    whyMissed: "Triple transgenic nomenclature with abbreviation not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\([^)]*\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(flox/flox) mice", "Pten(flox/wt) mice", "Nf1(flox/mut); GFAP-Cre (FMC) mice"]
+    reasoning: "Standard mouse strain nomenclature with genotype in parentheses followed by 'mice'"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[+/-]+\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice"]
+    reasoning: "Heterozygous knockout mouse nomenclature with +/- notation"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][A-Z0-9]+-Cre\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["GFAP-Cre mice"]
+    reasoning: "Cre recombinase driver line nomenclature"
+
+  - patternType: "term"
+    pattern: "knock-in mice"
+    toolType: "animal_model"
+    examples: ["KIAA1549:BRAF knock-in mice"]
+    reasoning: "Knock-in mouse models are common research tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\([A-Z]+\\)\\s+mice"
+    toolType: "animal_model"
+    examples: ["(FMC) mice", "(FMBC) mice", "(FMPC) mice"]
+    reasoning: "Mouse strain abbreviations in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "genetically engineered mouse strains"
+    toolType: "animal_model"
+    examples: ["leverage Nf1 genetically engineered mouse strains"]
+    reasoning: "General phrase indicating use of engineered mouse models as research tools"
+
+observations:
+  - resourceName: "Nf1(flox/mut); Pten(flox/wt); GFAP-Cre (FMPC) mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      FMPC mice had larger optic gliomas compared to other strains. This demonstrates
+      that Pten heterozygosity cooperates with Nf1 loss to enhance tumor growth in
+      the optic pathway. The increased tumor size was accompanied by greater
+      proliferative indices and microglial infiltration.
+    foundIn: "results"
+    contextSnippet: "FMPC mice had larger optic gliomas with greater proliferative indices and microglial infiltration"
+    confidence: 1.0
+    doi: "10.1093/neuonc/nou287"
+
+  - resourceName: "Nf1(flox/mut); f-BRAF; GFAP-Cre (FMBC) mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      KIAA1549:BRAF conferred no additional biological properties on Nf1 optic glioma.
+      FMBC mice showed similar tumor characteristics to FMC mice, indicating that
+      the BRAF fusion does not significantly alter optic glioma biology in this model.
+    foundIn: "results"
+    contextSnippet: "While KIAA1549:BRAF conferred no additional biological properties on Nf1 optic glioma"
+    confidence: 1.0
+    doi: "10.1093/neuonc/nou287"
+
+  - resourceName: "Nf1(flox/mut); GFAP-Cre (FMC) mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      All 3 Nf1 murine optic glioma strains (including FMC mice) exhibited reduced
+      retinal ganglion cell survival and numbers. This demonstrates that Nf1 loss
+      alone is sufficient to cause retinal ganglion cell dysfunction and death.
+    foundIn: "results"
+    contextSnippet: "all 3 Nf1 murine optic glioma strains exhibited reduced retinal ganglion cell survival and numbers"
+    confidence: 1.0
+    doi: "10.1093/neuonc/nou287"
+
+  - resourceName: "Nf1(flox/mut); Pten(flox/wt); GFAP-Cre (FMPC) mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003633"
+    details: |
+      FMPC mice had greater retinal nerve fiber layer thinning near the optic head
+      relative to FMC and FMBC mice. This indicates that Pten heterozygosity
+      exacerbates the retinal pathology associated with Nf1 loss.
+    foundIn: "results"
+    contextSnippet: "FMPC mice had greater retinal nerve fiber layer thinning near the optic head relative to FMC and FMBC mice"
+    confidence: 1.0
+    doi: "10.1093/neuonc/nou287"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Nf1+/- mice serve as the foundational breeding stock for generating more complex
+      genetically engineered mouse models. They are intercrossed with other strains
+      to create compound mutant mice for studying genetic cooperativity in optic
+      glioma development.
+    foundIn: "both"
+    contextSnippet: "Nf1+/- mice were intercrossed with Nf1(flox/flox) mice"
+    confidence: 1.0
+    doi: "10.1093/neuonc/nou287"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Cellular: 1
+    Nervous System: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Complete failure to detect any animal model tools despite this being a mouse genetics study
+    - Multiple genetically engineered mouse strains described in Methods section were not captured
+    - Standard mouse nomenclature patterns (flox, +/-, Cre lines) not recognized by mining system
+    - Complex genotype nomenclature with abbreviations (FMC, FMBC, FMPC) not detected
+    - Fusion gene knock-in models (KIAA1549:BRAF) not captured
+  recommendations: |
+    This publication should have 8 animal model tools added to the database. All missed tools
+    are legitimate genetically engineered mouse strains used as research tools in this study.
+    The mining system needs significant improvement in recognizing standard mouse nomenclature
+    including floxed alleles, heterozygous knockouts, Cre driver lines, and complex genotypes.
+    The suggested patterns should be implemented to capture similar tools in future mining.
+    All 5 extracted observations provide valuable phenotypic data about these mouse models
+    and should be included in the database to enhance the utility of these research tools.

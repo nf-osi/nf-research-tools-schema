@@ -1,0 +1,171 @@
+publicationMetadata:
+  pmid: "41591566"
+  title: "FAP expression as a marker of malignant transformation enabling in vivo characterization in peripheral nerve sheath tumors: a multimodal and translational study."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a multimodal translational study combining:
+    - Lab Research → antibodies, computational tools, genetic reagents (RNA profiling panels)
+    - Clinical Research → clinical imaging tracers/techniques
+    - Bioinformatics Analysis → computational tools (R packages, analysis pipelines)
+    
+    The study integrates immunohistochemistry, transcriptomics analysis, and clinical PET/CT imaging,
+    so it should contain antibodies, computational tools, and potentially clinical assessment tools.
+    The comprehensive methods section indicates extensive use of research tools across multiple categories.
+  overallAssessment: |
+    This publication is a comprehensive translational research study that clearly uses multiple research tools.
+    The detailed methods section describes immunohistochemistry protocols, computational analysis pipelines,
+    and clinical imaging techniques. Tools are expected across antibodies, computational tools, and clinical
+    imaging reagents. The fact that no tools were initially mined suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "anti-FAP antibody (clone ab207178)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "A recombinant anti-FAP antibody (clone ab207178, Abcam, Cambridge, UK) was applied at a dilution of 1:250."
+    whyMissed: "Specific antibody with clone number and vendor information not detected by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We processed the data using Seurat [36, 37] (Version: 5.3.0, https://satijalab.org/seurat/) in R (Version: 4.4.0)."
+    whyMissed: "Popular bioinformatics R package with version number not caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GEOquery"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Expression matrices and corresponding phenotype metadata were processed using the GEOquery and Biobase R packages."
+    whyMissed: "R package for accessing GEO datasets not detected by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Biobase"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Expression matrices and corresponding phenotype metadata were processed using the GEOquery and Biobase R packages."
+    whyMissed: "Bioconductor R package not detected by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Slingshot"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To explore differentiation trajectories among tumor clusters, we applied Slingshot [39] (Version: 2.12.0)"
+    whyMissed: "Specialized trajectory inference R package with version number not caught"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "TruSight RNA Pan-Cancer Panel"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RNA fusion profiling was performed using the TruSight RNA Pan-Cancer Panel (Illumina, San Diego, CA, US)"
+    whyMissed: "Commercial RNA profiling panel with vendor information not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina EPIC DNA methylation"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Furthermore, Illumina EPIC DNA methylation profiling was performed with application of the Heidelberg sarcoma classifier"
+    whyMissed: "DNA methylation profiling platform not caught by genetic reagent patterns"
+    confidence: 0.93
+    shouldBeAdded: Yes
+
+  - toolName: "[68Ga]Ga-LNTH-1363S"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "After administration of 179 MBq [68Ga]Ga-LNTH-1363S, (FAP-directed radiotracer; mass dose, 90 ug)"
+    whyMissed: "FAP-directed PET radiotracer not detected by clinical tool patterns"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "10x Genomics Visium"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We analyzed spatial transcriptomics data from eight peripheral nerve lesions profiled by the 10×Genomics Visium platform"
+    whyMissed: "Spatial transcriptomics platform not caught by genetic reagent patterns"
+    confidence: 0.94
+    shouldBeAdded: Yes
+
+  - toolName: "Read10X"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw UMI count matrices were loaded via Read10X, filtered to remove cells"
+    whyMissed: "R function for reading 10X Genomics data not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "anti-[A-Z0-9]+ antibody \\(clone [a-zA-Z0-9]+\\)"
+    toolType: "antibody"
+    examples: ["anti-FAP antibody (clone ab207178)"]
+    reasoning: "Pattern to catch antibodies with clone information in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "processed using .+ R packages?"
+    toolType: "computational_tool"
+    examples: ["processed using the GEOquery and Biobase R packages"]
+    reasoning: "Context phrase indicating R package usage in data processing"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+, [A-Za-z ]+, [A-Z]{2,3}, US\\)"
+    toolType: "general"
+    examples: ["(Illumina, San Diego, CA, US)", "(Abcam, Cambridge, UK)"]
+    reasoning: "Vendor location pattern indicating commercial research tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\[[0-9]+[A-Za-z]+\\]Ga-[A-Z0-9-]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["[68Ga]Ga-LNTH-1363S"]
+    reasoning: "Radiopharmaceutical naming convention for PET tracers"
+
+  - patternType: "term"
+    pattern: "[0-9]+[×x]\\s*Genomics\\s+[A-Za-z]+"
+    toolType: "genetic_reagent"
+    examples: ["10×Genomics Visium"]
+    reasoning: "10X Genomics platform naming pattern"
+
+  - patternType: "context_phrase"
+    pattern: "profiling was performed using"
+    toolType: "genetic_reagent"
+    examples: ["RNA fusion profiling was performed using the TruSight RNA Pan-Cancer Panel"]
+    reasoning: "Context indicating use of molecular profiling platforms"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were initially mined despite this being a comprehensive lab research study
+    - Mining patterns failed to detect multiple clear research tools including:
+      * Specific antibody with clone number and vendor (anti-FAP ab207178)
+      * Multiple R/Bioconductor packages (Seurat, GEOquery, Biobase, Slingshot)
+      * Commercial molecular profiling platforms (TruSight RNA Panel, Illumina EPIC)
+      * Spatial transcriptomics platform (10X Genomics Visium)
+      * Clinical PET radiotracer ([68Ga]Ga-LNTH-1363S)
+    - Patterns are missing for vendor information, R package detection, and clinical imaging reagents
+  recommendations: |
+    - ALL 10 identified tools should be added to the database - they represent genuine research tools with clear experimental usage
+    - Implement the 6 suggested patterns to improve detection of similar tools in future mining
+    - Review mining patterns for R/Bioconductor packages - many bioinformatics tools are being missed
+    - Add patterns for commercial molecular profiling platforms and spatial transcriptomics
+    - Include patterns for PET/SPECT radiotracers in clinical assessment tools
+    - Consider adding vendor location patterns as strong indicators of research tools
+    - No observations extracted as no tools were initially validated, but the Results/Discussion sections likely contain relevant findings about FAP expression patterns

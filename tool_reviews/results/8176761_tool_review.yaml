@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "8176761"
+  title: "Modulation of neurofibromatosis type 1 gene expression during in vitro myoblast differentiation."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study examining gene expression during muscle cell differentiation.
+    Expected tools include cell lines (C2C12 myoblasts), genetic reagents (radioactive tracers),
+    and potentially antibodies for protein detection. The study uses established cell culture
+    and molecular biology techniques typical of 1990s research.
+  overallAssessment: |
+    This is a laboratory research publication that clearly uses experimental tools and techniques.
+    The study examines NF1 gene expression during C2C12 myoblast differentiation using molecular
+    biology methods including mRNA analysis and radioactive labeling. Despite lacking a Methods
+    section, the abstract describes experimental procedures that would require research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "C2C12"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Previous work demonstrated that C2C12 murine myoblast cell differentiation could be blocked by the introduction of an activated p21-ras protein. Using this model system, we demonstrate that differentiating C2C12 cells upregulate the expression of NF1 mRNA"
+    whyMissed: "C2C12 is a well-established murine myoblast cell line commonly used in muscle differentiation studies. The mining patterns may not have recognized this specific cell line nomenclature."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "32P-orthophosphate"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The increase in neurofibromin levels paralleled a decrease in the levels of activated p21-ras as assayed by in vivo 32P-orthophosphate incorporation into p21-ras."
+    whyMissed: "32P-orthophosphate is a radioactive reagent used for metabolic labeling and protein phosphorylation studies. The mining patterns may not recognize radioactive isotope nomenclature."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "C2C12|C2C-12"
+    toolType: "cell_line"
+    examples: ["C2C12 murine myoblast cell differentiation", "differentiating C2C12 cells"]
+    reasoning: "C2C12 is a standard cell line name that follows the pattern of alphanumeric cell line nomenclature. Adding this specific pattern would catch this important muscle cell line."
+
+  - patternType: "term"
+    pattern: "32P-orthophosphate|32P orthophosphate|\\[32P\\]orthophosphate"
+    toolType: "genetic_reagent"
+    examples: ["32P-orthophosphate incorporation into p21-ras"]
+    reasoning: "Radioactive phosphate isotopes are commonly used reagents in molecular biology for labeling and tracking phosphorylation. This pattern would catch radioactive orthophosphate in various formats."
+
+  - patternType: "context_phrase"
+    pattern: "murine myoblast cell|myoblast cell line|muscle cell line"
+    toolType: "cell_line"
+    examples: ["C2C12 murine myoblast cell differentiation"]
+    reasoning: "Context phrases indicating muscle/myoblast cell lines would help identify cell lines used in muscle biology research, which are common in NF1 studies."
+
+  - patternType: "context_phrase"
+    pattern: "in vivo.*incorporation|radioactive.*incorporation|isotope.*labeling"
+    toolType: "genetic_reagent"
+    examples: ["in vivo 32P-orthophosphate incorporation"]
+    reasoning: "Context phrases around radioactive incorporation and labeling would help identify radioactive reagents used in molecular biology experiments."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - C2C12 cell line, a standard muscle cell line, was not detected
+    - 32P-orthophosphate radioactive reagent was not detected
+    - Mining patterns appear to miss standard cell line nomenclature and radioactive reagents
+    - Abstract-only content may have limited tool detection, but key tools are clearly mentioned
+  recommendations: |
+    This publication should have detected at least 2 research tools:
+    1. C2C12 murine myoblast cell line - clearly used as experimental model system
+    2. 32P-orthophosphate - radioactive reagent used for phosphorylation assays
+    
+    The mining system needs improvement in:
+    - Cell line nomenclature recognition (alphanumeric patterns like C2C12)
+    - Radioactive reagent detection (isotope labeling compounds)
+    - Context-based tool identification when Methods sections are unavailable
+    
+    Both missed tools are legitimate research tools that should be added to the database.
+    The suggested patterns would significantly improve detection of similar tools in future mining.
+    
+    No observations were extracted since no tools were initially validated, but the missed
+    tools would likely have associated phenotypic observations related to muscle differentiation
+    and gene expression changes.

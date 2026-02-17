@@ -1,0 +1,105 @@
+publicationMetadata:
+  pmid: "30298332"
+  title: "Lifespan Development: Symptoms Experienced by Individuals with Neurofibromatosis Type 1 Associated Plexiform Neurofibromas from Childhood into Adulthood."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a qualitative clinical study using semi-structured interviews:
+    - Clinical assessment tools: Semi-structured interview guides, qualitative analysis frameworks
+    - Computational tools: Qualitative data analysis software (NVivo mentioned in methods)
+    - No lab research tools expected (antibodies, cell lines, animal models, genetic reagents, organoids, PDX)
+    
+    This is a patient experience study using interviews and qualitative analysis, so clinical assessment 
+    tools and computational analysis tools are the primary expected categories.
+  overallAssessment: |
+    This qualitative clinical study examining patient experiences with NF1-associated plexiform neurofibromas 
+    would typically use clinical assessment tools (interview guides, questionnaires) and computational tools 
+    for qualitative data analysis. The study used semi-structured interviews and conventional content analysis 
+    with NVivo software, indicating legitimate research tools were employed despite none being captured in the 
+    initial mining.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "NVivo"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The authors E.I. and A.G. used qualitative data analysis software to organise meaning units, codes, subcategories, and categories within the transcripts [Lumivero, Denver, CO (2023) NVivo (Version 1.7.2) www.lumivero.com]"
+    whyMissed: "Specific software name with version number and vendor information was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Semi-structured interview guide"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "A semi-structured interview guide was constructed by all the authors, comprising questions concerning everyday life experiences, anxieties, fears, and self-perceived health regarding the nerve tumour"
+    whyMissed: "Clinical assessment instrument development not captured by current mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Conventional content analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The transcribed texts were analysed using conventional content analysis"
+    whyMissed: "Qualitative analysis methodology not recognized as computational tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NVivo|ATLAS\\.ti|MAXQDA|QSR|qualitative data analysis software"
+    toolType: "computational_tool"
+    examples: ["NVivo (Version 1.7.2)"]
+    reasoning: "Qualitative data analysis software packages are commonly used research tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "(semi-structured|structured) interview (guide|protocol|schedule)"
+    toolType: "clinical_assessment_tool"
+    examples: ["semi-structured interview guide was constructed"]
+    reasoning: "Interview guides are validated clinical assessment instruments used in qualitative research"
+
+  - patternType: "naming_convention"
+    pattern: "\\[([^\\]]+),\\s*([^\\]]+)\\s*\\(\\d{4}\\)\\s*([^\\]]+)\\s*\\(Version\\s*[^\\)]+\\)\\]"
+    toolType: "computational_tool"
+    examples: ["[Lumivero, Denver, CO (2023) NVivo (Version 1.7.2)]"]
+    reasoning: "Software citations with vendor, year, and version information indicate research tools"
+
+  - patternType: "context_phrase"
+    pattern: "(conventional|thematic|framework|grounded theory) (content )?analysis"
+    toolType: "computational_tool"
+    examples: ["conventional content analysis"]
+    reasoning: "Qualitative analysis methodologies are computational approaches that could be considered tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a legitimate research study
+    - Qualitative data analysis software (NVivo) with full version and vendor details was missed
+    - Semi-structured interview guide (clinical assessment tool) was not captured
+    - Current mining patterns appear inadequate for qualitative research methodologies
+  recommendations: |
+    This publication represents a significant gap in the current mining approach for qualitative clinical research:
+    
+    1. **Add NVivo as computational tool**: Clear software with version (1.7.2) and vendor (Lumivero) information
+    2. **Add semi-structured interview guide as clinical assessment tool**: This is a legitimate research instrument
+    3. **Consider conventional content analysis**: While methodological, it represents a systematic analytical approach
+    4. **Improve patterns for qualitative research**: Current mining misses common qualitative research tools
+    5. **No lab tools expected**: This is purely clinical/qualitative research, so absence of lab tools is appropriate
+    
+    The mining system needs better coverage of:
+    - Qualitative data analysis software packages
+    - Clinical interview instruments and guides
+    - Qualitative analysis methodologies
+    - Software citations with vendor/version information

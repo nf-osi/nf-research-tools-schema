@@ -1,0 +1,153 @@
+publicationMetadata:
+  pmid: "28589254"
+  title: "Characterisation of malignant peripheral nerve sheath tumours in neurofibromatosis-1 using heterogeneity analysis of (18)F-FDG PET"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study with quantitative imaging analysis):
+    - Computational tools → Expected for image analysis, statistical analysis, and data processing
+    - Clinical assessment tools → Unlikely (study uses imaging parameters, not patient-reported outcomes)
+    - Lab research tools → Unlikely (no laboratory experiments described)
+    
+    This is a retrospective clinical imaging study using PET/CT scans to differentiate tumor types.
+    The study involves computational analysis of imaging data using specialized software for texture
+    analysis and statistical evaluation. While queryType suggests "bench" research, the actual
+    content is clinical imaging research with computational analysis components.
+  overallAssessment: |
+    This clinical imaging study would be expected to use computational tools for image analysis
+    and statistical processing, which it does. The study uses MATLAB for texture analysis and
+    statistical software (SPSS, MedCalc) for data analysis. No clinical assessment tools are
+    expected since the study relies on imaging parameters rather than patient-reported outcomes.
+    The "bench" queryType appears to be a misclassification - this is clinical research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The reconstructed PET datasets were imported into in-house texture analysis software implemented in MATLAB (Release 2016a, The MathWorks, Inc., Natick, MA, USA)."
+    whyMissed: "Specific software with version number and vendor information used for texture analysis - clear computational tool usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using SPSS (v22, Chicago, IL, USA) and MedCalc (v16.8.4, Ostend, Belgium) software."
+    whyMissed: "Statistical analysis software with version number - standard computational tool for data analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MedCalc"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using SPSS (v22, Chicago, IL, USA) and MedCalc (v16.8.4, Ostend, Belgium) software."
+    whyMissed: "Statistical analysis software with version number - specialized medical statistics tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MATLAB\\s*\\([^)]*Release\\s*[0-9]+[a-z]*[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["MATLAB (Release 2016a, The MathWorks, Inc., Natick, MA, USA)"]
+    reasoning: "Pattern to catch MATLAB with release version and vendor information - commonly used in image analysis"
+
+  - patternType: "term"
+    pattern: "SPSS\\s*\\([^)]*v[0-9]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["SPSS (v22, Chicago, IL, USA)"]
+    reasoning: "Pattern to catch SPSS statistical software with version numbers - very common in medical research"
+
+  - patternType: "term"
+    pattern: "MedCalc\\s*\\([^)]*v[0-9]+\\.[0-9]+\\.[0-9]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["MedCalc (v16.8.4, Ostend, Belgium)"]
+    reasoning: "Pattern to catch MedCalc medical statistics software with detailed version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "analysis was performed using\\s+([A-Z][a-zA-Z]+)\\s*\\([^)]*v?[0-9]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["Statistical analysis was performed using SPSS (v22, Chicago, IL, USA)"]
+    reasoning: "Context phrase indicating software usage for analysis with version information"
+
+  - patternType: "context_phrase"
+    pattern: "implemented in\\s+([A-Z][a-zA-Z]+)\\s*\\([^)]*[0-9]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["implemented in MATLAB (Release 2016a, The MathWorks, Inc., Natick, MA, USA)"]
+    reasoning: "Context phrase indicating custom software implementation using specific platforms"
+
+observations:
+  - resourceName: "MATLAB"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for implementing in-house texture analysis software for processing 18F-FDG PET datasets.
+      Voxel intensities within symptomatic tumor volumes of interest were resampled to yield 64 discrete bins.
+      Software calculated first-order, second-order (GLCM), and high-order (NGTDM) statistical features
+      from tumor volumes. Version: Release 2016a from The MathWorks, Inc.
+    foundIn: "methods"
+    contextSnippet: "The reconstructed PET datasets were imported into in-house texture analysis software implemented in MATLAB (Release 2016a, The MathWorks, Inc., Natick, MA, USA). Voxel intensities within the symptomatic tumour VOI were resampled to yield 64 discrete bins."
+    confidence: 0.95
+    doi: "10.1007/s00259-017-3733-1"
+
+  - resourceName: "SPSS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for statistical analysis including normality testing with Shapiro-Wilk test,
+      Mann-Whitney U test for comparing benign and malignant tumors, Spearman correlation
+      analysis, and receiver operating characteristic (ROC) curve analysis. Version: v22.
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using SPSS (v22, Chicago, IL, USA) and MedCalc (v16.8.4, Ostend, Belgium) software. The data distributions were tested for normality using the Shapiro–Wilk test."
+    confidence: 0.90
+    doi: "10.1007/s00259-017-3733-1"
+
+  - resourceName: "MedCalc"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for statistical analysis including receiver operating characteristic (ROC) curve
+      calculations and area under ROC curves (AUROC) analysis. Used for comparing AUROC
+      values as described by DeLong et al. method. Version: v16.8.4.
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using SPSS (v22, Chicago, IL, USA) and MedCalc (v16.8.4, Ostend, Belgium) software... Receiver operator characteristic (ROC) curves were also used to compare the ability of each parameter to classify tumours as benign or malignant and the area under ROC curves (AUROC) were calculated."
+    confidence: 0.90
+    doi: "10.1007/s00259-017-3733-1"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Initial mining completely missed all computational tools used in this study
+    - Three clear computational tools (MATLAB, SPSS, MedCalc) with version numbers and vendor information were not detected
+    - QueryType "bench" is misleading - this is clinical imaging research, not bench research
+    - Mining patterns appear inadequate for detecting statistical software and analysis platforms
+  recommendations: |
+    All three missed computational tools should be added to the database:
+    1. MATLAB (Release 2016a) - Used for custom texture analysis software implementation
+    2. SPSS (v22) - Used for comprehensive statistical analysis
+    3. MedCalc (v16.8.4) - Used for ROC analysis and medical statistics
+    
+    The suggested patterns would significantly improve detection of computational tools in medical research.
+    This publication demonstrates that clinical studies often use sophisticated computational tools for
+    data analysis that should be captured. The mining system needs better coverage of statistical
+    software and analysis platforms commonly used in medical research.
+    
+    Three usage instruction observations were extracted describing how each tool was employed in the study.
+    This type of clinical imaging study represents an important category that uses computational tools
+    extensively but may be missed by current mining approaches focused on traditional lab tools.

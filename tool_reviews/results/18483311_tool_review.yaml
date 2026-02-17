@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "18483311"
+  title: "Effective in vivo targeting of the mammalian target of rapamycin pathway in malignant peripheral nerve sheath tumors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - Cell line experiments (MPNST cell lines mentioned)
+    - Animal models (xenograft studies described)
+    - Drug testing (RAD001, erlotinib, doxorubicin)
+    - Molecular assays (phosphorylation analysis, apoptosis measurement)
+    
+    Expected tools: cell lines, animal models (xenograft hosts), potentially antibodies for phosphorylation analysis.
+    The publication should contain multiple tool types despite having only abstract text available.
+  overallAssessment: |
+    This is a laboratory research study that clearly uses research tools including MPNST cell lines and xenograft animal models.
+    The study describes drug testing experiments both in vitro (cell lines) and in vivo (xenografts), which requires specific research tools.
+    Despite lacking full-text sections, the abstract contains sufficient detail to identify several research tools that should have been mined.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...tested three drugs for single and combinatorial effects on collected MPNST cell lines and in MPNST xenografts..."
+    whyMissed: "Generic term 'MPNST cell lines' may not have matched specific cell line naming patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-derived MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...decreased growth 19% to 60% after 4 days of treatment in NF1 and sporadic-derived MPNST cell lines..."
+    whyMissed: "Descriptive cell line name may not match standard nomenclature patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "sporadic-derived MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...decreased growth 19% to 60% after 4 days of treatment in NF1 and sporadic-derived MPNST cell lines..."
+    whyMissed: "Descriptive cell line name may not match standard nomenclature patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...Treatment of subcutaneous sporadic MPNST cell xenografts with RAD001 significantly, but transiently, delayed tumor growth..."
+    whyMissed: "Xenograft models may not have been recognized as patient-derived models"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "subcutaneous xenograft model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Treatment of subcutaneous sporadic MPNST cell xenografts with RAD001 significantly, but transiently, delayed tumor growth..."
+    whyMissed: "Animal model hosting xenografts not detected as separate tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MPNST cell lines?"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines", "collected MPNST cell lines"]
+    reasoning: "MPNST cell lines are commonly used in neurofibromatosis research and should be detected as cell line tools"
+
+  - patternType: "context_phrase"
+    pattern: "(NF1|sporadic)-derived .* cell lines?"
+    toolType: "cell_line"
+    examples: ["NF1-derived MPNST cell lines", "sporadic-derived MPNST cell lines"]
+    reasoning: "Cell lines derived from specific disease contexts are legitimate research tools"
+
+  - patternType: "term"
+    pattern: "xenografts?"
+    toolType: "patient_derived_model"
+    examples: ["MPNST xenografts", "subcutaneous sporadic MPNST cell xenografts"]
+    reasoning: "Xenograft models are patient-derived models that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "subcutaneous .* xenografts?"
+    toolType: "animal_model"
+    examples: ["subcutaneous sporadic MPNST cell xenografts"]
+    reasoning: "Subcutaneous xenograft models represent animal model systems"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+-derived .* cell lines?"
+    toolType: "cell_line"
+    examples: ["NF1-derived MPNST cell lines"]
+    reasoning: "Disease/mutation-derived cell lines follow this naming pattern and are research tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication only has abstract text available, but abstract contains sufficient tool mentions
+    - Multiple cell lines and xenograft models are described but were not detected
+    - Mining patterns appear to miss disease-specific cell line nomenclature
+    - Xenograft models not properly categorized as patient-derived models
+  recommendations: |
+    This publication clearly uses research tools but none were detected by the mining process.
+    The abstract describes MPNST cell lines (both NF1-derived and sporadic-derived) and xenograft models.
+    All potentially missed tools should be added to improve mining coverage.
+    The suggested patterns would help capture similar tools in other neurofibromatosis research publications.
+    No observations can be extracted due to lack of Results/Discussion sections.
+    This case highlights the need for better pattern coverage for disease-specific cell lines and xenograft models.

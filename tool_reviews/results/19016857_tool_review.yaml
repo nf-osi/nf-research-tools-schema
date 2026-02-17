@@ -1,0 +1,278 @@
+publicationMetadata:
+  pmid: "19016857"
+  title: "Polypyrimidine tract binding protein regulates alternative splicing of an aberrant pseudoexon in NF1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study investigating splicing mechanisms using minigene constructs,
+    cell culture, and computational analysis. Expected tools include:
+    - Cell lines (HEK-293 mentioned)
+    - Genetic reagents (vectors, plasmids, minigenes)
+    - Computational tools (analysis software mentioned)
+    - Laboratory reagents and kits
+    
+    Note: Publications can contain MULTIPLE tool types. This lab study uses computational tools
+    for sequence analysis alongside wet lab techniques.
+  overallAssessment: |
+    This is a laboratory research study with detailed Methods section describing experimental procedures
+    including minigene construction, cell culture, transfection, RT-PCR, and computational analysis.
+    The study clearly uses multiple research tools across genetic reagents, cell lines, and computational
+    tools. Tools are expected and likely present despite none being initially mined.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HEK-293"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human Embryonic Kidney cell lines (HEK-293), were grown in DMEM medium supplemented with 1% streptomycin and 10% fetal bovine serum"
+    whyMissed: "Standard cell line name not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pGEM vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "PCR products were sub-cloned into the pGEM vector (Promega) following manufacturer's instructions"
+    whyMissed: "Vector name with vendor information not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pCDNA3(+) vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sub-cloned PCR fragments and a pCDNA3(+) vector (Invitrogen) containing exons and introns 1–3 of the human alpha globin (HBA1) gene"
+    whyMissed: "Vector name with vendor not caught by patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FuGENE HD"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Minigenes were transfected into HEK-293 cell lines using FuGENE HD (Roche)"
+    whyMissed: "Transfection reagent name not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "RNeasy Plus Mini Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RNA was extracted from cells 48 hours after transfection using an RNeasy® Plus Mini Kit (Qiagen)"
+    whyMissed: "Kit name with vendor not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "M-MLV Reverse Transcriptase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cDNA sysntheis was performed on 1 μg total RNA using random primers and Promgea M-MLV Reverse Transcriptase (Promega)"
+    whyMissed: "Enzyme name with vendor not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "IMAGEJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PCR products were analyzed by electrophoresis on 1.5% agarose gels and band intensity quantified using IMAGEJ"
+    whyMissed: "Software name in all caps not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis (student's t test) was performed using GraphPad Prism software"
+    whyMissed: "Statistical software name not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "GeneJET Gel Extraction Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Individual PCR fragments were purified using the GeneJET Gel Extraction Kit (Thermo Scientific)"
+    whyMissed: "Kit name with vendor not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Chromas Lite"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Chromas Lite 2.0 (Technelysium Pty) and CLC Sequence Viewer v.6.8.1 (Qiagen) were used to align and analyse cDNA"
+    whyMissed: "Sequence analysis software with version not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "CLC Sequence Viewer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Chromas Lite 2.0 (Technelysium Pty) and CLC Sequence Viewer v.6.8.1 (Qiagen) were used to align and analyse cDNA"
+    whyMissed: "Sequence analysis software with version not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SpliceAid"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Splicing regulatory sequences in SRD5A2 and HSD17B3 genes were predicted using the computational tools SpliceAid"
+    whyMissed: "Bioinformatics tool name not caught despite 'computational tools' context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Human Splicing Finder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Splicing regulatory sequences in SRD5A2 and HSD17B3 genes were predicted using the computational tools SpliceAid, and Human Splicing Finder version 2.4.1"
+    whyMissed: "Bioinformatics tool with version not recognized despite 'computational tools' context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using the computational tools? (.+?)(?:,|\\.|$)"
+    toolType: "computational_tool"
+    examples: ["using the computational tools SpliceAid", "using the computational tools SpliceAid, and Human Splicing Finder"]
+    reasoning: "This paper explicitly states 'using the computational tools' but tools weren't caught - need better context phrase recognition"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z0-9\\s\\-\\.]+)\\s*\\(([A-Z][a-zA-Z]+)\\)"
+    toolType: "general"
+    examples: ["pGEM vector (Promega)", "FuGENE HD (Roche)", "RNeasy Plus Mini Kit (Qiagen)"]
+    reasoning: "Many tools mentioned with vendor in parentheses - pattern should catch 'ToolName (Vendor)' format"
+
+  - patternType: "term"
+    pattern: "\\b(HEK-?293|HEK293)\\b"
+    toolType: "cell_line"
+    examples: ["HEK-293", "HEK293"]
+    reasoning: "Standard cell line naming convention not caught - need pattern for common cell lines"
+
+  - patternType: "naming_convention"
+    pattern: "\\b([A-Z][a-zA-Z0-9]+)\\s+v?(?:version\\s+)?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+    toolType: "computational_tool"
+    examples: ["Chromas Lite 2.0", "CLC Sequence Viewer v.6.8.1", "Human Splicing Finder version 2.4.1"]
+    reasoning: "Software with version numbers should be strong indicators of computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|quantified using|performed using|extracted using|purified using"
+    toolType: "general"
+    examples: ["quantified using IMAGEJ", "performed using GraphPad Prism", "extracted using an RNeasy Plus Mini Kit"]
+    reasoning: "Usage context phrases strongly indicate tool usage but weren't caught"
+
+observations:
+  - resourceName: "HEK-293"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Cell culture conditions specified: grown in DMEM medium supplemented with 1% streptomycin 
+      and 10% fetal bovine serum, incubated in 5% CO2 at 37°C. Transfection performed at 60% 
+      confluency in 6 cm-well cultures. Cells harvested 48 hours after transfection for RNA extraction.
+    foundIn: "methods"
+    contextSnippet: "Human Embryonic Kidney cell lines (HEK-293), were grown in DMEM medium supplemented with 1% streptomycin and 10% fetal bovine serum, and incubated in 5% CO2 at 37°C"
+    confidence: 0.90
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+  - resourceName: "FuGENE HD"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Transfection protocol: Mix 100 μl DMEM serum-free medium with 1 μg vector DNA and 3 μl 
+      FuGENE reagent, incubate 15 minutes at room temperature before adding to cell cultures 
+      in presence of 10% fetal bovine serum.
+    foundIn: "methods"
+    contextSnippet: "A mix of 100 μl of DMEM serum-free medium containing 1 ug of vector DNA and 3 μl of FuGENE reagent was incubated for 15 minutes at room temperature"
+    confidence: 0.85
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+  - resourceName: "IMAGEJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for band intensity quantification of PCR products analyzed by electrophoresis on 
+      1.5% agarose gels. Band intensities normalized to product length, then calculated as 
+      percentage of total expression of all isoforms.
+    foundIn: "methods"
+    contextSnippet: "PCR products were analyzed by electrophoresis on 1.5% agarose gels and band intensity quantified using IMAGEJ"
+    confidence: 0.90
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+  - resourceName: "GraphPad Prism"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for statistical analysis, specifically student's t-test. Results showed significant 
+      differences in splicing patterns between wild-type and mutant constructs (p<0.01 and p≤0.001).
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis (student's t test) was performed using GraphPad Prism software"
+    confidence: 0.90
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+  - resourceName: "SpliceAid"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for in silico analysis to predict splicing regulatory sequences in SRD5A2 and HSD17B3 
+      genes. Applied alongside Human Splicing Finder for comprehensive splicing prediction analysis.
+    foundIn: "methods"
+    contextSnippet: "Splicing regulatory sequences in SRD5A2 and HSD17B3 genes were predicted using the computational tools SpliceAid"
+    confidence: 0.95
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+  - resourceName: "Human Splicing Finder"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Version 2.4.1 used for in silico analysis to predict splicing regulatory sequences in 
+      SRD5A2 and HSD17B3 genes. Applied alongside SpliceAid for comprehensive splicing prediction 
+      analysis to support experimental findings.
+    foundIn: "methods"
+    contextSnippet: "Splicing regulatory sequences in SRD5A2 and HSD17B3 genes were predicted using the computational tools SpliceAid, and Human Splicing Finder version 2.4.1"
+    confidence: 0.95
+    doi: "10.1111/j.1742-4658.2008.06734.x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 5
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 6
+  majorIssuesFound: |
+    - Complete failure to mine any tools despite this being a clear laboratory research study
+    - Multiple obvious tools missed including standard cell line (HEK-293), vectors, reagents, and software
+    - Tools explicitly described as "computational tools" in the text were not caught
+    - Vendor information in parentheses format not recognized
+    - Software with version numbers not identified
+    - Standard molecular biology reagents and kits not detected
+  recommendations: |
+    This publication represents a significant mining failure. Despite being a laboratory research 
+    study with detailed Methods section and clear tool usage, zero tools were identified. 
+    
+    CRITICAL ISSUES:
+    - 13 clear research tools were missed, spanning cell lines, genetic reagents, and computational tools
+    - The paper explicitly states "using the computational tools" but these weren't caught
+    - Standard formats like "ToolName (Vendor)" and "Software version X.X" need better recognition
+    
+    IMMEDIATE ACTIONS NEEDED:
+    - Add all 13 identified tools to the database
+    - Implement the 5 suggested patterns to catch similar tools in future mining
+    - Review mining algorithms for basic molecular biology tool recognition
+    - Test patterns against this paper to ensure they would catch the missed tools
+    
+    OBSERVATIONS:
+    - 6 usage instructions extracted showing proper experimental protocols and software applications
+    - Tools were used appropriately in experimental context with clear methodological descriptions
+    
+    This case highlights the need for comprehensive pattern coverage in molecular biology research.

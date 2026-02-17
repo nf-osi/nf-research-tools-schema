@@ -1,0 +1,104 @@
+publicationMetadata:
+  pmid: "17053831"
+  title: "Hyperactivation of p21ras and PI3K cooperate to alter murine and human neurofibromatosis type 1-haploinsufficient osteoclast functions."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the experimental approaches described in the abstract, this lab research study would be expected to contain:
+    - Animal models (Nf1+/- mice, PI3K knockout mice mentioned explicitly)
+    - Antibodies (implied by biochemical assays for p21ras-GTP, Akt phosphorylation, PI3K activity)
+    - Genetic reagents (growth factors M-CSF and RANKL mentioned)
+    - Potentially computational tools for data analysis (though not evident from abstract)
+    
+    The study involves mouse genetics, primary cell culture, biochemical assays, and functional studies - all typical of lab research requiring multiple tool types.
+  overallAssessment: |
+    This is clearly a laboratory research study investigating cellular and molecular mechanisms of NF1 haploinsufficiency in osteoclasts. The experimental design includes mouse genetic models, primary cell isolation and culture, biochemical assays, and functional studies. Such studies typically require numerous research tools including animal models, antibodies, cell culture reagents, and growth factors. However, the absence of a Methods section limits our ability to identify specific tools used, as only high-level experimental approaches are described in the abstract.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We found that Nf1(+/-) mice contain elevated numbers of multinucleated osteoclasts. Both osteoclasts and osteoclast progenitors from Nf1(+/-) mice were hyperresponsive to limiting concentrations of M-CSF"
+    whyMissed: "Animal model clearly mentioned multiple times in abstract but not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "p85alpha-deficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Intercrossing Nf1(+/-) mice and mice deficient in class 1(A) PI3K (p85alpha) restored elevated PI3K activity and Nf1(+/-) osteoclast functions to WT levels"
+    whyMissed: "Specific knockout mouse strain mentioned but not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "M-CSF"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Both osteoclasts and osteoclast progenitors from Nf1(+/-) mice were hyperresponsive to limiting concentrations of M-CSF and receptor activator of NF-kappaB ligand (RANKL) levels. M-CSF-stimulated p21(ras)-GTP and Akt phosphorylation"
+    whyMissed: "Growth factor/cytokine reagent used in experiments but not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "RANKL"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Both osteoclasts and osteoclast progenitors from Nf1(+/-) mice were hyperresponsive to limiting concentrations of M-CSF and receptor activator of NF-kappaB ligand (RANKL) levels"
+    whyMissed: "Growth factor/cytokine reagent used in experiments but not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "Pattern to capture haploinsufficient mouse models using standard genetic nomenclature with (+/-) notation"
+
+  - patternType: "naming_convention"
+    pattern: "\\bmice deficient in\\s+[^.]+\\b"
+    toolType: "animal_model"
+    examples: ["mice deficient in class 1(A) PI3K (p85alpha)"]
+    reasoning: "Pattern to capture knockout/deficient mouse models described with 'deficient in' terminology"
+
+  - patternType: "term"
+    pattern: "\\b(M-CSF|RANKL|GM-CSF|IL-\\d+|TNF-?α?)\\b"
+    toolType: "genetic_reagent"
+    examples: ["M-CSF", "RANKL"]
+    reasoning: "Common cytokines and growth factors used in cell biology experiments that are research reagents"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(stimulated|treated with|exposed to|incubated with)\\s+[A-Z-]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["M-CSF-stimulated"]
+    reasoning: "Context phrases indicating experimental treatment with reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of tool usage in this lab research study
+    - Abstract describes multiple animal models (Nf1+/- mice, p85alpha-deficient mice) that should have been captured
+    - Growth factors/cytokines (M-CSF, RANKL) used as experimental reagents were missed
+    - Absence of Methods section limits ability to identify specific antibodies, protocols, or other detailed tools
+    - Mining patterns appear insufficient for capturing standard genetic nomenclature and reagent names
+  recommendations: |
+    This publication clearly contains research tools that were completely missed by the initial mining:
+    - Add all 4 identified animal models and reagents to the tool database
+    - Implement suggested patterns to improve capture of mouse genetic models and cytokine reagents
+    - The mining system needs better coverage of standard laboratory reagents and genetic model nomenclature
+    - While no specific observations can be extracted without Methods/Results sections, the tools identified are legitimate research resources
+    - Consider expanding mining to capture implied tools (antibodies for biochemical assays) when Methods sections are available
+    - This case demonstrates the importance of comprehensive pattern coverage for basic lab research tools

@@ -1,0 +1,92 @@
+publicationMetadata:
+  pmid: "29712669"
+  title: "Proliferation-independent role of NF2 (merlin) in limiting biliary morphogenesis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence based on experimental mouse study described
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) studying NF2 protein function in mouse liver:
+    - Animal models (NF2 knockout mice mentioned)
+    - Genetic reagents (NF2 elimination/knockout system)
+    - Potentially antibodies for protein detection
+    - Potentially computational tools for morphological analysis
+    
+    This is clearly a laboratory research study involving mouse models and genetic manipulation,
+    so research tools are highly expected despite the lack of detailed Methods section.
+
+  overallAssessment: |
+    This is a laboratory research publication studying NF2 protein function in mouse liver development
+    using genetic knockout approaches. The abstract describes experimental elimination of NF2 protein
+    and resulting phenotypic analysis, which strongly indicates use of animal models and genetic reagents.
+    However, only the abstract is available, limiting detailed tool identification. Research tools are
+    definitely expected for this type of molecular/developmental biology study.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "NF2 knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Elimination of the neurofibromatosis type 2 protein (NF2; also known as merlin or neurofibromin 2) causes hepatomegaly due to massive biliary neoductulogenesis in the mouse liver."
+    whyMissed: "The abstract describes 'elimination of NF2 protein' in mouse liver, which strongly suggests use of NF2 knockout mouse model, but this wasn't detected by mining patterns"
+    confidence: 0.8  # High confidence this represents an animal model
+    shouldBeAdded: Yes
+
+  - toolName: "mouse liver"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "causes hepatomegaly due to massive biliary neoductulogenesis in the mouse liver. We show that this phenotype reflects unlimited biliary morphogenesis"
+    whyMissed: "Multiple references to mouse liver studies and phenotypic analysis suggest use of mouse models, but generic 'mouse liver' wasn't captured"
+    confidence: 0.7  # Moderate confidence - could be part of NF2 knockout model
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "elimination of.*protein.*in.*mouse"
+    toolType: "animal_model"
+    examples: ["Elimination of the neurofibromatosis type 2 protein (NF2; also known as merlin or neurofibromin 2) causes hepatomegaly due to massive biliary neoductulogenesis in the mouse liver"]
+    reasoning: "This pattern would catch genetic knockout/elimination studies in mouse models, which are common in developmental biology research"
+
+  - patternType: "context_phrase"
+    pattern: "(knockout|elimination|deletion).*of.*(NF1|NF2|neurofibromin)"
+    toolType: "genetic_reagent"
+    examples: ["Elimination of the neurofibromatosis type 2 protein (NF2; also known as merlin or neurofibromin 2)"]
+    reasoning: "Would capture genetic manipulation tools targeting NF genes, distinguishing from disease references by including action words"
+
+  - patternType: "naming_convention"
+    pattern: "(NF1|NF2).*(knockout|KO|null|deficient|mutant).*mice"
+    toolType: "animal_model"
+    examples: ["Based on this paper's approach, would catch 'NF2 knockout mice' or 'NF2-deficient mice'"]
+    reasoning: "Standard nomenclature for neurofibromatosis gene knockout mouse models that combines gene name with knockout terminology"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # NF2 knockout mice and mouse liver model
+  newPatternsCount: 3  # Three new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of laboratory research
+    - Only abstract available - full Methods section would likely contain detailed tool information
+    - Mining patterns failed to detect obvious animal model usage (NF2 knockout mice)
+    - Genetic manipulation described but not captured as genetic reagent
+  recommendations: |
+    This publication clearly describes laboratory research using mouse models and genetic manipulation,
+    but no tools were detected by the mining process. This represents a significant gap in tool detection.
+    
+    Key recommendations:
+    1. Add the suggested patterns to catch genetic knockout studies and mouse models
+    2. NF2 knockout mice should definitely be added as a missed animal model tool
+    3. Consider whether genetic elimination/knockout systems should be captured as genetic reagents
+    4. This case highlights the need for better pattern coverage of developmental biology terminology
+    5. Full-text access would likely reveal additional tools in Methods section
+    
+    The mining system needs improvement to catch standard laboratory research tools described in abstracts,
+    particularly for genetic knockout studies which are fundamental research tools.

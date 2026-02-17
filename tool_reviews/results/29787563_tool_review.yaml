@@ -1,0 +1,332 @@
+publicationMetadata:
+  pmid: "29787563"
+  title: "Graph complexity analysis identifies an ETV5 tumor-specific network in human and murine low-grade glioma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research publication combining computational network analysis with experimental validation.
+    Expected tool types:
+    - Animal models (multiple Nf1 genetically-engineered mouse strains)
+    - Antibodies (for immunohistochemistry validation)
+    - Computational tools (ARACNe-AP, R packages, analysis software)
+    - Genetic reagents (mouse strains with specific genetic modifications)
+    
+    This publication uses both computational methods and wet lab validation, so tools from
+    multiple categories are expected. The Methods section describes detailed experimental
+    procedures using mouse models, antibodies, and computational analysis pipelines.
+  overallAssessment: |
+    This is a computational biology study that combines network analysis with experimental validation
+    using mouse models and immunohistochemistry. The publication clearly describes research tools
+    including genetically-engineered mouse strains, antibodies, and computational software packages.
+    Tools are expected across multiple categories given the hybrid computational-experimental approach.
+
+toolValidations: []  # No tools were mined, but many should have been found
+
+potentiallyMissedTools:
+  - toolName: "Nf1^flox/flox mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1^flox/flox Nf1^flox/null; GFAP-Cre (OPG-1), Nf1^flox/R681*; GFAP-Cre (OPG-2), Nf1^flox/null; Pten^flox/wt; GFAP-Cre (OPG-3), and Nf1^flox/null; Olig2-Cre (OPG-4) mice"
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1^flox/null; GFAP-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1^flox/null; GFAP-Cre (OPG-1) mice were maintained on a C57Bl/6 background"
+    whyMissed: "Complex genotype notation with multiple genetic modifications not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1^flox/R681*; GFAP-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1^flox/R681*; GFAP-Cre (OPG-2) mice representing molecularly-distinct tumors"
+    whyMissed: "Specific mutation notation (R681*) not captured by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1^flox/null; Pten^flox/wt; GFAP-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1^flox/null; Pten^flox/wt; GFAP-Cre (OPG-3) mice with additional genetic mutations"
+    whyMissed: "Triple genetic modification notation too complex for current patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1^flox/null; Olig2-Cre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1^flox/null; Olig2-Cre (OPG-4) mice in which tumors arise from Olig2+ cells"
+    whyMissed: "Olig2-Cre driver line notation not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "C57Bl/6 background"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "mice were maintained on a C57Bl/6 background"
+    whyMissed: "Standard inbred strain background notation not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit anti-Etv5 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Rabbit anti-Etv5 antibody (Novus Biologicals) was diluted at 1:100 for immunohistochemistry"
+    whyMissed: "Antibody with vendor information not captured by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ARACNe-AP algorithm"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "the network was built using the ARACNe-AP algorithm. The ARACNe-AP algorithm reconstructs gene regulatory networks from large-scale gene expression data"
+    whyMissed: "Bioinformatics algorithm name not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "igraph package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Centrality measures were calculated using the igraph package in R"
+    whyMissed: "R package name not captured by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "differential expression and fold change calculations on the RNA-Seq datasets were performed using the R package DESeq2 version 1.18.1"
+    whyMissed: "Popular bioinformatics package with version number not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "RNeasy Mini Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RNA from primary astrocytes was isolated using the RNeasy Mini Kit (Qiagen) according to the manufacturer's protocol"
+    whyMissed: "Commercial kit with vendor name not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRIzol solution"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "optic nerves/chiasms microdissection, and preservation in TRIzol solution"
+    whyMissed: "Standard molecular biology reagent not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "primary astrocytes"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Wild-type and Nf1-/- primary astrocytes were generated and maintained as previously described"
+    whyMissed: "Primary cell culture system not captured by cell line patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\^[a-z]+/[a-z]+;?\\s*[A-Z][a-z0-9]+-Cre\\b"
+    toolType: "animal_model"
+    examples: ["Nf1^flox/null; GFAP-Cre", "Nf1^flox/R681*; GFAP-Cre", "Nf1^flox/null; Olig2-Cre"]
+    reasoning: "Captures genetically-engineered mouse nomenclature with flox/null notation and Cre driver lines"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\^[a-z]+/[a-z]+\\b"
+    toolType: "animal_model"
+    examples: ["Nf1^flox/flox", "Pten^flox/wt"]
+    reasoning: "Captures conditional allele notation commonly used in mouse genetics"
+
+  - patternType: "naming_convention"
+    pattern: "\\bC57[A-Z][a-z]/[0-9]+\\b"
+    toolType: "animal_model"
+    examples: ["C57Bl/6"]
+    reasoning: "Standard inbred mouse strain background nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(rabbit|mouse|goat)\\s+anti-[A-Za-z0-9]+\\s+antibody\\b"
+    toolType: "antibody"
+    examples: ["rabbit anti-Etv5 antibody"]
+    reasoning: "Captures antibody descriptions with species and target information"
+
+  - patternType: "term"
+    pattern: "\\bARACNe-AP\\b"
+    toolType: "computational_tool"
+    examples: ["ARACNe-AP algorithm"]
+    reasoning: "Specific bioinformatics algorithm for network reconstruction"
+
+  - patternType: "context_phrase"
+    pattern: "\\busing\\s+the\\s+([A-Za-z0-9]+)\\s+package\\s+in\\s+R\\b"
+    toolType: "computational_tool"
+    examples: ["using the igraph package in R"]
+    reasoning: "Captures R package usage context which is common in bioinformatics"
+
+  - patternType: "context_phrase"
+    pattern: "\\bR\\s+package\\s+([A-Za-z0-9]+)\\s+version\\s+[0-9.]+\\b"
+    toolType: "computational_tool"
+    examples: ["R package DESeq2 version 1.18.1"]
+    reasoning: "Captures R packages with version numbers indicating actual usage"
+
+  - patternType: "context_phrase"
+    pattern: "\\b([A-Za-z0-9]+\\s+[A-Za-z]+\\s+Kit)\\s+\\([A-Za-z]+\\)\\b"
+    toolType: "genetic_reagent"
+    examples: ["RNeasy Mini Kit (Qiagen)"]
+    reasoning: "Commercial molecular biology kits with vendor information"
+
+  - patternType: "context_phrase"
+    pattern: "\\bprimary\\s+([a-z]+)\\s+were\\s+(generated|maintained|cultured)\\b"
+    toolType: "cell_line"
+    examples: ["primary astrocytes were generated and maintained"]
+    reasoning: "Primary cell culture systems used in research"
+
+observations:
+  - resourceName: "Nf1^flox/null; GFAP-Cre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Multiple independently-generated mouse optic glioma models showed increased Etv5 expression
+      in optic gliomas relative to non-neoplastic optic nerves. Tumors develop early and are
+      histologically similar to human pilocytic astrocytomas. Differential Etv5 expression
+      was observed at both 6 weeks (early tumor formation) and 3 months (established tumors).
+    foundIn: "results"
+    contextSnippet: "the expression of Etv5 and Etv5 target genes were increased in multiple independently-generated mouse optic glioma models relative to non-neoplastic (normal healthy) optic nerves"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "Nf1^flox/R681*; GFAP-Cre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      OPG-2 model with patient-relevant R681* mutation showed 3.54-fold increase in Etv5
+      expression compared to normal controls. This model represents molecularly-distinct
+      tumors but shares the Etv5 network signature with other optic glioma models.
+    foundIn: "results"
+    contextSnippet: "Each of these models differs in important respects, including the germline Nf1 gene mutation (OPG-2; c.2041C>T; p.R681X as seen in several patients with NF1-OPG)"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "Nf1^flox/null; Pten^flox/wt; GFAP-Cre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      OPG-3 model with additional heterozygous Pten loss showed 2.40-fold increase in Etv5
+      expression. Despite additional genetic modifications, this model maintained the
+      Etv5 network signature characteristic of optic gliomas.
+    foundIn: "results"
+    contextSnippet: "the presence of additional genetic mutations (OPG-3; additionally harboring heterozygous Pten loss)"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "Nf1^flox/null; Olig2-Cre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      OPG-4 model with different cell of origin (Olig2+ cells) showed 2.07-fold increase
+      in Etv5 expression. This demonstrates that the Etv5 network signature is independent
+      of the specific tumor cell of origin.
+    foundIn: "results"
+    contextSnippet: "the tumor cell of origin (OPG-4; Nf1^flox/mut; Olig2-Cre in which tumors arise from Olig2+ cells)"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "rabbit anti-Etv5 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Antibody successfully used at 1:100 dilution for immunohistochemistry on paraffin-embedded
+      formalin-fixed specimens. Demonstrated specific staining in optic glioma tissue but not
+      in normal optic nerves, validating tumor-specific Etv5 protein expression.
+    foundIn: "results"
+    contextSnippet: "Etv5 protein expression was also observed in optic glioma tissue, but not in normal healthy optic nerves, by immunohistochemistry with an Etv5-specific antibody"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "ARACNe-AP algorithm"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used to reconstruct gene regulatory networks from 874 glioma specimens
+      in the Rembrandt dataset. Algorithm uses mutual information and bootstrapping to
+      identify statistically significant gene interactions, with consensus networks built
+      from multiple bootstrap runs (p<0.05 threshold).
+    foundIn: "results"
+    contextSnippet: "The glioma network was inferred from the Rembrandt microarray data set using the ARACNe-AP algorithm which reconstructs gene regulatory networks from large-scale gene expression data"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "DESeq2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Version 1.18.1 successfully used for differential expression analysis of RNA-Seq datasets
+      including all OPG models. Used Benjamini-Hochberg adjusted p-values with significance
+      level of 0.01. Identified 31 Etv5 target genes as differentially expressed.
+    foundIn: "results"
+    contextSnippet: "differential expression and fold change calculations on the RNA-Seq datasets were performed using the R package DESeq2 version 1.18.1, including use of Benjamini-Hochberg adjusted p-values"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0190001"
+
+  - resourceName: "igraph package"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R package successfully used to calculate betweenness centrality measures for network
+      analysis. Enabled identification of genes that are central to tumor networks by
+      measuring the fraction of shortest paths passing through each gene node.
+    foundIn: "results"
+    contextSnippet: "Centrality measures were calculated using the igraph package in R. The betweenness centrality of gene i is the fraction of shortest paths in the network that go through gene i"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0190001"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 9
+  observationsExtracted: 8
+  observationsByType:
+    Tumor Growth: 4
+    Usage Instructions: 4
+  majorIssuesFound: |
+    Critical mining failure - no tools were detected despite this being a clear lab research
+    publication with extensive tool usage:
+    - Multiple genetically-engineered mouse strains with complex nomenclature not captured
+    - Antibodies with vendor information not recognized
+    - Popular bioinformatics tools (ARACNe-AP, DESeq2, igraph) not detected
+    - Commercial molecular biology reagents and kits not found
+    - Primary cell culture systems not identified
+    
+    This represents a significant gap in mining coverage for computational biology papers
+    that combine wet lab and computational approaches.
+  recommendations: |
+    URGENT: All 13 missed tools should be added to improve mining coverage. This publication
+    demonstrates major gaps in current mining patterns, particularly for:
+    
+    1. Mouse genetic nomenclature - need patterns for flox/null, Cre driver lines, and complex genotypes
+    2. Bioinformatics tools - ARACNe-AP, R packages with versions, analysis algorithms
+    3. Antibodies with vendor context - species + target + vendor format
+    4. Commercial reagents - kits and solutions with manufacturer information
+    5. Primary cell cultures - "primary [cell type]" patterns
+    
+    The suggested patterns would significantly improve tool detection in computational biology
+    and mouse genetics publications. All observations extracted demonstrate successful tool
+    usage and validation, providing valuable metadata for the research community.
+    
+    This paper exemplifies the hybrid computational-experimental approach common in modern
+    biomedical research, requiring comprehensive pattern coverage across multiple tool categories.

@@ -1,0 +1,256 @@
+publicationMetadata:
+  pmid: "32642740"
+  title: "Quality of life in patients with neurofibromatosis type 1 and 2 in Canada."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a cross-sectional clinical study examining quality of life in NF1 and NF2 patients.
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY
+    - Computational tools (statistical software for analysis) - SECONDARY
+    
+    The study administered multiple validated questionnaires to patients and used statistical
+    software for analysis. Clinical assessment tools are the primary focus, with computational
+    tools used for data analysis. No lab research tools expected.
+  overallAssessment: |
+    This clinical study would typically contain multiple clinical assessment tools as it involves
+    administering validated questionnaires and scales to patients. The methods section clearly
+    describes several standardized instruments used to measure quality of life, pain, and
+    disease-specific outcomes. Statistical analysis tools would also be expected for data processing.
+
+toolValidations: []
+  # No tools were initially mined, but several should have been captured
+
+potentiallyMissedTools:
+  - toolName: "SF-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Patients completed generic measures (SF-36, EQ-5D-5L, and PROMIS pain interference)"
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "EQ-5D-5L"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Patients completed generic measures (SF-36, EQ-5D-5L, and PROMIS pain interference)"
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS pain interference"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Patients completed generic measures (SF-36, EQ-5D-5L, and PROMIS pain interference)"
+    whyMissed: "PROMIS tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL NF1 module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "disease-specific questionnaires (PedsQL NF1 module and the NFTI-QOL for NF2)"
+    whyMissed: "Disease-specific questionnaire name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NFTI-QOL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "disease-specific questionnaires (PedsQL NF1 module and the NFTI-QOL for NF2)"
+    whyMissed: "NF2-specific quality of life tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Ablon visibility index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "the clinicians also rated the disease visibility using the Ablon visibility index"
+    whyMissed: "Clinical rating scale not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "House and Brackmann facial nerve scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "physicians also completed the House and Brackmann facial nerve scale that rates facial nerve impairments from 1—normal symmetric function to 6—indicating complete paralysis"
+    whyMissed: "Clinical rating scale with specific name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R statistical software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All analyses were done with R statistical software version 3.5.1"
+    whyMissed: "Statistical software with version number not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SF-36"
+    toolType: "clinical_assessment_tool"
+    examples: ["SF-36", "SF-36 scores", "SF-36 PCS", "SF-36 MCS"]
+    reasoning: "SF-36 is a widely used generic quality of life measure that should be captured"
+
+  - patternType: "term"
+    pattern: "EQ-5D-5L"
+    toolType: "clinical_assessment_tool"
+    examples: ["EQ-5D-5L", "EQ-5D-5L utility score", "EQ-5D-5L VAS"]
+    reasoning: "EQ-5D-5L is a standard health utility measure used in clinical studies"
+
+  - patternType: "term"
+    pattern: "PROMIS"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS pain interference", "PROMIS pain interference short form 8a"]
+    reasoning: "PROMIS tools are patient-reported outcome measures widely used in clinical research"
+
+  - patternType: "term"
+    pattern: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL NF1 module", "PedsQL NF1 adult module"]
+    reasoning: "PedsQL is a family of disease-specific quality of life instruments"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+-[A-Z0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["EQ-5D-5L", "NFTI-QOL"]
+    reasoning: "Many clinical assessment tools use hyphenated naming conventions"
+
+  - patternType: "context_phrase"
+    pattern: "completed.*scale|administered.*scale|using.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed the House and Brackmann facial nerve scale"]
+    reasoning: "Context phrases indicating clinical scale administration"
+
+  - patternType: "context_phrase"
+    pattern: "R statistical software version"
+    toolType: "computational_tool"
+    examples: ["R statistical software version 3.5.1"]
+    reasoning: "Statistical software with version specification should be captured"
+
+  - patternType: "term"
+    pattern: "visibility index"
+    toolType: "clinical_assessment_tool"
+    examples: ["Ablon visibility index"]
+    reasoning: "Clinical rating indices should be captured as assessment tools"
+
+observations:
+  - resourceName: "SF-36"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      NF1 and NF2 patients had significantly lower scores in all domains of the SF-36 compared to the Canadian general population (P < .005). NF2 patients had lower scores than NF1 patients in Social Functioning and General Health domains (P-values .02 and .016, respectively). The SF-36 showed good correlation with other quality of life measures and was sensitive to detecting quality of life differences in NF populations.
+    foundIn: "results"
+    contextSnippet: "NF1 and NF2 individuals had lower employment rates and lower scores in all domains of the SF-36 compared to the general Canadian population (P < .005)"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "EQ-5D-5L"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      High proportion of NF1 and NF2 patients reported pain/discomfort (66% for NF1 and 73% for NF2) and anxiety/depression (61% and 68% for NF1 and NF2, respectively). Mean EQ-5D-5L VAS score was 74.5 ± 23 for NF1 patients and 64.2 ± 21 for NF2 (P-value .05). Mean health utility score was 0.73 ± 0.24 for NF1 and 0.65 ± 0.25 for NF2 patients.
+    foundIn: "results"
+    contextSnippet: "Using the EQ-5D-5L, there was a high proportion of pain (64% in NF1 and 74% in NF2) and anxiety/depression (60% in NF1 and 68% in NF2)"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "PROMIS pain interference"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Pain interference scores showed moderate to high correlations with quality of life measures. Correlation between pain interference and health utilities was -0.70 (CI: -0.77, -0.61, P < .001) for NF1 and -0.90 (CI: -0.96, -0.78, P < .001) for NF2. Pain interference was identified as a major driver of quality of life in both NF1 and NF2 patients and was a significant predictor in regression models.
+    foundIn: "results"
+    contextSnippet: "Pain interference correlated with poor quality of life in NF1 and NF2"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "PedsQL NF1 module"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Cronbach's alpha for the PedsQL NF1 was 0.96, indicating excellent internal consistency. The domains with the lowest scores (worse quality of life) were perceived physical appearance, worry, cognitive, emotion, fatigue, and pain. Total PedsQL NF1 scores were obtained for 153 patients, with less than 10% missing values except for the sexual domain (18% missing). Perceived physical appearance was identified as the main predictor of mental well-being in NF1 patients.
+    foundIn: "results"
+    contextSnippet: "The PedsQL NF1 domains with the lowest scores (worse QoL) were perceived physical appearance, worry, cognitive, emotion, fatigue, and pain"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "NFTI-QOL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Cronbach's alpha was 0.87, indicating good internal consistency. The items with highest (worse) scores were hearing (median 2, range 1-3) and outlook on life (median 2, range 0-3). The total NFTI-QOL had moderate to high correlations with EQ-5D-5L utility score (r: -0.76, P < .001), EQ-5D-5L VAS score (r: -0.52, P = .01), SF-36 PCS (r: -0.65, P = .003), and SF-36 MCS (r: -0.63, P = .004).
+    foundIn: "results"
+    contextSnippet: "The items with highest (worse) scores were hearing (median 2, range 1–3) and outlook on life (median 2, range 0–3)"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "Ablon visibility index"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Ablon visibility index is used to rate disease visibility in NF1 patients while fully dressed. Visibility ranges from 1 (mild, no visible tumors outside normal clothing areas) to 3 (indicating numerous visible tumors in the face or neck, or visible limp). In this study, when examined by clinicians using the Ablon index, no correlation with mental health was found; however, self-reported physical appearance was a major driver of mental health-related quality of life.
+    foundIn: "both"
+    contextSnippet: "the clinicians also rated the disease visibility using the Ablon visibility index. In this measure, patients are assessed while fully dressed, and visibility ranges from 1—mild, no visible tumors outside normal clothing areas to 3—indicating numerous visible tumors in the face or neck, or visible limp"
+    confidence: 0.90
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "House and Brackmann facial nerve scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The House and Brackmann facial nerve scale rates facial nerve impairments from 1 (normal symmetric function) to 6 (indicating complete paralysis). In this NF2 cohort, 63% had Grade 1 (normal function), 23% had Grades 2 and 3, and 14% had Grades 5 and 6 (severe impairment). This scale is specifically useful for assessing facial nerve function in NF2 patients who commonly develop vestibular schwannomas affecting facial nerve function.
+    foundIn: "both"
+    contextSnippet: "physicians also completed the House and Brackmann facial nerve scale that rates facial nerve impairments from 1—normal symmetric function to 6—indicating complete paralysis"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+  - resourceName: "R statistical software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R statistical software version 3.5.1 was used for all statistical analyses including correlation analyses, regression modeling, and bootstrapping procedures. The software was used to perform t-tests, calculate correlation coefficients, build multivariable regression models, and conduct bootstrap validation with 100 repetitions to account for overfitting. Bonferroni correction was applied when appropriate.
+    foundIn: "methods"
+    contextSnippet: "All analyses were done with R statistical software version 3.5.1, and we considered P-values <.05 as significant. We used Bonferroni correction when appropriate"
+    confidence: 0.95
+    doi: "10.1093/noajnl/vdaa003"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 8
+  observationsExtracted: 8
+  observationsByType:
+    General Comment or Review: 5
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - CRITICAL: No tools were initially mined despite this being a clinical study with multiple validated assessment instruments
+    - Mining patterns failed to capture standard clinical assessment tools (SF-36, EQ-5D-5L, PROMIS, PedsQL)
+    - Disease-specific questionnaires (NFTI-QOL, PedsQL NF1 module) were not detected
+    - Clinical rating scales (Ablon index, House and Brackmann scale) were missed
+    - Statistical software (R version 3.5.1) was not captured
+    - This represents a significant gap in clinical assessment tool mining coverage
+  recommendations: |
+    - ALL 8 potentially missed tools should be added to the database - they are clearly validated research instruments
+    - Implement suggested patterns to capture clinical assessment tools, especially standard QOL measures
+    - Add patterns for hyphenated tool names (EQ-5D-5L, NFTI-QOL) and disease-specific modules (PedsQL NF1)
+    - Include context patterns for scale administration and completion
+    - Add statistical software detection with version numbers
+    - This publication demonstrates excellent examples of clinical assessment tools that should be systematically captured
+    - The extracted observations provide valuable information about tool performance and correlations in NF populations
+    - Consider this publication as a reference case for improving clinical assessment tool mining patterns

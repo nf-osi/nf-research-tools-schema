@@ -1,0 +1,223 @@
+publicationMetadata:
+  pmid: "33519543"
+  title: "Autism Spectrum Disorder Symptom Profile Across the RASopathies."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical study comparing ASD symptom profiles across three RASopathies (NF1, Noonan syndrome, CFC).
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, diagnostic instruments) - PRIMARY
+    - Computational tools (statistical analysis software) - SECONDARY
+    
+    The study uses standardized, validated clinical assessment instruments to measure autism symptoms,
+    intellectual functioning, and ADHD symptoms. These are legitimate research tools used in clinical
+    research and should be captured by mining algorithms. The publication has a detailed Methods section
+    describing the administration and scoring of multiple assessment tools.
+  overallAssessment: |
+    This clinical study extensively uses validated clinical assessment tools for autism diagnosis and
+    symptom measurement. The Methods section clearly describes the administration of multiple standardized
+    instruments including ADOS-2, ADI-R, WASI-II, and Conners scales. These are well-established research
+    tools in autism and neurodevelopmental research. The mining algorithm completely missed these tools,
+    representing a significant gap in clinical assessment tool detection.
+
+toolValidations: []
+  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "Autism Diagnostic Observation Schedule-2 (ADOS-2)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Autism Diagnostic Observation Schedule–second edition (ADOS-2) was used to measure current autism clinical profile. ADOS is a semi-structured, standardized observational assessment in communication, play, imaginative skills, and repetitive behaviors."
+    whyMissed: "Mining algorithm likely lacks patterns for clinical assessment tools with version numbers and detailed descriptive names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Autism Diagnostic Interview-Revised (ADI-R)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Autism Diagnostic Interview-Revised (ADI-R) was used for detailed parent interviews. It measures the clinical profile throughout the development based on parent-reported observation gathered during a structured interview."
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler Abbreviated Scale of Intelligence-II (WASI-II)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Wechsler Abbreviated Scale of Intelligence-II (WASI-II) was used to measure verbal intellectual functioning (VIQ), based on two subscales called Similarities and Vocabulary."
+    whyMissed: "Intellectual assessment tool with version number not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Conners Parent Rating Scale (3rd edition, short form)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Conners Parent Rating Scale (3rd edition, short form) measured ADHD symptomatology. The two domains, inattention and hyperactivity, were used in the study and presented in T-score."
+    whyMissed: "ADHD assessment tool with edition specification not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS version 25"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were analyzed in SPSS version 25 (SPSS Inc., Chicago, USA). Mean (M) and SD (or ratio for categorical variable) of each characteristic of the population were described."
+    whyMissed: "Statistical software with version number not captured by computational tool patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(ADOS-2|ADOS-II|Autism Diagnostic Observation Schedule)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["ADOS-2", "Autism Diagnostic Observation Schedule–second edition"]
+    reasoning: "ADOS is a gold-standard autism diagnostic tool frequently used in research"
+
+  - patternType: "term"
+    pattern: "\\b(ADI-R|Autism Diagnostic Interview-Revised)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["ADI-R", "Autism Diagnostic Interview-Revised"]
+    reasoning: "ADI-R is a standard parent interview tool for autism diagnosis"
+
+  - patternType: "term"
+    pattern: "\\b(WASI-II|Wechsler Abbreviated Scale of Intelligence)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["WASI-II", "Wechsler Abbreviated Scale of Intelligence-II"]
+    reasoning: "Wechsler scales are widely used intelligence assessment tools"
+
+  - patternType: "term"
+    pattern: "\\bConners\\s+(Parent\\s+)?Rating\\s+Scale\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Conners Parent Rating Scale (3rd edition, short form)"]
+    reasoning: "Conners scales are standard ADHD assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(was used to measure|measured|assessed using|administered)\\b.*\\b(scale|questionnaire|inventory|assessment|diagnostic)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["was used to measure current autism clinical profile", "measured ADHD symptomatology"]
+    reasoning: "Context phrases indicating clinical tool administration"
+
+  - patternType: "term"
+    pattern: "\\bSPSS\\s+version\\s+\\d+"
+    toolType: "computational_tool"
+    examples: ["SPSS version 25"]
+    reasoning: "Statistical software with version numbers commonly used in clinical research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}-[A-Z0-9]+\\b|\\b[A-Z]{2,}\\s*-\\s*[A-Z0-9]+\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["ADOS-2", "ADI-R", "WASI-II"]
+    reasoning: "Clinical assessment tools often use abbreviated names with version indicators"
+
+observations:
+  - resourceName: "Autism Diagnostic Observation Schedule-2 (ADOS-2)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ADOS-2 consists of four modules appropriate to different developmental age and expressive language skills.
+      Module 2 is for children of any age who use phrase speech but are not verbally fluent, module 3 is for
+      verbally fluent children and young adolescents, and module 4 is for verbally fluent older adolescents.
+      Study used items common to modules 2, 3, and 4. Scores range from 0 (no evident abnormality) to 3 (marked abnormality).
+      CSS scores: 1-3 = Nonspectrum, 4-5 = ASD, 6-10 = autism.
+    foundIn: "methods"
+    contextSnippet: "According to the ADOS manual, module 2 is for children of any age who use phrase speech but are not verbally fluent, module 3 is for verbally fluent children and young adolescents, and module 4 is for verbally fluent older adolescents."
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+  - resourceName: "Autism Diagnostic Observation Schedule-2 (ADOS-2)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      NF1 group showed higher impairments in social affect (ADOS-SA CSS mean 7.3) compared to NS (6.4) and CFC (5.3) groups,
+      but lower levels of restricted repetitive behaviors (ADOS-RRB CSS: NF1 5.0, NS 6.5, CFC 8.3).
+      CFC group showed highest RRB scores with significant group differences (p=0.009).
+      No significant differences in overall ADOS composite CSS scores between groups.
+    foundIn: "results"
+    contextSnippet: "Sub-scale analyses showed that NF1 group had higher impairments in social affect as compared with NS and CFC group but lower levels of restricted repetitive behaviors. The CFC group showed overall higher RRBs, but group differences were not significant (p = 0.009)."
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+  - resourceName: "Autism Diagnostic Interview-Revised (ADI-R)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ADI-R measures clinical profile throughout development based on parent-reported observations during structured interview.
+      Collects data about most abnormal behavior in past, either when child was 4-5 years old or "Ever".
+      Includes 87 items scored 0-3 (except early skills scored by age of acquisition).
+      Items grouped into 12 subscores providing three domain scores: Social Interaction (Domain A),
+      Communication (Domain B), and Restricted/Repetitive Behaviors (Domain C).
+    foundIn: "methods"
+    contextSnippet: "It measures the clinical profile throughout the development based on parent-reported observation gathered during a structured interview. The aim of the interview is to collect data about the most abnormal behavior exhibited in the past"
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+  - resourceName: "Autism Diagnostic Interview-Revised (ADI-R)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      No significant differences between RASopathy groups on ADI-R domain scores.
+      NF1 and CFC groups had higher reciprocal social interaction impairments and restricted repetitive behaviors
+      compared to NS group, but differences were not significant. NS and CFC groups showed higher communication
+      impairments compared to NF1 group, but not significantly different.
+    foundIn: "results"
+    contextSnippet: "On the ADI-R, the NF1 and CFC groups had higher levels of reciprocal social interaction impairments and restricted repetitive behaviors as compared with the NS group, but there were no significant differences between the groups."
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+  - resourceName: "Wechsler Abbreviated Scale of Intelligence-II (WASI-II)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Mean verbal IQ across RASopathies + ASD population was 87.0 (SD = 13.8).
+      CFC group had lowest VIQ (79.8, 95% CI: 73.6-85.9) compared to NF1 (88.7, 95% CI: 88.1-89.3)
+      and NS (89.1, 95% CI: 87.5-90.7), but no significant differences between groups (p = 0.853).
+    foundIn: "results"
+    contextSnippet: "The mean verbal IQ across the current population of RASopathies + ASD was 87.0 (SD = 13.8). The CFC group had the lowest VIQ, but there were no significant differences across the groups (p = 0.853)."
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+  - resourceName: "Conners Parent Rating Scale (3rd edition, short form)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      No significant mean differences observed on inattention (p = 0.460) or hyperactivity subscales (p = 0.923) between RASopathy groups.
+      However, ADHD symptoms were highly comorbid: 68.2% in NF1 + ASD, 68.2% in NS + ASD, and 85.7% in CFC + ASD.
+      Significant clinical score defined as T-score ≥65. ADHD comorbidity rates higher than typical non-syndromic ASD (~30%).
+    foundIn: "results"
+    contextSnippet: "On the parent-reported Conners questionnaire, no mean differences were observed on the inattention (p = 0.460) or hyperactivity subscales (p = 0.923). However, ADHD symptoms were comorbid in 68.2% children with NF1 + ASD, 68.2% NS + ASD, and 85.7% with CFC + ASD."
+    confidence: 1.0
+    doi: "10.3389/fpsyt.2020.585700"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 3
+  majorIssuesFound: |
+    - COMPLETE MINING FAILURE: No tools were captured despite extensive use of validated clinical assessment tools
+    - Missing all major clinical assessment tools: ADOS-2, ADI-R, WASI-II, Conners scales
+    - Missing statistical software (SPSS) used for data analysis
+    - Clinical assessment tool patterns appear to be completely absent from mining algorithm
+    - This represents a systematic gap in clinical tool detection capabilities
+  recommendations: |
+    CRITICAL MINING GAPS IDENTIFIED:
+    - All 5 missed tools should be added to the database - they are legitimate, validated research instruments
+    - Implement suggested patterns immediately to capture clinical assessment tools in future mining
+    - Clinical studies are a major source of research tools but appear to be poorly covered by current mining
+    - Consider separate mining strategies for clinical vs. laboratory publications
+    - ADOS, ADI-R, Wechsler scales, and Conners scales are gold-standard tools used across thousands of studies
+    - The 5 scientific observations extracted demonstrate rich phenotypic data available from clinical tool usage
+    - This publication type (clinical phenotyping study) should be prioritized for improved tool detection

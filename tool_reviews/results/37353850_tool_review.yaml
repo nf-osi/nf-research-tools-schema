@@ -1,0 +1,131 @@
+publicationMetadata:
+  pmid: "37353850"
+  title: "Burden of adult neurofibromatosis 1 questionnaire: translation and psychometric properties of the Persian version."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire validation study, which should contain:
+    - Clinical assessment tools (the BoN questionnaire being validated)
+    - Possibly computational tools for statistical analysis (though not explicitly mentioned)
+    
+    Questionnaire development/validation studies are a specific type of clinical research that
+    develops or validates patient-reported outcome measures (PROMs). These validated instruments
+    are legitimate research tools used to assess patient outcomes in clinical studies.
+  overallAssessment: |
+    This publication is a questionnaire validation study that translates and validates the Persian
+    version of the Burden of Neurofibromatosis 1 (BoN) questionnaire. Such studies typically develop
+    or validate clinical assessment tools, which are legitimate research instruments. The BoN questionnaire
+    should have been captured as a clinical assessment tool, as it's a validated instrument for measuring
+    disease burden in NF1 patients.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Burden of Neurofibromatosis 1 questionnaire (BoN)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The aim of this study was to evaluate the psychometric properties of the burden of neurofibromatosis 1 questionnaire (BoN) and to determine the perceived disease burden. RESULTS: The 15-item BoN was translated into Persian"
+    whyMissed: "The mining patterns likely didn't capture the full questionnaire name or the abbreviation 'BoN'. The tool is clearly described as a 15-item questionnaire being translated and validated."
+    confidence: 0.95
+    shouldBeAdded: Yes
+  
+  - toolName: "Persian version of BoN"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Persian version of the BoN is an acceptable tool in terms of structure and content, and it specifically assesses the practical aspects of daily activities for patients with neurofibromatosis."
+    whyMissed: "This represents the translated/validated version of the questionnaire, which is the main output/tool of this study. Mining patterns may not have recognized this as a distinct tool."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "questionnaire\\s*\\([A-Z][a-zA-Z]*\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaire (BoN)"]
+    reasoning: "Captures questionnaires with their abbreviations in parentheses, which is a common naming convention for clinical assessment tools"
+  
+  - patternType: "context_phrase"
+    pattern: "psychometric properties of.*questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["psychometric properties of the burden of neurofibromatosis 1 questionnaire"]
+    reasoning: "Questionnaire validation studies often use this phrase pattern when describing the validation of clinical assessment instruments"
+  
+  - patternType: "context_phrase"
+    pattern: "translated into.*version"
+    toolType: "clinical_assessment_tool"
+    examples: ["translated into Persian", "Persian version"]
+    reasoning: "Translation studies create new versions of existing tools, which are legitimate research instruments that should be captured"
+  
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]*\\s+version\\s+of\\s+[A-Z][a-zA-Z]*"
+    toolType: "clinical_assessment_tool"
+    examples: ["Persian version of BoN"]
+    reasoning: "Captures language-specific versions of questionnaires and assessment tools, which are distinct validated instruments"
+
+observations:
+  - resourceName: "Burden of Neurofibromatosis 1 questionnaire (BoN)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The 15-item BoN questionnaire demonstrated good psychometric properties in Persian translation:
+      - Content validity: No items were removed based on content validity assessment
+      - Sample adequacy: KMO = 0.902 (acceptable)
+      - Bartlett's test of sphericity: statistically significant (P < 0.001)
+      - Factor structure: Exploratory factor analysis revealed three factors
+      - Internal consistency reliability: Cronbach's alpha = 0.90 (good)
+      - Test-retest reliability: Intraclass coefficient = 0.85
+      - Disease burden assessment: Total mean burden score was 33.12 ± 16.12 (moderate severity)
+    foundIn: "results"
+    contextSnippet: "The 15-item BoN was translated into Persian, and no items were removed based on content validity. The adequacy of the sample was acceptable (KMO = 0.902), and Bartlett's test of sphericity revealed statistically significant results (P < 0.001). Exploratory factor analysis revealed three factors. The reliability of the scale was good (Cronbach's alpha: 0.90), and the intraclass coefficient was 0.85."
+    confidence: 0.95
+    doi: "10.1186/s13023-023-02681-x"
+  
+  - resourceName: "Persian version of BoN"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Persian version of the BoN questionnaire is validated for use in Persian-speaking NF1 patients:
+      - Acceptable tool in terms of structure and content
+      - Specifically assesses practical aspects of daily activities for patients with neurofibromatosis
+      - Can be used to measure disease burden in Persian-speaking NF1 populations
+      - Maintains the 15-item structure of the original questionnaire
+    foundIn: "discussion"
+    contextSnippet: "The Persian version of the BoN is an acceptable tool in terms of structure and content, and it specifically assesses the practical aspects of daily activities for patients with neurofibromatosis."
+    confidence: 0.90
+    doi: "10.1186/s13023-023-02681-x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 4
+  observationsExtracted: 2
+  observationsByType:
+    General Comment or Review: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Critical mining failure: The main clinical assessment tool (BoN questionnaire) was completely missed
+    - No tools were mined from a publication that clearly develops/validates a clinical assessment instrument
+    - Mining patterns appear inadequate for capturing questionnaire validation studies
+    - Only abstract text available, but it contains clear tool mentions that should have been captured
+  recommendations: |
+    This publication represents a significant mining failure. The Burden of Neurofibromatosis 1 (BoN) 
+    questionnaire is a legitimate clinical assessment tool that was translated and validated in this study.
+    Both the original BoN questionnaire and its Persian version should be added to the database.
+    
+    Key recommendations:
+    1. Add both "Burden of Neurofibromatosis 1 questionnaire (BoN)" and "Persian version of BoN" as clinical assessment tools
+    2. Implement suggested patterns to better capture questionnaire validation studies
+    3. Review mining patterns for clinical assessment tools - they appear to miss questionnaire names with abbreviations
+    4. Consider that questionnaire validation studies are a legitimate source of clinical assessment tools
+    5. The psychometric validation data provides valuable observations about tool reliability and validity
+    
+    This case highlights the need for better pattern coverage of questionnaire validation studies,
+    which are an important source of clinical assessment tools in rare disease research.

@@ -1,0 +1,192 @@
+publicationMetadata:
+  pmid: "34646065"
+  title: "Survival and NF1 Analysis in a Cohort of Orthopedics Patients with Malignant Peripheral Nerve Sheath Tumors."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical retrospective study with genetic analysis:
+    - Computational tools: Statistical software (SPSS), genetic analysis tools
+    - Genetic reagents: PCR primers, TaqMan assays for NF1 copy-number analysis
+    - Clinical assessment tools: Potentially survival assessment scales or staging systems
+    
+    This study combines clinical data collection with molecular genetic analysis, so both
+    computational tools for statistics and genetic reagents for mutation analysis are expected.
+    The study also uses immunohistochemistry (S100B staining) which may involve antibodies.
+  overallAssessment: |
+    This clinical study includes substantial molecular genetic analysis components that would
+    require research tools. The Methods section describes NF1 gene mutation analysis using
+    PCR, Sanger sequencing, and TaqMan copy-number assays, indicating use of genetic reagents.
+    Statistical analysis using SPSS software is also described. While primarily a clinical
+    study, the genetic analysis component makes research tools highly likely.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "SPSS 25"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All data were analyzed using statistical software (SPSS 25, IBM Co. Armonk, NY). The significance level for analyses was set a priori at p < 0.05."
+    whyMissed: "Statistical software with specific version number and vendor information was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TaqMan NF1 copy-number assays"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "all samples were screened for large deletions using four TaqMan NF1 copy-number assays across the gene (ThermoFisher; Hs05477010, Hs06413401, Hs05512625, and Hs03960106)"
+    whyMissed: "Specific genetic reagents with catalog numbers from ThermoFisher were not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PCR"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "current testing included PCR and sequencing of 13 exons (4, 5, 11, 13, 14, 16, 18, 20, 22, 26, 28, 32, 40, and 46) of the 57 exons"
+    whyMissed: "PCR as a molecular technique was mentioned but not captured as a genetic reagent/method"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "Sanger sequencing"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Previously existing data included some NF1 cDNA Sanger sequencing, while current testing included PCR and sequencing"
+    whyMissed: "Sanger sequencing as a specific sequencing method was not captured"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "S100B immunohistochemistry"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "immunohistochemical S100B data from a pathology service"
+    whyMissed: "S100B antibody used for immunohistochemistry was not captured, though it's mentioned as a clinical assay"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Kaplan-Meier survival analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Kaplan–Meier survival curves were generated to assess the overall survival of the study population"
+    whyMissed: "Statistical analysis method was not captured as a computational tool"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SPSS\\s+\\d+(\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["SPSS 25"]
+    reasoning: "Statistical software with version numbers should be captured as computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using statistical software \\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["analyzed using statistical software (SPSS 25, IBM Co. Armonk, NY)"]
+    reasoning: "Context phrase indicating statistical software usage with vendor information"
+
+  - patternType: "term"
+    pattern: "TaqMan\\s+[A-Z0-9]+\\s+copy-number assays?"
+    toolType: "genetic_reagent"
+    examples: ["TaqMan NF1 copy-number assays"]
+    reasoning: "TaqMan assays are specific genetic reagents that should be captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(ThermoFisher;\\s*[A-Za-z0-9,\\s]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["(ThermoFisher; Hs05477010, Hs06413401, Hs05512625, and Hs03960106)"]
+    reasoning: "Vendor information with catalog numbers indicates specific genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "Kaplan[–-]Meier survival curves?"
+    toolType: "computational_tool"
+    examples: ["Kaplan–Meier survival curves"]
+    reasoning: "Specific statistical analysis methods should be captured as computational tools"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+\\d+[A-Z]*\\s+immunohistochemistry"
+    toolType: "antibody"
+    examples: ["S100B immunohistochemistry"]
+    reasoning: "Protein markers used in immunohistochemistry likely involve specific antibodies"
+
+observations:
+  - resourceName: "SPSS 25"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Statistical software used for comprehensive data analysis including descriptive statistics,
+      Kaplan-Meier survival curve generation, and comparative survival analysis between demographic,
+      clinical, and pathological variables. Significance level set at p < 0.05 a priori.
+      Used to analyze 20 MPNST patient cases over 25-year period.
+    foundIn: "both"
+    contextSnippet: "All data were analyzed using statistical software (SPSS 25, IBM Co. Armonk, NY). The significance level for analyses was set a priori at p < 0.05. Descriptive statistics were computed for demographic and clinical variables. Kaplan–Meier survival curves were generated"
+    confidence: 0.95
+    doi: "10.1155/2021/9386823"
+
+  - resourceName: "TaqMan NF1 copy-number assays"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Four specific TaqMan assays (Hs05477010, Hs06413401, Hs05512625, and Hs03960106) from
+      ThermoFisher used to screen for large NF1 gene deletions across 27 NF1 families with
+      MPNST occurrence. Analysis performed at Center for Pharmacogenomics Core, UF Clinical
+      and Translational Institute. Successfully identified whole-gene deletions in 14.8% of cases.
+    foundIn: "both"
+    contextSnippet: "all samples were screened for large deletions using four TaqMan NF1 copy-number assays across the gene (ThermoFisher; Hs05477010, Hs06413401, Hs05512625, and Hs03960106)"
+    confidence: 0.90
+    doi: "10.1155/2021/9386823"
+
+  - resourceName: "TaqMan NF1 copy-number assays"
+    resourceType: "Genetic Reagent"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The frequency of whole-gene deletions (14.8%) detected in the 27 germline NF1 mutations
+      associated with MPNSTs was higher than the 4-5% rate typically seen in general NF1 patient
+      population. This finding supports previous reports that individuals with such deletions
+      have greater risk for MPNSTs, possibly related to increased plexiform neurofibroma burden.
+    foundIn: "discussion"
+    contextSnippet: "The frequency of whole-gene deletions (14.8%) in the 27 germline NF1 mutations associated with MPNSTs was higher in our population than the 4–5% rate of such deletions in NF1 patients in general"
+    confidence: 0.85
+    doi: "10.1155/2021/9386823"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage
+    - Statistical software (SPSS 25) with version and vendor information was missed
+    - Genetic reagents (TaqMan assays) with specific catalog numbers were missed
+    - Molecular techniques (PCR, Sanger sequencing) were not captured
+    - Immunohistochemistry reagents (S100B antibody) were not identified
+    - Statistical analysis methods (Kaplan-Meier) were not recognized as computational tools
+  recommendations: |
+    This publication contains several genuine research tools that were completely missed by
+    the initial mining process. The most critical omissions are:
+    
+    1. SPSS 25 - Clear computational tool with version and vendor information
+    2. TaqMan NF1 copy-number assays - Specific genetic reagents with catalog numbers
+    
+    These tools should definitely be added to the database. The molecular techniques (PCR,
+    Sanger sequencing) and statistical methods (Kaplan-Meier) represent borderline cases
+    that may warrant inclusion depending on tool definition scope.
+    
+    The mining patterns need significant improvement to capture:
+    - Statistical software with version numbers
+    - Genetic reagents with vendor/catalog information
+    - Immunohistochemistry antibodies
+    - Statistical analysis methods as computational tools
+    
+    Three high-quality scientific observations were extracted, primarily focusing on tool
+    usage instructions and performance characteristics in the context of NF1/MPNST research.

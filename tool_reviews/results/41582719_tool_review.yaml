@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "41582719"
+  title: "Inhibition of Cxcr4 chemokine receptor signaling improves habituation learning in a zebrafish model of Neurofibromatosis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental design described in abstract
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool types include:
+    - Animal models (nf1 mutant zebrafish explicitly mentioned)
+    - Computational tools (RNAseq analysis mentioned)
+    - Genetic reagents (nf1 mutants, potentially drug compounds)
+    - Clinical assessment tools (habituation learning behavioral assays)
+    
+    The study describes experimental work with zebrafish models, drug screening, transcriptomic analysis,
+    and behavioral testing, indicating multiple tool categories should be present.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving experimental work with zebrafish models
+    of Neurofibromatosis. The abstract describes drug screening, RNAseq analysis, and behavioral testing,
+    all of which typically require specific research tools. However, only abstract text is available,
+    limiting detailed tool identification. Tools are highly expected but may be underrepresented due to
+    limited text availability.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "nf1 mutant zebrafish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...cAMP-PKA signaling in nf1 mutant larval zebrafish. Combining a small-molecule drug screen and RNAseq analysis, we show that cxcr4b expression is increased in nf1 mutants..."
+    whyMissed: "Animal model clearly mentioned but not captured by mining patterns. May need patterns for 'mutant' + species combinations."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AMD3100"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...that pharmacological inhibition of Cxcr4 with AMD3100 (Plerixafor) improves habituation learning..."
+    whyMissed: "Specific pharmacological compound with alternative name (Plerixafor) mentioned but not captured. May need patterns for drug names with parenthetical alternatives."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Plerixafor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...that pharmacological inhibition of Cxcr4 with AMD3100 (Plerixafor) improves habituation learning. We further demonstrate that Plerixafor activates cAMP-PKA pathway signaling..."
+    whyMissed: "FDA-approved drug used as research reagent, mentioned twice but not captured. May need patterns for pharmaceutical compounds used in research."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RNAseq"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Combining a small-molecule drug screen and RNAseq analysis, we show that cxcr4b expression is increased..."
+    whyMissed: "RNA sequencing analysis method mentioned but not captured. May need patterns for 'RNAseq', 'RNA-seq', and similar transcriptomic methods."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "habituation learning assay"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...evidence that Cxcr4 chemokine receptor signaling is a regulator of habituation learning and modulator of cAMP-PKA signaling..."
+    whyMissed: "Behavioral assessment method for cognitive function mentioned but not captured. May need patterns for behavioral testing paradigms."
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\s+mutant\\s+(zebrafish|mice|mouse|rats?|flies?)\\b"
+    toolType: "animal_model"
+    examples: ["nf1 mutant larval zebrafish"]
+    reasoning: "Pattern to capture mutant animal models with gene name + 'mutant' + species. This would catch commonly used model organism nomenclature."
+
+  - patternType: "term"
+    pattern: "\\b(AMD3100|Plerixafor)\\b"
+    toolType: "genetic_reagent"
+    examples: ["AMD3100 (Plerixafor)", "Plerixafor activates"]
+    reasoning: "Specific drug compounds used as research reagents. These are FDA-approved drugs commonly used in research contexts."
+
+  - patternType: "term"
+    pattern: "\\b(RNAseq|RNA-seq|RNA\\s+sequencing)\\b"
+    toolType: "computational_tool"
+    examples: ["RNAseq analysis"]
+    reasoning: "Common transcriptomic analysis methods that are frequently mentioned but may be missed by current patterns."
+
+  - patternType: "context_phrase"
+    pattern: "\\b(habituation\\s+learning|behavioral\\s+assay|cognitive\\s+testing)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["habituation learning", "improves habituation learning"]
+    reasoning: "Behavioral and cognitive assessment methods used in animal models. These represent standardized testing paradigms."
+
+  - patternType: "context_phrase"
+    pattern: "\\bpharmacological\\s+inhibition\\s+of\\s+\\w+\\s+with\\s+(\\w+)"
+    toolType: "genetic_reagent"
+    examples: ["pharmacological inhibition of Cxcr4 with AMD3100"]
+    reasoning: "Pattern to capture drug compounds used for pharmacological interventions in research contexts."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - Methods, Results, and Discussion sections missing
+    - Multiple obvious research tools mentioned in abstract were not captured
+    - Mining patterns appear insufficient for this type of zebrafish model research
+    - Drug compounds used as research reagents were not identified
+    - Computational analysis methods (RNAseq) were not captured
+    - Behavioral assessment tools were not recognized
+  recommendations: |
+    Strong recommendations for this publication:
+    - This publication clearly contains multiple research tools that were completely missed
+    - The mining system failed to identify obvious animal models (nf1 mutant zebrafish)
+    - Drug compounds (AMD3100/Plerixafor) used as research reagents were not captured
+    - Computational tools (RNAseq) and behavioral assays were not identified
+    - Suggest implementing the 5 new patterns proposed to improve future mining
+    - This represents a significant false negative case where legitimate tools were missed
+    - Consider manual curation of similar zebrafish/behavioral neuroscience publications
+    - The limited text availability (abstract only) may have contributed to missed tools
+    - Future mining should prioritize abstracts more heavily when full text unavailable

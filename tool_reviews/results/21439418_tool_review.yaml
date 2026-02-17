@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "21439418"
+  title: "Primary osteopathy of vertebrae in a neurofibromatosis type 1 murine model."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study using genetically modified mouse models to study NF1-related 
+    skeletal abnormalities. Despite lacking a formal Methods section, the abstract describes experimental 
+    procedures using animal models and analytical techniques. Expected tools include animal models 
+    (genetically modified mice) and computational/analytical tools (imaging and measurement techniques).
+  overallAssessment: |
+    This is a laboratory research study that developed and characterized a novel NF1 mouse model. The publication 
+    clearly describes experimental work using genetically modified mice and analytical techniques for bone analysis. 
+    Research tools are definitely expected and present, particularly animal models and analytical/computational tools. 
+    The absence of a formal Methods section is concerning but the abstract provides sufficient detail to identify 
+    key research tools that were missed during initial mining.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1(flox/-);Col2.3Cre(+) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we report a novel murine NF1 model, Nf1(flox/-);Col2.3Cre(+) mice. These mice display short vertebral segments..."
+    whyMissed: "Complex genetic nomenclature with special characters (flox, -/-, +) may not have been captured by standard animal model patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "dual-energy X-ray absorptiometry"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...cortical and trabecular bone mass of the vertebrae was observed in Nf1(flox/-);Col2.3Cre(+) mice as measured by dual-energy X-ray absorptiometry (DEXA)..."
+    whyMissed: "Full technique name may not be in computational tool patterns, only the abbreviation DEXA might be recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "DEXA"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...as measured by dual-energy X-ray absorptiometry (DEXA) and peripheral quantitative computed tomography (pQCT)..."
+    whyMissed: "Medical imaging abbreviation may not be included in computational tool patterns focused on software/bioinformatics"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "peripheral quantitative computed tomography"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...as measured by dual-energy X-ray absorptiometry (DEXA) and peripheral quantitative computed tomography (pQCT)..."
+    whyMissed: "Full technique name may not be in computational tool patterns, focus might be on software rather than analytical techniques"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pQCT"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...dual-energy X-ray absorptiometry (DEXA) and peripheral quantitative computed tomography (pQCT). Peak stress and peak load..."
+    whyMissed: "Medical imaging abbreviation may not be included in computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\(flox[/-]+\\);[A-Za-z0-9.]+Cre\\([+-]\\)\\s+mice"
+    toolType: "animal_model"
+    examples: ["Nf1(flox/-);Col2.3Cre(+) mice"]
+    reasoning: "Captures conditional knockout mouse nomenclature with floxed alleles and Cre recombinase systems, which are common in modern mouse genetics but have complex naming patterns"
+
+  - patternType: "term"
+    pattern: "dual-energy X-ray absorptiometry|DEXA"
+    toolType: "computational_tool"
+    examples: ["dual-energy X-ray absorptiometry (DEXA)"]
+    reasoning: "Bone density measurement technique commonly used in skeletal research, should be recognized as an analytical tool"
+
+  - patternType: "term"
+    pattern: "peripheral quantitative computed tomography|pQCT"
+    toolType: "computational_tool"
+    examples: ["peripheral quantitative computed tomography (pQCT)"]
+    reasoning: "Specialized CT technique for bone analysis, important analytical tool in skeletal research"
+
+  - patternType: "context_phrase"
+    pattern: "as measured by|measured using|analyzed by|quantified using"
+    toolType: "general"
+    examples: ["as measured by dual-energy X-ray absorptiometry (DEXA)"]
+    reasoning: "Context phrases that indicate analytical tool usage, could help identify measurement and analysis techniques"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\([^)]*flox[^)]*\\)[^;]*;[^\\s]+\\s+mice"
+    toolType: "animal_model"
+    examples: ["Nf1(flox/-);Col2.3Cre(+) mice"]
+    reasoning: "More flexible pattern to capture various floxed mouse model nomenclatures with different genetic backgrounds and Cre systems"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of research tools in the abstract
+    - Missing Methods section limits ability to extract detailed tool usage and scientific observations
+    - Complex genetic nomenclature for mouse models was not captured by existing patterns
+    - Medical imaging/analytical techniques (DEXA, pQCT) were not recognized as computational tools
+    - Abstract-only content prevents extraction of detailed experimental observations
+  recommendations: |
+    - All 5 potentially missed tools should be added to the database - they represent genuine research tools used in this study
+    - The genetically modified mouse model Nf1(flox/-);Col2.3Cre(+) is a novel research tool that should definitely be included
+    - DEXA and pQCT are standard analytical techniques in bone research and should be recognized as computational tools
+    - Mining patterns need improvement for complex genetic nomenclature and medical imaging techniques
+    - Consider expanding computational tool patterns to include analytical/measurement techniques beyond just software
+    - No scientific observations could be extracted due to lack of Results/Discussion sections
+    - This publication demonstrates the need for better pattern coverage of specialized research tools

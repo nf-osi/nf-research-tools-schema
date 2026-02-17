@@ -1,0 +1,168 @@
+publicationMetadata:
+  pmid: "29796169"
+  title: "Aberrant ATRX protein expression is associated with poor overall survival in NF1-MPNST."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study examining ATRX protein expression in malignant peripheral nerve sheath tumors (MPNSTs) using immunohistochemistry. Expected tools include:
+    - Antibodies (for immunohistochemistry)
+    - Computational tools (for statistical analysis)
+    - Potentially tissue microarrays as research tools
+    - Patient databases as data sources
+    
+    The study involves experimental procedures (IHC staining, microscopy, statistical analysis) indicating active tool usage rather than just citations.
+  overallAssessment: |
+    This is a laboratory research study with extensive methods describing immunohistochemical analysis of tumor samples. The publication clearly uses research tools including antibodies, statistical software, and tissue microarrays. Tools are expected and likely present based on the experimental design involving protein expression analysis, microscopy, and statistical evaluation of clinical outcomes.
+
+toolValidations: []  # No tools were initially mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "ATRX antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemical stain for ATRX (Sigma, HPA001906, 1:300, rabbit polyclonal) was performed with appropriate positive and negative controls."
+    whyMissed: "Specific antibody with vendor (Sigma), catalog number (HPA001906), dilution (1:300), and type (rabbit polyclonal) clearly described in methods section"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "SAS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed with SAS (version 9.4; SAS Institute, Cary, NC) unless otherwise noted."
+    whyMissed: "Statistical software with specific version number (9.4) and vendor information used for data analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ATRX protein expression was compared between histology by Fisher's Exact Test using Graphpad Prism Version 7.03."
+    whyMissed: "Statistical analysis software with specific version (7.03) used for Fisher's Exact Test analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "tissue microarray"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The previously-generated tissue microarrays which included 34 patients treated at UCSF were utilized in this study. The cores were obtained from the most representative area of tumor and two 2 mm cores from each tumor were evaluated."
+    whyMissed: "Tissue microarray (TMA) is a research tool/reagent used for systematic analysis of multiple tissue samples"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Sigma|HPA\\d+|rabbit polyclonal|1:\\d+)\\b"
+    toolType: "antibody"
+    examples: ["Sigma, HPA001906, 1:300, rabbit polyclonal"]
+    reasoning: "Antibody mentions with vendor names, catalog numbers, dilutions, and antibody types are strong indicators of research tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "Statistical analyses were performed with|analyzed using|version \\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["Statistical analyses were performed with SAS (version 9.4)", "using Graphpad Prism Version 7.03"]
+    reasoning: "Software usage phrases with version numbers indicate active computational tool usage rather than citations"
+
+  - patternType: "term"
+    pattern: "tissue microarray|TMA"
+    toolType: "genetic_reagent"
+    examples: ["tissue microarrays which included 34 patients", "TMA was generated"]
+    reasoning: "Tissue microarrays are specialized research tools used for systematic tissue analysis and should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "Immunohistochemical stain for|IHC was performed|antibody.*performed"
+    toolType: "antibody"
+    examples: ["Immunohistochemical stain for ATRX"]
+    reasoning: "Immunohistochemistry context phrases strongly indicate antibody usage in experimental procedures"
+
+observations:
+  - resourceName: "ATRX antibody"
+    resourceType: "Antibody"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0010768"
+    details: |
+      ATRX protein expression patterns in MPNSTs showed three distinct categories: retained (81-100%), mosaic (21-80%), and complete loss (0-20%). 57% (43/74) of MPNSTs showed aberrant ATRX expression (mosaic or loss) compared to only 7% (2/30) of plexiform and atypical neurofibromas (p < 0.0001, Fisher's Exact Test). The antibody successfully differentiated between malignant and pre-malignant lesions.
+    foundIn: "results"
+    contextSnippet: "Of note, slightly more than half of the MPNSTs (43/74 tumors) examined exhibited either a mosaic pattern (29 tumors) or loss of ATRX (14 tumors)... compared to 57% (43/74) of MPNSTs showing aberrant ATRX protein (Figure 3, p < 0.0001, Fisher's Exact Test)"
+    confidence: 0.95
+    doi: "10.18632/oncotarget.25195"
+
+  - resourceName: "ATRX antibody"
+    resourceType: "Antibody"
+    observationType: "Disease Susceptibility"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      In NF1-associated MPNSTs, aberrant ATRX expression was significantly associated with worse overall survival (p = 0.0276, log rank test). In multivariate analysis, aberrant ATRX expression was an independent poor prognostic factor with hazard ratio of 5.3 (95%CI: 1.367-20.433). No survival difference was observed in sporadic MPNSTs based on ATRX status.
+    foundIn: "results"
+    contextSnippet: "we did observe a statistically significant decrease in OS for patients with NF1-MPNSTs who have aberrant ATRX expression (Figure 4B, p = 0.0276, log rank test)... aberrant ATRX expression was found to be an independent poor prognostic factor with a hazard ratio of 5.3"
+    confidence: 0.95
+    doi: "10.18632/oncotarget.25195"
+
+  - resourceName: "ATRX antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The ATRX antibody (Sigma, HPA001906) was used at 1:300 dilution with rabbit polyclonal specificity. Staining was evaluated semi-quantitatively across whole tumor sections with appropriate positive and negative controls. Internal positive controls (inflammatory and endothelial cells) were used to validate staining quality.
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemical stain for ATRX (Sigma, HPA001906, 1:300, rabbit polyclonal) was performed with appropriate positive and negative controls... Note the residual ATRX nuclear staining in the inflammatory and endothelial cells in panel F as an internal positive control"
+    confidence: 0.90
+    doi: "10.18632/oncotarget.25195"
+
+  - resourceName: "tissue microarray"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Tissue microarray included 34 MPNST patients from UCSF treated between 1990-2012. Cores were obtained from the most representative tumor areas with two 2mm cores per tumor evaluated. TMA generation required chart review for clinical NF1 diagnosis documentation and pathological evaluation by multiple pathologists.
+    foundIn: "methods"
+    contextSnippet: "The previously-generated tissue microarrays which included 34 patients treated at UCSF were utilized in this study. The cores were obtained from the most representative area of tumor and two 2 mm cores from each tumor were evaluated"
+    confidence: 0.85
+    doi: "10.18632/oncotarget.25195"
+
+  - resourceName: "SAS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SAS version 9.4 was used for statistical analyses including χ² test, Fisher exact test for categorical variables, non-parametric Wilcoxon rank sum test for continuous variables, Kaplan-Meier survival analysis, log-rank test, and multivariate Cox proportional hazards modeling. All tests were two-sided with statistical significance defined as p ≤ 0.05.
+    foundIn: "methods"
+    contextSnippet: "Patient characteristics were compared... using χ² test or Fisher exact test as appropriate for categorical variables while non-parametric Wilcoxon rank sum test was used for continuous variables... Statistical analyses were performed with SAS (version 9.4; SAS Institute, Cary, NC)"
+    confidence: 0.90
+    doi: "10.18632/oncotarget.25195"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 5
+  observationsByType:
+    Molecular: 1
+    Disease Susceptibility: 1
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Initial mining completely missed several clear research tools despite detailed methods section
+    - ATRX antibody with full vendor/catalog information was not detected
+    - Statistical software with version numbers were not captured
+    - Tissue microarray as a research reagent was overlooked
+    - Mining patterns appear insufficient for detecting antibodies with vendor information and computational tools in statistical analysis context
+  recommendations: |
+    All 4 potentially missed tools should be added to the database:
+    1. ATRX antibody (Sigma, HPA001906) - clear experimental usage with detailed specifications
+    2. SAS version 9.4 - statistical analysis software with version specified
+    3. GraphPad Prism Version 7.03 - statistical software for specific analyses
+    4. Tissue microarray - research reagent used for systematic tumor analysis
+    
+    The mining patterns need significant improvement to capture:
+    - Antibodies with vendor/catalog information in immunohistochemistry context
+    - Statistical software mentioned in methods with version numbers
+    - Tissue microarrays and other specialized research reagents
+    
+    5 scientific observations were successfully extracted, primarily focusing on ATRX expression patterns, survival outcomes, and tool usage protocols. The observations provide valuable insights into tool performance and experimental findings.

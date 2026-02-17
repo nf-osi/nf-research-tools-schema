@@ -1,0 +1,244 @@
+publicationMetadata:
+  pmid: "29200117"
+  title: "Common Histologically Benign Tumors of the Brain."
+  queryType: "unknown"  # No queryType provided in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical intervention study (quasi-experimental design) testing a post-discharge care program
+    for brain tumor surgery patients. Expected tool types include:
+    - Clinical assessment tools: Validated questionnaires and scales for measuring symptom clusters, 
+      post-discharge adaptation, and quality of life (primary outcome measures)
+    - Computational tools: Statistical software for data analysis and sample size calculation
+    
+    Clinical studies typically use validated instruments to measure patient outcomes, which are legitimate
+    research tools even though they differ from traditional lab tools. The study design and methods
+    clearly indicate use of standardized assessment instruments.
+  overallAssessment: |
+    This clinical intervention study would be expected to contain multiple research tools, particularly
+    clinical assessment tools for measuring patient outcomes. The detailed methods section describes
+    validated questionnaires and statistical software, indicating active tool usage rather than just
+    citations. The absence of any mined tools suggests significant under-detection of clinical assessment
+    tools and computational tools used in this study.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Memorial Symptom Assessment Scale (MSAS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "To examine symptom cluster, the study used Portenoy et al.'s [25] Memorial Symptom Assessment Scale (MSAS) developed for general cancer patients, which was translated by Kim [26] to measure the symptom clusters of patients undergoing brain tumor surgery."
+    whyMissed: "Clinical assessment tool not detected - likely missing patterns for validated questionnaire names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Post-Discharge Coping Difficulty Scale (PDCDS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "To examine post-discharge adaptation, this study utilized Weiss and Piacentine's [27] Post-Discharge Coping Difficulty Scale (PDCDS), which was translated by Kim [28] to fit the Korean situation, to measure post-discharge adaptation."
+    whyMissed: "Clinical assessment tool not detected - missing patterns for scale/questionnaire names with acronyms"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Functional Assessment of Chronic Illness Therapy (FACIT)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "To examine quality of life, the research adopted Cella's [29] Functional Assessment of Chronic Illness Therapy (FACIT), which was translated by Kim et al. [30] to measure the quality of life of patients undergoing brain tumor surgery."
+    whyMissed: "Clinical assessment tool not detected - missing patterns for therapy assessment instruments"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "G*Power 3.1.9.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The sample size for each group was calculated as 31 by setting the significance level to 0.05, power (1-β) to 0.90, medium effect size (f) to 0.25, number of groups to 2, and number of repeated measurements to 2 in the G*power 3.1.9.2 program [14]."
+    whyMissed: "Statistical software with version number not detected - missing patterns for G*Power software"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS PC+ Version 23.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The collected data were analyzed using the SPSS PC+ Version 23.0 program."
+    whyMissed: "Statistical software with version not detected - missing patterns for SPSS versions"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ZOOM platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sessions from Week 2 to Week 8 were delivered in real-time via the Zoom platform. For participants unfamiliar with the virtual platform, instructions were provided in advance together with their caregivers, and the researcher personally assisted with mobile device setup to improve accessibility."
+    whyMissed: "Video conferencing platform used for intervention delivery not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Memorial Symptom Assessment Scale|MSAS"
+    toolType: "clinical_assessment_tool"
+    examples: ["Memorial Symptom Assessment Scale (MSAS)"]
+    reasoning: "Widely used cancer symptom assessment tool that should be captured"
+
+  - patternType: "term"
+    pattern: "Post-Discharge Coping Difficulty Scale|PDCDS"
+    toolType: "clinical_assessment_tool"
+    examples: ["Post-Discharge Coping Difficulty Scale (PDCDS)"]
+    reasoning: "Specific post-discharge adaptation assessment tool"
+
+  - patternType: "term"
+    pattern: "Functional Assessment of Chronic Illness Therapy|FACIT"
+    toolType: "clinical_assessment_tool"
+    examples: ["Functional Assessment of Chronic Illness Therapy (FACIT)"]
+    reasoning: "Quality of life assessment instrument for chronic illness patients"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(Scale|Assessment|Questionnaire|Inventory|Index)\\s*\\([A-Z]{2,6}\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Scale (PDCDS)", "Assessment Scale (MSAS)"]
+    reasoning: "Pattern to catch clinical instruments with common acronyms in parentheses"
+
+  - patternType: "term"
+    pattern: "G\\*[Pp]ower\\s+\\d+\\.\\d+\\.\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["G*power 3.1.9.2"]
+    reasoning: "Statistical power analysis software with version numbers"
+
+  - patternType: "term"
+    pattern: "SPSS\\s+(PC\\+\\s+)?[Vv]ersion\\s+\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["SPSS PC+ Version 23.0"]
+    reasoning: "SPSS statistical software with version information"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|data were analyzed using|statistical analysis.*using"
+    toolType: "computational_tool"
+    examples: ["analyzed using the SPSS PC+ Version 23.0 program"]
+    reasoning: "Context phrases that indicate active use of statistical software"
+
+  - patternType: "context_phrase"
+    pattern: "to examine|to measure|utilized.*to measure|adopted.*to measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["utilized Weiss and Piacentine's Post-Discharge Coping Difficulty Scale to measure"]
+    reasoning: "Context phrases indicating active use of clinical assessment instruments"
+
+observations:
+  - resourceName: "Memorial Symptom Assessment Scale (MSAS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MSAS measures 32 different symptom cluster items that cancer patients can experience, with patients 
+      self-evaluating frequency, severity, physical and psychological pain and discomfort. Severity 
+      measured on 1-4 point scale where higher scores indicate higher severity. Total score ranges 
+      from 32-128 points. Cronbach's α was 0.96 in this study, indicating excellent internal consistency.
+    foundIn: "methods"
+    contextSnippet: "MSAS measures 32 different symptom cluster items that cancer patients can experience, and patients self-evaluate the frequency, severity, physical and psychological pain and discomfort. The severity of symptoms is measured on a scale from 1 to 4 points, where a higher score indicates a higher severity."
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+  - resourceName: "Post-Discharge Coping Difficulty Scale (PDCDS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PDCDS consists of 10 items measuring overall stress, difficulties in recovery process, self-management 
+      difficulty, medical condition management difficulty, family/friend difficulties, emotional support needs, 
+      self-management confidence, medical needs management difficulty, and home adaptation degree. Each item 
+      measured on 11-level scale (0-10 points). Total score 0-100 points where higher scores indicate more 
+      difficulty in post-discharge adaptation. Cronbach's α was 0.95 in this study.
+    foundIn: "methods"
+    contextSnippet: "This tool consists of 10 items, including overall stress in life perceived by patients, difficulties in the recovery process, difficulty in self-management, difficulty in managing medical conditions, difficulties experienced by family and friends, degree of need for emotional support, confidence in self-management, difficulty in managing medical needs, and degree of adaptation at home."
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+  - resourceName: "Functional Assessment of Chronic Illness Therapy (FACIT)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FACIT covers 27 items measuring quality of life in physical, social family, emotional, and functional 
+      domains. Each item measured on five-level scale (0-4 points). Total score ranges 0-108 points where 
+      higher scores indicate higher quality of life. Domain-specific Cronbach's α values: physical (0.83), 
+      social/family (0.70), emotional (0.83), functional (0.74). Total Cronbach's α was 0.81.
+    foundIn: "methods"
+    contextSnippet: "This tool covers 27 items that measure the quality of life in the physical, social family, emotional, and functional domains. Each item is measured on a five-level scale from 0 to 4 points. The total score of the 27 items ranges from 0 to 108 points, where a higher total score shows a higher quality of life."
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+  - resourceName: "Memorial Symptom Assessment Scale (MSAS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The intervention group showed significant improvement in symptom cluster scores from pre-intervention 
+      (mean 2.30, SD 0.581) to post-intervention (mean 1.90, SD 0.630), while the control group showed 
+      minimal change from 2.24 (SD 0.379) to 2.17 (SD 0.423). The difference was statistically significant 
+      between times (F = 157.742, p < 0.001) and between groups × times (F = 74.878, p < 0.001).
+    foundIn: "results"
+    contextSnippet: "For the symptom cluster, the pre-mean (standard deviation) of the intervention group was 2.30 (0.581), and the post mean (standard deviation) was 1.90 (0.630). The pre-mean (standard deviation) of the control group was 2.24 (0.379), and the post mean (standard deviation) was 2.17 (0.423)."
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+  - resourceName: "Post-Discharge Coping Difficulty Scale (PDCDS)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The intervention group demonstrated improved post-discharge adaptation scores from pre-intervention 
+      (mean 5.59, SD 1.541) to post-intervention (mean 4.81, SD 1.845), while the control group showed 
+      worsening from 5.45 (SD 1.514) to 5.63 (SD 1.453). Lower scores indicate better adaptation. 
+      Statistical significance found between times (F = 56.691, p < 0.001) and groups × times 
+      (F = 144.687, p < 0.001).
+    foundIn: "results"
+    contextSnippet: "For the post-discharge adaptation, the pre-mean (standard deviation) of the intervention group was 5.59 (1.541), and the post mean (standard deviation) was 4.81 (1.845). On the other hand, the pre-mean (standard deviation) of the control group was 5.45 (1.514), and the post mean (standard deviation) was 5.63 (1.453)."
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+  - resourceName: "Functional Assessment of Chronic Illness Therapy (FACIT)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Significant improvements were observed in all four quality of life domains (physical, social/family, 
+      emotional, and functional) for the intervention group compared to controls. Physical domain showed 
+      significant time effect (F = 62.743, p < 0.001) and group × time interaction (F = 38.996, p < 0.001). 
+      The remaining three domains showed significant effects for time, group, and group × time interactions, 
+      supporting the hypothesis that the intervention improved quality of life across multiple dimensions.
+    foundIn: "results"
+    contextSnippet: "The differences in the four domains (i.e., physical, social/family, emotional, and functional) of quality of life between the intervention and control groups were all significant. Additionally, the main effect of the difference between times (F = 62.743, p < 0.001) and the interaction of the difference between groups and times (F = 38.996, p < 0.001) in the physical domain was significant"
+    confidence: 0.95
+    doi: "10.1212/CON.0000000000000541"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 8
+  observationsExtracted: 7
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 4
+  majorIssuesFound: |
+    - Complete failure to detect clinical assessment tools: No tools were mined despite clear usage of 
+      validated clinical instruments (MSAS, PDCDS, FACIT) as primary outcome measures
+    - Missing computational tools: Statistical software (SPSS, G*Power) and intervention platform (ZOOM) 
+      not detected despite explicit version information and usage context
+    - Clinical study tool detection gap: Mining patterns appear optimized for lab research tools but 
+      inadequate for clinical assessment instruments commonly used in patient outcome studies
+    - Systematic under-detection: All 6 legitimate research tools used in this study were missed, 
+      indicating fundamental gaps in clinical tool recognition patterns
+  recommendations: |
+    - All 6 missed tools should be added to the database as they represent legitimate research tools 
+      actively used in this clinical intervention study
+    - Implement suggested patterns to improve detection of clinical assessment tools, particularly 
+      validated questionnaires and scales with acronyms
+    - Add patterns for statistical software with version numbers and context phrases indicating active usage
+    - Expand mining to better capture tools used in clinical studies, not just laboratory research
+    - The extracted observations provide valuable information about tool performance and usage in 
+      clinical settings, demonstrating effectiveness of the intervention program
+    - This publication represents a clear case where clinical assessment tools are the primary research 
+      instruments and should be systematically captured by mining algorithms

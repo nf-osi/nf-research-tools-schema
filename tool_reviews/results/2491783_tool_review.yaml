@@ -1,0 +1,176 @@
+publicationMetadata:
+  pmid: "2491783"
+  title: "Physical mapping of the von Recklinghausen neurofibromatosis region on chromosome 17."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - describes molecular genetic mapping experiments
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → genetic reagents (probes, cell lines), computational tools (mapping software)
+    
+    This is a 1989 genetic mapping study using somatic cell hybrids, chromosome translocations, 
+    and pulsed-field gel electrophoresis. Expected tools include:
+    - Genetic reagents: DNA probes, chromosome-specific libraries
+    - Cell lines: Somatic cell hybrids, hybrid cell lines
+    - Potentially computational tools for genetic mapping analysis
+    
+    Note: This is from 1989, so computational tools may be less sophisticated than modern standards.
+    The focus is on physical/genetic mapping rather than protein analysis, so antibodies unlikely.
+  overallAssessment: |
+    This 1989 publication describes laboratory-based genetic mapping experiments using somatic cell hybrids,
+    chromosome translocations, and pulsed-field gel electrophoresis to map the NF1 gene region. The study
+    clearly involves experimental tools including DNA probes, cell lines, and mapping techniques, making
+    it highly likely to contain research tools despite having no formal Methods section (common in older papers).
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "somatic-cell hybrid from the t(17;22) individual"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "We have used a somatic-cell hybrid from the t(17;22) individual, along with other hybrid cell lines, to order probes around the NF1 locus."
+    whyMissed: "Specific cell line derived from translocation patient - not caught by standard cell line patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "hybrid cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "We have used a somatic-cell hybrid from the t(17;22) individual, along with other hybrid cell lines, to order probes around the NF1 locus."
+    whyMissed: "Generic term for multiple cell lines - may need broader cell line detection patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "17L1 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "An additional probe, 17L1, has been isolated from a NotI linking library made from flow-sorted chromosome 17 material"
+    whyMissed: "Specific DNA probe with alphanumeric identifier - probe naming patterns may be incomplete"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NotI linking library"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "An additional probe, 17L1, has been isolated from a NotI linking library made from flow-sorted chromosome 17 material"
+    whyMissed: "Genomic library constructed with restriction enzyme - library detection patterns may be missing"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "EW206 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "While neither NF1 translocation breakpoint has yet been identified by pulse-field gel analysis, an overlap between two probes, EW206 and EW207, has been detected."
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "EW207 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "While neither NF1 translocation breakpoint has yet been identified by pulse-field gel analysis, an overlap between two probes, EW206 and EW207, has been detected."
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "HHH202 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "This breakpoint has been helpful in creating a 1,000-kb pulsed-field map, which includes the closely linked NF1 probes HHH202 and TH17.19."
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TH17.19 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "This breakpoint has been helpful in creating a 1,000-kb pulsed-field map, which includes the closely linked NF1 probes HHH202 and TH17.19."
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "EW203 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The combined somatic-cell hybrid and pulsed-field gel analysis we report here favors the probe order D17Z1-HHH202-TH17.19-CRYB1-17L1-NF1-(EW206, EW207, EW203, L581, L946)"
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "L581 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The combined somatic-cell hybrid and pulsed-field gel analysis we report here favors the probe order D17Z1-HHH202-TH17.19-CRYB1-17L1-NF1-(EW206, EW207, EW203, L581, L946)"
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "L946 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The combined somatic-cell hybrid and pulsed-field gel analysis we report here favors the probe order D17Z1-HHH202-TH17.19-CRYB1-17L1-NF1-(EW206, EW207, EW203, L581, L946)"
+    whyMissed: "DNA probe with alphanumeric identifier - probe naming patterns may need expansion"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{1,3}[0-9]{2,4}\\s+probe"
+    toolType: "genetic_reagent"
+    examples: ["EW206 probe", "EW207 probe", "HHH202 probe", "L581 probe", "L946 probe"]
+    reasoning: "DNA probes often use alphanumeric identifiers with 1-3 letters followed by 2-4 numbers. Adding 'probe' context improves specificity."
+
+  - patternType: "naming_convention"
+    pattern: "[0-9]{1,2}[A-Z][0-9]{1,2}(\\.[0-9]+)?\\s+probe"
+    toolType: "genetic_reagent"
+    examples: ["17L1 probe", "TH17.19 probe"]
+    reasoning: "Some probes use chromosome-based naming (number + letter + number) or include decimal points for sub-localization."
+
+  - patternType: "context_phrase"
+    pattern: "somatic-cell hybrid from the t\\([0-9]+;[0-9]+\\)"
+    toolType: "cell_line"
+    examples: ["somatic-cell hybrid from the t(17;22) individual"]
+    reasoning: "Somatic cell hybrids from specific chromosomal translocations are specialized cell lines used in genetic mapping."
+
+  - patternType: "term"
+    pattern: "NotI linking library"
+    toolType: "genetic_reagent"
+    examples: ["NotI linking library made from flow-sorted chromosome 17 material"]
+    reasoning: "Restriction enzyme-based genomic libraries are important genetic reagents for chromosome walking and mapping."
+
+  - patternType: "context_phrase"
+    pattern: "hybrid cell lines"
+    toolType: "cell_line"
+    examples: ["along with other hybrid cell lines"]
+    reasoning: "Generic term for somatic cell hybrids used in genetic mapping - may catch multiple cell lines in one phrase."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Multiple DNA probes with specific identifiers were completely missed (EW206, EW207, HHH202, TH17.19, 17L1, EW203, L581, L946)
+    - Somatic cell hybrids and hybrid cell lines were not detected
+    - Genomic libraries (NotI linking library) were not identified
+    - This represents a significant gap in genetic reagent detection patterns
+    - The mining system appears to lack patterns for 1980s-era genetic mapping tools
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded multiple genetic reagents (DNA probes) and cell lines
+    - The complete absence of mined tools indicates major gaps in detection patterns for genetic mapping studies
+    - Recommend adding the suggested patterns to catch alphanumeric probe identifiers
+    - Consider expanding cell line patterns to include "somatic cell hybrid" and "hybrid cell lines"
+    - Add patterns for genomic libraries and restriction enzyme-based reagents
+    - This type of genetic mapping study from the 1980s-1990s era may be systematically under-mined
+    - No observations could be extracted since no tools were validated, but the abstract contains mapping data that could be valuable
+    - Future mining should specifically target genetic mapping terminology and probe nomenclature

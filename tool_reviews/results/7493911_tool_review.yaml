@@ -1,0 +1,85 @@
+publicationMetadata:
+  pmid: "7493911"
+  title: "Low incidence of a nucleotide sequence alteration of the neurofibromatosis 2 gene in human breast cancers."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - molecular genetics study with PCR and sequencing
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract describing "single-strand conformation polymorphism analysis of polymerase chain reaction products followed by nucleotide sequencing", this molecular genetics study would be expected to contain:
+    - Genetic reagents (PCR primers, probes for NF2 gene analysis)
+    - Computational tools (DNA sequencing analysis software, SSCP analysis tools)
+    - Possibly cell lines or tissue samples (breast cancer samples from 60 patients)
+    
+    The study involves PCR amplification, SSCP analysis, and DNA sequencing - all techniques that require specific molecular reagents and analysis tools. However, only the abstract is available, limiting tool detection.
+  overallAssessment: |
+    This 1995 molecular genetics study investigating NF2 gene mutations in breast cancer samples would typically use multiple research tools including PCR primers, sequencing reagents, and analysis software. The study methodology (SSCP analysis, PCR, DNA sequencing) strongly indicates tool usage, but the lack of Methods section severely limits tool identification. The abstract mentions specific techniques that require specialized reagents and equipment, suggesting tools were used but not explicitly named in the available text.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "polymerase chain reaction"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...by single-strand conformation polymorphism analysis of polymerase chain reaction products followed by nucleotide sequencing..."
+    whyMissed: "PCR is mentioned as a technique but not recognized as a tool - may need patterns for molecular biology techniques"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "single-strand conformation polymorphism analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...by single-strand conformation polymorphism analysis of polymerase chain reaction products..."
+    whyMissed: "SSCP analysis is a specific molecular technique that may involve specialized software or equipment"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  - toolName: "nucleotide sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...polymerase chain reaction products followed by nucleotide sequencing..."
+    whyMissed: "DNA sequencing typically involves specific sequencing platforms and analysis software"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "followed by nucleotide sequencing"
+    toolType: "computational_tool"
+    examples: ["polymerase chain reaction products followed by nucleotide sequencing"]
+    reasoning: "Sequencing is often mentioned as a technique but may involve specific sequencing platforms or analysis software that should be captured"
+  - patternType: "context_phrase"
+    pattern: "single-strand conformation polymorphism analysis"
+    toolType: "computational_tool"
+    examples: ["single-strand conformation polymorphism analysis of polymerase chain reaction products"]
+    reasoning: "SSCP is a specific molecular technique that may involve specialized analysis software or equipment"
+  - patternType: "context_phrase"
+    pattern: "polymerase chain reaction products"
+    toolType: "genetic_reagent"
+    examples: ["single-strand conformation polymorphism analysis of polymerase chain reaction products"]
+    reasoning: "PCR products imply the use of specific primers and reagents that could be research tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # PCR, SSCP analysis, nucleotide sequencing
+  newPatternsCount: 3  # Context phrases for molecular techniques
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    - Only abstract available - no Methods, Results, or Discussion sections to identify specific tools
+    - Publication from 1995 may use older terminology or techniques not captured by modern mining patterns
+    - Molecular techniques mentioned (PCR, SSCP, sequencing) but specific reagents, primers, or software not named
+    - Limited text available severely constrains tool identification despite clear evidence of molecular biology work
+  recommendations: |
+    This publication represents a molecular genetics study that almost certainly used research tools (PCR primers, sequencing reagents, analysis software), but the lack of full-text content makes tool identification impossible. The abstract mentions specific molecular techniques that require specialized tools, but without Methods section details, we cannot identify specific reagents, equipment, or software used. 
+    
+    Key recommendations:
+    - No tools should be accepted based solely on abstract content
+    - The three potentially missed tools (PCR, SSCP, sequencing) are techniques rather than specific tools and should not be added without more context
+    - Future mining should consider patterns for molecular biology techniques that often imply tool usage
+    - Full-text access would be essential for proper tool identification in molecular genetics papers
+    - The suggested patterns could help identify similar molecular techniques in other publications with more complete text

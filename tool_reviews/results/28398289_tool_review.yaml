@@ -1,0 +1,213 @@
+publicationMetadata:
+  pmid: "28398289"
+  title: "A high-throughput molecular data resource for cutaneous neurofibromas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular profiling study involving whole genome sequencing, RNA-sequencing, and SNP arrays
+    of cutaneous neurofibroma samples. Expected tools include:
+    - Computational tools for genomics analysis (alignment, variant calling, quality control)
+    - Genetic reagents (DNA/RNA extraction kits, library prep reagents)
+    - Laboratory equipment and instruments for sequencing and analysis
+    
+    Note: This study focuses on molecular characterization rather than functional studies, so cell lines,
+    animal models, antibodies, and organoids are less likely to be present.
+  overallAssessment: |
+    This publication is a high-throughput molecular profiling study that generated genomic, transcriptomic,
+    and SNP array data from cutaneous neurofibroma samples. The detailed Methods section describes extensive
+    use of computational tools for data analysis and genetic reagents for sample processing. Tools are
+    expected and likely to be numerous, particularly computational tools and laboratory reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Dragen"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reads were mapped to the genome and variants identified using the Dragen program with default settings."
+    whyMissed: "Software name without version number or clear vendor identification"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK pipeline"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The resulting VCF files were then sorted and updated to remove errors and analysed using the GATK pipeline"
+    whyMissed: "Well-known bioinformatics tool mentioned in analysis context"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "VarDict"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Somatic mutations were called from BAM files exported by the Dragen alignment using the Java version of VarDict in paired mode"
+    whyMissed: "Specific software with version (Java version) mentioned in variant calling context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GenomeStudio"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Samples were analysed by GenomeStudio and exported to text"
+    whyMissed: "Illumina analysis software used for SNP array data processing"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FastQC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "quality control checks on raw sequence data for each sample were performed using FastQC (Babraham Bioinformatics, Cambridge, UK)"
+    whyMissed: "Well-known quality control software with vendor information"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "TopHat v2.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw reads were mapped to the reference human genome hg19 using TopHat v2.0 with the -p 4 and -r210 arguments"
+    whyMissed: "RNA-seq alignment tool with specific version number"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "SAMtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The alignment metrics of the mapped reads were estimated using SAMtools"
+    whyMissed: "Standard bioinformatics tool for sequence alignment processing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cufflinks v0.9.3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reads were quantified by both Cufflinks v0.9.3 and FeatureCounts"
+    whyMissed: "RNA-seq analysis tool with specific version number"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "FeatureCounts"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reads were quantified by both Cufflinks v0.9.3 and FeatureCounts"
+    whyMissed: "Read quantification tool used in RNA-seq analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DNeasy mini kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Genomic DNA (gDNA) was extracted from both frozen tumour and blood tissues using the DNeasy mini kit (Qiagen, Valencia, CA, USA)"
+    whyMissed: "Commercial DNA extraction kit with vendor and location information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "miRNeasy mini kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Total RNA containing both mRNA as well as microRNA fractions was extracted from the tissues using the miRNeasy mini kit (Qiagen, Valencia, CA, USA)"
+    whyMissed: "Commercial RNA extraction kit with vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NEBNext DNA Library Prep Reagent Set"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Standard whole genome library prep was done using the NEBNext DNA Library Prep Reagent Set for Illumina (New England BioLabs Inc., Ipswich, MA, USA)"
+    whyMissed: "Commercial library preparation reagent set with full vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NEBNext mRNA Library Prep Reagent Set"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The NEBNext mRNA Library Prep Reagent Set for Illumina (New England BioLabs Inc., Ipswich, MA, USA) was then used to prepare individually bar-coded next-generation sequencing expression libraries"
+    whyMissed: "Commercial mRNA library preparation reagent set with vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "KAPA Biosystems Library Quantification Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Accurate quantification for sequencing applications was determined using the qPCR-based KAPA Biosystems Library Quantification Kit (Kapa Biosystems, Inc., Woburn, MA, USA)"
+    whyMissed: "Commercial quantification kit with vendor information"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "HumanOmni2.5-8"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "SNP array sample prep was done using the HumanOmni2.5-8 (Illumina, Inc., San Diego, CA, USA)"
+    whyMissed: "Illumina SNP array chip with vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NEBNext Magnetic Oligo d(T)25 Beads"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Poly-adenylated RNAs were isolated using NEBNext Magnetic Oligo d(T)25 Beads"
+    whyMissed: "Specific magnetic beads for RNA isolation"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(Dragen|GATK|VarDict|GenomeStudio|FastQC|TopHat|SAMtools|Cufflinks|FeatureCounts)\\b"
+    toolType: "computational_tool"
+    examples: ["Dragen program", "GATK pipeline", "using FastQC", "TopHat v2.0", "SAMtools", "Cufflinks v0.9.3"]
+    reasoning: "Common bioinformatics tools that are frequently used in genomics studies but may not be caught by generic software patterns"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]*\\s+v?\\d+\\.\\d+(\\.\\d+)?\\b"
+    toolType: "computational_tool"
+    examples: ["TopHat v2.0", "Cufflinks v0.9.3"]
+    reasoning: "Software names with version numbers following standard naming conventions"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(kit|reagent set|beads)\\s+\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["DNeasy mini kit (Qiagen, Valencia, CA, USA)", "NEBNext DNA Library Prep Reagent Set for Illumina (New England BioLabs Inc.)"]
+    reasoning: "Commercial kits and reagent sets with vendor information in parentheses"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Qiagen|Illumina|New England BioLabs|KAPA|Invitrogen|Applied Biosystems)\\b"
+    toolType: "genetic_reagent"
+    examples: ["Qiagen, Valencia, CA", "Illumina, Inc., San Diego", "New England BioLabs Inc."]
+    reasoning: "Major life sciences vendors that indicate presence of commercial reagents or instruments"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(analysed using|processed with|mapped using|quantified by|extracted using|prepared using)\\s+\\w+"
+    toolType: "general"
+    examples: ["analysed using the GATK pipeline", "mapped using TopHat v2.0", "extracted using the DNeasy mini kit"]
+    reasoning: "Action phrases that reliably indicate tool usage in experimental context"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 16
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining completely failed to identify any tools despite this being a methods-heavy genomics study
+    - 16 clear research tools were missed, including 9 computational tools and 7 genetic reagents
+    - All missed tools have clear experimental usage context and vendor/version information
+    - The mining patterns appear to be inadequate for genomics/bioinformatics publications
+  recommendations: |
+    - All 16 identified tools should be added to the database as they represent genuine research tools
+    - The computational tools (Dragen, GATK, VarDict, etc.) are standard bioinformatics software with clear usage context
+    - The genetic reagents (kits, reagent sets, arrays) are commercial products with vendor information
+    - Mining patterns need significant improvement for genomics studies, particularly:
+      * Better recognition of bioinformatics software names
+      * Improved detection of commercial kits and reagents with vendor information
+      * Context phrases that indicate experimental tool usage
+    - No observations were extracted as the publication lacks Results and Discussion sections
+    - This represents a complete mining failure that needs systematic pattern improvements

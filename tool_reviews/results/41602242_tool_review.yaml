@@ -1,0 +1,154 @@
+publicationMetadata:
+  pmid: "41602242"
+  title: "Perspectives of Patients and Providers on Chronic Pain Assessment in Neurofibromatosis Type 1 (NF1): A Qualitative Study."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, outcome measures), possibly computational tools for analysis
+    
+    This qualitative study specifically focuses on pain assessment in NF1 patients and uses multiple validated clinical assessment instruments in their methodology. The study involves focus groups and interviews, which are standard clinical research methods. Given the focus on pain assessment and the detailed methods describing use of validated questionnaires, clinical assessment tools are highly expected.
+  overallAssessment: |
+    This is a qualitative clinical research study examining patient and provider perspectives on chronic pain assessment in NF1. The study uses established clinical assessment tools (questionnaires and scales) to screen participants and collect data. Clinical assessment tools are definitely expected and should be present, as the methods section explicitly describes using validated instruments like BPI-SF, PHQ-9, GAD-7, and SCID-SR. The mining appears to have missed several clinical assessment tools that are clearly mentioned in the methods.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Brief Pain Inventory Short Form"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...responses to the Brief Pain Inventory Short Form (BPI-SF) [ 8 ], Patient Health Questionnaire (PHQ) [ 19 ]..."
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "BPI-SF"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...a pain severity aggregate score of ≥3 on the BPI-SF [ 8 ] for pain experienced in the previous 2 weeks..."
+    whyMissed: "Abbreviated form of Brief Pain Inventory Short Form not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "Patient Health Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...responses to the Brief Pain Inventory Short Form (BPI-SF) [ 8 ], Patient Health Questionnaire (PHQ) [ 19 ], Structured Clinical Interview..."
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "PHQ"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...evidence of moderate to severe depression or anxiety on the PHQ or GAD-7..."
+    whyMissed: "Abbreviated form of Patient Health Questionnaire not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "PHQ-9"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...The PHQ-9 and GAD-7 are copyrighted by Pfizer Inc. and are freely available for research and clinical use..."
+    whyMissed: "Specific version of PHQ not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "Structured Clinical Interview for DSM Self Report version"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Patient Health Questionnaire (PHQ) [ 19 ], Structured Clinical Interview for DSM Self Report version (SCID-SR) [ 20 ], and Generalized Anxiety Disorder..."
+    whyMissed: "Long clinical assessment tool name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "SCID-SR"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...evidence of psychosis or schizophrenia on the SCID-SR [ 20 ]. Members of the research team..."
+    whyMissed: "Abbreviated form of Structured Clinical Interview not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "Generalized Anxiety Disorder 7 Item version"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Structured Clinical Interview for DSM Self Report version (SCID-SR) [ 20 ], and Generalized Anxiety Disorder 7 Item version (GAD-7) [ 21 ]..."
+    whyMissed: "Long clinical assessment tool name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "GAD-7"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...evidence of moderate to severe depression or anxiety on the PHQ or GAD-7, or (2) evidence of psychosis..."
+    whyMissed: "Abbreviated form of Generalized Anxiety Disorder scale not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+    
+  - toolName: "Qualtrics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...completed an online screening survey administered via Qualtrics ( www.qualtrics.com ) that collected demographic information..."
+    whyMissed: "Survey platform/software not captured by computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "ATLAS.ti"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The coded transcripts were entered into ATLAS.ti (Version 9; Kansas City, MO). Using thematic analysis..."
+    whyMissed: "Qualitative data analysis software not captured by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Brief Pain Inventory|BPI-SF|Patient Health Questionnaire|PHQ|PHQ-9|Structured Clinical Interview|SCID-SR|Generalized Anxiety Disorder|GAD-7"
+    toolType: "clinical_assessment_tool"
+    examples: ["Brief Pain Inventory Short Form (BPI-SF)", "Patient Health Questionnaire (PHQ)", "GAD-7"]
+    reasoning: "These are standard validated clinical assessment instruments commonly used in pain and mental health research that should be captured"
+    
+  - patternType: "context_phrase"
+    pattern: "administered via|completed.*questionnaire|responses to the|aggregate score.*on the|evidence of.*on the"
+    toolType: "clinical_assessment_tool"
+    examples: ["administered via Qualtrics", "responses to the Brief Pain Inventory", "aggregate score of ≥3 on the BPI-SF"]
+    reasoning: "These phrases indicate active use of clinical assessment tools in research methodology"
+    
+  - patternType: "term"
+    pattern: "Qualtrics|ATLAS\\.ti|Version \\d+"
+    toolType: "computational_tool"
+    examples: ["Qualtrics ( www.qualtrics.com )", "ATLAS.ti (Version 9; Kansas City, MO)"]
+    reasoning: "Survey platforms and qualitative analysis software are commonly used computational tools in clinical research that should be captured"
+    
+  - patternType: "context_phrase"
+    pattern: "transcripts were entered into|coded.*using|analysis.*software|platform.*for"
+    toolType: "computational_tool"
+    examples: ["transcripts were entered into ATLAS.ti", "administered via Qualtrics"]
+    reasoning: "These phrases indicate active use of computational tools for data collection and analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely failed to capture any clinical assessment tools despite this being a clinical study
+    - Multiple validated clinical assessment instruments (BPI-SF, PHQ-9, GAD-7, SCID-SR) explicitly mentioned in methods were missed
+    - Computational tools used for data collection (Qualtrics) and analysis (ATLAS.ti) were also missed
+    - This represents a significant gap in clinical assessment tool mining patterns
+  recommendations: |
+    - All 11 potentially missed tools should be added to the database
+    - The mining patterns for clinical assessment tools need significant improvement to capture standard validated instruments
+    - Both full names and abbreviated forms of clinical tools should be captured (e.g., "Brief Pain Inventory Short Form" and "BPI-SF")
+    - Survey platforms and qualitative analysis software should be included in computational tool patterns
+    - This publication demonstrates the need for better coverage of clinical research tools
+    - No observations were extracted since no tools were initially validated, but the missed tools would likely have usage observations in the methods section

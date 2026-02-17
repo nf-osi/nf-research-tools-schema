@@ -1,0 +1,301 @@
+publicationMetadata:
+  pmid: "25003081"
+  title: "An integrative analysis of meningioma tumors reveals the determinant genes and pathways of malignant transformation."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics analysis paper that should contain extensive computational tools:
+    - Computational tools (software, packages, pipelines, databases, web tools)
+    - The queryType "bench" is misleading - this is not wet lab research but computational analysis
+    - No lab tools (antibodies, cell lines, animal models) are expected
+    - No clinical assessment tools are expected
+    - The paper uses genomic/transcriptomic data analysis methods extensively
+  overallAssessment: |
+    This publication is a comprehensive bioinformatics analysis that integrates genomic and transcriptomic data 
+    to identify pathways involved in meningioma malignant transformation. The extensive Methods section describes 
+    numerous computational tools, R packages, databases, and web-based analysis platforms. The mining system 
+    completely failed to detect any tools, which represents a major gap in computational tool detection.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "WGCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Weighted Gene Co-expression Network Analysis, WGCNA ( 15 , 17 ) was applied to explore gene expression as an undirected co-expression network"
+    whyMissed: "Core analysis method - should be detected as primary computational tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CEL files were also downloaded from GEO (GEO accession code ) and analyzed in GSE16581 R ( 21 )"
+    whyMissed: "Primary programming language/environment used throughout analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Affymetrix Genotyping Console"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Hind and Xba CEL files were downloaded from GEO and analyzed the Affymetrix Genotyping Console software ( Affymetrix )"
+    whyMissed: "Specific software with vendor name should be detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "affy"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "summarized into an R eset class object using functions of the affy package ( 22 )"
+    whyMissed: "R package for microarray analysis - standard bioinformatics tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "arrayQualityMetrics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Array quality was determined with the arrayQualityMetrics package ( 23 )"
+    whyMissed: "R package for quality control - specific analysis tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "matrixStats"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene-expression standard deviation was determined with the function rowSds , part of the package matrixStats ( 25 )"
+    whyMissed: "R package mentioned with specific function usage"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cytoscape"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Cytoscape ( 26 ) was used to create a graphic representation of the pink-module"
+    whyMissed: "Major network visualization software - widely used bioinformatics tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CentiScape"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Using the CentiScape plug-in ( 27 ), we analyzed several network parameters"
+    whyMissed: "Cytoscape plugin for network analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ClueGO"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The ClueGO plug-in ( 28 ) was utilized to create pathway and Gene Ontology ( 29 ) enrichment networks"
+    whyMissed: "Cytoscape plugin for pathway analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DAVID"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene ontology analysis for hub genes was performed with DAVID web tool ( 33 , 34 )"
+    whyMissed: "Popular web-based functional annotation tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "snpStats"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "fitting a logistic regression with SNPs as dependent phenotypes with the function spn.lhs.tests implemented in the package snpStats ( 35 )"
+    whyMissed: "R package for SNP analysis with specific function mentioned"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HaploReg"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "mQTL putative genes were obtained from the HaploReg v2 web browser ( 36 )"
+    whyMissed: "Web-based tool with version number specified"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "oPPOSUM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "mQTL enrichment in TFBS was studied using oPPOSUM Single Site Analysis tool ( 37 )"
+    whyMissed: "Transcription factor binding site analysis tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GSEA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene set enrichment analysis (GSEA) was used for miRNA target site enrichment ( 38 )"
+    whyMissed: "Standard gene set enrichment analysis tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "STRING"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The PPI database STRING ( 39 ) was used to test for known interactions among the proteins"
+    whyMissed: "Major protein-protein interaction database"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ComBat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "batches were removed with the ComBat function implemented in the package sva ( 42 )"
+    whyMissed: "Batch effect correction function in R package sva"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "sva"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "batches were removed with the ComBat function implemented in the package sva ( 42 )"
+    whyMissed: "R package for surrogate variable analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "limma"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Linear models of the limma package ( 43 ) were applied to determine differential gene expression"
+    whyMissed: "Major R package for differential expression analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GenABEL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Rank transformation into normality function [ rntransform , package GenABEL ( 45 )]"
+    whyMissed: "R package for genetic association analysis with specific function"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "fmsb"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variance inflation factors (VIFs) for lineal models were calculated with the VIF function implemented in the package fmsb ( 46 )"
+    whyMissed: "R package with specific function for statistical analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "impute"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Expression missing values were imputed with functions of the package impute ( 47 )"
+    whyMissed: "R package for missing value imputation"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GEO"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CEL files were downloaded from GEO [ Gene-Expression Omnibus ( 19 , 20 )]"
+    whyMissed: "Major genomics database - Gene Expression Omnibus"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "KEGG"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene ontology databases for Biological Processes, Cellular Components, Immune System Processes , and Molecular Functions , as well as KEGG ( 30 , 31 )"
+    whyMissed: "Major pathway database"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Reactome"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "as well as KEGG ( 30 , 31 ) and Reactome ( 32 ), were included in the analysis"
+    whyMissed: "Major pathway database"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "1000 Genomes Project"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "linkage disequilibrium value at least of 0.8 in individuals of European Ancestry included in the 1000 Genomes Project"
+    whyMissed: "Major genomics reference database/resource"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\bWGCNA\\b"
+    toolType: "computational_tool"
+    examples: ["WGCNA"]
+    reasoning: "Weighted Gene Co-expression Network Analysis is a standard bioinformatics method"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(package|implemented in the package)\\s+([A-Za-z][A-Za-z0-9]*)"
+    toolType: "computational_tool"
+    examples: ["package matrixStats", "implemented in the package sva"]
+    reasoning: "R packages are computational tools and often mentioned with 'package' keyword"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(plug-in|plugin)\\s+([A-Za-z][A-Za-z0-9]*)"
+    toolType: "computational_tool"
+    examples: ["CentiScape plug-in", "ClueGO plug-in"]
+    reasoning: "Software plugins are computational tools, especially for Cytoscape"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(web tool|web browser|database)\\s+([A-Za-z][A-Za-z0-9]*)"
+    toolType: "computational_tool"
+    examples: ["DAVID web tool", "HaploReg v2 web browser", "PPI database STRING"]
+    reasoning: "Web-based analysis tools and databases are computational resources"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(function|implemented in)\\s+([A-Za-z][A-Za-z0-9\\.]*)"
+    toolType: "computational_tool"
+    examples: ["function rowSds", "ComBat function"]
+    reasoning: "Specific functions often indicate software packages or tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}[A-Za-z]*\\b"
+    toolType: "computational_tool"
+    examples: ["GSEA", "DAVID", "KEGG"]
+    reasoning: "Many bioinformatics tools use all-caps or mixed-case naming"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(analyzed|processed|calculated|determined)\\s+(with|using|in)\\s+([A-Za-z][A-Za-z0-9]*)"
+    toolType: "computational_tool"
+    examples: ["analyzed with arrayQualityMetrics", "calculated with VIF function"]
+    reasoning: "Usage context phrases strongly indicate computational tool usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Affymetrix|Illumina|Agilent)\\s+([A-Za-z][A-Za-z0-9\\s]*)"
+    toolType: "computational_tool"
+    examples: ["Affymetrix Genotyping Console"]
+    reasoning: "Vendor names often precede software/platform names"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 24
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Mining system completely failed to detect any computational tools
+    - This is a comprehensive bioinformatics analysis paper with extensive tool usage
+    - 24+ computational tools were clearly mentioned with usage context
+    - Tools include R packages, web-based analysis platforms, databases, and software
+    - The queryType "bench" is misleading - this is computational analysis, not wet lab
+    - No observations extracted as no tools were validated (all tools were missed)
+  recommendations: |
+    - ALL 24 identified computational tools should be added to the mining results
+    - The computational tool detection patterns need major improvement
+    - Focus on R package detection (package keyword, function names)
+    - Improve detection of web-based tools and databases
+    - Add patterns for software plugins (especially Cytoscape)
+    - Consider vendor-specific software naming patterns
+    - The 8 suggested patterns would significantly improve computational tool mining
+    - This paper demonstrates a major gap in the current mining system's ability to detect bioinformatics tools
+    - Future mining should better distinguish between wet lab "bench" work and computational "bench" analysis

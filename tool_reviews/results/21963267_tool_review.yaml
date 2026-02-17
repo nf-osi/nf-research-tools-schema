@@ -1,0 +1,111 @@
+publicationMetadata:
+  pmid: "21963267"
+  title: "Choroidal abnormalities detected by near-infrared reflectance imaging as a new diagnostic criterion for neurofibromatosis 1."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study):
+    - Clinical assessment tools → NIH diagnostic criteria, imaging-based diagnostic methods
+    - Computational tools → Statistical analysis software (though not explicitly mentioned)
+    
+    This is a diagnostic accuracy study evaluating near-infrared reflectance imaging as a new 
+    diagnostic criterion for NF1. Clinical studies of this type typically use:
+    1. Established diagnostic criteria (NIH criteria for NF1)
+    2. Imaging/diagnostic technologies (confocal scanning laser ophthalmoscopy, NIR imaging)
+    3. Statistical analysis tools for sensitivity/specificity calculations
+    
+    The study compares a new diagnostic method against established criteria, which is a common
+    clinical research design that would involve clinical assessment tools.
+  overallAssessment: |
+    This clinical diagnostic study would be expected to contain clinical assessment tools, 
+    particularly diagnostic criteria and imaging-based assessment methods. The study evaluates 
+    NIR imaging as a diagnostic tool and compares it to established NIH criteria, both of which 
+    represent clinical assessment tools. Statistical analysis tools may also be present but are 
+    not explicitly mentioned in the available text.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NIH criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...95 consecutive adult and pediatric patients (190 eyes) with NF1, diagnosed based on the National Institutes of Health (NIH) criteria. Controls included 100 healthy age- and gender-matched control subjects..."
+    whyMissed: "Standard diagnostic criteria are clinical assessment tools but may not have been recognized by mining patterns focused on questionnaires/scales"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Confocal scanning laser ophthalmoscopy"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...METHODS: Confocal scanning laser ophthalmoscopy was performed for each subject, investigating the presence and the number of choroidal abnormalities..."
+    whyMissed: "Imaging-based diagnostic technique may not have been captured by patterns focused on questionnaires rather than diagnostic imaging methods"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Near-infrared reflectance imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...To investigate in a large sample of consecutive patients with neurofibromatosis type 1 (NF1) the possibility of including the presence of choroidal abnormalities detected by near-infrared reflectance (NIR) as a new diagnostic criterion..."
+    whyMissed: "Novel diagnostic imaging method being evaluated as a clinical assessment tool, may not match existing patterns for traditional questionnaires"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NIH criteria|National Institutes of Health criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["NIH criteria", "National Institutes of Health (NIH) criteria"]
+    reasoning: "Standard diagnostic criteria are clinical assessment tools used to diagnose conditions and should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "diagnosed based on|diagnostic criteria|diagnostic criterion"
+    toolType: "clinical_assessment_tool"
+    examples: ["diagnosed based on the National Institutes of Health (NIH) criteria", "as a new diagnostic criterion for NF1"]
+    reasoning: "These phrases often precede mentions of clinical diagnostic tools and assessment methods"
+
+  - patternType: "term"
+    pattern: "confocal scanning laser ophthalmoscopy|near-infrared reflectance imaging|NIR imaging"
+    toolType: "clinical_assessment_tool"
+    examples: ["Confocal scanning laser ophthalmoscopy", "near-infrared reflectance (NIR)", "NIR imaging"]
+    reasoning: "Imaging-based diagnostic techniques are clinical assessment tools that should be captured, especially in ophthalmology studies"
+
+  - patternType: "context_phrase"
+    pattern: "imaging was performed|examination to detect|imaging to detect"
+    toolType: "clinical_assessment_tool"
+    examples: ["NIR examination to detect choroidal involvement", "Confocal scanning laser ophthalmoscopy was performed"]
+    reasoning: "These phrases indicate active use of imaging-based clinical assessment tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this clinical diagnostic study
+    - Mining patterns appear to miss clinical assessment tools beyond traditional questionnaires
+    - Diagnostic criteria (NIH criteria) and imaging-based assessment methods were not captured
+    - Study focuses on evaluating a new diagnostic method, which is itself a clinical assessment tool
+  recommendations: |
+    This publication contains legitimate clinical assessment tools that were missed by the initial mining:
+    
+    1. **NIH criteria** should be added - these are established diagnostic criteria for NF1, which constitute a clinical assessment tool
+    2. **Confocal scanning laser ophthalmoscopy** should be added - this is an imaging-based diagnostic technique used for clinical assessment
+    3. **Near-infrared reflectance imaging** should be added - this is the novel diagnostic method being evaluated as a clinical assessment tool
+    
+    The mining patterns need expansion to capture:
+    - Diagnostic criteria and clinical guidelines
+    - Imaging-based assessment methods in clinical studies
+    - Novel diagnostic techniques being evaluated for clinical use
+    
+    No observations were extracted as no tools were initially validated, but the missed tools would likely have associated diagnostic performance observations (sensitivity, specificity, accuracy) from the Results section.
+    
+    This case highlights the need for broader pattern recognition in clinical assessment tools beyond traditional questionnaires and scales.

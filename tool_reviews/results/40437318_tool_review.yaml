@@ -1,0 +1,131 @@
+publicationMetadata:
+  pmid: "40437318"
+  title: "Quantitative MRI of dorsal root ganglion alterations in neurofibromatosis type 1 patients with or without pain."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study with quantitative MRI analysis):
+    - Clinical assessment tools: Visual analogue scale (VAS) for pain assessment mentioned
+    - Computational tools: MATLAB, R, GraphPad Prism, 3D Slicer for image analysis
+    - Potentially imaging tools/protocols: MRI sequences and analysis pipelines
+    
+    This is a clinical imaging study that uses computational analysis tools for quantitative MRI
+    processing and statistical analysis. The study also uses clinical pain assessment scales.
+    While no traditional lab tools are expected, computational and clinical assessment tools
+    are highly likely to be present.
+  overallAssessment: |
+    This clinical study investigating DRG alterations in NF1 patients using quantitative MRI
+    would be expected to contain computational tools for image processing and statistical analysis,
+    as well as clinical assessment tools for pain evaluation. The detailed Methods section describes
+    sophisticated image analysis workflows that require specialized software tools.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "Visual analogue scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The inclusion criteria for the pain group were an average pain score of ≥ 3 on the visual analogue 0–10 scale over the previous 10 weeks."
+    whyMissed: "Clinical pain assessment scale not detected by mining patterns - likely missing clinical assessment tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image postprocessing was performed via MATLAB (The MathWorks, Inc., 2024: MATLAB, version R2024a Update 3, retrieved from https://www.mathworks.com/)"
+    whyMissed: "Software with version and vendor information not detected - may need better computational tool patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "3D Slicer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The two readers independently performed three-dimensional selection of the volume of interest by manual segmentation of the DRG of levels L5 and S1 via 3D Slicer (The Slicer Community 2024: 3D Slicer, version 5.6.2, retrieved from: https://www.slicer.org/)"
+    whyMissed: "Medical imaging software with version and URL not detected - missing pattern for specialized imaging tools"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses and visualisations were performed with R (The R Foundation for Statistical Computing 2024: R: A language for Data Analysis and Graphics, version 4.4.1, retrieved from: https://www.r-project.org/)"
+    whyMissed: "Statistical software with full citation and version not detected - need better R language detection patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses and visualisations were performed with R (The R Foundation for Statistical Computing 2024: R: A language for Data Analysis and Graphics, version 4.4.1, retrieved from: https://www.r-project.org/) and GraphPad Prism (GraphPad Prism version 9.4.0, GraphPad Software)."
+    whyMissed: "Commercial statistical software with version not detected - missing patterns for GraphPad products"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "visual analogue scale|VAS|visual analog scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["visual analogue 0–10 scale"]
+    reasoning: "Common pain assessment tool used in clinical studies, should be detected as clinical assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "performed via MATLAB|using MATLAB|with MATLAB|MATLAB.*version"
+    toolType: "computational_tool"
+    examples: ["Image postprocessing was performed via MATLAB"]
+    reasoning: "MATLAB usage context with version information indicates computational tool usage"
+
+  - patternType: "term"
+    pattern: "3D Slicer|3DSlicer|Slicer.*version"
+    toolType: "computational_tool"
+    examples: ["via 3D Slicer (The Slicer Community 2024: 3D Slicer, version 5.6.2)"]
+    reasoning: "Medical imaging software commonly used for segmentation and analysis"
+
+  - patternType: "context_phrase"
+    pattern: "performed with R|using R|R.*Foundation.*Computing|R.*version.*retrieved"
+    toolType: "computational_tool"
+    examples: ["Statistical analyses and visualisations were performed with R"]
+    reasoning: "R statistical software usage with full citation format should be detected"
+
+  - patternType: "term"
+    pattern: "GraphPad Prism|Prism.*version|GraphPad.*Software"
+    toolType: "computational_tool"
+    examples: ["GraphPad Prism (GraphPad Prism version 9.4.0, GraphPad Software)"]
+    reasoning: "Commercial statistical software with version information"
+
+  - patternType: "context_phrase"
+    pattern: "pain score.*scale|average pain score.*on.*scale|pain.*visual analogue"
+    toolType: "clinical_assessment_tool"
+    examples: ["average pain score of ≥ 3 on the visual analogue 0–10 scale"]
+    reasoning: "Context phrases indicating clinical pain assessment tool usage"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - Mining completely failed to detect any tools despite clear presence of multiple computational and clinical assessment tools
+    - Clinical assessment tool patterns appear to be missing (visual analogue scale)
+    - Computational tool patterns are inadequate for detecting software with full citations and versions
+    - Medical imaging software (3D Slicer) not detected despite clear usage context
+    - Statistical software (R, GraphPad Prism) with version information not detected
+  recommendations: |
+    Critical recommendations for this publication:
+    - All 5 missed tools should be added to the database - they represent genuine research tools used in the study
+    - Mining patterns need significant improvement for clinical studies that use computational analysis
+    - Clinical assessment tool patterns are clearly inadequate and need expansion
+    - Computational tool patterns should better handle software citations with versions and URLs
+    - This represents a complete mining failure for a publication type that should contain multiple tools
+    - The suggested patterns should be implemented to prevent similar misses in clinical imaging studies
+    - No observations can be extracted since no tools were validated, but the study does contain quantitative findings about DRG alterations

@@ -1,0 +1,183 @@
+publicationMetadata:
+  pmid: "29987133"
+  title: "Clinical trial design for cutaneous neurofibromas"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This publication discusses clinical trial design and specifically mentions multiple patient-reported 
+    outcome tools and assessment methods for measuring cutaneous neurofibromas. While it's a design/
+    methodology paper rather than a primary research study, it extensively discusses validated clinical 
+    assessment tools that would be used in trials. The paper also mentions technological measurement 
+    tools like optical coherence tomography and high-frequency ultrasound for tumor assessment.
+  overallAssessment: |
+    This clinical trial design paper would be expected to contain clinical assessment tools as it 
+    discusses outcome measures and patient-reported outcome instruments for cutaneous neurofibroma 
+    trials. The paper systematically reviews assessment methods including validated questionnaires 
+    (SF-36, Skindex) and measurement techniques, making it highly likely to contain legitimate 
+    clinical assessment tools even though no experimental work was conducted.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SF-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "SF-36 is a QoL survey to assess general physical and emotional health. Skindex is an instrument to measure the effect of skin disease on QoL"
+    whyMissed: "Standard abbreviation for Short Form-36 quality of life questionnaire not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "Short Form-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "2 PRO instruments have been studied extensively in patients with cutaneous manifestations of NF1: Short Form (SF)–36 and Skindex"
+    whyMissed: "Full name of SF-36 questionnaire with hyphenated format not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "Skindex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Skindex is an instrument to measure the effect of skin disease on QoL, and has been validated for several dermatologic conditions including psoriasis and atopic dermatitis"
+    whyMissed: "Dermatology-specific quality of life instrument name not in mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "Investigator Global Assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "an ordinal global assessment scale, such as the Investigator Global Assessment or the Physician Global Assessment, should be considered for the study of cNF in NF1"
+    whyMissed: "Clinical assessment scale name not captured by current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "Physician Global Assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "an ordinal global assessment scale, such as the Investigator Global Assessment or the Physician Global Assessment, should be considered for the study of cNF in NF1"
+    whyMissed: "Clinical assessment scale name not captured by current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "paper frame"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "The paper frame is a clinician-reported outcome measure used to quantify the number of cNF lesions (figure 2). A 100 cm2 paper frame is placed on the skin and all cNF lesions within the frame are counted"
+    whyMissed: "Physical measurement tool for clinical assessment not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+    
+  - toolName: "caliper"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "A caliper is used to measure lesion size. While the use of calipers in the evaluation of cNF size after treatment with the vascular endothelial growth factor–targeting agent ranibizumab resulted in variable results"
+    whyMissed: "Physical measurement instrument for clinical assessment not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+    
+  - toolName: "optical coherence tomography"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "New approaches, such as optical coherence tomography (OCT) or high-frequency ultrasound (HFUS), may assess the full thickness of a lesion above and below the skin surface"
+    whyMissed: "Imaging-based clinical assessment tool not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "OCT"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "New approaches, such as optical coherence tomography (OCT) or high-frequency ultrasound (HFUS), may assess the full thickness of a lesion above and below the skin surface"
+    whyMissed: "Abbreviation for optical coherence tomography not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "high-frequency ultrasound"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "New approaches, such as optical coherence tomography (OCT) or high-frequency ultrasound (HFUS), may assess the full thickness of a lesion above and below the skin surface"
+    whyMissed: "Imaging-based clinical assessment tool not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "HFUS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "New approaches, such as optical coherence tomography (OCT) or high-frequency ultrasound (HFUS), may assess the full thickness of a lesion above and below the skin surface"
+    whyMissed: "Abbreviation for high-frequency ultrasound not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SF-36|Short Form.36|Short Form-36"
+    toolType: "clinical_assessment_tool"
+    examples: ["SF-36 is a QoL survey", "Short Form (SF)–36 and Skindex"]
+    reasoning: "SF-36 is a widely used validated quality of life questionnaire that appears in many clinical studies"
+    
+  - patternType: "term"
+    pattern: "Skindex"
+    toolType: "clinical_assessment_tool"
+    examples: ["Skindex is an instrument to measure the effect of skin disease on QoL"]
+    reasoning: "Skindex is a validated dermatology-specific quality of life instrument commonly used in skin disease studies"
+    
+  - patternType: "context_phrase"
+    pattern: "(Investigator|Physician) Global Assessment"
+    toolType: "clinical_assessment_tool"
+    examples: ["Investigator Global Assessment or the Physician Global Assessment"]
+    reasoning: "Global assessment scales are standard clinical outcome measures in dermatology trials"
+    
+  - patternType: "term"
+    pattern: "paper frame"
+    toolType: "clinical_assessment_tool"
+    examples: ["The paper frame is a clinician-reported outcome measure"]
+    reasoning: "Paper frames are standardized measurement tools used in dermatology research for lesion counting"
+    
+  - patternType: "term"
+    pattern: "caliper|calipers"
+    toolType: "clinical_assessment_tool"
+    examples: ["A caliper is used to measure lesion size"]
+    reasoning: "Calipers are standard measurement instruments used in clinical assessment of skin lesions"
+    
+  - patternType: "term"
+    pattern: "optical coherence tomography|OCT"
+    toolType: "clinical_assessment_tool"
+    examples: ["optical coherence tomography (OCT)"]
+    reasoning: "OCT is an imaging-based clinical assessment tool used for detailed tissue evaluation"
+    
+  - patternType: "term"
+    pattern: "high-frequency ultrasound|HFUS"
+    toolType: "clinical_assessment_tool"
+    examples: ["high-frequency ultrasound (HFUS)"]
+    reasoning: "HFUS is a specialized imaging tool used for clinical assessment of skin lesions and tumors"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clinical trial design paper that extensively discusses clinical assessment tools
+    - Multiple validated clinical assessment instruments (SF-36, Skindex, Global Assessment scales) were mentioned but not captured
+    - Physical measurement tools (calipers, paper frames) and imaging tools (OCT, HFUS) used for clinical assessment were missed
+    - The mining patterns appear to lack coverage for clinical assessment tools and measurement instruments
+  recommendations: |
+    This publication should have captured multiple clinical assessment tools as it systematically reviews outcome measures for cutaneous neurofibroma trials. The 11 potentially missed tools represent a significant gap in mining coverage for clinical assessment instruments. Key recommendations:
+    
+    1. Add patterns for standard quality of life questionnaires (SF-36, Skindex)
+    2. Include global assessment scales commonly used in dermatology trials
+    3. Capture physical measurement tools (calipers, paper frames) used in clinical assessment
+    4. Add imaging-based assessment tools (OCT, HFUS) and their abbreviations
+    5. Improve context recognition for clinical trial design papers that discuss but don't directly use tools
+    
+    No observations were extracted as this is a methodology/design paper rather than a primary research study reporting experimental findings. The tools discussed are recommendations for future trials rather than tools used to generate results.

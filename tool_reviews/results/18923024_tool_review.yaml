@@ -1,0 +1,105 @@
+publicationMetadata:
+  pmid: "18923024"
+  title: "Tumor suppressor schwannomin/merlin is critical for the organization of Schwann cell contacts in peripheral nerves."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving mouse genetics, ultrastructural analysis, and 
+    molecular organization studies. Based on the abstract content describing mouse models with genetic 
+    modifications (overexpression, conditional deletion), this publication should contain animal models 
+    and genetic reagents. The study involves multiple transgenic/knockout mouse lines which are 
+    definitive research tools.
+  overallAssessment: |
+    This is a laboratory research publication that definitely uses research tools, particularly 
+    genetically modified mouse models. The study describes multiple mouse lines with different 
+    genetic modifications of the Nf2 gene/schwannomin protein, which are classic research tools 
+    in neuroscience research. The absence of mined tools appears to be a significant mining failure.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "P0-SCH-Delta39-121 mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we studied peripheral nerves in mice overexpressing in Schwann cells schwannomin with a deletion occurring in NF2 patients (P0-SCH-Delta39-121) or a C-terminal deletion..."
+    whyMissed: "This transgenic mouse line name wasn't recognized by the mining patterns. The specific nomenclature P0-SCH-Delta39-121 represents a transgenic mouse overexpressing a mutant form of schwannomin."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2 conditional knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Similar but more severe alterations were observed in mice with conditional deletion of the Nf2 gene in Schwann cells..."
+    whyMissed: "The phrase 'conditional deletion of the Nf2 gene' describes a conditional knockout mouse model, but wasn't captured by mining patterns that may look for more standard nomenclature."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "C-terminal deletion schwannomin mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...mice overexpressing in Schwann cells schwannomin with a deletion occurring in NF2 patients (P0-SCH-Delta39-121) or a C-terminal deletion..."
+    whyMissed: "This represents another transgenic mouse line with C-terminal deletion of schwannomin, but the descriptive phrase wasn't captured by mining patterns."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "P0-[A-Z]+-[A-Za-z0-9-]+ mice"
+    toolType: "animal_model"
+    examples: ["P0-SCH-Delta39-121 mice"]
+    reasoning: "P0 promoter-driven transgenic mice follow this naming pattern. P0 is commonly used for Schwann cell-specific expression, and this pattern would catch similar transgenic lines."
+
+  - patternType: "context_phrase"
+    pattern: "mice with conditional deletion of the [A-Za-z0-9]+ gene"
+    toolType: "animal_model"
+    examples: ["mice with conditional deletion of the Nf2 gene"]
+    reasoning: "This phrase structure is commonly used to describe conditional knockout mouse models and should be captured as animal model tools."
+
+  - patternType: "context_phrase"
+    pattern: "mice overexpressing.*[A-Za-z0-9]+ with.*deletion"
+    toolType: "animal_model"
+    examples: ["mice overexpressing in Schwann cells schwannomin with a deletion"]
+    reasoning: "This pattern captures transgenic mice overexpressing mutant proteins, which are important research tools in functional studies."
+
+  - patternType: "term"
+    pattern: "[A-Z]-terminal deletion.*mice"
+    toolType: "animal_model"
+    examples: ["C-terminal deletion mice"]
+    reasoning: "Mice with terminal deletion constructs are common research tools and this pattern would capture various terminal deletion mouse models."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete mining failure: No tools were mined despite clear presence of multiple mouse models
+    - Missing Methods section: Only abstract available, limiting detailed tool identification
+    - Pattern gaps: Current mining patterns failed to capture transgenic mouse nomenclature and conditional knockout descriptions
+  recommendations: |
+    This represents a significant mining failure. The publication clearly describes multiple genetically 
+    modified mouse models that are definitive research tools:
+    1. P0-SCH-Delta39-121 transgenic mice (overexpressing mutant schwannomin)
+    2. Conditional Nf2 knockout mice 
+    3. C-terminal deletion schwannomin mice
+    
+    All three mouse lines should be added to the database. The mining patterns need improvement to 
+    capture transgenic mouse nomenclature and conditional knockout descriptions. Without access to 
+    the full Methods section, we cannot extract detailed observations about these tools, but their 
+    existence as research tools is unambiguous from the abstract.
+    
+    Priority actions:
+    - Add the four suggested patterns to improve mouse model detection
+    - Consider manual review of other "bench" publications with zero mined tools
+    - Investigate why standard mouse model terminology wasn't captured

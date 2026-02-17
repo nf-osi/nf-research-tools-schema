@@ -1,0 +1,105 @@
+publicationMetadata:
+  pmid: "1639394"
+  title: "A yeast artificial chromosome contig encompassing the type 1 neurofibromatosis gene."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - this is molecular cloning/genomics research
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research - molecular cloning/genomics):
+    - genetic reagents (YACs, plasmids, cloning vectors)
+    - computational tools (possibly for sequence analysis, though not explicitly mentioned)
+    
+    This is a 1992 genomics paper focused on YAC (yeast artificial chromosome) construction
+    and molecular cloning. The abstract describes specific molecular biology techniques and
+    reagents that should be considered research tools, particularly the YAC system and
+    plasmid rescue methods.
+  overallAssessment: |
+    This is clearly a laboratory research publication from 1992 describing molecular cloning
+    and genomics work. The study involves constructing YAC contigs, homologous recombination
+    in yeast, and plasmid rescue - all of which involve specific genetic reagents and molecular
+    tools. However, only the abstract is available, which limits detailed tool extraction.
+    The YAC system itself and the novel YAC end rescue method represent legitimate research tools.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "yeast artificial chromosome (YAC) system"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The yeast artificial chromosome (YAC) system (Burke et al., 1987, Science 236: 806-812) allows the direct cloning of large regions of the genome."
+    whyMissed: "YAC system is a well-established molecular cloning tool/vector system that should be recognized as a genetic reagent"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "YAC circularization"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "In the process of contig construction a novel method of YAC end rescue has been developed by YAC circularization in yeast and plasmid rescue in bacteria."
+    whyMissed: "This describes a novel molecular biology method/technique that represents a genetic reagent/tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "plasmid rescue"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "In the process of contig construction a novel method of YAC end rescue has been developed by YAC circularization in yeast and plasmid rescue in bacteria."
+    whyMissed: "Plasmid rescue is a standard molecular biology technique/method that should be recognized as a genetic reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "yeast artificial chromosome|YAC system|YAC vector"
+    toolType: "genetic_reagent"
+    examples: ["yeast artificial chromosome (YAC) system", "YAC contig"]
+    reasoning: "YAC systems are fundamental molecular cloning tools that should be consistently detected as genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "plasmid rescue|vector rescue|end rescue"
+    toolType: "genetic_reagent"
+    examples: ["plasmid rescue in bacteria", "YAC end rescue"]
+    reasoning: "Rescue techniques are standard molecular biology methods that represent genetic reagent tools"
+
+  - patternType: "naming_convention"
+    pattern: "homologous recombination in (yeast|bacteria|E\\.?\\s*coli)"
+    toolType: "genetic_reagent"
+    examples: ["homologous recombination in yeast"]
+    reasoning: "Homologous recombination systems are genetic engineering tools that should be captured"
+
+  - patternType: "term"
+    pattern: "contig (construction|assembly|map|mapping)"
+    toolType: "computational_tool"
+    examples: ["YAC contig map", "contig construction"]
+    reasoning: "Contig construction and mapping often involve computational tools, especially in genomics contexts"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # YAC system, YAC circularization, plasmid rescue
+  newPatternsCount: 4  # YAC terms, rescue techniques, homologous recombination, contig methods
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear molecular biology/genomics research paper
+    - Only abstract text available - full Methods section would likely contain more detailed tool usage
+    - Several legitimate genetic reagents and molecular biology tools were missed in the initial mining
+    - The YAC system and associated techniques (plasmid rescue, homologous recombination) are well-established research tools
+  recommendations: |
+    This publication clearly describes laboratory research involving molecular cloning and genomics tools.
+    The mining system missed several legitimate genetic reagents:
+    1. YAC (yeast artificial chromosome) system - a fundamental cloning vector system
+    2. Plasmid rescue technique - a standard molecular biology method
+    3. YAC circularization method - a novel technique developed in this study
+    
+    These tools should be added to improve mining coverage for genomics/molecular biology papers.
+    The suggested patterns would help capture similar tools in future mining efforts.
+    
+    While only the abstract is available, it contains sufficient information to identify these
+    research tools. The full paper would likely contain additional tools and more detailed
+    experimental procedures.

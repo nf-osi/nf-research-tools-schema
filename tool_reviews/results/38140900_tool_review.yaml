@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "38140900"
+  title: "Recommendations for assessing appearance concerns related to plexiform and cutaneous neurofibromas in neurofibromatosis 1 clinical trials."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (patient-reported outcome measures, questionnaires, scales)
+    This publication specifically focuses on evaluating and recommending patient-reported outcome measures 
+    for NF1 clinical trials, so clinical assessment tools are highly expected.
+  overallAssessment: |
+    This is a clinical research paper that systematically reviews and evaluates patient-reported outcome 
+    measures for assessing appearance concerns in NF1 clinical trials. The publication explicitly discusses 
+    multiple clinical assessment tools and makes specific recommendations, so clinical assessment tools 
+    should definitely be present. The mining appears to have missed several important tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "FACE-Q Craniofacial Module-Appearance Distress scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The FACE-Q Craniofacial Module-Appearance Distress scale was the top-rated measure for potential use in neurofibromatosis 1 clinical trials. Strengths of the measure included that it was rigorously developed, included individuals with neurofibromatosis 1 in the validation sample"
+    whyMissed: "This is a specific, named clinical assessment tool that is the main recommendation of the paper. It should have been detected as it's a validated patient-reported outcome measure."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Patient-Reported Outcome Rating and Acceptance Tool for Endpoints"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Our revised Patient-Reported Outcome Rating and Acceptance Tool for Endpoints then was used to evaluate each published patient-reported outcome measures in five domains"
+    whyMissed: "This is a specific evaluation tool used in the methodology to assess other patient-reported outcome measures. It's a named clinical assessment instrument."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "patient-reported outcome measures"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "we used it to identify and rate existing patient-reported outcome measures related to disfigurement and appearance...Eleven measures assessing appearance concerns were reviewed and rated"
+    whyMissed: "While this is a general term, the paper specifically mentions 'Eleven measures' were reviewed, indicating multiple specific clinical assessment tools that weren't individually captured."
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FACE-Q [A-Za-z\\s-]+ scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["FACE-Q Craniofacial Module-Appearance Distress scale"]
+    reasoning: "FACE-Q is a well-known family of patient-reported outcome measures in plastic surgery and appearance research. This pattern would catch specific FACE-Q modules."
+
+  - patternType: "term"
+    pattern: "Patient-Reported Outcome Rating and Acceptance Tool"
+    toolType: "clinical_assessment_tool"
+    examples: ["Patient-Reported Outcome Rating and Acceptance Tool for Endpoints"]
+    reasoning: "This is a specific evaluation tool for assessing patient-reported outcome measures. The full name should be captured."
+
+  - patternType: "context_phrase"
+    pattern: "(scale|measure|questionnaire|tool|instrument)\\s+(was|were)\\s+(used|administered|completed|evaluated|rated)"
+    toolType: "clinical_assessment_tool"
+    examples: ["scale was the top-rated measure", "Tool then was used to evaluate"]
+    reasoning: "Clinical assessment tools are often described with these usage verbs, which could help identify tools in clinical contexts."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-Q\\s+[A-Za-z\\s-]+\\s+(scale|module|questionnaire)"
+    toolType: "clinical_assessment_tool"
+    examples: ["FACE-Q Craniofacial Module-Appearance Distress scale"]
+    reasoning: "Many patient-reported outcome measures follow the pattern of abbreviated name + descriptive module/scale name."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely missed clinical assessment tools in a paper specifically about patient-reported outcome measures
+    - The main recommendation (FACE-Q Craniofacial Module-Appearance Distress scale) was not detected
+    - A methodological tool (Patient-Reported Outcome Rating and Acceptance Tool for Endpoints) was missed
+    - Paper mentions "Eleven measures" were reviewed but none were captured individually
+    - This represents a significant gap in clinical assessment tool detection
+  recommendations: |
+    This publication should have detected at least 2-3 clinical assessment tools, particularly the FACE-Q 
+    Craniofacial Module-Appearance Distress scale which is the main recommendation. The mining patterns 
+    for clinical assessment tools need improvement to catch:
+    1. Specific named scales and questionnaires (especially FACE-Q family)
+    2. Evaluation tools used in systematic reviews
+    3. Patient-reported outcome measures mentioned in clinical contexts
+    
+    The suggested patterns should be implemented to improve detection of clinical assessment tools in 
+    similar publications. No observations could be extracted due to lack of Results/Discussion sections, 
+    but the abstract provides clear evidence of tool usage and recommendations.

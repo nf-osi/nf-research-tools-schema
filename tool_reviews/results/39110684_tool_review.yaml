@@ -1,0 +1,220 @@
+publicationMetadata:
+  pmid: "39110684"
+  title: "Electrical stimulation of Schwann cells on electrospun hyaluronic acid carbon nanotube fibers."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a clear laboratory research study involving:
+    - Cell culture experiments with patient-derived and wild-type Schwann cell lines
+    - Immunofluorescence staining requiring antibodies
+    - Image analysis requiring computational tools
+    - Biomaterial development using modified hyaluronic acid (genetic reagent)
+    - Quantitative assays and data analysis
+    
+    Expected tools: cell lines (patient-derived), antibodies (for immunostaining), computational tools (ImageJ, Python), genetic reagents (modified biomaterials)
+  overallAssessment: |
+    This is a comprehensive laboratory research study that should contain multiple research tools. The study involves developing electrospun nanofiber scaffolds, culturing patient-derived and wild-type Schwann cells, performing electrical stimulation experiments, immunofluorescence staining, proliferation assays, and ELISA. The detailed Methods section describes extensive experimental procedures that require specific research tools including cell lines, antibodies, computational analysis software, and modified biomaterials. The fact that no tools were initially mined suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ipNF 95.11b"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized NF1 patient derived Schwann cell (NF SC, NF-/-) line, ipNF 95.11b and Wild type Schwann cell (WT SC, NF+/+) line, ipn 02.8 were utilized for all experiments"
+    whyMissed: "Specific cell line name with standard nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ipn 02.8"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized NF1 patient derived Schwann cell (NF SC, NF-/-) line, ipNF 95.11b and Wild type Schwann cell (WT SC, NF+/+) line, ipn 02.8 were utilized for all experiments"
+    whyMissed: "Specific cell line name with standard nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "s-100b antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Schwann cells were incubated with antibody against s-100b (Sigma) as the primary overnight at 1:400 ratio"
+    whyMissed: "Antibody target name with vendor information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-rabbit IgG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "treated with anti-rabbit IgG as secondary (Alexa Fluro 594, Invitrogen) for 2 hours at 1:1000 ratio"
+    whyMissed: "Secondary antibody with vendor and fluorophore information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The images were analyzed using NIH ImageJ (version 1.53a) software. Aspect ratio, which is the longest length of the cell divided by the shortest length of the cell, and cellular spread area, which is the total area of the cell, were measured and statistically analyzed."
+    whyMissed: "Software name with version number not captured by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The applied biphasic stimulus (Voltage In) and the stimulus after it passed through the stimulation chamber (Voltage Out) were captured from Channel 1 and Channel 2 of an oscilloscope (Rigol) connected to a Raspberry Pi running a Python script to store the data in near real time"
+    whyMissed: "Programming language used for data collection not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "methacrylated hyaluronic acid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "hydrogels were prepared by mixing 3% methacrylated HA (~30% methacrylated, tested with NMR, S1 Fig in S1 File), 1x PBS and 0.05% irgacure and UV crosslinked for 30 minutes"
+    whyMissed: "Modified biomaterial/chemical reagent used in experimental procedures not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "ip[A-Z]*\\s*\\d+\\.\\d+[a-z]*"
+    toolType: "cell_line"
+    examples: ["ipNF 95.11b", "ipn 02.8"]
+    reasoning: "Cell line naming convention used in this lab - 'ip' prefix followed by letters/numbers and version identifiers"
+
+  - patternType: "context_phrase"
+    pattern: "antibody against\\s+([\\w-]+)"
+    toolType: "antibody"
+    examples: ["antibody against s-100b"]
+    reasoning: "Common phrase structure for describing primary antibodies with target specification"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using\\s+([A-Z][\\w\\s]+)\\s+\\(version\\s+[\\d\\.]+[a-z]*\\)"
+    toolType: "computational_tool"
+    examples: ["analyzed using NIH ImageJ (version 1.53a)"]
+    reasoning: "Software usage context with version information commonly found in methods sections"
+
+  - patternType: "context_phrase"
+    pattern: "running a\\s+(\\w+)\\s+script"
+    toolType: "computational_tool"
+    examples: ["running a Python script"]
+    reasoning: "Programming language usage in data collection/analysis context"
+
+  - patternType: "term"
+    pattern: "methacrylated\\s+[\\w\\s]+"
+    toolType: "genetic_reagent"
+    examples: ["methacrylated hyaluronic acid"]
+    reasoning: "Modified biomaterials/chemical reagents with specific chemical modifications"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][\\w\\s]+\\s+by\\s+[A-Z][\\w\\s]+\\)"
+    toolType: "general"
+    examples: ["(Gibco by Life Technologies)", "(Alexa Fluro 594, Invitrogen)"]
+    reasoning: "Vendor information in parentheses indicating commercial research reagents"
+
+observations:
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF1 patient-derived Schwann cells (NF SC) showed significantly different morphological characteristics compared to wild-type cells. NF SC appeared more elongated and aligned on nanofiber substrates, with higher aspect ratios (elongation measurements) than WT SC in all conditions tested. NF SC on collagen-coated HA nanofibers showed significantly higher aspect ratio than WT SC, indicating a more spindle-shaped morphology characteristic of a migratory phenotype.
+    foundIn: "results"
+    contextSnippet: "NF SC appear more aligned than WT SC in all conditions. WT SC are more rounded and appear to group together... NF SC on collagen coated HA nanofibers has a significantly higher aspect ratio than WT SC in all conditions."
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF1 Schwann cells showed reduced proliferation response to electrical stimulation compared to wild-type cells. Unstimulated NF SC showed highest proliferation, while electrical stimulation at 100 and 200 mV/mm decreased their proliferation. This contrasts with wild-type SC which showed increased proliferation under 100 mV/mm stimulation. The percentage increase in cell number from 24-72 hours was: unstimulated NF SC (64.3%±5.5), 100mV/mm (36.4%±16), 200mV/mm (44.0%±11).
+    foundIn: "results"
+    contextSnippet: "Following electrical stimulation, proliferation was measured for WT and NF cells using an Alamar Blue assay... NF SC showed highest proliferation when unstimulated"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+  - resourceName: "ipn 02.8"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Wild-type Schwann cells showed increased proliferation in response to electrical stimulation, particularly at 100 mV/mm. WT SC demonstrated optimal proliferation at 100 mV/mm stimulation with cellular proliferation being highest under these conditions. The percentage increase in cell number from 24-72 hours was: unstimulated WT SC (48.9%±20), 100mV/mm (73.9%±5.0), 200mV/mm (60.9%±11).
+    foundIn: "results"
+    contextSnippet: "Cellular proliferation was highest for WT SC at 100 mV/mm stimulation... WT SC at 48 hours, 100 mV/mm is significantly higher than all other conditions"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+  - resourceName: "ipn 02.8"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Wild-type Schwann cells showed significantly increased NGF (Nerve Growth Factor) release in response to electrical stimulation at 100 mV/mm. The highest NGF release was observed at 48 hours post-stimulation at 100 mV/mm, which was significantly higher than all other conditions tested (p<0.05). This indicates that WT SC respond to electrical stimulation by releasing growth factors that support nerve regeneration.
+    foundIn: "results"
+    contextSnippet: "Highest NGF release was seen following 100 mV/mm for WT SC. NGF release increased for both cell types under 100 mV/mm stimulation... WT SC at 48 hours, 100 mV/mm is significantly higher than all other conditions"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF1 Schwann cells showed relatively stable NGF release across all stimulation conditions, unlike wild-type cells which showed increased NGF release with electrical stimulation. This suggests that NF SC have lost their ability to respond appropriately to electrical stimulation in terms of growth factor secretion, which may contribute to the pathological state in neurofibromatosis.
+    foundIn: "results"
+    contextSnippet: "NF SC show relatively stable NGF release in all conditions. This could attribute to WT SC being stimulated at regeneration ranges which triggers them to release NGF to support regeneration."
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ImageJ version 1.53a was successfully used for quantitative analysis of cell morphology parameters including aspect ratio (longest length divided by shortest length) and cellular spread area (total cell area). The software was used to measure at least 200 cells per condition for statistical analysis. Fiber diameter and angle measurements were also performed using ImageJ with at least 200 fibers per fiber type measured manually.
+    foundIn: "methods"
+    contextSnippet: "The images were analyzed using NIH ImageJ (version 1.53a) software. Aspect ratio, which is the longest length of the cell divided by the shortest length of the cell, and cellular spread area, which is the total area of the cell, were measured and statistically analyzed."
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0308207"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Cellular: 4
+    Molecular: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite this being a comprehensive lab research study
+    - No cell lines detected despite clear patient-derived and wild-type Schwann cell lines being used
+    - No antibodies detected despite immunofluorescence staining protocols described
+    - No computational tools detected despite ImageJ and Python usage clearly described
+    - No genetic reagents detected despite modified biomaterials being synthesized and used
+    - Mining patterns appear inadequate for this type of bioengineering/cell biology research
+  recommendations: |
+    All 7 potentially missed tools should be added to the database as they represent genuine research tools used in experimental procedures:
+    - Two cell lines (ipNF 95.11b, ipn 02.8) are patient-derived and wild-type Schwann cells with clear experimental usage
+    - Two antibodies (s-100b, anti-rabbit IgG) are used in immunofluorescence protocols with vendor information
+    - Two computational tools (ImageJ, Python) are used for image analysis and data collection with version/usage details
+    - One genetic reagent (methacrylated hyaluronic acid) is a modified biomaterial used in scaffold fabrication
+    
+    The suggested patterns should be implemented to improve mining of:
+    - Cell line naming conventions (ip prefix patterns)
+    - Antibody target descriptions
+    - Software usage with version information
+    - Programming language usage contexts
+    - Modified biomaterial terminology
+    - Vendor information indicators
+    
+    Six scientific observations were extracted covering cellular morphology, proliferation responses, and growth factor release patterns that demonstrate functional differences between NF1 and wild-type Schwann cells under electrical stimulation conditions.

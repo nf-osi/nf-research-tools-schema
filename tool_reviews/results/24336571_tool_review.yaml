@@ -1,0 +1,152 @@
+publicationMetadata:
+  pmid: "24336571"
+  title: "Genome-scale CRISPR-Cas9 knockout screening in human cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes the development and application of a genome-scale CRISPR-Cas9 knockout screening system.
+    Expected tool types include:
+    - Genetic reagents (CRISPR-Cas9 components, guide RNA libraries, lentiviral vectors)
+    - Computational tools (GeCKO library, screening analysis pipelines)
+    - Cell lines (cancer cells, pluripotent stem cells, melanoma models)
+    
+    The publication should contain multiple tool types across genetic reagents and computational tools categories,
+    with potential cell line usage for the screening experiments.
+  overallAssessment: |
+    This is a methods-heavy laboratory research publication that developed a major screening platform (GeCKO library)
+    and applied it across multiple experimental systems. The work clearly involves extensive tool development and usage,
+    including genetic reagents (CRISPR components, viral vectors), computational tools (screening libraries, analysis),
+    and cell culture systems. The absence of any mined tools suggests significant gaps in the mining patterns rather
+    than a lack of tools in the publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "GeCKO library"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "lentiviral delivery of a genome-scale CRISPR-Cas9 knockout (GeCKO) library targeting 18,080 genes with 64,751 unique guide sequences"
+    whyMissed: "This is a major computational/genetic tool developed in this work - likely missed due to lack of patterns for CRISPR library names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR-Cas9"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The simplicity of programming the CRISPR (clustered regularly interspaced short palindromic repeats)-associated nuclease Cas9 to modify specific genomic loci"
+    whyMissed: "Core genetic reagent system - may have been missed due to hyphenated naming or lack of CRISPR-specific patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cas9"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "CRISPR (clustered regularly interspaced short palindromic repeats)-associated nuclease Cas9 to modify specific genomic loci"
+    whyMissed: "Essential component of CRISPR system - may need specific nuclease/enzyme patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "lentiviral delivery"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "lentiviral delivery of a genome-scale CRISPR-Cas9 knockout (GeCKO) library"
+    whyMissed: "Viral vector system used for tool delivery - needs patterns for viral delivery systems"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "guide sequences"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "targeting 18,080 genes with 64,751 unique guide sequences"
+    whyMissed: "CRISPR guide RNAs are genetic reagents - may need patterns for 'guide RNA' or 'guide sequences'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "vemurafenib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "screened for genes whose loss is involved in resistance to vemurafenib, a therapeutic RAF inhibitor"
+    whyMissed: "Drug used as research tool in screening - may need patterns for therapeutic compounds used in research"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "GeCKO|GECKO"
+    toolType: "computational_tool"
+    examples: ["GeCKO library"]
+    reasoning: "CRISPR screening libraries often have specific names like GeCKO that should be captured as computational tools"
+
+  - patternType: "term"
+    pattern: "CRISPR-Cas9|CRISPR/Cas9|Cas9"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR-Cas9 knockout", "Cas9"]
+    reasoning: "Core CRISPR system components are fundamental genetic reagents that need specific pattern recognition"
+
+  - patternType: "context_phrase"
+    pattern: "lentiviral delivery|viral delivery|adenoviral delivery|retroviral delivery"
+    toolType: "genetic_reagent"
+    examples: ["lentiviral delivery of a genome-scale CRISPR-Cas9 knockout library"]
+    reasoning: "Viral vector systems are commonly used genetic reagents for tool delivery in research"
+
+  - patternType: "term"
+    pattern: "guide RNA|guide sequences|gRNA|sgRNA"
+    toolType: "genetic_reagent"
+    examples: ["64,751 unique guide sequences"]
+    reasoning: "CRISPR guide RNAs are essential genetic reagents that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+[0-9]+ library|[A-Z]+ library"
+    toolType: "computational_tool"
+    examples: ["GeCKO library"]
+    reasoning: "Screening libraries often follow naming conventions with capital letters and 'library' suffix"
+
+  - patternType: "context_phrase"
+    pattern: "genome-scale.*screening|high-throughput.*screening|pooled.*screening"
+    toolType: "computational_tool"
+    examples: ["genome-scale CRISPR-Cas9 knockout screening"]
+    reasoning: "Large-scale screening approaches often involve computational tools and platforms"
+
+  - patternType: "term"
+    pattern: "RAF inhibitor|kinase inhibitor|therapeutic.*inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["vemurafenib, a therapeutic RAF inhibitor"]
+    reasoning: "Therapeutic compounds used in research contexts are genetic reagents/chemical tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a major methods paper
+    - This is a clear case of mining pattern inadequacy rather than absence of tools
+    - The publication describes development of GeCKO library, a major screening platform
+    - Multiple genetic reagents (CRISPR-Cas9, viral vectors, guide RNAs) are described
+    - Only abstract text available - full text would likely contain many more tools
+    - Missing patterns for CRISPR-related tools, screening libraries, and viral delivery systems
+  recommendations: |
+    This publication represents a significant failure of the mining system - zero tools were captured
+    from a methods-heavy paper that developed and used multiple research tools. Key recommendations:
+    
+    1. Add CRISPR-specific patterns (CRISPR-Cas9, Cas9, guide RNA, gRNA, sgRNA)
+    2. Add screening library patterns (GeCKO, genome-scale libraries)
+    3. Add viral delivery system patterns (lentiviral, retroviral, adenoviral delivery)
+    4. Add therapeutic compound patterns when used in research contexts
+    5. Prioritize obtaining full text for methods-heavy publications
+    6. All 6 potentially missed tools should be added to improve coverage
+    7. The 7 suggested patterns would significantly improve CRISPR and screening tool detection
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but full text
+    would likely contain extensive experimental findings about the screening platform performance.

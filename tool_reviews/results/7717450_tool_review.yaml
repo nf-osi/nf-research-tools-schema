@@ -1,0 +1,103 @@
+publicationMetadata:
+  pmid: "7717450"
+  title: "Analysis of the neurofibromatosis 2 gene reveals molecular variants of meningioma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - molecular analysis of gene mutations
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research - molecular genetics analysis):
+    - genetic_reagent: DNA primers, probes for PCR/sequencing
+    - computational_tool: sequence analysis software, mutation detection tools
+    - Possibly antibodies if protein analysis was performed
+    - Possibly cell_line if functional studies were conducted
+    
+    This is a molecular genetics study analyzing NF2 gene mutations in meningioma samples.
+    Such studies typically require:
+    1. DNA extraction and purification reagents
+    2. PCR primers for amplifying gene regions
+    3. Sequencing reagents and protocols
+    4. Computational tools for sequence analysis and mutation detection
+    5. Statistical software for association analysis
+    
+    However, only abstract is available, limiting tool detection to what's explicitly mentioned.
+  overallAssessment: |
+    This is a molecular genetics research study analyzing NF2 gene mutations in 70 sporadic meningiomas.
+    Such laboratory research would typically require genetic reagents (primers, probes), computational tools
+    for sequence analysis, and potentially other molecular biology tools. However, only the abstract is
+    available, which limits detection of specific research tools to those explicitly mentioned in the summary.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "PCR primers"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have analyzed the entire coding region of the NF2 gene in 70 sporadic meningiomas"
+    whyMissed: "Molecular analysis of entire coding region implies PCR amplification, but primers not explicitly mentioned in abstract"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+  
+  - toolName: "DNA sequencing"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "analyzed the entire coding region of the NF2 gene...and identified 43 mutations in 41 patients"
+    whyMissed: "Mutation identification requires DNA sequencing, but specific sequencing method/reagents not mentioned in abstract"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "sequence analysis software"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "identified 43 mutations...These resulted predominantly in immediate truncation, splicing abnormalities, or an altered reading frame"
+    whyMissed: "Mutation analysis and prediction of protein effects requires computational tools, but not explicitly mentioned"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "analyzed the entire coding region"
+    toolType: "genetic_reagent"
+    examples: ["We have analyzed the entire coding region of the NF2 gene"]
+    reasoning: "This phrase strongly implies use of PCR primers and sequencing reagents for comprehensive gene analysis"
+  
+  - patternType: "context_phrase"
+    pattern: "identified [0-9]+ mutations"
+    toolType: "computational_tool"
+    examples: ["identified 43 mutations in 41 patients"]
+    reasoning: "Mutation identification from sequence data requires computational analysis tools"
+  
+  - patternType: "context_phrase"
+    pattern: "loss of heterozygosity"
+    toolType: "genetic_reagent"
+    examples: ["association of loss of heterozygosity on chromosome 22 with mutations"]
+    reasoning: "LOH analysis typically requires microsatellite markers or SNP arrays as genetic reagents"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major limitations found during review:
+    - Only abstract text available - no Methods, Results, or Discussion sections
+    - No tools were mined from this publication despite it being molecular genetics research
+    - Abstract suggests extensive molecular analysis (70 meningioma samples, entire NF2 coding region)
+    - Missing full text prevents detection of specific reagents, primers, software used
+    - Publication from 1995 may have different reporting standards for tool details
+  recommendations: |
+    Overall recommendations for this publication:
+    - No tools were mined, so no rejections needed
+    - This appears to be legitimate molecular genetics research that would use tools
+    - Limited to abstract-only analysis prevents comprehensive tool detection
+    - Suggested patterns could help catch implied tools in similar abstracts
+    - Full text would be needed for comprehensive tool mining
+    - Consider developing patterns for inferring common tools from research descriptions
+    - This publication demonstrates need for full-text access for effective tool mining

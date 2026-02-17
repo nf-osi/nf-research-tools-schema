@@ -1,0 +1,106 @@
+publicationMetadata:
+  pmid: "7609078"
+  title: "Retroviral integration at the Evi-2 locus in BXH-2 myeloid leukemia cell lines disrupts Nf1 expression without changes in steady-state Ras-GTP levels."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - molecular biology study with cell lines
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and content analysis:
+    - Cell lines: BXH-2 myeloid leukemia cell lines are explicitly mentioned
+    - Animal models: Mouse models with Nf1 mutations are referenced
+    - Genetic reagents: Likely plasmids/vectors for retroviral integration studies
+    - Computational tools: Possible bioinformatics tools for sequence analysis
+    - Antibodies: Likely needed for protein detection (neurofibromin, Ras-GTP)
+    
+    This is a molecular biology study investigating retroviral integration effects on gene expression,
+    which typically requires multiple tool types for experimental validation.
+  overallAssessment: |
+    This is a laboratory research publication investigating molecular mechanisms of retroviral integration
+    and its effects on Nf1 gene expression in myeloid leukemia cell lines. The study involves cell line
+    derivation, molecular analysis of gene expression, and protein function studies. Such research typically
+    requires multiple research tools including cell lines, antibodies for protein detection, and potentially
+    genetic reagents for molecular manipulations. However, only the abstract is available, limiting tool detection.
+
+toolValidations: []  # No tools were initially mined
+
+potentiallyMissedTools:
+  - toolName: "BXH-2 myeloid leukemia cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we derived a series of BXH-2 myeloid leukemia cell lines with or without viral integrations at Evi-2..."
+    whyMissed: "Cell line name may not match standard naming patterns - BXH-2 is a specific mouse strain-derived cell line"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 heterozygous mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...aged mice, heterozygous for a germ line Nf1 mutation, develop myeloid leukemia with loss of the wild-type Nf1 allele..."
+    whyMissed: "Animal model described functionally rather than by standard strain nomenclature"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "p21ras proteins"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromin is a GTPase-activating protein (GAP) for p21ras proteins..."
+    whyMissed: "Protein target mentioned but may not be recognized as a reagent without additional context"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "BXH-[0-9]+ .*(cell line|leukemia)"
+    toolType: "cell_line"
+    examples: ["BXH-2 myeloid leukemia cell lines"]
+    reasoning: "BXH strain-derived cell lines follow this naming pattern and are commonly used in cancer research"
+
+  - patternType: "context_phrase"
+    pattern: "heterozygous for.*mutation"
+    toolType: "animal_model"
+    examples: ["mice, heterozygous for a germ line Nf1 mutation"]
+    reasoning: "Functional description of genetically modified animal models that may not follow standard nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "we derived.*cell lines"
+    toolType: "cell_line"
+    examples: ["we derived a series of BXH-2 myeloid leukemia cell lines"]
+    reasoning: "Indicates active cell line development/usage rather than just citation"
+
+  - patternType: "term"
+    pattern: "proviral integration"
+    toolType: "genetic_reagent"
+    examples: ["proviral integrations at the Evi-2 common viral integration site"]
+    reasoning: "Indicates use of retroviral vectors as genetic tools for insertional mutagenesis"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of tool usage
+    - Only abstract text available - Methods section would contain detailed tool information
+    - Cell line derivation and animal model usage clearly described but not captured
+    - Limited text availability restricts comprehensive tool identification
+  recommendations: |
+    This publication clearly describes laboratory research involving cell lines and animal models
+    that should have been captured by mining algorithms. The BXH-2 myeloid leukemia cell lines
+    and Nf1 heterozygous mice represent legitimate research tools that were missed. The suggested
+    patterns should be implemented to improve detection of:
+    1. Strain-specific cell line nomenclature (BXH-2)
+    2. Functional descriptions of genetically modified animals
+    3. Context phrases indicating tool derivation/development
+    4. Retroviral integration as a genetic tool methodology
+    
+    Future mining should prioritize publications with full-text access to capture tools
+    described in Methods sections. This paper demonstrates that significant tools can be
+    mentioned even in abstracts when Methods sections are unavailable.

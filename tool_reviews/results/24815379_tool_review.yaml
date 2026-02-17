@@ -1,0 +1,88 @@
+publicationMetadata:
+  pmid: "24815379"
+  title: "Application of COLD-PCR for improved detection of NF2 mosaic mutations."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review articles typically do not contain research tools as they synthesize existing literature
+    rather than report original experimental work. However, they may mention:
+    - Computational tools used for analysis or cited from other studies
+    - Clinical assessment tools discussed in the context of diagnostic criteria
+    - Molecular techniques referenced from the literature
+    
+    The title mentions "COLD-PCR" which could be a computational tool, but this appears to be
+    a technique discussed in the context of literature review rather than actual usage.
+    
+    Given the lack of Methods and Results sections, this publication is unlikely to contain
+    genuine research tools that were actively used by the authors.
+  overallAssessment: |
+    This is clearly a review article that synthesizes existing knowledge about schwannomatosis
+    and NF2, focusing on genetic mutations, diagnostic criteria, and models of tumorigenesis.
+    The absence of Methods and Results sections confirms this is not experimental research.
+    While the title mentions COLD-PCR, the content is primarily a comprehensive literature
+    review rather than a report of original experimental work using research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "COLD-PCR"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Application of COLD-PCR for improved detection of NF2 mosaic mutations...Co-amplification at lower denaturation temperature (COLD)-PCR has been described as a powerful method to selectively amplify minority alleles from mixtures of wild-type and mutation-containing sequences. Here, we applied COLD-PCR to molecular analysis of patients with NF2 mosaicism."
+    whyMissed: "COLD-PCR is mentioned in the title and abstract as a molecular technique, but this appears to be discussed in the context of literature review rather than actual experimental usage by the authors"
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "BAF47 antibody"
+    toolType: "antibody"
+    foundIn: "introduction"
+    contextSnippet: "Schwannomas in patients with germline SMARCB1 mutations have been reported to exhibit a mosaic SMARCB1 protein expression pattern by immunohistochemical staining of tumour sections with the monoclonal BAF47 antibody specific for the C-terminal part of SMARCB1 raised against amino acids 257–359"
+    whyMissed: "This antibody is mentioned in the context of describing methods used in other studies, not as a tool used by the current authors"
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "has been described as"
+    toolType: "general"
+    examples: ["COLD-PCR has been described as a powerful method"]
+    reasoning: "This phrase often indicates literature review context rather than actual tool usage, helping to distinguish between tools used vs. tools cited from other studies"
+  - patternType: "context_phrase"
+    pattern: "have been reported to"
+    toolType: "general"
+    examples: ["Schwannomas...have been reported to exhibit...staining...with the monoclonal BAF47 antibody"]
+    reasoning: "This phrase typically indicates citation of methods from other studies rather than current experimental usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not experimental research
+    - No Methods or Results sections present
+    - COLD-PCR mentioned in title appears to be discussed in literature review context
+    - All tool mentions (COLD-PCR, BAF47 antibody) refer to techniques from other studies
+    - No evidence of original experimental work by the authors
+  recommendations: |
+    This publication should not contribute any tools to the database as it is a review article
+    that synthesizes existing literature rather than reporting original experimental work.
+    
+    The mining correctly identified 0 tools, which is appropriate for this publication type.
+    
+    The queryType classification as "bench" appears to be incorrect - this should be classified
+    as a review article. The mention of COLD-PCR in the title may have led to the bench
+    classification, but the content clearly indicates this is a comprehensive literature review.
+    
+    Suggested patterns could help distinguish between tools actively used vs. tools cited
+    from other studies in future mining efforts.
+    
+    No observations were extracted as this is a review article without experimental findings.

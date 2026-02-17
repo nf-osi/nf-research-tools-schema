@@ -1,0 +1,109 @@
+publicationMetadata:
+  pmid: "23124644"
+  title: "Anatomic MR imaging and functional diffusion tensor imaging of peripheral nerve tumors and tumorlike conditions."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (imaging quality scales), computational tools for image analysis
+    
+    This is a clinical imaging study evaluating MRI techniques for peripheral nerve tumors. Expected tools include:
+    - Clinical assessment tools: imaging quality rating scales, measurement protocols
+    - Computational tools: image analysis software, statistical analysis packages, tractography software
+    - NOT expected: antibodies, cell lines, animal models, genetic reagents, organoids, PDX models
+    
+    Publications can contain multiple tool types. Clinical studies often use computational tools for data analysis
+    and may employ standardized assessment instruments for measurements.
+  overallAssessment: |
+    This clinical imaging study would typically use computational tools for image analysis and processing,
+    as well as clinical assessment tools for standardized evaluation of image quality and measurements.
+    The study describes specific imaging protocols (DTI, DWI) and analysis methods (tractography, ADC, FA)
+    that likely involve specialized software tools, though these may not be explicitly named.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "3-point scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were evaluated for image quality (3-point scale), ADC of the lesion, tractography, and fractional anisotropy"
+    whyMissed: "Clinical assessment scale for image quality evaluation - may not have been recognized as a standardized tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "DTI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "underwent 3T MR imaging by using anatomic (n=29), functional diffusion, DWI (n=21), and DTI (n=24) techniques"
+    whyMissed: "DTI (Diffusion Tensor Imaging) is both an imaging technique and requires specialized analysis software"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  
+  - toolName: "Tractography"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were evaluated for image quality (3-point scale), ADC of the lesion, tractography, and fractional anisotropy"
+    whyMissed: "Tractography is a computational analysis method that requires specialized software for fiber tracking"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\d+-point scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["3-point scale"]
+    reasoning: "Standardized rating scales are common clinical assessment tools that may be missed by current patterns"
+  
+  - patternType: "term"
+    pattern: "tractography"
+    toolType: "computational_tool"
+    examples: ["tractography"]
+    reasoning: "Tractography is a specialized computational analysis method requiring dedicated software"
+  
+  - patternType: "context_phrase"
+    pattern: "(DTI|diffusion tensor imaging)"
+    toolType: "computational_tool"
+    examples: ["DTI", "diffusion tensor imaging"]
+    reasoning: "DTI analysis requires specialized computational tools and software packages"
+
+observations:
+  - resourceName: "3-point scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # No MP ID for usage instructions
+    details: |
+      Image quality assessment using 3-point scale showed excellent results:
+      - All anatomic MR imaging studies (29/29, 100%) received "good" quality
+      - 20/21 (95%) DWI studies received "good" quality  
+      - 21/24 (79%) DTI studies received "good" quality
+      This demonstrates the scale's utility for standardized image quality evaluation in clinical imaging studies.
+    foundIn: "results"
+    contextSnippet: "All anatomic (29/29, 100%) MR imaging studies received \"good\" quality; 20/21 (95%) DWI and 21/24 (79%) DTI studies received \"good\" quality."
+    confidence: 0.8
+    doi: "10.3174/ajnr.A3316"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 1
+  observationsByType:
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - No tools were initially mined from this clinical imaging study
+    - Several potential computational and clinical assessment tools may have been missed
+    - The study describes specialized imaging analysis methods that likely require dedicated software
+    - Clinical assessment scales for image quality evaluation were not captured
+  recommendations: |
+    This publication appears to have missed several potential tools:
+    1. The "3-point scale" for image quality assessment is a standardized clinical tool
+    2. DTI and tractography analysis methods require specialized computational software
+    3. Consider adding patterns to capture imaging analysis methods and rating scales
+    4. The mining may be too restrictive for clinical imaging studies that use specialized analysis tools
+    5. One usage instruction observation was extracted showing the effectiveness of the 3-point scale
+    6. Manual curator review recommended to determine if these imaging analysis methods qualify as research tools

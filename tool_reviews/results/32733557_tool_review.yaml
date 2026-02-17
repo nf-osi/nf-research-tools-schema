@@ -1,0 +1,291 @@
+publicationMetadata:
+  pmid: "32733557"
+  title: "Gene Expression, Network Analysis, and Drug Discovery of Neurofibromatosis Type 2-Associated Vestibular Schwannomas Based on Bioinformatics Analysis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # Very clear from title and methods
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, databases, web tools, analysis pipelines) - HIGHLY EXPECTED
+    - Genetic reagents (primers for qPCR validation) - POSSIBLE
+    - Lab tools are unlikely since this is primarily computational analysis
+    - Clinical assessment tools are not expected for this type of study
+    
+    This is a computational study analyzing gene expression data, so multiple bioinformatics
+    tools, databases, and software packages should be present throughout the methods.
+  overallAssessment: |
+    This is a bioinformatics analysis study that should contain numerous computational tools.
+    The study uses microarray data analysis, gene expression profiling, pathway enrichment,
+    protein-protein interaction network analysis, and drug discovery databases. Multiple
+    software tools, web platforms, and databases are explicitly mentioned in the methods
+    section and should have been captured by the mining system.
+
+toolValidations: []  # No tools were initially mined to validate
+
+potentiallyMissedTools:
+  - toolName: "GEO2R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GEO2R (http://www.ncbi.nlm.nih.gov/geo/geo2r/), a web tool based on the analysis of variance or t-test, was used to identify DEGs between NF2-associated VSs tissues and normal nerves."
+    whyMissed: "Web-based analysis tool with URL - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DAVID"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Database for Annotation, Visualization, and Integrated Discovery (DAVID) (Version 6.8, https://david.ncifcrf.gov/) was used to perform GO and KEGG pathway enrichment analysis"
+    whyMissed: "Major bioinformatics database with version number and URL - clear computational tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "STRING"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We submitted DEGs in Search Tool for the Retrieval of Interacting Genes database (STRING, http://www.string-db.org/) to screen the PPI pairs"
+    whyMissed: "Well-known protein interaction database with URL - should be captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Cytoscape"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "visualized the interaction using Cytoscape software (Version 3.7.0.)"
+    whyMissed: "Popular network visualization software with specific version number"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "CentiScaPe"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Finally, CentiScaPe and Molecular Complex Detection (MCODE), a Cytoscape plugin, were utilized to screen PPI network key genes."
+    whyMissed: "Cytoscape plugin for network analysis - computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MCODE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CentiScaPe and Molecular Complex Detection (MCODE), a Cytoscape plugin, were utilized to screen PPI network key genes"
+    whyMissed: "Molecular Complex Detection plugin - computational analysis tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DGIdb"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "the hub genes were mapped onto the Drug-Gene Interaction database (DGIdb; http://www.dgidb.org) to obtain potential drug target genes"
+    whyMissed: "Drug-gene interaction database with URL - computational resource"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ClinicalTrials.gov"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "In addition, ClinicalTrials.gov (https://clinicaltrials.gov) was used to identify whether drugs have been previously investigated"
+    whyMissed: "Clinical trials database used for computational analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was conducted by SPSS 20.0 software."
+    whyMissed: "Statistical analysis software with version number - clear computational tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Gene Expression Omnibus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The gene expression profile GSE108524 of the NF2-associated VSs and normal nerve groups was obtained from the NCBI GEO database."
+    whyMissed: "Major genomics database (GEO) - computational resource"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GPL17586 Platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "These microarray data were based on GPL17586 Platform [HTA-2_0] Affymetrix Human Transcriptome Array 2.0"
+    whyMissed: "Specific microarray platform identifier - computational/experimental resource"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "SYBR premix EX Taq"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Reverse transcription was carried out using SYBR premix EX Taq (Takara, Japan)"
+    whyMissed: "qPCR reagent with vendor information - genetic reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SYBR Premix Ex Taq II"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "SYBR Premix Ex Taq II (Takara) was used for qPCR"
+    whyMissed: "qPCR reagent with vendor - genetic reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "was used to|were used to|was utilized to|were utilized to"
+    toolType: "general"
+    examples: ["DAVID was used to perform GO", "STRING was used to analyze", "Cytoscape was utilized to"]
+    reasoning: "Strong indicator of tool usage in methods sections - would catch many computational tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}\\d*\\b.*\\(Version\\s+[\\d\\.]+\\)"
+    toolType: "computational_tool"
+    examples: ["DAVID (Version 6.8)", "Cytoscape software (Version 3.7.0)"]
+    reasoning: "Software names with version numbers are clear computational tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+,\\s*[A-Za-z]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["SYBR premix EX Taq (Takara, Japan)", "SYBR Premix Ex Taq II (Takara)"]
+    reasoning: "Reagents with vendor and location information indicate commercial genetic reagents"
+
+  - patternType: "term"
+    pattern: "database|Database"
+    toolType: "computational_tool"
+    examples: ["Drug-Gene Interaction database (DGIdb)", "STRING database", "GEO database"]
+    reasoning: "Databases are computational resources and should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "obtained from|downloaded from|retrieved from"
+    toolType: "computational_tool"
+    examples: ["obtained from the NCBI GEO database", "downloaded from the Gene Expression Omnibus"]
+    reasoning: "Indicates data retrieval from computational resources/databases"
+
+  - patternType: "naming_convention"
+    pattern: "GSE\\d+"
+    toolType: "computational_tool"
+    examples: ["GSE108524"]
+    reasoning: "GEO dataset identifiers represent computational resources"
+
+  - patternType: "naming_convention"
+    pattern: "GPL\\d+"
+    toolType: "computational_tool"
+    examples: ["GPL17586 Platform"]
+    reasoning: "GEO platform identifiers represent computational/experimental resources"
+
+observations:
+  - resourceName: "DAVID"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      DAVID Version 6.8 was used for GO and KEGG pathway enrichment analysis of differentially expressed genes.
+      Analysis criteria: GO terms with P < 0.05 and false discovery rate (FDR) < 0.05, and KEGG pathway 
+      analysis with P < 0.05 were considered statistically significant. Successfully identified enriched 
+      biological processes, cellular components, molecular functions, and pathways.
+    foundIn: "methods"
+    contextSnippet: "The Database for Annotation, Visualization, and Integrated Discovery (DAVID) (Version 6.8, https://david.ncifcrf.gov/) was used to perform GO and KEGG pathway enrichment analysis of DEGs. GO analysis contains biological process (BP), cellular component (CC), and molecular function (MF). GO term with the criterion of P < 0.05 and false discovery rate (FDR) < 0.05 and KEGG pathway analysis with the criterion of P < 0.05 were considered statistically significant."
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+  - resourceName: "STRING"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      STRING database was used to screen protein-protein interaction pairs with a combined score ≥0.4.
+      Successfully generated PPI network of 369 nodes and 1,322 edges. Analysis identified 28 hub genes 
+      with connectivity degree ≥20. Tool performed well for large-scale protein interaction analysis.
+    foundIn: "results"
+    contextSnippet: "We submitted DEGs in Search Tool for the Retrieval of Interacting Genes database (STRING, http://www.string-db.org/) to screen the PPI pairs with a combined score of ≥0.4... In total, we made the PPI network of 369 nodes and 1,322 edges, based on the STRING database"
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+  - resourceName: "Cytoscape"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      Cytoscape software Version 3.7.0 was used to visualize protein-protein interactions and drug-gene 
+      interactions. Successfully generated network visualizations and supported plugin analysis with 
+      CentiScaPe and MCODE for hub gene identification and module detection.
+    foundIn: "methods"
+    contextSnippet: "visualized the interaction using Cytoscape software (Version 3.7.0.)... Visualization of the drug-gene interaction was generated using Cytoscape software (Version 3.7.0.)"
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+  - resourceName: "MCODE"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      MCODE (Molecular Complex Detection) Cytoscape plugin was used to identify functional modules in the 
+      PPI network. Default parameters: degree cutoff ≥2, node score cutoff ≥0.2, k-score ≥2, maximum 
+      depth = 100. Successfully identified three modules with scores >4.5 and >18 nodes each.
+    foundIn: "results"
+    contextSnippet: "Finally, CentiScaPe and Molecular Complex Detection (MCODE), a Cytoscape plugin, were utilized to screen PPI network key genes. The default parameters of MCODE were used: degree cutoff ≥2, node score cutoff ≥0.2, k-score ≥2, and maximum depth = 100... using MCODE, three modules with scores >4.5 and a number of nodes >18 were selected"
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+  - resourceName: "DGIdb"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      Drug-Gene Interaction database (DGIdb) was used to map 28 hub genes and identify potential therapeutic 
+      drugs for NF2-associated vestibular schwannomas. Analysis revealed 31 drugs associated with 12 key 
+      genes as potential NF2 treatment candidates. Tool successfully facilitated drug repurposing analysis.
+    foundIn: "results"
+    contextSnippet: "Based on the DGIdb, we use the 28 hub genes to screen for drug-gene interactions, which revealed that 31 drugs associated with 12 key genes may be potential NF2 treatment drugs"
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+  - resourceName: "GEO2R"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      GEO2R web tool was used to identify differentially expressed genes between NF2-associated vestibular 
+      schwannoma tissues and normal nerves. Analysis criteria: |log FC| ≥ 1.5 and adj. P < 0.05. 
+      Successfully identified 542 DEGs (13 upregulated, 329 downregulated genes).
+    foundIn: "results"
+    contextSnippet: "GEO2R (http://www.ncbi.nlm.nih.gov/geo/geo2r/), a web tool based on the analysis of variance or t-test, was used to identify DEGs... A total of 542 DEGs, including 13 upregulated and 329 downregulated genes, were identified"
+    confidence: 0.95
+    doi: "10.1155/2020/5976465"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13  # Number of tools that should have been captured
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 6  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Usage Instructions: 6
+  majorIssuesFound: |
+    Critical mining failure - this bioinformatics analysis publication contains numerous computational 
+    tools that were completely missed:
+    - Multiple databases (DAVID, STRING, DGIdb, GEO, ClinicalTrials.gov)
+    - Analysis software (Cytoscape, SPSS, GEO2R)
+    - Specialized plugins (MCODE, CentiScaPe)
+    - qPCR reagents (SYBR premix products)
+    - All tools have clear usage context and version/vendor information
+    - This represents a systematic failure to capture computational tools in bioinformatics studies
+  recommendations: |
+    URGENT: The mining system failed to capture any tools from a publication rich in computational resources.
+    This indicates major gaps in computational tool detection patterns. All 13 missed tools should be added:
+    
+    HIGH PRIORITY ADDITIONS:
+    - DAVID, STRING, Cytoscape, SPSS, GEO2R, DGIdb (core bioinformatics tools)
+    - MCODE, CentiScaPe (analysis plugins)
+    - Gene Expression Omnibus (major database)
+    - SYBR reagents (genetic reagents with vendor info)
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Better detection of "was used to" phrases
+    - Software version patterns (Version X.X)
+    - Database URLs and identifiers (GSE, GPL numbers)
+    - Vendor information patterns for reagents
+    
+    This publication demonstrates the mining system needs significant enhancement for computational tool detection.
+    The suggested patterns would dramatically improve capture rates for bioinformatics studies.

@@ -1,0 +1,96 @@
+publicationMetadata:
+  pmid: "10591653"
+  title: "Mouse tumor model for neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the title "Mouse tumor model for neurofibromatosis type 1" and abstract content, this is clearly a lab research publication describing the development and characterization of an animal model. Expected tool types include:
+    - Animal models (genetically modified mice with Nf1 and p53 mutations)
+    - Potentially genetic reagents (knockout alleles, targeting constructs)
+    - Possibly computational tools for genetic analysis
+    
+    The publication describes mice with "null Nf1 and p53 alleles in cis" which indicates specific genetically modified mouse strains were developed or used.
+  overallAssessment: |
+    This is a seminal lab research paper describing the development of a mouse tumor model for NF1 research. The abstract clearly describes genetically modified mice with specific mutations (Nf1 and p53 null alleles), indicating this should contain animal model tools. The lack of full-text sections limits detailed analysis, but the abstract provides sufficient evidence of tool development/usage. This type of publication would typically contain multiple research tools including animal models and genetic reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 null mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "One hundred percent of mice harboring null Nf1 and p53 alleles in cis synergize to develop soft tissue sarcomas between 3 and 7 months of age."
+    whyMissed: "The mining patterns may not have captured 'null Nf1' as an animal model reference. This clearly describes genetically modified mice with Nf1 knockout alleles."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "p53 null mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "One hundred percent of mice harboring null Nf1 and p53 alleles in cis synergize to develop soft tissue sarcomas between 3 and 7 months of age."
+    whyMissed: "Similar to Nf1, the p53 null allele represents a genetically modified mouse model that wasn't captured by mining patterns."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1/p53 double knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "One hundred percent of mice harboring null Nf1 and p53 alleles in cis synergize to develop soft tissue sarcomas between 3 and 7 months of age."
+    whyMissed: "The compound genotype (double knockout) represents a specific animal model that combines both mutations. Mining patterns may not capture complex genotype descriptions."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "null [A-Z][a-z0-9]+ (allele|mice|mouse)"
+    toolType: "animal_model"
+    examples: ["null Nf1 and p53 alleles", "mice harboring null Nf1"]
+    reasoning: "This pattern would capture references to knockout/null alleles in mice, which are common animal model descriptions that may be missed by current patterns."
+
+  - patternType: "context_phrase"
+    pattern: "mice harboring (null|knockout|mutant) [A-Z][a-z0-9]+"
+    toolType: "animal_model"
+    examples: ["mice harboring null Nf1 and p53 alleles"]
+    reasoning: "The phrase 'mice harboring' followed by genetic modifications is a strong indicator of animal model usage and should be captured."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+/[A-Z][a-z0-9]+ (double |compound )?(knockout|null|mutant)"
+    toolType: "animal_model"
+    examples: ["Nf1/p53 double knockout"]
+    reasoning: "Compound genotype nomenclature (gene1/gene2) is commonly used to describe animal models with multiple genetic modifications."
+
+  - patternType: "context_phrase"
+    pattern: "(develop|exhibit|synergize to develop) .+ (sarcomas|tumors|malignancies)"
+    toolType: "animal_model"
+    examples: ["synergize to develop soft tissue sarcomas"]
+    reasoning: "Phenotypic descriptions of tumor development in animal models provide strong context for identifying mouse model tools."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of animal model development/usage
+    - Only abstract text available, limiting detailed analysis of experimental methods
+    - Mining patterns appear to miss common animal model nomenclature (null alleles, knockout mice)
+    - The publication clearly describes genetically modified mice that should be captured as research tools
+  recommendations: |
+    This publication represents a significant missed opportunity for tool mining. The abstract clearly describes the development and characterization of genetically modified mouse models for NF1 research, which are valuable research tools. Recommendations:
+    
+    1. ADD the three identified animal models (Nf1 null mice, p53 null mice, Nf1/p53 double knockout mice)
+    2. IMPLEMENT the suggested patterns to better capture animal model nomenclature
+    3. IMPROVE mining to recognize "null alleles" and "knockout mice" terminology
+    4. CONSIDER that seminal model development papers like this are high-value targets for tool extraction
+    5. NO observations could be extracted due to lack of Results/Discussion sections, but the abstract indicates these models develop tumors with specific characteristics
+    
+    This is a classic example of a tool development paper that should have high mining success but was completely missed by current patterns.

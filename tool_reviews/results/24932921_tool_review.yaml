@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "24932921"
+  title: "Neurofibromin deficiency-associated transcriptional dysregulation suggests a novel therapy for tibial pseudoarthrosis in NF1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - clear experimental study with multi-omics analysis
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool categories:
+    - Computational tools (high priority) - whole-exome sequencing analysis, RNA-seq analysis, microarray analysis, pathway analysis
+    - Cell lines/primary cultures - cells cultured from surgically resected pseudoarthrosis tissue
+    - Genetic reagents - potentially for cell culture and molecular analysis
+    - Clinical assessment tools - possibly for tissue characterization and patient phenotyping
+    
+    This is a multi-omics study (exome sequencing, transcriptome sequencing, microarray analysis) that would require
+    extensive computational tools for data processing, analysis, and interpretation. The study also involves primary
+    cell culture from patient tissue, which may involve additional laboratory tools and reagents.
+  overallAssessment: |
+    This is a clear laboratory research study involving multi-omics analysis of NF1 pseudoarthrosis tissue and cultured cells.
+    The study employed whole-exome sequencing, whole-transcriptome sequencing, and genome-wide microarray analysis, which
+    would require numerous computational tools for data processing and analysis. The absence of any mined tools suggests
+    significant gaps in the mining process, particularly for computational tools and bioinformatics software.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "whole-exome sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...pseudoarthrosis tissue from NF1 individuals were analyzed using whole-exome and whole-transcriptome sequencing as well as genomewide microarray analysis..."
+    whyMissed: "Generic term for sequencing approach - mining patterns may need to capture sequencing methodologies as computational tools"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "whole-transcriptome sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...pseudoarthrosis tissue from NF1 individuals were analyzed using whole-exome and whole-transcriptome sequencing as well as genomewide microarray analysis..."
+    whyMissed: "Generic term for RNA-seq approach - mining patterns may need to capture transcriptome sequencing as computational methodology"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "genomewide microarray analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...analyzed using whole-exome and whole-transcriptome sequencing as well as genomewide microarray analysis. Genomewide analysis identified multiple genetic mechanisms..."
+    whyMissed: "Generic term for microarray methodology - mining patterns may need to capture microarray analysis as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "gene expression profiling"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Gene expression profiling identified dysregulated pathways associated with neurofibromin deficiency, including phosphoinositide 3-kinase (PI3K) and mitogen-activated protein kinase (MAPK) signaling pathways..."
+    whyMissed: "Generic methodology term - mining patterns may need to capture expression profiling as computational analysis"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+    
+  - toolName: "cultured cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...pseudoarthrosis tissue and cells cultured from surgically resected pseudoarthrosis tissue from NF1 individuals were analyzed..."
+    whyMissed: "Primary cell culture from patient tissue - mining patterns may not capture patient-derived primary cultures"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "analyzed using [sequencing method]"
+    toolType: "computational_tool"
+    examples: ["analyzed using whole-exome and whole-transcriptome sequencing", "analyzed using genomewide microarray analysis"]
+    reasoning: "This phrase pattern indicates active use of analytical methodologies that require computational tools"
+    
+  - patternType: "term"
+    pattern: "whole-exome sequencing|whole-transcriptome sequencing|RNA-seq|microarray analysis|gene expression profiling"
+    toolType: "computational_tool"
+    examples: ["whole-exome sequencing", "whole-transcriptome sequencing", "genomewide microarray analysis", "gene expression profiling"]
+    reasoning: "These are standard omics methodologies that require computational analysis tools and should be captured"
+    
+  - patternType: "context_phrase"
+    pattern: "cells cultured from [tissue/source]"
+    toolType: "cell_line"
+    examples: ["cells cultured from surgically resected pseudoarthrosis tissue"]
+    reasoning: "This pattern identifies primary cell cultures derived from patient tissue, which are valuable research tools"
+    
+  - patternType: "naming_convention"
+    pattern: "[tissue/disease] tissue|[patient/primary] cells"
+    toolType: "cell_line"
+    examples: ["pseudoarthrosis tissue", "cultured cells from NF1 individuals"]
+    reasoning: "Patient-derived primary cultures and tissue samples are important research resources that should be captured"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite clear evidence of extensive tool usage
+    - Publication is a multi-omics laboratory research study that would require numerous computational tools
+    - Abstract mentions whole-exome sequencing, whole-transcriptome sequencing, and microarray analysis
+    - Primary cell cultures from patient tissue are mentioned but not captured
+    - Missing Methods section limits ability to identify specific tools, software, and protocols used
+    - Mining patterns appear inadequate for capturing omics methodologies and computational analysis tools
+  recommendations: |
+    Strong recommendations for this publication:
+    - This publication should be flagged for comprehensive re-mining with enhanced patterns
+    - The study represents a multi-omics analysis that would use extensive computational tools for data processing
+    - Primary cell cultures from NF1 patient tissue should be captured as research tools
+    - Enhanced mining patterns needed for: sequencing methodologies, microarray analysis, gene expression profiling
+    - Consider accessing full-text to identify specific software packages, analysis pipelines, and laboratory protocols
+    - This type of genomics/transcriptomics study is highly valuable for tool mining and should not return zero tools
+    - Suggest manual curator review to identify specific computational tools used in the analysis pipeline

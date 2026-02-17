@@ -1,0 +1,176 @@
+publicationMetadata:
+  pmid: "24249806"
+  title: "Patient-reported outcomes in neurofibromatosis and schwannomatosis clinical trials."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This publication specifically focuses on evaluating patient-reported outcome (PRO) measures
+    for neurofibromatosis clinical trials. The study systematically reviews and rates different
+    clinical assessment tools, particularly pain intensity scales. Clinical assessment tools
+    (questionnaires, scales, outcome measures) are the primary tool type expected.
+    
+    Note: Publications can contain MULTIPLE tool types. While this is primarily a clinical study,
+    it could potentially use computational tools for analysis, though none are evident in the
+    available text sections.
+  overallAssessment: |
+    This publication is a clinical study that systematically evaluates patient-reported outcome
+    measures for use in neurofibromatosis clinical trials. The study specifically reviews and
+    rates clinical assessment tools, particularly pain intensity scales, making it highly likely
+    to contain validated clinical assessment tools. The REiNS PRO Working Group developed criteria
+    to evaluate PRO measures and applied systematic review processes, indicating methodical
+    assessment of clinical tools rather than just observational research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Numerical Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Within the subdomain of pain intensity, the group reviewed the Numerical Rating Scale-11 (NRS-11), the Visual Analogue Scale, and the Faces Pain Scale-Revised using this process."
+    whyMissed: "This is a validated pain assessment scale that was systematically reviewed by the REiNS PRO group. The mining may have missed it due to the hyphenated format (NRS-11) or lack of specific clinical assessment tool patterns."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NRS-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "However, the NRS-11 was given the highest rating for use in NF clinical trials due to recommendations from pain experts and other consensus groups, its extensive use in research, strong psychometric data including sensitivity to change, and excellent feasibility in ages ≥8 years."
+    whyMissed: "This is the abbreviated form of the Numerical Rating Scale-11. The mining patterns may not have recognized this abbreviated clinical assessment tool name."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Visual Analogue Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Within the subdomain of pain intensity, the group reviewed the Numerical Rating Scale-11 (NRS-11), the Visual Analogue Scale, and the Faces Pain Scale-Revised using this process."
+    whyMissed: "This is a widely used pain assessment scale that was systematically reviewed. The mining may have missed it due to lack of specific patterns for this common clinical assessment tool."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Faces Pain Scale-Revised"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Within the subdomain of pain intensity, the group reviewed the Numerical Rating Scale-11 (NRS-11), the Visual Analogue Scale, and the Faces Pain Scale-Revised using this process."
+    whyMissed: "This is a validated pediatric pain assessment scale that was systematically reviewed. The mining may have missed it due to the compound name format or lack of specific pediatric assessment tool patterns."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Numerical Rating Scale-11|NRS-11"
+    toolType: "clinical_assessment_tool"
+    examples: ["Numerical Rating Scale-11 (NRS-11)", "the NRS-11 was given the highest rating"]
+    reasoning: "The NRS-11 is a widely used pain assessment scale in clinical research. Adding this specific pattern would capture both the full name and abbreviated form."
+
+  - patternType: "term"
+    pattern: "Visual Analogue Scale|VAS"
+    toolType: "clinical_assessment_tool"
+    examples: ["the Visual Analogue Scale", "VAS scores"]
+    reasoning: "The Visual Analogue Scale (VAS) is one of the most common pain assessment tools in clinical research. This pattern would capture both full and abbreviated forms."
+
+  - patternType: "term"
+    pattern: "Faces Pain Scale-Revised|FPS-R"
+    toolType: "clinical_assessment_tool"
+    examples: ["Faces Pain Scale-Revised", "FPS-R assessment"]
+    reasoning: "This is a validated pediatric pain assessment tool. The compound name format may require specific pattern recognition."
+
+  - patternType: "context_phrase"
+    pattern: "pain intensity scale|pain assessment scale|pain rating scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["pain intensity scales is brief, reliable, valid", "pain assessment scale for children"]
+    reasoning: "These context phrases often indicate clinical assessment tools for pain measurement, which are common in neurofibromatosis research due to pain being a major symptom."
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome|PRO measure|outcome measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcomes (PROs) as endpoints", "appropriate PRO measures for NF clinical trials"]
+    reasoning: "Patient-reported outcome measures are clinical assessment tools. This context phrase would help identify various PRO instruments used in clinical research."
+
+  - patternType: "context_phrase"
+    pattern: "systematic review criteria|psychometric properties|validated instrument"
+    toolType: "clinical_assessment_tool"
+    examples: ["systematic review criteria and process", "strong psychometric data including sensitivity to change"]
+    reasoning: "These phrases often appear when clinical assessment tools are being evaluated or validated, indicating the presence of measurement instruments."
+
+observations:
+  - resourceName: "Numerical Rating Scale-11"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The NRS-11 was rated as the highest recommended pain intensity scale for use in NF clinical trials.
+      Key advantages identified include: recommendations from pain experts and consensus groups, extensive
+      use in research, strong psychometric data including sensitivity to change, and excellent feasibility
+      for ages ≥8 years. The scale is described as brief, reliable, valid, and widely used.
+    foundIn: "results"
+    contextSnippet: "However, the NRS-11 was given the highest rating for use in NF clinical trials due to recommendations from pain experts and other consensus groups, its extensive use in research, strong psychometric data including sensitivity to change, and excellent feasibility in ages ≥8 years."
+    confidence: 0.95
+    doi: "10.1212/01.wnl.0000435747.02780.bf"
+
+  - resourceName: "Visual Analogue Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Visual Analogue Scale was evaluated as one of three pain intensity scales reviewed by the
+      REiNS PRO group. It was found to be brief, reliable, valid, and widely used, though it received
+      a lower rating than the NRS-11 for use in NF clinical trials. The scale was assessed using
+      systematic review criteria including patient characteristics, psychometric properties, and feasibility.
+    foundIn: "both"
+    contextSnippet: "Based on the review criteria, each of these pain intensity scales is brief, reliable, valid, and widely used. However, the NRS-11 was given the highest rating..."
+    confidence: 0.90
+    doi: "10.1212/01.wnl.0000435747.02780.bf"
+
+  - resourceName: "Faces Pain Scale-Revised"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Faces Pain Scale-Revised was evaluated as one of three pain intensity scales reviewed by the
+      REiNS PRO group. It was found to be brief, reliable, valid, and widely used, though it received
+      a lower rating than the NRS-11 for use in NF clinical trials. This scale is particularly relevant
+      for pediatric populations and was assessed using systematic review criteria.
+    foundIn: "both"
+    contextSnippet: "Based on the review criteria, each of these pain intensity scales is brief, reliable, valid, and widely used. However, the NRS-11 was given the highest rating..."
+    confidence: 0.90
+    doi: "10.1212/01.wnl.0000435747.02780.bf"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Critical mining failure: No tools were captured despite clear presence of clinical assessment tools
+    - The publication explicitly discusses and evaluates three validated pain assessment scales
+    - Mining patterns appear to lack coverage for clinical assessment tools, particularly pain scales
+    - The systematic review nature of the study makes these tools highly reliable and well-documented
+    - All missed tools have strong validation context and psychometric data mentioned
+  recommendations: |
+    This publication represents a significant mining failure - four validated clinical assessment tools
+    were completely missed despite being explicitly discussed and systematically evaluated. The tools
+    (NRS-11, Visual Analogue Scale, Faces Pain Scale-Revised) are well-established pain assessment
+    instruments with strong psychometric properties.
+    
+    All four missed tools should be added to the database as they represent genuine clinical assessment
+    tools that are actively used and recommended for neurofibromatosis clinical trials. The publication
+    provides valuable usage guidance and comparative evaluation data.
+    
+    The mining patterns urgently need enhancement for clinical assessment tools, particularly:
+    1. Pain assessment scales and their abbreviations
+    2. Patient-reported outcome measures (PROs)
+    3. Context phrases indicating systematic tool evaluation
+    4. Compound tool names with hyphens and revisions
+    
+    Three high-quality usage observations were extracted providing implementation guidance for these
+    clinical assessment tools in NF research contexts.

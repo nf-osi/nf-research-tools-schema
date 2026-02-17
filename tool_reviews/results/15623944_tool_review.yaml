@@ -1,0 +1,130 @@
+publicationMetadata:
+  pmid: "15623944"
+  title: "DNA ploidy and chromosome (FISH) pattern analysis of peripheral nerve sheath tumors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes laboratory analysis of tumor samples using molecular techniques (DNA ploidy analysis, FISH).
+    Expected tools include: computational tools (image analysis software), genetic reagents (chromosome probes), 
+    and potentially antibodies or other molecular reagents for sample preparation and analysis.
+    
+    Note: Even though only abstract is available, the described methodology clearly indicates use of research tools
+    including imaging software and molecular probes.
+  overallAssessment: |
+    This is a laboratory research study analyzing peripheral nerve sheath tumors using DNA ploidy and FISH analysis.
+    The study methodology clearly involves research tools including chromosome probes, imaging analysis software, and
+    molecular biology techniques. Tools are expected despite limited text availability (abstract only).
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Metafer 4"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...analyzed 6 schwannomas, one atypical neurofibroma and five MPNSTs by fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes (7, 17 and 18) and automatic image analysis station, Metafer 4. RESULTS: Benign schwannomas..."
+    whyMissed: "Specific imaging analysis software/hardware system mentioned with clear usage context but not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "centromeric chromosome probes"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes (7, 17 and 18) and automatic image analysis station..."
+    whyMissed: "Specific genetic reagents (chromosome 7, 17, 18 centromeric probes) used in FISH analysis but not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "chromosome 7 centromeric probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes (7, 17 and 18) and automatic image analysis station..."
+    whyMissed: "Individual chromosome probe not captured - mining may need patterns for specific chromosome probe numbers"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "chromosome 17 centromeric probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes (7, 17 and 18) and automatic image analysis station..."
+    whyMissed: "Individual chromosome probe not captured - mining may need patterns for specific chromosome probe numbers"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "chromosome 18 centromeric probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes (7, 17 and 18) and automatic image analysis station..."
+    whyMissed: "Individual chromosome probe not captured - mining may need patterns for specific chromosome probe numbers"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Metafer\\s+\\d+"
+    toolType: "computational_tool"
+    examples: ["Metafer 4"]
+    reasoning: "Metafer is a specific automated imaging analysis system commonly used in cytogenetics - should be captured as computational tool"
+
+  - patternType: "context_phrase"
+    pattern: "automatic image analysis station,?\\s+([A-Za-z0-9\\s]+)"
+    toolType: "computational_tool"
+    examples: ["automatic image analysis station, Metafer 4"]
+    reasoning: "Context phrase that reliably indicates imaging analysis software/hardware systems used in research"
+
+  - patternType: "term"
+    pattern: "centromeric chromosome probes?\\s*\\([0-9,\\s]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["centromeric chromosome probes (7, 17 and 18)"]
+    reasoning: "Pattern to capture chromosome-specific probes used in FISH analysis with chromosome numbers in parentheses"
+
+  - patternType: "term"
+    pattern: "chromosome\\s+(\\d+)\\s+centromeric probe"
+    toolType: "genetic_reagent"
+    examples: ["chromosome 7 centromeric probe", "chromosome 17 centromeric probe", "chromosome 18 centromeric probe"]
+    reasoning: "Pattern to capture individual chromosome centromeric probes by number - common genetic reagents in cytogenetics"
+
+  - patternType: "context_phrase"
+    pattern: "fluorescence in situ hybridization.*using\\s+([^.]+)"
+    toolType: "genetic_reagent"
+    examples: ["fluorescence in situ hybridization (FISH) technique using centromeric chromosome probes"]
+    reasoning: "FISH technique context reliably indicates use of molecular probes and reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication describes laboratory methodology using specific equipment and reagents
+    - Missing key computational tool (Metafer 4 imaging analysis system)
+    - Missing genetic reagents (chromosome-specific centromeric probes)
+    - Mining patterns appear insufficient for cytogenetics/molecular biology terminology
+  recommendations: |
+    This publication clearly describes laboratory research using specific research tools that were completely missed by mining.
+    Key missing tools include:
+    1. Metafer 4 - automated image analysis system (computational tool)
+    2. Centromeric chromosome probes for chromosomes 7, 17, and 18 (genetic reagents)
+    
+    The mining patterns need significant improvement for cytogenetics and molecular biology terminology.
+    Suggested patterns focus on:
+    - Imaging analysis systems and software
+    - Chromosome-specific probes and FISH reagents
+    - Context phrases that indicate molecular biology tool usage
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the methodology
+    suggests this study would have generated valuable phenotypic and molecular observations about
+    peripheral nerve sheath tumors.
+    
+    This case highlights the need for better pattern coverage in molecular biology and cytogenetics domains.

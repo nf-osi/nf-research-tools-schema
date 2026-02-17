@@ -1,0 +1,104 @@
+publicationMetadata:
+  pmid: "7485407"
+  title: "NF2 gene analysis distinguishes hemangiopericytoma from meningioma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular genetics study from 1995 analyzing NF2 gene mutations in tumor samples.
+    Expected tools include:
+    - Genetic reagents: PCR primers, DNA sequencing reagents
+    - Computational tools: DNA analysis software (though limited in 1995)
+    - Laboratory techniques: Single strand conformation polymorphism (SSCP) analysis
+    - Molecular biology reagents: DNA extraction kits, sequencing chemicals
+    
+    Note: This publication lacks detailed Methods section, which limits tool identification.
+    However, the abstract describes specific molecular techniques that would require reagents.
+  overallAssessment: |
+    This is a molecular genetics laboratory study that would typically use research tools, particularly
+    genetic reagents and molecular biology techniques. The study describes DNA sequencing and SSCP
+    analysis of tumor samples, which requires specific primers, reagents, and potentially software.
+    However, the lack of a Methods section severely limits tool identification opportunities.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "single strand conformation polymorphism analysis"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we scanned all 17 exons of the NF2 gene and flanking intronic sequences for mutations with single strand conformation polymorphism analysis and DNA sequencing..."
+    whyMissed: "SSCP is a molecular technique that requires specific reagents and protocols, but may not have been recognized as a 'tool' by the mining algorithm"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "DNA sequencing"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we scanned all 17 exons of the NF2 gene and flanking intronic sequences for mutations with single strand conformation polymorphism analysis and DNA sequencing..."
+    whyMissed: "DNA sequencing is a general technique rather than a specific tool/reagent, but the process requires specific sequencing reagents and potentially sequencing machines"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  
+  - toolName: "paraffin-embedded archival material"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Using paraffin-embedded archival material from 28 cHPCs (including three primary and recurrent tumors), 10 pHPCs, and 26 meningiomas..."
+    whyMissed: "This describes the sample type/preparation method rather than a specific research tool"
+    confidence: 0.3
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "single strand conformation polymorphism|SSCP analysis"
+    toolType: "genetic_reagent"
+    examples: ["single strand conformation polymorphism analysis"]
+    reasoning: "SSCP is a specific molecular technique that requires specialized reagents and protocols, commonly used in mutation detection studies"
+  
+  - patternType: "context_phrase"
+    pattern: "DNA sequencing.*mutations|mutation.*DNA sequencing"
+    toolType: "genetic_reagent"
+    examples: ["DNA sequencing" in mutation analysis context]
+    reasoning: "When DNA sequencing is mentioned in the context of mutation analysis, it often implies use of specific sequencing reagents and protocols"
+  
+  - patternType: "naming_convention"
+    pattern: "exon.*scanning|gene.*scanning.*mutations"
+    toolType: "genetic_reagent"
+    examples: ["scanned all 17 exons of the NF2 gene"]
+    reasoning: "Gene/exon scanning for mutations typically involves specific molecular techniques and reagents that could be captured"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No Methods section available, severely limiting tool identification
+    - Publication from 1995 may use older terminology not captured by modern mining patterns
+    - Abstract-only content provides limited context for tool identification
+    - Molecular techniques mentioned (SSCP, DNA sequencing) are general methods rather than specific tools
+    - No specific vendor names, catalog numbers, or tool identifiers mentioned
+  recommendations: |
+    This publication represents a challenging case for tool mining due to:
+    1. Lack of Methods section - most tools would be described in experimental procedures
+    2. Age of publication (1995) - may use different terminology than modern papers
+    3. Abstract-only content - insufficient detail for confident tool identification
+    
+    The molecular techniques mentioned (SSCP analysis, DNA sequencing) represent methodological approaches
+    rather than specific research tools. While these techniques require reagents and equipment, the
+    abstract doesn't provide enough detail to identify specific tools.
+    
+    Recommendations:
+    - Consider whether publications without Methods sections should be prioritized for tool mining
+    - Develop patterns for older publications that may use different terminology
+    - Focus mining efforts on publications with full-text Methods sections available
+    - No specific tools should be added from this publication without more detailed methodological information

@@ -1,0 +1,175 @@
+publicationMetadata:
+  pmid: "41023593"
+  title: "Selective inhibition of BRAF and CRAF sensitizes NF1-deficient malignant peripheral nerve sheath tumors to MEK inhibitors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes extensive laboratory research including:
+    - CRISPR-Cas9 gene editing (genetic reagents)
+    - shRNA knockdown systems (genetic reagents)
+    - Cell line and patient-derived xenograft models (animal models, patient-derived models)
+    - Immunoblotting and immunohistochemistry (antibodies)
+    - RNA sequencing analysis (computational tools)
+    - Multiple mouse strains (animal models)
+    
+    Expected tool types: genetic reagents, animal models, patient-derived models, antibodies, computational tools
+  overallAssessment: |
+    This is a comprehensive laboratory research study investigating targeted therapies for MPNST using multiple experimental approaches.
+    The methods clearly describe use of CRISPR-Cas9, shRNA systems, xenograft models, and various analytical techniques.
+    The publication should contain numerous research tools across multiple categories, making the absence of mined tools highly concerning.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CRISPR-Cas9"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Conditional gene expression, CRISPR-CAS9, and shRNA-mediated knockdown were used to perform gain/loss-of-function experiments"
+    whyMissed: "Standard genetic editing tool name not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "shRNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "CRISPR-CAS9, and shRNA-mediated knockdown were used to perform gain/loss-of-function experiments to explore the effect"
+    whyMissed: "Common genetic knockdown reagent not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NSG mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "6- to 8-week-old NSG (NOD.Cg-Prkdc scid Il2rg tm1Wjl /SzJ, strain #:005557, Jackson Laboratory"
+    whyMissed: "Mouse strain with full nomenclature and vendor information not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SCID mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "and SCID (C.B-17/IcrHsd-Prkdc scid , Envigo) female mice were used for in vivo efficacy studies"
+    whyMissed: "Another mouse strain with vendor information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "patient-derived xenograft"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "efficacy studies in cell-line-derived and patient-derived xenograft models, and immunoblotting/immunohistochemistry were conducted"
+    whyMissed: "PDX models mentioned multiple times but not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "cell-line-derived xenograft"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "efficacy studies in cell-line-derived and patient-derived xenograft models, and immunoblotting/immunohistochemistry were conducted"
+    whyMissed: "Cell line xenograft models not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "trametinib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Vehicle, trametinib (dosed at 0.075 mg/kg and 0.3 mg/kg, QD- once daily), LXH254"
+    whyMissed: "MEK inhibitor drug used as research reagent with specific dosing"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "LXH254"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "trametinib (dosed at 0.075 mg/kg and 0.3 mg/kg, QD- once daily), LXH254 (dosed at 25 mg/kg and 50 mg/kg, BID- twice daily)"
+    whyMissed: "RAF inhibitor drug used as research reagent with specific dosing"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "randomizr package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Mice were randomized into treatment groups using the randomizr package that arranges animals to achieve the best-case distribution"
+    whyMissed: "R package for randomization not detected"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "CRISPR[\\-\\s]?[Cc]as9?"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR-CAS9", "CRISPR-Cas9", "CRISPR Cas9"]
+    reasoning: "CRISPR-Cas9 is a fundamental gene editing tool that appears in many forms and should always be captured"
+
+  - patternType: "term"
+    pattern: "shRNA|siRNA|miRNA"
+    toolType: "genetic_reagent"
+    examples: ["shRNA-mediated knockdown", "siRNA transfection"]
+    reasoning: "RNA interference reagents are common genetic tools that were missed"
+
+  - patternType: "naming_convention"
+    pattern: "(NSG|SCID|NOD|NOG)\\s+(mice|mouse)"
+    toolType: "animal_model"
+    examples: ["NSG mice", "SCID mice", "NOD mice"]
+    reasoning: "Common immunodeficient mouse strain abbreviations used in xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "patient-derived xenograft|PDX model|cell-line-derived xenograft"
+    toolType: "patient_derived_model"
+    examples: ["patient-derived xenograft models", "PDX model", "cell-line-derived xenograft"]
+    reasoning: "Xenograft model terminology should be captured as these are key research models"
+
+  - patternType: "vendor_indicator"
+    pattern: "Jackson Laboratory|Envigo|strain\\s+#:\\d+"
+    toolType: "animal_model"
+    examples: ["strain #:005557, Jackson Laboratory", "Envigo"]
+    reasoning: "Vendor information and strain numbers indicate research-grade animal models"
+
+  - patternType: "term"
+    pattern: "trametinib|LXH254|[A-Z]{2,}\\d{2,}"
+    toolType: "genetic_reagent"
+    examples: ["trametinib", "LXH254"]
+    reasoning: "Specific drug compounds used as research reagents with dosing information"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+the\\s+([a-zA-Z]+)\\s+package"
+    toolType: "computational_tool"
+    examples: ["using the randomizr package"]
+    reasoning: "Software packages mentioned with 'using the X package' pattern indicate computational tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite clear evidence of extensive tool usage
+    - Mining system completely failed to detect obvious research tools including:
+      * CRISPR-Cas9 gene editing system
+      * shRNA knockdown reagents  
+      * Multiple mouse strains (NSG, SCID) with vendor information
+      * Patient-derived xenograft models
+      * Specific drug compounds (trametinib, LXH254)
+      * Computational tools (randomizr package)
+    - This represents a major failure of the mining system for a typical laboratory research publication
+    - The methods section contains detailed experimental procedures that should have triggered tool detection
+  recommendations: |
+    - URGENT: Review and fix mining patterns - this publication should have yielded 8-10 tools minimum
+    - Add patterns for common genetic reagents (CRISPR, shRNA, siRNA)
+    - Improve mouse strain detection, especially with vendor information
+    - Enhance xenograft model detection (PDX, cell-line derived)
+    - Add drug compound patterns for research reagents
+    - Include computational tool patterns for R packages and software
+    - This publication demonstrates significant gaps in current mining coverage
+    - All 9 potentially missed tools should be added to improve mining accuracy
+    - The suggested patterns would prevent similar failures in future mining

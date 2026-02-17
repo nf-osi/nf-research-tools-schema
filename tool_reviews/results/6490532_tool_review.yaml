@@ -1,0 +1,116 @@
+publicationMetadata:
+  pmid: "6490532"
+  title: "The effects of mesencephalic neural crest cell extirpation on the development of chicken embryos."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes surgical procedures and microscopy analysis
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a developmental biology study using chicken embryos as an animal model system.
+    The abstract describes surgical extirpation procedures, microscopy techniques, and embryological
+    analysis. Expected tools include:
+    - Animal models (chicken embryos, Hamburger-Hamilton staging system)
+    - Microscopy equipment/techniques (light microscopy, scanning electron microscopy)
+    - Surgical tools/procedures for neural crest cell extirpation
+    
+    Note: This is a 1984 publication, so modern molecular tools (antibodies, genetic reagents,
+    computational tools) are less likely to be present.
+  overallAssessment: |
+    This is clearly a laboratory research publication describing experimental developmental biology
+    using chicken embryos. The study involves surgical manipulation of neural crest cells followed
+    by morphological analysis using microscopy. While no tools were initially mined, the publication
+    likely contains research tools that should be captured, particularly the chicken embryo model
+    system and microscopy techniques described in the abstract.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "chicken embryos"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The mesencephalic neural crest cells of Hamburger-Hamilton Stage 9-Stage 11 chick embryos were surgically extirpated unilaterally in 148 embryos and bilaterally in 8 embryos."
+    whyMissed: "Standard animal model terminology - 'chick embryos' and 'chicken embryos' are commonly used interchangeably for this model system"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Hamburger-Hamilton staging system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The mesencephalic neural crest cells of Hamburger-Hamilton Stage 9-Stage 11 chick embryos were surgically extirpated"
+    whyMissed: "This is a standardized developmental staging system for chicken embryos, widely used in developmental biology research"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "light microscopy"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Embryos were fixed at various time intervals after operation, studied macroscopically, and by light and scanning electron microscopy"
+    whyMissed: "Microscopy techniques are research tools/methods, though the specific equipment/software isn't detailed"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "scanning electron microscopy"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "studied macroscopically, and by light and scanning electron microscopy, and their development compared"
+    whyMissed: "SEM is a standard research technique/tool, though specific equipment details aren't provided"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "chick embryos?|chicken embryos?"
+    toolType: "animal_model"
+    examples: ["chick embryos", "chicken embryos"]
+    reasoning: "Standard terminology for this widely-used developmental biology model system"
+
+  - patternType: "naming_convention"
+    pattern: "Hamburger-Hamilton [Ss]tage \\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Hamburger-Hamilton Stage 9-Stage 11"]
+    reasoning: "Standardized developmental staging system for chicken embryos - should be captured as an assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "studied.*by (light|electron|scanning electron) microscopy"
+    toolType: "computational_tool"
+    examples: ["studied macroscopically, and by light and scanning electron microscopy"]
+    reasoning: "Microscopy techniques mentioned in methodology context should be captured"
+
+  - patternType: "term"
+    pattern: "neural crest cell extirpation|surgical extirpation"
+    toolType: "genetic_reagent"
+    examples: ["mesencephalic neural crest cell extirpation", "surgically extirpated"]
+    reasoning: "Surgical procedures for cell/tissue removal are experimental techniques that could be considered tools/methods"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research publication
+    - Only abstract text available - full Methods section would likely contain more detailed tool information
+    - Several research tools/methods mentioned in abstract were missed by mining algorithms
+    - 1984 publication date means some modern tool categories (molecular reagents, computational tools) less likely
+  recommendations: |
+    This publication represents a significant mining failure - clear laboratory research with animal models
+    and experimental techniques was not captured. Key recommendations:
+    
+    1. ADD chicken embryos as animal model - this is a standard research model system
+    2. ADD Hamburger-Hamilton staging system as assessment tool - standardized developmental staging
+    3. CONSIDER adding microscopy techniques if specific equipment/methods are detailed in full text
+    4. IMPROVE patterns to catch standard developmental biology terminology
+    5. INVESTIGATE why no tools were mined from this obvious lab research publication
+    
+    The suggested patterns should help capture similar developmental biology studies in the future.
+    This case highlights the need for better coverage of classical model organisms and developmental
+    biology terminology in mining algorithms.

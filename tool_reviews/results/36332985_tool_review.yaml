@@ -1,0 +1,141 @@
+publicationMetadata:
+  pmid: "36332985"
+  title: "Ten-Year Follow-up of Internal Neurofibroma Growth Behavior in Adult Patients With Neurofibromatosis Type 1 Using Whole-Body MRI."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical observational study design:
+    - Clinical assessment tools: Pain intensity scales, quality of life questionnaires (mentioned in methods)
+    - Computational tools: Statistical analysis software (Spearman correlation, Kruskal-Wallis test mentioned)
+    - Imaging analysis tools: Software for MRI volume measurements and tumor tracking
+    
+    This is a longitudinal imaging study tracking neurofibroma growth, so clinical assessment tools
+    for patient-reported outcomes and computational tools for image analysis are expected.
+    Lab research tools (antibodies, cell lines, animal models) are not expected.
+  overallAssessment: |
+    This clinical observational study would typically use clinical assessment tools for measuring
+    patient-reported variables (pain intensity, quality of life) and computational tools for
+    statistical analysis and imaging data processing. The study design involves longitudinal
+    MRI tracking and correlation with patient variables, making these tool types highly expected.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Spearman correlation coefficient"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The association between tumor growth and patient-specific...was assessed using the Spearman correlation coefficient and Kruskal-Wallis test."
+    whyMissed: "Statistical test mentioned as analysis method but not recognized as computational tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "Kruskal-Wallis test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The association between tumor growth and patient-specific...was assessed using the Spearman correlation coefficient and Kruskal-Wallis test."
+    whyMissed: "Statistical test mentioned as analysis method but not recognized as computational tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "pain intensity scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "patient-reported variables (endogenous and exogenous hormone exposure, pain intensity, and quality of life) was assessed"
+    whyMissed: "Pain assessment mentioned but specific scale/instrument not named"
+    confidence: 0.6
+    shouldBeAdded: No
+  
+  - toolName: "quality of life questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "patient-reported variables (endogenous and exogenous hormone exposure, pain intensity, and quality of life) was assessed"
+    whyMissed: "Quality of life assessment mentioned but specific instrument not named"
+    confidence: 0.6
+    shouldBeAdded: No
+  
+  - toolName: "coronal short TI inversion recovery sequences"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "internal neurofibromas were identified on coronal short TI inversion recovery sequences on baseline and follow-up whole-body MRIs"
+    whyMissed: "MRI sequence protocol mentioned but not recognized as imaging tool/protocol"
+    confidence: 0.5
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "assessed using the [statistical test name]"
+    toolType: "computational_tool"
+    examples: ["assessed using the Spearman correlation coefficient", "assessed using the Kruskal-Wallis test"]
+    reasoning: "Statistical tests are computational tools when used for data analysis, this pattern would catch them"
+  
+  - patternType: "context_phrase"
+    pattern: "correlation coefficient"
+    toolType: "computational_tool"
+    examples: ["Spearman correlation coefficient"]
+    reasoning: "Correlation coefficients are statistical analysis methods that should be captured as computational tools"
+  
+  - patternType: "term"
+    pattern: "pain intensity"
+    toolType: "clinical_assessment_tool"
+    examples: ["pain intensity"]
+    reasoning: "Pain intensity assessment implies use of pain scales (VAS, NRS, etc.) even if not specifically named"
+
+observations:
+  - resourceName: "whole-body MRI"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Among 324 internal neurofibromas tracked over median 10.4 years:
+      - 62.8% (56% of PNF and 62.1% of DNL) shrank spontaneously without treatment
+      - 17.1% (17.9% of PNF and 13.8% of DNL) grew (defined as ≥20% volume change)
+      - Growth patterns were heterogeneous within participants
+      - Median patient age was 42 years (range 18-70) at baseline
+    foundIn: "results"
+    contextSnippet: "Among 324 internal neurofibromas, 62.8% (56% of PNF and 62.1% of DNL) shrank spontaneously without treatment and 17.1% (17.9% of PNF and 13.8% of DNL) grew."
+    confidence: 0.9
+    doi: "10.1212/WNL.0000000000201535"
+  
+  - resourceName: "whole-body MRI"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Internal neurofibroma growth behavior in older adults differs fundamentally from that in 
+      children and young adults, with most tumors demonstrating spontaneous shrinkage. 
+      Patient-specific, tumor-specific, and patient-reported variables (including hormone exposure) 
+      were not strong predictors of tumor growth.
+    foundIn: "discussion"
+    contextSnippet: "Internal neurofibroma growth behavior in older adults differs fundamentally from that in children and young adults, with most tumors, including DNL, demonstrating spontaneous shrinkage."
+    confidence: 0.85
+    doi: "10.1212/WNL.0000000000201535"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 3
+  observationsExtracted: 2
+  observationsByType:
+    Tumor Growth: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined from this clinical observational study
+    - Statistical analysis methods (Spearman correlation, Kruskal-Wallis) were not captured as computational tools
+    - Patient-reported outcome measures (pain intensity, quality of life) mentioned but specific instruments not named
+    - MRI imaging protocols mentioned but not recognized as clinical assessment tools
+    - This appears to be appropriate mining result for this publication type
+  recommendations: |
+    The zero-tool mining result appears largely appropriate for this clinical observational study.
+    However, some potentially missed opportunities:
+    - Statistical analysis methods could be captured as computational tools if that level of granularity is desired
+    - Generic mentions of "pain intensity" and "quality of life" assessments suggest clinical tools were used but not specifically named
+    - Consider whether MRI protocols/sequences should be captured as clinical assessment tools
+    - The study design and methodology are clearly described, making this a good example of appropriate negative mining
+    - Extracted observations provide valuable scientific findings about neurofibroma growth patterns in adults
+    - Future mining could benefit from patterns to catch statistical analysis methods if those are considered tools

@@ -1,0 +1,107 @@
+publicationMetadata:
+  pmid: "3118033"
+  title: "Linkage studies in peripheral neurofibromatosis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.8
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a genetic linkage study from 1987 using molecular biology techniques. Expected tool types:
+    - genetic reagents (DNA probes, RFLPs, restriction enzymes)
+    - computational tools (linkage analysis software, though less likely given 1987 timeframe)
+    
+    The publication describes "Recombinant DNA studies of several restriction fragment length polymorphisms (RFLPs)"
+    which indicates use of molecular genetic reagents including DNA probes and restriction enzymes.
+    
+    While classified as "bench" research, this is specifically genetic linkage analysis rather than 
+    cell culture or animal model work, so antibodies, cell lines, animal models, organoids, and PDX 
+    models are not expected.
+  overallAssessment: |
+    This 1987 genetic linkage study would typically use molecular genetic reagents including DNA probes 
+    for RFLPs and restriction enzymes for DNA analysis. However, the publication only contains an abstract 
+    with no Methods section, making it difficult to identify specific tools used. The study mentions 
+    several RFLP markers (C3, ApoC2, pBam34, etc.) which could represent genetic reagents, but these 
+    appear to be genomic loci rather than specific laboratory reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "C3"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Recombinant DNA studies of several restriction fragment length polymorphisms (RFLPs) including C3, ApoC2, pBam34"
+    whyMissed: "RFLP marker mentioned in context of recombinant DNA studies, but likely refers to genomic locus rather than specific probe reagent"
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "ApoC2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Recombinant DNA studies of several restriction fragment length polymorphisms (RFLPs) including C3, ApoC2, pBam34"
+    whyMissed: "RFLP marker mentioned in context of recombinant DNA studies, but likely refers to genomic locus rather than specific probe reagent"
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "pBam34"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Recombinant DNA studies of several restriction fragment length polymorphisms (RFLPs) including C3, ApoC2, pBam34 (D19S6]"
+    whyMissed: "DNA probe name with 'p' prefix suggesting plasmid, but without Methods section cannot confirm if this is a specific reagent or just a locus identifier"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+    
+  - toolName: "pE40-1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "RFLPs including C3, ApoC2, pBam34 (D19S6], HAUP[APRT], pE40-1 [D11521], Hp[Hp2 alpha]"
+    whyMissed: "DNA probe name with 'p' prefix suggesting plasmid, but without Methods section cannot confirm if this is a specific reagent or just a locus identifier"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "p[A-Z][a-z0-9]+-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["pBam34", "pE40-1"]
+    reasoning: "DNA probe naming convention with 'p' prefix (plasmid) followed by alphanumeric identifier and version number, commonly used for RFLP probes in 1980s genetic studies"
+    
+  - patternType: "context_phrase"
+    pattern: "restriction fragment length polymorphisms?\\s*\\(RFLPs?\\)\\s*including\\s+([A-Za-z0-9, ]+)"
+    toolType: "genetic_reagent"
+    examples: ["RFLPs including C3, ApoC2, pBam34"]
+    reasoning: "Context phrase that introduces lists of RFLP markers/probes used in genetic linkage studies"
+    
+  - patternType: "context_phrase"
+    pattern: "recombinant DNA studies\\s+of\\s+.*?\\s+including\\s+([A-Za-z0-9, ]+)"
+    toolType: "genetic_reagent"
+    examples: ["Recombinant DNA studies of several restriction fragment length polymorphisms (RFLPs) including C3, ApoC2, pBam34"]
+    reasoning: "Context phrase indicating molecular genetic reagents used in DNA-based studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication contains only abstract with no Methods section, making tool identification difficult
+    - RFLP markers mentioned (C3, ApoC2, pBam34, pE40-1) could be genetic reagents but likely refer to genomic loci
+    - Without detailed methodology, cannot distinguish between specific laboratory reagents and genomic markers
+    - No experimental results or observations reported due to abstract-only format
+  recommendations: |
+    This 1987 genetic linkage study mentions several RFLP markers that could potentially be genetic reagents,
+    but the abstract-only format makes validation extremely difficult. The markers with 'p' prefixes (pBam34, pE40-1)
+    are more likely to represent actual DNA probe reagents, but without Methods sections describing probe sources,
+    preparation, or usage protocols, confidence is low.
+    
+    Recommend:
+    - Manual curator review for pBam34 and pE40-1 as potential genetic reagents
+    - Develop patterns for 1980s-era RFLP probe nomenclature
+    - Consider excluding abstract-only publications from tool mining unless they contain clear reagent identifiers
+    - No observations can be extracted due to lack of Results/Discussion sections

@@ -1,0 +1,213 @@
+publicationMetadata:
+  pmid: "18931645"
+  title: "Bioluminescent imaging of intracranial vestibular schwannoma xenografts in NOD/SCID mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study involving patient-derived xenograft development and characterization.
+    Expected tool types include:
+    - Animal models (NOD/SCID mice)
+    - Patient-derived models (xenograft system)
+    - Genetic reagents (lentiviral vectors, luciferase constructs)
+    - Computational tools (imaging analysis software)
+    - Potentially advanced cellular models (patient-derived tumor cultures)
+    
+    The study involves experimental procedures including cell culture, viral transduction, 
+    stereotactic injection, and longitudinal imaging - all indicating active tool usage.
+  overallAssessment: |
+    This publication describes the development and validation of a patient-derived xenograft model
+    for vestibular schwannomas, which inherently involves multiple research tools. The study includes
+    detailed methods for cell culture, viral transduction, animal procedures, and imaging analysis.
+    This type of translational research typically uses numerous laboratory tools and model systems.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NOD/SCID mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...stereotactically injected into the right caudate nucleus of 21 nonobese diabetic/severe combined immunodeficient mice. Schwannoma engraftment..."
+    whyMissed: "Standard mouse strain nomenclature not captured - NOD/SCID is a well-known immunodeficient strain"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Patient-derived xenograft model"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "...Patient excised vestibular schwannomas were cultured and transduced with firefly luciferase expressing lentivirus. One million cells were stereotactically injected..."
+    whyMissed: "PDX model establishment described but not recognized as a formal tool type"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Firefly luciferase expressing lentivirus"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Patient excised vestibular schwannomas were cultured and transduced with firefly luciferase expressing lentivirus..."
+    whyMissed: "Lentiviral vector with reporter gene not captured by genetic reagent patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Bioluminescent imaging"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Intracranial vestibular schwannoma xenografts can be successfully established and followed with bioluminescent imaging (BLI)..."
+    whyMissed: "Imaging technique/system not recognized as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Fluorescent in situ hybridization"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...After animal sacrifice, the presence of human tumor cells was confirmed with fluorescent in situ hybridization..."
+    whyMissed: "FISH technique involves specific probe reagents not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Vestibular schwannoma cell cultures"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "...Patient excised vestibular schwannomas were cultured and transduced..."
+    whyMissed: "Patient-derived primary cell cultures not recognized as model system"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "NOD/SCID|NOD-SCID|SCID|NSG|NOG"
+    toolType: "animal_model"
+    examples: ["NOD/SCID mice", "nonobese diabetic/severe combined immunodeficient mice"]
+    reasoning: "Common immunodeficient mouse strain names used in xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "patient.{0,20}(excised|derived|tumor).{0,20}(cultured|xenograft|transplant)"
+    toolType: "patient_derived_model"
+    examples: ["Patient excised vestibular schwannomas were cultured"]
+    reasoning: "Phrases indicating patient-derived model establishment"
+
+  - patternType: "term"
+    pattern: "(firefly|renilla|gaussia).{0,10}luciferase.{0,20}(lentivirus|vector|construct)"
+    toolType: "genetic_reagent"
+    examples: ["firefly luciferase expressing lentivirus"]
+    reasoning: "Reporter gene constructs in viral vectors commonly used for tracking"
+
+  - patternType: "term"
+    pattern: "bioluminescent imaging|BLI|fluorescent in situ hybridization|FISH"
+    toolType: "computational_tool"
+    examples: ["bioluminescent imaging (BLI)", "fluorescent in situ hybridization"]
+    reasoning: "Imaging and molecular analysis techniques that involve specialized equipment/software"
+
+  - patternType: "context_phrase"
+    pattern: "stereotactically injected|intracranial injection|caudate nucleus"
+    toolType: "animal_model"
+    examples: ["stereotactically injected into the right caudate nucleus"]
+    reasoning: "Context phrases indicating specialized animal model procedures"
+
+observations:
+  - resourceName: "NOD/SCID mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Xenograft engraftment success rate was 38% (8 of 21 mice). Successful engraftment 
+      was achieved from 4 of 6 patient-derived tumors (67% success rate). Engrafted mice 
+      could be differentiated from non-engrafted mice at 21 weeks based on bioluminescent 
+      signal intensity.
+    foundIn: "results"
+    contextSnippet: "Eight (38%) of 21 mice successfully engrafted the schwannoma cells. All of these mice were generated from 4 (67%) of the 6 patient excised tumors."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31818b6cea"
+
+  - resourceName: "NOD/SCID mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      Bioluminescent signal intensity distinguished engrafted from non-engrafted mice. 
+      Engrafted group emitted >100,000 photons/s (range: 142,478-3,106,300 photons/s; 
+      average: 618,740 photons/s), while non-engrafted group emitted <100,000 photons/s 
+      (range: 0-76,010 photons/s; average: 10,737 photons/s) with statistical significance (p < 0.001).
+    foundIn: "results"
+    contextSnippet: "The engrafted group emitted BLI of greater than 100,000 photons/s (range, 142,478–3,106,300 photons/s; average, 618,740 photons/s), whereas the nonengrafted group were all under 100,000 photons/s"
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31818b6cea"
+
+  - resourceName: "Patient-derived xenograft model"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Intracranial xenograft model successfully established with 38% engraftment rate. 
+      Model allows longitudinal monitoring of tumor growth using bioluminescent imaging 
+      over 30 weeks. Fluorescent in situ hybridization confirmed presence of viable 
+      human schwannoma cells in greater numbers in mice with stable or growing tumors 
+      compared to those with regressing tumors.
+    foundIn: "results"
+    contextSnippet: "Fluorescent in situ hybridization analysis confirmed the presence of viable human schwannoma cells in much greater numbers in those mice with stable or growing tumors compared with those whose tumors regressed."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31818b6cea"
+
+  - resourceName: "Patient-derived xenograft model"
+    resourceType: "Patient-Derived Model"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Model established by culturing patient-excised vestibular schwannomas, transducing 
+      with firefly luciferase lentivirus, and stereotactically injecting 1 million cells 
+      into the right caudate nucleus. Successful engraftment can be monitored longitudinally 
+      using bioluminescent imaging. Model intended for in vivo testing of schwannoma therapies.
+    foundIn: "discussion"
+    contextSnippet: "We have successfully established an intracranial schwannoma xenograft model that can be followed with noninvasive BLI. We hope to use this model for in vivo testing of schwannoma tumor therapies."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31818b6cea"
+
+  - resourceName: "Bioluminescent imaging"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      BLI provides a noninvasive method for longitudinal tumor monitoring with lower cost 
+      and labor demands compared to traditional imaging (MRI, CT). Signal threshold of 
+      100,000 photons/s effectively distinguishes engrafted from non-engrafted mice at 
+      21 weeks post-injection. Method suitable for studies involving large numbers of mice.
+    foundIn: "both"
+    contextSnippet: "BLI's lower cost and labor demands make this a more feasible approach for tumor monitoring in studies involving large numbers of mice."
+    confidence: 0.9
+    doi: "10.1097/MAO.0b013e31818b6cea"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Molecular: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete failure to detect any research tools despite clear laboratory research study
+    - NOD/SCID mice (standard immunodeficient strain) not recognized
+    - Patient-derived xenograft model establishment not captured
+    - Genetic reagents (lentiviral vectors) not detected
+    - Imaging techniques not classified as computational tools
+    - Primary cell culture systems not recognized as patient-derived models
+  recommendations: |
+    This publication represents a significant mining failure - zero tools were detected in a 
+    clear laboratory research study that establishes and characterizes multiple research tools.
+    All 6 potentially missed tools should be added to the database:
+    
+    1. NOD/SCID mice - well-established immunodeficient animal model
+    2. Patient-derived xenograft model - novel intracranial schwannoma model
+    3. Patient-derived cell cultures - primary tumor cultures
+    4. Firefly luciferase lentivirus - genetic reagent for tracking
+    5. Bioluminescent imaging system - computational/imaging tool
+    6. FISH reagents - molecular analysis tools
+    
+    The suggested patterns should be implemented to capture similar tools in future mining.
+    This study provides excellent examples of patient-derived model development with 
+    quantitative characterization data that should be preserved in the database.

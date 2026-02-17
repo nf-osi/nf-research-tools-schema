@@ -1,0 +1,309 @@
+publicationMetadata:
+  pmid: "30615146"
+  title: "Preclinical assessment of MEK1/2 inhibitors for neurofibromatosis type 2-associated schwannomas reveals differences in efficacy and drug resistance development."
+  queryType: "bench,clinical"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a preclinical laboratory study investigating MEK inhibitors in schwannoma models. Expected tools include:
+    - Cell lines (merlin-deficient Schwann cells, primary human VS cells)
+    - Animal models (NF2 transgenic mice, orthotopic allograft models)
+    - Computational tools (proteome analysis, DNA methylation analysis)
+    - Genetic reagents (MEK1/2 inhibitors as research compounds)
+    - Antibodies (for detecting pERK1/2, cyclin D1, p27, Ki-67, caspase-3)
+  overallAssessment: |
+    This is a comprehensive preclinical laboratory study that extensively uses research tools across multiple categories.
+    The study involves cell culture experiments, animal model testing, proteomic analysis, and molecular pathway analysis.
+    Multiple research tools should be present including cell lines, animal models, antibodies for protein detection, and computational tools for data analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MD-MSC"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Mouse and human merlin-deficient Schwann cell lines (MD-MSC/HSC) were screened against 6 MEK1/2 inhibitors"
+    whyMissed: "Cell line abbreviation not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MD-HSC"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Mouse and human merlin-deficient Schwann cell lines (MD-MSC/HSC) were screened against 6 MEK1/2 inhibitors"
+    whyMissed: "Cell line abbreviation not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF2 transgenic mouse model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Efficacious drugs were tested in orthotopic allograft and NF2 transgenic mouse models"
+    whyMissed: "Transgenic mouse model phrase not captured by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "orthotopic allograft model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Efficacious drugs were tested in orthotopic allograft and NF2 transgenic mouse models"
+    whyMissed: "Allograft model terminology not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "primary human VS cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Drug efficacy was examined in primary human VS cells with NF2 mutations"
+    whyMissed: "Primary cell culture terminology not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "trametinib"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Trametinib, PD0325901, and cobimetinib were most effective in reducing MD-MSC/HSC viability"
+    whyMissed: "MEK inhibitor compounds not recognized as research reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "PD0325901"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Trametinib, PD0325901, and cobimetinib were most effective in reducing MD-MSC/HSC viability"
+    whyMissed: "MEK inhibitor compounds not recognized as research reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "cobimetinib"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Trametinib, PD0325901, and cobimetinib were most effective in reducing MD-MSC/HSC viability"
+    whyMissed: "MEK inhibitor compounds not recognized as research reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "pERK1/2 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "Each decreased phosphorylated pERK1/2 and cyclin D1, increased p27"
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "cyclin D1 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "Each decreased phosphorylated pERK1/2 and cyclin D1, increased p27"
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "p27 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "Each decreased phosphorylated pERK1/2 and cyclin D1, increased p27"
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Ki-67 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "decreased pERK1/2, cyclin D1, and Ki-67 levels were observed only in PD0325901 and cobimetinib-treated grafts"
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "caspase-3 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "increased p27, and induced caspase-3 cleavage in MD-MSCs"
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "MD-[A-Z]{2,4}"
+    toolType: "cell_line"
+    examples: ["MD-MSC", "MD-HSC"]
+    reasoning: "Merlin-deficient cell line abbreviations follow this pattern and are commonly used in NF research"
+
+  - patternType: "context_phrase"
+    pattern: "transgenic mouse model"
+    toolType: "animal_model"
+    examples: ["NF2 transgenic mouse models"]
+    reasoning: "Transgenic mouse models are frequently mentioned but not captured by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "orthotopic allograft"
+    toolType: "animal_model"
+    examples: ["orthotopic allograft and NF2 transgenic mouse models"]
+    reasoning: "Orthotopic allograft models are specialized animal model systems not captured"
+
+  - patternType: "context_phrase"
+    pattern: "primary [a-zA-Z]+ cells"
+    toolType: "cell_line"
+    examples: ["primary human VS cells"]
+    reasoning: "Primary cell cultures are important research tools but not consistently captured"
+
+  - patternType: "term"
+    pattern: "trametinib|PD0325901|cobimetinib|selumetinib|binimetinib"
+    toolType: "genetic_reagent"
+    examples: ["trametinib", "PD0325901", "cobimetinib"]
+    reasoning: "MEK inhibitor compounds are research reagents but not recognized by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "(decreased|increased|reduced|elevated)\\s+[a-zA-Z0-9/]+\\s+(levels?|expression)"
+    toolType: "antibody"
+    examples: ["decreased pERK1/2", "increased p27", "Ki-67 levels"]
+    reasoning: "Protein level measurements strongly indicate antibody usage for detection"
+
+  - patternType: "context_phrase"
+    pattern: "proteomic analysis"
+    toolType: "computational_tool"
+    examples: ["Proteomic analysis confirmed cell cycle arrest"]
+    reasoning: "Proteomic analysis requires specialized computational tools for data processing"
+
+  - patternType: "context_phrase"
+    pattern: "DNA methylation analysis"
+    toolType: "computational_tool"
+    examples: ["DNA methylation analysis of PD0325901-resistant versus -susceptible VS"]
+    reasoning: "DNA methylation analysis requires computational tools for data analysis"
+
+observations:
+  - resourceName: "trametinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Trametinib was most effective in reducing MD-MSC/HSC viability. It decreased phosphorylated pERK1/2 and cyclin D1, 
+      increased p27, and induced caspase-3 cleavage in MD-MSCs. Proteomic analysis confirmed cell cycle arrest and 
+      activation of pro-apoptotic pathways in trametinib-treated MD-MSCs.
+    foundIn: "results"
+    contextSnippet: "Trametinib, PD0325901, and cobimetinib were most effective in reducing MD-MSC/HSC viability. Each decreased phosphorylated pERK1/2 and cyclin D1, increased p27, and induced caspase-3 cleavage in MD-MSCs. Proteomic analysis confirmed cell cycle arrest and activation of pro-apoptotic pathways in trametinib-treated MD-MSCs."
+    confidence: 0.95
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "trametinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Tumor burden and average tumor size were reduced in trametinib-treated NF2 transgenic mice; however, 
+      tumors did not exhibit reduced pERK1/2 levels, suggesting potential resistance mechanisms.
+    foundIn: "results"
+    contextSnippet: "Tumor burden and average tumor size were reduced in trametinib-treated NF2 transgenic mice; however, tumors did not exhibit reduced pERK1/2 levels."
+    confidence: 0.9
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "PD0325901"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      PD0325901 was effective in reducing MD-MSC/HSC viability and showed decreased pERK1/2, cyclin D1, and Ki-67 levels 
+      in treated grafts. It modestly reduced viability of several primary human VS cell cultures with NF2 mutations.
+    foundIn: "results"
+    contextSnippet: "decreased pERK1/2, cyclin D1, and Ki-67 levels were observed only in PD0325901 and cobimetinib-treated grafts. Trametinib and PD0325901 modestly reduced viability of several primary human VS cell cultures with NF2 mutations."
+    confidence: 0.9
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "cobimetinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Cobimetinib was effective in reducing MD-MSC/HSC viability and showed decreased pERK1/2, cyclin D1, and Ki-67 levels 
+      in treated grafts. The inhibitor slowed allograft growth in animal models.
+    foundIn: "results"
+    contextSnippet: "decreased pERK1/2, cyclin D1, and Ki-67 levels were observed only in PD0325901 and cobimetinib-treated grafts. The 3 inhibitors slowed allograft growth"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "NF2 transgenic mouse model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NF2 transgenic mice showed reduced tumor burden and average tumor size when treated with trametinib, 
+      demonstrating the model's utility for testing therapeutic interventions.
+    foundIn: "results"
+    contextSnippet: "Tumor burden and average tumor size were reduced in trametinib-treated NF2 transgenic mice"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "MD-MSC"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      MD-MSC (merlin-deficient mouse Schwann cells) showed reduced viability when treated with MEK inhibitors, 
+      with decreased pERK1/2 and cyclin D1, increased p27, and induced caspase-3 cleavage.
+    foundIn: "results"
+    contextSnippet: "Trametinib, PD0325901, and cobimetinib were most effective in reducing MD-MSC/HSC viability. Each decreased phosphorylated pERK1/2 and cyclin D1, increased p27, and induced caspase-3 cleavage in MD-MSCs."
+    confidence: 0.9
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "primary human VS cells"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Primary human vestibular schwannoma cells with NF2 mutations showed modest reduction in viability when treated 
+      with trametinib and PD0325901, with variability between different cell cultures.
+    foundIn: "results"
+    contextSnippet: "Trametinib and PD0325901 modestly reduced viability of several primary human VS cell cultures with NF2 mutations."
+    confidence: 0.85
+    doi: "10.1093/neuonc/noz002"
+
+  - resourceName: "PD0325901"
+    resourceType: "Genetic Reagent"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      DNA methylation analysis revealed differences between PD0325901-resistant versus -susceptible VS cells, 
+      identifying genes that could contribute to drug resistance development.
+    foundIn: "results"
+    contextSnippet: "DNA methylation analysis of PD0325901-resistant versus -susceptible VS identified genes that could contribute to drug resistance."
+    confidence: 0.8
+    doi: "10.1093/neuonc/noz002"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 8
+  observationsExtracted: 8
+  observationsByType:
+    Cellular: 5
+    Tumor Growth: 2
+    Issue: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite this being a comprehensive preclinical study
+    - Multiple cell lines (MD-MSC, MD-HSC, primary human VS cells) completely missed
+    - Animal models (NF2 transgenic mice, orthotopic allograft models) not detected
+    - Research compounds (MEK inhibitors) not recognized as genetic reagents
+    - Antibody targets (pERK1/2, cyclin D1, p27, Ki-67, caspase-3) not captured
+    - Computational analysis tools (proteomic analysis, DNA methylation analysis) missed
+  recommendations: |
+    This publication represents a major failure of the mining system. Despite being a comprehensive preclinical study 
+    with extensive tool usage, zero tools were detected. All 13 identified tools should be added to the database.
+    
+    Key recommendations:
+    1. Add all 13 missed tools - they represent genuine research tools with clear experimental usage
+    2. Implement the 8 suggested patterns to improve future mining of similar publications
+    3. Review mining patterns for cell line abbreviations, animal model terminology, and research compounds
+    4. Improve detection of antibody targets mentioned in protein level measurements
+    5. Add patterns for computational analysis tools (proteomic, methylation analysis)
+    6. Consider this publication as a test case for validating improved mining patterns
+    
+    The extracted observations provide valuable scientific data about tool efficacy and should be included in the database.
+    This case highlights the need for more comprehensive pattern coverage in preclinical research publications.

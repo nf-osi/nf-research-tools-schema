@@ -1,0 +1,168 @@
+publicationMetadata:
+  pmid: "27760236"
+  title: "Disease Burden and Symptom Structure of Autism in Neurofibromatosis Type 1: A Study of the International NF1-ASD Consortium Team (INFACT)."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This is a multi-center clinical study analyzing autism traits in NF1 patients using validated
+    assessment instruments. Expected tools include:
+    - Clinical assessment tools (questionnaires, scales) for measuring autism and ADHD symptoms
+    - Computational tools for statistical analysis (factor analysis, mixture modeling, correlation analysis)
+    
+    Note: Clinical studies often have different structure than lab research - assessment tools are
+    valid research tools even without traditional Methods sections.
+  overallAssessment: |
+    This clinical study would definitely use research tools, specifically validated clinical assessment
+    instruments for measuring autism and ADHD symptoms in a large patient cohort (n=531). The study
+    mentions specific standardized scales and sophisticated statistical analyses that would require
+    computational tools. Clinical assessment tools are legitimate research tools even in the absence
+    of traditional laboratory methods.
+
+toolValidations: []  # No tools were initially mined, but several were missed
+
+potentiallyMissedTools:
+  - toolName: "Social Responsiveness Scale, second edition (SRS-2)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Distribution of ASD traits (Social Responsiveness Scale, second edition [SRS-2], with T scores of ≥75 associated with a categorical ASD diagnosis)..."
+    whyMissed: "Clinical assessment tool not captured by mining patterns focused on lab research tools"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Conners Rating Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...attention-deficit/hyperactivity disorder (ADHD) traits (4 versions of Conners Rating Scale, with T scores of ≥65 indicating clinically significant ADHD symptoms)..."
+    whyMissed: "Clinical assessment tool not captured by mining patterns focused on lab research tools"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "mixture modeling"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...ASD symptom structure, latent structure, base rate derived from mixture modeling; and familiality..."
+    whyMissed: "Statistical analysis method not captured by computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "principal component analysis"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "...demonstrated a robust unitary factor structure, with the first principal component explaining 30.9% of the variance in SRS-2 scores..."
+    whyMissed: "Statistical analysis method not captured by computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Social Responsiveness Scale|SRS-2|SRS"
+    toolType: "clinical_assessment_tool"
+    examples: ["Social Responsiveness Scale, second edition [SRS-2]"]
+    reasoning: "SRS-2 is a widely used validated autism assessment tool that should be captured"
+
+  - patternType: "term"
+    pattern: "Conners Rating Scale|Conners Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["4 versions of Conners Rating Scale"]
+    reasoning: "Conners scales are standard ADHD assessment tools used in clinical research"
+
+  - patternType: "context_phrase"
+    pattern: "T scores of [≥>]\\d+|T scores [≥>]\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["T scores of ≥75 associated with", "T scores of ≥65 indicating"]
+    reasoning: "T-score thresholds are characteristic of standardized clinical assessment tools"
+
+  - patternType: "term"
+    pattern: "mixture modeling|latent class analysis|factor analysis|principal component analysis"
+    toolType: "computational_tool"
+    examples: ["base rate derived from mixture modeling", "first principal component explaining"]
+    reasoning: "Statistical analysis methods are computational tools that should be captured in clinical studies"
+
+  - patternType: "context_phrase"
+    pattern: "intraclass correlation coefficient|ICC"
+    toolType: "computational_tool"
+    examples: ["intraclass correlation coefficient, 0.73"]
+    reasoning: "ICC is a specific statistical measure that indicates use of statistical software"
+
+observations:
+  - resourceName: "Social Responsiveness Scale, second edition (SRS-2)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      SRS-2 T scores were continuously distributed and pathologically shifted in the NF1 cohort.
+      13.2% (95% CI, 10.3%-16.1%) of individuals scored within the most severe range (above the
+      first percentile of the general population distribution). T scores of ≥75 were associated
+      with categorical ASD diagnosis. The first principal component explained 30.9% of the
+      variance in SRS-2 scores, demonstrating robust unitary factor structure.
+    foundIn: "results"
+    contextSnippet: "QAT scores were continuously distributed and pathologically shifted; 13.2%(95%CI, 10.3%–16.1%) of individuals scored within the most severe range...with the first principal component explaining 30.9%of the variance in SRS-2 scores"
+    confidence: 0.95
+    doi: "10.1001/jamapsychiatry.2016.2600"
+
+  - resourceName: "Social Responsiveness Scale, second edition (SRS-2)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Strong association between SRS-2 autism symptoms and ADHD symptoms was observed (r = 0.61).
+      Within-family correlation for quantitative autistic trait burden measured by SRS-2 showed
+      intraclass correlation coefficient of 0.73 in NF1-affected first-degree relatives, which
+      exceeded correlations observed in general population and ASD family samples.
+    foundIn: "results"
+    contextSnippet: "strong association with ADHD symptoms ( r  = 0.61). Within-family correlation for QAT burden (intraclass correlation coefficient, 0.73 in NF1-affected first-degree relatives)"
+    confidence: 0.95
+    doi: "10.1001/jamapsychiatry.2016.2600"
+
+  - resourceName: "Conners Rating Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Four versions of Conners Rating Scale were used to assess ADHD traits. T scores of ≥65
+      were used as the threshold indicating clinically significant ADHD symptoms. The scale
+      showed strong correlation with autism symptoms as measured by SRS-2 (r = 0.61).
+    foundIn: "both"
+    contextSnippet: "4 versions of Conners Rating Scale, with T scores of ≥65 indicating clinically significant ADHD symptoms...strong association with ADHD symptoms ( r  = 0.61)"
+    confidence: 0.90
+    doi: "10.1001/jamapsychiatry.2016.2600"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    General Comment or Review: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Mining completely missed clinical assessment tools despite this being a clinical study
+    - No tools were initially mined from a publication that clearly uses validated assessment instruments
+    - Mining patterns appear to be heavily biased toward laboratory research tools
+    - Statistical analysis methods (computational tools) were also missed
+  recommendations: |
+    This publication should have captured at least 2-4 research tools:
+    - Social Responsiveness Scale, second edition (SRS-2) - DEFINITELY should be added
+    - Conners Rating Scale - DEFINITELY should be added  
+    - Statistical analysis methods (mixture modeling, PCA) - POSSIBLY should be added
+    
+    The mining system needs better patterns for clinical assessment tools, which are legitimate
+    research tools widely used in clinical research. The complete absence of mined tools from
+    this clinical study indicates a significant gap in mining coverage for clinical research.
+    
+    Key improvements needed:
+    1. Add patterns for validated clinical assessment scales and questionnaires
+    2. Include T-score threshold patterns as indicators of standardized instruments
+    3. Consider statistical analysis methods as computational tools in clinical studies
+    4. Expand beyond laboratory-focused tool mining to include clinical research tools
+    
+    The observations extracted demonstrate meaningful scientific findings about tool performance
+    and characteristics that would be valuable for the research community.

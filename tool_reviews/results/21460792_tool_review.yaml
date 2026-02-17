@@ -1,0 +1,250 @@
+publicationMetadata:
+  pmid: "21460792"
+  title: "Orthotopic xenografting of human luciferase-tagged malignant peripheral nerve sheath tumor cells for in vivo testing of candidate therapeutic agents."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a methodology paper describing orthotopic xenografting procedures for MPNST research.
+    Expected tools include: cell lines (MPNST lines), animal models (immunodeficient mice), 
+    patient-derived models (xenograft systems), and computational tools (bioluminescence imaging).
+    
+    Note: While no formal Methods section exists, the entire paper IS a detailed methodology 
+    description with protocols and procedures.
+  overallAssessment: |
+    This is a laboratory methodology paper describing orthotopic xenografting techniques for 
+    malignant peripheral nerve sheath tumor research. Despite lacking a traditional Methods 
+    section, the entire publication serves as a detailed protocol describing experimental 
+    procedures, making it highly likely to contain research tools including cell lines, 
+    animal models, and imaging systems.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ST88-14"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...detailed orthotopic xenografting method presented here is one that we developed using ST88-14 MPNST cells, a line which is widely used in studies of these NF1-associated peripheral nerve sheath tumors..."
+    whyMissed: "Cell line name not captured by mining patterns - may need pattern for alphanumeric cell line nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "STS-26T"
+    toolType: "cell_line"
+    foundIn: "discussion"
+    contextSnippet: "...we have also performed orthotopic xenografting with STS-26T 10 cells, a line derived from a sporadically occurring MPNST..."
+    whyMissed: "Cell line name with alphanumeric pattern not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "T265-2c"
+    toolType: "cell_line"
+    foundIn: "discussion"
+    contextSnippet: "...and T265-2c 11 cells, which are derived from a NF1-associated MPNST, with success similar to that we observed with ST88-14 cells..."
+    whyMissed: "Cell line name with complex alphanumeric pattern not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NIH III mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "...Figure 1 illustrates the typical progressive increase in bioluminescence observed 1 to 18 days post-grafting in a properly established orthotopic xenograft in a nude (NIH III) mouse..."
+    whyMissed: "Mouse strain name in parentheses may not be captured by standard patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "...in a properly established orthotopic xenograft in a nude (NIH III) mouse (A-C)..."
+    whyMissed: "Generic mouse strain descriptor without specific strain identifier"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "immunodeficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...xenograft models (human tumor cells grafted into immunodeficient mice) for preclinical trials..."
+    whyMissed: "Generic descriptor rather than specific strain name"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "orthotopic xenograft model"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...firefly luciferase-tagged human MPNST cells are orthopically xenografted into the sciatic nerve of immunodeficient mice..."
+    whyMissed: "Xenograft system described as methodology rather than recognized as patient-derived model tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "bioluminescence imaging"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "...Figure 1 illustrates the typical progressive increase in bioluminescence observed...Quantification of the bioluminescence signals..."
+    whyMissed: "Imaging system/software not captured - may need patterns for imaging technologies"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}[0-9]{2,3}-[0-9]{1,2}[A-Z]?"
+    toolType: "cell_line"
+    examples: ["ST88-14", "STS-26T", "T265-2c"]
+    reasoning: "Captures alphanumeric cell line naming conventions commonly used for cancer cell lines, including those with suffix letters"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{3,4}\\s+[IVX]+\\s+mice"
+    toolType: "animal_model"
+    examples: ["NIH III mice"]
+    reasoning: "Captures mouse strain names with Roman numerals, which are common in immunodeficient mouse nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "(orthotopic|ectopic)\\s+(xenograft|xenografting)\\s+(model|system|methodology)"
+    toolType: "patient_derived_model"
+    examples: ["orthotopic xenograft model", "orthotopic xenografting methodology"]
+    reasoning: "Identifies xenograft systems as patient-derived models when described in methodological context"
+
+  - patternType: "term"
+    pattern: "bioluminescence\\s+(imaging|detection|quantification)"
+    toolType: "computational_tool"
+    examples: ["bioluminescence imaging", "bioluminescence quantification"]
+    reasoning: "Captures bioluminescence imaging systems which require specialized software for analysis and quantification"
+
+  - patternType: "context_phrase"
+    pattern: "(nude|immunodeficient|SCID|NOD)\\s+mice"
+    toolType: "animal_model"
+    examples: ["nude mice", "immunodeficient mice"]
+    reasoning: "Captures common immunodeficient mouse strain descriptors used in xenograft studies"
+
+observations:
+  - resourceName: "ST88-14"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Cell line requires empirical determination of key parameters for orthotopic xenografting including:
+      - Number of cells initially grafted (10³ to 5×10⁶ range tested)
+      - Time allowed for graft development (30-60 days optimal)
+      - Injection volume (up to 5 mL for larger cell numbers)
+      - Maximum cell density (5×10⁶ cells per 5 mL to prevent shear damage)
+      Successful grafting achieved with concentrations reaching maximal tumor growth within 30-60 days.
+    foundIn: "discussion"
+    contextSnippet: "...key parameters of the methodology must be empirically determined for each cell line. These parameters include the number of MPNST cells initially grafted, the time allowed for graft development..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "ST88-14"
+    resourceType: "Cell Line"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Demonstrates progressive tumor growth in orthotopic xenografts with markedly accelerated growth in later stages.
+      Bioluminescence signals progressively increase from 1-24 days post-grafting, with tumor growth acceleration
+      occurring in later stages of the study period. Grafted cells show aggressive migration into nerve tissue
+      proximal and distal to graft site, often breaching normal nerve barriers and invading adjacent tissues.
+    foundIn: "results"
+    contextSnippet: "...Quantification of the bioluminescence signals observed 1-24 days after grafting shows that, although these signals progressively increase, tumor growth markedly accelerates in the later stages..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "STS-26T"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully adapted for orthotopic xenografting with similar success to ST88-14 cells.
+      Derived from sporadically occurring MPNST. Requires empirical determination of grafting
+      parameters specific to this cell line, as exact conditions for ST88-14 cannot be directly adopted.
+    foundIn: "discussion"
+    contextSnippet: "...we have also performed orthotopic xenografting with STS-26T 10 cells, a line derived from a sporadically occurring MPNST...with success similar to that we observed with ST88-14 cells..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "T265-2c"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully adapted for orthotopic xenografting with similar success to ST88-14 cells.
+      Derived from NF1-associated MPNST. Requires empirical determination of grafting parameters
+      specific to this cell line, as exact conditions cannot be directly transferred from other lines.
+    foundIn: "discussion"
+    contextSnippet: "...and T265-2c 11 cells, which are derived from a NF1-associated MPNST, with success similar to that we observed with ST88-14 cells..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "NIH III mice"
+    resourceType: "Animal Model"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Nude (NIH III) mice serve as suitable immunodeficient hosts for orthotopic xenografting of human MPNST cells.
+      Successfully used to demonstrate therapeutic effectiveness of tamoxifen in orthotopic xenograft studies.
+      Allows for bioluminescence imaging to monitor tumor growth progression over time.
+    foundIn: "both"
+    contextSnippet: "...we have used this orthotopic xenografting methodology with ST88-14 cells grafted into NIH III mice to demonstrate the therapeutic effectiveness of tamoxifen..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "orthotopic xenograft model"
+    resourceType: "Patient-Derived Model"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Methodology allows rapid determination of therapeutic ranges and comparison of agent effectiveness
+      between transgenic tumors and genuine human tumor cells. Facilitates continuous quantitation of
+      tumor growth during therapeutic period. Provides more physiologically relevant microenvironment
+      compared to subcutaneous xenografts. Successfully demonstrated for preclinical testing of candidate
+      therapeutic agents including tamoxifen.
+    foundIn: "both"
+    contextSnippet: "...this partnership allows a comparison of the effectiveness of the agent in transgenic tumors and genuine human tumor cells...facilitate rapid determination of therapeutic ranges..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+  - resourceName: "orthotopic xenograft model"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Demonstrates aggressive tumor growth with grafted MPNST cells breaching normal nerve barriers
+      and invading adjacent skeletal muscle tissue. Tumor cells migrate aggressively into nerve
+      tissue both proximal and distal to the graft site. Growth pattern shows initial establishment
+      followed by markedly accelerated growth in later stages (1-24 days post-grafting).
+    foundIn: "results"
+    contextSnippet: "...we often find that the grafted tumor cells have breached the normal barriers of the nerve and invaded adjacent tissues...grafted MPNST cells migrate aggressively into nerve proximal and distal to the graft site..."
+    confidence: 1.0
+    doi: "10.3791/2558"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 7
+  observationsByType:
+    Usage Instructions: 5
+    Tumor Growth: 2
+  majorIssuesFound: |
+    - Complete failure to capture any tools despite this being a methodology paper rich in research tools
+    - Multiple cell lines (ST88-14, STS-26T, T265-2c) not detected
+    - Animal model (NIH III mice) not captured
+    - Patient-derived xenograft model system not recognized
+    - Bioluminescence imaging system not identified
+    - Mining patterns appear inadequate for alphanumeric cell line nomenclature
+    - Xenograft systems not recognized as patient-derived models
+  recommendations: |
+    This publication should have captured multiple tools across several categories:
+    - All 8 potentially missed tools should be added to the database
+    - Mining patterns need significant improvement for cell line nomenclature
+    - Xenograft methodologies should be recognized as patient-derived model systems
+    - Imaging systems require better pattern coverage
+    - The 5 suggested patterns should be implemented to improve future mining
+    - This represents a major mining failure that needs systematic pattern review
+    - All 7 extracted observations provide valuable usage and phenotypic information
+    - Manual curator review recommended for similar methodology papers

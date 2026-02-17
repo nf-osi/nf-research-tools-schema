@@ -1,0 +1,211 @@
+publicationMetadata:
+  pmid: "30413310"
+  title: "Patient Reported Outcomes Measurement Information System and Quality of Life in Neurological Disorders Measurement System to Evaluate Quality of Life for Children and Adolescents with Neurofibromatosis Type 1 Associated Plexiform Neurofibroma."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, patient-reported outcome measures)
+    This study specifically uses validated clinical assessment instruments to measure quality of life
+    in pediatric patients with neurofibromatosis. Clinical assessment tools are the primary research
+    tools expected in this type of patient-reported outcomes research. Computational tools may also
+    be present for statistical analysis (IRT, factor analysis).
+  overallAssessment: |
+    This is a clinical study using validated patient-reported outcome measures to assess quality of life
+    in children with neurofibromatosis type 1. Clinical assessment tools (PROMIS, Neuro-QoL) are clearly
+    described and used as primary research instruments. The study methodology involves psychometric analysis
+    using statistical techniques, suggesting computational tools may also be present for data analysis.
+
+toolValidations: []  # No tools were mined, but several should have been detected
+
+potentiallyMissedTools:
+  - toolName: "Patient-Reported Outcomes Measurement Information System"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...completed the Patient-Reported Outcomes Measurement Information System (including domains anxiety, depressive symptom, psychosocial stress experiences, fatigue, pain interference, meaning and purpose, positive affect, peer relationships, physical function-mobility)..."
+    whyMissed: "Full name not recognized as clinical assessment tool - may need pattern for 'Patient-Reported Outcomes Measurement Information System' or 'PROMIS'"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...completed the Patient-Reported Outcomes Measurement Information System (including domains anxiety, depressive symptom, psychosocial stress experiences, fatigue, pain interference, meaning and purpose, positive affect, peer relationships, physical function-mobility)..."
+    whyMissed: "Acronym PROMIS not explicitly mentioned but this is the standard abbreviation for Patient-Reported Outcomes Measurement Information System"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Quality of Life in Neurological Disorders measurement system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...and Quality of Life in Neurological Disorders measurement system (stigma) via an online platform..."
+    whyMissed: "Full name not recognized - may need pattern for 'Quality of Life in Neurological Disorders' or 'Neuro-QoL'"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Neuro-QoL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Children with epilepsy, pNF and MD (sample-1) completed the original 18-item Neuro-QoL Stigma..."
+    whyMissed: "Neuro-QoL acronym not detected - this is a well-established clinical assessment tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Neuro-QoL Stigma"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Children with epilepsy, pNF and MD (sample-1) completed the original 18-item Neuro-QoL Stigma..."
+    whyMissed: "Specific subscale of Neuro-QoL not detected - pattern may need to include subscale names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PPS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "...All items fit the IRT model and were able to be calibrated together to form the PPS which consists of 18 core items..."
+    whyMissed: "Newly developed scale acronym (Pediatric Perceived Stigma) not detected - may need pattern for scale development context"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PPS-Skin"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "...The PPS-Skin (18 cores items + 6 skin items) was developed by calibrating 6 skin items onto the common metric as the PPS..."
+    whyMissed: "Variant of newly developed scale not detected - pattern should catch scale variants"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Patient-Reported Outcomes Measurement Information System|PROMIS"
+    toolType: "clinical_assessment_tool"
+    examples: ["Patient-Reported Outcomes Measurement Information System (including domains anxiety, depressive symptom...)"]
+    reasoning: "PROMIS is a widely used clinical assessment tool system that should be consistently detected"
+
+  - patternType: "term"
+    pattern: "Quality of Life in Neurological Disorders|Neuro-QoL"
+    toolType: "clinical_assessment_tool"
+    examples: ["Quality of Life in Neurological Disorders measurement system (stigma)", "18-item Neuro-QoL Stigma"]
+    reasoning: "Neuro-QoL is an established neurological quality of life assessment tool with multiple subscales"
+
+  - patternType: "context_phrase"
+    pattern: "completed the .{1,50}(questionnaire|scale|measure|assessment|instrument)"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed the Patient-Reported Outcomes Measurement Information System", "completed the original 18-item Neuro-QoL Stigma"]
+    reasoning: "Phrase 'completed the' followed by assessment tool name is strong indicator of clinical tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "(developed|calibrated|formed) .{1,30}(PPS|scale|measure|instrument)"
+    toolType: "clinical_assessment_tool"
+    examples: ["calibrated together to form the PPS", "The PPS-Skin was developed"]
+    reasoning: "Scale development language indicates creation of new clinical assessment tools"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,6}(-[A-Za-z]+)?"
+    toolType: "clinical_assessment_tool"
+    examples: ["PPS", "PPS-Skin", "PROMIS", "Neuro-QoL"]
+    reasoning: "Clinical assessment tools often use acronyms, sometimes with descriptive suffixes"
+
+  - patternType: "context_phrase"
+    pattern: "T-scores for each measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["T-scores for each measure were compared with US population norms"]
+    reasoning: "T-scores are standardized scores commonly used with clinical assessment tools, indicating tool usage"
+
+observations:
+  - resourceName: "Patient-Reported Outcomes Measurement Information System"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Children with plexiform neurofibromas reported significantly worse scores than population norms on 8 of 10 PROMIS domains.
+      Domains assessed included anxiety, depressive symptoms, psychosocial stress experiences, fatigue, pain interference,
+      meaning and purpose, positive affect, peer relationships, and physical function-mobility. This demonstrates the tool's
+      ability to detect quality of life impairments in this patient population.
+    foundIn: "results"
+    contextSnippet: "Children with pNF reported significantly worse scores than the population norms on 8 of 10 domains..."
+    confidence: 0.95
+    doi: "10.1016/j.jpeds.2018.10.019"
+
+  - resourceName: "Quality of Life in Neurological Disorders measurement system"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The stigma domain from Neuro-QoL showed significant differences from population norms in children with plexiform
+      neurofibromas. Boys reported significantly worse stigma scores than girls. The tool demonstrated sensitivity
+      to detect stigma-related quality of life impacts in this neurological condition.
+    foundIn: "results"
+    contextSnippet: "Boys reported significantly worse pain interference, stigma, meaning and purpose, mobility function, and upper extremity function than girls..."
+    confidence: 0.95
+    doi: "10.1016/j.jpeds.2018.10.019"
+
+  - resourceName: "Neuro-QoL Stigma"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The original 18-item Neuro-QoL Stigma scale was used for children with epilepsy, plexiform neurofibromas, and
+      muscular dystrophy. A 16-item version plus 6 additional skin-related items was used for children with cancer
+      and skin conditions. This demonstrates the tool's adaptability across different pediatric conditions.
+    foundIn: "methods"
+    contextSnippet: "Children with epilepsy, pNF and MD (sample-1) completed the original 18-item Neuro-QoL Stigma, while children with cancer and skin conditions completed a 16-item version and 6 additional skin related items..."
+    confidence: 0.90
+    doi: "10.1016/j.jpeds.2018.10.019"
+
+  - resourceName: "PPS"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The Pediatric Perceived Stigma (PPS) scale was successfully developed using IRT techniques, consisting of 18 core items.
+      All items fit the IRT model and demonstrated sufficient unidimensionality supported by both exploratory and confirmatory
+      factor analysis. No items showed significant differential item functioning, indicating stable measurement properties
+      across comparison groups.
+    foundIn: "results"
+    contextSnippet: "All items fit the IRT model and were able to be calibrated together to form the PPS which consists of 18 core items..."
+    confidence: 0.95
+    doi: "10.1016/j.jpeds.2018.10.019"
+
+  - resourceName: "PPS-Skin"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The PPS-Skin variant was developed by calibrating 6 skin-specific items onto the common metric as the core PPS scale.
+      This creates a specialized version (18 core items + 6 skin items) that shares a common metric with the standard PPS
+      while accounting for unique concerns related to skin conditions. Both scales account for unique and common concerns
+      related to chronic conditions.
+    foundIn: "results"
+    contextSnippet: "The PPS-Skin (18 cores items + 6 skin items) was developed by calibrating 6 skin items onto the common metric as the PPS..."
+    confidence: 0.95
+    doi: "10.1016/j.jpeds.2018.10.019"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    General Comment or Review: 4
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - CRITICAL: Mining completely failed to detect any clinical assessment tools despite this being a clinical study focused on patient-reported outcomes
+    - Multiple well-established clinical assessment tools (PROMIS, Neuro-QoL) were not detected
+    - Newly developed scales (PPS, PPS-Skin) were also missed
+    - The mining patterns appear inadequate for clinical assessment tool detection
+    - This represents a major gap in clinical tool mining capability
+  recommendations: |
+    - ALL 7 potentially missed tools should be added - they are clearly valid clinical assessment tools used in this study
+    - The mining patterns for clinical assessment tools need significant improvement
+    - Add specific patterns for PROMIS and Neuro-QoL as these are widely used in clinical research
+    - Include patterns for scale development language ("developed", "calibrated", "formed")
+    - Add context patterns for tool administration ("completed the", "administered")
+    - Consider acronym patterns for clinical scales (2-6 letter combinations)
+    - This publication demonstrates the need for better clinical assessment tool detection
+    - The observations extracted show meaningful scientific findings about tool performance and validation

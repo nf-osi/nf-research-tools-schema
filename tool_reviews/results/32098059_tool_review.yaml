@@ -1,0 +1,266 @@
+publicationMetadata:
+  pmid: "32098059"
+  title: "Integrative Analysis Identifies Candidate Tumor Microenvironment and Intracellular Signaling Pathways that Define Tumor Heterogeneity in NF1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # Very confident - extensive computational methods described
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, packages, pipelines) - HIGHLY EXPECTED
+    - Potentially some databases or web applications
+    - Lab tools (antibodies, cell lines, etc.) - UNLIKELY for this type of analysis
+    - Clinical assessment tools - UNLIKELY for this computational study
+    
+    This is a pure bioinformatics analysis using RNA-seq and genomic data with extensive
+    computational methods. Multiple R packages, algorithms, and analysis pipelines are
+    described in detail in the Methods section.
+  overallAssessment: |
+    This is a computational bioinformatics study analyzing existing RNA-seq and genomic datasets
+    from NF1 tumors. The publication extensively uses computational tools including R packages,
+    machine learning algorithms, and bioinformatics pipelines. No wet lab experiments were
+    performed - all analysis was computational. The Methods section contains detailed descriptions
+    of software tools, versions, and analysis workflows that should be captured as research tools.
+
+toolValidations: []  # No tools were initially mined to validate
+
+potentiallyMissedTools:
+  - toolName: "R programming language"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All analyses were performed using the R programming language. A comprehensive list of packages used and their versions are available in an renv lockfile"
+    whyMissed: "Generic programming language mention without version - mining patterns may require more specific context"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "tidyverse"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34]"
+    whyMissed: "R package name in quotes - mining patterns may not capture quoted package names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PLIER"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34]"
+    whyMissed: "R package name in quotes with citation - may need better pattern for quoted tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "synapser"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34]"
+    whyMissed: "R package name in quotes - pattern may not capture quoted package names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "tximport"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34], "tximport" [35]"
+    whyMissed: "R package name in quotes - consistent pattern of missing quoted package names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "immunedeconv"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34], "tximport" [35], "immundeconv" [35]"
+    whyMissed: "R package name in quotes - same pattern as other missed packages"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "viper"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include "tidyverse" [33], "PLIER" [26], "synapser" [34], "tximport" [35], "immundeconv" [35], and "viper" [32]"
+    whyMissed: "R package name in quotes - consistent with other missed packages"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Salmon"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "raw fastq files were downloaded from Synapse and transcripts were quantified using the Salmon pseudo-alignment tool [36]"
+    whyMissed: "Tool name without quotes but with descriptive context - may need pattern for 'using the [TOOL] tool'"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "vcf2maf"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variant call format (VCF) files were processed using "vcf2maf" (https://github.com/mskcc/vcf2maf)"
+    whyMissed: "Tool name in quotes with GitHub URL - should be captured by repository patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MultiPLIER"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We analyzed transcriptomic data from NF in the context of latent variables from MultiPLIER, a machine learning resource"
+    whyMissed: "Tool name without quotes but with descriptive context - may need pattern for machine learning tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "org.Hs.eg.db"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "converted to HUGO gene names using the "tximport" [35] and "org.Hs.eg.db" [40] packages"
+    whyMissed: "R package name in quotes - same pattern as other missed packages"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "caret"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The main algorithm was implemented using the "caret" and "randomforest" packages in R [44, 45]"
+    whyMissed: "R package name in quotes - consistent pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "randomforest"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The main algorithm was implemented using the "caret" and "randomforest" packages in R [44, 45]"
+    whyMissed: "R package name in quotes - same pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CIBERSORT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we used two tumor deconvolution methods: CIBERSORT and MCP-counter, as implemented through the "immunedeconv" R package"
+    whyMissed: "Algorithm name without quotes - may need pattern for deconvolution methods"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MCP-counter"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we used two tumor deconvolution methods: CIBERSORT and MCP-counter, as implemented through the "immunedeconv" R package"
+    whyMissed: "Algorithm name with hyphen - may need pattern for hyphenated tool names"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "metaVIPER"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We applied the metaVIPER algorithm [32] to infer protein regulatory activity"
+    whyMissed: "Algorithm name without quotes but with 'algorithm' context - may need pattern for algorithms"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pheatmap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A heatmap and subclusters of latent variables that had similar VIPER protein predictions were generated using the "pheatmap" R package [47]"
+    whyMissed: "R package name in quotes - consistent pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "clusterProfiler"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we used gene set enrichment analysis (via the "clusterProfiler" R package [48])"
+    whyMissed: "R package name in quotes - same pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ggplot"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results were plotted using "ggplot" and "enrichplot" packages [33, 50]"
+    whyMissed: "R package name in quotes - consistent pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "enrichplot"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results were plotted using "ggplot" and "enrichplot" packages [33, 50]"
+    whyMissed: "R package name in quotes - same pattern"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using the \"([^\"]+)\" (?:R )?package"
+    toolType: "computational_tool"
+    examples: ["using the \"tximport\" [35] and \"org.Hs.eg.db\" [40] packages", "using the \"pheatmap\" R package [47]"]
+    reasoning: "Many R packages are mentioned in quotes with 'package' context - this pattern would capture quoted package names"
+
+  - patternType: "context_phrase"
+    pattern: "packages used include \"([^\"]+)\""
+    toolType: "computational_tool"
+    examples: ["Key packages used include \"tidyverse\" [33], \"PLIER\" [26], \"synapser\" [34]"]
+    reasoning: "Multiple packages listed in quotes after 'packages used include' - would capture package lists"
+
+  - patternType: "context_phrase"
+    pattern: "using the ([A-Z][a-zA-Z0-9-]+) (?:pseudo-alignment )?tool"
+    toolType: "computational_tool"
+    examples: ["using the Salmon pseudo-alignment tool [36]"]
+    reasoning: "Tools mentioned with 'using the [TOOL] tool' pattern - would capture tool names with descriptive context"
+
+  - patternType: "context_phrase"
+    pattern: "([A-Z][a-zA-Z0-9-]+) algorithm"
+    toolType: "computational_tool"
+    examples: ["metaVIPER algorithm [32]", "MultiPLIER algorithm"]
+    reasoning: "Algorithms mentioned with 'algorithm' suffix - would capture computational algorithms and methods"
+
+  - patternType: "context_phrase"
+    pattern: "deconvolution methods: ([A-Z][A-Z0-9-]+)(?:,? and ([A-Z][A-Z0-9-]+))?"
+    toolType: "computational_tool"
+    examples: ["deconvolution methods: CIBERSORT and MCP-counter"]
+    reasoning: "Specific pattern for deconvolution methods which are commonly used in bioinformatics"
+
+  - patternType: "context_phrase"
+    pattern: "implemented using the \"([^\"]+)\" and \"([^\"]+)\" packages"
+    toolType: "computational_tool"
+    examples: ["implemented using the \"caret\" and \"randomforest\" packages in R"]
+    reasoning: "Pattern for multiple packages mentioned together in implementation context"
+
+  - patternType: "naming_convention"
+    pattern: "\"([a-z][a-zA-Z0-9\\.]+)\""
+    toolType: "computational_tool"
+    examples: ["\"tidyverse\"", "\"org.Hs.eg.db\"", "\"clusterProfiler\""]
+    reasoning: "R packages often follow lowercase naming with dots - quoted package names should be captured"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 19  # Number of computational tools that were missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite extensive computational methods
+    - This is a pure bioinformatics analysis paper with detailed Methods section listing 19+ software tools
+    - All mentions are legitimate computational tools (R packages, algorithms, bioinformatics software)
+    - Mining patterns appear to miss quoted package names and algorithm mentions
+    - GitHub repositories and analysis workflows are also mentioned but not captured
+  recommendations: |
+    URGENT: This publication should have captured 19+ computational tools but found none.
+    
+    Key issues with current mining:
+    1. Quoted R package names are not being captured ("tidyverse", "PLIER", etc.)
+    2. Algorithm names without quotes are missed (MultiPLIER, metaVIPER, CIBERSORT)
+    3. Tools with descriptive context are missed (Salmon pseudo-alignment tool)
+    4. GitHub repositories with tool names are not captured
+    
+    Recommended actions:
+    1. Implement suggested patterns for quoted package names
+    2. Add patterns for algorithm mentions
+    3. Improve context-based tool detection
+    4. Add all 19 identified tools to the mining results
+    5. Review other bioinformatics papers to ensure similar tools aren't being missed
+    
+    This represents a significant gap in computational tool mining that likely affects
+    many bioinformatics publications in the corpus.

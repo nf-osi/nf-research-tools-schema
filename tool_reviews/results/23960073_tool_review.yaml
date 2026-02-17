@@ -1,0 +1,148 @@
+publicationMetadata:
+  pmid: "23960073"
+  title: "FRAX597, a small molecule inhibitor of the p21-activated kinases, inhibits tumorigenesis of neurofibromatosis type 2 (NF2)-associated Schwannomas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - Small molecule drug development and characterization
+    - Cell culture experiments with NF2-deficient schwannoma cells
+    - In vivo animal model studies (orthotopic model)
+    - Crystallographic analysis
+    - RNAi-based genetic approaches
+    - High-throughput screening
+    
+    Expected tools: cell lines (schwannoma cells), animal models (orthotopic NF2 model), 
+    genetic reagents (RNAi constructs), computational tools (crystallographic analysis software),
+    and potentially antibodies for protein detection/validation.
+  overallAssessment: |
+    This is a typical bench research study focused on drug discovery and cancer biology that would 
+    extensively use research tools. The study involves cell culture, animal models, genetic manipulation, 
+    and structural biology - all requiring specific research tools. However, only the abstract is available, 
+    which limits tool detection since detailed methodological information is typically found in Methods sections.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF2-deficient schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Knockdown of PAK1 and PAK2 expression, through RNAi-based approaches, impairs the proliferation of NF2-deficient schwannoma cells in culture and inhibits their ability to form tumors in vivo..."
+    whyMissed: "Cell line mentioned in abstract but not detected by mining patterns - may need better patterns for disease-specific cell lines"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF2-null schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Knockdown of PAK1 and PAK2 expression, through RNAi-based approaches, impairs the proliferation of NF2-null schwannoma cells in culture..."
+    whyMissed: "Alternative naming for the same cell line type - mining patterns may not capture 'null' terminology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "orthotopic model of NF2"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...FRAX597 inhibits the proliferation of NF2-deficient schwannoma cells in culture and displayed potent anti-tumor activity in vivo, impairing schwannoma development in an orthotopic model of NF2..."
+    whyMissed: "Animal model mentioned but not detected - may need patterns for 'orthotopic model' terminology"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RNAi constructs for PAK1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Knockdown of PAK1 and PAK2 expression, through RNAi-based approaches, impairs the proliferation..."
+    whyMissed: "RNAi reagents mentioned but not specifically detected - need patterns for RNAi/knockdown approaches"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "RNAi constructs for PAK2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Knockdown of PAK1 and PAK2 expression, through RNAi-based approaches, impairs the proliferation..."
+    whyMissed: "RNAi reagents mentioned but not specifically detected - need patterns for RNAi/knockdown approaches"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "FRAX597"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...High-throughput screening of a library of small molecules combined with a structure-activity relationship approach resulted in the identification of FRAX597, a small-molecule pyridopyrimidinone..."
+    whyMissed: "Small molecule inhibitor/drug compound - may need patterns for chemical compounds and inhibitors"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+-(?:deficient|null|knockout|KO)\\s+\\w+\\s+cells?\\b"
+    toolType: "cell_line"
+    examples: ["NF2-deficient schwannoma cells", "NF2-null schwannoma cells"]
+    reasoning: "Pattern to capture disease-specific cell lines with genetic modifications (deficient, null, knockout)"
+
+  - patternType: "context_phrase"
+    pattern: "orthotopic model of \\w+"
+    toolType: "animal_model"
+    examples: ["orthotopic model of NF2"]
+    reasoning: "Orthotopic models are specific animal model systems that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "RNAi-based approaches|RNAi constructs?|knockdown of \\w+|\\w+ knockdown"
+    toolType: "genetic_reagent"
+    examples: ["RNAi-based approaches", "Knockdown of PAK1 and PAK2"]
+    reasoning: "RNAi and knockdown terminology indicates genetic reagents for gene silencing"
+
+  - patternType: "term"
+    pattern: "small[- ]molecule inhibitor|chemical compound|drug compound|\\w+\\d+(?:\\s+inhibitor)?"
+    toolType: "genetic_reagent"
+    examples: ["FRAX597", "small-molecule pyridopyrimidinone"]
+    reasoning: "Chemical compounds and small molecule inhibitors are important research tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "high[- ]throughput screening|HTS|compound library|chemical library"
+    toolType: "computational_tool"
+    examples: ["High-throughput screening of a library of small molecules"]
+    reasoning: "High-throughput screening involves computational tools and automated systems"
+
+  - patternType: "context_phrase"
+    pattern: "crystallographic characterization|crystal structure|X-ray crystallography"
+    toolType: "computational_tool"
+    examples: ["Crystallographic characterization of the FRAX597/PAK1 complex"]
+    reasoning: "Crystallographic analysis requires specialized computational tools for structure determination"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - Methods section would contain detailed tool information
+    - Mining patterns appear to miss several common tool types used in cancer/NF research:
+      * Disease-specific cell lines (NF2-deficient/null cells)
+      * Orthotopic animal models
+      * RNAi genetic reagents
+      * Small molecule compounds/inhibitors
+      * Computational tools for structural analysis
+  recommendations: |
+    - This publication clearly contains multiple research tools that were completely missed
+    - The mining patterns need significant improvement to capture:
+      * Cell lines with genetic modifications (deficient, null, knockout terminology)
+      * Animal models described as "orthotopic model of [disease]"
+      * RNAi and knockdown reagents
+      * Small molecule inhibitors and chemical compounds
+      * Computational tools for crystallography and high-throughput screening
+    - All 6 potentially missed tools should be added to the database
+    - The suggested patterns should be implemented to improve future mining
+    - No observations could be extracted due to lack of Results/Discussion sections
+    - This represents a significant gap in the current mining approach for cancer biology tools

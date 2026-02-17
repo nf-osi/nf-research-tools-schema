@@ -1,0 +1,130 @@
+publicationMetadata:
+  pmid: "30728335"
+  title: "Cxcr3-expressing leukocytes are necessary for neurofibroma formation in mice."
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract, this is clearly a laboratory research study involving:
+    - Animal models (Nf1-mutant mice, neurofibroma-prone mice)
+    - Antibodies (anti-Cxcr3 antibody mentioned)
+    - Genetic reagents (global deletion of Cxcr3)
+    - Computational tools (gene expression analysis)
+    
+    The study describes experimental manipulations including gene deletions, antibody treatments,
+    and comparative gene expression analysis between different mouse models. This type of research
+    typically requires multiple tool categories including animal models, antibodies, genetic
+    reagents, and computational analysis tools.
+  overallAssessment: |
+    This is a laboratory research publication investigating neurofibroma formation in mouse models.
+    The abstract clearly describes experimental work including genetic manipulations, antibody treatments,
+    and gene expression analysis, indicating high likelihood of containing genuine research tools.
+    However, only the abstract is available for analysis, limiting comprehensive tool validation.
+
+toolValidations: []
+  # No tools were mined according to the input file, but this appears to be an error
+  # as the abstract clearly mentions several research tools
+
+potentiallyMissedTools:
+  - toolName: "Nf1-mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...compare gene expression in Nf1-mutant nerves, which invariably form neurofibroma..."
+    whyMissed: "Standard mouse model nomenclature for NF1 research - should be recognized as animal model"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibroma-prone mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Global deletion of the CXCL10 receptor Cxcr3 prevented neurofibroma development in these neurofibroma-prone mice..."
+    whyMissed: "Descriptive term for specific mouse strain/model used in neurofibroma research"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Cxcr3 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...Global deletion of the CXCL10 receptor Cxcr3 prevented neurofibroma development in these neurofibroma-prone mice, and an anti-Cxcr3 antibody somewhat reduced tumor numbers..."
+    whyMissed: "Clear antibody nomenclature with 'anti-' prefix and specific target"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Cxcr3 global deletion"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Global deletion of the CXCL10 receptor Cxcr3 prevented neurofibroma development..."
+    whyMissed: "Genetic manipulation/knockout - represents engineered genetic reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...the chemokine Cxcl10 is uniquely upregulated in NF1 mice that invariably develop neurofibroma..."
+    whyMissed: "Standard reference to NF1 mouse model in research context"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+-mutant mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1-mutant mice"]
+    reasoning: "Standard nomenclature for genetically modified mouse models in research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[a-z]+-prone mice\\b"
+    toolType: "animal_model"
+    examples: ["neurofibroma-prone mice"]
+    reasoning: "Descriptive terms for mouse models with specific phenotypic predispositions"
+
+  - patternType: "term"
+    pattern: "\\banti-[A-Z][a-z0-9]+ antibody\\b"
+    toolType: "antibody"
+    examples: ["anti-Cxcr3 antibody"]
+    reasoning: "Standard antibody nomenclature with anti- prefix and target specification"
+
+  - patternType: "context_phrase"
+    pattern: "global deletion of [A-Z][a-z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["Global deletion of the CXCL10 receptor Cxcr3"]
+    reasoning: "Indicates engineered genetic knockout/deletion constructs"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}[0-9]* mice\\b"
+    toolType: "animal_model"
+    examples: ["NF1 mice"]
+    reasoning: "Common pattern for disease-associated mouse model naming"
+
+observations: []
+  # Cannot extract observations without full text sections (Methods, Results, Discussion)
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available - full text sections (Methods, Results, Discussion) missing
+    - Mining system failed to detect standard research tools mentioned in abstract
+    - At least 5 clear research tools were missed including animal models, antibodies, and genetic reagents
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the mining system.
+    The abstract alone mentions several standard research tools including Nf1-mutant mice, anti-Cxcr3 antibody,
+    and genetic deletion constructs. The mining patterns need significant improvement to catch:
+    
+    1. Standard mouse model nomenclature (Gene-mutant mice, Disease mice)
+    2. Antibody naming with anti- prefix
+    3. Genetic manipulation terminology (global deletion, knockout)
+    4. Phenotype-based model descriptions (neurofibroma-prone mice)
+    
+    Full text access would be essential for comprehensive tool validation and observation extraction.
+    This case demonstrates major gaps in the current mining approach for laboratory research publications.

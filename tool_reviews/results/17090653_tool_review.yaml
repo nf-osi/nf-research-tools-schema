@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "17090653"
+  title: "Beta common receptor inactivation attenuates myeloproliferative disease in Nf1 mutant mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes mouse model experiments with genetic modifications, hematopoietic stem cell 
+    transplantation, and Cre-lox conditional gene targeting. Expected tools include animal models (knockout mice), 
+    genetic reagents (Cre transgenes, conditional alleles), and potentially cell lines (hematopoietic stem cells).
+    
+    Despite being lab research, the publication may also use computational tools for data analysis, though none 
+    are explicitly mentioned in the abstract.
+  overallAssessment: |
+    This is a laboratory research publication studying myeloproliferative disease using genetically modified 
+    mouse models. The study involves complex genetic engineering including knockout mice, Cre-lox conditional 
+    systems, and hematopoietic stem cell transplantation. Such research typically requires multiple research 
+    tools including animal models and genetic reagents. The absence of mined tools suggests potential gaps 
+    in mining patterns for mouse genetic nomenclature and Cre-lox systems.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...lethally irradiated mice given transplants with homozygous Nf1 mutant (Nf1-/-) hematopoietic stem cells develop a fatal myeloproliferative disorder..."
+    whyMissed: "Mouse genetic nomenclature (Nf1-/-) may not be captured by current patterns. The term 'Nf1 mutant mice' clearly indicates a genetically modified animal model."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1-/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...lethally irradiated mice given transplants with homozygous Nf1 mutant (Nf1-/-) hematopoietic stem cells..."
+    whyMissed: "Standard mouse genetic nomenclature (gene-/-) indicating homozygous knockout may not be recognized by current patterns."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "beta c-/- stem cells"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Mice reconstituted with Nf1-/-, beta c-/- stem cells did not develop evidence of MPD..."
+    whyMissed: "Another example of knockout nomenclature (beta c-/-) that wasn't captured. This represents beta common receptor knockout mice."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Mx1-Cre transgene"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...when the Mx1-Cre transgene was used to inactivate a conditional Nf1 mutant allele in hematopoietic cells..."
+    whyMissed: "Cre-lox system components may not be captured by current patterns. Mx1-Cre is a well-known inducible Cre recombinase system."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "conditional Nf1 mutant allele"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Mx1-Cre transgene was used to inactivate a conditional Nf1 mutant allele in hematopoietic cells..."
+    whyMissed: "Conditional allele terminology may not be recognized. This represents a floxed Nf1 allele for conditional knockout."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[-/+]+\\b"
+    toolType: "animal_model"
+    examples: ["Nf1-/-", "beta c-/-", "Nf1+/-"]
+    reasoning: "Mouse genetic nomenclature using gene symbols followed by +/- notation to indicate wild-type, heterozygous, or homozygous knockout alleles. This is standard nomenclature in mouse genetics."
+
+  - patternType: "term"
+    pattern: "\\b\\w+\\s*mutant\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 mutant mice", "conditional Nf1 mutant"]
+    reasoning: "Captures references to genetically modified mouse models using the pattern 'gene mutant mice' which is common in mouse genetics literature."
+
+  - patternType: "term"
+    pattern: "\\b\\w+-Cre\\s+transgene\\b"
+    toolType: "genetic_reagent"
+    examples: ["Mx1-Cre transgene", "Alb-Cre transgene"]
+    reasoning: "Cre-lox system components are widely used genetic tools. Pattern captures tissue-specific or inducible Cre recombinase transgenes."
+
+  - patternType: "term"
+    pattern: "\\bconditional\\s+\\w+\\s+(mutant\\s+)?allele\\b"
+    toolType: "genetic_reagent"
+    examples: ["conditional Nf1 mutant allele", "conditional knockout allele"]
+    reasoning: "Conditional alleles (typically floxed alleles) are important genetic reagents for tissue-specific or temporal gene inactivation."
+
+  - patternType: "context_phrase"
+    pattern: "mice\\s+(given\\s+transplants\\s+with|reconstituted\\s+with)"
+    toolType: "animal_model"
+    examples: ["mice given transplants with", "mice reconstituted with"]
+    reasoning: "Context phrases that indicate experimental use of mouse models in transplantation studies, suggesting the mice themselves are research tools."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication describes complex mouse genetics experiments but mining patterns failed to capture standard genetic nomenclature
+    - Missing patterns for mouse knockout nomenclature (gene-/-, gene+/-)
+    - Missing patterns for Cre-lox system components (Mx1-Cre transgene)
+    - Missing patterns for conditional allele terminology
+    - Only abstract text available - full Methods section would likely contain additional tool details
+  recommendations: |
+    This publication clearly uses multiple research tools (animal models and genetic reagents) that were completely 
+    missed by the current mining approach. The major issue is inadequate coverage of mouse genetics nomenclature 
+    and terminology. Recommendations:
+    
+    1. Add all 5 potentially missed tools - they represent legitimate research tools used in this study
+    2. Implement the suggested patterns to capture mouse genetic nomenclature and Cre-lox systems
+    3. Consider expanding patterns for conditional genetics terminology
+    4. This case highlights the need for better coverage of standard laboratory animal model nomenclature
+    5. No observations could be extracted due to lack of Results/Discussion sections, but the tools themselves are valid
+    
+    The mining system needs significant improvement in recognizing standard mouse genetics terminology to avoid 
+    missing tools in similar publications.

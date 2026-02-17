@@ -1,0 +1,115 @@
+publicationMetadata:
+  pmid: "33032988"
+  title: "Combined Inhibition of SHP2 and MEK Is Effective in Models of NF1-Deficient Malignant Peripheral Nerve Sheath Tumors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on abstract content
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content, this lab research publication should contain:
+    - Cell lines (MPNST models mentioned)
+    - Animal models (preclinical models referenced)
+    - Computational tools (kinome activity screen mentioned)
+    - Genetic reagents (NF1-deficient models)
+    - Possibly patient-derived models (MPNST models could be PDX)
+    
+    The abstract describes "models of NF1-MPNST" and "precursor lesion plexiform neurofibroma",
+    indicating experimental model systems. An "unbiased kinome screen" suggests computational
+    analysis tools. However, without full text sections, tool identification is limited.
+  overallAssessment: |
+    This is clearly a laboratory research publication investigating therapeutic targets in
+    NF1-deficient malignant peripheral nerve sheath tumors. The abstract describes experimental
+    work including kinome screens, drug combination studies, and testing in multiple model
+    systems. Such studies typically require extensive research tools including cell lines,
+    animal models, and computational analysis software. The absence of mined tools and full
+    text sections suggests a technical issue with text extraction rather than lack of tools.
+
+toolValidations: []
+  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "SHP099"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The combination of MEKi plus SHP099 was superior to MEKi alone in models of NF1-MPNST"
+    whyMissed: "SHP2 inhibitor compound not recognized as a research reagent"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "MEK inhibitors"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "studies of novel single agents including MEK inhibitors (MEKi) have demonstrated limited efficacy"
+    whyMissed: "MEK inhibitor compounds not recognized as research reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-MPNST models"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The combination of MEKi plus SHP099 was superior to MEKi alone in models of NF1-MPNST"
+    whyMissed: "Cell line or model system not specifically identified by mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "kinome activity screen"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "By interrogation of kinome activity through an unbiased screen"
+    whyMissed: "Screening methodology not recognized as computational tool"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SHP099|SHP2 inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["SHP099 was superior to MEKi alone"]
+    reasoning: "SHP2 inhibitors are important research reagents for studying RAS signaling pathways"
+
+  - patternType: "term"
+    pattern: "MEKi|MEK inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["MEK inhibitors (MEKi) have demonstrated limited efficacy"]
+    reasoning: "MEK inhibitors are commonly used research compounds in cancer studies"
+
+  - patternType: "context_phrase"
+    pattern: "models of [A-Z0-9]+-[A-Z]+"
+    toolType: "cell_line"
+    examples: ["models of NF1-MPNST"]
+    reasoning: "Pattern to catch disease-specific model systems that may be cell lines or animal models"
+
+  - patternType: "term"
+    pattern: "kinome.*screen|kinome activity"
+    toolType: "computational_tool"
+    examples: ["interrogation of kinome activity through an unbiased screen"]
+    reasoning: "Kinome screens involve computational analysis tools and should be captured"
+
+observations: []
+  # No validated tools available for observation extraction
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined despite clear evidence of laboratory research
+    - Full text sections (Methods, Introduction, Results, Discussion) are missing
+    - Only abstract text was available for analysis
+    - Technical issue with text extraction likely prevented tool identification
+    - Abstract contains clear references to research tools and experimental models
+  recommendations: |
+    This publication requires manual curator review due to technical issues:
+    - Full text should be re-extracted to enable proper tool mining
+    - Abstract clearly indicates this is legitimate lab research with multiple tool types
+    - Several research reagents (SHP099, MEK inhibitors) and model systems are mentioned
+    - Kinome screening methodology suggests computational tools were used
+    - Without full Methods section, comprehensive tool validation is impossible
+    - Recommend re-processing this publication with complete text extraction
+    - High priority for manual review given clear research tool content in abstract

@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "18367665"
+  title: "Induction of apoptosis in neurofibromatosis type 1 malignant peripheral nerve sheath tumor cell lines by a combination of novel farnesyl transferase inhibitors and lovastatin."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating drug combinations on cancer cell lines.
+    The abstract describes experimental procedures including cell proliferation assays, apoptosis assays,
+    and biochemical analyses. Expected tools include cell lines (which are mentioned), chemical reagents,
+    and potentially antibodies for detection assays. The lack of full-text sections limits comprehensive
+    tool identification, but the abstract provides clear evidence of experimental lab work.
+  overallAssessment: |
+    This is a laboratory research study investigating the effects of farnesyl transferase inhibitors
+    combined with lovastatin on NF1 tumor cell lines. The publication clearly describes experimental
+    procedures and would be expected to contain multiple research tools including cell lines, chemical
+    reagents, and assay reagents. The absence of detected tools appears to be a mining failure rather
+    than absence of tools in the publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF90-8"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...two NF1 malignant peripheral nerve sheath tumor (MPNST) cell lines, NF90-8 and ST88-14. Single treatments..."
+    whyMissed: "Cell line name not recognized by mining patterns - may need specific NF cell line nomenclature patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ST88-14"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...two NF1 malignant peripheral nerve sheath tumor (MPNST) cell lines, NF90-8 and ST88-14. Single treatments..."
+    whyMissed: "Cell line name not recognized by mining patterns - may need specific NF cell line nomenclature patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "normal rat Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Little to no detectable toxicity was observed in normal rat Schwann cells following FTI/lovastatin combination treatment..."
+    whyMissed: "Primary cell type described generically rather than as specific cell line name - may need patterns for 'normal [species] [cell type] cells'"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "lovastatin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...combination of novel farnesyl transferase inhibitors and lovastatin...low micromolar combinations of 1 or 2 with lovastatin..."
+    whyMissed: "Chemical compound/drug not recognized as research reagent - may need patterns for pharmaceutical compounds used as research tools"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "farnesyl transferase inhibitors"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...two novel farnesyl transferase inhibitors (FTIs), 1 and 2, alone or in combination with lovastatin..."
+    whyMissed: "Novel chemical compounds described generically - may need patterns for 'novel [compound type]' or numbered compounds"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}[0-9]{1,3}-[0-9]{1,3}"
+    toolType: "cell_line"
+    examples: ["NF90-8", "ST88-14"]
+    reasoning: "NF-related cell lines appear to follow this naming pattern with letter prefix, numbers, dash, and more numbers"
+
+  - patternType: "context_phrase"
+    pattern: "normal [species] [cell type] cells"
+    toolType: "cell_line"
+    examples: ["normal rat Schwann cells"]
+    reasoning: "Primary cells are often described as 'normal [species] [cell type] cells' and represent important research tools"
+
+  - patternType: "context_phrase"
+    pattern: "novel [compound/inhibitor type]"
+    toolType: "genetic_reagent"
+    examples: ["novel farnesyl transferase inhibitors"]
+    reasoning: "Novel compounds developed for research are important tools but may not have specific names in abstracts"
+
+  - patternType: "term"
+    pattern: "lovastatin|simvastatin|atorvastatin|pravastatin"
+    toolType: "genetic_reagent"
+    examples: ["lovastatin"]
+    reasoning: "Statin drugs are commonly used as research reagents for studying cholesterol/prenylation pathways"
+
+  - patternType: "context_phrase"
+    pattern: "(MPNST|malignant peripheral nerve sheath tumor) cell lines?"
+    toolType: "cell_line"
+    examples: ["NF1 malignant peripheral nerve sheath tumor (MPNST) cell lines"]
+    reasoning: "Context phrase that reliably indicates cell line tools even when specific names follow"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete mining failure: No tools were detected despite clear presence of multiple research tools
+    - Missing cell line detection: Two specific NF1 tumor cell lines (NF90-8, ST88-14) were not detected
+    - Missing chemical reagent detection: Lovastatin and novel FTIs were not recognized as research tools
+    - Limited text availability: Only abstract available, preventing comprehensive tool and observation extraction
+    - Pattern gaps: Current mining patterns appear inadequate for NF-specific cell line nomenclature
+  recommendations: |
+    This publication represents a significant mining failure - multiple clear research tools were missed.
+    All 5 potentially missed tools should be added to improve mining accuracy. The suggested patterns
+    would help catch similar tools in future NF research publications. The cell lines NF90-8 and ST88-14
+    are particularly important as they are specific NF1 research models. Without access to Methods/Results
+    sections, detailed observations cannot be extracted, but the abstract indicates this is legitimate
+    laboratory research with multiple experimental tools that should have been detected.

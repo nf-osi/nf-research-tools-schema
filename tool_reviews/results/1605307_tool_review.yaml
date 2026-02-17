@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "1605307"
+  title: "Adrenal medullary tumors and iris proliferation in a transgenic mouse model of neurofibromatosis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes transgenic mouse model development and characterization
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research with transgenic mouse model):
+    - Animal models: Transgenic mouse model described
+    - Genetic reagents: HTLV-1 tax gene construct used for transgenesis
+    - Potentially computational tools: Though not explicitly mentioned, transgenic model development typically requires molecular cloning tools
+
+    This is clearly a lab research publication describing the development and characterization of a transgenic mouse model.
+    Even with only abstract available, the transgenic mouse model itself is a research tool that should be captured.
+  overallAssessment: |
+    This is a laboratory research publication describing the development and characterization of a transgenic mouse model of neurofibromatosis.
+    The transgenic mice expressing HTLV-1 tax gene represent a clear animal model research tool that should have been detected.
+    Despite lacking full-text sections, the abstract provides sufficient evidence of tool development and usage in neurofibromatosis research.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "transgenic mouse model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The expression of the human T-cell lymphotropic virus type 1 (HTLV-1) tax gene in transgenic mice has been shown to result in the development of neurofibromas. Further characterization of these transgenic mice has revealed other significant pathologic similarities between this transgenic mouse model and human neurofibromatosis"
+    whyMissed: "Generic term 'transgenic mouse model' may not have been in the animal model pattern dictionary"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HTLV-1 tax transgenic mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The expression of the human T-cell lymphotropic virus type 1 (HTLV-1) tax gene in transgenic mice has been shown to result in the development of neurofibromas"
+    whyMissed: "Specific transgenic line name combining virus gene (HTLV-1 tax) with mouse model may not match existing patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "HTLV-1 tax gene"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The expression of the human T-cell lymphotropic virus type 1 (HTLV-1) tax gene in transgenic mice"
+    whyMissed: "Viral gene construct used for transgenesis - may need patterns for viral genes used as transgenes"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "transgenic mouse model"
+    toolType: "animal_model"
+    examples: ["transgenic mouse model of neurofibromatosis"]
+    reasoning: "Generic but specific term for genetically modified mouse models that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[GENE/VIRUS]\\s+transgenic\\s+(mice|mouse)"
+    toolType: "animal_model"
+    examples: ["HTLV-1 tax transgenic mice"]
+    reasoning: "Pattern to capture transgenic mouse lines named after the specific gene or viral element they express"
+
+  - patternType: "context_phrase"
+    pattern: "expression of.*gene in transgenic mice"
+    toolType: "animal_model"
+    examples: ["expression of the human T-cell lymphotropic virus type 1 (HTLV-1) tax gene in transgenic mice"]
+    reasoning: "Context phrase indicating transgenic mouse model development/usage"
+
+  - patternType: "term"
+    pattern: "tax gene"
+    toolType: "genetic_reagent"
+    examples: ["HTLV-1 tax gene"]
+    reasoning: "Viral tax genes are commonly used genetic reagents in cancer and neurofibromatosis research"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined despite clear evidence of transgenic mouse model development
+    - Missing animal model detection for "transgenic mouse model" and "HTLV-1 tax transgenic mice"
+    - Missing genetic reagent detection for "HTLV-1 tax gene" construct
+    - Only abstract available limits full assessment, but sufficient evidence exists for tool identification
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have detected at least 2-3 research tools (transgenic mouse model, specific transgenic line, viral gene construct)
+    - The mining patterns need improvement to capture transgenic mouse models and viral gene constructs
+    - Add suggested patterns to improve detection of transgenic animal models and viral genetic reagents
+    - This represents a significant false negative - clear research tools were missed
+    - Future mining should include patterns for "transgenic mouse model" and viral gene constructs like "tax gene"
+    - No observations could be extracted due to lack of Results/Discussion sections, but the transgenic model development itself is valuable

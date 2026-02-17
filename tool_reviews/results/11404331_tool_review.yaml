@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "11404331"
+  title: "A systematic screen for dominant second-site modifiers of Merlin/NF2 phenotypes reveals an interaction with blistered/DSRF and scribbler."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, computational tools
+    
+    This is a Drosophila genetics study involving systematic genetic screens, mutation analysis, 
+    and phenotypic characterization. Expected tools include:
+    - Animal models: Drosophila strains with specific mutations (Merlin mutants, modifier strains)
+    - Genetic reagents: Mutant alleles, transgenic lines, complementation groups
+    - Potentially computational tools for genetic analysis and mapping
+    
+    Note: While only abstract is available, the study design clearly indicates experimental 
+    genetics work that would require specific fly strains and genetic reagents.
+  overallAssessment: |
+    This is a laboratory genetics research study that would definitely use research tools, 
+    specifically Drosophila animal models and genetic reagents. The study involves systematic 
+    genetic screens, mutation analysis, and complementation testing - all requiring specific 
+    fly strains and mutant alleles. The lack of Methods section limits detailed tool identification, 
+    but the experimental design described in the abstract clearly indicates tool usage.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Merlin loss-of-function mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...genetic screens designed to isolate second-site modifiers of Merlin phenotypes from which we have identified five multiallelic complementation groups that modify both loss-of-function and dominant-negative Merlin phenotypes..."
+    whyMissed: "Specific Drosophila mutant strains not detected - may need patterns for 'loss-of-function mutants' or 'mutant phenotypes'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Merlin dominant-negative mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...modify both loss-of-function and dominant-negative Merlin phenotypes..."
+    whyMissed: "Dominant-negative mutant strains not detected - may need patterns for 'dominant-negative' constructs/strains"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "scribbler/brakeless mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Group IIa/scribbler (also known as brakeless)...mutations in scribbler and blistered display second-site noncomplementation..."
+    whyMissed: "Specific Drosophila mutant strain not detected - gene name followed by 'mutants' or 'mutations' pattern needed"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "blistered/DSRF mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Group IIc/blistered...mutations in scribbler and blistered display second-site noncomplementation..."
+    whyMissed: "Specific Drosophila mutant strain not detected - gene name with mutation context pattern needed"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "net mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Group IId/net, are known genes..."
+    whyMissed: "Drosophila mutant strain not detected - complementation group naming pattern needed"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "loss-of-function\\s+(\\w+)\\s+(mutants?|phenotypes?)"
+    toolType: "animal_model"
+    examples: ["loss-of-function Merlin phenotypes"]
+    reasoning: "Captures loss-of-function mutant strains which are common in Drosophila genetics but may be missed by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "dominant-negative\\s+(\\w+)\\s+(mutants?|phenotypes?)"
+    toolType: "animal_model"
+    examples: ["dominant-negative Merlin phenotypes"]
+    reasoning: "Identifies dominant-negative mutant constructs/strains used in genetic studies"
+
+  - patternType: "context_phrase"
+    pattern: "mutations?\\s+in\\s+(\\w+)\\s+and\\s+(\\w+)"
+    toolType: "animal_model"
+    examples: ["mutations in scribbler and blistered"]
+    reasoning: "Captures multiple mutant strains mentioned together in genetic interaction studies"
+
+  - patternType: "naming_convention"
+    pattern: "Group\\s+[IVX]+[a-z]?\\/(\\w+)"
+    toolType: "animal_model"
+    examples: ["Group IIa/scribbler", "Group IIc/blistered", "Group IId/net"]
+    reasoning: "Drosophila complementation group naming convention that indicates specific mutant strains"
+
+  - patternType: "context_phrase"
+    pattern: "(\\w+)\\s+\\(also\\s+known\\s+as\\s+(\\w+)\\)"
+    toolType: "animal_model"
+    examples: ["scribbler (also known as brakeless)"]
+    reasoning: "Captures alternative gene/strain names common in Drosophila genetics literature"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory genetics study
+    - Multiple Drosophila mutant strains and genetic reagents were missed
+    - Only abstract text available - Methods section would likely contain more detailed tool information
+    - Current mining patterns may not adequately capture Drosophila genetics terminology
+    - Complementation group naming conventions not recognized
+  recommendations: |
+    This publication clearly involves research tools (Drosophila mutant strains) that were completely 
+    missed by the initial mining. Recommendations:
+    
+    1. Add the 5 potentially missed Drosophila mutant strains as animal models
+    2. Implement the suggested patterns to better capture Drosophila genetics terminology
+    3. Focus on patterns for "loss-of-function", "dominant-negative", "mutations in X", and complementation groups
+    4. Consider that genetics papers often describe tools differently than molecular biology papers
+    5. No observations could be extracted due to lack of Results/Discussion sections
+    
+    The mining system needs improvement for Drosophila genetics literature - this represents a 
+    significant gap where multiple legitimate research tools went undetected.

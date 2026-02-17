@@ -1,0 +1,138 @@
+publicationMetadata:
+  pmid: "35735230"
+  title: "Centralizing neurofibromatosis experimental tool knowledge with the NF Research Tools Database."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a database/resource development paper describing the creation of the NF Research Tools Database.
+    Expected tool types:
+    - Computational tools (software, libraries, databases used in development)
+    - Possibly references to external databases/resources that were integrated
+    
+    The paper describes building a web application and database system, so computational tools
+    for development (React, MySQL, Python libraries) are expected. However, this is NOT a
+    bench research paper using lab tools experimentally - it's about creating a database
+    to catalog such tools for others to use.
+
+  overallAssessment: |
+    This publication describes the development of a database resource rather than experimental research.
+    It would typically contain computational tools used for database development (MySQL, React, Python libraries)
+    and references to external databases that were integrated. However, it would NOT contain experimental
+    lab tools being used for research - instead it catalogs such tools for others to discover and use.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MySQL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...This schema was processed with the 'schematic' Python library to generate a MySQL database as well as data intake spreadsheets..."
+    whyMissed: "Database management system used for storing the research tools data"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "schematic"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...This schema was processed with the 'schematic' Python library ( 11 , 12 ) to generate a MySQL database..."
+    whyMissed: "Python library specifically mentioned for database generation from schema"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "React"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...We then built the application using the React JavaScript library and the Synapse React Client..."
+    whyMissed: "JavaScript library used for building the web application interface"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Synapse React Client"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...We then built the application using the React JavaScript library and the Synapse React Client ( 13 )..."
+    whyMissed: "Specific client library used for Synapse integration in the web application"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...This schema was processed with the 'schematic' Python library...The database tables can be retrieved and queried using SQL-like syntax in the Synapse web, Python, or R clients..."
+    whyMissed: "Programming language used for database processing and mentioned as client option"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The database tables can be retrieved and queried using SQL-like syntax in the Synapse web, Python, or R clients..."
+    whyMissed: "Programming language mentioned as client option for database access"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "Synapse"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...all database tables and a variety of 'joined' tables are available for anyone to access on the Synapse collaborative science platform..."
+    whyMissed: "Collaborative science platform used for hosting and sharing the database"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "built using|developed using|constructed using|processed with"
+    toolType: "computational_tool"
+    examples: ["built the application using the React JavaScript library", "processed with the 'schematic' Python library"]
+    reasoning: "These phrases often indicate active usage of computational tools in development contexts"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ (JavaScript|Python|R) (library|package|client)"
+    toolType: "computational_tool"
+    examples: ["React JavaScript library", "schematic Python library", "Synapse React Client"]
+    reasoning: "Pattern for identifying programming libraries and clients with language specification"
+
+  - patternType: "context_phrase"
+    pattern: "hosted in|available on|platform"
+    toolType: "computational_tool"
+    examples: ["hosted in a private cloud computing environment", "available on the Synapse collaborative science platform"]
+    reasoning: "Phrases that indicate computational platforms and hosting services used"
+
+  - patternType: "term"
+    pattern: "MySQL|PostgreSQL|MongoDB|SQLite"
+    toolType: "computational_tool"
+    examples: ["MySQL database"]
+    reasoning: "Common database management systems that should be captured as computational tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication, but several computational tools were missed
+    - This is a database/resource development paper, not experimental bench research
+    - The queryType "bench" is misleading - this should have been classified as bioinformatics/database development
+    - Multiple computational tools used in database and web application development were not detected
+  recommendations: |
+    This publication should have computational tools added for the software and libraries used in development:
+    - MySQL (database management system) - DEFINITELY add
+    - schematic (Python library) - DEFINITELY add  
+    - React (JavaScript library) - DEFINITELY add
+    - Synapse React Client (specific client library) - DEFINITELY add
+    - Synapse (collaborative platform) - DEFINITELY add
+    - Python and R could be added but are more generic programming languages
+    
+    The mining patterns need improvement to catch computational tools in database/software development contexts.
+    This paper demonstrates the need for better detection of development tools and platforms.
+    
+    No experimental observations were found since this is a resource development paper, not experimental research.

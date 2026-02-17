@@ -1,0 +1,116 @@
+publicationMetadata:
+  pmid: "8089100"
+  title: "An anti-Ras function of neurofibromatosis type 2 gene product (NF2/Merlin)."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study involving protein cloning, cell transformation, and functional assays.
+    Expected tools include cell lines (NIH/3T3), genetic reagents (expression constructs, viral vectors),
+    and potentially antibodies for protein detection. The study involves experimental manipulation of cells
+    and protein expression, which typically requires multiple research tools.
+  overallAssessment: |
+    This is a legitimate laboratory research publication from 1994 involving molecular cloning, cell transformation,
+    and functional assays. The study describes expressing NF2 constructs in transformed cell lines and performing
+    growth assays, which would require multiple research tools including cell lines and genetic reagents.
+    However, only the abstract is available, limiting tool detection to high-level mentions.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NIH/3T3 cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...both full-length NF2 and its N-terminal half (NF2-N, residues 9-359) have been expressed in v-Ha-Ras-transformed NIH/3T3 cells. Like neurofibromatosis type 1 (NF1) fragments..."
+    whyMissed: "Standard cell line name not caught by mining patterns - may need pattern for 'cell line name + cells' format"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "v-Ha-Ras transformation vector"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...both full-length NF2 and its N-terminal half (NF2-N, residues 9-359) have been expressed in v-Ha-Ras-transformed NIH/3T3 cells..."
+    whyMissed: "Viral transformation system not detected - pattern needed for 'v-[gene]-transformed' format indicating viral vector usage"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF2 expression construct"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...both full-length NF2 and its N-terminal half (NF2-N, residues 9-359) have been expressed in v-Ha-Ras-transformed NIH/3T3 cells..."
+    whyMissed: "Expression constructs mentioned but not detected - need patterns for 'full-length [gene]' and '[gene]-N' construct naming"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NF2-N construct"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...both full-length NF2 and its N-terminal half (NF2-N, residues 9-359) have been expressed in v-Ha-Ras-transformed NIH/3T3 cells..."
+    whyMissed: "N-terminal truncation construct not detected - need pattern for '[gene]-N' naming convention"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+/[A-Z0-9]+ cells"
+    toolType: "cell_line"
+    examples: ["NIH/3T3 cells"]
+    reasoning: "Standard cell line naming convention with institution/designation followed by 'cells' - very reliable pattern for cell line identification"
+
+  - patternType: "context_phrase"
+    pattern: "v-[A-Za-z0-9]+-transformed"
+    toolType: "genetic_reagent"
+    examples: ["v-Ha-Ras-transformed"]
+    reasoning: "Viral transformation systems are genetic reagents - pattern 'v-[gene]-transformed' indicates use of viral vector for cell transformation"
+
+  - patternType: "naming_convention"
+    pattern: "full-length [A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["full-length NF2"]
+    reasoning: "Full-length protein constructs are genetic reagents - this pattern catches expression constructs when mentioned in experimental context"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+-[A-Z]\\b"
+    toolType: "genetic_reagent"
+    examples: ["NF2-N"]
+    reasoning: "Protein domain/truncation constructs follow [gene]-[domain] naming - common pattern for expression constructs in molecular biology"
+
+  - patternType: "context_phrase"
+    pattern: "have been expressed in"
+    toolType: "general"
+    examples: ["both full-length NF2 and its N-terminal half (NF2-N, residues 9-359) have been expressed in"]
+    reasoning: "Strong indicator of experimental tool usage - when proteins are 'expressed in' cells, both the constructs and cell lines are research tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available, limiting comprehensive tool detection
+    - Multiple obvious research tools missed: cell line (NIH/3T3), viral transformation system, expression constructs
+    - Mining patterns appear insufficient for detecting standard molecular biology tools from 1990s publications
+  recommendations: |
+    This publication clearly describes legitimate laboratory research using multiple research tools that were completely missed by the mining process.
+    The NIH/3T3 cell line is a standard, well-characterized tool that should definitely be captured.
+    The viral transformation system and expression constructs represent genetic reagents that are core to the experimental design.
+    
+    Key recommendations:
+    1. Add all 4 identified tools to the database - they represent genuine research tools used experimentally
+    2. Implement suggested patterns to catch similar tools in other publications
+    3. The cell line pattern "[institution]/[designation] cells" is particularly important and reliable
+    4. Consider that older publications (1990s) may use different terminology than modern papers
+    5. No observations could be extracted due to lack of Results/Discussion sections
+    
+    This case highlights significant gaps in current mining patterns for basic molecular biology tools.

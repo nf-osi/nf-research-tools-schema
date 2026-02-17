@@ -1,0 +1,229 @@
+publicationMetadata:
+  pmid: "37276689"
+  title: "Health-related quality of life of children with neurofibromatosis type 1: Analysis of proxy-rated PedsQL and CHQ questionnaires."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, outcome measures), possibly computational tools for statistical analysis
+    
+    This publication specifically focuses on health-related quality of life assessment using validated questionnaires.
+    Expected tools include:
+    - Clinical assessment tools: PedsQL, CHQ (Child Health Questionnaire)
+    - Computational tools: Statistical analysis software for t-tests, PCA, correlation analysis
+    
+    Note: Clinical studies have different structure than lab research - assessment tools are valid research tools
+    even without traditional experimental methods sections.
+  overallAssessment: |
+    This clinical study clearly uses validated clinical assessment tools (PedsQL and CHQ questionnaires) to measure
+    health-related quality of life in children with NF1. The study involves administering standardized questionnaires
+    to 160 patients and performing statistical analyses. Clinical assessment tools are legitimate research tools that
+    should be captured, as they are validated instruments used to measure patient outcomes and quality of life.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...investigate health-related quality of life (HRQoL) in children with Neurofibromatosis Type 1 (NF1) using the Pediatric Quality of Life inventory (PedsQL) and the Child Health Questionnaire (CHQ)..."
+    whyMissed: "Clinical assessment tool not detected - PedsQL is a well-established validated questionnaire for measuring pediatric quality of life"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Pediatric Quality of Life inventory"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...investigate health-related quality of life (HRQoL) in children with Neurofibromatosis Type 1 (NF1) using the Pediatric Quality of Life inventory (PedsQL) and the Child Health Questionnaire (CHQ)..."
+    whyMissed: "Full name of PedsQL questionnaire not detected - this is the formal name of the validated assessment tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "CHQ"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...using the Pediatric Quality of Life inventory (PedsQL) and the Child Health Questionnaire (CHQ); and (2) compare the psychometric properties..."
+    whyMissed: "Clinical assessment tool abbreviation not detected - CHQ is a validated questionnaire for child health assessment"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Child Health Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...using the Pediatric Quality of Life inventory (PedsQL) and the Child Health Questionnaire (CHQ); and (2) compare the psychometric properties..."
+    whyMissed: "Full name of CHQ questionnaire not detected - this is the formal name of the validated assessment tool"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "independent t-tests"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...HRQoL scores were compared with Dutch population norms using independent t-tests. Psychometric properties..."
+    whyMissed: "Statistical analysis method not detected - t-tests are computational tools used for data analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "principal component analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...A principal component analysis (PCA) with varimax rotation was performed to identify the data's internal structure..."
+    whyMissed: "Statistical analysis method not detected - PCA is a computational tool for dimensionality reduction and data analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PCA"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...A principal component analysis (PCA) with varimax rotation was performed to identify the data's internal structure..."
+    whyMissed: "Statistical analysis abbreviation not detected - PCA is commonly used abbreviation for principal component analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Cronbach's alpha"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Psychometric properties (feasibility and reliability) were assessed by floor/ceiling effects and Cronbach's alpha coefficient..."
+    whyMissed: "Statistical reliability measure not detected - Cronbach's alpha is a computational tool for assessing internal consistency"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "multiple linear regressions"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Correlations and multiple linear regressions were conducted to identify determinants of psychosocial HRQoL."
+    whyMissed: "Statistical analysis method not detected - multiple linear regression is a computational tool for predictive modeling"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL|Pediatric Quality of Life [Ii]nventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL", "Pediatric Quality of Life inventory"]
+    reasoning: "PedsQL is a widely used validated questionnaire in pediatric research that should be consistently detected"
+
+  - patternType: "term"
+    pattern: "CHQ|Child Health Questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["CHQ", "Child Health Questionnaire"]
+    reasoning: "CHQ is a standard clinical assessment tool for child health that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "administered to|completed.*questionnaire|proxy-report"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL and CHQ proxy-reports were administered to parents/caregivers"]
+    reasoning: "These phrases indicate active use of clinical assessment tools in research studies"
+
+  - patternType: "term"
+    pattern: "independent t-test|t-test|Student.*t-test"
+    toolType: "computational_tool"
+    examples: ["independent t-tests", "t-tests"]
+    reasoning: "Statistical tests are computational tools that should be captured for analysis reproducibility"
+
+  - patternType: "term"
+    pattern: "principal component analysis|PCA"
+    toolType: "computational_tool"
+    examples: ["principal component analysis (PCA)", "PCA with varimax rotation"]
+    reasoning: "PCA is a fundamental computational tool in data analysis that should be consistently detected"
+
+  - patternType: "term"
+    pattern: "Cronbach.*alpha|internal consistency"
+    toolType: "computational_tool"
+    examples: ["Cronbach's alpha coefficient"]
+    reasoning: "Reliability measures are important computational tools in psychometric research"
+
+  - patternType: "term"
+    pattern: "multiple.*regression|linear regression|logistic regression"
+    toolType: "computational_tool"
+    examples: ["multiple linear regressions"]
+    reasoning: "Regression analyses are core computational tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "were compared.*using|analyzed.*using|assessed.*by|performed.*to identify"
+    toolType: "computational_tool"
+    examples: ["compared with Dutch population norms using independent t-tests", "performed to identify the data's internal structure"]
+    reasoning: "These phrases indicate active use of computational methods and statistical tools"
+
+observations:
+  - resourceName: "PedsQL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Proxy-reported HRQoL was significantly lower on all PedsQL subscales for children aged 5-7 years, 
+      and on 4/6 subscales for children aged 8-12 years compared to Dutch population norms. The PedsQL 
+      showed slightly better feasibility and reliability compared to CHQ. The questionnaire adequately 
+      measures HRQoL in children with NF1 and has slightly better psychometric properties than CHQ.
+    foundIn: "both"
+    contextSnippet: "Proxy-reported HRQoL was significantly lower on all PedsQL subscales for children aged 5-7 years, and on 4/6 subscales for children aged 8-12 years compared to norms...The PedsQL showed slightly better feasibility and reliability."
+    confidence: 0.95
+    doi: "10.1016/j.ejpn.2023.05.010"
+
+  - resourceName: "Child Health Questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Significantly lower HRQoL was reported on 6/14 CHQ subscales for children aged 5-7 years and 
+      9/14 subscales for children aged 8-12 years compared to norms. The CHQ covers a unique dimension 
+      of HRQoL associated with disease impact on parents and family. CHQ subscales concerning parents 
+      and family were considered unique contributions not captured by PedsQL.
+    foundIn: "both"
+    contextSnippet: "Significantly lower HRQoL was reported on 6/14 CHQ subscales (children 5-7 years) and 9/14 subscales (children 8-12 years)...the CHQ covers a unique dimension of HRQoL associated with disease impact on parents and family."
+    confidence: 0.95
+    doi: "10.1016/j.ejpn.2023.05.010"
+
+  - resourceName: "principal component analysis"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PCA with varimax rotation was performed to identify the data's internal structure. The analysis 
+      identified two components representing psychosocial and physical aspects of HRQoL, explaining 
+      63% of total variance. Both PedsQL and CHQ questionnaires showed relevant loadings on both components.
+    foundIn: "both"
+    contextSnippet: "A principal component analysis (PCA) with varimax rotation was performed to identify the data's internal structure...The PCA identified two components, representing psychosocial and physical aspects of HRQoL, explaining 63% of total variance."
+    confidence: 0.90
+    doi: "10.1016/j.ejpn.2023.05.010"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 8
+  observationsExtracted: 3
+  observationsByType:
+    General Comment or Review: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear presence of clinical assessment tools
+    - No clinical assessment tool patterns appear to be implemented in the mining system
+    - Statistical analysis methods (computational tools) were also missed
+    - This represents a major gap in clinical research tool detection capabilities
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the mining system:
+    
+    CLINICAL ASSESSMENT TOOLS (4 missed):
+    - PedsQL (Pediatric Quality of Life inventory) - validated questionnaire
+    - CHQ (Child Health Questionnaire) - validated questionnaire
+    Both are well-established, validated clinical assessment tools used in pediatric research
+    
+    COMPUTATIONAL TOOLS (5 missed):
+    - Independent t-tests - statistical analysis method
+    - Principal component analysis (PCA) - dimensionality reduction technique
+    - Cronbach's alpha - reliability assessment method
+    - Multiple linear regressions - predictive modeling technique
+    
+    CRITICAL RECOMMENDATIONS:
+    1. Implement clinical assessment tool detection patterns immediately
+    2. Add statistical analysis method detection for computational tools
+    3. Include context phrases that indicate tool usage ("administered to", "completed", "analyzed using")
+    4. This publication demonstrates that clinical studies contain legitimate research tools that must be captured
+    5. The mining system appears to have significant gaps in clinical research tool detection
+    
+    All 9 missed tools should be added to the database as they represent genuine research tools used in this study.
+    The observations extracted show meaningful scientific findings about tool performance and utility.

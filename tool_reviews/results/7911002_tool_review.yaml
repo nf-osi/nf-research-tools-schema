@@ -1,0 +1,101 @@
+publicationMetadata:
+  pmid: "7911002"
+  title: "Frequent NF2 gene transcript mutations in sporadic meningiomas and vestibular schwannomas."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - molecular analysis of tumor samples
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular genetics study from 1994 analyzing NF2 gene mutations in tumor samples.
+    Expected tools include:
+    - Genetic reagents: PCR primers, reverse transcriptase enzymes
+    - Computational tools: DNA sequence analysis software (though limited in 1994)
+    - Potentially antibodies for protein analysis
+    - Cell lines if tumor cells were cultured
+    
+    Note: This is a 1994 publication, so computational tools would be limited compared to modern standards.
+    The study focuses on molecular analysis techniques that were standard for that era.
+  overallAssessment: |
+    This is a laboratory research study conducting molecular genetic analysis of tumor samples using reverse transcriptase-PCR,
+    SSCP (Single Strand Conformation Polymorphism), and DNA sequencing. Such studies typically require multiple research tools
+    including PCR reagents, enzymes, primers, and analysis equipment. However, only the abstract is available, which limits
+    the ability to identify specific tools that would normally be detailed in the Methods section.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "reverse transcriptase-PCR"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "we have used reverse transcriptase-PCR amplification followed by SSCP and DNA sequence analysis to screen for mutations"
+    whyMissed: "RT-PCR is a standard molecular biology technique that requires specific enzymes and reagents, but may not have been recognized as a discrete tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "SSCP"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "reverse transcriptase-PCR amplification followed by SSCP and DNA sequence analysis to screen for mutations"
+    whyMissed: "SSCP (Single Strand Conformation Polymorphism) is a specific molecular technique that requires specialized reagents and conditions"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "DNA sequence analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "reverse transcriptase-PCR amplification followed by SSCP and DNA sequence analysis to screen for mutations"
+    whyMissed: "DNA sequencing in 1994 would have involved computational analysis tools for sequence comparison and mutation detection"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "reverse transcriptase-PCR|RT-PCR"
+    toolType: "genetic_reagent"
+    examples: ["reverse transcriptase-PCR amplification"]
+    reasoning: "RT-PCR is a fundamental molecular biology technique that involves specific enzymes and reagents, commonly used in genetic analysis studies"
+
+  - patternType: "context_phrase"
+    pattern: "SSCP|Single Strand Conformation Polymorphism"
+    toolType: "genetic_reagent"
+    examples: ["followed by SSCP and DNA sequence analysis"]
+    reasoning: "SSCP is a specific molecular technique for detecting mutations that requires specialized reagents and protocols"
+
+  - patternType: "context_phrase"
+    pattern: "DNA sequence analysis|sequencing analysis"
+    toolType: "computational_tool"
+    examples: ["SSCP and DNA sequence analysis to screen for mutations"]
+    reasoning: "DNA sequence analysis involves computational tools for sequence comparison, alignment, and mutation detection, especially relevant for older publications"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # RT-PCR, SSCP, DNA sequence analysis
+  newPatternsCount: 3  # Patterns for molecular biology techniques
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Only abstract available - no Methods section to identify specific tools and reagents
+    - 1994 publication predates many modern computational tools and databases
+    - Mining may have missed fundamental molecular biology techniques (RT-PCR, SSCP)
+    - Limited text availability prevents comprehensive tool identification
+    - Abstract mentions techniques but not specific reagents, vendors, or protocols
+  recommendations: |
+    This publication represents a molecular genetics study that would have used multiple research tools,
+    but the mining found zero tools. Key recommendations:
+    
+    1. The mining patterns should be expanded to capture fundamental molecular biology techniques like RT-PCR and SSCP
+    2. For older publications (pre-2000), different patterns may be needed as tool naming conventions have evolved
+    3. Abstract-only publications are challenging for tool mining as Methods sections contain the detailed tool information
+    4. Consider whether techniques like "reverse transcriptase-PCR" should be classified as tools vs. general methods
+    5. DNA sequence analysis from 1994 era may represent early computational tools that deserve recognition
+    
+    The three potentially missed tools should be evaluated for inclusion, particularly RT-PCR which is a standard
+    molecular biology reagent/technique. However, the confidence is moderate due to limited text availability.

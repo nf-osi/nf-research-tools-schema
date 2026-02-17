@@ -1,0 +1,247 @@
+publicationMetadata:
+  pmid: "37140985"
+  title: "Basement membrane proteins in extracellular matrix characterize NF1 neurofibroma development and response to MEK inhibitor"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive laboratory research study investigating NF1 neurofibroma development using multiple experimental approaches:
+    - Animal models (mouse models with Nf1 mutations)
+    - Cell lines (human NF1 cell lines from ATCC)
+    - Computational tools (bioinformatics analysis, image analysis)
+    - Genetic reagents (siRNAs for gene knockdown)
+    - Antibodies (for Western blots and immunostaining)
+    
+    The study combines in vivo mouse studies, cell culture experiments, proteomics, single-cell RNA sequencing, and various molecular biology techniques. This type of publication would typically contain all major categories of lab research tools.
+  overallAssessment: |
+    This is a high-quality laboratory research publication that extensively uses multiple types of research tools across different experimental approaches. The comprehensive Methods section describes detailed protocols for animal studies, cell culture, molecular biology, proteomics, and bioinformatics analysis. The complete absence of mined tools is highly concerning and suggests a significant failure in the mining pipeline for this publication.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "H7;Nf1mut mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Methods Mice. The H7;Nf1mut mice have been described previously (10). Mice were maintained in a clean mouse facility at University of Texas Southwestern Medical Center."
+    whyMissed: "Specific mouse strain name with genetic modification notation not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "hTERT ipNF05.5"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The human pNF cell line hTERT ipNF05.5 (ATCC, CRL-3388) and the normal Schwann cell line hTERT ipn02.3 2λ (ATCC, CRL-3392) were cultured in DMEM"
+    whyMissed: "Cell line name with ATCC catalog number not detected by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "hTERT ipn02.3 2λ"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The human pNF cell line hTERT ipNF05.5 (ATCC, CRL-3388) and the normal Schwann cell line hTERT ipn02.3 2λ (ATCC, CRL-3392) were cultured in DMEM"
+    whyMissed: "Cell line name with ATCC catalog number and special characters not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cell Ranger 5.0.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Cell Ranger 5.0.1 (10x Genomics, https://www.10xgenomics.com/) was used to process the raw sequencing data. BCL files were converted to FASTQ files"
+    whyMissed: "Bioinformatics software with version number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat R package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The gene expression matrix from Cell Ranger was used as input to the Seurat R package (v4.0.2) for downstream analysis (53)."
+    whyMissed: "R package name with version not detected by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The length and width of DRGs were measured by ImageJ (NIH). The volume of each DRG was calculated by the formula length × width2 × 0.5."
+    whyMissed: "Common image analysis software not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Proteome Discoverer 2.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were acquired by the facility core and analyzed using Proteome Discoverer 2.4 (Thermo Fisher Scientific), followed by searching of the mouse protein database"
+    whyMissed: "Proteomics analysis software with version number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SASI_Hs01_00129008"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Two predesigned siRNAs against human NF1 were purchased from MilliporeSigma (SASI_Hs01_00129008 and SASI_Hs01_00129006)."
+    whyMissed: "siRNA catalog numbers not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SASI_Hs01_00129006"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Two predesigned siRNAs against human NF1 were purchased from MilliporeSigma (SASI_Hs01_00129008 and SASI_Hs01_00129006)."
+    whyMissed: "siRNA catalog numbers not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PD0325901"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "For MEKi treatment, 1 μg/mL PD0325901 (Selleckchem, S1036) was added to cell culture for 72 hours."
+    whyMissed: "Chemical compound with vendor information not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TGF-β1"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Recombinant human TGF-β1 (PeproTech, 100-21) was solubilized in PBS and dosed to 100 μg per kg body weight for 4 weeks."
+    whyMissed: "Recombinant protein with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][0-9]+;[A-Za-z0-9]+[a-z]+"
+    toolType: "animal_model"
+    examples: ["H7;Nf1mut"]
+    reasoning: "Mouse strain nomenclature with genetic modification notation commonly used in NF research"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(ATCC,\\s*[A-Z]+-[0-9]+\\)"
+    toolType: "cell_line"
+    examples: ["(ATCC, CRL-3388)", "(ATCC, CRL-3392)"]
+    reasoning: "ATCC catalog numbers are strong indicators of validated cell lines"
+
+  - patternType: "term"
+    pattern: "Cell Ranger\\s+[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Cell Ranger 5.0.1"]
+    reasoning: "10x Genomics Cell Ranger is widely used in single-cell RNA sequencing"
+
+  - patternType: "term"
+    pattern: "Seurat\\s+R\\s+package"
+    toolType: "computational_tool"
+    examples: ["Seurat R package"]
+    reasoning: "Seurat is the most common R package for single-cell RNA analysis"
+
+  - patternType: "term"
+    pattern: "Proteome Discoverer\\s+[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Proteome Discoverer 2.4"]
+    reasoning: "Thermo Fisher proteomics analysis software commonly used in mass spectrometry"
+
+  - patternType: "naming_convention"
+    pattern: "SASI_[A-Z][a-z][0-9]+_[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["SASI_Hs01_00129008", "SASI_Hs01_00129006"]
+    reasoning: "MilliporeSigma siRNA catalog number format"
+
+  - patternType: "context_phrase"
+    pattern: "siRNAs?\\s+against\\s+[A-Z0-9]+\\s+were\\s+purchased"
+    toolType: "genetic_reagent"
+    examples: ["siRNAs against human NF1 were purchased"]
+    reasoning: "Context phrase indicating commercial siRNA reagents"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+,\\s*[A-Z0-9]+-[0-9]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["(Selleckchem, S1036)", "(PeproTech, 100-21)"]
+    reasoning: "Vendor and catalog number format for chemical/biological reagents"
+
+observations:
+  - resourceName: "H7;Nf1mut mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Plexiform neurofibromas (pNFs) develop in H7;Nf1mut mice, serving as a model for NF1-associated tumor development. The study used these mice to investigate ECM dynamics during neurofibroma progression and response to MEK inhibitor treatment. DRG size quantification was performed to measure tumor burden.
+    foundIn: "methods"
+    contextSnippet: "The H7;Nf1mut mice have been described previously (10). Mice were maintained in a clean mouse facility... DRG size quantification. Whole spinal cord dissection was performed as previously described (4, 10), followed by image capture."
+    confidence: 1.0
+    doi: "https://doi.org/10.1172/jci168227"
+
+  - resourceName: "H7;Nf1mut mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0010768"
+    details: |
+      Mass spectrometry analysis revealed that basement membrane (BM) proteins, rather than major collagen isoforms, were the most upregulated ECM component during pNF development in H7;Nf1mut mice. Following MEK inhibitor treatment, the ECM profile showed overall downregulation, suggesting ECM reduction as a therapeutic benefit.
+    foundIn: "both"
+    contextSnippet: "We performed a systematic investigation of ECM enrichment during plexiform neurofibroma (pNF) development and identified basement membrane (BM) proteins, rather than major collagen isoforms, as the most upregulated ECM component."
+    confidence: 1.0
+    doi: "https://doi.org/10.1172/jci168227"
+
+  - resourceName: "TGF-β1"
+    resourceType: "Genetic Reagent"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      TGF-β1 overexpression promoted pNF progression in vivo when administered subcutaneously via osmotic minipump at 100 μg per kg body weight for 4 weeks. This demonstrated the role of TGF-β1 signaling in ECM dynamics and neurofibroma development.
+    foundIn: "both"
+    contextSnippet: "Indeed, TGF-β1 overexpression promoted pNF progression in vivo... TGF-β1 or vehicle was subcutaneously delivered by implantable osmotic minipump (RWD Life Science, 1004w)."
+    confidence: 1.0
+    doi: "https://doi.org/10.1172/jci168227"
+
+  - resourceName: "Cell Ranger 5.0.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Cell Ranger 5.0.1 was used to process raw single-cell RNA sequencing data. BCL files were converted to FASTQ files and aligned to mouse (mm10) reference transcriptome. Transcript counts of each cell were quantified using unique molecular identifier and valid cell barcode.
+    foundIn: "methods"
+    contextSnippet: "Cell Ranger 5.0.1 (10x Genomics, https://www.10xgenomics.com/) was used to process the raw sequencing data. BCL files were converted to FASTQ files and aligned to mouse (mm10) reference transcriptome."
+    confidence: 1.0
+    doi: "https://doi.org/10.1172/jci168227"
+
+  - resourceName: "Seurat R package"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Seurat R package (v4.0.2) was used for downstream single-cell RNA sequencing analysis. The workflow included filtering cells with fewer than 200 genes and high mitochondrial content, LogNormalize global-scaling normalization, identification of highly variable genes, SNN graph construction, and cluster identification with resolution 0.4, resulting in 14 clusters.
+    foundIn: "methods"
+    contextSnippet: "The gene expression matrix from Cell Ranger was used as input to the Seurat R package (v4.0.2) for downstream analysis (53). Cells with fewer than 200 genes per cell and high mitochondrial gene content were filtered out."
+    confidence: 1.0
+    doi: "https://doi.org/10.1172/jci168227"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 8
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Molecular: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - zero tools detected despite extensive Methods section
+    - Publication contains numerous clearly identifiable research tools across multiple categories
+    - Animal models, cell lines, computational tools, and genetic reagents all present but missed
+    - Mining patterns appear inadequate for capturing standard laboratory tools
+    - Vendor information and catalog numbers not being utilized for tool identification
+  recommendations: |
+    This represents a complete failure of the mining pipeline for a tool-rich publication. Immediate actions needed:
+    
+    1. URGENT: Review and expand mining patterns to capture basic laboratory tools
+    2. Add patterns for ATCC cell lines with catalog numbers
+    3. Include common bioinformatics tools (Cell Ranger, Seurat, ImageJ, Proteome Discoverer)
+    4. Capture mouse strain nomenclature with genetic modifications
+    5. Detect siRNA catalog numbers and chemical compounds with vendor info
+    6. Implement vendor-catalog number patterns as strong tool indicators
+    
+    All 11 missed tools should be added to the database as they represent genuine, well-documented research tools used in this study. The observations extracted demonstrate the scientific value that can be captured when tools are properly identified.
+    
+    This publication serves as an excellent test case for validating improved mining patterns, as it contains clear examples of tools across multiple categories with proper experimental context.

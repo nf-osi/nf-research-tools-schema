@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "7485397"
+  title: "Neurofibromatosis type 2 protein co-localizes with elements of the cytoskeleton."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving protein localization, immunostaining, and cell culture.
+    Despite lacking a formal Methods section, the abstract describes experimental procedures using multiple
+    research tools including monoclonal antibodies, cell lines, and microscopy techniques.
+  overallAssessment: |
+    This is a 1995 laboratory research publication studying NF2 protein localization using immunological
+    and cell biology techniques. The study clearly uses research tools (antibodies, cell lines, microscopy)
+    but the mining system failed to detect any tools, likely due to the limited text available (abstract only).
+    Multiple genuine research tools should have been identified from the experimental descriptions.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "monoclonal antibodies to amino- and carboxyl-terminal synthetic NF2 peptides"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Using monoclonal antibodies to amino- and carboxyl-terminal synthetic NF2 peptides we demonstrate the co-localization of the NF2 protein with elements of the cytoskeleton"
+    whyMissed: "Mining patterns likely don't capture the full descriptive phrase 'monoclonal antibodies to amino- and carboxyl-terminal synthetic NF2 peptides'"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "COS cell model system"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "we demonstrate the co-localization of the NF2 protein with elements of the cytoskeleton in a COS cell model system and in cultured human cells"
+    whyMissed: "COS cells are a standard cell line but may not be in the mining dictionary, or the phrase 'COS cell model system' wasn't recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "cultured human cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "in a COS cell model system and in cultured human cells. Furthermore, the presence of the NF2 protein in tissue sections is shown"
+    whyMissed: "Generic term 'cultured human cells' is too vague for specific cell line identification, but represents a cell culture system"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "cultured smooth muscle cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The monoclonal antibodies specifically stain smooth muscle cells and the stratum granulosum of the human epidermis. In cultured smooth muscle cells the NF2 protein co-localizes with actin stress fibers"
+    whyMissed: "Specific cell type mentioned as 'cultured smooth muscle cells' but may be too generic or not in mining patterns"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "immunoelectron microscopy"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "In cultured smooth muscle cells the NF2 protein co-localizes with actin stress fibers. Immunoelectron microscopy demonstrates the presence of the NF2 protein associated with keratohyalin granules"
+    whyMissed: "Immunoelectron microscopy is a technique/method but could be considered a research tool/instrument"
+    confidence: 0.60
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "monoclonal antibodies to .+ peptides"
+    toolType: "antibody"
+    examples: ["monoclonal antibodies to amino- and carboxyl-terminal synthetic NF2 peptides"]
+    reasoning: "This pattern would catch antibodies described with their target peptide sequences, which is common in older literature"
+
+  - patternType: "term"
+    pattern: "COS cells?"
+    toolType: "cell_line"
+    examples: ["COS cell model system"]
+    reasoning: "COS cells are a widely used cell line that should be captured. Pattern should include variations like 'COS cell', 'COS cells', 'COS cell line'"
+
+  - patternType: "context_phrase"
+    pattern: "cultured .+ cells"
+    toolType: "cell_line"
+    examples: ["cultured human cells", "cultured smooth muscle cells"]
+    reasoning: "Many cell culture systems are described as 'cultured [cell type] cells' and represent legitimate research tools"
+
+  - patternType: "naming_convention"
+    pattern: "immunoelectron microscopy|transmission electron microscopy|scanning electron microscopy"
+    toolType: "computational_tool"
+    examples: ["immunoelectron microscopy"]
+    reasoning: "Microscopy techniques are research tools/instruments that should be captured, especially when used for specific experimental procedures"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication lacks Methods, Results, and Discussion sections (only abstract available)
+    - Multiple genuine research tools are described in the abstract but were not detected
+    - Mining system appears to have significant gaps in pattern recognition for this type of content
+  recommendations: |
+    This publication represents a significant mining failure - multiple genuine research tools were completely
+    missed despite clear experimental descriptions in the abstract. The tools that should have been detected include:
+    1. Monoclonal antibodies to NF2 peptides (high confidence)
+    2. COS cell model system (high confidence)
+    3. Cultured cell systems (moderate confidence)
+    
+    The suggested patterns should be implemented to improve detection of:
+    - Antibodies described with target peptide information
+    - Standard cell lines like COS cells
+    - Cell culture systems described as "cultured [type] cells"
+    - Microscopy techniques as research instruments
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the experimental
+    design suggests this study would have generated valuable phenotypic and cellular observations about
+    NF2 protein localization and cytoskeletal interactions.

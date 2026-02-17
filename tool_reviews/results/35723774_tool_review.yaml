@@ -1,0 +1,89 @@
+publicationMetadata:
+  pmid: "35723774"
+  title: "A randomized controlled trial of remote microphone listening devices to treat auditory deficits in children with neurofibromatosis type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, outcome measures), possibly computational tools for statistical analysis
+    
+    This randomized controlled trial would be expected to use:
+    - Clinical assessment tools for measuring hearing/communication outcomes
+    - Standardized questionnaires for patient-reported outcomes
+    - Speech perception tests for objective measurement
+    - Potentially statistical software for analysis (though not mentioned in available text)
+    
+    Note: Clinical trials are a major source of clinical assessment tools, even when they don't use traditional laboratory research tools.
+  overallAssessment: |
+    This is a randomized controlled trial testing an intervention (remote microphone devices) in pediatric NF1 patients. Clinical trials typically use validated assessment tools to measure outcomes, and this study should contain clinical assessment tools for hearing/communication evaluation. The presence of specific outcome measures (CNC-word test, LIFE-R Questionnaire) indicates genuine research tools were used but not captured by the mining process.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CNC-word test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Speech perception ability in background noise was evaluated in device-active and inactive conditions using the CNC-word test."
+    whyMissed: "Clinical assessment tool not captured - may need patterns for speech/hearing assessment tools"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "LIFE-R Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Listening and communication ratings (LIFE-R Questionnaire) were obtained at baseline and at the end of each treatment phase."
+    whyMissed: "Clinical questionnaire not captured - may need patterns for questionnaire/rating scale detection"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "evaluated.*using the [A-Z-]+ test"
+    toolType: "clinical_assessment_tool"
+    examples: ["evaluated in device-active and inactive conditions using the CNC-word test"]
+    reasoning: "Pattern to catch clinical tests/assessments introduced with 'using the [TEST NAME]'"
+    
+  - patternType: "context_phrase"
+    pattern: "ratings.*\\([A-Z-]+ Questionnaire\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Listening and communication ratings (LIFE-R Questionnaire)"]
+    reasoning: "Pattern to catch questionnaires mentioned in parentheses after rating/assessment context"
+    
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-[A-Z] (Questionnaire|Scale|Test|Assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["LIFE-R Questionnaire"]
+    reasoning: "Pattern for abbreviated clinical assessment tool names with descriptive suffix"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this clinical trial despite clear usage of clinical assessment tools
+    - CNC-word test and LIFE-R Questionnaire are legitimate clinical assessment tools that should have been captured
+    - Mining patterns appear insufficient for clinical assessment tool detection in this context
+    - Limited text availability (only abstract and methods) may have contributed to missed tools
+  recommendations: |
+    This publication demonstrates a significant gap in clinical assessment tool mining:
+    
+    1. **Add the missed tools**: Both CNC-word test and LIFE-R Questionnaire are legitimate clinical assessment tools used in this randomized controlled trial
+    
+    2. **Improve clinical tool patterns**: The suggested patterns would help capture similar assessment tools in future mining
+    
+    3. **Context-based detection**: Clinical trials often introduce assessment tools with phrases like "evaluated using", "measured with", "ratings obtained using"
+    
+    4. **Questionnaire detection**: Many clinical tools are questionnaires mentioned in parentheses after descriptive text
+    
+    5. **No observations extracted**: Limited text availability (no Results/Discussion sections) prevented extraction of scientific observations about tool performance
+    
+    This case highlights the importance of comprehensive clinical assessment tool mining patterns, as clinical trials are a major source of validated outcome measures and assessment instruments.

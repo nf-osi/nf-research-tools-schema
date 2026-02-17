@@ -1,0 +1,95 @@
+publicationMetadata:
+  pmid: "7947085"
+  title: "Frequency of allele loss of DCC, p53, RBI, WT1, NF1, NM23 and APC/MCC in colorectal cancer assayed by fluorescent multiplex polymerase chain reaction."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - describes molecular biology methods and experimental results
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study using fluorescent multiplex PCR for allele loss detection in colorectal tumors.
+    Expected tools include:
+    - Genetic reagents: PCR primers, microsatellite markers, fluorescent probes
+    - Computational tools: PCR analysis software, allele sizing software
+    - Potentially cell lines or tissue samples (though not explicitly mentioned in abstract)
+    
+    The study focuses on molecular genetic analysis rather than cell culture or animal models.
+  overallAssessment: |
+    This is a laboratory research publication describing the development and application of fluorescent multiplex PCR
+    for detecting allele loss at tumor suppressor gene loci in colorectal cancer. The study would typically use
+    genetic reagents (primers, probes, microsatellite markers) and computational tools for PCR analysis and allele sizing.
+    However, only the abstract is available, limiting detailed tool identification.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "fluorescent multiplex polymerase chain reaction"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We report here the use of multiplex fluorescent polymerase chain reaction (PCR) for quantitative allele loss detection using microsatellites"
+    whyMissed: "This is a specific molecular biology technique/method that could be considered a genetic reagent or assay protocol"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "microsatellite polymorphisms"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "using microsatellites with 2-5 base pair repeat motifs...We have used microsatellite polymorphisms which map within, or are closely linked to, these tumour-suppressor gene loci"
+    whyMissed: "Microsatellite markers are specific genetic reagents used for genotyping and allele loss detection"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "fluorescent multiplex PCR assays"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "These rapid, and mostly gene-specific, fluorescent multiplex PCR assays for allele loss detection could be modified to devise a single molecular diagnostic test"
+    whyMissed: "Specific PCR assays developed for allele loss detection - these are research tools/reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "microsatellite (polymorphisms?|markers?)"
+    toolType: "genetic_reagent"
+    examples: ["microsatellites with 2-5 base pair repeat motifs", "microsatellite polymorphisms which map within"]
+    reasoning: "Microsatellite markers are commonly used genetic reagents for genotyping and linkage analysis"
+  
+  - patternType: "context_phrase"
+    pattern: "(fluorescent|multiplex) PCR (assays?|methods?)"
+    toolType: "genetic_reagent"
+    examples: ["fluorescent multiplex polymerase chain reaction", "fluorescent multiplex PCR assays"]
+    reasoning: "Specific PCR-based assays and methods are research tools, especially when described as developed or optimized"
+  
+  - patternType: "naming_convention"
+    pattern: "allele loss detection (assays?|methods?)"
+    toolType: "genetic_reagent"
+    examples: ["fluorescent multiplex PCR assays for allele loss detection"]
+    reasoning: "Specific molecular diagnostic assays are research tools when developed or applied in studies"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were initially mined despite this being a molecular biology research paper
+    - Only abstract text available - Methods section would contain detailed tool information
+    - Several genetic reagents (microsatellite markers, PCR assays) appear to have been missed
+    - Limited text availability restricts comprehensive tool identification
+  recommendations: |
+    Overall recommendations for this publication:
+    - The mining appears to have missed several legitimate genetic reagents mentioned in the abstract
+    - Microsatellite polymorphisms and fluorescent multiplex PCR assays should be considered for addition
+    - The publication describes laboratory research with molecular biology tools, but limited text availability hampers comprehensive analysis
+    - Suggested patterns could help capture similar genetic reagents and molecular assays in future mining
+    - No observations could be extracted due to lack of Results/Discussion sections
+    - This case highlights the importance of having full-text access for accurate tool mining

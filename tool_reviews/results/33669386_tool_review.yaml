@@ -1,0 +1,119 @@
+publicationMetadata:
+  pmid: "33669386"
+  title: "Spontaneous and Engineered Large Animal Models of Neurofibromatosis Type 1."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review articles typically do not contain research tools used in original experiments.
+    They may mention tools in the context of discussing other studies, but these would be
+    citations rather than actual tool usage. This review focuses on animal models as
+    research subjects rather than tools used to study them.
+    
+    Expected tool types for this publication type:
+    - Unlikely to contain: antibodies, cell lines, genetic reagents, computational tools,
+      organoids, PDX models, clinical assessment tools
+    - May mention: animal models (as research subjects, not tools)
+    
+    Note: Animal models mentioned in reviews are typically research subjects being
+    discussed, not tools being used by the authors for experiments.
+  overallAssessment: |
+    This is a comprehensive review article discussing spontaneous and engineered large
+    animal models of neurofibromatosis type 1. Review articles synthesize existing
+    literature rather than report original experimental work, so they typically do not
+    use research tools directly. Any tools mentioned would be in the context of
+    discussing other studies' methodologies. The absence of a Methods section confirms
+    this is not an experimental study.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Cre-Lox system"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Moreover, NF1 mouse models are heavily reliant on the Cre-Lox system, which does not accurately reflect the molecular mechanism..."
+    whyMissed: "This is a genetic engineering system mentioned in the context of discussing limitations of mouse models"
+    confidence: 0.3
+    shouldBeAdded: No
+    reasoning: "While Cre-Lox is a genetic tool, it's mentioned here in a review context discussing limitations of existing models, not as a tool used by the authors"
+
+  - toolName: "CRISPR/Cas9"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...advances in gene editing and reproductive technologies like CRISPR/Cas9 and somatic cell nuclear transfer (SCNT) have enabled researchers..."
+    whyMissed: "This gene editing technology is mentioned as an enabling technology in the field"
+    confidence: 0.2
+    shouldBeAdded: No
+    reasoning: "CRISPR/Cas9 is mentioned in general terms as a field advancement, not as a specific tool used in experiments by the authors"
+
+  - toolName: "somatic cell nuclear transfer (SCNT)"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...advances in gene editing and reproductive technologies like CRISPR/Cas9 and somatic cell nuclear transfer (SCNT) have enabled researchers..."
+    whyMissed: "This reproductive technology is mentioned alongside CRISPR as an enabling technology"
+    confidence: 0.2
+    shouldBeAdded: No
+    reasoning: "SCNT is mentioned as a general reproductive technology advancement, not as a specific tool used by the authors"
+
+  - toolName: "NF1+/- minipigs"
+    toolType: "animal_model"
+    foundIn: "introduction"
+    contextSnippet: "...We and others have recently developed a gene-edited pig carrying a germline heterozygous loss of function mutation in the NF1 gene, and characterization of NF1+/− minipigs..."
+    whyMissed: "This appears to be an animal model developed by the authors, but mentioned in review context"
+    confidence: 0.4
+    shouldBeAdded: Maybe
+    reasoning: "While this could be considered a tool, it's mentioned in the context of the authors' previous work being reviewed, not as a tool actively used in this publication"
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "heavily reliant on the"
+    toolType: "general"
+    examples: ["NF1 mouse models are heavily reliant on the Cre-Lox system"]
+    reasoning: "This phrase often indicates discussion of tools/methods used in other studies, but in review context rather than active usage"
+
+  - patternType: "context_phrase"
+    pattern: "advances in.*technologies.*like"
+    toolType: "general"
+    examples: ["advances in gene editing and reproductive technologies like CRISPR/Cas9"]
+    reasoning: "This pattern identifies general technology discussions in reviews, which are typically not active tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "gene-edited.*carrying.*mutation"
+    toolType: "animal_model"
+    examples: ["gene-edited pig carrying a germline heterozygous loss of function mutation"]
+    reasoning: "This pattern could identify engineered animal models, but context analysis needed to distinguish between tools used vs. models being reviewed"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not original experimental research
+    - No Methods section present, confirming lack of experimental procedures
+    - All tool mentions are in the context of discussing other studies' work
+    - No original experimental data or tool usage reported
+    - Tools mentioned (Cre-Lox, CRISPR, SCNT) are discussed as field technologies, not actively used
+  recommendations: |
+    This publication should not contribute any tools to the database as it is a review article
+    that synthesizes existing literature rather than reporting original experimental work.
+    The mining correctly identified zero tools. The potentially missed tools identified are
+    all mentioned in review context (discussing other studies' methods) rather than active
+    usage by the authors. Review articles are valuable for understanding the field but do
+    not typically contain research tools that should be cataloged in a tools database.
+    
+    Future mining should consider adding patterns to better distinguish between:
+    1. Active tool usage ("we used", "we analyzed with", "we generated")
+    2. Review context ("studies have used", "researchers rely on", "advances in")
+    3. Citation context ("as described by", "previously reported", "established methods")
+    
+    No observations were extracted as this review does not report original experimental
+    findings about specific tools.

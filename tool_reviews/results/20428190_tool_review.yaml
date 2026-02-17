@@ -1,0 +1,112 @@
+publicationMetadata:
+  pmid: "20428190"
+  title: "NF-1Score: a prediction score for internal neurofibromas in neurofibromatosis-1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study):
+    - Clinical assessment tools: The study develops a clinical prediction score (NF-1Score) which is itself a clinical assessment tool
+    - Computational tools: Statistical analysis requires software (Stata mentioned in methods)
+    
+    Note: Although queryType is "bench", this is clearly a clinical study developing a prediction score.
+    The study involves retrospective analysis of patient data and statistical modeling, not laboratory research.
+    Clinical studies commonly use computational tools for statistical analysis and may develop clinical assessment tools.
+  overallAssessment: |
+    This clinical study develops and validates a prediction score for internal neurofibromas in NF1 patients.
+    The study would be expected to contain clinical assessment tools (the NF-1Score itself) and computational tools for statistical analysis.
+    The retrospective design with logistic regression modeling indicates use of statistical software, which was confirmed (Stata v17.0 mentioned).
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "NF-1Score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Our purpose was to develop and to validate a clinical score for predicting internal neurofibromas in adults...The score computed by linear combination of the rounded coefficients of these four variables ranged from 0 to 40"
+    whyMissed: "The prediction score developed in this study is itself a clinical assessment tool, but may not have been recognized as such by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Stata"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All analyses were performed using Stata software, version 17.0 (StataCorp, College Station, TX, USA)"
+    whyMissed: "Statistical software with version number and vendor information should have been caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "prediction score|clinical score|risk score|assessment score"
+    toolType: "clinical_assessment_tool"
+    examples: ["NF-1Score: a prediction score for internal neurofibromas", "clinical score for predicting internal neurofibromas"]
+    reasoning: "Clinical prediction scores and risk assessment tools are valid clinical assessment tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "analyses were performed using|analyzed using|statistical analysis.*using"
+    toolType: "computational_tool"
+    examples: ["All analyses were performed using Stata software, version 17.0"]
+    reasoning: "This phrase pattern reliably indicates computational tool usage in statistical analysis contexts"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+software,?\\s+version\\s+[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Stata software, version 17.0"]
+    reasoning: "Software names with version numbers are strong indicators of computational tools and should be captured"
+
+observations:
+  - resourceName: "NF-1Score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # No MP ID for usage instructions
+    details: |
+      The NF-1Score is computed by linear combination of four variables: at least two subcutaneous neurofibromas (OR=4.7), 
+      age ≤30 years (OR=3.1), absence of cutaneous neurofibromas (OR=2.6), and fewer than six café-au-lait spots (OR=2.0). 
+      The score ranges from 0 to 40 (mean 12.8±10.8). Probability of internal neurofibromas is calculated as 
+      exp(-2.93+0.11×Score)/exp(1+(-2.93+0.11×Score)). The model showed good discrimination (AUC-ROC 0.75) and calibration 
+      in both development and validation datasets.
+    foundIn: "results"
+    contextSnippet: "The score computed by linear combination of the rounded coefficients of these four variables ranged from 0 to 40 (mean, 12.8+/-10.8). The probability of internal neurofibromas was computed as exp (-2.93+0.11Score)/exp (1+(-2.93+0.11Score)). Probabilities agreed well with the observed frequencies indicating good calibration, and discrimination was adequate (AUC-ROC, 0.75)"
+    confidence: 0.95
+    doi: "10.1038/jid.2010.100"
+
+  - resourceName: "NF-1Score"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # No MP ID for general comments
+    details: |
+      The NF-1Score demonstrated adequate discrimination with AUC-ROC of 0.75 in both development (208 patients) and 
+      validation (191 patients) datasets. The model showed good calibration with probabilities agreeing well with 
+      observed frequencies. Four variables were independently associated with internal neurofibromas and incorporated 
+      into the final score. Further work is needed to establish score thresholds for identifying high-risk patients.
+    foundIn: "both"
+    contextSnippet: "discrimination was adequate (AUC-ROC, 0.75) in both data sets. The presence of internal neurofibromas can be accurately predicted using a simple clinical score. Further work will establish the score threshold that identifies patients at high risk for complications"
+    confidence: 0.90
+    doi: "10.1038/jid.2010.100"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 2
+  observationsByType:
+    Usage Instructions: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Mining completely missed the primary clinical assessment tool (NF-1Score) that was developed in this study
+    - Statistical software (Stata v17.0) with clear version and vendor information was not captured
+    - Publication was classified as "bench" query type but is clearly a clinical study
+    - No tools were mined despite clear presence of both clinical assessment and computational tools
+  recommendations: |
+    - Add the NF-1Score as a clinical assessment tool - this is the main contribution of the paper
+    - Add Stata v17.0 as a computational tool used for statistical analysis
+    - Improve mining patterns to capture clinical prediction scores and risk assessment tools
+    - Enhance patterns for statistical software with version numbers
+    - Consider reclassifying query type logic to better distinguish clinical vs bench research
+    - The observations extracted provide valuable information about the performance and usage of the NF-1Score

@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "28542306"
+  title: "Gene signature associated with benign neurofibroma transformation to malignant peripheral nerve sheath tumors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, packages, pipelines) - EXPECTED
+    - Potentially genetic reagents if analyzing specific datasets
+    - Lab tools unlikely as this is purely computational meta-analysis
+    - Clinical assessment tools unlikely as this focuses on gene expression
+
+    This is a meta-analysis integrating genomic data from public databases (GEO, ArrayExpress)
+    using computational methods. Should contain multiple bioinformatics tools and software packages.
+  overallAssessment: |
+    This is a computational meta-analysis study that integrates gene expression data from multiple
+    microarray studies to identify biomarkers for neurofibroma-to-MPNST transformation. The study
+    extensively uses bioinformatics tools and software packages for data processing, statistical
+    analysis, and visualization. Given the computational nature and detailed Methods section,
+    multiple computational tools should be present but were apparently missed by the mining process.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "R/BioConductor"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Each microarray was preprocessed and evaluated independently using the R/BioConductor software environment [63]."
+    whyMissed: "Standard bioinformatics environment not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MEDIPS R package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Methylation data were downloaded from GEO, and inspected and analyzed using the MEDIPS R package [68]."
+    whyMissed: "Specific R package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PANTHER v.10"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The over-representation test for GO terms from GO Ontology database release 2016_09_24 (The Gene Ontology Consortium, 2015) was performed through PANTHER v.10 (release 20160715; [64])"
+    whyMissed: "Bioinformatics tool with version number not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "EnrichNet tool"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The EnrichNet tool [65] was used to inspect KEGG, BioCarta, Wiki Pathways and Reactome databases"
+    whyMissed: "Tool name not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SOTA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Genes were grouped using SOTA [66] implemented in the analysis and visualization tool MultiexperimentViewer MeV v. 4.9 [67]."
+    whyMissed: "Algorithm/method name not caught by patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MultiexperimentViewer MeV v. 4.9"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Genes were grouped using SOTA [66] implemented in the analysis and visualization tool MultiexperimentViewer MeV v. 4.9 [67]."
+    whyMissed: "Software with version number not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NFFinder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The search for opposite and similar gene signatures in CMap-DrugMatrix and GEO databases in NFFinder was performed as described [20]."
+    whyMissed: "Specialized bioinformatics tool name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pbinom function"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we calculated the accumulated probability of a binomial distribution P(X≥x) using the pbinom function from the R stats package"
+    whyMissed: "R function name not recognized as tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "cor.test function"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Pearson's product-moment correlation was calculated using the cor.test function from the R stats package."
+    whyMissed: "R function name not recognized as tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "edgeR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The edgeR.logFC and edgeR.adj.pval (<0.1) values obtained for MPNST vs. NF"
+    whyMissed: "R package for differential expression analysis not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "R/BioConductor|Bioconductor"
+    toolType: "computational_tool"
+    examples: ["R/BioConductor software environment"]
+    reasoning: "Standard bioinformatics environment frequently used but not caught"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+v\\.?\\s*\\d+(\\.\\d+)*\\b"
+    toolType: "computational_tool"
+    examples: ["PANTHER v.10", "MultiexperimentViewer MeV v. 4.9"]
+    reasoning: "Software names with version numbers are strong indicators of computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "using the .+ (package|tool|software|function)"
+    toolType: "computational_tool"
+    examples: ["using the MEDIPS R package", "using the pbinom function"]
+    reasoning: "Context phrases indicating software usage"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z]{2,}\\s+(package|tool|software)\\b"
+    toolType: "computational_tool"
+    examples: ["MEDIPS R package"]
+    reasoning: "Capitalized tool names with descriptive terms"
+
+  - patternType: "context_phrase"
+    pattern: "(performed through|implemented in|analyzed using|processed with)\\s+[A-Z][a-zA-Z]+"
+    toolType: "computational_tool"
+    examples: ["performed through PANTHER", "implemented in MultiexperimentViewer"]
+    reasoning: "Action phrases indicating tool usage in analysis"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[a-z]+R\\b"
+    toolType: "computational_tool"
+    examples: ["edgeR"]
+    reasoning: "R packages often end with 'R' suffix"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined despite this being a computational study with extensive tool usage
+    - Multiple computational tools clearly mentioned in Methods section were missed
+    - Mining patterns appear inadequate for bioinformatics/computational tools
+    - Standard R/Bioconductor environment and packages not detected
+    - Software with version numbers not caught (PANTHER v.10, MeV v.4.9)
+    - Specialized bioinformatics tools (NFFinder, EnrichNet, SOTA) not recognized
+  recommendations: |
+    - ALL 10 potentially missed tools should be added to the mining results
+    - This represents a significant failure of the computational tool mining patterns
+    - The 6 suggested patterns should be implemented to catch similar tools in future mining
+    - Focus on improving detection of:
+      * R packages and Bioconductor tools
+      * Software with version numbers
+      * Bioinformatics analysis tools
+      * Statistical functions and methods
+    - Consider separate mining strategies for different publication types (lab vs computational)
+    - This publication demonstrates the need for better computational tool pattern coverage

@@ -1,0 +1,136 @@
+publicationMetadata:
+  pmid: "33767727"
+  title: "Molecular Diagnosis of Neurofibromatosis by Multigene Panel Testing."
+  queryType: "bench"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical molecular diagnostics study that uses genetic testing methods. Expected tool types:
+    - Computational tools: sequencing analysis software, primer design tools
+    - Genetic reagents: DNA extraction kits, sequencing libraries, capture probes
+    - Clinical assessment tools: potentially diagnostic criteria or assessment scales (though not prominent in this study)
+    
+    The study focuses on molecular diagnosis using multigene panel testing and Sanger sequencing,
+    so computational tools for sequence analysis and genetic reagents for sample preparation are expected.
+    Traditional lab research tools (antibodies, cell lines, animal models) are not expected as this is
+    a clinical diagnostic study on patient samples.
+  overallAssessment: |
+    This clinical molecular diagnostics study would typically use computational tools for sequence analysis
+    and genetic reagents for DNA extraction and library preparation. The detailed Methods section describes
+    multigene panel testing, Sanger sequencing, and ultradeep sequencing procedures, indicating active use
+    of molecular diagnostic tools rather than just observational clinical assessment.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Primer 3.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Primers were designed based on the mutation sites found using Primer 3.0. An ABI PRISM 3730XL analyzer"
+    whyMissed: "Software name with version number in clear usage context for primer design"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AxyPrep Blood Genomic DNA Miniprep Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Genomic DNA was extracted from the peripheral blood, skin lesions, hair, oral mucosa, and tumor tissues separately using the AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China)"
+    whyMissed: "Commercial kit with vendor information used for DNA extraction"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "DNeasy Blood & Tissue Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using the AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China) and DNeasy Blood & Tissue Kit (Qiagen, Germany)"
+    whyMissed: "Commercial kit with vendor information used for DNA extraction"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit dsDNA HS Assay Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "quantified with a Qubit 2.0 Fluorometer using the Qubit dsDNA HS Assay Kit (Life Technologies, Thermo Fisher Scientific, Inc.)"
+    whyMissed: "Commercial assay kit with vendor information used for DNA quantification"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Roche NimbleGen Sequence Capture SeqCap EZ Library"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "the capture probe from the Roche NimbleGen Sequence Capture SeqCap EZ Library was used to capture a total of 569 genes associated with hereditary dermatosis"
+    whyMissed: "Commercial sequence capture library with vendor information used for targeted sequencing"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina HiSeq X Ten System"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing was carried out on an Illumina HiSeq X Ten System (Illumina, San Diego, CA, United States) under sequencing efficiency with an average sequencing depth > 200× and Q30 > 90%"
+    whyMissed: "Sequencing platform that includes both hardware and software components for data analysis"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "Kit \\([A-Za-z]+,.*?\\)"
+    toolType: "genetic_reagent"
+    examples: ["AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China)", "DNeasy Blood & Tissue Kit (Qiagen, Germany)"]
+    reasoning: "Commercial kits with vendor information in parentheses are reliable indicators of genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "designed.*using [A-Za-z0-9\\s\\.]+"
+    toolType: "computational_tool"
+    examples: ["Primers were designed based on the mutation sites found using Primer 3.0"]
+    reasoning: "Design context phrases often indicate computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z]+\\s+[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Primer 3.0"]
+    reasoning: "Software names with version numbers are strong indicators of computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "extracted.*using.*Kit"
+    toolType: "genetic_reagent"
+    examples: ["Genomic DNA was extracted from the peripheral blood, skin lesions, hair, oral mucosa, and tumor tissues separately using the AxyPrep Blood Genomic DNA Miniprep Kit"]
+    reasoning: "Extraction procedures using commercial kits are reliable indicators of genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "carried out on.*System"
+    toolType: "computational_tool"
+    examples: ["Sequencing was carried out on an Illumina HiSeq X Ten System"]
+    reasoning: "Analysis or sequencing carried out on named systems often indicates computational tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to identify any tools despite clear presence of computational tools and genetic reagents
+    - Publication contains detailed Methods section with multiple commercial kits and software tools
+    - Mining patterns appear insufficient for clinical molecular diagnostics studies
+    - Vendor information and version numbers were not captured effectively
+  recommendations: |
+    This publication contains several legitimate research tools that were completely missed by initial mining:
+    - Primer 3.0 software should definitely be added as a computational tool
+    - Multiple commercial DNA extraction and quantification kits should be added as genetic reagents
+    - The Roche NimbleGen capture library is a specialized genetic reagent for targeted sequencing
+    - Sequencing platforms like Illumina HiSeq may warrant inclusion as computational tools
+    
+    The mining patterns need significant improvement for clinical molecular diagnostics studies:
+    - Better recognition of commercial kit names with vendor information
+    - Improved detection of software tools with version numbers
+    - Enhanced context phrases for molecular biology procedures
+    
+    No scientific observations were extracted as this is primarily a methods/diagnostics paper
+    focused on genetic testing procedures rather than experimental findings about tool performance.

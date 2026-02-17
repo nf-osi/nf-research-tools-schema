@@ -1,0 +1,140 @@
+publicationMetadata:
+  pmid: "7996175"
+  title: "Hepatocyte growth factor is a mitogen for Schwann cells and is present in neurofibromas."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental language and in vitro studies
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - In vitro Schwann cell culture experiments
+    - DNA synthesis assays
+    - mRNA expression analysis
+    - Neutralizing antibody experiments
+    - Analysis of human tissue samples (neurofibromas)
+    
+    Expected tools: primary cell cultures (rat Schwann cells), antibodies (anti-HGF neutralizing antibodies), 
+    growth factors/reagents (HGF, forskolin, TGF-beta, FGF), and potentially animal models for cell isolation.
+    
+    Note: Despite only having abstract text, the experimental descriptions clearly indicate multiple research tools were used.
+  overallAssessment: |
+    This is a laboratory research publication describing in vitro experiments with Schwann cell cultures, 
+    growth factor treatments, and molecular analysis. The study clearly used multiple research tools including 
+    cell cultures, antibodies, and biochemical reagents, even though no tools were initially mined. The absence 
+    of full-text sections likely prevented proper tool detection.
+
+toolValidations: []  # No tools were initially mined to validate
+
+potentiallyMissedTools:
+  - toolName: "rat Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "HGF is a potent mitogen for purified rat Schwann cells; DNA synthesis in rat Schwann cells was stimulated 20-40-fold by 3-10 ng/ml HGF"
+    whyMissed: "Primary cell culture not detected - may need patterns for 'purified [species] [cell type] cells'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-HGF neutralizing antibodies"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "anti-HGF neutralizing antibodies failed to block neuron-stimulated Schwann cell proliferation"
+    whyMissed: "Neutralizing antibody pattern not detected - need patterns for 'anti-[target] neutralizing antibodies'"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "hepatocyte growth factor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "we tested the ability of hepatocyte growth factor (HGF) to stimulate Schwann cell division in vitro. HGF is a potent mitogen for purified rat Schwann cells"
+    whyMissed: "Growth factor/protein reagent not detected - need patterns for growth factors used as experimental reagents"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "forskolin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "its activity is abolished by forskolin and is not inhibited or potentiated by addition of transforming growth factor beta"
+    whyMissed: "Small molecule reagent not detected - need patterns for pharmacological compounds used in experiments"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "transforming growth factor beta"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "is not inhibited or potentiated by addition of transforming growth factor beta (TGF beta)"
+    whyMissed: "Growth factor reagent not detected - TGF-beta is a common experimental reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "fibroblast growth factor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "is not inhibited or potentiated by addition of transforming growth factor beta (TGF beta) or fibroblast growth factor (FGF)"
+    whyMissed: "Growth factor reagent not detected - FGF is a common experimental reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "purified [species] [cell type] cells"
+    toolType: "cell_line"
+    examples: ["purified rat Schwann cells"]
+    reasoning: "Primary cell cultures are often described as 'purified [species] [cell type] cells' and represent important research tools"
+
+  - patternType: "term"
+    pattern: "anti-[target] neutralizing antibodies"
+    toolType: "antibody"
+    examples: ["anti-HGF neutralizing antibodies"]
+    reasoning: "Neutralizing antibodies are functional antibodies used in experiments but may be missed by simpler antibody patterns"
+
+  - patternType: "context_phrase"
+    pattern: "stimulated by [compound]|treated with [compound]|addition of [compound]"
+    toolType: "genetic_reagent"
+    examples: ["stimulated 20-40-fold by 3-10 ng/ml HGF", "addition of transforming growth factor beta"]
+    reasoning: "Growth factors and biochemical reagents used in experimental treatments should be captured"
+
+  - patternType: "term"
+    pattern: "growth factor|mitogen|cytokine"
+    toolType: "genetic_reagent"
+    examples: ["hepatocyte growth factor", "transforming growth factor beta", "fibroblast growth factor"]
+    reasoning: "Protein reagents like growth factors are essential research tools but may not be captured by current patterns"
+
+  - patternType: "naming_convention"
+    pattern: "[protein name] \\([ABBREVIATION]\\)"
+    toolType: "genetic_reagent"
+    examples: ["hepatocyte growth factor (HGF)", "transforming growth factor beta (TGF beta)", "fibroblast growth factor (FGF)"]
+    reasoning: "Protein reagents are often written with full name followed by abbreviation in parentheses"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were initially mined despite clear experimental content
+    - Only abstract text available - full Methods section would likely contain many more tools
+    - Multiple research tools clearly described in abstract were completely missed
+    - Current mining patterns appear inadequate for detecting primary cell cultures, neutralizing antibodies, and protein reagents
+    - Publication from 1994 may have different terminology/formatting that current patterns don't capture
+  recommendations: |
+    Overall recommendations for this publication:
+    - This is a clear false negative case - multiple legitimate research tools were missed
+    - At least 6 research tools should have been detected from the abstract alone
+    - The mining system needs better patterns for:
+      * Primary cell cultures ("purified rat Schwann cells")
+      * Neutralizing antibodies ("anti-HGF neutralizing antibodies") 
+      * Growth factors and protein reagents (HGF, TGF-beta, FGF, forskolin)
+    - Full-text access would likely reveal many additional tools in Methods section
+    - This publication demonstrates significant gaps in current tool detection capabilities
+    - Recommend manual curation to add the 6 missed tools identified
+    - Use this paper as a test case for improving mining patterns for biochemical reagents and primary cell cultures

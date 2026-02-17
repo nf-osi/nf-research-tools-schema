@@ -1,0 +1,240 @@
+publicationMetadata:
+  pmid: "15206577"
+  title: "Gene expression analysis of the lung following paraquat administration in rats using DNA microarray."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a laboratory research study involving:
+    - Animal models (Sprague-Dawley rats)
+    - Molecular biology techniques (DNA microarray)
+    - Immunohistochemistry (antibodies)
+    - Biochemical assays (commercial kits)
+    - Statistical analysis software
+    
+    Expected tool types: animal models, antibodies, genetic reagents, computational tools
+  overallAssessment: |
+    This is a comprehensive laboratory research study that should contain multiple research tools.
+    The study involves animal experimentation, molecular analysis, immunohistochemistry, and statistical analysis.
+    The complete absence of mined tools indicates a significant failure in the mining process, as the methods section
+    clearly describes the use of specific antibodies, animal models, DNA microarrays, and software tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Sprague-Dawley rats"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Eight-week-old male Sprague-Dawley rats were purchased from the Animal Research and Service Centre, Health Campus, USM, Kubang Kerian, Kelantan, Malaysia."
+    whyMissed: "Standard animal model strain name not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DNA microarray"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Gene expression changes in the lungs induced by paraquat (PQ) administration were studied in rats using DNA microarrays that were detectable for 1,090 genes per DNA microarray."
+    whyMissed: "Generic term for molecular biology reagent not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TyrH antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "incubated overnight with TyrH antibody raised in rabbit (AB152, Millipore, 1:10,000 dilution) at 4°C"
+    whyMissed: "Antibody with catalog number and vendor information not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "IBM SPSS software version 22.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using IBM SPSS software version 22.0 (Armonk, NY, USA)."
+    whyMissed: "Statistical software with version number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "horseradish peroxidase-conjugated secondary antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "incubated with horseradish peroxidase- (HRP-) conjugated secondary antibody"
+    whyMissed: "Secondary antibody description not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cayman Chemical assay kits"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The assay kits for quantifying total protein, SOD, GPx, GR, GST, total GSH, and MDA were purchased from Cayman Chemical Company (USA)."
+    whyMissed: "Commercial biochemical assay kits not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "BioAssay Systems CAT assay kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The assay kit for CAT was purchased from BioAssay Systems (USA)."
+    whyMissed: "Specific enzyme assay kit not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cusabio Biotech ELISA kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "the midbrain tyrosine hydroxylase (TyrH) concentration was measured using an ELISA kit from Cusabio Biotech, China."
+    whyMissed: "ELISA kit with vendor information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+-[A-Z][a-z]+ rats?|[A-Z][a-z]+/[A-Z][a-z]+ rats?"
+    toolType: "animal_model"
+    examples: ["Sprague-Dawley rats", "Wistar rats", "C57BL/6 mice"]
+    reasoning: "Standard laboratory animal strain nomenclature follows specific naming patterns that should be captured"
+
+  - patternType: "term"
+    pattern: "DNA microarray|microarray|gene chip|expression array"
+    toolType: "genetic_reagent"
+    examples: ["DNA microarrays that were detectable for 1,090 genes"]
+    reasoning: "Microarray technology is a fundamental molecular biology tool that should be systematically captured"
+
+  - patternType: "context_phrase"
+    pattern: "antibody.*\\([A-Z0-9]+,\\s*[A-Za-z\\s]+\\)"
+    toolType: "antibody"
+    examples: ["TyrH antibody raised in rabbit (AB152, Millipore, 1:10,000 dilution)"]
+    reasoning: "Antibodies with catalog numbers and vendor information in parentheses are clear tool indicators"
+
+  - patternType: "vendor_indicator"
+    pattern: "assay kit[s]?.*from\\s+[A-Z][a-zA-Z\\s]+(?:Company|Systems|Biotech|Inc\\.?|Corp\\.?)"
+    toolType: "genetic_reagent"
+    examples: ["assay kits for quantifying total protein, SOD, GPx, GR, GST, total GSH, and MDA were purchased from Cayman Chemical Company"]
+    reasoning: "Commercial assay kits with vendor information are legitimate research reagents"
+
+  - patternType: "term"
+    pattern: "SPSS|SAS|R\\s+version|Python\\s+\\d|MATLAB|ImageJ|GraphPad"
+    toolType: "computational_tool"
+    examples: ["IBM SPSS software version 22.0"]
+    reasoning: "Common statistical and analysis software should be systematically captured with version information"
+
+  - patternType: "context_phrase"
+    pattern: "ELISA kit.*from\\s+[A-Z][a-zA-Z\\s]+(?:Biotech|Inc\\.?|Corp\\.?)"
+    toolType: "genetic_reagent"
+    examples: ["ELISA kit from Cusabio Biotech, China"]
+    reasoning: "ELISA kits are standard biochemical reagents that should be captured when vendor is specified"
+
+observations:
+  - resourceName: "Sprague-Dawley rats"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      All PQ-treated groups (PQ, PQ + TH, and PQ + QH) showed significantly lower body weight gain 
+      compared to vehicle control groups (N and TH) (p = 0.003 at week 1 and p < 0.001 at weeks 2, 3, and 4 
+      when compared to week 0). The significantly smaller gains in body weight were observed as early as 
+      one week following the first PQ administration.
+    foundIn: "results"
+    contextSnippet: "the body weight gain in all PQ-treated groups (PQ, PQ + TH, and PQ + QH) was significantly lower than in the vehicle control groups (N and TH) (p = 0.003 at week 1 and p < 0.001 at weeks 2, 3, and 4 when compared to week 0"
+    confidence: 1.0
+    doi: "10.2131/jts.29.91"
+
+  - resourceName: "Sprague-Dawley rats"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Immunohistochemical assessment of the SNpc showed a significant reduction in the number of 
+      TyrH-positive neurons in group PQ compared to control (p = 0.007), indicating damage to 
+      dopaminergic neurons. Treatment with ubiquinol significantly increased the number of 
+      TyrH-positive neurons (p = 0.039). Tualang honey treatment also increased TyrH-positive 
+      neurons but did not reach statistical significance (p = 0.059).
+    foundIn: "results"
+    contextSnippet: "The number of TyrH-positive neurons counted in the three midbrain sections containing the SNpc was significantly lower in group PQ than in group N (p = 0.007). However, treatment with QH significantly increased the number of TyrH-positive neurons (p = 0.039)."
+    confidence: 1.0
+    doi: "10.2131/jts.29.91"
+
+  - resourceName: "Sprague-Dawley rats"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0001764"
+    details: |
+      PQ-intoxicated rats showed significantly lower total SOD activity in lungs than control 
+      (p < 0.005) and honey (p < 0.05) groups. GST activity was significantly lower in PQ-treated 
+      rats than in control group (p < 0.005). Midbrain GPx activity was significantly lower in 
+      groups PQ and PQ + QH (p < 0.05). Treatment with Tualang honey or ubiquinol restored SOD 
+      activity to levels comparable to vehicle control.
+    foundIn: "results"
+    contextSnippet: "PQ-intoxicated rats (group PQ) showed significantly lower total SOD activity than the control (p < 0.005) and honey (p < 0.05) groups. The PQ-intoxicated rats that received honey (p < 0.05) or ubiquinol treatments (p < 0.05) showed significantly greater SOD activity"
+    confidence: 1.0
+    doi: "10.2131/jts.29.91"
+
+  - resourceName: "TyrH antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      TyrH antibody (AB152, Millipore) was used at 1:10,000 dilution for overnight incubation at 4°C 
+      in immunohistochemical staining. The antibody successfully detected tyrosine hydroxylase-positive 
+      dopaminergic neurons in the substantia nigra pars compacta (SNpc) region. Tissue sections from 
+      striatum served as positive control and liver as negative control.
+    foundIn: "methods"
+    contextSnippet: "incubated overnight with TyrH antibody raised in rabbit (AB152, Millipore, 1:10,000 dilution) at 4°C. The tissues were then rinsed with 1x TBS wash buffer, incubated with horseradish peroxidase- (HRP-) conjugated secondary antibody"
+    confidence: 1.0
+    doi: "10.2131/jts.29.91"
+
+  - resourceName: "IBM SPSS software version 22.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      IBM SPSS software version 22.0 was used for statistical analysis. Data analysis included 
+      one-way ANOVA for normally distributed data followed by Tukey's post hoc test for pairwise 
+      comparisons. For non-normally distributed data, Kruskal-Wallis test was used followed by 
+      Mann-Whitney U-test for pairwise comparisons. Statistical significance was set at p < 0.05.
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using IBM SPSS software version 22.0 (Armonk, NY, USA). Data that were normally distributed are presented as the mean (standard deviation). The differences among the means of the groups were analyzed using one-way analysis of variance (ANOVA)."
+    confidence: 1.0
+    doi: "10.2131/jts.29.91"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Body Weight: 1
+    Nervous System: 1
+    Molecular: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete mining failure: No tools were detected despite this being a comprehensive laboratory research study
+    - Multiple legitimate research tools present: animal models, antibodies, genetic reagents, computational tools
+    - Clear experimental context with detailed methods section describing tool usage
+    - Commercial reagents with catalog numbers and vendor information not captured
+    - Standard laboratory animal strain nomenclature missed
+    - Statistical software with version information not detected
+  recommendations: |
+    This publication represents a significant mining failure. All 8 potentially missed tools should be added:
+    - Sprague-Dawley rats (animal model) - fundamental to the study
+    - DNA microarray (genetic reagent) - core technology mentioned in title
+    - TyrH antibody with catalog number (antibody) - specific experimental reagent
+    - IBM SPSS software (computational tool) - statistical analysis platform
+    - Multiple commercial assay kits (genetic reagents) - biochemical analysis tools
+    
+    The suggested patterns should be implemented to prevent similar failures:
+    - Animal strain nomenclature patterns
+    - Microarray/gene chip terminology
+    - Antibody catalog number patterns
+    - Commercial kit vendor patterns
+    - Statistical software patterns
+    
+    Scientific observations were successfully extracted for validated tools, showing good experimental detail
+    and quantitative data. The study provides clear phenotypic and molecular observations that would be
+    valuable for the research community.

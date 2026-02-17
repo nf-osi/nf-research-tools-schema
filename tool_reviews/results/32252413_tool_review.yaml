@@ -1,0 +1,115 @@
+publicationMetadata:
+  pmid: "32252413"
+  title: "Genomics of MPNST (GeM) Consortium: Rationale and Study Design for Multi-Omic Characterization of NF1-Associated and Sporadic MPNSTs."
+  queryType: "bench"
+  publicationType: "Study Design/Protocol"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a study design/protocol paper describing plans for multi-omic analysis of MPNST tumors.
+    Expected tool types include:
+    - Computational tools: Mentioned sequencing analysis methods (bulk whole genome sequencing, RNAseq, DNA methylation profiling, deep exome sequencing)
+    - Clinical assessment tools: References to "International MPNST Registry" for clinical data collection
+    - Potentially patient-derived models: Working with fresh frozen tumor specimens from patients
+    
+    Note: This is a protocol/design paper describing PLANNED analyses rather than completed experiments,
+    so tools may be mentioned as intended methods rather than actively used tools.
+  overallAssessment: |
+    This publication describes the rationale and study design for a multi-institutional consortium
+    to perform multi-omic characterization of MPNSTs. While it lacks a traditional Methods section,
+    it describes planned analytical approaches including genomic sequencing, transcriptomics, and
+    epigenetic profiling. The paper would be expected to mention computational tools for planned
+    analyses and potentially clinical assessment tools for data collection.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "bulk whole genome sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "We will characterize these tumors with bulk whole genome sequencing, RNAseq, and DNA methylation profiling."
+    whyMissed: "Sequencing methodology mentioned as planned analysis approach, but may be too general/methodological rather than specific tool"
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "RNAseq"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "We will characterize these tumors with bulk whole genome sequencing, RNAseq, and DNA methylation profiling."
+    whyMissed: "RNA sequencing mentioned as planned methodology, but represents general technique rather than specific software tool"
+    confidence: 0.2
+    shouldBeAdded: No
+    
+  - toolName: "DNA methylation profiling"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "We will characterize these tumors with bulk whole genome sequencing, RNAseq, and DNA methylation profiling."
+    whyMissed: "Methylation analysis mentioned as planned approach, but too general to be considered specific tool"
+    confidence: 0.2
+    shouldBeAdded: No
+    
+  - toolName: "deep exome sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Subsequent multi-omic analyses of additional archival specimens will include deep exome sequencing (500×) and high density copy number arrays"
+    whyMissed: "Exome sequencing mentioned with specific coverage depth, but represents methodology rather than specific tool"
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "International MPNST Registry"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Clinical data have been collected as part of the International MPNST Registry."
+    whyMissed: "Registry mentioned for clinical data collection, could be considered a clinical data collection tool"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+    
+  - toolName: "cloud-based platform"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Digital pathology images are being collected in a cloud-based platform for consensus review."
+    whyMissed: "Digital pathology platform mentioned but too generic without specific software name"
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "Registry"
+    toolType: "clinical_assessment_tool"
+    examples: ["International MPNST Registry"]
+    reasoning: "Clinical registries serve as data collection tools and should be captured when mentioned in context of data collection"
+    
+  - patternType: "naming_convention"
+    pattern: "multi-omic|multi-omics"
+    toolType: "computational_tool"
+    examples: ["multi-omic analysis", "multi-omic dataset"]
+    reasoning: "Multi-omic approaches often involve specific computational pipelines and analysis tools that should be identified"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - This is a study design/protocol paper describing planned analyses rather than completed experiments
+    - No Methods section present, only abstract and brief discussion
+    - Most mentions are of general methodological approaches (sequencing, profiling) rather than specific tools
+    - The "International MPNST Registry" could potentially be considered a clinical assessment tool
+    - No specific software, reagents, or experimental tools are named
+  recommendations: |
+    The mining results appear correct - this publication contains no specific research tools.
+    It describes planned methodological approaches (sequencing, profiling) but does not name
+    specific software, reagents, or experimental tools. The International MPNST Registry
+    could potentially be considered a clinical data collection tool, but this would require
+    manual curator review to determine if registries should be included as clinical assessment tools.
+    
+    This type of study design/protocol paper typically would not contain specific research tools
+    since it describes planned work rather than completed experiments. The absence of mined tools
+    is appropriate for this publication type.

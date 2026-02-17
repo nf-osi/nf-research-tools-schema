@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "28198162"
+  title: "The health-related quality of life of children, adolescents, and young adults with neurofibromatosis type 1 and their families: Analysis of narratives."
+  queryType: "unknown"  # From PubMed query (hint only)
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.9  # High confidence based on abstract mentioning "developing the Pediatric Quality of Life Inventory™ (PedsQL™) NF1 module"
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Questionnaire/Survey Development):
+    - Clinical assessment tools: Expected - this study is developing the PedsQL™ NF1 module
+    - Computational tools: Possible - qualitative data analysis may use software
+    - Lab research tools: Unlikely - this is not laboratory research
+    
+    This publication focuses on qualitative interviews and questionnaire development for measuring
+    health-related quality of life in NF1 patients. Clinical assessment tools are the primary
+    expected tool type, specifically the PedsQL™ instrument mentioned in the abstract.
+
+  overallAssessment: |
+    This publication is questionnaire/survey development research focused on creating a disease-specific
+    quality of life assessment tool (PedsQL™ NF1 module). Such studies typically develop, validate, or
+    use clinical assessment tools for measuring patient-reported outcomes. The absence of a Methods
+    section is typical for qualitative research. Clinical assessment tools are highly expected in this
+    context, and the PedsQL™ mentioned in the abstract should have been detected as a validated tool.
+
+toolValidations: []
+  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Pediatric Quality of Life Inventory™ (PedsQL™)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Data were drawn from qualitative interviews conducted for a larger study aimed at developing the Pediatric Quality of Life Inventory™ (PedsQL™) NF1 module."
+    whyMissed: "The mining patterns likely missed this due to the trademark symbols (™) and the fact it's mentioned as being 'developed' rather than 'used'. The tool name includes special characters and is embedded in a complex sentence structure."
+    confidence: 0.95  # Very high confidence this is a validated clinical assessment tool
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL™ NF1 module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Data were drawn from qualitative interviews conducted for a larger study aimed at developing the Pediatric Quality of Life Inventory™ (PedsQL™) NF1 module."
+    whyMissed: "This is the disease-specific module of PedsQL being developed in this study. Mining patterns may not have recognized this as a distinct tool or may have been confused by the 'developing' context rather than 'using' context."
+    confidence: 0.9  # High confidence this is a specific clinical assessment tool
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL|Pediatric Quality of Life Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pediatric Quality of Life Inventory™ (PedsQL™)", "PedsQL™ NF1 module"]
+    reasoning: "PedsQL is a widely validated pediatric quality of life assessment tool with disease-specific modules. The trademark symbols and various naming formats should be captured."
+
+  - patternType: "context_phrase"
+    pattern: "aimed at developing.*(?:questionnaire|inventory|scale|assessment|tool|instrument)"
+    toolType: "clinical_assessment_tool"
+    examples: ["aimed at developing the Pediatric Quality of Life Inventory™ (PedsQL™) NF1 module"]
+    reasoning: "Tool development context is important for clinical assessment tools. Many studies develop or validate instruments rather than just using existing ones."
+
+  - patternType: "naming_convention"
+    pattern: ".*™.*(?:module|scale|inventory|questionnaire)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pediatric Quality of Life Inventory™ (PedsQL™) NF1 module"]
+    reasoning: "Trademark symbols (™, ®) often indicate validated, proprietary clinical assessment tools that should be captured."
+
+  - patternType: "context_phrase"
+    pattern: "health-related quality of life|HRQoL"
+    toolType: "clinical_assessment_tool"
+    examples: ["health-related quality of life (HRQoL)"]
+    reasoning: "HRQoL studies typically use validated assessment instruments. This context phrase could help identify clinical assessment tools in quality of life research."
+
+observations: []
+  # No validated tools to extract observations from, since no tools were initially mined and would need to be added first
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # PedsQL and PedsQL NF1 module
+  newPatternsCount: 4  # Four new patterns suggested
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - Critical clinical assessment tool missed: PedsQL™ (Pediatric Quality of Life Inventory) mentioned in abstract
+    - Disease-specific module missed: PedsQL™ NF1 module being developed in this study
+    - Mining patterns appear inadequate for clinical assessment tools with trademark symbols
+    - Tool development context ("aimed at developing") not recognized as valid tool usage
+    - No tools detected despite this being questionnaire/survey development research where clinical assessment tools are expected
+  recommendations: |
+    Strong recommendations for this publication:
+    - ADD the missed PedsQL™ tools - these are validated clinical assessment instruments
+    - This publication type (questionnaire development) should be a high-priority target for clinical assessment tool mining
+    - Improve mining patterns to handle trademark symbols (™, ®) in tool names
+    - Expand context recognition to include tool "development" and "validation" scenarios, not just "usage"
+    - Consider that clinical studies often lack traditional Methods sections but still use/develop valid research tools
+    - The suggested patterns would significantly improve detection of clinical assessment tools in similar publications
+    - Future mining should prioritize quality of life and patient-reported outcome studies for clinical assessment tools

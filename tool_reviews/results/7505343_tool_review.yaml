@@ -1,0 +1,148 @@
+publicationMetadata:
+  pmid: "7505343"
+  title: "Modulation of the neurofibromatosis type 1 gene product, neurofibromin, during Schwann cell differentiation."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research), expected tool categories include:
+    - Cell lines (Schwann cell lines mentioned in abstract)
+    - Antibodies (for protein detection/immunostaining)
+    - Genetic reagents (for gene expression analysis)
+    - Computational tools (for data analysis, ImageJ mentioned in methods)
+    
+    Note: There appears to be a data mismatch between the 1993 publication metadata/abstract
+    and the methods section which describes much more recent techniques (electrospinning,
+    carbon nanotubes, electrical stimulation). The methods section contains extensive
+    experimental protocols that would typically use multiple research tools.
+  overallAssessment: |
+    This appears to be a laboratory research study that would typically use multiple research tools.
+    However, there's a significant data integrity issue - the 1993 publication metadata and abstract
+    don't match the modern methods section describing advanced biomaterials and electrical stimulation.
+    The methods section alone contains numerous tools that should have been mined but weren't detected.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MT4H1"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...the modulation of NF1 gene expression in a Schwann cell line (MT4H1) stimulated to either proliferate or differentiate..."
+    whyMissed: "Schwann cell line name mentioned in abstract but not detected by mining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ipNF 95.11b"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Immortalized NF1 patient derived Schwann cell (NF SC, NF-/-) line, ipNF 95.11b and Wild type Schwann cell..."
+    whyMissed: "Patient-derived Schwann cell line with specific identifier not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ipn 02.8"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Wild type Schwann cell (WT SC, NF+/+) line, ipn 02.8 were utilized for all experiments..."
+    whyMissed: "Wild-type Schwann cell line with specific identifier not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Fiber diameter and angle were measured using ImageJ (v1.53a) with at least 200 fibers per fiber type..."
+    whyMissed: "Software with version number mentioned for image analysis but not detected"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "s-100b antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Schwann cells were incubated with antibody against s-100b (Sigma) as the primary overnight at 1:400 ratio..."
+    whyMissed: "Primary antibody with vendor information not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-rabbit IgG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...treated with anti-rabbit IgG as secondary (Alexa Fluro 594, Invitrogen) for 2 hours at 1:1000 ratio..."
+    whyMissed: "Secondary antibody with fluorophore and vendor information not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DAPI"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...and counterstained with DAPI (Fisher Scientific) for 5 minutes at 1:2500 ratio for nuclei staining..."
+    whyMissed: "Nuclear stain with vendor information not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...connected to a Raspberry Pi running a Python script to store the data in near real time..."
+    whyMissed: "Programming language used for data acquisition not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[a-zA-Z]+\\s*\\d+[a-zA-Z]*\\d*\\b"
+    toolType: "cell_line"
+    examples: ["MT4H1", "ipNF 95.11b", "ipn 02.8"]
+    reasoning: "Cell line naming conventions with alphanumeric identifiers are commonly missed"
+
+  - patternType: "context_phrase"
+    pattern: "antibody against\\s+([a-zA-Z0-9-]+)"
+    toolType: "antibody"
+    examples: ["antibody against s-100b"]
+    reasoning: "Phrase 'antibody against' followed by target protein name reliably indicates antibody usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z\\s]+\\)"
+    toolType: "general"
+    examples: ["(Sigma)", "(Invitrogen)", "(Fisher Scientific)"]
+    reasoning: "Vendor names in parentheses after reagents indicate commercial research tools"
+
+  - patternType: "term"
+    pattern: "ImageJ\\s*\\(v?\\d+\\.\\d+[a-z]?\\)"
+    toolType: "computational_tool"
+    examples: ["ImageJ (v1.53a)"]
+    reasoning: "Software names with version numbers in parentheses indicate computational tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "measured using\\s+([A-Za-z]+)"
+    toolType: "computational_tool"
+    examples: ["measured using ImageJ"]
+    reasoning: "Phrase 'measured using' followed by software name indicates computational tool usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL DATA INTEGRITY ISSUE: Publication metadata (PMID 7505343, 1993) and abstract don't match the methods section
+    - The methods section appears to be from a different, much more recent study about biomaterials and electrical stimulation
+    - Mining failed to detect ANY tools despite extensive methods section with clear tool usage
+    - Multiple cell lines, antibodies, and computational tools are explicitly mentioned but not captured
+    - No Results or Discussion sections provided, preventing observation extraction
+  recommendations: |
+    - URGENT: Verify data integrity - the methods section does not belong to PMID 7505343
+    - If this is the correct publication, the mining system has severe deficiencies and missed 8+ clear tools
+    - The patterns suggested would catch most of the missed tools in this publication
+    - Manual curator review required to determine correct publication content
+    - Cannot extract observations without proper Results/Discussion sections
+    - Consider implementing vendor name detection as tools are often mentioned with commercial sources
+    - Cell line naming convention patterns need improvement to catch alphanumeric identifiers

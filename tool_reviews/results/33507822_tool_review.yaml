@@ -1,0 +1,145 @@
+publicationMetadata:
+  pmid: "33507822"
+  title: "NF106: A Neurofibromatosis Clinical Trials Consortium Phase II Trial of the MEK Inhibitor Mirdametinib (PD-0325901) in Adolescents and Adults With NF1-Related Plexiform Neurofibromas."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (patient-reported outcome measures, pain scales, quality of life instruments), computational tools for statistical analysis and pharmacokinetic modeling
+    
+    This Phase II clinical trial would be expected to contain:
+    - Clinical assessment tools: Patient-reported outcome measures (PROs), pain scales, quality of life questionnaires
+    - Computational tools: Statistical analysis software, pharmacokinetic modeling software
+    - NOT expected: Lab research tools (antibodies, cell lines, animal models) as this is a clinical study in human patients
+  overallAssessment: |
+    This Phase II clinical trial publication would typically contain clinical assessment tools and computational analysis tools.
+    Clinical trials routinely use validated patient-reported outcome measures to assess treatment efficacy and safety.
+    Pharmacokinetic analysis requires specialized computational tools for modeling drug exposure and clearance.
+    The publication has a detailed Methods section describing patient assessments and analysis procedures, indicating tool usage.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Numerical Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Numerical Rating Scale-11 is a self-report measure of pain intensity that was adapted to assess PN-related pain for NF1 clinical trials. Patients were asked to choose their most important tumor pain and rate it from 0 (no pain) to 10 (worst pain) in the past week."
+    whyMissed: "Clinical assessment tool with specific name and validation context not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Brief Pain Inventory Pain Interference subscale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Brief Pain Inventory Pain Interference subscale assesses the impact of pain on daily functioning in seven areas from 0 (does not interfere) to 10 (completely interfered) in the past week; it yields a mean total score."
+    whyMissed: "Validated clinical assessment instrument with specific subscale name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Pediatric Quality of Life Inventory NF1 module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Pediatric Quality of Life Inventory NF1 module is a disease-specific health-related quality-of-life (QOL) measure assessing 16 domains. Responses on a five-point Likert scale are transformed to a scale of 0-100 (higher scores = better QOL)"
+    whyMissed: "Disease-specific quality of life instrument with detailed scoring description not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Phoenix WinNonlin"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A noncompartmental analysis was performed to estimate area under the concentration-time curve from time 0 to 12 hours (AUC 0-12h) after a single dose of mirdametinib using Phoenix WinNonlin (Version 8.1; Certara, Princeton, NJ)."
+    whyMissed: "Pharmacokinetic analysis software with version number and vendor not captured by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NONMEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A population pharmacokinetics (PK) analysis was also performed using nonlinear mixed effect modeling with NONMEM (version 7.2; ICON, Ellicott City, MD)"
+    whyMissed: "Specialized pharmacokinetic modeling software with version and vendor information not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Perl speaks NONMEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A population pharmacokinetics (PK) analysis was also performed using nonlinear mixed effect modeling with NONMEM (version 7.2; ICON, Ellicott City, MD) with Perl speaks NONMEM version 3.6.2"
+    whyMissed: "NONMEM interface software with version number not captured by patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Pirana"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A population pharmacokinetics (PK) analysis was also performed using nonlinear mixed effect modeling with NONMEM (version 7.2; ICON, Ellicott City, MD) with Perl speaks NONMEM version 3.6.2 and Pirana version 2.7.1 (Certara)."
+    whyMissed: "Pharmacokinetic modeling interface software with version and vendor not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SAS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The pain and QOL data were summarized with descriptive statistics (means, standard deviation [SD]) via SAS version 9.4 (Cary, NC)."
+    whyMissed: "Statistical analysis software with version and location information not captured by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Numerical Rating Scale|NRS-\\d+|Brief Pain Inventory|Pediatric Quality of Life Inventory|PedsQL"
+    toolType: "clinical_assessment_tool"
+    examples: ["Numerical Rating Scale-11", "Brief Pain Inventory Pain Interference subscale", "Pediatric Quality of Life Inventory NF1 module"]
+    reasoning: "Clinical assessment tools often have standardized names with specific scales or modules that should be captured"
+
+  - patternType: "term"
+    pattern: "Phoenix WinNonlin|NONMEM|Perl speaks NONMEM|Pirana"
+    toolType: "computational_tool"
+    examples: ["Phoenix WinNonlin (Version 8.1)", "NONMEM (version 7.2)", "Perl speaks NONMEM version 3.6.2", "Pirana version 2.7.1"]
+    reasoning: "Pharmacokinetic analysis software has specific names that are commonly used in clinical pharmacology studies"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measures?|PRO measures?|self-report measure|quality-of-life.*measure|QOL measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["Patients completed patient-reported outcome measures", "self-report measure of pain intensity", "quality-of-life (QOL) measure"]
+    reasoning: "Context phrases that indicate clinical assessment tools are being administered to patients"
+
+  - patternType: "context_phrase"
+    pattern: "pharmacokinetic analysis.*using|PK analysis.*using|noncompartmental analysis.*using|population pharmacokinetics.*using"
+    toolType: "computational_tool"
+    examples: ["pharmacokinetic analysis was performed using", "noncompartmental analysis was performed to estimate...using"]
+    reasoning: "Pharmacokinetic analysis context phrases reliably indicate computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "version \\d+\\.\\d+|Version \\d+\\.\\d+|v\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["Version 8.1", "version 7.2", "version 3.6.2", "version 2.7.1", "version 9.4"]
+    reasoning: "Version numbers with software names are strong indicators of computational tool usage with specific versions"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely missed all tools in this clinical trial publication
+    - No tools were initially identified despite clear presence of clinical assessment tools and computational analysis software
+    - Clinical assessment tools (patient-reported outcome measures) were not captured by existing patterns
+    - Pharmacokinetic analysis software with version numbers and vendors were not identified
+    - Statistical analysis software (SAS) with version information was missed
+  recommendations: |
+    All 8 potentially missed tools should be added to the mining results:
+    - 3 clinical assessment tools (NRS-11, Brief Pain Inventory, PedsQL NF1 module) are validated instruments used for patient outcomes
+    - 5 computational tools (Phoenix WinNonlin, NONMEM, Perl speaks NONMEM, Pirana, SAS) are specialized software for pharmacokinetic and statistical analysis
+    - The mining patterns need significant improvement for clinical publications, especially for patient-reported outcome measures
+    - Version numbers and vendor information should be strong signals for computational tool identification
+    - Context phrases around "patient-reported outcome measures" and "pharmacokinetic analysis" should trigger tool detection
+    - This publication demonstrates the need for clinical assessment tool patterns that capture standardized instruments
+    - No observations could be extracted as Results and Discussion sections were not available in the input data

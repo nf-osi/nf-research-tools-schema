@@ -1,0 +1,99 @@
+publicationMetadata:
+  pmid: "2491778"
+  title: "Flanking markers for the gene causing von Recklinghausen neurofibromatosis (NF1)."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"  # Genetic mapping/linkage analysis study
+  publicationTypeConfidence: 0.8  # High confidence - clear genetic analysis methodology
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Based on publication type (genetic mapping/linkage analysis from 1989):
+    - Genetic reagents: DNA markers, probes, restriction enzymes for linkage analysis
+    - Computational tools: Statistical software for multipoint linkage analysis (though likely not explicitly named in 1989)
+    
+    However, this appears to be a genetic mapping study using chromosomal markers rather than 
+    experimental research tools. The "markers" mentioned (D17Z1, EW 207) are chromosomal loci 
+    used for linkage analysis, not research reagents that would be purchased or developed.
+    
+    Given the 1989 timeframe and focus on genetic mapping, this publication is unlikely to 
+    contain the types of research tools typically mined (antibodies, cell lines, modern 
+    computational tools, etc.).
+  overallAssessment: |
+    This 1989 genetic mapping study focuses on chromosomal localization of the NF1 gene using 
+    linkage analysis. While it mentions DNA markers, these appear to be chromosomal loci rather 
+    than research tools. The lack of a Methods section and the purely genetic mapping approach 
+    suggest minimal use of experimental research tools. The study predates many modern molecular 
+    biology tools and focuses on statistical genetic analysis rather than experimental manipulation.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "D17Z1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...multipoint linkage analysis suggests that the NF1 gene is flanked by D17Z1 on the centromeric side and by EW 207 on the telomeric side..."
+    whyMissed: "This appears to be a chromosomal locus/marker used for genetic mapping rather than a research reagent. In 1989 genetic mapping context, these were likely RFLP markers or chromosomal landmarks rather than purchasable research tools."
+    confidence: 0.2  # Low confidence this is a research tool
+    shouldBeAdded: No
+    
+  - toolName: "EW 207"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...multipoint linkage analysis suggests that the NF1 gene is flanked by D17Z1 on the centromeric side and by EW 207 on the telomeric side..."
+    whyMissed: "Similar to D17Z1, this appears to be a chromosomal marker/locus used for genetic mapping rather than a research tool. The naming convention suggests it may be a DNA probe or RFLP marker, but without Methods section, cannot confirm if this represents a purchasable reagent."
+    confidence: 0.3  # Low confidence this is a research tool
+    shouldBeAdded: Maybe
+    
+  - toolName: "multipoint linkage analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "A multipoint linkage analysis suggests that the NF1 gene is flanked by D17Z1 on the centromeric side..."
+    whyMissed: "This is a statistical method/analysis approach rather than a specific software tool. In 1989, this would likely have been performed using general statistical software or custom programs, but no specific tool is named."
+    confidence: 0.1  # Very low confidence this represents a specific tool
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "chromosomal loci|genetic loci|RFLP marker|DNA probe"
+    toolType: "genetic_reagent"
+    examples: ["D17Z1", "EW 207"]
+    reasoning: "These context phrases could help distinguish between chromosomal locations (not tools) and actual DNA probes/markers (potential tools). However, careful manual review would be needed as many genetic mapping studies reference loci rather than reagents."
+    
+  - patternType: "naming_convention"
+    pattern: "^[A-Z]+\\s*\\d+$"
+    toolType: "genetic_reagent"
+    examples: ["EW 207"]
+    reasoning: "This pattern might catch DNA probe/marker naming conventions from older genetic mapping studies, but would need careful validation to distinguish from chromosomal loci designations."
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # D17Z1, EW 207, multipoint linkage analysis
+  newPatternsCount: 2  # Context phrases and naming conventions for genetic markers
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}  # No observations found
+  majorIssuesFound: |
+    - Publication from 1989 predates many modern research tools typically mined
+    - Only abstract available - no Methods section to confirm experimental procedures
+    - Focus on genetic mapping/linkage analysis rather than experimental tool usage
+    - Mentioned "markers" (D17Z1, EW 207) appear to be chromosomal loci rather than research reagents
+    - Statistical analysis methods mentioned but no specific software tools named
+  recommendations: |
+    This publication should likely be excluded from tool mining efforts because:
+    1. It's a 1989 genetic mapping study that predates most modern research tools
+    2. The "markers" mentioned are chromosomal loci used for genetic mapping, not research reagents
+    3. No Methods section available to confirm any experimental tool usage
+    4. The focus is on statistical genetic analysis rather than experimental manipulation
+    
+    The mining algorithm correctly identified zero tools. The potential markers (D17Z1, EW 207) 
+    would require expert genetic mapping knowledge to determine if they represent actual DNA 
+    probes/reagents or just chromosomal landmarks. Given the 1989 timeframe and genetic mapping 
+    context, they are likely the latter.
+    
+    For future mining: Consider excluding very old publications (pre-1990s) or publications 
+    focused purely on genetic mapping/linkage analysis unless they explicitly mention 
+    experimental procedures or reagent usage.

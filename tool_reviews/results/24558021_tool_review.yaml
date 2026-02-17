@@ -1,0 +1,197 @@
+publicationMetadata:
+  pmid: "24558021"
+  title: "Proteomic screening identifies a YAP-driven signaling network linked to tumor cell proliferation in human schwannomas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a proteomic screening study analyzing human schwannoma tumors using multiple experimental approaches.
+    Expected tools include: antibodies (for immunohistochemistry and protein detection), computational tools 
+    (for proteomic data analysis), and potentially cell lines (schwannoma cells mentioned in culture).
+    The study uses RTK arrays, reverse-phase protein arrays (RRPA), and immunohistochemistry - all requiring
+    specific antibodies and reagents.
+  overallAssessment: |
+    This laboratory research study clearly uses multiple research tools for proteomic analysis of human schwannomas.
+    The methods describe RTK arrays, reverse-phase protein array (RRPA), and immunohistochemistry approaches,
+    all of which require specific antibodies, reagents, and computational tools for data analysis.
+    The fact that no tools were initially mined suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Ki67"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...correlation between the expression and activity of signaling pathways and proliferation of tumor cells using Ki67 marker was investigated by reverse-phase protein array..."
+    whyMissed: "Ki67 is a well-known proliferation marker antibody used in immunohistochemistry and protein arrays, but may not have been recognized as an antibody tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "RTK arrays"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Large sets of human schwannomas, totaling 68 tumors, were analyzed using complementary proteomic approaches. RTK arrays identified the most frequently activated RTKs..."
+    whyMissed: "RTK (receptor tyrosine kinase) arrays are commercial protein/antibody arrays used for screening, but may not have been recognized as a research tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "reverse-phase protein array"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...The correlation between the expression and activity of signaling pathways and proliferation of tumor cells using Ki67 marker was investigated by reverse-phase protein array (RRPA)..."
+    whyMissed: "RRPA is a specific proteomic analysis platform/reagent system, but may not have been recognized in the mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "...In addition, Her2, Her3, and PDGFβ are transcriptional targets of Yes-associated protein (YAP) in schwannoma cells in culture..."
+    whyMissed: "Schwannoma cells in culture represents a cell line or primary cell culture system used for experimental work"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "immunohistochemistry"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Finally, immunohistochemistry was used to evaluate the expression pattern of signaling effectors in the tumors..."
+    whyMissed: "While immunohistochemistry is a technique, it implies the use of specific antibodies that should be captured as tools"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Ki67|Ki-67|MKI67"
+    toolType: "antibody"
+    examples: ["Ki67 marker", "Ki67 levels"]
+    reasoning: "Ki67 is a standard proliferation marker antibody widely used in research and should be automatically detected"
+
+  - patternType: "term"
+    pattern: "RTK array|receptor tyrosine kinase array"
+    toolType: "genetic_reagent"
+    examples: ["RTK arrays identified the most frequently activated RTKs"]
+    reasoning: "RTK arrays are commercial screening platforms that should be captured as research tools"
+
+  - patternType: "term"
+    pattern: "reverse-phase protein array|RRPA"
+    toolType: "genetic_reagent"
+    examples: ["reverse-phase protein array (RRPA)"]
+    reasoning: "RRPA is a specific proteomic analysis platform that should be recognized as a research tool"
+
+  - patternType: "context_phrase"
+    pattern: "\\w+ cells in culture|\\w+ cell line"
+    toolType: "cell_line"
+    examples: ["schwannoma cells in culture"]
+    reasoning: "Cells mentioned 'in culture' typically represent cell lines or primary cultures used as research tools"
+
+  - patternType: "context_phrase"
+    pattern: "using \\w+ marker|\\w+ marker was"
+    toolType: "antibody"
+    examples: ["using Ki67 marker"]
+    reasoning: "Protein markers used in experiments are typically antibodies and should be captured"
+
+  - patternType: "term"
+    pattern: "immunohistochemistry|IHC"
+    toolType: "antibody"
+    examples: ["immunohistochemistry was used"]
+    reasoning: "Immunohistochemistry implies the use of specific antibodies that should be captured, though this may require additional context analysis"
+
+observations:
+  - resourceName: "Ki67"
+    resourceType: "Antibody"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Ki67 levels are linked to YAP, p-Her3, and PDGFβ expression levels in human schwannomas.
+      This indicates that Ki67 (a proliferation marker) correlates with specific signaling pathway
+      components, suggesting these pathways control tumor cell proliferation.
+    foundIn: "results"
+    contextSnippet: "Furthermore, RRPA demonstrated that Ki67 levels are linked to YAP, p-Her3, and PDGFβ expression levels."
+    confidence: 0.9
+    doi: "10.1093/neuonc/nou020"
+
+  - resourceName: "RTK arrays"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      RTK arrays identified Her2, Her3, PDGFRβ, Axl, and Tie2 as frequently activated receptor
+      tyrosine kinases in human schwannomas. This screening approach revealed the most relevant
+      RTK targets in these tumors.
+    foundIn: "results"
+    contextSnippet: "We showed that Her2, Her3, PDGFRβ, Axl, and Tie2 are frequently activated in the tumors."
+    confidence: 0.85
+    doi: "10.1093/neuonc/nou020"
+
+  - resourceName: "reverse-phase protein array"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      RRPA analysis demonstrated correlations between Ki67 proliferation levels and expression
+      of YAP, p-Her3, and PDGFRβ, establishing links between these signaling components and
+      tumor cell proliferation in schwannomas.
+    foundIn: "results"
+    contextSnippet: "Furthermore, RRPA demonstrated that Ki67 levels are linked to YAP, p-Her3, and PDGFβ expression levels."
+    confidence: 0.9
+    doi: "10.1093/neuonc/nou020"
+
+  - resourceName: "schwannoma cells"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      In schwannoma cells in culture, Her2, Her3, and PDGFRβ were identified as transcriptional
+      targets of Yes-associated protein (YAP), demonstrating YAP's role in controlling expression
+      of these receptor tyrosine kinases.
+    foundIn: "results"
+    contextSnippet: "In addition, Her2, Her3, and PDGFβ are transcriptional targets of Yes-associated protein (YAP) in schwannoma cells in culture."
+    confidence: 0.8
+    doi: "10.1093/neuonc/nou020"
+
+  - resourceName: "schwannoma cells"
+    resourceType: "Cell Line"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The expression of signaling effectors (Her2, Her3, PDGFRβ, Axl, Tie2, YAP) is very variable
+      between tumors, which may result in strong differences in response to targeted therapy.
+      This variability was observed across the 68 human schwannoma samples analyzed.
+    foundIn: "both"
+    contextSnippet: "Finally, we observed that the expression of these signaling effectors is very variable between tumors...However, the variability of their expression between tumors may result in strong differences in the response to targeted therapy."
+    confidence: 0.85
+    doi: "10.1093/neuonc/nou020"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 1
+    Molecular: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple obvious research tools were missed: Ki67 antibody, RTK arrays, RRPA platform, schwannoma cell cultures
+    - The mining patterns appear to have significant gaps for proteomic research tools
+    - Standard immunohistochemistry and protein array approaches were not detected
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the initial mining.
+    The tools identified (Ki67 antibody, RTK arrays, RRPA, schwannoma cells) should all be added to the database.
+    The mining patterns need significant improvement to capture:
+    1. Standard protein markers like Ki67
+    2. Proteomic screening platforms (RTK arrays, RRPA)
+    3. Cell culture systems mentioned in experimental context
+    4. Antibody-based techniques like immunohistochemistry
+    
+    All 4-5 missed tools should be manually added, and the suggested patterns should be implemented
+    to prevent similar gaps in future mining. The observations extracted provide valuable scientific
+    insights about YAP signaling networks in schwannomas and tool performance characteristics.

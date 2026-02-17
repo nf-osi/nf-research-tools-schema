@@ -1,0 +1,256 @@
+publicationMetadata:
+  pmid: "37616542"
+  title: "Pro-905, a Novel Purine Antimetabolite, Combines with Glutamine Amidotransferase Inhibition to Suppress Growth of Malignant Peripheral Nerve Sheath Tumor"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive laboratory research study with extensive experimental methods. Expected tool types include:
+    - Cell lines (multiple MPNST cell lines mentioned)
+    - Animal models (multiple mouse strains and xenograft models)
+    - Antibodies (Ki67 antibody for IHC)
+    - Computational tools (analysis software mentioned)
+    - Patient-derived models (PDX models explicitly described)
+    - Genetic reagents (transgenic mouse lines)
+    
+    The publication contains detailed methods for cell culture, animal studies, metabolomics, bioanalysis, and immunohistochemistry, indicating extensive tool usage across multiple categories.
+  overallAssessment: |
+    This publication represents a typical preclinical cancer research study with comprehensive experimental methods. The extensive Methods section describes multiple research tools including cell lines, animal models, patient-derived xenografts, antibodies, and computational analysis tools. The mining system completely failed to identify any tools from this publication, representing a significant gap in tool detection capabilities.
+
+toolValidations: []
+  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "sNF96.2"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The sNF96.2 cells (RRID:CVCL_K281) were received from ATCC and grown in DMEM (Life Technologies #11965), 10% FBS (Hyclone)"
+    whyMissed: "Standard cell line name with RRID identifier not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "JH-2-002"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "JH-2–002 and JH-2–031 MPNST cells were received from the JH NF1 Biospecimen Repository"
+    whyMissed: "Custom cell line naming convention not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "JH-2-031"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "JH-2–002 and JH-2–031 MPNST cells were received from the JH NF1 Biospecimen Repository"
+    whyMissed: "Custom cell line naming convention not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NSG mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "NSG mice (#005557) were obtained from Jackson Labs and bred in house"
+    whyMissed: "Common immunodeficient mouse strain not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NPcis mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "NPcis (B6;129S2-Trp53tm1Tyj/J, RRID:IMSR_JAX:008191) transgenic mice (Nf1tm1Tyj) were obtained from Jackson Labs"
+    whyMissed: "Transgenic mouse strain name not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL6/NHsd"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "C57BL6/NHsd (B6) male mice, at approximately 12 weeks of age between 25 and 30 g were obtained from Envigo"
+    whyMissed: "Standard inbred mouse strain nomenclature not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "JH-2-031 MPNST PDX"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "JH-2–031 MPNST PDX specimens at mouse passage 3 were obtained from the JH NF1 Biospecimen Repository"
+    whyMissed: "PDX model naming not recognized despite explicit PDX context"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Ki67"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "followed by incubation with 1°C anti-Ki67 (Abcam ab16667; 1:200, overnight, 4°C)"
+    whyMissed: "Antibody with catalog number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "plotted in GraphPad Prism (RRID:SCR_002798) and analyzed by ordinary one-way ANOVA"
+    whyMissed: "Statistical analysis software with RRID not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Aperio Imagescope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed by a trained blinded investigator using Aperio Imagescope software"
+    whyMissed: "Image analysis software not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MultiQuant 3.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were integrated using MultiQuant 3.0 software to generate peak area intensities"
+    whyMissed: "Mass spectrometry analysis software with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Metaboanalyst"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Peak intensities were normalized to vehicle-treated samples and analyzed further using Metaboanalyst"
+    whyMissed: "Metabolomics analysis platform not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "JH-\\d+-\\d+"
+    toolType: "cell_line"
+    examples: ["JH-2-002", "JH-2-031"]
+    reasoning: "Custom cell line naming from Johns Hopkins biorepository follows this pattern"
+
+  - patternType: "context_phrase"
+    pattern: "PDX specimens at mouse passage"
+    toolType: "patient_derived_model"
+    examples: ["JH-2–031 MPNST PDX specimens at mouse passage 3"]
+    reasoning: "Explicit PDX context with passage information indicates patient-derived xenograft models"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(RRID:[A-Z_]+:[A-Z0-9_]+\\)"
+    toolType: "general"
+    examples: ["(RRID:CVCL_K281)", "(RRID:IMSR_JAX:008191)", "(RRID:SCR_002798)"]
+    reasoning: "Research Resource Identifiers (RRIDs) are strong indicators of validated research tools"
+
+  - patternType: "term"
+    pattern: "NSG mice|NOG mice|SCID mice"
+    toolType: "animal_model"
+    examples: ["NSG mice (#005557)"]
+    reasoning: "Common immunodeficient mouse strains used for xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Za-z0-9]+ \\([A-Za-z]+ [a-z0-9]+;"
+    toolType: "antibody"
+    examples: ["anti-Ki67 (Abcam ab16667;"]
+    reasoning: "Antibody naming with vendor and catalog number pattern"
+
+  - patternType: "term"
+    pattern: "GraphPad Prism|Aperio Imagescope|MultiQuant|Metaboanalyst"
+    toolType: "computational_tool"
+    examples: ["GraphPad Prism", "Aperio Imagescope", "MultiQuant 3.0", "Metaboanalyst"]
+    reasoning: "Common analysis software tools used in life sciences research"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+cis mice|[A-Z0-9]+/[A-Z0-9]+ mice"
+    toolType: "animal_model"
+    examples: ["NPcis mice", "C57BL6/NHsd mice"]
+    reasoning: "Transgenic and inbred mouse strain naming conventions"
+
+observations:
+  - resourceName: "NPcis mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NPcis (NF1+/-;p53+/-) mice develop spontaneous tumors that can be monitored for therapeutic studies. Animals were monitored three times weekly for spontaneous tumor development, and once palpable tumors reached ≥100 mm³, they were enrolled in treatment studies. This model represents a genetically engineered mouse model of MPNST with predictable tumor formation.
+    foundIn: "methods"
+    contextSnippet: "Animals were monitored three times weekly for spontaneous tumor development. Once a palpable tumor reached a volume of ≥100 mm³ as measured by calipers"
+    confidence: 1.0
+    doi: "https://doi.org/10.1158/1535-7163.mct-23-0258"
+
+  - resourceName: "JH-2-031 MPNST PDX"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      JH-2-031 PDX model demonstrates successful engraftment and growth in NSG mice. Tumors form when >500 mm³ pieces are implanted subcutaneously in Matrigel, and can be passaged between mice. The model maintains tumor characteristics through multiple passages (passage 3 and 7 mentioned), making it suitable for therapeutic efficacy studies.
+    foundIn: "methods"
+    contextSnippet: "When palpable tumors > ∼500 mm³ formed, mice were euthanized and tumors harvested under sterile conditions, dissected to approximately 3 mm pieces, and immediately passaged to recipient experimental mice"
+    confidence: 1.0
+    doi: "https://doi.org/10.1158/1535-7163.mct-23-0258"
+
+  - resourceName: "anti-Ki67"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Anti-Ki67 antibody (Abcam ab16667) is used at 1:200 dilution for overnight incubation at 4°C to assess tumor cell proliferation. Requires heated antigen retrieval in 10 mmol/L citric acid for 20 minutes. Works effectively with polymer-based secondary detection system and DAB development for 90 seconds. Provides reliable proliferation index when analyzed using Aperio Nuclear v9 algorithm.
+    foundIn: "methods"
+    contextSnippet: "followed by incubation with 1°C anti-Ki67 (Abcam ab16667; 1:200, overnight, 4°C) or rabbit IgG (Cell Signaling Technology, DA1E; concentration-matched, overnight, 4°C) in 2.5% BSA"
+    confidence: 1.0
+    doi: "https://doi.org/10.1158/1535-7163.mct-23-0258"
+
+  - resourceName: "sNF96.2"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      sNF96.2 cells (RRID:CVCL_K281) are maintained in DMEM with 10% FBS, 2 mmol/L L-glutamine and 1% penicillin/streptomycin. Cells are authenticated by STR profiling and tested negative for Mycoplasma. Used for metabolomics studies, radiolabel incorporation assays, and colony formation assays. Responds to treatment with JHU395 and Pro-905 in dose-dependent manner.
+    foundIn: "methods"
+    contextSnippet: "The sNF96.2 cells (RRID:CVCL_K281) were received from ATCC and grown in DMEM (Life Technologies #11965), 10% FBS (Hyclone), 2 mmol/L l-glutamine and 1% penicillin/streptomycin"
+    confidence: 1.0
+    doi: "https://doi.org/10.1158/1535-7163.mct-23-0258"
+
+  - resourceName: "GraphPad Prism"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      GraphPad Prism (RRID:SCR_002798) is used for statistical analysis and data visualization. Specifically employed for plotting proliferation data and performing ordinary one-way ANOVA with multiple comparisons. Statistical significance threshold set at P < 0.05. Suitable for analyzing Ki67 proliferation index data from immunohistochemistry experiments.
+    foundIn: "methods"
+    contextSnippet: "Counts were converted to % proliferation [(Ki67 Nuclei Count/Total Nuclei Count) × 100], plotted in GraphPad Prism (RRID:SCR_002798) and analyzed by ordinary one-way ANOVA with multiple comparisons"
+    confidence: 1.0
+    doi: "https://doi.org/10.1158/1535-7163.mct-23-0258"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Usage Instructions: 2
+    Cellular: 1
+  majorIssuesFound: |
+    - Complete mining failure: No tools were detected despite extensive tool usage throughout the Methods section
+    - Missing cell line detection: Multiple cell lines with RRIDs not identified
+    - Missing animal model detection: Standard and transgenic mouse strains not recognized
+    - Missing PDX model detection: Patient-derived xenograft models explicitly mentioned but not found
+    - Missing antibody detection: Antibodies with catalog numbers not identified
+    - Missing computational tool detection: Analysis software with RRIDs not recognized
+    - Pattern gaps: Current mining patterns fail to capture standard research tool nomenclature
+  recommendations: |
+    This publication represents a complete mining system failure. Despite containing 12+ clear research tools across 6 different categories, zero tools were detected. Critical recommendations:
+    
+    1. IMMEDIATE PATTERN UPDATES: Add patterns for RRID identifiers, standard cell line names, mouse strain nomenclature, and common analysis software
+    
+    2. VENDOR/CATALOG DETECTION: Implement patterns to detect tools mentioned with vendor names and catalog numbers (e.g., "Abcam ab16667")
+    
+    3. PDX MODEL RECOGNITION: Add specific patterns for patient-derived xenograft terminology and passage information
+    
+    4. CONTEXT-AWARE MINING: Improve detection of tools in Methods sections where experimental usage is described
+    
+    5. QUALITY CONTROL: This publication should be used as a test case to validate mining improvements, as it contains clear examples of all major tool types
+    
+    6. SYSTEMATIC REVIEW: Conduct broader analysis to determine if this represents an isolated failure or systematic mining inadequacy
+    
+    The extracted observations demonstrate the rich scientific content available when tools are properly identified, highlighting the importance of fixing the mining system.

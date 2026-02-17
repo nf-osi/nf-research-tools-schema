@@ -1,0 +1,268 @@
+publicationMetadata:
+  pmid: "33978635"
+  title: "Selumetinib normalizes Ras/MAPK signaling in clinically relevant neurofibromatosis type 1 minipig tissues in vivo."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a comprehensive laboratory research study using genetically modified minipigs to evaluate drug pharmacokinetics
+    and pharmacodynamics. Expected tools include:
+    - Animal models (NF1 minipigs with R1947X mutation)
+    - Antibodies (for Western blot and immunohistochemistry)
+    - Genetic reagents (TALENs, oligonucleotides for gene editing)
+    - Computational tools (R, statistical software, LC-MS/MS analysis software)
+    - Cell lines (fetal Ossabaw minipig fibroblasts used for gene editing)
+  overallAssessment: |
+    This is a high-quality laboratory research study that extensively uses research tools across multiple categories.
+    The study involves generating and characterizing genetically modified minipigs, performing complex pharmacokinetic
+    and pharmacodynamic analyses, and using multiple analytical techniques. The comprehensive Methods section
+    describes detailed experimental procedures that clearly indicate extensive tool usage.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "NF1 R1947X minipig model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "To generate a minipig model of NF1, we mimicked a recurrent nonsense mutation p.Arg1947X (R1947X) identified in 62 of 8100 (± 8) unrelated and symptomatic NF1 patients."
+    whyMissed: "Animal model with specific genetic modification not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Ossabaw minipig fibroblasts"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Transcription activator-like effector nucleases flanking NF1 were transfected into fetal Ossabaw minipig fibroblasts with a homology directed repair oligonucleotide"
+    whyMissed: "Primary cell line used for genetic engineering not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TALENs"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Transcription activator-like effector nucleases flanking NF1 were transfected into fetal Ossabaw minipig fibroblasts"
+    whyMissed: "Gene editing tool mentioned by full name rather than abbreviation"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Phospho-p44/42 ERK1/2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Primary antibodies against Phospho-p44/42 ERK1/2 (p-ERK) (Cell Signaling Technologies #4370S) and p44/42 ERK1/2 (ERK) (Cell Signaling Technologies #4695S) were used at 1:100 dilution"
+    whyMissed: "Specific antibody with catalog number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p44/42 ERK1/2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Primary antibodies against Phospho-p44/42 ERK1/2 (p-ERK) (Cell Signaling Technologies #4370S) and p44/42 ERK1/2 (ERK) (Cell Signaling Technologies #4695S) were used at 1:100 dilution"
+    whyMissed: "Total ERK antibody with catalog number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "phosphor-p44/p42 MAPK antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemical staining for phosphor-p44/p42 MAPK (ERK1/2) (Thr202/Tyr204) (Cell Signaling Technology Catalog #4370, Rabbit mAb, 1:100 dilution)"
+    whyMissed: "IHC antibody with detailed specifications not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Selumetinib plasma concentration–time data were analyzed using noncompartmental methods implemented in R (version 3.6) R Studio PKNCA package (version 0.9.3)"
+    whyMissed: "Statistical software with version number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PKNCA package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "R Studio PKNCA package (version 0.9.3)"
+    whyMissed: "R package for pharmacokinetic analysis not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Linear regression was performed using GraphPad software"
+    whyMissed: "Statistical analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Analyst software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data acquisition was performed with analyst 1.4.1 software (MDS-SCIEX)"
+    whyMissed: "LC-MS/MS data acquisition software with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Wes system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A capillary western blot assay was performed on a Wes system (ProteinSimple 004–600)"
+    whyMissed: "Automated Western blot system not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Fluidigm platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analysis of transcript biomarkers of MEK inhibition was performed using the Fluidigm platform"
+    whyMissed: "qPCR analysis platform not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ minipig.*model|minipig model of [A-Z]+"
+    toolType: "animal_model"
+    examples: ["minipig model of NF1", "NF1 minipig model"]
+    reasoning: "Genetically modified minipig models are important research tools but may not be caught by standard animal model patterns"
+
+  - patternType: "term"
+    pattern: "TALENs?|transcription activator-like effector nucleases?"
+    toolType: "genetic_reagent"
+    examples: ["TALENs", "transcription activator-like effector nucleases"]
+    reasoning: "Gene editing tools like TALENs are critical genetic reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies? against [A-Za-z0-9/-]+.*\\([A-Za-z ]+\\s+#[0-9A-Z]+\\)"
+    toolType: "antibody"
+    examples: ["antibodies against Phospho-p44/42 ERK1/2 (p-ERK) (Cell Signaling Technologies #4370S)"]
+    reasoning: "Antibodies with vendor and catalog numbers should be reliably detected"
+
+  - patternType: "vendor_indicator"
+    pattern: "Cell Signaling Technolog(y|ies)\\s+(Catalog\\s+)?#[0-9A-Z]+"
+    toolType: "antibody"
+    examples: ["Cell Signaling Technologies #4370S", "Cell Signaling Technology Catalog #4370"]
+    reasoning: "Cell Signaling Technology is a major antibody vendor and catalog numbers indicate research tools"
+
+  - patternType: "term"
+    pattern: "R\\s+\\(version\\s+[0-9.]+\\)|R\\s+Studio|GraphPad\\s+software"
+    toolType: "computational_tool"
+    examples: ["R (version 3.6)", "R Studio", "GraphPad software"]
+    reasoning: "Statistical software with version numbers or brand names should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "performed using.*platform|analyzed using.*software|data acquisition.*with.*software"
+    toolType: "computational_tool"
+    examples: ["performed using the Fluidigm platform", "data acquisition was performed with analyst 1.4.1 software"]
+    reasoning: "Analysis platforms and software usage contexts indicate computational tools"
+
+  - patternType: "term"
+    pattern: "fetal\\s+[A-Za-z]+\\s+fibroblasts?|primary\\s+[A-Za-z]+\\s+fibroblasts?"
+    toolType: "cell_line"
+    examples: ["fetal Ossabaw minipig fibroblasts"]
+    reasoning: "Primary and fetal fibroblast cell lines are important research tools"
+
+observations:
+  - resourceName: "NF1 R1947X minipig model"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      NF1 minipigs showed significantly elevated basal p-ERK levels in optic nerve compared to wild-type controls.
+      This hyperactivation of MAPK signaling was normalized to wild-type levels (60% reduction) following
+      selumetinib treatment, demonstrating the model recapitulates key aspects of NF1 pathophysiology.
+    foundIn: "results"
+    contextSnippet: "Basal p-ERK levels were significantly higher in NF1 minipig optic nerve compared to WT and were reduced to WT levels (60%) with selumetinib"
+    confidence: 1.0
+    doi: "10.1093/noajnl/vdab020"
+
+  - resourceName: "NF1 R1947X minipig model"
+    resourceType: "Animal Model"
+    observationType: "Metabolism"
+    observationTypeOntologyId: "MP:0005266"
+    details: |
+      Selumetinib concentrations were significantly higher in CNS tissues (cerebral cortex P=0.03, optic nerve P=0.03)
+      from NF1 minipigs compared to wild-type animals, suggesting that germline NF1 defects may affect drug
+      uptake and distribution in certain tissues, possibly due to blood-brain barrier alterations.
+    foundIn: "results"
+    contextSnippet: "the mean selumetinib concentration was higher in cerebral cortex (P = .03) and optic nerve (P = .03) from NF1 minipigs compared to WT minipigs"
+    confidence: 0.9
+    doi: "10.1093/noajnl/vdab020"
+
+  - resourceName: "NF1 R1947X minipig model"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      NF1 minipigs showed normal fitness and reproductive capacity with 105 F1 piglets produced from first 15 litters
+      (54% wild-type, 46% NF1), demonstrating Mendelian inheritance and no evidence of reduced fitness.
+      Germline transmission was confirmed in both male and female NF1 carriers.
+    foundIn: "methods"
+    contextSnippet: "There was no evidence of reduced fitness in NF1 minipigs, with 105 F1 piglets produced from the first 15 litters: 54% (57) WT and 46% (48) NF1"
+    confidence: 1.0
+    doi: "10.1093/noajnl/vdab020"
+
+  - resourceName: "Phospho-p44/42 ERK1/2 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Antibody used successfully at 1:100 dilution for both capillary Western blot (Wes system) and
+      immunohistochemistry applications. Showed strong signal detection in tissues with varying
+      basal p-ERK levels, with skin showing highest expression and CNS tissues showing lower levels.
+    foundIn: "methods"
+    contextSnippet: "Primary antibodies against Phospho-p44/42 ERK1/2 (p-ERK) (Cell Signaling Technologies #4370S) and p44/42 ERK1/2 (ERK) (Cell Signaling Technologies #4695S) were used at 1:100 dilution"
+    confidence: 1.0
+    doi: "10.1093/noajnl/vdab020"
+
+  - resourceName: "R software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R version 3.6 with PKNCA package (version 0.9.3) successfully used for noncompartmental pharmacokinetic
+      analysis of selumetinib plasma concentration-time data. Statistical analyses including paired/unpaired
+      t-tests with Welch's correction were performed using R with α = 0.05.
+    foundIn: "methods"
+    contextSnippet: "Selumetinib plasma concentration–time data were analyzed using noncompartmental methods implemented in R (version 3.6) R Studio PKNCA package (version 0.9.3)"
+    confidence: 1.0
+    doi: "10.1093/noajnl/vdab020"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Nervous System: 1
+    Metabolism: 1
+    Developmental: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - The mining system completely failed to detect multiple categories of research tools including:
+      * Genetically modified animal model (NF1 R1947X minipigs)
+      * Multiple antibodies with catalog numbers from Cell Signaling Technologies
+      * Primary cell line (Ossabaw minipig fibroblasts)
+      * Gene editing reagents (TALENs)
+      * Multiple computational tools (R, GraphPad, Analyst software, Wes system, Fluidigm platform)
+    - This represents a major gap in mining coverage for laboratory research publications
+  recommendations: |
+    This publication should have yielded 12+ research tools across multiple categories. The complete absence of
+    mined tools indicates serious deficiencies in the mining patterns, particularly for:
+    
+    1. Animal models with genetic modifications and species-specific naming
+    2. Antibodies from major vendors with catalog numbers
+    3. Gene editing tools and genetic reagents
+    4. Statistical and analytical software platforms
+    5. Primary cell lines and specialized cell types
+    
+    All 12 identified tools should be added to the database as they represent genuine research tools with
+    clear experimental usage context. The suggested patterns should be implemented to improve future mining
+    of similar laboratory research publications. This case demonstrates the need for more comprehensive
+    pattern coverage across all tool categories.

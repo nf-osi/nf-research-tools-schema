@@ -1,0 +1,308 @@
+publicationMetadata:
+  pmid: "18800150"
+  title: "Mechanisms of loss of heterozygosity in neurofibromatosis type 1-associated plexiform neurofibromas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study investigating molecular mechanisms of NF1-associated skeletal abnormalities.
+    Expected tool types include:
+    - Computational tools (NGS analysis software, bioinformatics pipelines)
+    - Genetic reagents (commercial kits for DNA extraction, NGS panels)
+    - Antibodies (for Western blot analysis of neurofibromin)
+    - Animal models (mouse models mentioned in discussion)
+    
+    The study uses next-generation sequencing, multiplex ligation-dependent probe amplification (MLPA),
+    exome sequencing, Western blot analysis, and various molecular biology techniques that require
+    specific reagents and computational tools.
+  overallAssessment: |
+    This publication is a molecular biology research study that extensively uses laboratory techniques
+    and should contain multiple research tools. The methods section describes NGS, MLPA, exome sequencing,
+    Western blot, and various commercial kits. The complete absence of mined tools (minedTools: [])
+    indicates significant gaps in the mining process for this type of publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Ion AmpliSeq Designer v6.13"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A next-generation sequencing (NGS) custom-designed panel was created using the Ion AmpliSeq™ Designer v6.13 algorithm provided by Thermo Fisher Scientific"
+    whyMissed: "Specific software version with vendor information not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Ion Gene Studio S5"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NGS was performed on genomic DNA extracted from both blood and cartilaginous biopsies using the Ion Gene Studio S5 platform (Thermo Fisher Scientific, Inc.)"
+    whyMissed: "NGS platform/instrument not recognized as genetic reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Ion Reporter Software v.5.6"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were analyzed using both the Ion Reporter Software v.5.6 (Thermo Fisher Scientific, Inc.) and the CLC Genomics Workbench 6.5.1 software"
+    whyMissed: "Software version with vendor not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CLC Genomics Workbench 6.5.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were analyzed using both the Ion Reporter Software v.5.6 (Thermo Fisher Scientific, Inc.) and the CLC Genomics Workbench 6.5.1 software (Qiagen)"
+    whyMissed: "Bioinformatics software with version number not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SALSA P081/P082 kits"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Multiplex ligation-dependent probe amplification (MLPA) was performed in order to detect somatic exonic deletions of NF1 using two commercial kits, the SALSA P081/P082 kits (MRC-Holland, Amsterdam, the Netherlands)"
+    whyMissed: "Commercial kit with catalog numbers not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "4 × 180 K Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Both cartilage and peripheral blood were also tested by high-resolution oligonucleotide array CGH (comparative genomic hybridization) using the 4 × 180 K Kit, with probe design 086332 (Agilent 119 Technologies, Santa Clara, CA)"
+    whyMissed: "Array CGH kit with specific design number not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FastQC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The quality of the sequence reads was assessed by generating QC statistics with FastQC (http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc)"
+    whyMissed: "Bioinformatics tool with URL not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BWA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "BWA with default parameters was used for the read alignment to the reference human genome (hg38, UCSC assembly)"
+    whyMissed: "Standard bioinformatics alignment tool not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "HaplotypeCaller algorithm in the GATK package was used for quality score recalibration, indel realignment, and variant calling"
+    whyMissed: "Well-known bioinformatics package not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ANNOVAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were annotated with ANNOVAR and filtered for population genetics, conservation (GERP), and impact on the protein function"
+    whyMissed: "Variant annotation software not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Col2a1-Cre mice"
+    toolType: "animal_model"
+    foundIn: "discussion"
+    contextSnippet: "Crossing the Col2a1 (collagen, type II, alpha 1)-Cre promoter mouse with the Nf1 mouse, the authors found that the flox/flox Nf1/Col2−/− mice showed progressive scoliosis"
+    whyMissed: "Transgenic mouse strain with specific promoter not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 flox/flox mice"
+    toolType: "animal_model"
+    foundIn: "discussion"
+    contextSnippet: "Crossing the Col2a1 (collagen, type II, alpha 1)-Cre promoter mouse with the Nf1 mouse, the authors found that the flox/flox Nf1/Col2−/− mice"
+    whyMissed: "Conditional knockout mouse strain not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+ v?\\d+\\.\\d+(\\.\\d+)?\\b"
+    toolType: "computational_tool"
+    examples: ["Ion AmpliSeq Designer v6.13", "Ion Reporter Software v.5.6", "CLC Genomics Workbench 6.5.1"]
+    reasoning: "Software names with version numbers are strong indicators of computational tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][A-Za-z0-9\\s]+ (kit|Kit|platform|Platform)\\b.*\\([A-Z][a-zA-Z\\s]+,.*\\)"
+    toolType: "genetic_reagent"
+    examples: ["SALSA P081/P082 kits (MRC-Holland)", "4 × 180 K Kit (Agilent Technologies)", "Ion Gene Studio S5 platform (Thermo Fisher Scientific)"]
+    reasoning: "Commercial kits and platforms with vendor information in parentheses are genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|performed using|was used for|using the"
+    toolType: "general"
+    examples: ["analyzed using both the Ion Reporter Software", "was used for the read alignment", "performed using two commercial kits"]
+    reasoning: "These phrases often precede tool usage descriptions"
+
+  - patternType: "term"
+    pattern: "\\b(FastQC|BWA|GATK|ANNOVAR|SAMtools|Bowtie|TopHat|Cufflinks|DESeq|edgeR)\\b"
+    toolType: "computational_tool"
+    examples: ["FastQC", "BWA", "GATK", "ANNOVAR"]
+    reasoning: "Standard bioinformatics tools commonly used in genomics research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\d+[a-z]\\d+-Cre\\b|\\b[A-Z][a-z0-9]+\\s*flox/flox\\b"
+    toolType: "animal_model"
+    examples: ["Col2a1-Cre", "Nf1 flox/flox"]
+    reasoning: "Transgenic and conditional knockout mouse nomenclature patterns"
+
+  - patternType: "context_phrase"
+    pattern: "commercial kit|Commercial kit|using.*kit.*\\("
+    toolType: "genetic_reagent"
+    examples: ["using two commercial kits, the SALSA P081/P082 kits (MRC-Holland)"]
+    reasoning: "Commercial kit mentions with vendor information indicate genetic reagents"
+
+observations:
+  - resourceName: "Ion AmpliSeq Designer v6.13"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used to create a custom-designed NGS panel targeting the entire coding sequence (CDS) and 10 bases 
+      of the adjacent intronic regions of NF1 gene (NM_001042492.3). The algorithm was provided by 
+      Thermo Fisher Scientific for targeted sequencing applications.
+    foundIn: "methods"
+    contextSnippet: "A next-generation sequencing (NGS) custom-designed panel was created using the Ion AmpliSeq™ Designer v6.13 algorithm provided by Thermo Fisher Scientific (Carlsbad, CA, USA) in order to target the entire coding sequence (CDS) and 10 bases of the adjacent intronic regions of NF1 gene"
+    confidence: 0.90
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "Ion Gene Studio S5"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NGS platform used to perform genomic DNA sequencing from both blood and cartilaginous biopsies. 
+      Successfully generated sequence data for variant analysis in both germline and somatic tissue samples.
+    foundIn: "methods"
+    contextSnippet: "NGS was performed on genomic DNA extracted from both blood and cartilaginous biopsies using the Ion Gene Studio S5 platform (Thermo Fisher Scientific, Inc.)"
+    confidence: 0.90
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "SALSA P081/P082 kits"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MLPA kits used to detect somatic exonic deletions of NF1. The assays excluded somatic loss of the 
+      NF1 wild-type allele by copy number variations, helping to confirm that the mechanism was somatic 
+      second hit rather than deletion.
+    foundIn: "methods"
+    contextSnippet: "Multiplex ligation-dependent probe amplification (MLPA) was performed in order to detect somatic exonic deletions of NF1 using two commercial kits, the SALSA P081/P082 kits (MRC-Holland, Amsterdam, the Netherlands)"
+    confidence: 0.90
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "FastQC"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Quality control software used to assess the quality of sequence reads by generating QC statistics. 
+      Essential step in the exome sequencing pipeline to ensure data quality before downstream analysis.
+    foundIn: "methods"
+    contextSnippet: "The quality of the sequence reads was assessed by generating QC statistics with FastQC (http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc)"
+    confidence: 0.95
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "BWA"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Alignment software used with default parameters for read alignment to the reference human genome 
+      (hg38, UCSC assembly). Standard tool in genomics pipelines for mapping sequencing reads to reference.
+    foundIn: "methods"
+    contextSnippet: "BWA with default parameters was used for the read alignment to the reference human genome (hg38, UCSC assembly)"
+    confidence: 0.95
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "GATK"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Genomics toolkit used for quality score recalibration, indel realignment, and variant calling. 
+      Specifically used the HaplotypeCaller algorithm for comprehensive variant detection in both 
+      germline and somatic samples.
+    foundIn: "methods"
+    contextSnippet: "HaplotypeCaller algorithm in the GATK package was used for quality score recalibration, indel realignment, and variant calling"
+    confidence: 0.95
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "ANNOVAR"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Variant annotation software used to annotate variants and filter for population genetics, 
+      conservation (GERP), and impact on protein function. Critical for interpreting the pathogenicity 
+      of identified variants in the NF1 gene.
+    foundIn: "methods"
+    contextSnippet: "Variants were annotated with ANNOVAR and filtered for population genetics, conservation (GERP), and impact on the protein function according to in silico tools"
+    confidence: 0.95
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "Col2a1-Cre mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0005380"
+    details: |
+      Transgenic mouse model with Cre recombinase under the Col2a1 (collagen, type II, alpha 1) promoter. 
+      When crossed with Nf1 flox/flox mice, the resulting flox/flox Nf1/Col2−/− mice showed progressive 
+      scoliosis, tibial pseudoarthrosis, and skeletal abnormalities involving the skull and anterior chest wall.
+    foundIn: "discussion"
+    contextSnippet: "Crossing the Col2a1 (collagen, type II, alpha 1)-Cre promoter mouse with the Nf1 mouse, the authors found that the flox/flox Nf1/Col2−/− mice showed progressive scoliosis, tibial pseudoarthrosis, and skeletal abnormalities involving the skull and anterior chest wall"
+    confidence: 0.85
+    doi: "10.1038/jid.2008.274"
+
+  - resourceName: "Nf1 flox/flox mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0005380"
+    details: |
+      Conditional knockout mouse model with floxed Nf1 alleles. When crossed with Col2a1-Cre mice, 
+      demonstrates that loss of Nf1 in axial and appendicular osteo-chondro progenitors recapitulates 
+      the skeletal abnormalities of NF1 patients, including progressive scoliosis and chest wall deformities.
+    foundIn: "discussion"
+    contextSnippet: "the flox/flox Nf1/Col2−/− mice showed progressive scoliosis, tibial pseudoarthrosis, and skeletal abnormalities involving the skull and anterior chest wall, demonstrating that loss of Nf1 in axial and appendicular osteo-chondro progenitors recapitulates the skeletal abnormalities of NF1 patients"
+    confidence: 0.85
+    doi: "10.1038/jid.2008.274"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 9
+  observationsByType:
+    Usage Instructions: 7
+    Developmental: 2
+  majorIssuesFound: |
+    - Complete failure of mining process: No tools were identified despite this being a comprehensive 
+      molecular biology study with extensive methods
+    - Missing computational tools: Multiple bioinformatics software packages (FastQC, BWA, GATK, ANNOVAR) 
+      with clear usage context were not detected
+    - Missing genetic reagents: Commercial kits with catalog numbers and vendor information were not caught
+    - Missing animal models: Transgenic mouse strains mentioned in discussion were not identified
+    - Pattern gaps: Current mining patterns do not capture software versions, commercial kits with vendors, 
+      or standard bioinformatics tools
+  recommendations: |
+    This publication demonstrates major gaps in the current mining approach for laboratory research papers.
+    All 12 potentially missed tools should be added to the database as they represent genuine research tools
+    with clear experimental usage context. The suggested patterns should be implemented to catch:
+    1. Software with version numbers and vendor information
+    2. Commercial kits with catalog numbers and vendor details
+    3. Standard bioinformatics tools (FastQC, BWA, GATK, ANNOVAR, etc.)
+    4. Transgenic and conditional knockout mouse nomenclature
+    5. Context phrases that indicate tool usage
+    
+    The observations extracted provide valuable information about tool performance and applications.
+    This type of molecular biology research should be a high-priority target for improved mining patterns.

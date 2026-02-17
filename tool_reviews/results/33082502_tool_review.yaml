@@ -1,0 +1,211 @@
+publicationMetadata:
+  pmid: "33082502"
+  title: "Image segmentation of plexiform neurofibromas from a deep neural network using multiple b-value diffusion data."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis with MRI image processing):
+    - Computational tools (software, analysis pipelines) - EXPECTED
+    - Imaging analysis software - EXPECTED
+    - Machine learning frameworks - EXPECTED
+    - Statistical analysis tools - EXPECTED
+    
+    This is a biomedical imaging study using deep neural networks for automated tumor segmentation.
+    The study involves MRI image processing, machine learning model development, and statistical analysis.
+    Multiple computational tools should be present for image processing, neural network implementation,
+    and data analysis.
+  overallAssessment: |
+    This publication describes the development and validation of a deep neural network for automated
+    segmentation of plexiform neurofibromas from MRI diffusion data. The study includes detailed
+    methods for image processing, neural network training, and statistical validation. Multiple
+    computational tools are expected and should be present throughout the workflow.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Analyze 12.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Using the multispectral neural network (MSNN) modeling tool available in Analyze 12.0 (AnalyzeDirect, Overland Park, KS), model priors for each "class" were constructed"
+    whyMissed: "Commercial software name with version number and vendor information - clear computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MIM Encore 6.9.3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Measurements were made on a commercially available image analysis software (MIM Encore 6.9.3, MIM Software INC, Cleveland, OH, https://www.mimsoftware.com/nuclear_medicine/encore)"
+    whyMissed: "Commercial software with specific version number, vendor, and URL - clear computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "eLucidate"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Calculation of IVIM parameters were performed on a molecular kinetic modeling software (eLucidate, Paul R. Territo, Ph.D, Indiana University, Indianapolis, USA)"
+    whyMissed: "Custom molecular kinetic modeling software with author attribution - clear computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Clinical Trials Processor"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DWI MRI image series from baseline and follow up scans are imported into the Clinical Trials Processor for de-identification and then registered"
+    whyMissed: "Specialized software for clinical trial image processing - clear computational tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Multi-Spectral Neural Network"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Using the multispectral neural network (MSNN) modeling tool available in Analyze 12.0"
+    whyMissed: "Specific neural network algorithm/tool within Analyze software - computational method"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Simulated Annealing"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "normalized b-value series was optimized via Simulated Annealing (relative SSD, tolerance 1e−15)"
+    whyMissed: "Optimization algorithm used for IVIM parameter calculation - computational method"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ [0-9]+\\.[0-9]+(?:\\.[0-9]+)?\\b.*\\([^)]+,\\s*[^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["Analyze 12.0 (AnalyzeDirect, Overland Park, KS)", "MIM Encore 6.9.3 (MIM Software INC, Cleveland, OH)"]
+    reasoning: "Pattern to catch software with version numbers followed by vendor information in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "(?:performed on|using|available in|imported into)\\s+(?:a\\s+)?(?:commercially available\\s+)?(?:image analysis\\s+)?software\\s+\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["performed on a molecular kinetic modeling software (eLucidate", "available in Analyze 12.0"]
+    reasoning: "Context phrases that indicate software usage with parenthetical tool identification"
+
+  - patternType: "term"
+    pattern: "\\b(?:modeling tool|analysis software|image analysis software|kinetic modeling software)\\b"
+    toolType: "computational_tool"
+    examples: ["multispectral neural network (MSNN) modeling tool", "molecular kinetic modeling software"]
+    reasoning: "Specific terminology that indicates computational analysis tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[0-9]+\\.[0-9]+(?:\\.[0-9]+)?\\b"
+    toolType: "computational_tool"
+    examples: ["Analyze 12.0", "MIM Encore 6.9.3"]
+    reasoning: "Software naming convention with version numbers that was missed"
+
+observations:
+  - resourceName: "Analyze 12.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Multi-spectral neural network (MSNN) modeling tool used for image segmentation with specific parameters:
+      - Minimum probability fixed at 0.1
+      - Alpha probability set to 0.25
+      - Epochs set at 200
+      - Systematic optimization of hidden layers (3-20 layers tested)
+      - Final configuration: 15 hidden layers with 3 nodes each
+      - Used for training feed-forward neural network for tumor classification
+    foundIn: "methods"
+    contextSnippet: "Using the multispectral neural network (MSNN) modeling tool available in Analyze 12.0 (AnalyzeDirect, Overland Park, KS), model priors for each "class" were constructed... The selection of hidden layers was based on an empirical analysis of the model, where the minimum probability was fixed at 0.1, alpha probability was set to 0.25, and epochs set at 200"
+    confidence: 0.95
+    doi: "10.1038/s41598-020-74920-1"
+
+  - resourceName: "MIM Encore 6.9.3"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Commercial image analysis software used for manual segmentation of plexiform neurofibromas:
+      - Used freehand ROI tool for manual tracing
+      - Measurements performed on registered SPAIR images
+      - Volumes summated for each MRI exam
+      - Manual segmentation took average of 18 minutes per case
+      - Used as gold standard comparison for neural network results
+    foundIn: "methods"
+    contextSnippet: "Measurements were made on a commercially available image analysis software (MIM Encore 6.9.3, MIM Software INC, Cleveland, OH) using a freehand ROI tool. The volumes of the manual measurements were summated for each MRI exam"
+    confidence: 0.95
+    doi: "10.1038/s41598-020-74920-1"
+
+  - resourceName: "eLucidate"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Custom molecular kinetic modeling software for IVIM parameter calculation:
+      - Optimizes uniformly weighted sum-of-squares difference (SSD) between objective function and normalized b-value series
+      - Uses Simulated Annealing optimization algorithm
+      - Relative SSD tolerance set to 1e−15
+      - Calculates perfusion fraction (f), pseudo-diffusion coefficient (D*), and true molecular diffusion coefficient (D)
+      - Developed by Paul R. Territo, Ph.D at Indiana University
+    foundIn: "methods"
+    contextSnippet: "Calculation of IVIM parameters were performed on a molecular kinetic modeling software (eLucidate, Paul R. Territo, Ph.D, Indiana University, Indianapolis, USA), where the uniformly weighted sum-of squares difference (SSD) between the objective function and normalized b-value series was optimized via Simulated Annealing"
+    confidence: 0.90
+    doi: "10.1038/s41598-020-74920-1"
+
+  - resourceName: "Analyze 12.0"
+    resourceType: "Computational Tool"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Limitations identified with the MSNN tool in Analyze 12.0:
+      - Only single training set can be defined as part of model priors
+      - Fixed model implementation limits extension to more advanced approaches
+      - Cannot use convolutional neural networks
+      - Does not permit selection of alternative activation functions (sigmoid, ELU, ReLU, leaky ReLU, tanh)
+      - Cannot control level of connections/recursions across layers
+      - Limits broad application for complex imaging studies
+    foundIn: "discussion"
+    contextSnippet: "Due to design limitations of the MSNN tool, only a single training set could be defined as part of the model priors... The MSNN model implementation is fixed, limiting its extension to more advanced modeling approaches... the MSNN tool does not permit selection of alternative activation functions"
+    confidence: 0.90
+    doi: "10.1038/s41598-020-74920-1"
+
+  - resourceName: "MIM Encore 6.9.3"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Performance comparison with neural network approach:
+      - Manual segmentation using MIM Encore took average of 18 minutes per case
+      - Neural network processing took only 6 minutes including manual correction
+      - Represents significant time savings (67% reduction in processing time)
+      - Cost savings estimated at $3500-7000 per case in annualized costs
+      - Manual approach subject to user fatigue and measurement errors
+    foundIn: "results"
+    contextSnippet: "On average, a neural network case including manual definition of tumor classes with removal of obvious normal anatomy took 6 min, while manually measuring the PNs took an average of 18 min"
+    confidence: 0.95
+    doi: "10.1038/s41598-020-74920-1"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 3
+    Issue: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite clear presence of multiple computational tools
+    - Publication contains detailed methods section with specific software names, versions, and vendors
+    - Multiple commercial and custom software tools are explicitly mentioned and used
+    - This represents a significant failure in the mining algorithm for computational tools
+    - All major computational tools used in the study were missed by the mining process
+  recommendations: |
+    - ALL 4 major computational tools should be added to the database (Analyze 12.0, MIM Encore 6.9.3, eLucidate, Clinical Trials Processor)
+    - The mining patterns need significant improvement for computational tools, especially:
+      * Software with version numbers and vendor information
+      * Context phrases indicating software usage
+      * Commercial image analysis software
+    - This publication demonstrates excellent examples of computational tool usage with detailed methodology
+    - The suggested patterns should be implemented to catch similar tools in future mining
+    - 5 high-quality scientific observations were extracted showing detailed usage instructions, limitations, and performance comparisons

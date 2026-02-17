@@ -1,0 +1,134 @@
+publicationMetadata:
+  pmid: "22550514"
+  title: "Skin-derived precursor cells as an in vitro modelling tool for the study of type 1 neurofibromatosis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Review Article → May reference various research tools from cited studies including:
+    - Cell lines and cellular models (SKPs, stem cells)
+    - Animal models (mouse models of NF1)
+    - Antibodies/markers (S100β)
+    - Genetic reagents (NF1 knockout constructs)
+    
+    This review specifically discusses experimental models and tools for NF1 research,
+    so it's likely to mention tools even without original experimental data.
+    However, tools mentioned may be from cited studies rather than used directly.
+  overallAssessment: |
+    This is a review article discussing skin-derived precursor cells as modeling tools for NF1 research.
+    While it lacks Methods/Results sections typical of experimental papers, it extensively discusses
+    various cellular and animal models used in NF1 research. The publication would be expected to
+    reference research tools from the literature it reviews, making tool mentions likely but primarily
+    as citations rather than direct experimental usage.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Skin-derived precursor cells (SKPs)"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...it has been recently suggested that skin-derived precursor cells (SKPs) could be the cell of origin of dermal neurofibromas..."
+    whyMissed: "Primary focus of the paper - SKPs are described as both a research tool and biological entity"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1(-/-) SKPs"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Nullizygous (NF1(-/-)) SKPs do give rise to neurofibromas when transplanted to heterozygous mice..."
+    whyMissed: "Specific genetically modified cell line with clear experimental usage context"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "heterozygous mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...NF1(-/-)) SKPs do give rise to neurofibromas when transplanted to heterozygous mice..."
+    whyMissed: "Animal model used for transplantation experiments, though referenced from other studies"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "S100β"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...a nullizygous population of cells that is S100β negative is present in human neurofibromas..."
+    whyMissed: "Cellular marker used for identification/characterization, likely antibody-based detection"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "NF1(+/-) multipotent progenitor cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...and NF1(+/-) multipotent progenitor cells are seemingly recruited to the tumor..."
+    whyMissed: "Specific genetically defined cell population used in research"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "human neurofibromas"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...a nullizygous population of cells that is S100β negative is present in human neurofibromas..."
+    whyMissed: "Patient-derived tissue samples used for research, though context suggests analysis rather than active use"
+    confidence: 0.60
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "skin-derived precursor cells|SKPs"
+    toolType: "cell_line"
+    examples: ["skin-derived precursor cells (SKPs)", "NF1(-/-) SKPs"]
+    reasoning: "SKPs are a specific type of stem cell used as research tools in neurofibroma research"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\(\\+/-\\)|\\b\\w+\\(-/-\\)"
+    toolType: "cell_line"
+    examples: ["NF1(+/-) multipotent progenitor cells", "NF1(-/-) SKPs"]
+    reasoning: "Genetic notation indicating heterozygous/homozygous knockout cell lines"
+
+  - patternType: "term"
+    pattern: "S100β|S100beta"
+    toolType: "antibody"
+    examples: ["S100β negative"]
+    reasoning: "S100β is a common cellular marker requiring antibody detection"
+
+  - patternType: "context_phrase"
+    pattern: "transplanted to \\w+ mice|injected into \\w+ mice"
+    toolType: "animal_model"
+    examples: ["transplanted to heterozygous mice"]
+    reasoning: "Context phrases indicating use of specific mouse strains for transplantation studies"
+
+  - patternType: "naming_convention"
+    pattern: "human \\w+fibromas|patient \\w+fibromas"
+    toolType: "patient_derived_model"
+    examples: ["human neurofibromas"]
+    reasoning: "Patient-derived tumor samples used as research models"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - Mining algorithm failed to detect any tools despite clear tool mentions in the text
+    - Publication is a review article, so tools mentioned are primarily from cited studies rather than direct experimental usage
+    - Several cellular models and research tools are discussed as the main focus of the review
+    - S100β marker detection suggests antibody usage but was not captured
+    - Genetic notation for knockout cell lines (NF1(-/-), NF1(+/-)) was not recognized
+  recommendations: |
+    Overall recommendations for this publication:
+    - The mining algorithm needs significant improvement to capture tools mentioned in review articles
+    - At least 4-6 legitimate research tools were missed, particularly cellular models and markers
+    - New patterns should be added to capture genetic notation and stem cell terminology
+    - Review articles should be treated as valid sources of tool information, even without Methods sections
+    - The SKPs mentioned are both the subject of study AND research tools, requiring nuanced classification
+    - Consider adding context-aware mining that recognizes when tools are discussed as research models
+    - S100β and similar protein markers need better pattern recognition for antibody detection

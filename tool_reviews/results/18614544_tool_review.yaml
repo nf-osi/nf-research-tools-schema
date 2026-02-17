@@ -1,0 +1,124 @@
+publicationMetadata:
+  pmid: "18614544"
+  title: "Neurofibromin regulates somatic growth through the hypothalamic-pituitary axis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes mouse models, molecular pathways, experimental treatments
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes experimental work with genetically modified mice (Nf1(BLBP)CKO),
+    molecular pathway analysis, and pharmacological treatments. Expected tools include:
+    - Animal models (genetically modified mice)
+    - Genetic reagents (promoters, constructs)
+    - Potentially antibodies for protein detection
+    - Possibly computational tools for data analysis
+    
+    Note: Only abstract is available, so full tool inventory cannot be determined.
+  overallAssessment: |
+    This is clearly a laboratory research publication describing experimental work with genetically
+    modified mouse models and molecular pathway analysis. The study involves conditional knockout
+    mice, pharmacological treatments (rolipram), and molecular measurements (mRNA, protein levels).
+    Such studies typically use multiple research tools including animal models, genetic reagents,
+    and analytical tools, though only the abstract is available for analysis.
+
+toolValidations: []
+  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Nf1(BLBP)CKO mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we recently generated mice in which Nf1 gene inactivation occurs in neuroglial progenitor cells using the brain lipid binding protein (BLBP) promoter. We found that Nf1(BLBP)CKO mice exhibit significantly reduced body weights..."
+    whyMissed: "Specific genetically modified mouse strain with conditional knockout - clear animal model but may not match standard naming patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BLBP promoter"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...mice in which Nf1 gene inactivation occurs in neuroglial progenitor cells using the brain lipid binding protein (BLBP) promoter..."
+    whyMissed: "Specific promoter used for conditional gene expression - genetic reagent for targeting specific cell types"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "rolipram"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...treatment of Nf1(BLBP)CKO mice with rolipram to increase cAMP levels resulted in a partial restoration of the body weight phenotype..."
+    whyMissed: "Pharmacological compound used as experimental treatment - could be classified as chemical reagent"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "activated Ras molecule"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...BLBP-mediated expression of an activated Ras molecule did not recapitulate the body weight and hypothalamic/pituitary defects..."
+    whyMissed: "Genetically modified protein construct used for experimental manipulation"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Ras regulatory GAP domain of neurofibromin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...conditional expression of the Ras regulatory GAP domain of neurofibromin also did not rescue the body weight or Igf1 mRNA defects..."
+    whyMissed: "Specific protein domain construct used for rescue experiments - genetic reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\([A-Z]+\\)CKO\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(BLBP)CKO mice"]
+    reasoning: "Conditional knockout mouse naming convention with gene(promoter)CKO format commonly used in neuroscience research"
+
+  - patternType: "context_phrase"
+    pattern: "using the .+ promoter"
+    toolType: "genetic_reagent"
+    examples: ["using the brain lipid binding protein (BLBP) promoter"]
+    reasoning: "Phrase indicating use of specific promoters for targeted gene expression"
+
+  - patternType: "context_phrase"
+    pattern: "expression of .+ domain"
+    toolType: "genetic_reagent"
+    examples: ["expression of the Ras regulatory GAP domain"]
+    reasoning: "Indicates use of specific protein domains as experimental constructs"
+
+  - patternType: "context_phrase"
+    pattern: "treatment .+ with \\w+"
+    toolType: "genetic_reagent"
+    examples: ["treatment of Nf1(BLBP)CKO mice with rolipram"]
+    reasoning: "Pharmacological treatment context indicating use of chemical compounds as experimental reagents"
+
+observations: []
+  # No validated tools to extract observations from, and only abstract available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text is available - full Methods section would likely contain many more tools
+    - Multiple animal models and genetic reagents are described but were not captured
+    - Mining patterns may be insufficient for conditional knockout mouse nomenclature
+    - Pharmacological reagents (rolipram) not captured
+    - Genetic constructs and protein domains not captured
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication clearly contains research tools that were completely missed by mining
+    - At minimum, the Nf1(BLBP)CKO mouse model should be added as it's a key experimental tool
+    - BLBP promoter and protein domain constructs are legitimate genetic reagents
+    - Mining patterns need improvement for conditional knockout mouse nomenclature
+    - Consider expanding patterns for pharmacological reagents and genetic constructs
+    - Full text would likely reveal many additional tools (antibodies, additional reagents, etc.)
+    - This represents a significant false negative case where clear research tools were not detected

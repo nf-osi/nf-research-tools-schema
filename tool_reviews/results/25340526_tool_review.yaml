@@ -1,0 +1,245 @@
+publicationMetadata:
+  pmid: "25340526"
+  title: "Nilotinib is more potent than imatinib for treating plexiform neurofibroma in vitro and in vivo."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory study comparing two tyrosine kinase inhibitors (nilotinib vs imatinib) 
+    for treating plexiform neurofibromas. It includes both in vitro cell culture experiments and in vivo xenograft studies.
+    Expected tools include:
+    - Animal models (nude mice for xenografting)
+    - Cell lines (PNF-derived Schwann cells)
+    - Patient-derived models (xenografts from patient tumor tissue)
+    - Computational tools (for RNA sequencing analysis and statistical analysis)
+    - Advanced cellular models (primary cell cultures from patient tissue)
+  overallAssessment: |
+    This is a legitimate laboratory research study with extensive experimental methodology. The publication 
+    describes detailed in vitro and in vivo experiments using patient-derived materials, animal models, 
+    and computational analysis tools. Multiple research tools should have been detected by the mining process.
+
+toolValidations: []
+  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "Athymic nude mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Athymic nude mice (female, nu/nu Balb/c, 6 weeks, 20 g) were obtained from Charles River Laboratories (Sulzfeld, Germany)."
+    whyMissed: "Standard animal model nomenclature with strain specification and vendor information was not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "nu/nu Balb/c mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Athymic nude mice (female, nu/nu Balb/c, 6 weeks, 20 g) were obtained from Charles River Laboratories"
+    whyMissed: "Specific mouse strain genotype notation was not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PNF-derived Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Schwann cells from the PNF were cultured and identified as previously described [16]. After ensuring purity of 85%, PNF-derived Schwann cells were treated"
+    whyMissed: "Primary cell culture derived from patient tissue was not detected as a cell line tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PNF xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "The xenografting of fragments of PNF was carried out as described previously [17], [19]. Briefly, a small incision was made into the skin to expose the right sciatic nerve and an incision was made into the sciatic nerve, under which one tumor piece was orthtopically implanted"
+    whyMissed: "Patient-derived xenograft model establishment was not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Galaxy server"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Alignment and analysis was performed using a Galaxy server and open source Chipster software (http://chipster.csc.fi/) as well as R bioconductor"
+    whyMissed: "Computational analysis platform was not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Chipster"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Alignment and analysis was performed using a Galaxy server and open source Chipster software (http://chipster.csc.fi/) as well as R bioconductor"
+    whyMissed: "Bioinformatics software with URL was not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R bioconductor"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "as well as R bioconductor (http://www.bioconductor.org/) tools for calculating similarity clusters on a Galaxy server"
+    whyMissed: "Statistical analysis software package with URL was not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Vevo 2100 micro-imaging system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sonographic measurement was performed using a Vevo 2100 micro-imaging system (VisualSonics, Amsterdam, Netherlands), which is a high-frequency, high-resolution digital imaging platform"
+    whyMissed: "Specialized imaging system with vendor information was not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Vevo software version 5.0.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Three-dimensional images of the xenografts were generated and analyzed using the Vevo software version 5.0.0 to calculate their size in volume"
+    whyMissed: "Software with specific version number was not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "nu/nu [A-Z][a-z]+/[a-z]+"
+    toolType: "animal_model"
+    examples: ["nu/nu Balb/c"]
+    reasoning: "Mouse strain genotype notation pattern for immunodeficient strains commonly used in xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "obtained from Charles River|purchased from [A-Z][a-zA-Z\\s]+\\([A-Za-z\\s,]+\\)"
+    toolType: "animal_model"
+    examples: ["obtained from Charles River Laboratories (Sulzfeld, Germany)"]
+    reasoning: "Vendor information with location indicates commercial animal model sourcing"
+
+  - patternType: "term"
+    pattern: "[A-Z]+-derived [A-Za-z\\s]+ cells"
+    toolType: "cell_line"
+    examples: ["PNF-derived Schwann cells"]
+    reasoning: "Primary cell cultures derived from patient tissue or specific sources"
+
+  - patternType: "context_phrase"
+    pattern: "xenografting of fragments|tumor piece was orthtopically implanted|patient-derived xenograft"
+    toolType: "patient_derived_model"
+    examples: ["xenografting of fragments of PNF", "one tumor piece was orthtopically implanted"]
+    reasoning: "Specific procedures indicating patient-derived xenograft model establishment"
+
+  - patternType: "term"
+    pattern: "Galaxy server|Chipster software|R bioconductor"
+    toolType: "computational_tool"
+    examples: ["Galaxy server", "Chipster software", "R bioconductor"]
+    reasoning: "Bioinformatics platforms and analysis tools commonly used in genomics research"
+
+  - patternType: "context_phrase"
+    pattern: "using a [A-Z][a-zA-Z0-9\\s]+ (version [0-9\\.]+|v[0-9\\.]+)"
+    toolType: "computational_tool"
+    examples: ["using the Vevo software version 5.0.0"]
+    reasoning: "Software usage with version specification indicates computational tool usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z\\s]+,\\s[A-Za-z\\s,]+\\)"
+    toolType: "general"
+    examples: ["(VisualSonics, Amsterdam, Netherlands)", "(Charles River Laboratories, Sulzfeld, Germany)"]
+    reasoning: "Vendor name with location in parentheses indicates commercial tool sourcing"
+
+observations:
+  - resourceName: "Athymic nude mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Body weights of mice increased 10% (23.9±1.0 to 26.4±1.6 g) in the control group and 7% (23.4±1.8 to 25.1±1.8 g) 
+      in the nilotinib group but not in the imatinib group (2% = 23.3±1.2 to 23.7±1.7 g) over the 28-days of treatment period. 
+      Only the difference between the imatinib group and the control group was significant (P<0.05).
+    foundIn: "results"
+    contextSnippet: "The body weights of mice increased 10% (23.9±1.0 to 26.4±1.6 g) in the control group and 7% (23.4±1.8 to 25.1±1.8 g) in the nilotinib group but not in the imatinib group (2%=23.3±1.2 to 23.7±1.7 g) over the 28-days of treatment period"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0107760"
+
+  - resourceName: "PNF xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The decrease in xenograft size was significantly more profound in the nilotinib group than in the untreated group 
+      (68±7% vs. 33±8%, P<0.05) and than in the imatinib group (47±15%, P<0.05). Initial sizes of the xenografts were 
+      comparable among the control, nilotinib and imatinib groups, which were 6.0±3.7 mm³, 5.9±2.5 mm³ and 5.2±3.4 mm³, respectively.
+    foundIn: "results"
+    contextSnippet: "The decrease in xenograft size was significantly more profound in the nilotinib group than in the untreated group (68±7% vs. 33±8%, P<0.05) and than in the imatinib group (47±15%, P<0.05)"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0107760"
+
+  - resourceName: "PNF-derived Schwann cells"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      The IC50 values of nilotinib were 4.0 and 4.7 μM for proliferation and viability respectively, much lower than 
+      the 12.4 and 14.6 μM of imatinib. Both nilotinib and imatinib dose-dependently inhibited proliferation and 
+      viability of the PNF-derived Schwann cells, with nilotinib being significantly more potent.
+    foundIn: "results"
+    contextSnippet: "However, the IC50 values of nilotinib were 4.0 and 4.7 μM, much lower than the 12.4 and 14.6 μM of imatinib"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0107760"
+
+  - resourceName: "Athymic nude mice"
+    resourceType: "Animal Model"
+    observationType: "Immune System"
+    observationTypeOntologyId: "MP:0005387"
+    details: |
+      Imatinib and nilotinib elevated cytotoxicity of mouse spleen cells on cultured PNF Schwann cells significantly, 
+      21.1±7.2% and 17.6±6.2%, respectively vs. 12.5±7.1% in spleen cells of untreated mice whereas imatinib was 
+      significantly more potent than nilotinib (P<0.05). This suggests imatinib might have an immune-activating component.
+    foundIn: "results"
+    contextSnippet: "Imatinib and nilotinib elevated cytotoxicity of mouse spleen cells on cultured PNF Schwann cells significantly, 21.1±7.2% and 17.6±6.2%, respectively vs. 12.5±7.1% in spleen cells of untreated mice"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0107760"
+
+  - resourceName: "PNF xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      No growth was observed in any of the xenografts, in concordance with the natural history study of PNF. 
+      Xenografts tend to shrink in the 2 to 3 weeks after implantation, likely due to clearance of pre-grafting 
+      and post-grafting cell death. Drug effect can therefore be described as an increase in graft size reduction, 
+      which is more profound after 2 to 3 weeks.
+    foundIn: "discussion"
+    contextSnippet: "No growth was observed in any of the xenografts, in concordance with the result of the natural history study of PNF... xenografts tend to shrink in the 2 to 3 weeks after the implantation"
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0107760"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 5  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Body Weight: 1
+    Tumor Growth: 1
+    Cellular: 1
+    Immune System: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - The mining system completely failed to detect multiple obvious research tools including:
+      * Animal models (athymic nude mice with strain specification)
+      * Patient-derived models (PNF xenografts)
+      * Cell lines (PNF-derived Schwann cells)
+      * Computational tools (Galaxy server, Chipster, R bioconductor, Vevo software)
+    - This represents a major failure in the mining algorithm for laboratory research publications
+    - All tools found should be added to improve mining coverage
+  recommendations: |
+    URGENT MINING SYSTEM IMPROVEMENTS NEEDED:
+    - This publication demonstrates significant gaps in tool detection for laboratory research
+    - All 9 potentially missed tools should be added to the database
+    - The suggested patterns should be implemented to catch similar tools in future mining
+    - Animal model detection needs improvement for strain nomenclature and vendor information
+    - Patient-derived model detection needs patterns for xenograft establishment procedures
+    - Computational tool detection should include bioinformatics platforms and analysis software
+    - Cell line detection should include primary cultures derived from patient tissue
+    - The mining system appears to have completely failed on this publication type
+    - Consider reviewing other "bench" publications to identify similar systematic failures
+    - High-quality scientific observations were successfully extracted from the validated tools

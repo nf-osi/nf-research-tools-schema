@@ -1,0 +1,214 @@
+publicationMetadata:
+  pmid: "35741605"
+  title: "Integrated Drug Mining Reveals Actionable Strategies Inhibiting Plexiform Neurofibromas"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, packages, pipelines) - HIGHLY EXPECTED
+    - Cell lines - EXPECTED (PN cell lines mentioned for drug screening data)
+    - Potentially clinical assessment tools if patient outcomes are analyzed
+    
+    This is a computational drug discovery study that analyzes transcriptome data from PN cell lines
+    and primary tumor tissues. The study uses multiple R packages and bioinformatics tools for
+    network analysis, drug screening analysis, and data visualization. Cell lines are mentioned
+    as data sources but may not qualify as research tools if only used for data generation.
+  overallAssessment: |
+    This bioinformatics study should contain multiple computational tools (R packages, databases, 
+    analysis software) which are legitimate research tools. The study mentions several PN cell lines
+    but these appear to be data sources rather than tools actively used by the authors. The mining
+    system appears to have missed multiple computational tools that are clearly mentioned in the
+    methods section with specific package names and versions.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "R programming environment"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All analyses were performed under the R programming environment. Key packages used include synapser"
+    whyMissed: "Generic programming language mention without version - mining patterns may require more specific formatting"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "synapser"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ]"
+    whyMissed: "R package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "tidyverse"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ]"
+    whyMissed: "R package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "dplyr"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ]"
+    whyMissed: "R package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "WGCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ], WGCNA [ 27 ]"
+    whyMissed: "Bioinformatics package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ggplot2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ], WGCNA [ 27 ], ggplot2 [ 28 ]"
+    whyMissed: "R visualization package not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "enrichplot"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ], WGCNA [ 27 ], ggplot2 [ 28 ], enrichplot [ 29 ]"
+    whyMissed: "R package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ConsensusClusterPlus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ], WGCNA [ 27 ], ggplot2 [ 28 ], enrichplot [ 29 ], and ConsensusClusterPlus [ 30 ]"
+    whyMissed: "Bioinformatics package name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ChEMBL database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We queried drug information from the ChEMBL database, a manually curated database of bioactive molecules maintained by the European Bioinformatics Institute"
+    whyMissed: "Database name not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MIPE 4.0 library"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The drug screening data were contributed by Ferrer et al. using the Mechanism Interrogation PlatE (MIPE 4.0) library [ 6 ]. This library comprises 1912 small molecules"
+    whyMissed: "Specialized drug screening library not recognized by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "IDAPredict.2drug"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "IDAPredict.2drug function package was used to predict the drug combination between DrugCluster pairs [ 23 ]"
+    whyMissed: "Specialized drug combination prediction tool not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ipNF05.5"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "five cell lines had available transcriptome data, which were downloaded via syn22351884, including ipNF05.5 (mixed clone), ipNF05.5 (single clone)"
+    whyMissed: "PN cell line naming convention not recognized by mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "ipNF95.11bC"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "including ipNF05.5 (mixed clone), ipNF05.5 (single clone), ipNF95.11bC, ipNF95.6, and ipnNF95.11c"
+    whyMissed: "PN cell line naming convention not recognized by mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "ipNF95.6"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "including ipNF05.5 (mixed clone), ipNF05.5 (single clone), ipNF95.11bC, ipNF95.6, and ipnNF95.11c"
+    whyMissed: "PN cell line naming convention not recognized by mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "ipnNF95.11c"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "including ipNF05.5 (mixed clone), ipNF05.5 (single clone), ipNF95.11bC, ipNF95.6, and ipnNF95.11c"
+    whyMissed: "PN cell line naming convention not recognized by mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "Key packages used include"
+    toolType: "computational_tool"
+    examples: ["Key packages used include synapser [ 24 ], tidyverse [ 25 ], dplyr [ 26 ]"]
+    reasoning: "This phrase directly indicates computational tools/packages being used in analysis"
+
+  - patternType: "context_phrase"
+    pattern: "package was used"
+    toolType: "computational_tool"
+    examples: ["IDAPredict.2drug function package was used to predict"]
+    reasoning: "Clear indication of software package usage in methods"
+
+  - patternType: "context_phrase"
+    pattern: "analyses were performed under"
+    toolType: "computational_tool"
+    examples: ["All analyses were performed under the R programming environment"]
+    reasoning: "Indicates the computational environment/platform used for analysis"
+
+  - patternType: "naming_convention"
+    pattern: "ipNF\\d+\\.\\d+[a-zA-Z]*"
+    toolType: "cell_line"
+    examples: ["ipNF05.5", "ipNF95.11bC", "ipNF95.6", "ipnNF95.11c"]
+    reasoning: "Specific naming pattern for induced pluripotent neurofibromatosis cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "database.*maintained by"
+    toolType: "computational_tool"
+    examples: ["ChEMBL database, a manually curated database of bioactive molecules maintained by the European Bioinformatics Institute"]
+    reasoning: "Pattern to identify databases as computational resources"
+
+  - patternType: "term"
+    pattern: "library.*comprises.*molecules"
+    toolType: "computational_tool"
+    examples: ["MIPE 4.0 library [ 6 ]. This library comprises 1912 small molecules"]
+    reasoning: "Pattern to identify chemical/drug screening libraries as computational tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear presence of multiple computational tools
+    - Multiple R packages explicitly listed in methods section were not detected
+    - Specialized bioinformatics tools (WGCNA, ChEMBL) were missed
+    - Cell line names with specific naming conventions were not recognized
+    - Database resources used for analysis were not identified
+  recommendations: |
+    This publication contains numerous legitimate research tools that were completely missed by the mining system.
+    The computational tools (R packages, databases, analysis libraries) are clearly described in the methods
+    section and represent genuine research tools used for bioinformatics analysis. The cell lines mentioned
+    are more ambiguous - they appear to be data sources rather than tools actively used by the authors, but
+    could be considered research resources. The mining patterns need significant improvement to catch:
+    1. R package names in "packages used include" contexts
+    2. Database names with institutional affiliations
+    3. Specialized bioinformatics tool names
+    4. Cell line naming conventions for neurofibromatosis research
+    5. Drug screening libraries and platforms
+    All computational tools identified should be added to improve mining coverage for bioinformatics studies.

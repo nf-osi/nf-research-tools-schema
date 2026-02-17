@@ -1,0 +1,298 @@
+publicationMetadata:
+  pmid: "27458360"
+  title: "COMT Val(158)Met Polymorphism Is Associated with Verbal Working Memory in Neurofibromatosis Type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical genetic association study investigating cognitive phenotypes in NF1 patients.
+    Expected tool types:
+    - Clinical assessment tools: Standardized neuropsychological tests, cognitive assessments, socioeconomic measures
+    - Computational tools: Statistical analysis software for data processing
+    - Genetic reagents: Genotyping assays and PCR reagents for COMT polymorphism analysis
+    
+    The study combines clinical assessment with molecular genotyping, so tools from multiple categories are expected.
+    Clinical assessment tools are the primary focus, but computational and genetic tools support the methodology.
+  overallAssessment: |
+    This clinical study would typically use multiple research tools including standardized clinical assessment instruments
+    for cognitive evaluation, computational tools for statistical analysis, and genetic reagents for genotyping.
+    The study has a comprehensive Methods section describing detailed protocols for neuropsychological testing,
+    genotyping procedures, and statistical analysis, indicating active tool usage rather than just citations.
+
+toolValidations: []  # No tools were mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "Wechsler Adult Intelligence Scale (WAIS-III)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "General intellectual functioning was assessed by the third version of the Brazilian Wechsler Intelligence Scales (WAIS-III or WISC-III for adults and children, respectively; Wechsler, 2002, 2004)."
+    whyMissed: "Standardized clinical assessment tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler Intelligence Scale for Children (WISC-III)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "General intellectual functioning was assessed by the third version of the Brazilian Wechsler Intelligence Scales (WAIS-III or WISC-III for adults and children, respectively; Wechsler, 2002, 2004)."
+    whyMissed: "Standardized clinical assessment tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Digit-span subtest"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All participants completed the age-appropriate digit-span subtest of the Wechsler Adult and Children Intelligence Scales (Wechsler, 2002, 2004)"
+    whyMissed: "Specific neuropsychological test component not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Corsi block-tapping task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All participants completed the age-appropriate digit-span subtest of the Wechsler Adult and Children Intelligence Scales (Wechsler, 2002, 2004) and the Corsi block-tapping task (Kessels et al., 2000, 2008)."
+    whyMissed: "Visuospatial working memory assessment tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "School Achievement Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "We adopted the arithmetic subtest from the School Achievement Test (Stein, 1994), as an objective measure of school performance."
+    whyMissed: "Academic assessment tool not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Brazilian Criterion for Economic Classification (CCEB)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Socioeconomic status (SES) was assessed using the Brazilian Criterion for Economic Classification (CCEB) according to the criteria established by the Brazilian Research Enterprises Association"
+    whyMissed: "Socioeconomic assessment tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS 20.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All statistical procedures were performed in SPSS 20.0."
+    whyMissed: "Statistical software with version number not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Stratagene Mx3005 – MxPro QPCR-Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Genotyping was performed using a real-time PCR system in the allelic discrimination mode (Stratagene Mx3005 – MxPro QPCR-Software, 2007)"
+    whyMissed: "PCR analysis software not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TaqMan Genotyping Master Mix"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using the TaqMan Genotyping Master Mix (Applied Biosystems, Foster City, CA, USA)"
+    whyMissed: "Commercial genotyping reagent not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Applied Biosystems COMT assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The COMT functional polymorphism (val158met, rs4680) was purchased in a made-to-order from Applied Biosystems®"
+    whyMissed: "Custom genotyping assay not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Wechsler.*Intelligence.*Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler Adult Intelligence Scale (WAIS-III)", "Wechsler Intelligence Scale for Children (WISC-III)"]
+    reasoning: "Wechsler scales are widely used standardized cognitive assessment tools in clinical research"
+
+  - patternType: "term"
+    pattern: "digit.span|digit span"
+    toolType: "clinical_assessment_tool"
+    examples: ["digit-span subtest", "backward digit-span task"]
+    reasoning: "Digit span is a common working memory assessment component"
+
+  - patternType: "term"
+    pattern: "Corsi.*block.*tapping"
+    toolType: "clinical_assessment_tool"
+    examples: ["Corsi block-tapping task"]
+    reasoning: "Corsi block-tapping is a standard visuospatial working memory assessment"
+
+  - patternType: "context_phrase"
+    pattern: "assessed using|measured by|administered.*test|completed.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed using the Brazilian Criterion", "measured by the backward digit-span task"]
+    reasoning: "These phrases commonly indicate clinical assessment tool usage"
+
+  - patternType: "term"
+    pattern: "SPSS\\s+\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["SPSS 20.0"]
+    reasoning: "Statistical software with version numbers should be captured"
+
+  - patternType: "term"
+    pattern: "TaqMan.*Master.*Mix"
+    toolType: "genetic_reagent"
+    examples: ["TaqMan Genotyping Master Mix"]
+    reasoning: "TaqMan reagents are common commercial genotyping products"
+
+  - patternType: "context_phrase"
+    pattern: "made.to.order.*from|purchased.*from.*Applied Biosystems"
+    toolType: "genetic_reagent"
+    examples: ["purchased in a made-to-order from Applied Biosystems®"]
+    reasoning: "Indicates custom or commercial genetic reagent procurement"
+
+  - patternType: "naming_convention"
+    pattern: "Achievement.*Test|Criterion.*Classification"
+    toolType: "clinical_assessment_tool"
+    examples: ["School Achievement Test", "Brazilian Criterion for Economic Classification"]
+    reasoning: "Common naming patterns for standardized assessment instruments"
+
+observations:
+  - resourceName: "Wechsler Adult Intelligence Scale (WAIS-III)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for general intellectual functioning assessment in adults (19-50 years old) in the NF1 sample.
+      Brazilian version was specifically utilized. No significant differences in IQ scores were found
+      between COMT genotype groups (χ² = 1.83, p = 0.400), with median IQ scores ranging from 94-98
+      across genotype groups.
+    foundIn: "results"
+    contextSnippet: "No significant differences in performance according to COMT genotype were found... Full scale IQ 89 95 103 77 94 106 89 98 106 1.73 0.400"
+    confidence: 0.90
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "Wechsler Intelligence Scale for Children (WISC-III)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for intellectual functioning assessment in children (6-18 years old) in the NF1 sample.
+      Brazilian version was specifically utilized. Applied to 19 pediatric subjects as part of the
+      comprehensive cognitive assessment battery.
+    foundIn: "results"
+    contextSnippet: "Fifty participants with NF1 [19 subjects from 6- to 18-year-old (11.89 ± 4.11 years; 11 male) and 31 adults"
+    confidence: 0.85
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "Digit-span subtest"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Backward digit-span task showed significant group differences between COMT genotypes (χ² = 6.65, p = 0.036).
+      Met/Met group outperformed Val/Met group (Z = 2.58, p = 0.030, r = 0.44) but not Val/Val group.
+      Forward digit-span showed no significant differences between genotype groups (χ² = 1.06, p = 0.587).
+      Backward digit-span was predictive of arithmetic performance (p = 0.020) in logistic regression analysis.
+    foundIn: "results"
+    contextSnippet: "In the digit-span backward condition, significant group differences were found (χ² = 6.65, p = 0.036). The Met/Met group outperformed the Val/Met group"
+    confidence: 0.95
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "Corsi block-tapping task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      No significant differences found between COMT genotype groups for either forward (χ² = 4.29, p = 0.117)
+      or backward (χ² = 3.27, p = 0.195) conditions. The backward Corsi task failed to demonstrate the same
+      level of difficulty compared to backward digit-span task, with participants reaching similar performance
+      on both forward and backward versions.
+    foundIn: "results"
+    contextSnippet: "No significant differences in performance according to COMT genotype were found for... Corsi block-tapping task forward (χ² = 4.29, p = 0.117) and backward (χ² = 3.27, p = 0.195)"
+    confidence: 0.90
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "School Achievement Test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Arithmetic subtest revealed that 40% of NF1 sample had difficulties in basic arithmetic skills
+      (performance below 25th percentile). No significant difference found between low-achievement and
+      normal-high-achievement groups regarding COMT genotype distribution (χ² = 0.952, p = 0.621).
+      Test was developed for Brazilian population with adequate normative data for grades 1-6.
+    foundIn: "results"
+    contextSnippet: "The school performance analysis showed that 40% of our sample had difficulties in basic arithmetic skills according to the cut-offs of the School Achievement Test"
+    confidence: 0.90
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "Brazilian Criterion for Economic Classification (CCEB)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully classified NF1 participants into socioeconomic categories: 36% high class (A and B),
+      54% middle class (C), and 10% low class (D and E). No significant differences in socioeconomic
+      status found between COMT genotype groups (χ² = 1.03, p = 0.596). Scale ranges from 0-46 points
+      with eight economic classes based on household resources and education level.
+    foundIn: "results"
+    contextSnippet: "Eighteen NF1 participants (36%) were classified as high class, 27 (54%) as middle class, and five (10%) as low class"
+    confidence: 0.85
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "SPSS 20.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for all statistical procedures including non-parametric tests (Kruskal-Wallis), post hoc
+      comparisons (Dunn-Bonferroni method), chi-square tests, and multinomial stepwise logistic regression.
+      Successfully handled non-normally distributed data and provided effect size calculations.
+      Final logistic regression model showed moderate sensitivity (83%) and specificity (75%).
+    foundIn: "results"
+    contextSnippet: "The final step of the backward logistic regression model was significant (χ² = 26.30, df = 2, p < 0.001) and showed a moderate sensitivity (83%) and specificity (75%)"
+    confidence: 0.95
+    doi: "10.3389/fnhum.2016.00334"
+
+  - resourceName: "TaqMan Genotyping Master Mix"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used for COMT polymorphism genotyping with real-time PCR in allelic discrimination mode.
+      PCR parameters: initial denaturation at 95°C for 10 min, followed by 50 cycles at 95°C for 15 s
+      and 60°C for 1 min. Each reaction contained 3.5 μl of mix with other components. Enabled successful
+      genotyping of all 50 NF1 participants for Val/Val, Val/Met, and Met/Met genotypes.
+    foundIn: "results"
+    contextSnippet: "COMT genotype was coded as a categorical variable (Val/Val, Met/Val, and Met/Met) for further analysis"
+    confidence: 0.90
+    doi: "10.3389/fnhum.2016.00334"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 8
+  observationsExtracted: 8
+  observationsByType:
+    Usage Instructions: 5
+    General Comment or Review: 3
+  majorIssuesFound: |
+    - Complete failure to mine any tools from this publication despite containing multiple valid research tools
+    - Clinical assessment tools (Wechsler scales, cognitive tests) completely missed
+    - Computational tools (SPSS, PCR software) not captured
+    - Genetic reagents (TaqMan, Applied Biosystems assays) not detected
+    - Mining patterns appear inadequate for clinical research publications
+  recommendations: |
+    This publication contains numerous valid research tools that were completely missed by the mining process.
+    The study uses standardized clinical assessment instruments, statistical software, and genetic reagents
+    that should have been captured. Key recommendations:
+    
+    1. ADD ALL 10 MISSED TOOLS - These are legitimate research tools with clear experimental usage
+    2. IMPLEMENT SUGGESTED PATTERNS - The 8 new patterns would significantly improve clinical tool detection
+    3. EXPAND CLINICAL TOOL COVERAGE - Current mining appears biased toward lab tools, missing clinical assessments
+    4. IMPROVE SOFTWARE DETECTION - Statistical and analysis software with versions should be captured
+    5. ENHANCE REAGENT PATTERNS - Commercial genetic reagents and assays need better coverage
+    
+    The observations extracted demonstrate that these tools produced meaningful scientific findings about
+    COMT genotype effects on working memory in NF1 patients. This represents a significant gap in the
+    current mining approach for clinical research publications.

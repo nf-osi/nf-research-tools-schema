@@ -1,0 +1,80 @@
+publicationMetadata:
+  pmid: "34230200"
+  title: "Imaging Evaluation of Plexiform Neurofibromas in Neurofibromatosis Type 1: A Survey-Based Assessment."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Based on publication type (Observational Study - Survey):
+    - Clinical assessment tools: Potentially the survey instrument itself, though not described in detail
+    - Computational tools: Possibly statistical analysis software for survey data analysis
+    - Lab tools (antibodies, cell lines, animal models, genetic reagents, organoids, PDX): Not expected
+    
+    Note: This is a survey study about imaging practices, not laboratory research. The queryType "bench" 
+    appears to be a mismatch - this publication was likely misclassified by the PubMed query.
+  overallAssessment: |
+    This is a survey-based observational study examining imaging practices among clinicians treating NF1 patients.
+    The study does not involve laboratory research, experimental procedures, or tool development. While the survey
+    instrument itself could be considered a clinical assessment tool, it is not described in sufficient detail
+    to be considered a research tool for reuse. The publication focuses on practice patterns rather than tool usage.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Survey instrument"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "An institutional review board–exempt survey was administered to medical practitioners caring for individuals with NF1 at the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) meeting in September 2019. The survey included questions on respondent demographic data (9 questions), type of imaging obtained for asymptomatic (4 questions) and symptomatic (4 questions) people with and without PN, and utilization of diffusion-weighted imaging (2 questions)."
+    whyMissed: "The survey instrument is mentioned but not described in detail with specific questions, validation data, or reusability information. It appears to be a custom survey created for this specific study rather than a standardized, validated clinical assessment tool."
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "Statistical analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Survey data would require statistical analysis software for processing responses and calculating percentages, but no specific software is mentioned in the available text."
+    whyMissed: "Statistical analysis software is implied for processing survey data (calculating percentages like '57% [17/30]') but no specific software package, version, or analysis methods are described in the available text sections."
+    confidence: 0.4
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "validated survey|standardized questionnaire|assessment instrument"
+    toolType: "clinical_assessment_tool"
+    examples: ["No examples found in this paper - this is a suggestion for future mining"]
+    reasoning: "To better distinguish between custom surveys (not tools) and validated clinical assessment instruments that could be reused by other researchers. This paper uses a custom survey that wouldn't qualify as a research tool."
+  - patternType: "term"
+    pattern: "REiNS|Response Evaluation in Neurofibromatosis and Schwannomatosis"
+    toolType: "clinical_assessment_tool"
+    examples: ["Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) meeting"]
+    reasoning: "REiNS appears to be a clinical evaluation framework/consortium for NF research. However, in this context it's mentioned as a meeting venue, not as a tool being used. Pattern should include context to distinguish meeting mentions from tool usage."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication queryType "bench" is mismatched - this is clearly a clinical survey study, not bench research
+    - No research tools were mined, which is appropriate for this publication type
+    - Survey instrument mentioned but lacks detail needed to qualify as a reusable research tool
+    - No Methods section describing experimental procedures or tool usage
+    - Limited text available (no Introduction, Results, or Discussion sections provided)
+  recommendations: |
+    This publication correctly yielded zero research tools. It is a survey-based observational study about
+    clinical imaging practices, not a laboratory research study or clinical trial using research tools.
+    The survey instrument itself is too briefly described to qualify as a validated clinical assessment tool.
+    
+    Key recommendations:
+    1. The queryType classification should be corrected from "bench" to "clinical" 
+    2. No tools should be added from this publication
+    3. This publication demonstrates the importance of publication type classification in tool mining
+    4. Future mining should include patterns to better identify when surveys are custom vs. validated instruments
+    5. Consider excluding survey methodology papers unless they describe validated, reusable instruments

@@ -1,0 +1,233 @@
+publicationMetadata:
+  pmid: "35244537"
+  title: "Detection of malignant peripheral nerve sheath tumors in patients with neurofibromatosis using aneuploidy and mutation identification in plasma."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → computational tools, genetic reagents, potentially antibodies, cell lines
+    
+    This publication describes extensive molecular biology methods including:
+    - Whole exome sequencing with library preparation
+    - Droplet digital PCR (ddPCR) analysis
+    - Custom computational analysis pipelines
+    - Plasma cfDNA extraction and analysis
+    - Statistical analysis methods
+    
+    Expected tool categories:
+    - Computational tools: Custom software (VariantDx), analysis pipelines, statistical software
+    - Genetic reagents: PCR primers, library construction reagents, sequencing kits
+    - Potentially missed: Specific software versions, analysis tools, commercial kits with catalog numbers
+  overallAssessment: |
+    This is a laboratory research study with extensive molecular biology methods that would typically use multiple research tools.
+    The detailed Methods section describes complex protocols for DNA sequencing, library preparation, and computational analysis.
+    The absence of mined tools suggests significant gaps in the mining patterns, as this type of publication should contain
+    numerous computational tools, genetic reagents, and commercial kits that are essential research tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "VariantDx"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Somatic mutations were identified using VariantDx custom software for identifying mutations in matched tumor and normal samples from whole exome sequencing (WES)."
+    whyMissed: "Custom computational software not caught by mining patterns - lacks version number or standard software naming conventions"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina TruSeq"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Genomic DNA from tumor and normal samples were fragmented and used for Illumina TruSeq library construction (Illumina, San Diego, CA) according to the manufacturer's instructions."
+    whyMissed: "Commercial kit with vendor information not caught - may need patterns for 'library construction' context"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Agencourt AMPure XP beads"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "DNA was purified using Agencourt AMPure XP beads (Beckman Coulter, IN) in a ratio of 1.0–0.9 of PCR product to beads."
+    whyMissed: "Commercial purification reagent with vendor - needs patterns for purification/cleanup reagents"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent SureSelect v.4 kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Exonic regions were captured in solution using the Agilent SureSelect v.4 kit (Agilent, Santa Clara, CA)."
+    whyMissed: "Commercial exome capture kit with version number - needs patterns for capture/enrichment kits"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina HiSeq 2,500"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Paired-end sequencing resulting in 100 bases from each end of the fragments was performed using Illumina HiSeq 2,500 (Illumina, San Diego, CA)."
+    whyMissed: "Sequencing platform/instrument - may need patterns for sequencing instruments"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "BioChain cfDNA Extraction Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA from each of the plasma samples was purified using a BioChain cfDNA Extraction Kit (BioChain, cat #K5011610) using the manufacturer's recommended protocol."
+    whyMissed: "Commercial extraction kit with catalog number - needs patterns for extraction kits"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina CASAVA software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Prior to mutation calling, primary processing of sequence data for both tumor and normal samples were performed using Illumina CASAVA software (v1.8)"
+    whyMissed: "Bioinformatics software with version number - needs patterns for sequence analysis software"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ELAND software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequence reads were aligned against the human reference genome (version hg19) using ELAND software."
+    whyMissed: "Sequence alignment software - needs patterns for alignment tools"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "snpEff"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Functional consequences were predicted using snpEff and a custom database of CCDS, RefSeq and Ensembl annotations"
+    whyMissed: "Variant annotation software - needs patterns for bioinformatics annotation tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "QIAGEN circulating nucleic acid kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cell-free DNA was extracted using the QIAGEN circulating nucleic acid kit (Catalog# 55114)."
+    whyMissed: "Commercial kit with catalog number - needs patterns for nucleic acid extraction kits"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "BioRad QX200 droplet digital PCR system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Extracted cell-free DNA was analyzed with custom designed droplet digital PrimePCR assays using the BioRad QX200 droplet digital PCR system"
+    whyMissed: "PCR instrument/system - needs patterns for PCR platforms and instruments"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "RealSeqS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RealSeqS uses a single primer pair to amplify about 750,000 loci scattered throughout the genome"
+    whyMissed: "Custom analysis method/assay - needs patterns for specialized genomic assays"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using [A-Z][a-zA-Z0-9\\s]+ (software|kit|system|platform)"
+    toolType: "general"
+    examples: ["using VariantDx custom software", "using the BioRad QX200 droplet digital PCR system"]
+    reasoning: "Captures tools mentioned with 'using' followed by proper noun and tool type indicator"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z]+,\\s*[A-Z]{2,}\\)"
+    toolType: "general"
+    examples: ["(Illumina, San Diego, CA)", "(Beckman Coulter, IN)", "(Agilent, Santa Clara, CA)"]
+    reasoning: "Identifies commercial products by vendor location pattern - strong indicator of research tools"
+
+  - patternType: "term"
+    pattern: "catalog\\s*#?\\s*[A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["cat# E6050", "Catalog# 55114", "cat #K5011610"]
+    reasoning: "Catalog numbers are strong indicators of commercial research reagents and kits"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-zA-Z]+\\s+(v\\.|version\\s+)?\\d+(\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["CASAVA software (v1.8)", "SureSelect v.4 kit"]
+    reasoning: "Software and kit names with version numbers are clear tool indicators"
+
+  - patternType: "context_phrase"
+    pattern: "(library construction|exome capture|DNA extraction|sequence alignment|variant annotation)"
+    toolType: "general"
+    examples: ["library construction", "exonic regions were captured", "DNA was extracted", "reads were aligned"]
+    reasoning: "Methodological phrases that typically involve specific commercial kits or software tools"
+
+  - patternType: "term"
+    pattern: "(HiSeq|MiSeq|NextSeq|NovaSeq)\\s+\\d+"
+    toolType: "genetic_reagent"
+    examples: ["HiSeq 2,500", "MiSeq v3"]
+    reasoning: "Illumina sequencing platform naming convention - these are major research instruments"
+
+observations:
+  - resourceName: "VariantDx"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Custom software demonstrated effective performance for somatic mutation identification in matched tumor-normal samples from whole exome sequencing.
+      Applied specific filtering criteria: (i) distinct paired reads contained the mutation in tumor; (ii) at least 10% of total distinct read pairs; 
+      (iii) mismatched base not present in >1% of matched normal reads; (iv) position covered in both tumor and normal.
+      Successfully identified somatic mutations in NF1, NF2, RB1, TP53BP2, and GOLGA2 genes from plasma cfDNA samples.
+    foundIn: "results"
+    contextSnippet: "Three patients had positive ctDNA results, including one patient (INDIA 1280) with a benign neurofibroma of the right femoral nerve that had a GOLGA2 splice site acceptor mutation at a mutant allele frequency (MAF) of 0.19%, and two MPNST patients (INDIA 1244 and INDIA 1281) that a RB1 R787Qfs*23 mutation at 2.55% and a TP53BP2 A324V mutation at 0.04%, respectively."
+    confidence: 0.90
+    doi: "e74238"
+
+  - resourceName: "RealSeqS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Assay demonstrated ability to amplify approximately 750,000 loci across 39 chromosome arms for aneuploidy detection.
+      Achieved 97% specificity in healthy controls (n=883) with median GAS score of 0.008 ± 0.102.
+      Sensitivity for detecting MPNST was 33% (4/12 patients, p < 0.001 compared to healthy controls).
+      Successfully detected focal copy number alterations including losses in TERT (17% of MPNST), TP53 (8%), and SUZ12 (50%).
+      Low sequencing coverage requirement (~10M reads per sample) enables cost-effective high-throughput analysis.
+    foundIn: "both"
+    contextSnippet: "At 97% specificity in healthy controls, at the time of blood draw, the false positive rate among benign/plexiform neurofibromas was 6.3% (1/16, p = 0.42 compared to healthy controls), while the sensitivity for detecting MPNST was 33% (4/12, p < 0.001 compared to healthy controls)."
+    confidence: 0.95
+    doi: "e74238"
+
+  - resourceName: "BioRad QX200 droplet digital PCR system"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      System successfully quantified mutant allele frequencies (MAF) in circulating tumor DNA from plasma samples.
+      Detected mutations at low frequencies: GOLGA2 splice site mutation at 0.19% MAF, RB1 R787Qfs*23 at 2.55% MAF, 
+      and TP53BP2 A324V at 0.04% MAF. Performed in triplicate for accurate quantification of wild-type and mutant 
+      genomic equivalents. Demonstrated sensitivity for detecting rare mutant alleles in liquid biopsy applications.
+    foundIn: "results"
+    contextSnippet: "ddPCR was then performed in triplicate on DNA derived from the plasma and ctDNA levels were quantified. These data were used to calculate the overall MAF for each somatic mutation, defined as the number of mutant counts divided by the total number of counts for a given amplicon."
+    confidence: 0.85
+    doi: "e74238"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite extensive methodology
+    - Publication contains numerous commercial kits, instruments, and software tools that should have been captured
+    - Missing patterns for: vendor information, catalog numbers, software versions, sequencing platforms
+    - No recognition of bioinformatics tools (VariantDx, CASAVA, ELAND, snpEff) despite clear usage context
+    - Commercial kits with catalog numbers completely missed (BioChain K5011610, QIAGEN 55114)
+    - Sequencing instruments and PCR systems not detected
+  recommendations: |
+    - All 12 potentially missed tools should be added to the database - they represent genuine research tools with clear experimental usage
+    - Implement suggested patterns immediately, particularly vendor location patterns and catalog number detection
+    - Add bioinformatics software patterns to capture sequence analysis tools
+    - Include sequencing platform naming conventions (HiSeq, MiSeq patterns)
+    - This publication demonstrates major gaps in current mining coverage for molecular biology tools
+    - The 6 suggested patterns would significantly improve tool detection in similar publications
+    - Three high-quality usage observations were extracted showing practical performance data for computational tools and instruments

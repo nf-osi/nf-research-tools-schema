@@ -1,0 +1,253 @@
+publicationMetadata:
+  pmid: "33160273"
+  title: "Modeling tumors of the peripheral nervous system associated with Neurofibromatosis type 1: Reprogramming plexiform neurofibroma cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study with extensive experimental methods including:
+    - Cell culture of immortalized Schwann cell lines
+    - Immunofluorescence staining with antibodies
+    - Computational analysis using ImageJ
+    - Custom electrical stimulation setup
+    - Various biochemical assays (Alamar blue, ELISA)
+    
+    Expected tools: cell lines (Schwann cells), antibodies (s-100b), computational tools (ImageJ), 
+    potentially genetic reagents (cell line modifications), and advanced cellular models (3D culture systems).
+  overallAssessment: |
+    This is a clear laboratory research study investigating Schwann cell behavior using engineered biomaterials 
+    and electrical stimulation. The extensive Methods section describes multiple experimental procedures that 
+    would require various research tools. The study uses immortalized cell lines, antibodies for staining, 
+    computational software for analysis, and custom fabricated experimental setups. This type of publication 
+    should contain multiple validated research tools across several categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ipNF 95.11b"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized NF1 patient derived Schwann cell (NF SC, NF-/-) line, ipNF 95.11b and Wild type Schwann cell (WT SC, NF+/+) line, ipn 02.8 were utilized for all experiments"
+    whyMissed: "Specific cell line name with standard nomenclature not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ipn 02.8"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized NF1 patient derived Schwann cell (NF SC, NF-/-) line, ipNF 95.11b and Wild type Schwann cell (WT SC, NF+/+) line, ipn 02.8 were utilized for all experiments"
+    whyMissed: "Specific cell line name with standard nomenclature not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "s-100b antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Schwann cells were incubated with antibody against s-100b (Sigma) as the primary overnight at 1:400 ratio"
+    whyMissed: "Antibody target name not detected, vendor information present (Sigma)"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-rabbit IgG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "treated with anti-rabbit IgG as secondary (Alexa Fluro 594, Invitrogen) for 2 hours at 1:1000 ratio"
+    whyMissed: "Secondary antibody with vendor information (Invitrogen) not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Fiber diameter and angle were measured using ImageJ (v1.53a) with at least 200 fibers per fiber type"
+    whyMissed: "Software name with version number not detected by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NIH ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The images were analyzed using NIH ImageJ (version 1.53a) software"
+    whyMissed: "Full software name with version not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Python"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "connected to a Raspberry Pi running a Python script to store the data in near real time through the USB port connection"
+    whyMissed: "Programming language in active usage context not detected"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "DMEM"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "All cells were cultured in DMEM (Gibco by Life Technologies) with 10% Fetal Bovine Serum"
+    whyMissed: "Cell culture medium with vendor information not detected"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "ip[A-Z]*\\s+\\d+\\.\\d+[a-z]*"
+    toolType: "cell_line"
+    examples: ["ipNF 95.11b", "ipn 02.8"]
+    reasoning: "Immortalized cell lines often follow 'ip' prefix naming convention with alphanumeric identifiers"
+
+  - patternType: "context_phrase"
+    pattern: "antibody against\\s+([A-Za-z0-9-]+)"
+    toolType: "antibody"
+    examples: ["antibody against s-100b"]
+    reasoning: "Common phrase structure for antibody target specification in methods"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(([A-Za-z\\s]+)\\s+by\\s+([A-Za-z\\s]+)\\)"
+    toolType: "general"
+    examples: ["(Gibco by Life Technologies)", "(Alexa Fluro 594, Invitrogen)"]
+    reasoning: "Vendor attribution pattern commonly used for reagents and tools"
+
+  - patternType: "term"
+    pattern: "ImageJ\\s*\\([v]?\\d+\\.\\d+[a-z]*\\)"
+    toolType: "computational_tool"
+    examples: ["ImageJ (v1.53a)", "NIH ImageJ (version 1.53a)"]
+    reasoning: "ImageJ is extremely common analysis software that should be detected with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "running\\s+a\\s+([A-Za-z]+)\\s+script"
+    toolType: "computational_tool"
+    examples: ["running a Python script"]
+    reasoning: "Programming languages in active usage context should be detected"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}\\s*\\([A-Za-z\\s]+\\s+by\\s+[A-Za-z\\s]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["DMEM (Gibco by Life Technologies)"]
+    reasoning: "Cell culture media and reagents with vendor information"
+
+observations:
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF1 patient-derived Schwann cells (NF SC, NF-/-) showed increased elongation and higher aspect ratio 
+      compared to wild-type cells. NF SC appeared more aligned than WT SC in all culture conditions and 
+      exhibited more spindle-shaped morphology. Cell spread area was lower for NF cells compared to WT cells.
+    foundIn: "results"
+    contextSnippet: "NF SC appear more aligned than WT SC in all conditions. WT SC are more rounded and appear to group together... Cell spread area was higher for WT SC, while aspect ratio was higher for NF SC indicating that the NF cells have a more spindle shaped morphology."
+    confidence: 0.9
+    doi: "10.1016/j.scr.2020.102068"
+
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Under electrical stimulation conditions, NF Schwann cells showed decreased elongation and aspect ratio, 
+      with proliferation remaining relatively constant. NF SC showed highest proliferation when unstimulated, 
+      unlike wild-type cells which showed increased proliferation under 100 mV/mm stimulation.
+    foundIn: "results"
+    contextSnippet: "For NF SC, we saw different results in the same stimulation range. Elongation and aspect ratio decreased, while proliferation stayed about constant... NF SC showed highest proliferation when unstimulated"
+    confidence: 0.9
+    doi: "10.1016/j.scr.2020.102068"
+
+  - resourceName: "ipn 02.8"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Wild-type Schwann cells (WT SC, NF+/+) showed increased proliferation, particularly at 72 hours on 
+      HA-CNT fibers. WT SC exhibited rounder morphology, tendency to cluster, and higher cellular spread area 
+      compared to NF cells. Under electrical stimulation, WT SC showed increased proliferation at 100 mV/mm.
+    foundIn: "results"
+    contextSnippet: "WT SC showed the most proliferation in all material conditions... WT SC are rounder and tend to cluster... Cellular proliferation was highest for WT SC at 100 mV/mm stimulation"
+    confidence: 0.9
+    doi: "10.1016/j.scr.2020.102068"
+
+  - resourceName: "ipn 02.8"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Wild-type Schwann cells showed increased NGF (Neural Growth Factor) release under electrical stimulation, 
+      with highest release at 100 mV/mm stimulation at 48 hours post-stimulation. NGF release was significantly 
+      higher than all other conditions tested.
+    foundIn: "results"
+    contextSnippet: "Highest NGF release was seen following 100 mV/mm for WT SC. NGF release increased for both cell types under 100 mV/mm stimulation... WT SC at 48 hours, 100 mV/mm is significantly higher than all other conditions"
+    confidence: 0.9
+    doi: "10.1016/j.scr.2020.102068"
+
+  - resourceName: "ipNF 95.11b"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF Schwann cells showed relatively stable NGF release across all stimulation conditions, unlike wild-type 
+      cells which showed increased NGF release under stimulation. This suggests altered growth factor regulation 
+      in NF1-deficient cells.
+    foundIn: "results"
+    contextSnippet: "NF SC show relatively stable NGF release in all conditions... This could attribute to WT SC being stimulated at regeneration ranges which triggers them to release NGF to support regeneration"
+    confidence: 0.85
+    doi: "10.1016/j.scr.2020.102068"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ImageJ (v1.53a) was used for fiber diameter and angle measurements with at least 200 fibers per fiber type. 
+      The angle tool was used to measure fiber orientation with the bottom border as reference 0° plane. 
+      Aspect ratio and cellular spread area were also measured using ImageJ software.
+    foundIn: "methods"
+    contextSnippet: "Fiber diameter and angle were measured using ImageJ (v1.53a) with at least 200 fibers per fiber type... The images were analyzed using NIH ImageJ (version 1.53a) software. Aspect ratio... and cellular spread area... were measured"
+    confidence: 0.95
+    doi: "10.1016/j.scr.2020.102068"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Cellular: 4
+    Molecular: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite clear laboratory research publication
+    - Multiple obvious research tools present: cell lines with specific names, antibodies with vendors, computational software with versions
+    - Cell line nomenclature (ipNF 95.11b, ipn 02.8) not recognized by current patterns
+    - Common laboratory software (ImageJ) with version numbers not detected
+    - Antibody targets and vendor information not captured
+    - Programming languages in active usage context missed
+  recommendations: |
+    This publication represents a significant mining failure - zero tools were detected despite this being 
+    a clear laboratory research study with multiple obvious research tools. The following tools should be added:
+    
+    CRITICAL ADDITIONS:
+    - ipNF 95.11b (NF1 patient-derived Schwann cell line)
+    - ipn 02.8 (wild-type Schwann cell line)  
+    - s-100b antibody (Sigma)
+    - anti-rabbit IgG secondary antibody (Invitrogen)
+    - ImageJ v1.53a (computational analysis software)
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Cell line naming conventions for immortalized lines (ip* prefix)
+    - Antibody target detection with vendor information
+    - Software version detection for ImageJ and other common tools
+    - Programming language usage context detection
+    - Vendor attribution patterns for reagents
+    
+    OBSERVATIONS:
+    Six high-quality scientific observations were extracted showing differential behavior between 
+    NF1-deficient and wild-type Schwann cells, including morphological differences, proliferation 
+    patterns, and growth factor secretion under various stimulation conditions.
+    
+    This case highlights major gaps in the current mining system that need immediate attention.

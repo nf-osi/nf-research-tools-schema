@@ -1,0 +1,190 @@
+publicationMetadata:
+  pmid: "24559228"
+  title: "Abnormal late visual responses and alpha oscillations in neurofibromatosis type 1: a link to visual and attention deficits."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (WISC-III found), computational tools for EEG analysis
+    
+    This neurophysiological study uses EEG/ERP measurements in human participants with NF1.
+    Expected tools include:
+    - Clinical assessment tools: WISC-III intelligence scale (found)
+    - Computational tools: MATLAB, STIM 2, Scan 4.5, IBM SPSS Statistics (found)
+    - No lab research tools expected (antibodies, cell lines, animal models, genetic reagents)
+    - No advanced cellular models or patient-derived models expected
+  overallAssessment: |
+    This clinical neurophysiological study examines visual processing in NF1 patients using EEG recordings.
+    The study design involves human participants and neurophysiological measurements, making it likely to contain
+    computational tools for data analysis and clinical assessment tools for participant characterization.
+    Traditional lab research tools (antibodies, cell lines, animal models) are not expected in this type of study.
+
+toolValidations: []  # No tools were initially mined
+
+potentiallyMissedTools:
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Stimuli were generated with MATLAB (R2008a, MathWorks, Natick, MA, USA) and presented with the stimulation software STIM 2"
+    whyMissed: "Software name with version and vendor information clearly indicating computational tool usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STIM 2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "presented with the stimulation software STIM 2 (Neuroscan, Charlotte, NC, USA) with a display resolution of 1,280 × 1,024 × 32"
+    whyMissed: "Specialized stimulation software with vendor information for visual stimulus presentation"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Scan 4.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data analysis was performed with Scan 4.5 (Neuroscan). We started the analysis by correcting the eye blinking artifacts"
+    whyMissed: "EEG data analysis software with version number and vendor, used for signal processing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "IBM SPSS Statistics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All statistical analyses were performed with IBM SPSS Statistics, version 19, software (IBM Corporation, Armonk, NY, USA)"
+    whyMissed: "Statistical analysis software with full version and vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "WISC-III"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "We administered the Portuguese adapted version of the Wechsler Intelligence Scale for Children (WISC-III), in all participants with NF1"
+    whyMissed: "Validated clinical assessment tool (intelligence scale) administered to study participants"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MATLAB\\s*\\([^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["MATLAB (R2008a, MathWorks, Natick, MA, USA)"]
+    reasoning: "MATLAB with version and vendor information pattern for computational analysis tools"
+
+  - patternType: "context_phrase"
+    pattern: "analysis was performed with|analyses were performed with|analyzed using|processed with"
+    toolType: "computational_tool"
+    examples: ["Data analysis was performed with Scan 4.5", "All statistical analyses were performed with IBM SPSS Statistics"]
+    reasoning: "Context phrases that reliably indicate computational tool usage in data analysis"
+
+  - patternType: "term"
+    pattern: "WISC-III|Wechsler Intelligence Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler Intelligence Scale for Children (WISC-III)"]
+    reasoning: "Standardized intelligence assessment tool commonly used in clinical studies"
+
+  - patternType: "context_phrase"
+    pattern: "administered|completed|assessed using|measured with"
+    toolType: "clinical_assessment_tool"
+    examples: ["We administered the Portuguese adapted version of the Wechsler Intelligence Scale"]
+    reasoning: "Context phrases indicating administration of clinical assessment tools to participants"
+
+observations:
+  - resourceName: "MATLAB"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MATLAB R2008a was used to generate visual stimuli for the EEG experiments. The software was used
+      in conjunction with STIM 2 presentation software to create circular horizontal Gabors (sinewave
+      gratings modulated by a Gaussian window) for achromatic, red-green, and blue-yellow visual stimulation.
+      Stimuli were calibrated for specific chromatic properties using cone contrast space calculations.
+    foundIn: "methods"
+    contextSnippet: "Stimuli were generated with MATLAB (R2008a, MathWorks, Natick, MA, USA) and presented with the stimulation software STIM 2"
+    confidence: 0.95
+    doi: "10.1186/1866-1955-6-4"
+
+  - resourceName: "Scan 4.5"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Scan 4.5 (Neuroscan) was used for comprehensive EEG data analysis including: automated eye blink
+      artifact correction using spatial principal component analysis, bandpass filtering (1-100 Hz),
+      epoch extraction, artifact rejection (>100 μV threshold), VEP averaging, and spectral analysis
+      using fast Fourier transforms. The software enabled both time-domain and frequency-domain analyses
+      of visual evoked potentials.
+    foundIn: "methods"
+    contextSnippet: "Data analysis was performed with Scan 4.5 (Neuroscan). We started the analysis by correcting the eye blinking artifacts present in the EEG recordings using an automated procedure available in Scan 4.5"
+    confidence: 0.95
+    doi: "10.1186/1866-1955-6-4"
+
+  - resourceName: "IBM SPSS Statistics"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      IBM SPSS Statistics version 19 was used for all statistical analyses including: Shapiro-Wilk
+      normality tests, repeated measures ANOVA, parametric t-tests, Pearson correlation analyses,
+      Mann-Whitney U tests for non-parametric comparisons, and Greenhouse-Geisser corrections for
+      sphericity violations. The software handled complex mixed-design analyses with between-subjects
+      (NF1 vs control) and within-subjects factors (stimulus contrast, frequency bands, conditions).
+    foundIn: "methods"
+    contextSnippet: "All statistical analyses were performed with IBM SPSS Statistics, version 19, software (IBM Corporation, Armonk, NY, USA). We verified the normality assumption for the different parameters using the Shapiro–Wilk test."
+    confidence: 0.95
+    doi: "10.1186/1866-1955-6-4"
+
+  - resourceName: "WISC-III"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The Portuguese adapted version of WISC-III was administered to all NF1 participants and a subset
+      of controls (n=8). Mean full-scale IQ for NF1 group was 97 (SD=16), while control subgroup scored
+      124 (SD=17). The assessment confirmed the typical downward IQ shift in NF1 populations. Importantly,
+      neurophysiological differences (alpha oscillations) persisted even when comparing IQ-matched
+      subgroups, indicating that EEG abnormalities were not simply due to general cognitive differences.
+    foundIn: "methods"
+    contextSnippet: "We administered the Portuguese adapted version of the Wechsler Intelligence Scale for Children (WISC-III), in all participants with NF1 and in a subgroup of control children and adolescents (n = 8). The mean (standard deviation) full-scale IQ for the NF1 group was 97 (16), while for the subgroup of control participants it was 124 (17)."
+    confidence: 0.95
+    doi: "10.1186/1866-1955-6-4"
+
+  - resourceName: "STIM 2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      STIM 2 stimulation software (Neuroscan) was used to present visual stimuli with precise timing
+      and display parameters. The system operated at 1,280 × 1,024 × 32 resolution with NVIDIA GeForce
+      6600 graphics processing, presented on a CRT monitor at 85 Hz refresh rate. The software enabled
+      precise control of stimulus timing for phase-reversal paradigms and integration with EEG trigger
+      systems for synchronized data acquisition.
+    foundIn: "methods"
+    contextSnippet: "presented with the stimulation software STIM 2 (Neuroscan, Charlotte, NC, USA) with a display resolution of 1,280 × 1,024 × 32 and graphic processing unit NVIDIA GeForce 6600, provided by Neuroscan"
+    confidence: 0.90
+    doi: "10.1186/1866-1955-6-4"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 4
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of computational and clinical assessment tools
+    - Mining patterns missed standard software tools with version numbers and vendor information
+    - Clinical assessment tools (WISC-III) were not detected despite clear administration context
+    - Publication was classified as "bench" query but is actually a clinical neurophysiological study
+  recommendations: |
+    All 5 identified tools should be added to the mining results:
+    - MATLAB, STIM 2, Scan 4.5, and IBM SPSS Statistics are clearly computational tools with version/vendor info
+    - WISC-III is a validated clinical assessment tool administered to study participants
+    - The mining patterns need improvement to catch software tools with parenthetical version/vendor information
+    - Context phrases like "analysis was performed with" and "administered" should be added to improve detection
+    - This publication demonstrates the need for better computational tool and clinical assessment tool mining patterns
+    - All extracted observations provide valuable usage information for these tools in neurophysiological research

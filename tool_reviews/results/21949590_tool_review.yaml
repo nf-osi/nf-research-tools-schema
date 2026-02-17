@@ -1,0 +1,125 @@
+publicationMetadata:
+  pmid: "21949590"
+  title: "ALTERED CALCIUM CURRENTS AND AXONAL GROWTH IN Nf1 HAPLOINSUFFICIENT MICE"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - clear experimental study with animal models
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating calcium currents and axonal growth in 
+    Nf1 haploinsufficient mice. Expected tools include:
+    - Animal models (Nf1+/- mice)
+    - Cell culture systems (hippocampal neurons, cortical cultures)
+    - Potentially computational tools for data analysis
+    - Possibly genetic reagents or antibodies for characterization
+    
+    The study involves electrophysiology, neurotransmitter release assays, and morphological analysis,
+    all of which typically require specific research tools and model systems.
+  overallAssessment: |
+    This is a laboratory research study investigating neurobiological mechanisms in Nf1 haploinsufficient 
+    mice. The study clearly uses animal models (Nf1+/- mice) and cell culture systems (hippocampal neurons, 
+    cortical cultures) to investigate calcium currents and axonal growth. Research tools are definitely 
+    expected and should be present, particularly the Nf1+/- mouse model which is explicitly mentioned 
+    multiple times in the abstract.
+
+toolValidations: []  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Learning deficits also are observed in mice with a heterozygous mutation of Nf1 (Nf1(+/-)). Dysregulation of regulated neurotransmitter release has been observed in Nf1(+/-) mice."
+    whyMissed: "The mining system likely failed to recognize 'Nf1(+/-)' or 'Nf1+/-' as an animal model designation. The parenthetical notation and special characters may have interfered with pattern matching."
+    confidence: 0.95  # Very high confidence this is a genuine animal model
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 haploinsufficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "ALTERED CALCIUM CURRENTS AND AXONAL GROWTH IN Nf1 HAPLOINSUFFICIENT MICE."
+    whyMissed: "The term 'haploinsufficient' may not be in the animal model pattern dictionary. This is a specific genetic terminology describing mice with one functional copy of the Nf1 gene."
+    confidence: 0.90  # High confidence - this is the same model as Nf1+/- mice
+    shouldBeAdded: Yes
+
+  - toolName: "hippocampal neurons"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Hippocampal Ca(2+) current density was greater in neurons from Nf1(+/-) mice"
+    whyMissed: "Primary cell cultures from specific brain regions may not be captured by standard cell line patterns. These are primary neuronal cultures, not immortalized cell lines."
+    confidence: 0.75  # Moderate confidence - these are primary cultures, not standard cell lines
+    shouldBeAdded: Maybe
+
+  - toolName: "neuronal cortical cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "release of the excitatory neurotransmitter, glutamate, was increased in neuronal cortical cultures from Nf1(+/-) mice"
+    whyMissed: "Primary neuronal culture terminology may not be captured by cell line patterns focused on immortalized lines. The phrase structure 'neuronal cortical cultures' is specific to neuroscience."
+    confidence: 0.75  # Moderate confidence - primary cultures vs immortalized cell lines
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice", "p53(+/-) mice"]
+    reasoning: "Captures the standard genetic nomenclature for heterozygous knockout mice using parenthetical notation. This is a common way to denote haploinsufficient animal models."
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\+/-\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "Trp53+/- mice"]
+    reasoning: "Captures the alternative notation for heterozygous knockout mice without parentheses. Both formats are commonly used in the literature."
+
+  - patternType: "term"
+    pattern: "\\b\\w+\\s+haploinsufficient\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 haploinsufficient mice", "p53 haploinsufficient mice"]
+    reasoning: "Captures mice described with haploinsufficiency terminology, which specifically refers to animal models with reduced gene dosage (typically heterozygous knockouts)."
+
+  - patternType: "context_phrase"
+    pattern: "\\b(hippocampal|cortical|cerebellar|striatal)\\s+(neurons?|cultures?)\\b"
+    toolType: "cell_line"
+    examples: ["hippocampal neurons", "neuronal cortical cultures"]
+    reasoning: "Captures primary neuronal cultures from specific brain regions. While not immortalized cell lines, these are important cellular model systems used in neuroscience research."
+
+  - patternType: "context_phrase"
+    pattern: "\\bneurons?\\s+from\\s+\\w+\\s+mice\\b"
+    toolType: "cell_line"
+    examples: ["neurons from Nf1(+/-) mice", "neurons from wild-type mice"]
+    reasoning: "Captures primary neuronal cultures derived from specific mouse strains or genotypes. This pattern would help identify primary cell culture systems."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of animal model usage
+    - The Nf1+/- mouse model is mentioned multiple times but was not detected
+    - Primary neuronal cultures are described but not captured
+    - Mining patterns appear to miss genetic nomenclature with special characters (+/-, parentheses)
+    - Only abstract text available - full Methods section would likely contain more detailed tool information
+  recommendations: |
+    This publication clearly uses research tools, particularly the Nf1+/- (Nf1 haploinsufficient) mouse model,
+    which should have been detected. The mining system needs improvement in:
+    
+    1. Recognizing genetic nomenclature with special characters (+/-, parentheses)
+    2. Capturing haploinsufficient terminology for animal models
+    3. Identifying primary cell culture systems from specific tissues/regions
+    
+    The Nf1+/- mouse model should definitely be added as it's a well-established research tool.
+    Primary neuronal cultures are borderline - they're research tools but not standardized like 
+    immortalized cell lines.
+    
+    Suggested patterns would significantly improve detection of similar tools in neuroscience 
+    and genetics literature. The lack of full-text sections limits tool discovery, but the 
+    abstract alone contains clear evidence of multiple research tools.

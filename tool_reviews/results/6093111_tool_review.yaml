@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "6093111"
+  title: "Characterization of nerve growth factor receptor in neural crest tumors using monoclonal antibodies."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study focused on characterizing the NGF receptor using monoclonal antibodies.
+    The abstract describes experimental procedures including antibody development, cell line studies, immunoprecipitation,
+    and immunohistochemistry. Despite lacking a formal Methods section (common in older publications), the abstract
+    contains sufficient detail to identify multiple research tools that should have been detected.
+  overallAssessment: |
+    This is a classic laboratory research publication from 1984 that developed and characterized monoclonal antibodies
+    against the nerve growth factor receptor. The study clearly uses multiple research tools including newly developed
+    monoclonal antibodies, melanoma cell lines, and various experimental techniques. The lack of a formal Methods
+    section is typical for older publications where methodology was often described within the abstract or results.
+
+toolValidations: []
+  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "anti-receptor monoclonal antibodies"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "The nerve growth factor (NGF) receptor was characterized by using a new series of anti-receptor monoclonal antibodies (MAbs). These MAbs (i) showed significantly greater reactivity with a melanoma cell line"
+    whyMissed: "The mining system failed to detect 'monoclonal antibodies' or 'MAbs' as antibody tools, likely missing the pattern for antibody abbreviations and descriptive antibody names"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "melanoma cell line"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "These MAbs (i) showed significantly greater reactivity with a melanoma cell line expressing higher levels of NGF receptor"
+    whyMissed: "The mining system failed to detect 'melanoma cell line' as a cell line tool, possibly missing the pattern for descriptive cell line names without specific identifiers"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "125I-labeled NGF"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "(ii) inhibited the binding of 125I-labeled NGF to its receptor, and (iii) immunoprecipitated both metabolically labeled and 125I-labeled NGF affinity-labeled receptor"
+    whyMissed: "The mining system failed to detect radioactively labeled proteins/growth factors as genetic reagents, missing the pattern for isotope-labeled biological molecules"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "immunoperoxidase staining"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "The NGF receptor was visualized by immunoperoxidase staining in tissue sections of human nevi, melanomas, neurofibromas, a pheochromocytoma, and peripheral nerves"
+    whyMissed: "The mining system failed to detect immunohistochemical techniques that inherently involve antibodies, missing the pattern for antibody-based visualization methods"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "monoclonal antibod(y|ies)|MAbs?|mAbs?"
+    toolType: "antibody"
+    examples: ["anti-receptor monoclonal antibodies (MAbs)", "MAbs"]
+    reasoning: "This pattern would catch monoclonal antibody mentions including common abbreviations MAb/mAb, which are standard terminology in immunology research"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+cell line\\b"
+    toolType: "cell_line"
+    examples: ["melanoma cell line"]
+    reasoning: "This pattern would catch descriptive cell line names that don't follow standard nomenclature but are clearly identified as cell lines in context"
+
+  - patternType: "naming_convention"
+    pattern: "\\d+I-labeled\\s+\\w+"
+    toolType: "genetic_reagent"
+    examples: ["125I-labeled NGF"]
+    reasoning: "This pattern would catch radioactively labeled biological molecules (proteins, growth factors) commonly used as research reagents in biochemical studies"
+
+  - patternType: "context_phrase"
+    pattern: "immunoperoxidase staining|immunohistochemical staining|IHC staining"
+    toolType: "antibody"
+    examples: ["immunoperoxidase staining"]
+    reasoning: "These techniques inherently involve antibodies and should be captured as antibody-based tools, especially when used for tissue visualization"
+
+  - patternType: "context_phrase"
+    pattern: "characterized by using|using a new series of|developed.*antibod"
+    toolType: "antibody"
+    examples: ["characterized by using a new series of anti-receptor monoclonal antibodies"]
+    reasoning: "These phrases often indicate antibody development or usage in experimental contexts and could help identify antibody tools"
+
+observations: []
+  # No validated tools to extract observations from, and no Results/Discussion sections available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear presence of multiple research tools
+    - No tools were mined from a publication that clearly describes antibody development and cell line studies
+    - Missing patterns for monoclonal antibodies, descriptive cell line names, and radioactive reagents
+    - Lack of Methods section may have contributed to missed tools, but abstract contains sufficient detail
+    - This represents a significant false negative case where obvious research tools were not detected
+  recommendations: |
+    This publication represents a major mining failure with 4 clear research tools completely missed:
+    1. Anti-receptor monoclonal antibodies (newly developed) - HIGH PRIORITY to add
+    2. Melanoma cell line (experimental model) - HIGH PRIORITY to add  
+    3. 125I-labeled NGF (radioactive reagent) - MEDIUM PRIORITY to add
+    4. Immunoperoxidase staining (antibody technique) - MEDIUM PRIORITY to add
+    
+    The suggested patterns should be implemented to catch similar tools in future mining:
+    - Monoclonal antibody abbreviations (MAb, mAb)
+    - Descriptive cell line names
+    - Radioactively labeled biological molecules
+    - Antibody-based visualization techniques
+    
+    This case highlights the need for better pattern coverage of older publications and standard
+    immunology terminology. The mining system should be tested against more 1980s-era publications
+    to identify additional pattern gaps.

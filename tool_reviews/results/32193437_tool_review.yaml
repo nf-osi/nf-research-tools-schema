@@ -1,0 +1,292 @@
+publicationMetadata:
+  pmid: "32193437"
+  title: "Longitudinal phenotype development in a minipig model of neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research), expected tool categories include:
+    - Animal models (primary focus - NF1+/ex42del minipig model)
+    - Computational tools (imaging analysis software like 3D Slicer, statistical analysis)
+    - Genetic reagents (potentially antibodies for immunohistochemistry)
+    - Clinical assessment tools (potentially imaging protocols, measurement criteria)
+    
+    This is a longitudinal animal model study with extensive imaging, histopathology, and quantitative analysis.
+    The publication describes development and characterization of a large animal model with systematic
+    phenotyping using clinical imaging modalities. Multiple tool types are expected across different categories.
+  overallAssessment: |
+    This is a comprehensive lab research study that extensively uses research tools across multiple categories.
+    The study involves a genetically modified minipig model (NF1+/ex42del), sophisticated imaging protocols,
+    computational analysis software, and histopathological techniques. The systematic longitudinal design
+    with quantitative measurements strongly indicates extensive tool usage that should have been captured.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "NF1+/ex42del minipig model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we studied a NF1 minipig model (NF1+/ex42del) for the first 12 months of life to evaluate phenotype development..."
+    whyMissed: "This is the primary animal model used throughout the study - a genetically modified Yucatan minipig with NF1 exon 42 deletion"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Yucatan minipigs"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...12 Yucatan minipigs (6 female, 6 male), 8 heterozygous for NF1 (NF1+/ex42del) and 4 littermate wildtypes..."
+    whyMissed: "Specific strain/breed of minipig used as the animal model system"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "3D Slicer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...skeletal measurements were taken with tools available in 3D Slicer (https://www.slicer.org/) to identify any developmental abnormalities..."
+    whyMissed: "Computational software with URL provided, used for CT-based skeletal measurements"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Siemens SOMATOM Force CT scanner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...A non-contrast enhanced, full body screening CT was acquired at TP1 and TP3 using a Siemens SOMATOM Force CT scanner (Siemens Healthcare, Forcheim, Germany)..."
+    whyMissed: "Specific imaging equipment/system used for data acquisition"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "GE Discovery MI PET/CT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...or a GE Discovery MI PET/CT (GE Healthcare, Waukesha, WI)..."
+    whyMissed: "Alternative imaging system used for CT acquisition"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "General Electric Discovery MR750w"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...MR imaging was performed at all timepoints using a 3.0T General Electric Discovery MR750w..."
+    whyMissed: "MRI system used for magnetic resonance imaging"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "S100 immunohistochemistry"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...S100 immunohistochemistry was performed as detailed previously..."
+    whyMissed: "Antibody-based staining method for histopathological analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "World Health Organization (WHO) criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Measurements of the neurofibroma regions were made using the World Health Organization (WHO) criteria on the LAVA post contrast MR scans..."
+    whyMissed: "Standardized clinical measurement criteria for tumor assessment"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Lin's concordance correlation coefficient (CCC)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Repeated skeletal measurements were compared using Lin's concordance correlation coefficient (CCC) with a value ≥0.90 considered repeatable..."
+    whyMissed: "Statistical analysis method for assessing measurement repeatability"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "Mann-Whitney test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...A two-sample Wilcoxon rank sum (Mann-Whitney) test was performed between NF1+/ex42del and wildtype minipig weight and skeletal measurements..."
+    whyMissed: "Statistical test used for comparing groups"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "repeated measures ANOVA (RM-ANOVA)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...subject weight growth across time was compared using repeated measures analysis of variance (RM-ANOVA)..."
+    whyMissed: "Statistical analysis method for longitudinal data"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+[+/-]+[a-z0-9/]+(del|mut|tm[0-9]+)"
+    toolType: "animal_model"
+    examples: ["NF1+/ex42del", "Nf1+/-", "B6.129-Nf1tm1Tyj"]
+    reasoning: "Genetic nomenclature pattern for genetically modified animal models with specific allele designations"
+
+  - patternType: "context_phrase"
+    pattern: "minipig model|porcine model|swine model"
+    toolType: "animal_model"
+    examples: ["NF1 minipig model (NF1+/ex42del)", "Yucatan minipig model"]
+    reasoning: "Large animal model terminology that was missed in this publication"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-z]+ [A-Z][A-Za-z0-9]+ [A-Z]{2,}\\b.*\\([A-Z][a-z]+ [A-Za-z]+,.*\\)"
+    toolType: "computational_tool"
+    examples: ["Siemens SOMATOM Force CT scanner (Siemens Healthcare, Forcheim, Germany)"]
+    reasoning: "Equipment/instrument naming pattern with manufacturer and location information"
+
+  - patternType: "term"
+    pattern: "3D Slicer|ImageJ|FIJI|OsiriX|ITK-SNAP"
+    toolType: "computational_tool"
+    examples: ["3D Slicer (https://www.slicer.org/)"]
+    reasoning: "Medical imaging analysis software commonly used in research but missed by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "immunohistochemistry was performed|stained for|antibody against"
+    toolType: "genetic_reagent"
+    examples: ["S100 immunohistochemistry was performed"]
+    reasoning: "Immunohistochemistry context phrases that indicate antibody usage"
+
+  - patternType: "term"
+    pattern: "WHO criteria|World Health Organization criteria|NIH criteria|FDA guidelines"
+    toolType: "clinical_assessment_tool"
+    examples: ["World Health Organization (WHO) criteria"]
+    reasoning: "Standardized clinical assessment criteria and guidelines used in research"
+
+  - patternType: "context_phrase"
+    pattern: "measurements were made using|assessed using|evaluated using|analyzed using"
+    toolType: "general"
+    examples: ["Measurements of the neurofibroma regions were made using the World Health Organization (WHO) criteria"]
+    reasoning: "General usage context that could apply to multiple tool types"
+
+observations:
+  - resourceName: "NF1+/ex42del minipig model"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      NF1+/ex42del minipigs showed no significant differences in body weight compared to wildtype littermates 
+      at individual timepoints (Mann-Whitney p=0.14-0.78; RM-ANOVA p=0.39). However, NF1 minipigs trended 
+      to have slightly lower body weights with mean differences of 4 kg at TP1 (4 months), 2.5 kg at TP2 
+      (8 months), and 2.1 kg at TP3 (12 months), indicating the difference merged closer over time.
+    foundIn: "results"
+    contextSnippet: "...the NF1+/ex42del animals did not show significant differences in body weight compared to wildtype littermates (Mann-Whitney individual TP, p = 0.14–0.78; RM-ANOVA, p = 0.39)..."
+    confidence: 1.0
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "NF1+/ex42del minipig model"
+    resourceType: "Animal Model"
+    observationType: "Body Length"
+    observationTypeOntologyId: "MP:0001256"
+    details: |
+      CT-based skeletal measurements demonstrated shortened stature in NF1+/ex42del minipigs at 4 months of age. 
+      Long bones of NF1 subjects were smaller on average (42.5-110 mm) with higher standard deviation (2.1-6 mm) 
+      compared to wildtype controls (mean 47.4-119 mm; standard deviation 2-4 mm). Statistically significant 
+      differences were found in femur, tibia, humerus, ulna, and metacarpals (p<0.05 to p<0.01).
+    foundIn: "results"
+    contextSnippet: "...Skeletal measurements from CT imaging demonstrate shortened stature in NF1+/ex42del minipigs at 4-months of age...The long bones of NF1+/ex42del subjects were smaller on average..."
+    confidence: 1.0
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "NF1+/ex42del minipig model"
+    resourceType: "Animal Model"
+    observationType: "Coat Color"
+    observationTypeOntologyId: "MP:0001188"
+    details: |
+      All eight NF1+/ex42del subjects presented with multiple café-au-lait macules (CALMs) at 4 months of age, 
+      while no CALMs were present on wildtype subjects. Selected lateral CALMs ranged from 10.7 mm to 47.8 mm 
+      in maximum diameter. One subject presented with a giant CALM (>20 cm diameter) spanning the dorsal-ventral 
+      length of the left side. CALMs showed relative stability in size over the 12-month study period.
+    foundIn: "results"
+    contextSnippet: "...All eight NF1+/ex42del subjects presented with multiple CALMs at the first imaging timepoint (TP1, 4 months of age), while no CALMs were present on the four wildtype subjects..."
+    confidence: 1.0
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "NF1+/ex42del minipig model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      One out of eight NF1+/ex42del minipigs developed a detectable neurofibroma first observed at 8 months, 
+      with retrospective evidence of early abnormality at 4 months. The unilateral shoulder neurofibroma 
+      progressively grew in both diameter and depth, meeting WHO criteria for progressive disease (≥25% increase). 
+      By 20 months, the tumor extended from the top of the left shoulder to the mid-abdominal flank region. 
+      Histopathology confirmed diffuse cutaneous neurofibroma with progressive maturation from myxoid to fibrous appearance.
+    foundIn: "results"
+    contextSnippet: "...One out of eight NF1+/ex42del minipigs developed a detectable neurofibroma. The unilateral lesion was first detected via imaging at the 8-month imaging time point..."
+    confidence: 1.0
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "NF1+/ex42del minipig model"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      Assessment of tibial bowing demonstrated six NF1+/ex42del minipigs with measurements higher than the range 
+      of wildtype controls: bilaterally (N=2) and unilaterally (N=4), indicating a potential phenotype. 
+      One NF1 minipig had left leg bow angle of 8.9°, equal to one range deviation above the largest wildtype. 
+      Axillary/inguinal freckling was present in all NF1+/ex42del animals at 4 months of age.
+    foundIn: "results"
+    contextSnippet: "...Assessment of tibial bowing demonstrated six NF1+/ex42del minipigs with a measurement of bowing higher than the range of the controls; bilaterally (N = 2) and unilaterally (N = 4)..."
+    confidence: 1.0
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "3D Slicer"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      3D Slicer software (https://www.slicer.org/) was successfully used for CT-based skeletal measurements 
+      to identify developmental abnormalities in NF1 minipigs. Length measurements were made of long bones 
+      on both lateral sides including femur, tibia, humerus, ulna, metacarpals, and metatarsals. 
+      Measurement consistency was highly repeatable for long bones (CCC ≥0.90) but less repeatable for 
+      metatarsals (CCC 0.78-0.80).
+    foundIn: "results"
+    contextSnippet: "...skeletal measurements were taken with tools available in 3D Slicer (https://www.slicer.org/) to identify any developmental abnormalities typically seen in NF1 patients..."
+    confidence: 0.9
+    doi: "10.1038/s41598-020-61251-4"
+
+  - resourceName: "World Health Organization (WHO) criteria"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      WHO criteria were successfully applied for neurofibroma measurement on LAVA post-contrast MR scans. 
+      WHO measurement is taken as the product of the two longest perpendicular measurements of a tumor, 
+      with progressive disease defined as ≥25% increase in one lesion. All three neurofibroma regions 
+      (S1, S2, S3) showed growth rates >25% between imaging timepoints, indicating progressive disease.
+    foundIn: "results"
+    contextSnippet: "...Measurements of the neurofibroma regions were made using the World Health Organization (WHO) criteria on the LAVA post contrast MR scans; WHO is taken as the product of the two longest perpendicular measurements..."
+    confidence: 0.9
+    doi: "10.1038/s41598-020-61251-4"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 7
+  observationsExtracted: 7
+  observationsByType:
+    Body Weight: 1
+    Body Length: 1
+    Coat Color: 1
+    Tumor Growth: 1
+    Developmental: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    Critical mining failure - no tools were extracted from a publication rich in research tools:
+    - Primary animal model (NF1+/ex42del minipig) completely missed despite being central to the study
+    - Computational analysis software (3D Slicer with URL) not detected
+    - Clinical assessment tools (WHO criteria) not captured
+    - Immunohistochemistry reagents (S100) not identified
+    - Statistical analysis methods not recognized
+    - Large animal model terminology patterns not covered
+    - Equipment/instrument naming conventions need improvement
+  recommendations: |
+    URGENT: Complete overhaul of mining patterns needed for this publication type:
+    1. All 11 potentially missed tools should be added, with highest priority for the NF1+/ex42del minipig model
+    2. Implement suggested patterns for genetic nomenclature, large animal models, and equipment naming
+    3. Add context phrases for immunohistochemistry and clinical assessment tools
+    4. The 7 new patterns suggested would significantly improve coverage for similar publications
+    5. This represents a major gap in mining effectiveness for animal model research
+    6. Seven high-quality scientific observations were successfully extracted from validated tools
+    7. Future mining should prioritize animal model terminology and genetic nomenclature patterns

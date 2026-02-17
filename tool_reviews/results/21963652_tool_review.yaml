@@ -1,0 +1,117 @@
+publicationMetadata:
+  pmid: "21963652"
+  title: "PET imaging for attention deficit preclinical drug testing in neurofibromatosis-1 mice."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - clear animal model research with PET imaging
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tools include:
+    - Animal models: Nf1 mutant mice for NF1-associated attention deficit research
+    - Computational tools: PET imaging analysis software for [(11)C]-raclopride imaging
+    - Genetic reagents: Potentially Nf1 knockout/mutant constructs used to generate the mouse model
+    - Pharmacological reagents: methylphenidate, l-Deprenyl as test compounds
+    
+    This is clearly a preclinical animal study using mouse models, PET imaging, and pharmacological testing.
+    The absence of full Methods section limits detailed tool identification, but the abstract indicates
+    substantial tool usage across multiple categories.
+  overallAssessment: |
+    This is a laboratory research publication describing preclinical drug testing using Nf1 mutant mice
+    and PET imaging. The study clearly involves multiple research tools including animal models, imaging
+    tracers, and pharmacological agents. Despite lacking a full Methods section in the provided text,
+    the abstract contains sufficient detail to identify several legitimate research tools that should
+    have been mined but were missed.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Using a novel mouse model of NF1-associated attention deficit (ADD), we demonstrate a presynaptic defect in striatal dopaminergic homeostasis...defective attention system function in Nf1 mutant mice"
+    whyMissed: "Mining patterns may not recognize 'Nf1 mutant mice' as distinct from gene references. The context clearly indicates this is a mouse model, not just gene mention."
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "[(11)C]-raclopride"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "leverage this finding to apply [(11)C]-raclopride positron-emission tomography (PET) in the intact animal"
+    whyMissed: "Specialized PET tracer notation with isotope labeling may not be recognized by standard mining patterns. This is a specific radiotracer reagent."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "methylphenidate"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "While methylphenidate and l-Deprenyl correct both striatal dopamine levels on PET imaging and defective attention system function"
+    whyMissed: "Pharmacological agents used as research reagents may not be captured by current mining patterns focused on biological tools."
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "l-Deprenyl"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "While methylphenidate and l-Deprenyl correct both striatal dopamine levels on PET imaging and defective attention system function"
+    whyMissed: "Pharmacological agents used as research reagents may not be captured by current mining patterns focused on biological tools."
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+ (mutant|knockout|deficient) (mice|mouse)"
+    toolType: "animal_model"
+    examples: ["Nf1 mutant mice", "Nf1 knockout mice"]
+    reasoning: "Pattern to capture mouse models described with gene name + mutant/knockout + mice/mouse, distinguishing from simple gene references"
+
+  - patternType: "term"
+    pattern: "\\[\\([0-9]+C\\)\\]-[a-zA-Z]+"
+    toolType: "genetic_reagent"
+    examples: ["[(11)C]-raclopride"]
+    reasoning: "Pattern to capture carbon-11 labeled PET tracers, which are specialized research reagents for imaging studies"
+
+  - patternType: "context_phrase"
+    pattern: "(methylphenidate|l-Deprenyl|L-DOPA|amphetamine|atomoxetine)(?=.*correct|treat|improve|affect)"
+    toolType: "genetic_reagent"
+    examples: ["methylphenidate and l-Deprenyl correct both striatal dopamine levels"]
+    reasoning: "Pattern to capture pharmacological agents when used in experimental context (not just mentioned), indicating research reagent usage"
+
+  - patternType: "context_phrase"
+    pattern: "novel (mouse|animal) model of [A-Z0-9]+-associated"
+    toolType: "animal_model"
+    examples: ["novel mouse model of NF1-associated attention deficit"]
+    reasoning: "Pattern to identify newly developed or characterized animal models for specific disease conditions"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Nf1 mutant mice, [(11)C]-raclopride, methylphenidate, l-Deprenyl
+  newPatternsCount: 4  # Mouse model patterns, PET tracer patterns, pharmacological agent patterns
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - Complete failure to mine any tools despite clear presence of multiple research tools in abstract
+    - Mining patterns appear inadequate for capturing:
+      * Animal models with gene-specific naming (Nf1 mutant mice)
+      * Specialized PET tracers with isotope labeling ([(11)C]-raclopride)
+      * Pharmacological research reagents (methylphenidate, l-Deprenyl)
+    - Lack of full text sections (Methods, Results, Discussion) limits comprehensive tool identification
+    - Current mining approach may be too conservative or focused on specific tool categories
+  recommendations: |
+    Critical recommendations for this publication and mining system:
+    - All 4 identified tools should be added to the database as they represent legitimate research tools
+    - Mining patterns need significant enhancement to capture:
+      * Animal models described with gene names + mutant/knockout terminology
+      * PET tracers and other isotope-labeled compounds
+      * Pharmacological agents used as research reagents
+    - Consider expanding mining to include drug/compound databases for pharmacological research tools
+    - The complete absence of mined tools from a clear lab research publication indicates systematic
+      mining deficiencies that need immediate attention
+    - Future mining should distinguish between gene mentions and actual tool usage through context analysis
+    - Access to full Methods sections would significantly improve tool identification accuracy

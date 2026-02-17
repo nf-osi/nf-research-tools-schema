@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "26822862"
+  title: "Capturing the wide variety of impaired fracture healing phenotypes in Neurofibromatosis Type 1 with eight key factors: a computational study."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # Very clear from title and methods
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, statistical packages, modeling frameworks) - EXPECTED
+    - Mathematical modeling software or custom computational models - EXPECTED
+    - Statistical analysis software - EXPECTED
+    - High-performance computing resources - POSSIBLE
+    
+    NOT expected for this publication type:
+    - Lab research tools (antibodies, cell lines, animal models, genetic reagents) - NOT EXPECTED
+    - Advanced cellular models (organoids, assembloids) - NOT EXPECTED  
+    - Patient-derived models (PDX) - NOT EXPECTED
+    - Clinical assessment tools - NOT EXPECTED
+    
+    This is a pure computational modeling study that simulates biological processes mathematically
+    rather than using actual biological materials or clinical instruments.
+  overallAssessment: |
+    This is a computational modeling study that uses mathematical simulations to investigate bone healing
+    in Neurofibromatosis Type 1. The study develops and applies a multiscale computational model using
+    partial differential equations and agent-based modeling approaches. Computational tools for statistical
+    analysis and modeling are expected and appropriate for this publication type. No wet lab tools or
+    clinical assessment instruments would be expected since this is purely computational research.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "JMP"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The uniform designs were generated and analysed with JMP (SAS Institute Inc., Cary, North Carolina, USA) using a Gaussian process with a Gaussian covariance function."
+    whyMissed: "Statistical analysis software with full vendor information (SAS Institute Inc.) was not captured by mining patterns"
+    confidence: 0.95  # Very clear usage context with vendor details
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z]+)\\s*\\([^)]*Inc\\.|Corp\\.|Ltd\\.|LLC[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["JMP (SAS Institute Inc., Cary, North Carolina, USA)"]
+    reasoning: "Software tools are often mentioned with full vendor/company information in parentheses. This pattern would catch commercial software with company details."
+  
+  - patternType: "context_phrase"
+    pattern: "analysed with|analyzed with|generated.*with|using.*process"
+    toolType: "computational_tool"
+    examples: ["analysed with JMP", "using a Gaussian process"]
+    reasoning: "These phrases often precede computational tool names in methods sections describing analysis workflows."
+  
+  - patternType: "term"
+    pattern: "\\b(Design of Experiments|DOE)\\b"
+    toolType: "computational_tool"
+    examples: ["Design of Experiments (DOE)"]
+    reasoning: "DOE is a specific statistical methodology that often involves specialized software tools, though in this case it was implemented in JMP."
+
+observations:
+  - resourceName: "JMP"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # No MP ID for usage instructions
+    details: |
+      JMP software was used for Design of Experiments (DOE) analysis with a uniform design of 200 runs
+      to generate parameter combinations across an eight-dimensional parameter space. The software
+      implemented Gaussian process modeling with Gaussian covariance function for statistical analysis.
+      The analysis identified main effects of parameters on fracture healing outcomes and generated
+      marginal model plots for detailed interpretation of results.
+    foundIn: "methods"
+    contextSnippet: "The uniform designs were generated and analysed with JMP (SAS Institute Inc., Cary, North Carolina, USA) using a Gaussian process with a Gaussian covariance function. Unlike an ANOVA-type of analysis, Gaussian processes do not only estimate the importance of individual parameters, but also the influence of the parameters on the outcome of a model."
+    confidence: 0.95
+    doi: "10.1038/srep20010"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1  # JMP statistical software
+  newPatternsCount: 3  # Vendor indicator, context phrase, and DOE term patterns
+  observationsExtracted: 1  # Usage instructions for JMP
+  observationsByType:
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - No tools were initially mined from this computational study, but one legitimate computational tool (JMP) was missed
+    - The publication is a pure computational modeling study, so the absence of lab research tools is expected and correct
+    - Mining patterns need improvement to capture statistical software with vendor information
+    - The queryType "bench" is misleading - this is not bench research but computational analysis
+  recommendations: |
+    - ADD the missed tool: JMP statistical analysis software should be included as a legitimate computational tool
+    - IMPROVE mining patterns to capture commercial software with vendor details in parentheses
+    - CONSIDER that computational modeling studies may use fewer but highly specialized analysis tools
+    - The absence of other tool types (antibodies, cell lines, etc.) is CORRECT for this publication type
+    - Future mining should distinguish between wet lab "bench" research and computational "bench" modeling
+    - The extracted usage instructions provide valuable information about DOE methodology implementation

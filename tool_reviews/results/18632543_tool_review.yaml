@@ -1,0 +1,161 @@
+publicationMetadata:
+  pmid: "18632543"
+  title: "Effect of simvastatin on cognitive functioning in children with neurofibromatosis type 1: a randomized controlled trial."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (neuropsychological tests, cognitive assessments, neuroimaging measures)
+    This is a randomized controlled trial evaluating cognitive outcomes, which requires validated clinical assessment
+    instruments to measure neuropsychological function. The study uses multiple standardized tests and neuroimaging
+    measures that are legitimate clinical assessment tools, even though no traditional lab methods are present.
+  overallAssessment: |
+    This is a randomized controlled trial testing simvastatin effects on cognitive function in children with NF1.
+    Clinical trials of this type routinely use validated neuropsychological tests and neuroimaging measures as
+    outcome assessments, which are legitimate clinical assessment tools. The absence of a Methods section is
+    typical for clinical publications where methodology is described in the abstract and results.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Rey complex figure test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Primary outcomes were scores on a Rey complex figure test (delayed recall), cancellation test (speed), prism adaptation, and the mean brain apparent diffusion coefficient"
+    whyMissed: "This is a well-established neuropsychological test used to assess visuospatial constructional ability and visual memory. It was used as a primary outcome measure."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "cancellation test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Primary outcomes were scores on a Rey complex figure test (delayed recall), cancellation test (speed), prism adaptation"
+    whyMissed: "This is a standardized neuropsychological test used to assess attention and processing speed. It was used as a primary outcome measure."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "prism adaptation"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Primary outcomes were scores on a Rey complex figure test (delayed recall), cancellation test (speed), prism adaptation, and the mean brain apparent diffusion coefficient"
+    whyMissed: "This is a neuropsychological assessment technique used to evaluate visuospatial attention and adaptation. It was used as a primary outcome measure."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Stroop color word test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Secondary outcome measures were scores on the cancellation test (standard deviation), Stroop color word test, block design, object assembly"
+    whyMissed: "This is a well-established neuropsychological test used to assess cognitive flexibility and executive function. It was used as a secondary outcome measure."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "block design"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Secondary outcome measures were scores on the cancellation test (standard deviation), Stroop color word test, block design, object assembly"
+    whyMissed: "This is a standardized subtest (typically from WISC or WAIS) used to assess visuospatial processing and nonverbal reasoning. It was used as a secondary outcome measure."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "object assembly"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Secondary outcome measures were scores on the cancellation test (standard deviation), Stroop color word test, block design, object assembly, Rey complex figure test (copy)"
+    whyMissed: "This is a standardized subtest used to assess visuospatial processing and perceptual organization. It was used as a secondary outcome measure and showed significant improvement."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Beery developmental test of visual-motor integration"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Rey complex figure test (copy), Beery developmental test of visual-motor integration, and judgment of line orientation"
+    whyMissed: "This is a standardized developmental assessment tool (VMI) used to evaluate visual-motor integration skills in children. It was used as a secondary outcome measure."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "judgment of line orientation"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Beery developmental test of visual-motor integration, and judgment of line orientation. Scores were corrected for baseline performance, age, and sex."
+    whyMissed: "This is a standardized neuropsychological test used to assess visuospatial perception and judgment. It was used as a secondary outcome measure."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Rey complex figure test"
+    toolType: "clinical_assessment_tool"
+    examples: ["Rey complex figure test (delayed recall)", "Rey complex figure test (copy)"]
+    reasoning: "This is a well-established neuropsychological test that should be recognized as a clinical assessment tool"
+
+  - patternType: "term"
+    pattern: "Stroop (color word )?test"
+    toolType: "clinical_assessment_tool"
+    examples: ["Stroop color word test"]
+    reasoning: "The Stroop test is a classic neuropsychological assessment that appears in various forms and should be captured"
+
+  - patternType: "term"
+    pattern: "Beery.*visual-motor integration"
+    toolType: "clinical_assessment_tool"
+    examples: ["Beery developmental test of visual-motor integration"]
+    reasoning: "The Beery VMI is a standardized developmental assessment tool commonly used in pediatric neuropsychology"
+
+  - patternType: "term"
+    pattern: "judgment of line orientation"
+    toolType: "clinical_assessment_tool"
+    examples: ["judgment of line orientation"]
+    reasoning: "This is a specific neuropsychological test for visuospatial perception that should be recognized"
+
+  - patternType: "term"
+    pattern: "cancellation test"
+    toolType: "clinical_assessment_tool"
+    examples: ["cancellation test (speed)", "cancellation test (standard deviation)"]
+    reasoning: "Cancellation tests are standard neuropsychological assessments for attention and processing speed"
+
+  - patternType: "term"
+    pattern: "prism adaptation"
+    toolType: "clinical_assessment_tool"
+    examples: ["prism adaptation"]
+    reasoning: "Prism adaptation is a specialized neuropsychological assessment technique for visuospatial attention"
+
+  - patternType: "context_phrase"
+    pattern: "(primary|secondary) outcome measure[s]? were scores on.*test"
+    toolType: "clinical_assessment_tool"
+    examples: ["Primary outcomes were scores on a Rey complex figure test", "Secondary outcome measures were scores on the cancellation test"]
+    reasoning: "This phrase pattern reliably indicates clinical assessment tools being used as outcome measures in trials"
+
+  - patternType: "context_phrase"
+    pattern: "scores on (the )?[A-Z][a-z].*test"
+    toolType: "clinical_assessment_tool"
+    examples: ["scores on a Rey complex figure test", "scores on the cancellation test"]
+    reasoning: "This pattern captures standardized tests being administered and scored in clinical studies"
+
+observations:
+  # No observations can be extracted since no tools were validated (all were missed by initial mining)
+  # Observations would need to be extracted after tools are properly identified and validated
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to identify clinical assessment tools: All 8 neuropsychological tests and assessments used in this clinical trial were missed
+    - Mining patterns appear inadequate for clinical assessment tools: Standard neuropsychological tests like Rey Complex Figure, Stroop, and Beery VMI were not detected
+    - Clinical trial structure not recognized: The study used multiple validated outcome measures that are legitimate clinical assessment tools
+    - Lack of Methods section may have contributed to missing tools, but assessment tools were clearly described in abstract and results
+  recommendations: |
+    All 8 identified neuropsychological tests should be added as clinical assessment tools. This represents a complete
+    mining failure for clinical assessment tools in a clinical trial setting. The mining patterns need significant
+    improvement to capture standard neuropsychological assessments. These are well-established, validated clinical
+    instruments used as primary and secondary outcome measures. The patterns suggested above should be implemented
+    to prevent similar misses in future clinical publications. No observations could be extracted since the tools
+    were not initially identified, but the Results section contains quantitative outcomes for several of these tools
+    that could be valuable for future analysis.

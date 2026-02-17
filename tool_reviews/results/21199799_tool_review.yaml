@@ -1,0 +1,114 @@
+publicationMetadata:
+  pmid: "21199799"
+  title: "Dose-dependent effects of focal fractionated irradiation on secondary malignant neoplasms in Nf1 mutant mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, computational tools, antibodies
+    
+    This is clearly experimental laboratory research involving mouse models and radiation studies.
+    The abstract describes experimental procedures using Nf1 mutant mice, control mice, and
+    mentions genetic and biochemical analyses. Even without a Methods section, the abstract
+    provides clear evidence of tool usage in experimental context.
+  overallAssessment: |
+    This is a laboratory research study investigating radiation-induced cancer in mouse models.
+    The publication should contain research tools, particularly animal models (Nf1 mutant mice),
+    and likely additional tools for genetic/biochemical analyses mentioned in the abstract.
+    The absence of full-text sections limits tool discovery, but the abstract alone reveals
+    clear animal model usage that was missed by the mining process.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Secondary malignant neoplasms (SMN) are increasingly common complications of cancer therapy that have proven difficult to model in mice...We developed a novel procedure for administering fractionated cranial irradiation (CI) and investigated the incidence and spectrum of cancer in control and heterozygous Nf1 mutant mice irradiated to a moderate (15 Gy) or high dose (30 Gy)..."
+    whyMissed: "The mining patterns likely failed to distinguish between disease/gene references (NF1) and actual animal model usage (Nf1 mutant mice). The context clearly shows experimental usage of a mouse strain."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "heterozygous Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...We developed a novel procedure for administering fractionated cranial irradiation (CI) and investigated the incidence and spectrum of cancer in control and heterozygous Nf1 mutant mice irradiated to a moderate (15 Gy) or high dose (30 Gy). Heterozygous Nf1 inactivation cooperated with CI to induce solid tumors..."
+    whyMissed: "More specific variant of the Nf1 mutant mouse model. The term 'heterozygous' combined with 'mutant mice' clearly indicates an animal model, not a gene reference."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...CI-induced malignancies segregated according to radiation dose as Nf1(+/-) mice developed predominately hematologic abnormalities after 15 Gy, whereas solid tumors predominated at 30 Gy..."
+    whyMissed: "Standard genetic nomenclature for heterozygous knockout mice. The (+/-) notation is specific to animal model naming conventions and should be recognized as distinct from gene references."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "control mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...investigated the incidence and spectrum of cancer in control and heterozygous Nf1 mutant mice irradiated to a moderate (15 Gy) or high dose (30 Gy)..."
+    whyMissed: "Control animal strain used as comparison group. While generic, it represents a specific animal model used in the experimental design."
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "The (+/-) notation is standard genetic nomenclature for heterozygous knockout mice and should be recognized as animal model usage, not gene references."
+
+  - patternType: "context_phrase"
+    pattern: "\\b(heterozygous|homozygous)\\s+\\w+\\s+(mutant|knockout|deficient)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["heterozygous Nf1 mutant mice"]
+    reasoning: "Genetic modifiers (heterozygous/homozygous) combined with mutant/knockout terminology clearly indicate animal models rather than gene references."
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+mutant\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 mutant mice"]
+    reasoning: "The combination of gene name + 'mutant mice' is a strong indicator of animal model usage, especially in experimental contexts describing procedures or treatments."
+
+  - patternType: "context_phrase"
+    pattern: "\\bcontrol\\s+(and|versus|vs\\.?)\\s+\\w+\\s+(mutant|knockout)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["control and heterozygous Nf1 mutant mice"]
+    reasoning: "Comparative experimental design language indicating both control and experimental animal strains are being used as research tools."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear animal model usage
+    - Mining patterns failed to distinguish between gene/disease references and actual animal model usage
+    - The Nf1 mutant mouse model is explicitly mentioned multiple times in experimental context
+    - Standard genetic nomenclature (Nf1(+/-) mice) was not recognized as animal model usage
+    - Limited text availability (abstract only) may have contributed to missed tools
+  recommendations: |
+    This publication clearly uses animal models that were completely missed by the mining process.
+    The Nf1 mutant mice, heterozygous Nf1 mutant mice, and Nf1(+/-) mice should all be added as
+    validated animal model tools. The mining patterns need improvement to distinguish between:
+    1) Gene/disease references (NF1 as a gene)
+    2) Animal model usage (Nf1 mutant mice, Nf1(+/-) mice)
+    
+    Key indicators that were missed:
+    - Genetic nomenclature: (+/-) notation
+    - Context phrases: "mutant mice", "heterozygous...mice"
+    - Experimental usage: "irradiated", "developed", "investigated"
+    
+    The suggested patterns should help capture similar animal models in future mining.
+    No observations could be extracted due to lack of Results/Discussion sections, but the
+    abstract suggests this study would contain valuable phenotypic data if full text were available.

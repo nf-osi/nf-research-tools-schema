@@ -1,0 +1,119 @@
+publicationMetadata:
+  pmid: "20176786"
+  title: "Bioluminescent approaches for measuring tumor growth in a mouse model of neurofibromatosis."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, computational tools
+    This publication describes development and use of mouse models with bioluminescent reporters
+    for studying neurofibromatosis tumors. Expected tools include:
+    - Animal models (mouse strains and genetically modified mice)
+    - Genetic reagents (reporter constructs, promoter systems)
+    - Potentially computational tools for bioluminescence analysis
+  overallAssessment: |
+    This is clearly a laboratory research publication describing the development and characterization
+    of mouse models for neurofibromatosis research. The study involves genetically modified mice
+    with bioluminescent reporters, which represents multiple research tool categories. Despite
+    lacking a formal Methods section in the abstract-only format, the content strongly indicates
+    experimental tool usage and development.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/-;Trp53+/- (NPcis) mouse model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The Nf1+/-;Trp53+/- (NPcis) mouse model of NF1 spontaneously develops astrocytoma and MPNSTs that are very similar to human NF1 tumors."
+    whyMissed: "Complex genotype notation with multiple alleles may not have been recognized by standard mouse model patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "E2F1 promoter-driving luciferase (ELUX) reporter mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We have generated E2F1 promoter-driving luciferase (ELUX) reporter mice to detect proliferating tumors in NPcis mice in vivo using bioluminescence."
+    whyMissed: "Custom reporter mouse strain with specific promoter-reporter construct may not match standard naming patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "E2F1 promoter-luciferase construct"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have generated E2F1 promoter-driving luciferase (ELUX) reporter mice to detect proliferating tumors"
+    whyMissed: "Promoter-reporter construct embedded within mouse model description may not have been parsed as separate genetic reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "bioluminescence imaging system"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "using bioluminescence. The power of this system is that it enables looking at tumor evolution and detecting spontaneous tumors"
+    whyMissed: "Imaging system implied but not explicitly named - may require more specific terminology"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\+?/?-?;[A-Za-z0-9]+\\+?/?-?\\s*\\([A-Za-z0-9]+\\)\\s*mouse"
+    toolType: "animal_model"
+    examples: ["Nf1+/-;Trp53+/- (NPcis) mouse model"]
+    reasoning: "Complex genotype notation with multiple alleles and strain abbreviations in parentheses commonly used for compound mutant mice"
+
+  - patternType: "term"
+    pattern: "\\b[A-Za-z0-9]+\\s+promoter-driving\\s+[a-z]+\\s+\\([A-Z]+\\)\\s+reporter\\s+mice"
+    toolType: "animal_model"
+    examples: ["E2F1 promoter-driving luciferase (ELUX) reporter mice"]
+    reasoning: "Reporter mouse strains with specific promoter-reporter combinations and custom abbreviations"
+
+  - patternType: "context_phrase"
+    pattern: "we have generated.*reporter mice"
+    toolType: "animal_model"
+    examples: ["We have generated E2F1 promoter-driving luciferase (ELUX) reporter mice"]
+    reasoning: "Phrase indicating development of custom mouse models with reporter systems"
+
+  - patternType: "term"
+    pattern: "\\b[A-Za-z0-9]+\\s+promoter-[a-z]+\\s+construct"
+    toolType: "genetic_reagent"
+    examples: ["E2F1 promoter-luciferase construct"]
+    reasoning: "Promoter-reporter constructs used to generate transgenic animals"
+
+  - patternType: "context_phrase"
+    pattern: "bioluminescence.*system"
+    toolType: "computational_tool"
+    examples: ["bioluminescence imaging system"]
+    reasoning: "Bioluminescence detection and analysis systems commonly used in tumor research"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication describes development and use of genetically modified mouse models
+    - Complex genotype notation (Nf1+/-;Trp53+/-) and custom reporter systems (ELUX) were not detected
+    - Abstract-only format limits detailed analysis, but sufficient information present to identify tools
+    - Missing Methods section prevents extraction of detailed experimental observations
+  recommendations: |
+    This publication should have yielded multiple research tools, particularly animal models and genetic reagents.
+    The mining patterns need improvement to capture:
+    1. Complex mouse genotype notation with multiple alleles and strain abbreviations
+    2. Custom reporter mouse strains with promoter-reporter combinations
+    3. Genetic constructs embedded within mouse model descriptions
+    4. Bioluminescence imaging systems (though this may require more explicit naming)
+    
+    All identified tools should be added to the database as they represent legitimate research resources
+    developed and used in this study. The suggested patterns would significantly improve detection
+    of similar tools in neurofibromatosis and cancer research publications.
+    
+    No observations could be extracted due to abstract-only format, but this represents a valuable
+    set of research tools that were completely missed by the current mining approach.

@@ -1,0 +1,97 @@
+publicationMetadata:
+  pmid: "3280697"
+  title: "Monoclonal antibody (AFH1) immunoreactive on morphologically abnormal basal melanocytes within dysplastic nevi, nevocellular nevus nests, and melanoma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes the development and characterization of a monoclonal antibody (AFH1) 
+    and its use in immunohistochemical analysis. Despite being from 1988 and having only abstract 
+    text available, it clearly involves laboratory research tools including antibodies and cell lines.
+    The study used a human melanoma cell line (A375) as immunogen and developed/tested the AFH1 
+    monoclonal antibody on various tissue samples.
+  overallAssessment: |
+    This is a classic laboratory research publication describing antibody development and validation.
+    The study involves creating a monoclonal antibody using a cell line as immunogen, then testing
+    its specificity and sensitivity on tissue samples using immunohistochemical techniques. This
+    type of research inherently requires and develops research tools (antibodies, cell lines).
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "AFH1"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "The mouse monoclonal antibody AFH1 was produced using formalin-fixed, sham paraffin-embedded human melanoma cell culture line A375 as immunogen. Reactivity of this antibody was assessed by immunohistochemical techniques"
+    whyMissed: "Mining system failed to detect this monoclonal antibody despite clear identification as 'mouse monoclonal antibody AFH1' with detailed characterization and usage description"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "A375"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The mouse monoclonal antibody AFH1 was produced using formalin-fixed, sham paraffin-embedded human melanoma cell culture line A375 as immunogen"
+    whyMissed: "Mining system failed to detect this well-known human melanoma cell line despite clear identification as 'human melanoma cell culture line A375'"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "monoclonal antibody [A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["monoclonal antibody AFH1"]
+    reasoning: "Pattern to catch monoclonal antibodies with alphanumeric identifiers that may not follow standard naming conventions"
+
+  - patternType: "context_phrase"
+    pattern: "antibody was produced using"
+    toolType: "antibody"
+    examples: ["The mouse monoclonal antibody AFH1 was produced using"]
+    reasoning: "Context phrase indicating antibody development/production, which strongly suggests the presence of an antibody tool"
+
+  - patternType: "context_phrase"
+    pattern: "cell culture line [A-Z0-9]+"
+    toolType: "cell_line"
+    examples: ["human melanoma cell culture line A375"]
+    reasoning: "Pattern to catch cell lines mentioned with 'cell culture line' phrase followed by alphanumeric identifier"
+
+  - patternType: "naming_convention"
+    pattern: "A375"
+    toolType: "cell_line"
+    examples: ["A375"]
+    reasoning: "A375 is a well-established human melanoma cell line that should be in the cell line database. This specific cell line name should be recognized"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining system completely failed to detect obvious research tools in this publication
+    - AFH1 monoclonal antibody was clearly described as being developed and characterized
+    - A375 human melanoma cell line was explicitly mentioned as the immunogen source
+    - Both tools have clear experimental context and usage descriptions
+    - This represents a significant failure in the mining algorithm for antibody and cell line detection
+  recommendations: |
+    This publication should have detected 2 clear research tools:
+    1. AFH1 monoclonal antibody - developed and characterized in this study
+    2. A375 cell line - used as immunogen for antibody production
+    
+    Both tools have unambiguous experimental context and should be added to the database.
+    The mining patterns need significant improvement to catch:
+    - Monoclonal antibodies with non-standard naming (AFH1 vs typical anti-protein patterns)
+    - Well-known cell lines mentioned with full descriptive text
+    - Tools described in development/production context
+    
+    No observations were extracted since only abstract text was available, but the tools
+    themselves are clearly valid and should be included in the research tools database.
+    This case highlights the need for better pattern matching for antibody and cell line detection.

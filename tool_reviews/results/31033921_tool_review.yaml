@@ -1,0 +1,248 @@
+publicationMetadata:
+  pmid: "31033921"
+  title: "[18F]fluorothymidine and [18F]fluorodeoxyglucose PET Imaging Demonstrates Uptake and Differentiates Growth in Neurofibromatosis 2 Related Vestibular Schwannoma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical imaging study:
+    - Computational tools for image analysis, reconstruction, and statistical analysis (expected)
+    - Clinical assessment tools for tumor classification and patient evaluation (possible)
+    - Advanced imaging equipment and software for PET/CT and MRI analysis (expected)
+    
+    This is a clinical study using advanced imaging techniques to differentiate tumor growth patterns
+    in NF2 patients. The study involves complex image acquisition, reconstruction, and quantitative
+    analysis, which typically requires specialized computational tools and software packages.
+  overallAssessment: |
+    This clinical imaging study would be expected to use computational tools for image processing,
+    reconstruction, and statistical analysis. The detailed methods describe complex PET imaging
+    protocols, image reconstruction algorithms, and quantitative analysis procedures that require
+    specialized software. The study also involves clinical classification of tumors and patient
+    assessment, which may involve standardized clinical tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SPM 8"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Using SPM 8 ( http://www.fil.ion.ucl.ac.uk/spm ), contrast enhanced T1W MRIs were coregistered to the 30 minutes motion corrected PET images"
+    whyMissed: "SPM (Statistical Parametric Mapping) is a well-known neuroimaging analysis software package with version number and URL provided"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Analyze version 11"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All manual outlining was done using Analyze version 11 and was performed under the supervision of AJ and ID"
+    whyMissed: "Analyze is a medical imaging software package with specific version number mentioned for manual tumor outlining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Brainlab iPlan software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Volumetric measurements were made on T 1 -weighted (T1W) postcontrast imaging using the semiautomatic segmentation tool within the Brainlab iPlan software (Brainlab AG Germany)"
+    whyMissed: "iPlan is a commercial medical imaging software with vendor information for volumetric tumor measurements"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "e7_tools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For the TrueV scanner, the Siemens offline reconstruction package \"e7_tools\" was used with an image zoom of two"
+    whyMissed: "e7_tools is a specific Siemens software package for PET image reconstruction"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "HRRT user community software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "HRRT data was reconstructed using HRRT user community software generating images consisting of 256×256×207 voxels"
+    whyMissed: "Specialized software for HRRT PET scanner image reconstruction"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS version 23"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SPSS version 23 was used for all statistical analyses"
+    whyMissed: "SPSS is a widely used statistical analysis software with specific version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Ordinary Poisson Ordered Subset Expectation Maximisation"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data from both scanners were reconstructed using implementations of three-dimensional iterative Ordinary Poisson Ordered Subset Expectation Maximisation"
+    whyMissed: "This is a specific image reconstruction algorithm/method used in PET imaging"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "TXTV method"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "attenuation correction was calculated from a reconstructed and segmented μ-map image using the total variation TXTV method"
+    whyMissed: "TXTV is a specific computational method for attenuation correction in PET imaging"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SPM\\s+\\d+"
+    toolType: "computational_tool"
+    examples: ["SPM 8"]
+    reasoning: "SPM (Statistical Parametric Mapping) is a widely used neuroimaging software, often mentioned with version numbers"
+
+  - patternType: "term"
+    pattern: "Analyze\\s+version\\s+\\d+"
+    toolType: "computational_tool"
+    examples: ["Analyze version 11"]
+    reasoning: "Analyze is a medical imaging software package commonly referenced with version numbers"
+
+  - patternType: "term"
+    pattern: "SPSS\\s+version\\s+\\d+"
+    toolType: "computational_tool"
+    examples: ["SPSS version 23"]
+    reasoning: "SPSS is a statistical software package frequently mentioned with version numbers in research papers"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+[A-Z][a-zA-Z]+\\s+[a-zA-Z]*\\s*software"
+    toolType: "computational_tool"
+    examples: ["using Brainlab iPlan software", "using HRRT user community software"]
+    reasoning: "Pattern captures software usage with vendor or descriptive names"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z]+\\s+AG\\s+[A-Z][a-zA-Z]+\\)"
+    toolType: "computational_tool"
+    examples: ["(Brainlab AG Germany)"]
+    reasoning: "Vendor information in parentheses often indicates commercial software tools"
+
+  - patternType: "naming_convention"
+    pattern: "[a-z]+_tools"
+    toolType: "computational_tool"
+    examples: ["e7_tools"]
+    reasoning: "Software packages often use underscore naming conventions, especially for specialized tools"
+
+observations:
+  - resourceName: "SPM 8"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SPM 8 was used for coregistration of contrast enhanced T1W MRIs to motion corrected PET images.
+      The software successfully performed rigid body transformations for image alignment, enabling
+      accurate overlay of anatomical and functional imaging data. This coregistration was critical
+      for applying manually drawn tumor volumes of interest to PET data for quantitative analysis.
+    foundIn: "methods"
+    contextSnippet: "Using SPM 8 ( http://www.fil.ion.ucl.ac.uk/spm ), contrast enhanced T1W MRIs were coregistered to the 30 minutes motion corrected PET images from each of the three scans"
+    confidence: 0.9
+    doi: "10.1097/MAO.0000000000002272"
+
+  - resourceName: "Analyze version 11"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Analyze version 11 was used for manual outlining of tumor volumes of interest on contrast
+      enhanced T1W MR images. The software enabled precise delineation of enhancing tumor boundaries
+      while avoiding partial volume effects from nearby structures or surrounding CSF. Manual
+      outlining was performed under expert supervision with over 40 years of combined neuroradiology
+      experience.
+    foundIn: "methods"
+    contextSnippet: "All manual outlining was done using Analyze version 11 and was performed under the supervision of AJ and ID, consultant neuroradiologists with over 40 years of combined experience"
+    confidence: 0.9
+    doi: "10.1097/MAO.0000000000002272"
+
+  - resourceName: "Brainlab iPlan software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Brainlab iPlan software was used for volumetric measurements of vestibular schwannomas on
+      T1-weighted postcontrast imaging. The semiautomatic segmentation tool within iPlan enabled
+      accurate tumor volume quantification, which was essential for confirming differential growth
+      patterns between rapidly growing and indolent tumors. Results were reviewed and edited by
+      an experienced neuroradiologist to ensure accuracy.
+    foundIn: "methods"
+    contextSnippet: "Volumetric measurements were made on T 1 -weighted (T1W) postcontrast imaging using the semiautomatic segmentation tool within the Brainlab iPlan software (Brainlab AG Germany) and the results of segmentation were reviewed and, where necessary, edited by an experienced neuroradiologist"
+    confidence: 0.9
+    doi: "10.1097/MAO.0000000000002272"
+
+  - resourceName: "SPSS version 23"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SPSS version 23 was used for all statistical analyses in the study. The software successfully
+      performed normality testing (Shapiro-Wilk test), homogeneity of variance assessment (Levene test),
+      intergroup comparisons using Student's t-tests, linear regression analysis for intertumor
+      relationships, and receiver operator characteristic (ROC) curve analysis. Statistical analyses
+      demonstrated significant differences between rapidly growing and indolent tumors (p < 0.05).
+    foundIn: "methods"
+    contextSnippet: "SPSS version 23 was used for all statistical analyses. The normality and homogeneity of variance for derived values was assessed using the Shapiro–Wilk and Levene test respectively"
+    confidence: 0.95
+    doi: "10.1097/MAO.0000000000002272"
+
+  - resourceName: "e7_tools"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Siemens offline reconstruction package e7_tools was used for PET image reconstruction
+      on the TrueV scanner. The software was configured with an image zoom of two, resulting in
+      images with voxel size of 1.33mm×1.33mm×2.03mm and image grid dimension of 256×256×107 voxels.
+      The reconstruction successfully processed PET data with full corrections including scatter
+      and attenuation correction.
+    foundIn: "methods"
+    contextSnippet: "For the TrueV scanner, the Siemens offline reconstruction package \"e7_tools\" was used with an image zoom of two resulting in images with a voxel size of 1.33mm×1.33mm×2.03mm"
+    confidence: 0.85
+    doi: "10.1097/MAO.0000000000002272"
+
+  - resourceName: "HRRT user community software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      HRRT user community software was used for reconstructing high-resolution PET data from the
+      HRRT scanner. The software generated images consisting of 256×256×207 voxels each of size
+      1.22mm×1.22mm×1.22mm. The reconstruction used 16 subsets and included resolution modeling
+      capabilities, contributing to improved spatial resolution and image quality for small tumor
+      analysis.
+    foundIn: "methods"
+    contextSnippet: "HRRT data was reconstructed using HRRT user community software generating images consisting of 256×256×207 voxels each of size 1.22mm×1.22mm×1.22mm"
+    confidence: 0.8
+    doi: "10.1097/MAO.0000000000002272"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 6
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a computational imaging study
+    - Multiple computational tools were clearly mentioned with specific versions and usage contexts
+    - The mining system appears to have missed several well-established software packages (SPM, SPSS, Analyze)
+    - Commercial software with vendor information was not detected (Brainlab iPlan)
+    - Specialized PET reconstruction software was not captured
+  recommendations: |
+    This publication should have 6-8 computational tools added to the database:
+    - High confidence tools: SPM 8, SPSS version 23, Analyze version 11, Brainlab iPlan software (should definitely be added)
+    - Medium confidence tools: e7_tools, HRRT user community software (should likely be added)
+    - Lower confidence tools: OSEM algorithm, TXTV method (may be too generic/methodological)
+    
+    The mining patterns need significant improvement for computational tools, especially:
+    - Software with version numbers (SPM 8, SPSS version 23, Analyze version 11)
+    - Commercial software with vendor information (Brainlab iPlan)
+    - Specialized imaging reconstruction software
+    
+    All identified tools have clear usage contexts and are essential for the study methodology.
+    The observations extracted demonstrate practical usage and performance of these tools in
+    a clinical research setting.

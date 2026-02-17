@@ -1,0 +1,188 @@
+publicationMetadata:
+  pmid: "33080011"
+  title: "Temporal, spatial, and genetic constraints contribute to the patterning and penetrance of murine neurofibromatosis-1 optic glioma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study investigating mouse brain development and neurofibromatosis-1 
+    optic glioma using genetically engineered mice and cell sorting techniques. Expected tools include:
+    - Animal models (genetically engineered Nf1 mutant mice)
+    - Cell lines/primary cells (TVZ neuroglial progenitor cells)
+    - Computational tools (FACS analysis software)
+    - Genetic reagents (Nf1 mutations/constructs)
+    
+    The study involves experimental procedures including fluorescence-activated cell sorting (FACS),
+    cell culture, and molecular analysis of neural progenitor cells.
+  overallAssessment: |
+    This laboratory research publication should definitely contain research tools. The study uses 
+    genetically engineered mice with Nf1 mutations, performs FACS sorting of neural progenitor cells,
+    and conducts functional and molecular analyses. The presence of a Methods section and experimental
+    design strongly indicates multiple tool types should be present, particularly animal models and
+    computational tools for cell analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "genetically engineered mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The impact of different germline Nf1 mutations on TVZ NPC properties was analyzed using genetically engineered mice."
+    whyMissed: "Generic term 'genetically engineered mice' not caught by specific strain name patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 mutant mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "mutations in the neurofibromatosis type 1 [NF1] gene...germline Nf1 mutations differentially increase TVZ NPC proliferation"
+    whyMissed: "Nf1 mutations mentioned but not recognized as referring to mouse models with Nf1 genetic modifications"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "FACS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Progenitors isolated by fluorescence-activated cell sorting (FACS) were assessed for functional and molecular differences."
+    whyMissed: "FACS mentioned as technique but associated analysis software/computational tools not detected"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "TVZ neuroglial progenitor cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "TVZ neuroglial progenitor cells (NPCs) were analyzed over the course of mouse brain development."
+    whyMissed: "Primary cell type mentioned but not recognized as a research tool/cell system"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "fluorescence-activated cell sorting"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Progenitors isolated by fluorescence-activated cell sorting (FACS) were assessed"
+    whyMissed: "Full technique name not caught, only abbreviation FACS might be in patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "genetically engineered mice"
+    toolType: "animal_model"
+    examples: ["genetically engineered mice"]
+    reasoning: "Common phrase for describing transgenic/knockout mouse models that should be captured as animal model tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(Nf1|NF1)\\s+(mutant|knockout|deficient|null)\\s+(mice|mouse)"
+    toolType: "animal_model"
+    examples: ["Nf1 mutant mice", "NF1 knockout mice"]
+    reasoning: "Specific pattern to catch genetically modified mouse models with Nf1/NF1 mutations when used as research tools"
+
+  - patternType: "context_phrase"
+    pattern: "germline\\s+(\\w+)\\s+mutations?.*using.*mice"
+    toolType: "animal_model"
+    examples: ["germline Nf1 mutations...using genetically engineered mice"]
+    reasoning: "Pattern to identify mouse models with specific germline mutations used in research"
+
+  - patternType: "term"
+    pattern: "fluorescence-activated cell sorting"
+    toolType: "computational_tool"
+    examples: ["fluorescence-activated cell sorting (FACS)"]
+    reasoning: "Full technique name should be captured as it involves computational analysis and sorting"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,4}\\s+(neuroglial|neural|progenitor|stem)\\s+cells?"
+    toolType: "cell_line"
+    examples: ["TVZ neuroglial progenitor cells"]
+    reasoning: "Pattern for anatomically-defined primary cell populations used as research tools"
+
+observations:
+  - resourceName: "genetically engineered mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Three functionally and molecularly distinct populations of mouse TVZ NPCs were identified,
+      with one population ("M" cells) exhibiting the highest clonogenic incidence, proliferation,
+      and abundance during embryogenesis. This represents cellular-level phenotypic differences
+      in neural progenitor cell populations.
+    foundIn: "results"
+    contextSnippet: "there are 3 functionally and molecularly distinct populations of mouse TVZ NPCs, one of which (\"M\" cells) exhibits the highest clonogenic incidence, proliferation, and abundance during embryogenesis"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noaa237"
+
+  - resourceName: "genetically engineered mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      TVZ NPC proliferation dramatically decreases after birth, representing a significant
+      developmental transition in neural progenitor cell behavior. This temporal change
+      contributes to the unique patterning of Nf1 optic glioma development.
+    foundIn: "results"
+    contextSnippet: "TVZ NPC proliferation dramatically decreases after birth"
+    confidence: 0.95
+    doi: "10.1093/neuonc/noaa237"
+
+  - resourceName: "Nf1 mutant mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Germline Nf1 mutations differentially increase TVZ NPC proliferation during embryogenesis.
+      This represents a specific cellular phenotype where different Nf1 mutations have varying
+      effects on neural progenitor cell proliferation rates during development.
+    foundIn: "results"
+    contextSnippet: "germline Nf1 mutations differentially increase TVZ NPC proliferation during embryogenesis"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noaa237"
+
+  - resourceName: "Nf1 mutant mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The unique temporal patterning and penetrance of Nf1 optic glioma reflects the combined
+      effects of TVZ NPC population composition, time-dependent changes in progenitor proliferation,
+      and the differential impact of germline Nf1 mutations on TVZ NPC expansion. This explains
+      why NF1 low-grade gliomas typically arise in the optic pathway of young children.
+    foundIn: "discussion"
+    contextSnippet: "The unique temporal patterning and penetrance of Nf1 optic glioma reflects the combined effects of TVZ NPC population composition, time-dependent changes in progenitor proliferation, and the differential impact of the germline Nf1 mutation on TVZ NPC expansion"
+    confidence: 0.85
+    doi: "10.1093/neuonc/noaa237"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Cellular: 2
+    Developmental: 1
+    Tumor Growth: 1
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a clear laboratory research study
+    - Missing animal models: Genetically engineered Nf1 mutant mice are central to the study but not detected
+    - Missing computational tools: FACS analysis involves computational sorting and analysis software
+    - Missing primary cell systems: TVZ neuroglial progenitor cells used as research tools
+    - Pattern gaps: Current mining patterns failed to detect common laboratory research tools and techniques
+  recommendations: |
+    This publication represents a significant mining failure - it's a laboratory research study with clear
+    experimental methods using genetically engineered mice, cell sorting, and molecular analysis, yet zero
+    tools were detected. Key recommendations:
+    
+    1. ADD genetically engineered Nf1 mutant mice as animal models - these are the primary research tools
+    2. CONSIDER adding FACS/fluorescence-activated cell sorting as computational tools
+    3. EVALUATE whether primary cell populations (TVZ NPCs) should be captured as cell line tools
+    4. IMPLEMENT suggested patterns to catch similar tools in future mining
+    5. REVIEW mining algorithms for laboratory research publications - this represents a systematic gap
+    
+    The extracted observations demonstrate rich phenotypic data that would be valuable for the research
+    community, but only if the underlying tools are properly captured first. This publication should
+    serve as a test case for improving mining sensitivity for laboratory research tools.

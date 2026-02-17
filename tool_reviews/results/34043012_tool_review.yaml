@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "34043012"
+  title: "RNA sequence analysis reveals ITGAL/CD11A as a stromal regulator of murine low-grade glioma growth."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content, this lab research publication should contain:
+    - Animal models (genetically engineered mouse strains, Nf1 optic glioma mice, CD11a-knockout mice)
+    - Antibodies (anti-CD11a neutralizing antibody)
+    - Computational tools (RNA-seq analysis tools, meta-analysis software)
+    - Genetic reagents (knockout constructs, genetically modified strains)
+    
+    The study involves RNA sequencing, mouse genetics, immunohistochemistry, and in vivo experiments,
+    indicating multiple tool categories should be present.
+  overallAssessment: |
+    This is clearly a laboratory research study involving RNA sequencing analysis, genetically engineered
+    mouse models, and functional studies. The abstract describes experimental methods including RNA-seq
+    meta-analysis, mouse genetics, immunohistochemistry, and in vivo antibody treatments. Such studies
+    typically use numerous research tools including animal models, antibodies, and computational analysis
+    tools. The absence of any mined tools suggests significant under-detection by the mining algorithms.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf1 optic glioma mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...antibody treatment of Neurofibromatosis type 1 (Nf1) optic glioma mice in vivo. RESULTS: We identified..."
+    whyMissed: "Specific mouse model name not detected - may need patterns for 'gene + disease/tissue + mice' format"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD11a-knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...CX3CL1-directed motility, as well as glioma mitogen (Ccl5) production. Using CD11a-knockout mice, CD11a expression was shown..."
+    whyMissed: "Knockout mouse strain not detected - may need patterns for 'gene-knockout mice' format"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-CD11a neutralizing antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...while LGG growth in mice was assessed using anti-CD11a neutralizing antibody treatment of Neurofibromatosis..."
+    whyMissed: "Antibody with functional descriptor not detected - may need patterns for 'anti-target neutralizing antibody'"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "genetically engineered mouse strains"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we leveraged RNA sequencing meta-analysis, genetically engineered mouse strains, and human biospecimens..."
+    whyMissed: "General term for engineered mouse models not detected - too generic for current patterns"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "RNA-seq datasets"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Publicly available disease-associated microglia (DAM) RNA-seq datasets were used, followed by..."
+    whyMissed: "RNA-seq datasets as computational resource not detected - may need patterns for 'technique-seq datasets'"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "RNAScope"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...followed by immunohistochemistry and RNAScope validation. CD11a-deficient mouse microglia..."
+    whyMissed: "Commercial in situ hybridization technique not detected - specific brand name pattern needed"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+-knockout mice"
+    toolType: "animal_model"
+    examples: ["CD11a-knockout mice", "Nf1-knockout mice"]
+    reasoning: "Pattern to catch gene knockout mouse models with hyphenated format"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+ [a-z]+ glioma mice"
+    toolType: "animal_model"
+    examples: ["Nf1 optic glioma mice"]
+    reasoning: "Pattern for disease-specific mouse models with anatomical location"
+
+  - patternType: "term"
+    pattern: "anti-[A-Z][A-Za-z0-9]+ neutralizing antibody"
+    toolType: "antibody"
+    examples: ["anti-CD11a neutralizing antibody"]
+    reasoning: "Pattern for neutralizing antibodies with functional descriptor"
+
+  - patternType: "context_phrase"
+    pattern: "genetically engineered mouse strains"
+    toolType: "animal_model"
+    examples: ["genetically engineered mouse strains"]
+    reasoning: "General term for engineered mouse models used in research"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+-seq datasets"
+    toolType: "computational_tool"
+    examples: ["RNA-seq datasets", "ChIP-seq datasets"]
+    reasoning: "Pattern for sequencing datasets used as computational resources"
+
+  - patternType: "term"
+    pattern: "RNAScope"
+    toolType: "genetic_reagent"
+    examples: ["RNAScope validation", "RNAScope assay"]
+    reasoning: "Commercial in situ hybridization technique brand name"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Publication lacks Methods section in the provided data, limiting detailed tool validation
+    - Abstract contains multiple specific research tools that should have been detected
+    - Mining algorithms appear to have significant gaps in detecting mouse model nomenclature
+    - Antibody detection patterns may be too restrictive for functional descriptors
+    - RNA-seq datasets not recognized as computational tools/resources
+  recommendations: |
+    This publication represents a significant failure of the mining algorithms. The abstract alone
+    contains at least 6 clear research tools that were completely missed. Key recommendations:
+    
+    1. Implement suggested patterns for mouse model nomenclature (knockout mice, disease models)
+    2. Expand antibody patterns to include functional descriptors (neutralizing, blocking)
+    3. Add patterns for sequencing datasets as computational resources
+    4. Include commercial technique brand names (RNAScope, etc.)
+    5. Consider mining abstracts more aggressively when Methods sections are unavailable
+    6. This publication should be re-processed with improved patterns to capture missed tools
+    
+    The high confidence levels (0.80-0.95) for missed tools indicate these are genuine research
+    tools that would benefit the research community if properly cataloged. No observations could
+    be extracted due to lack of validated tools and missing Results/Discussion sections.

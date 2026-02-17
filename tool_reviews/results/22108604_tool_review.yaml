@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "22108604"
+  title: "Exploring the somatic NF1 mutational spectrum associated with NF1 cutaneous neurofibromas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes molecular genetics research involving mutation screening, DNA sequencing, 
+    cell culture, and bioinformatics analysis. Expected tools include:
+    - Genetic reagents (primers, probes for MLPA)
+    - Computational tools (sequencing analysis software, bioinformatics tools)
+    - Cell lines (neurofibroma-derived Schwann cell cultures)
+    - Potentially antibodies for functional assays
+    
+    The study involves multiple molecular techniques that typically require specialized reagents and software tools.
+  overallAssessment: |
+    This is a molecular genetics research study that would typically use multiple research tools including 
+    genetic reagents, computational tools, and cell culture systems. The study describes LOH analysis, 
+    MLPA, DNA sequencing, cell culture, and functional assays - all of which require specific tools and reagents. 
+    The absence of mined tools suggests potential gaps in the mining process for this type of molecular research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "multiplex ligation-dependent probe amplification"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...NF1 mutation screening (involving loss-of-heterozygosity (LOH) analysis, multiplex ligation-dependent probe amplification and DNA sequencing) identified 77 somatic NF1 point mutations..."
+    whyMissed: "MLPA is a specific molecular technique that requires specialized probe sets and reagents, but may not have been recognized as a tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibroma-derived Schwann cell cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Analysis of DNA/RNA from neurofibroma-derived Schwann cell cultures revealed NF1 mutations in four tumours whose presence had been overlooked in the tumour DNA..."
+    whyMissed: "Cell culture systems are research tools, but this may have been missed due to descriptive rather than specific naming"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "DNA sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...NF1 mutation screening (involving loss-of-heterozygosity (LOH) analysis, multiplex ligation-dependent probe amplification and DNA sequencing) identified 77 somatic NF1 point mutations..."
+    whyMissed: "DNA sequencing typically involves both wet lab protocols and computational analysis tools for sequence analysis, but may be too general a term"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+  - toolName: "bioinformatics analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Bioinformatics analysis suggested that four of seven novel somatic NF1 missense mutations (p.A330T, p.Q519P, p.A776T, p.S1463F) could be of functional/clinical significance..."
+    whyMissed: "General term that likely encompasses specific software tools for mutation analysis and prediction"
+    confidence: 0.5
+    shouldBeAdded: No
+
+  - toolName: "GTPase-activating protein-related domain"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Functional analysis confirmed this prediction for p.S1463F, located within the GTPase-activating protein-related domain, as this mutation resulted in a 150-fold increase in activated GTP-bound Ras..."
+    whyMissed: "This refers to a protein domain, not a research tool - likely a false positive if mined"
+    confidence: 0.1
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "multiplex ligation-dependent probe amplification|MLPA"
+    toolType: "genetic_reagent"
+    examples: ["multiplex ligation-dependent probe amplification"]
+    reasoning: "MLPA is a specific molecular technique requiring specialized probe sets that should be captured as genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "\\w+-derived \\w+ cell cultures?"
+    toolType: "cell_line"
+    examples: ["neurofibroma-derived Schwann cell cultures"]
+    reasoning: "Pattern to capture patient-derived or tissue-derived cell culture systems that are used as research tools"
+
+  - patternType: "term"
+    pattern: "loss-of-heterozygosity analysis|LOH analysis"
+    toolType: "genetic_reagent"
+    examples: ["loss-of-heterozygosity (LOH) analysis"]
+    reasoning: "LOH analysis typically requires specific molecular markers and reagents that could be captured"
+
+  - patternType: "context_phrase"
+    pattern: "functional analysis (?:confirmed|revealed|showed|demonstrated)"
+    toolType: "genetic_reagent"
+    examples: ["Functional analysis confirmed this prediction"]
+    reasoning: "Functional analysis context often indicates use of specific assays and reagents that might be missed"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of molecular research techniques
+    - Publication lacks full-text sections (Methods, Results, Discussion) which limits tool identification
+    - Several molecular techniques mentioned in abstract (MLPA, cell culture, sequencing) that typically involve specific tools
+    - Abstract-only content makes it difficult to identify specific reagents, software, or protocols used
+  recommendations: |
+    This publication represents a significant gap in tool mining effectiveness for molecular genetics research.
+    The study clearly describes multiple laboratory techniques that would require specific tools:
+    
+    1. MLPA should be captured as a genetic reagent - it requires specific probe sets
+    2. Cell culture systems mentioned should be evaluated as potential cell line tools
+    3. The mining patterns need improvement for molecular genetics terminology
+    4. Full-text access would likely reveal many more specific tools (primers, software, reagents)
+    
+    Recommend adding the suggested patterns to improve capture of molecular genetics tools.
+    The absence of any mined tools from a clear bench research paper indicates systematic issues
+    with pattern coverage for this research domain.

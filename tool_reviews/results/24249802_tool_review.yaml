@@ -1,0 +1,160 @@
+publicationMetadata:
+  pmid: "24249802"
+  title: "Functional outcome measures for NF1-associated optic pathway glioma clinical trials."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This publication is specifically about defining functional outcome measures for clinical trials,
+    which are clinical assessment tools by definition. The study recommends specific visual assessment
+    instruments and quality of life questionnaires for use in NF1-OPG clinical trials.
+    
+    Expected tool types: clinical assessment tools (visual acuity tests, quality of life questionnaires)
+  overallAssessment: |
+    This is a clinical consensus study specifically focused on defining functional outcome measures
+    for NF1-associated optic pathway glioma clinical trials. The publication explicitly recommends
+    specific clinical assessment tools including visual acuity tests and quality of life questionnaires.
+    Clinical assessment tools are the primary expected tool type for this publication type.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Teller acuity cards"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Visual acuity (VA) assessments using consistent quantitative testing methods are recommended as the main functional outcome measure for NF1-OPG clinical trials. Teller acuity cards are recommended for use as the primary VA endpoint..."
+    whyMissed: "This is a specific visual acuity assessment tool recommended as the primary endpoint for clinical trials. It's a standardized clinical assessment instrument."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HOTV"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Teller acuity cards are recommended for use as the primary VA endpoint, and HOTV as a secondary endpoint once subjects are old enough to complete it..."
+    whyMissed: "HOTV is a specific visual acuity test used as a secondary endpoint. It's a standardized clinical assessment tool for measuring visual acuity in children."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Children's Visual Function Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Given the importance of capturing patient-reported outcomes in clinical trials, evaluating visual quality of life using the Children's Visual Function Questionnaire as a secondary endpoint is also proposed..."
+    whyMissed: "This is a validated quality of life questionnaire specifically designed to assess visual function in children. It's a patient-reported outcome measure (PROM) recommended for clinical trials."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Teller acuity cards?"
+    toolType: "clinical_assessment_tool"
+    examples: ["Teller acuity cards are recommended for use as the primary VA endpoint"]
+    reasoning: "Teller acuity cards are a specific standardized visual acuity assessment tool commonly used in pediatric ophthalmology and clinical trials."
+
+  - patternType: "term"
+    pattern: "HOTV"
+    toolType: "clinical_assessment_tool"
+    examples: ["HOTV as a secondary endpoint once subjects are old enough to complete it"]
+    reasoning: "HOTV is a specific visual acuity test using letters H, O, T, V that is standardized for pediatric vision assessment."
+
+  - patternType: "term"
+    pattern: "Children's Visual Function Questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["evaluating visual quality of life using the Children's Visual Function Questionnaire"]
+    reasoning: "This is a validated patient-reported outcome measure specifically for assessing visual function and quality of life in children."
+
+  - patternType: "context_phrase"
+    pattern: "recommended for use as.*endpoint"
+    toolType: "clinical_assessment_tool"
+    examples: ["Teller acuity cards are recommended for use as the primary VA endpoint"]
+    reasoning: "Clinical studies often describe assessment tools in the context of being recommended as endpoints for trials or studies."
+
+  - patternType: "context_phrase"
+    pattern: "functional outcome measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["Visual acuity (VA) assessments using consistent quantitative testing methods are recommended as the main functional outcome measure"]
+    reasoning: "Functional outcome measures are clinical assessment tools used to evaluate treatment efficacy in clinical trials."
+
+observations:
+  - resourceName: "Teller acuity cards"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Teller acuity cards are recommended as the primary visual acuity endpoint for NF1-associated 
+      optic pathway glioma clinical trials. The study recommends using consistent quantitative 
+      testing methods for visual acuity assessments as the main functional outcome measure.
+    foundIn: "results"
+    contextSnippet: "Visual acuity (VA) assessments using consistent quantitative testing methods are recommended as the main functional outcome measure for NF1-OPG clinical trials. Teller acuity cards are recommended for use as the primary VA endpoint"
+    confidence: 0.95
+    doi: "10.1212/01.wnl.0000435745.95155.b8"
+
+  - resourceName: "HOTV"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      HOTV is recommended as a secondary visual acuity endpoint for NF1-OPG clinical trials, 
+      specifically for use once subjects are old enough to complete the assessment. This provides 
+      an age-appropriate alternative to Teller acuity cards for older children.
+    foundIn: "results"
+    contextSnippet: "Teller acuity cards are recommended for use as the primary VA endpoint, and HOTV as a secondary endpoint once subjects are old enough to complete it"
+    confidence: 0.90
+    doi: "10.1212/01.wnl.0000435745.95155.b8"
+
+  - resourceName: "Children's Visual Function Questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Children's Visual Function Questionnaire is proposed as a secondary endpoint for 
+      evaluating visual quality of life in NF1-OPG clinical trials. This patient-reported 
+      outcome measure is important for capturing the patient perspective on visual function 
+      and quality of life impacts.
+    foundIn: "results"
+    contextSnippet: "Given the importance of capturing patient-reported outcomes in clinical trials, evaluating visual quality of life using the Children's Visual Function Questionnaire as a secondary endpoint is also proposed"
+    confidence: 0.95
+    doi: "10.1212/01.wnl.0000435745.95155.b8"
+
+  - resourceName: "Teller acuity cards"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The optic disc should be assessed for pallor when using Teller acuity cards, as this 
+      appears to be a contributory variable that may affect the interpretation of visual 
+      acuity change over time. This suggests the need for comprehensive ophthalmologic 
+      assessment alongside visual acuity testing.
+    foundIn: "results"
+    contextSnippet: "The optic disc should be assessed for pallor, as this appears to be a contributory variable that may affect the interpretation of VA change over time"
+    confidence: 0.85
+    doi: "10.1212/01.wnl.0000435745.95155.b8"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Initial mining completely missed all clinical assessment tools in this publication
+    - This is a clinical consensus study specifically about functional outcome measures, which are clinical assessment tools by definition
+    - Three specific clinical assessment tools were clearly mentioned and recommended: Teller acuity cards, HOTV, and Children's Visual Function Questionnaire
+    - The mining patterns appear to be inadequate for detecting clinical assessment tools in consensus/recommendation studies
+  recommendations: |
+    This publication should have identified 3 clinical assessment tools that were completely missed by the initial mining:
+    1. Teller acuity cards (primary VA endpoint)
+    2. HOTV (secondary VA endpoint)  
+    3. Children's Visual Function Questionnaire (quality of life assessment)
+    
+    All three tools are explicitly recommended for use in NF1-OPG clinical trials and represent validated clinical assessment instruments. The mining patterns need significant improvement for detecting clinical assessment tools, particularly in consensus studies that recommend specific instruments for clinical trial use.
+    
+    The observations extracted provide valuable usage guidance for each tool, including age-appropriate selection criteria and the importance of comprehensive ophthalmologic assessment. These tools and their usage recommendations would be valuable additions to the research tools database.

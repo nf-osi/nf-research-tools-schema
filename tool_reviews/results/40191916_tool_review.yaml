@@ -1,0 +1,295 @@
+publicationMetadata:
+  pmid: "40191916"
+  title: "The draft genome of the Wisconsin Miniature SwineTM, a valuable biomedical research tool."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a genome assembly and bioinformatics analysis study, expected tool types include:
+    - Computational tools (genome assembly software, bioinformatics pipelines, analysis tools)
+    - Genetic reagents (DNA extraction kits, sequencing library preparation kits)
+    - Animal models (Wisconsin Miniature Swine™ as the research subject and biomedical model)
+    
+    This publication focuses on developing genomic resources for a biomedical research model, so it primarily
+    contains computational tools for genome assembly and analysis, along with the animal model itself.
+    Clinical assessment tools are not expected in this type of genomics study.
+  overallAssessment: |
+    This is a genome assembly and bioinformatics study that extensively uses computational tools for sequencing
+    data processing, genome assembly, and comparative genomics analysis. The publication describes the development
+    of genomic resources for the Wisconsin Miniature Swine™ biomedical research model. Multiple computational
+    tools and genetic reagents are used throughout the methodology, making this a tool-rich publication that
+    should have captured numerous research tools during mining.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Filtlong v0.2.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ONT reads meeting a minimum Q-value of 10 (phred scale) were size- and chimera-filtered (minimum length = 10,000 bp) to approximately 23× coverage with Filtlong v0.2.0"
+    whyMissed: "Specific software version with clear usage context for read filtering was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Porechop v0.2.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ONT reads meeting a minimum Q-value of 10 (phred scale) were size- and chimera-filtered (minimum length = 10,000 bp) to approximately 23× coverage with Filtlong v0.2.0 and Porechop v0.2.4"
+    whyMissed: "Specific software version with clear usage context for adapter trimming was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Flye v2.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Filtered reads were assembled with Flye v2.5, enforcing a 10,000 bp overlap minimum"
+    whyMissed: "Genome assembly software with version number and specific parameters was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GCpp v1.0.0-1807624"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Approximately 20× PacBio subread coverage was used with GCpp v1.0.0-1807624 to independently error-correct the ONT-based Flye assembly"
+    whyMissed: "PacBio error correction software with specific version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "purge_haplotigs"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The resulting error-corrected haploid (pseudohaploid) assembly was deduplicated with purge_haplotigs commit be7e44b"
+    whyMissed: "Assembly deduplication tool with specific commit hash was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Juicer v1.6.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Juicer v1.6.2 and 3D-DNA v180114 were used to scaffold the deduplicated, error-corrected assembly with the Hi-C data"
+    whyMissed: "Hi-C scaffolding software with version number was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "3D-DNA v180114"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Juicer v1.6.2 and 3D-DNA v180114 were used to scaffold the deduplicated, error-corrected assembly with the Hi-C data"
+    whyMissed: "3D genome assembly software with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BUSCO v5.7.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We assessed the quality of our genome assembly using BUSCO v5.7.0 with mammalia_odb10"
+    whyMissed: "Genome completeness assessment tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "QUASTv5.0.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We assessed the quality of our genome assembly using BUSCO v5.7.0 with mammalia_odb10 and QUASTv5.0.2"
+    whyMissed: "Genome assembly quality assessment tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Liftoff v1.6.3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Putative genes in the WMSTM draft genome were identified using Liftoff v1.6.3 with default parameters"
+    whyMissed: "Gene annotation transfer tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SnapGene™ Version 7.2.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we extracted the entire annotated gene sequence and aligned it to the S. scrofa reference coding sequence (CDS) using the align sequences feature in SnapGene™ Version 7.2.1"
+    whyMissed: "Commercial molecular biology software with specific version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AlphaFold 3"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The WMSTM and human amino acid sequences were then input into AlphaFold 3 for structural predictions using the same seed sequence"
+    whyMissed: "Protein structure prediction tool was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PyMOL Version 3.0.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The structural predictions from WMSTM and human proteins were aligned using PyMOL (The PyMOL Molecular Graphics System, Version 3.0.5 Schrödinger, LLC.)"
+    whyMissed: "Molecular visualization software with specific version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Skewer v0.2.2.b"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Adapters, low-quality bases, and primers were trimmed from reads to obtain a Phred score of 20 via the trimming software Skewer (v0.2.2.b)"
+    whyMissed: "Read trimming software with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Tassel pipeline version 2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Tassel pipeline (version 2) was used to process sequence reads to single nucleotide polymorphism (SNP) genotypes"
+    whyMissed: "SNP calling pipeline with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Bowtie2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "demultiplexed reads were aligned to the WMSTM draft genome using Bowtie2"
+    whyMissed: "Sequence alignment software was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VCFtools v.0.1.16"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The population-wide inbreeding coefficient F was calculated with VCFtools (v.0.1.16)"
+    whyMissed: "VCF file processing tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Beagle v4.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Beagle v4.1 was used to perform whole genome phasing and to impute missing data"
+    whyMissed: "Genotype imputation software with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "RAxML"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A mid-point rooted topology was created from the VCF data using RAxML and visualized with itol v6.9.1"
+    whyMissed: "Phylogenetic analysis software was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "itol v6.9.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A mid-point rooted topology was created from the VCF data using RAxML and visualized with itol v6.9.1"
+    whyMissed: "Tree visualization tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Wisconsin Miniature Swine™"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "The Wisconsin Miniature SwineTM (WMSTM) was developed to address these shortcomings. The WMSTM porcine model grows slower, reaching and maintaining human sizes at adulthood."
+    whyMissed: "The main biomedical research animal model described in the title and throughout the paper was not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Circulomics Nanobind CBB Big DNA kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "High molecular weight (HMW) DNA (25 µg) was extracted from leukocytes using the Circulomics Nanobind CBB Big DNA kit (Pacific Biosciences, Menlo Park, CA, USA)"
+    whyMissed: "DNA extraction kit with vendor information was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SQK-LSK109 ligation sequencing kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sequencing libraries were prepared from 3 µg of input DNA using the SQK-LSK109 ligation sequencing kit (Oxford Nanopore Technologies, Oxford, UK)"
+    whyMissed: "Oxford Nanopore sequencing library preparation kit with catalog number was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Arima HiC v1 kit for Mammalian Blood"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sample processing, crosslinking, and Hi-C library preparation were performed according to the manufacturer's instructions for the Arima HiC v1 kit for Mammalian Blood (Material Part Number: A410030)"
+    whyMissed: "Hi-C library preparation kit with part number was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "KAPA Hyper Prep Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sample processing, crosslinking, and Hi-C library preparation were performed according to the manufacturer's instructions for the Arima HiC v1 kit for Mammalian Blood and the KAPA Hyper Prep Kit (Roche, Basel, CH)"
+    whyMissed: "Library preparation kit with vendor information was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z0-9_-]+\\s+v?\\d+\\.\\d+(\\.\\d+)?([a-z])?\\b"
+    toolType: "computational_tool"
+    examples: ["Filtlong v0.2.0", "Flye v2.5", "BUSCO v5.7.0", "Skewer v0.2.2.b"]
+    reasoning: "Many computational tools follow the pattern of ToolName + version number, which is a strong indicator of software usage"
+
+  - patternType: "context_phrase"
+    pattern: "(?:using|with|via)\\s+([A-Z][a-zA-Z0-9_-]+(?:\\s+v?\\d+\\.\\d+(?:\\.\\d+)?[a-z]?)?)"
+    toolType: "computational_tool"
+    examples: ["using Filtlong v0.2.0", "with GCpp v1.0.0-1807624", "via the trimming software Skewer"]
+    reasoning: "Context phrases like 'using', 'with', 'via' followed by tool names indicate active software usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z0-9\\s]+(?:kit|Kit|reagent|Reagent))\\s*\\([^)]*(?:Inc\\.|LLC|Corp\\.|Technologies|Biosciences|Genomics)[^)]*\\)"
+    toolType: "genetic_reagent"
+    examples: ["Circulomics Nanobind CBB Big DNA kit (Pacific Biosciences, Menlo Park, CA, USA)", "SQK-LSK109 ligation sequencing kit (Oxford Nanopore Technologies, Oxford, UK)"]
+    reasoning: "Kits and reagents are often mentioned with vendor information in parentheses, indicating commercial research products"
+
+  - patternType: "term"
+    pattern: "\\b(Wisconsin\\s+Miniature\\s+Swine|WMS)™?\\b"
+    toolType: "animal_model"
+    examples: ["Wisconsin Miniature Swine™", "WMSTM"]
+    reasoning: "Specific animal model names, especially with trademark symbols, indicate proprietary research models"
+
+  - patternType: "context_phrase"
+    pattern: "(?:assembled|processed|analyzed|aligned|calculated|performed|generated|identified)\\s+(?:using|with|via)\\s+([A-Z][a-zA-Z0-9_-]+)"
+    toolType: "computational_tool"
+    examples: ["assembled with Flye v2.5", "analyzed using BUSCO v5.7.0", "aligned using PyMOL"]
+    reasoning: "Action verbs followed by 'using/with/via' and tool names indicate active computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+\\s+commit\\s+[a-f0-9]{7,}\\b"
+    toolType: "computational_tool"
+    examples: ["purge_haplotigs commit be7e44b"]
+    reasoning: "Software tools referenced by specific git commit hashes indicate precise version control and active usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 24
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to capture any tools despite this being a tool-rich bioinformatics publication
+    - 20+ computational tools with specific versions were used but not detected
+    - Multiple genetic reagents (DNA extraction kits, sequencing kits) were missed
+    - The main research subject (Wisconsin Miniature Swine™ animal model) was not captured
+    - No Results or Discussion sections available to extract scientific observations
+  recommendations: |
+    This publication represents a significant mining failure - despite being a computational genomics study
+    with extensive tool usage, zero tools were captured. The paper uses 20+ computational tools with
+    specific versions, multiple commercial genetic reagents, and describes a proprietary animal model.
+    
+    Key recommendations:
+    1. Implement the suggested patterns to capture versioned software tools
+    2. Add patterns for commercial kits with vendor information in parentheses
+    3. Include patterns for animal model names with trademark symbols
+    4. Add context-based patterns for computational tool usage phrases
+    5. Consider git commit hash patterns for development tools
+    
+    The mining system needs significant improvement to handle bioinformatics publications effectively.
+    All 24 missed tools should be added to improve coverage of genomics and computational biology studies.

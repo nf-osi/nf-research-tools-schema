@@ -1,0 +1,152 @@
+publicationMetadata:
+  pmid: "18988803"
+  title: "Ras signaling influences permissiveness of malignant peripheral nerve sheath tumor cells to oncolytic herpes."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving cell culture experiments, viral infections, 
+    and pathway inhibitor studies. The abstract mentions multiple cell lines, viral vectors, genetic 
+    reagents, and chemical inhibitors. Despite lacking a Methods section in the provided text, the 
+    experimental design described strongly indicates the use of multiple research tools across 
+    several categories.
+  overallAssessment: |
+    This is a laboratory research publication investigating oncolytic herpes virus therapy in 
+    malignant peripheral nerve sheath tumor (MPNST) cell lines. The study clearly uses multiple 
+    research tools including cell lines, viral vectors, genetic reagents, and pathway inhibitors. 
+    The absence of a Methods section in the provided data is likely due to incomplete text extraction, 
+    as the experimental work described requires detailed methodological approaches.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "mouse MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we show that among five different mouse MPNST cell lines, only the ones with elevated levels of Ras signaling are highly permissive to infection..."
+    whyMissed: "Generic reference to 'five different mouse MPNST cell lines' without specific cell line names - mining patterns may require specific nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SW10 Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Additionally, mouse SW10 Schwann cells were able to become infected by parental herpes but were found to be resistant to G207..."
+    whyMissed: "Specific cell line name 'SW10' should have been detected by standard cell line mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SV40 large T antigen"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...The immortalization of these cell lines with the expression of SV40 large T antigen increased the levels of Ras activation..."
+    whyMissed: "Well-known immortalization reagent - may need patterns for 'SV40 T antigen' variants"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "herpes simplex virus 1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...cells with overactivation in the Ras pathway are more permissive to infection with herpes simplex virus 1 and its mutant version R3616..."
+    whyMissed: "Viral vector used as research tool - patterns may not capture full virus names"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "R3616"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...more permissive to infection with herpes simplex virus 1 and its mutant version R3616..."
+    whyMissed: "Specific viral mutant designation - may need patterns for alphanumeric viral strain names"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "G207"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...only the ones with elevated levels of Ras signaling are highly permissive to infection with oncolytic herpes G207..."
+    whyMissed: "Oncolytic herpes virus strain - specific therapeutic viral vector"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Ras/Raf kinase inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...A Ras/Raf kinase inhibitor reduced the synthesis of both herpes simplex virus-1 and G207 proteins in SW10 cells..."
+    whyMissed: "Chemical inhibitor used as research reagent - may need patterns for 'kinase inhibitor' terminology"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "SW[0-9]+ [A-Za-z]+ cells"
+    toolType: "cell_line"
+    examples: ["SW10 Schwann cells"]
+    reasoning: "Pattern to capture SW-series cell lines which are commonly used in research"
+
+  - patternType: "term"
+    pattern: "SV40 (large )?T antigen"
+    toolType: "genetic_reagent"
+    examples: ["SV40 large T antigen"]
+    reasoning: "SV40 T antigen is a standard immortalization reagent that should be consistently captured"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z][0-9]+ (oncolytic )?(herpes|virus)"
+    toolType: "genetic_reagent"
+    examples: ["G207", "R3616"]
+    reasoning: "Pattern to capture alphanumeric viral strain designations used as research tools"
+
+  - patternType: "term"
+    pattern: "(Ras|Raf|ERK|JNK).* kinase inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["Ras/Raf kinase inhibitor"]
+    reasoning: "Pathway-specific kinase inhibitors are common research reagents"
+
+  - patternType: "context_phrase"
+    pattern: "[0-9]+ different .* cell lines"
+    toolType: "cell_line"
+    examples: ["five different mouse MPNST cell lines"]
+    reasoning: "Pattern to capture references to multiple cell lines even when not individually named"
+
+  - patternType: "term"
+    pattern: "herpes simplex virus [0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["herpes simplex virus 1"]
+    reasoning: "Full herpes virus names should be captured as they are used as research vectors"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Missing Methods section limits detailed tool validation, but abstract contains sufficient evidence
+    - Multiple cell lines (SW10 Schwann cells, mouse MPNST cell lines) were not detected
+    - Viral vectors and genetic reagents (SV40 T antigen, herpes viruses, G207, R3616) were missed
+    - Chemical inhibitors (Ras/Raf kinase inhibitor) were not captured
+    - This represents a significant mining failure for a tool-rich laboratory research publication
+  recommendations: |
+    This publication should have yielded multiple validated tools but none were detected, indicating 
+    significant gaps in the mining patterns. The following actions are recommended:
+    
+    1. Add all 7 potentially missed tools to the database - they represent genuine research tools
+    2. Implement the 6 suggested patterns to improve future mining of similar tools
+    3. Review mining patterns for cell line detection, particularly SW-series and generic references
+    4. Enhance viral vector detection patterns for herpes viruses and oncolytic strains
+    5. Improve genetic reagent patterns for immortalization agents like SV40 T antigen
+    6. Add kinase inhibitor detection patterns for pathway-specific chemical tools
+    7. Consider manual review of other publications from 2008 era that may have similar mining gaps
+    
+    No observations were extracted due to lack of Results/Discussion sections in the provided text, 
+    but the full paper likely contains detailed experimental findings that would yield multiple 
+    scientific observations about the identified tools.

@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "41411243"
+  title: "PERADIGM: Phenotype embedding similarity-based rare disease gene mapping."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95  # Very confident - this is clearly a computational methods paper
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, pipelines, analysis frameworks) - HIGHLY EXPECTED
+    - Potentially genetic reagents if analyzing specific variants
+    - Unlikely to contain: antibodies, cell lines, animal models, organoids, PDX models
+    - Clinical assessment tools unlikely but possible if analyzing clinical phenotypes
+    
+    This paper describes a computational framework (PERADIGM) and uses various bioinformatics tools
+    for data processing, quality control, and analysis. Should contain multiple computational tools.
+  overallAssessment: |
+    This is a bioinformatics analysis paper that develops and applies a computational framework called PERADIGM
+    for rare disease gene mapping. The publication extensively describes computational methods, data processing
+    pipelines, and statistical analyses, making it highly likely to contain computational tools. The methods
+    section mentions specific software (PLINK, Word2Vec), datasets (UK Biobank), and analytical approaches
+    that should be captured as research tools.
+
+toolValidations: []
+  # No tools were mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "PERADIGM"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Here, we introduce PERADIGM ( Phenotype Embedding similarity-based RAre DIsease Gene Mapping), a novel framework that leverages natural language processing techniques"
+    whyMissed: "This is the main computational framework developed in this paper - should be captured as a novel computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PLINK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we implemented stringent quality control (QC) measures on the whole-exome sequencing (WES) data using PLINK [ 51 ]"
+    whyMissed: "Well-known bioinformatics tool for genetic data analysis, explicitly mentioned with citation"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Word2Vec"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Mikolov et al. introduced the continuous Bag-of-Words (CBOW) and Skip-gram models, collectively known as Word2Vec"
+    whyMissed: "Established machine learning framework for word embeddings, core to the methodology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CBOW"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "In our embedding analysis, we applied the CBOW Word2Vec model to embed the ICD-10 phenotype data"
+    whyMissed: "Specific Word2Vec architecture used in the analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "UK Biobank"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We utilized the UK Biobank 200K dataset [ 4 , 50 ] in our analysis"
+    whyMissed: "Large-scale genetic dataset/biobank resource used as primary data source"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "UK Biobank 200K dataset"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We utilized the UK Biobank 200K dataset [ 4 , 50 ] in our analysis"
+    whyMissed: "Specific dataset version used in the analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PERADIGM"
+    toolType: "computational_tool"
+    examples: ["PERADIGM ( Phenotype Embedding similarity-based RAre DIsease Gene Mapping)"]
+    reasoning: "Novel computational frameworks developed in papers should be captured as tools"
+
+  - patternType: "term"
+    pattern: "PLINK"
+    toolType: "computational_tool"
+    examples: ["using PLINK [ 51 ]"]
+    reasoning: "Well-established bioinformatics software that was missed"
+
+  - patternType: "term"
+    pattern: "Word2Vec|CBOW|Skip-gram"
+    toolType: "computational_tool"
+    examples: ["Word2Vec", "CBOW Word2Vec model", "Skip-gram models"]
+    reasoning: "Machine learning frameworks and specific architectures used in analysis"
+
+  - patternType: "context_phrase"
+    pattern: "we (utilized|applied|used|employed) .+ (dataset|model|framework|tool|software)"
+    toolType: "computational_tool"
+    examples: ["we applied the CBOW Word2Vec model", "We utilized the UK Biobank 200K dataset"]
+    reasoning: "Context phrases indicating active use of computational resources"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}[0-9]*K? dataset"
+    toolType: "genetic_reagent"
+    examples: ["UK Biobank 200K dataset"]
+    reasoning: "Pattern for large-scale datasets and biobanks"
+
+  - patternType: "term"
+    pattern: "UK Biobank"
+    toolType: "genetic_reagent"
+    examples: ["UK Biobank 200K dataset", "UK Biobank database"]
+    reasoning: "Major biobank resource that should be captured as genetic reagent"
+
+observations: []
+  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this bioinformatics analysis paper despite extensive use of computational tools
+    - The main computational framework (PERADIGM) developed in the paper was not captured
+    - Well-established bioinformatics tools (PLINK, Word2Vec) were not detected
+    - Large-scale dataset resources (UK Biobank) were not identified as genetic reagents
+    - Mining patterns appear insufficient for computational biology papers
+  recommendations: |
+    Overall recommendations for this publication:
+    - This paper should have yielded multiple computational tools - the mining was inadequate
+    - At minimum, PERADIGM (novel framework), PLINK (established software), Word2Vec/CBOW (ML frameworks), 
+      and UK Biobank (genetic resource) should have been captured
+    - The suggested patterns would significantly improve mining for bioinformatics papers
+    - This represents a clear case where computational tools were systematically missed
+    - Future mining should better capture novel frameworks, established bioinformatics software, 
+      machine learning models, and large-scale datasets
+    - No observations could be extracted since no tools were validated, but the Results section 
+      likely contains performance metrics and validation data for the computational tools

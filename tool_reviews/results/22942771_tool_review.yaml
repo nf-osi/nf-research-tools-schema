@@ -1,0 +1,244 @@
+publicationMetadata:
+  pmid: "22942771"
+  title: "Secretome survey of human plexiform neurofibroma derived Schwann Cells reveals a secreted form of the RARRES1 protein."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory study involving primary cell culture, proteomics analysis,
+    Western blotting, and quantitative RT-PCR. Despite lacking a formal Methods section, the Results section
+    contains detailed methodological information describing experimental procedures. Expected tools include:
+    - Cell lines (primary Schwann cell cultures established from patients)
+    - Antibodies (for Western blot analysis)
+    - Computational tools (for proteomics data analysis)
+    - Potentially genetic reagents (stable isotope labeling)
+  overallAssessment: |
+    This is a legitimate laboratory research study that should contain multiple research tools.
+    The study involves primary cell culture establishment, proteomics analysis using LC-MS/MS,
+    Western blot analysis, and quantitative RT-PCR - all techniques that require specific tools.
+    The absence of mined tools suggests significant gaps in the mining process for this publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NFSC141"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma surgically resected from three different patients"
+    whyMissed: "Primary cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NFSC142"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma surgically resected from three different patients"
+    whyMissed: "Primary cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NFSC143R"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma surgically resected from three different patients"
+    whyMissed: "Primary cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NFSC143L"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma surgically resected from three different patients"
+    whyMissed: "Primary cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NSC1"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "Secretome profiles of the four plexiform neurofibroma Schwann cell cultures NFSC141, NFSC142, NFSC143R and NFSC143L and the two normal primary human Schwann cell cultures NSC1 and NSC2"
+    whyMissed: "Normal control cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NSC2"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "Secretome profiles of the four plexiform neurofibroma Schwann cell cultures NFSC141, NFSC142, NFSC143R and NFSC143L and the two normal primary human Schwann cell cultures NSC1 and NSC2"
+    whyMissed: "Normal control cell line names not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "sNF96.2"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "The altered secretome signature in NF1 Schwann cells relative to normal Schwann cells was maintained in the commercially available sNF96.2 cell line established from a malignant peripheral nerve sheath tumor"
+    whyMissed: "Commercial cell line name with non-standard format not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ProteoIQ"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "For quantitative comparisons we used ProteoIQ software to compare spectral counts and signal intensities generated from peptides belonging to each protein across all the samples analyzed"
+    whyMissed: "Proteomics software name not in mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit polyclonal antibodies against RARRES1"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "we performed Western blot analysis on the total protein extracts from NF1 and normal Schwann cells using two different rabbit polyclonal antibodies against human RARRES1 protein"
+    whyMissed: "Antibody description without specific clone/catalog information not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "S100β antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "All NF1 Schwann cultures resembled the normal Schwann cell culture and expressed the characteristic Schwann cell marker S100β"
+    whyMissed: "Antibody target mentioned without explicit antibody context"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "^[A-Z]{2,4}[0-9]{1,4}[A-Z]?$"
+    toolType: "cell_line"
+    examples: ["NFSC141", "NFSC142", "NSC1", "NSC2"]
+    reasoning: "Primary cell line naming convention used in this study - laboratory code followed by numbers and optional letter suffix"
+
+  - patternType: "naming_convention"
+    pattern: "^s[A-Z]{2,4}[0-9]{2,4}\\.[0-9]$"
+    toolType: "cell_line"
+    examples: ["sNF96.2"]
+    reasoning: "Commercial cell line naming with 's' prefix and decimal point notation"
+
+  - patternType: "context_phrase"
+    pattern: "using.*software"
+    toolType: "computational_tool"
+    examples: ["using ProteoIQ software"]
+    reasoning: "Common phrase pattern for software usage in methods/results"
+
+  - patternType: "context_phrase"
+    pattern: "rabbit polyclonal antibod(y|ies) against"
+    toolType: "antibody"
+    examples: ["rabbit polyclonal antibodies against human RARRES1 protein"]
+    reasoning: "Standard antibody description pattern for polyclonal antibodies"
+
+  - patternType: "context_phrase"
+    pattern: "primary.*cell cultures? (were )?established"
+    toolType: "cell_line"
+    examples: ["primary Schwann cells cultures were established"]
+    reasoning: "Indicates establishment of primary cell cultures as research tools"
+
+  - patternType: "context_phrase"
+    pattern: "commercially available.*cell line"
+    toolType: "cell_line"
+    examples: ["commercially available sNF96.2 cell line"]
+    reasoning: "Indicates use of commercial cell lines as research tools"
+
+observations:
+  - resourceName: "NFSC141"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Primary Schwann cell culture established from plexiform neurofibroma surgically resected from NF1 patient.
+      Showed highly homogenous cell population and expressed characteristic Schwann cell marker S100β.
+      Secreted significant amounts of complement components C3 and C4-A, RARRES1, apolipoproteins D and E,
+      Chitinase-3 like protein and glutathione peroxidase 3 compared to normal Schwann cells.
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma... Established Schwann cell cultures from these specimens showed highly homogenous cell population"
+    confidence: 0.9
+    doi: "10.3390/ijms13079380"
+
+  - resourceName: "NFSC142"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Primary Schwann cell culture established from plexiform neurofibroma surgically resected from NF1 patient.
+      Showed highly homogenous cell population and expressed characteristic Schwann cell marker S100β.
+      Part of the four NF1 Schwann cell cultures that showed altered secretome signature compared to normal cells.
+    foundIn: "results"
+    contextSnippet: "NFSC141, NFSC142, NFSC143R and NFSC143L primary Schwann cells cultures were established from plexiform neurofibroma... All NF1 Schwann cultures resembled the normal Schwann cell culture"
+    confidence: 0.9
+    doi: "10.3390/ijms13079380"
+
+  - resourceName: "sNF96.2"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Commercial Schwann cell line established from malignant peripheral nerve sheath tumor (MPNST) from 27-year-old donor.
+      Maintained altered secretome signature similar to primary NF1 Schwann cells relative to normal Schwann cells.
+      Secreted high molecular mass RARRES1 protein similar to primary NF1 cultures. Detected significant amount of uPA
+      (7 spectral counts) in conditioned medium, consistent with its malignant nature.
+    foundIn: "results"
+    contextSnippet: "The altered secretome signature in NF1 Schwann cells relative to normal Schwann cells was maintained in the commercially available sNF96.2 cell line... we detected a significant amount of uPA (7 spectral counts) in the conditioned medium of the malignant sNF96.2 Schwann cell line"
+    confidence: 0.95
+    doi: "10.3390/ijms13079380"
+
+  - resourceName: "ProteoIQ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Software used for quantitative proteomics comparisons. Successfully compared spectral counts and signal intensities
+      generated from peptides belonging to each protein across all samples analyzed. Enabled identification of
+      differentially secreted proteins between NF1 and normal Schwann cells with statistical significance (p ≤ 0.05).
+    foundIn: "results"
+    contextSnippet: "For quantitative comparisons we used ProteoIQ software to compare spectral counts and signal intensities generated from peptides belonging to each protein across all the samples analyzed"
+    confidence: 0.9
+    doi: "10.3390/ijms13079380"
+
+  - resourceName: "rabbit polyclonal antibodies against RARRES1"
+    resourceType: "Antibody"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Two different rabbit polyclonal antibodies from different sources with different target epitopes were tested.
+      Successfully detected cell-attached RARRES1 as single band around 40 kDa in Western blot analysis.
+      However, both antibodies failed to detect the secreted form of RARRES1 despite mass spectrometry detection,
+      suggesting potential post-translational modification of secreted RARRES1 that hinders antibody recognition.
+    foundIn: "results"
+    contextSnippet: "the commercially available rabbit polyclonal antibodies (from two different sources and with different target epitope) raised against cell attached RARRES1 failed to detect the secreted form of RARRES1 (data not shown)"
+    confidence: 0.85
+    doi: "10.3390/ijms13079380"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 3
+    Usage Instructions: 1
+    Issue: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite this being a comprehensive lab research study
+    - Multiple primary cell lines (NFSC141, NFSC142, NFSC143R, NFSC143L, NSC1, NSC2) completely missed
+    - Commercial cell line (sNF96.2) with non-standard naming not detected
+    - Proteomics software (ProteoIQ) not recognized
+    - Antibodies described without catalog numbers not detected
+    - Mining patterns appear inadequate for primary cell culture nomenclature
+  recommendations: |
+    All potentially missed tools should be added to improve mining coverage for similar publications.
+    The mining system needs significant enhancement for:
+    1. Primary cell line naming conventions (laboratory-specific codes)
+    2. Commercial cell lines with non-standard formats
+    3. Proteomics and bioinformatics software recognition
+    4. Antibody descriptions without explicit catalog/clone information
+    5. Context-based tool detection in Results sections when Methods are absent
+    
+    This publication demonstrates major gaps in current mining patterns, particularly for cell culture-based studies.
+    The suggested patterns would significantly improve detection of similar tools in future publications.
+    All five observations extracted provide valuable information about tool performance and characteristics.

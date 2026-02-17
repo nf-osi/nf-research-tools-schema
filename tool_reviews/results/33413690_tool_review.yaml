@@ -1,0 +1,233 @@
+publicationMetadata:
+  pmid: "33413690"
+  title: "Human cutaneous neurofibroma matrisome revealed by single-cell RNA sequencing."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study using single-cell RNA sequencing, qPCR, immunohistochemistry,
+    and histological analysis. Expected tool types include:
+    - Antibodies (for immunohistochemistry)
+    - Computational tools (Cell Ranger, Seurat, R packages)
+    - Genetic reagents (qPCR primers)
+    - Cell culture reagents and kits
+    
+    The publication combines molecular biology, bioinformatics, and histological techniques, so multiple
+    tool categories are expected.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that should contain multiple research tools.
+    The methods section describes detailed experimental procedures including single-cell RNA sequencing,
+    qPCR, immunohistochemistry, and histological analysis. Such studies typically use numerous research
+    tools including antibodies, computational software, and molecular biology reagents. The fact that
+    no tools were initially mined suggests significant gaps in the mining patterns.
+
+toolValidations: []  # No tools were initially mined to validate
+
+potentiallyMissedTools:
+  - toolName: "rabbit anti-SMA"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubated with primary antibodies [rabbit anti-SMA (Novus, NB600-531); rabbit anti-COL11A1..."
+    whyMissed: "Antibody with vendor and catalog number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit anti-COL11A1"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...rabbit anti-SMA (Novus, NB600-531); rabbit anti-COL11A1 (ThermoScientific; PA5-68410); rabbit anti-FAP..."
+    whyMissed: "Antibody with vendor and catalog number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit anti-FAP"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...rabbit anti-COL11A1 (ThermoScientific; PA5-68410); rabbit anti-FAP (Abcam; ab53066); rabbit anti-collagen VI..."
+    whyMissed: "Antibody with vendor and catalog number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "rabbit anti-collagen VI"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...rabbit anti-FAP (Abcam; ab53066); rabbit anti-collagen VI (Abcam; ab6588)] diluted in 3% donkey serum..."
+    whyMissed: "Antibody with vendor and catalog number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cell Ranger"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Cell Ranger version 3.0.0 (10× Genomics) was used to process the raw sequencing data..."
+    whyMissed: "Bioinformatics software with version number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The gene x cell expression matrices were loaded to the R package Seurat version 3.0.0 for downstream analyses..."
+    whyMissed: "R package with version number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "10X Genomics Chromium controller"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...A freshly prepared single cell suspension of ~10,000 cells per sample was loaded into a 10X Genomics Chromium controller for transcript barcoding..."
+    whyMissed: "Single-cell sequencing platform not detected by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "whole skin dissociation kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Based on the whole skin dissociation kit (Miltenyi Biotec, Cat. No. 130-101-540), human skin was harvested..."
+    whyMissed: "Commercial kit with catalog number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TRIzol reagent"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...RNA extraction was performed using the TRIzol reagent, reverse transcription was performed using iScript Select cDNA synthesis kit..."
+    whyMissed: "Standard molecular biology reagent not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "iScript Select cDNA synthesis kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...reverse transcription was performed using iScript Select cDNA synthesis kit, and qPCR was performed on a Bio-Rad FX96 apparatus..."
+    whyMissed: "Commercial molecular biology kit not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Bio-Rad FX96"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...qPCR was performed on a Bio-Rad FX96 apparatus using Bio-Rad iSCRIPT master mix..."
+    whyMissed: "qPCR instrument not detected by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Bio-Rad iSCRIPT master mix"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...qPCR was performed on a Bio-Rad FX96 apparatus using Bio-Rad iSCRIPT master mix and the following qPCR primers..."
+    whyMissed: "qPCR reagent not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Vecta Stain Elite ABC kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...incubated with a premixture of avidin and biotin (following Vecta Stain Elite ABC kit procedure) rinsed again in PBS..."
+    whyMissed: "Immunohistochemistry kit not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina HiSeq sequencer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...transcript barcoding and sequenced on an Illumina HiSeq sequencer. The expression data has been deposited..."
+    whyMissed: "DNA sequencing platform not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "rabbit anti-[A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["rabbit anti-SMA", "rabbit anti-COL11A1", "rabbit anti-FAP", "rabbit anti-collagen VI"]
+    reasoning: "Standard antibody naming convention with species and target protein"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+[,;]\\s*[A-Z0-9-]+\\)"
+    toolType: "general"
+    examples: ["(Novus, NB600-531)", "(ThermoScientific; PA5-68410)", "(Abcam; ab53066)", "(Miltenyi Biotec, Cat. No. 130-101-540)"]
+    reasoning: "Vendor name and catalog number pattern in parentheses indicates commercial research tools"
+
+  - patternType: "term"
+    pattern: "Cell Ranger"
+    toolType: "computational_tool"
+    examples: ["Cell Ranger version 3.0.0"]
+    reasoning: "Widely used single-cell RNA sequencing analysis software"
+
+  - patternType: "term"
+    pattern: "Seurat"
+    toolType: "computational_tool"
+    examples: ["R package Seurat version 3.0.0"]
+    reasoning: "Popular R package for single-cell RNA sequencing analysis"
+
+  - patternType: "naming_convention"
+    pattern: "version\\s+\\d+\\.\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["Cell Ranger version 3.0.0", "Seurat version 3.0.0"]
+    reasoning: "Software version numbers indicate specific computational tools being used"
+
+  - patternType: "term"
+    pattern: "10X Genomics Chromium"
+    toolType: "genetic_reagent"
+    examples: ["10X Genomics Chromium controller"]
+    reasoning: "Single-cell sequencing platform widely used in research"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z]+\\s+kit"
+    toolType: "genetic_reagent"
+    examples: ["whole skin dissociation kit", "iScript Select cDNA synthesis kit", "Vecta Stain Elite ABC kit"]
+    reasoning: "Commercial kits are common research reagents"
+
+  - patternType: "term"
+    pattern: "TRIzol"
+    toolType: "genetic_reagent"
+    examples: ["TRIzol reagent"]
+    reasoning: "Standard RNA extraction reagent used in molecular biology"
+
+  - patternType: "naming_convention"
+    pattern: "Bio-Rad\\s+[A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["Bio-Rad FX96", "Bio-Rad iSCRIPT master mix"]
+    reasoning: "Bio-Rad instruments and reagents are common in molecular biology"
+
+  - patternType: "term"
+    pattern: "Illumina HiSeq"
+    toolType: "genetic_reagent"
+    examples: ["Illumina HiSeq sequencer"]
+    reasoning: "DNA sequencing platform commonly used in genomics research"
+
+observations: []  # No validated tools to extract observations from since none were initially mined
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 10
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were initially mined despite this being a comprehensive laboratory research study
+    - Mining patterns completely failed to detect 14+ clear research tools including:
+      * 4 antibodies with vendor/catalog information
+      * 2 major computational tools (Cell Ranger, Seurat) with version numbers
+      * 8 molecular biology reagents and instruments with specific product names
+    - All missed tools have clear experimental usage context in detailed Methods section
+    - This represents a major failure of the mining system for this publication type
+  recommendations: |
+    - ALL 14 identified tools should be added to the database - they are clearly genuine research tools
+    - The mining patterns need significant improvement to catch:
+      * Antibodies with standard naming (species + anti-target)
+      * Vendor/catalog number patterns in parentheses
+      * Major bioinformatics software (Cell Ranger, Seurat)
+      * Commercial kits and reagents with product names
+      * Laboratory instruments with model numbers
+    - This publication demonstrates that current mining is missing many legitimate tools
+    - Suggest comprehensive review of mining patterns for laboratory research publications
+    - Consider adding patterns for standard molecular biology workflows (RNA-seq, qPCR, IHC)

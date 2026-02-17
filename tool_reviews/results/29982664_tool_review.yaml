@@ -1,0 +1,204 @@
+publicationMetadata:
+  pmid: "29982664"
+  title: "EPH receptor signaling as a novel therapeutic target in NF2-deficient meningioma."
+  queryType: "bench,clinical"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study investigating EPH receptor signaling in NF2-deficient meningioma.
+    The methods describe high-throughput kinome analyses, immunoblotting, cell-based drug screening,
+    and orthotopic animal models. This type of study would typically use:
+    - Cell lines (NF2-null human arachnoidal and meningioma cell lines mentioned)
+    - Animal models (orthotopic meningioma model mentioned)
+    - Antibodies (for immunoblotting and kinome analyses)
+    - Computational tools (for high-throughput kinome analyses)
+    - Genetic reagents (potentially for creating NF2-null cells)
+  overallAssessment: |
+    This is a clear laboratory research study with experimental methods including cell culture,
+    immunoblotting, drug screening, and animal models. The publication should contain multiple
+    research tools including cell lines, antibodies, animal models, and computational tools.
+    The fact that 0 tools were mined suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF2-null human arachnoidal cell lines"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "High-throughput kinome analyses were performed in NF2-null human arachnoidal and meningioma cell lines to identify functional kinome changes upon NF2 loss."
+    whyMissed: "Cell line description was not recognized - may need patterns for 'NF2-null' or 'gene-null' cell line nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF2-null human meningioma cell lines"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "High-throughput kinome analyses were performed in NF2-null human arachnoidal and meningioma cell lines to identify functional kinome changes upon NF2 loss."
+    whyMissed: "Cell line description was not recognized - may need patterns for 'NF2-null' or 'gene-null' cell line nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "orthotopic meningioma model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Antitumor drug efficacy was tested in an orthotopic meningioma model."
+    whyMissed: "Animal model description was not recognized - may need patterns for 'orthotopic model' terminology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "dasatinib"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Dasatinib significantly inhibited phospho-EPH receptor A2 (pEPHA2), pEPHB1, c-KIT, and Src/SFK in NF2-null cells"
+    whyMissed: "Drug/compound used as experimental reagent was not recognized - may need patterns for kinase inhibitors"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "dual mTORC1/2 inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "While dasatinib treatment showed some activity, dual mTORC1/2 inhibitor and its combination with dasatinib elicited stronger growth inhibition"
+    whyMissed: "Drug/compound used as experimental reagent was not recognized - may need patterns for mTOR inhibitors"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+-null.*cell line[s]?"
+    toolType: "cell_line"
+    examples: ["NF2-null human arachnoidal cell lines", "NF2-null human meningioma cell lines"]
+    reasoning: "Gene knockout cell lines often use 'gene-null' nomenclature that wasn't captured by existing patterns"
+
+  - patternType: "context_phrase"
+    pattern: "orthotopic.*model"
+    toolType: "animal_model"
+    examples: ["orthotopic meningioma model"]
+    reasoning: "Orthotopic models are common in cancer research but may not be captured by current animal model patterns"
+
+  - patternType: "term"
+    pattern: "dasatinib|imatinib|nilotinib|bosutinib"
+    toolType: "genetic_reagent"
+    examples: ["dasatinib"]
+    reasoning: "Tyrosine kinase inhibitors are commonly used research reagents but may not be captured as tools"
+
+  - patternType: "context_phrase"
+    pattern: "mTORC?[12]/? inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["dual mTORC1/2 inhibitor"]
+    reasoning: "mTOR pathway inhibitors are common research reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "high-throughput.*analys[ie]s"
+    toolType: "computational_tool"
+    examples: ["High-throughput kinome analyses"]
+    reasoning: "High-throughput analyses typically require specialized computational tools/platforms"
+
+  - patternType: "context_phrase"
+    pattern: "immunoblotting|western blot"
+    toolType: "antibody"
+    examples: ["Immunoblotting confirmed the activation of kinases"]
+    reasoning: "Immunoblotting mentions should trigger search for specific antibodies used"
+
+observations:
+  - resourceName: "NF2-null human arachnoidal cell lines"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF2-null cells showed activation of EPH receptor tyrosine kinases (EPH RTKs), c-KIT, and Src family kinase (SFK) members.
+      These kinases were among the top candidates activated upon NF2 loss based on high-throughput kinome analyses.
+    foundIn: "results"
+    contextSnippet: "Erythropoietin-producing hepatocellular receptor tyrosine kinases (EPH RTKs), c-KIT, and Src family kinase (SFK) members, which are biological targets of dasatinib, were among the top candidates activated in NF2-null cells."
+    confidence: 0.9
+    doi: "10.1093/neuonc/noy046"
+
+  - resourceName: "NF2-null human meningioma cell lines"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      NF2-null meningioma cells showed activation of EPH receptor tyrosine kinases, c-KIT, and Src family kinases.
+      Dasatinib treatment significantly inhibited phospho-EPH receptor A2 (pEPHA2), pEPHB1, c-KIT, and Src/SFK in these cells.
+      Dual mTORC1/2 inhibitor and its combination with dasatinib elicited stronger growth inhibition.
+    foundIn: "results"
+    contextSnippet: "Dasatinib significantly inhibited phospho-EPH receptor A2 (pEPHA2), pEPHB1, c-KIT, and Src/SFK in NF2-null cells, showing no cross-talk with mTORC1/2 signaling."
+    confidence: 0.9
+    doi: "10.1093/neuonc/noy046"
+
+  - resourceName: "orthotopic meningioma model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The orthotopic meningioma model was used to test antitumor drug efficacy.
+      This model allowed evaluation of drug treatments in vivo for meningioma research.
+    foundIn: "methods"
+    contextSnippet: "Antitumor drug efficacy was tested in an orthotopic meningioma model."
+    confidence: 0.8
+    doi: "10.1093/neuonc/noy046"
+
+  - resourceName: "dasatinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Dasatinib significantly inhibited phospho-EPH receptor A2 (pEPHA2), pEPHB1, c-KIT, and Src/SFK in NF2-null cells.
+      Treatment showed some growth inhibitory activity but was more effective when combined with mTORC1/2 inhibitor.
+      No cross-talk was observed with mTORC1/2 signaling pathways.
+    foundIn: "results"
+    contextSnippet: "Dasatinib significantly inhibited phospho-EPH receptor A2 (pEPHA2), pEPHB1, c-KIT, and Src/SFK in NF2-null cells, showing no cross-talk with mTORC1/2 signaling."
+    confidence: 0.85
+    doi: "10.1093/neuonc/noy046"
+
+  - resourceName: "dual mTORC1/2 inhibitor"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Dual mTORC1/2 inhibitor elicited stronger growth inhibition in meningiomas compared to dasatinib alone.
+      The combination of mTORC1/2 inhibitor with dasatinib showed enhanced efficacy for growth inhibition.
+      Co-targeting mTORC1/2 and EPH RTK/SFK pathways represents a novel effective treatment strategy.
+    foundIn: "results"
+    contextSnippet: "While dasatinib treatment showed some activity, dual mTORC1/2 inhibitor and its combination with dasatinib elicited stronger growth inhibition in meningiomas."
+    confidence: 0.85
+    doi: "10.1093/neuonc/noy046"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 2
+    Tumor Growth: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools in a clear laboratory research paper
+    - Cell lines with gene knockout nomenclature (NF2-null) were not recognized
+    - Animal models described as "orthotopic model" were not captured
+    - Drug compounds used as experimental reagents (dasatinib, mTORC1/2 inhibitor) were missed
+    - High-throughput analyses mentioned but no computational tools identified
+    - Immunoblotting mentioned but no antibodies captured
+  recommendations: |
+    This publication represents a significant mining failure - 0 tools were found in a clear laboratory
+    research study that should contain multiple tool types. The following tools should definitely be added:
+    - NF2-null human arachnoidal and meningioma cell lines (high confidence)
+    - Orthotopic meningioma animal model (high confidence)
+    - Dasatinib and mTORC1/2 inhibitor as experimental reagents (high confidence)
+    
+    The mining patterns need significant improvement to capture:
+    - Gene knockout cell line nomenclature (gene-null format)
+    - Orthotopic animal model terminology
+    - Drug compounds used as research reagents
+    - High-throughput analysis platforms
+    - Immunoblotting-related antibodies
+    
+    This paper demonstrates clear gaps in the current mining approach for laboratory research tools.
+    All 5 potentially missed tools should be manually reviewed and likely added to improve coverage.

@@ -1,0 +1,136 @@
+publicationMetadata:
+  pmid: "23140466"
+  title: "Regression of schwannomas induced by adeno-associated virus-mediated delivery of caspase-1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving gene therapy, cell culture, and animal models.
+    Expected tools include: cell lines (NF2 schwannoma cells), animal models (nude mice), 
+    genetic reagents (AAV vectors, caspase-1 constructs), and potentially antibodies for characterization.
+    
+    The study describes experimental procedures including cell implantation, viral vector injection,
+    and functional assessments, all typical of lab research requiring multiple tool types.
+  overallAssessment: |
+    This is a laboratory research study focused on gene therapy for schwannomas using AAV vectors.
+    The study clearly involves experimental procedures including cell culture, animal models, and genetic constructs.
+    Despite lacking a formal Methods section in the provided text, the abstract describes clear experimental usage of research tools.
+
+toolValidations: []  # No tools were mined, but several should have been detected
+
+potentiallyMissedTools:
+  - toolName: "immortalized human NF2 schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...using a model in which immortalized human NF2 schwannoma cells expressing a fluorescent protein and luciferase are implanted in the sciatic nerve of nude mice..."
+    whyMissed: "Cell line not detected despite clear experimental usage context with specific characteristics (immortalized, human, NF2-derived, expressing reporters)"
+    confidence: 0.95  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...immortalized human NF2 schwannoma cells expressing a fluorescent protein and luciferase are implanted in the sciatic nerve of nude mice..."
+    whyMissed: "Standard immunodeficient mouse strain used for xenograft studies not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "AAV1-P0-ICE vector"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Direct injection of an adeno-associated virus (AAV) serotype 1 vector encoding caspase-1 (ICE) under the Schwann-cell specific promoter, P0..."
+    whyMissed: "Specific viral vector construct with defined components (AAV1 serotype, P0 promoter, ICE/caspase-1 gene) not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "adeno-associated virus serotype 1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Direct injection of an adeno-associated virus (AAV) serotype 1 vector encoding caspase-1 (ICE)..."
+    whyMissed: "Specific AAV serotype used as gene delivery vector not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "P0 promoter"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...adeno-associated virus (AAV) serotype 1 vector encoding caspase-1 (ICE) under the Schwann-cell specific promoter, P0..."
+    whyMissed: "Tissue-specific promoter element used in vector construction not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "caspase-1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...adeno-associated virus (AAV) serotype 1 vector encoding caspase-1 (ICE) under the Schwann-cell specific promoter..."
+    whyMissed: "Therapeutic gene (also known as ICE) used in vector construct not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "immortalized.*cell[s]?"
+    toolType: "cell_line"
+    examples: ["immortalized human NF2 schwannoma cells"]
+    reasoning: "Immortalized cell lines are commonly used research tools but may not be caught by standard cell line patterns"
+
+  - patternType: "naming_convention"
+    pattern: "nude mice|SCID mice|NSG mice|NOG mice"
+    toolType: "animal_model"
+    examples: ["nude mice"]
+    reasoning: "Immunodeficient mouse strains commonly used for xenograft studies should be specifically detected"
+
+  - patternType: "context_phrase"
+    pattern: "AAV[0-9]+.*vector|adeno-associated virus.*vector"
+    toolType: "genetic_reagent"
+    examples: ["adeno-associated virus (AAV) serotype 1 vector"]
+    reasoning: "AAV vectors with serotype specifications are important gene therapy tools"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][0-9]+.*promoter|[A-Za-z]+.*promoter"
+    toolType: "genetic_reagent"
+    examples: ["P0 promoter"]
+    reasoning: "Promoter elements used in vector construction are important genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "vector encoding|construct encoding|plasmid encoding"
+    toolType: "genetic_reagent"
+    examples: ["vector encoding caspase-1"]
+    reasoning: "Phrases indicating genetic constructs with specific encoded genes"
+
+  - patternType: "naming_convention"
+    pattern: "expressing.*fluorescent protein|expressing.*luciferase"
+    toolType: "cell_line"
+    examples: ["cells expressing a fluorescent protein and luciferase"]
+    reasoning: "Reporter-expressing cell lines are modified research tools that should be detected"
+
+observations: []  # No validated tools to extract observations from, and no Methods/Results sections available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Publication describes laboratory research with cell lines, animal models, and genetic constructs
+    - Mining patterns appear to have missed standard research tools commonly used in gene therapy studies
+    - Abstract contains sufficient detail to identify at least 6 distinct research tools
+    - Lack of Methods section may have contributed to poor tool detection, but abstract provides clear experimental context
+  recommendations: |
+    Overall recommendations for this publication:
+    - All 6 potentially missed tools should be added to the database
+    - This represents a significant failure of the mining system to detect common research tools
+    - The suggested patterns should be implemented to catch similar tools in future mining
+    - Consider expanding mining to include abstract-only publications when Methods sections are unavailable
+    - AAV vectors, immortalized cell lines, and immunodeficient mouse strains are fundamental research tools that should be reliably detected
+    - No observations could be extracted due to lack of Results/Discussion sections, but the abstract suggests tumor regression and pain relief outcomes were measured

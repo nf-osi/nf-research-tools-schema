@@ -1,0 +1,180 @@
+publicationMetadata:
+  pmid: "21352477"
+  title: "Motor deficits in neurofibromatosis type 1 mice: the role of the cerebellum."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, behavioral assessment tools, computational tools for analysis
+    
+    This publication describes experimental work using Nf1(+/-) mice (animal model) and various
+    behavioral testing apparatus (Rotarod, Erasmus ladder) and physiological assessment protocols
+    (optokinetic reflex, vestibulo-ocular reflex tests). Despite lacking a formal Methods section,
+    the abstract clearly describes experimental procedures using research tools.
+  overallAssessment: |
+    This is a laboratory research study investigating motor deficits in NF1 using mouse models.
+    The publication describes experimental work with behavioral testing apparatus and physiological
+    assessment tools, indicating genuine research tool usage. The absence of a Methods section
+    is concerning but the abstract provides sufficient detail about experimental procedures.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...we determined the cerebellar contribution to motor problems in Nf1(+/-) mice, a validated mouse model for NF1. Using the Rotarod..."
+    whyMissed: "This is a clear animal model reference with explicit validation statement, should have been detected by animal model patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Rotarod"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Using the Rotarod, a non-specific motor performance test, we confirmed that, like NF1 patients, Nf1(+/-) mice have motor deficits..."
+    whyMissed: "Behavioral testing apparatus for motor performance assessment, commonly used in neuroscience research"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Erasmus ladder"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Nf1(+/-) mice showed no impairment on the Erasmus ladder, as step time and number of missteps were not different..."
+    whyMissed: "Specific behavioral testing apparatus for motor coordination assessment, should be detected by assessment tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "optokinetic reflex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...when compensatory eye movements were tested, no performance deficits were found in the optokinetic reflex and vestibulo-ocular reflex..."
+    whyMissed: "Physiological assessment protocol for testing visual-motor reflexes"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "vestibulo-ocular reflex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...no performance deficits were found in the optokinetic reflex and vestibulo-ocular reflex in the dark (VOR) or in the light (VVOR)..."
+    whyMissed: "Physiological assessment protocol for testing vestibular-motor reflexes, includes VOR and VVOR variants"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "VOR adaptation paradigms"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Nf1(+/-) mice successfully completed short- and long-term VOR adaptation paradigms, tests that both depend on cerebellar function..."
+    whyMissed: "Specific behavioral testing protocols for cerebellar function assessment"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "Pattern to catch heterozygous knockout mouse models with the (+/-) notation, commonly used in genetics research"
+
+  - patternType: "term"
+    pattern: "\\bRotarod\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Rotarod"]
+    reasoning: "Rotarod is a standard behavioral testing apparatus in neuroscience research for motor performance assessment"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(optokinetic|vestibulo-ocular)\\s+reflex\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["optokinetic reflex", "vestibulo-ocular reflex"]
+    reasoning: "Physiological reflex tests are standardized assessment tools in neuroscience and should be captured"
+
+  - patternType: "term"
+    pattern: "\\bErasmus\\s+ladder\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Erasmus ladder"]
+    reasoning: "Specific behavioral testing apparatus for motor coordination, should be included in assessment tool patterns"
+
+  - patternType: "context_phrase"
+    pattern: "\\bVOR\\s+adaptation\\s+paradigms?\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["VOR adaptation paradigms"]
+    reasoning: "Standardized behavioral testing protocols for cerebellar function assessment"
+
+  - patternType: "context_phrase"
+    pattern: "\\ba\\s+validated\\s+(mouse\\s+)?model\\s+for\\b"
+    toolType: "animal_model"
+    examples: ["a validated mouse model for NF1"]
+    reasoning: "Context phrase that strongly indicates animal model usage with validation statement"
+
+observations:
+  - resourceName: "Nf1(+/-) mice"
+    resourceType: "Animal Model"
+    observationType: "Motor Activity"
+    observationTypeOntologyId: "MP:0001405"
+    details: |
+      Nf1(+/-) mice demonstrated confirmed motor deficits when tested on the Rotarod, 
+      a non-specific motor performance test. This finding validates that the mouse model 
+      recapitulates the motor performance problems observed in NF1 patients. However, 
+      cerebellar-specific motor tests (Erasmus ladder, compensatory eye movements, 
+      optokinetic reflex, vestibulo-ocular reflex) showed no impairment, suggesting 
+      the motor deficits are not cerebellar in origin.
+    foundIn: "abstract"
+    contextSnippet: "...Using the Rotarod, a non-specific motor performance test, we confirmed that, like NF1 patients, Nf1(+/-) mice have motor deficits..."
+    confidence: 0.9
+    doi: "10.1111/j.1601-183X.2011.00685.x"
+
+  - resourceName: "Nf1(+/-) mice"
+    resourceType: "Animal Model"
+    observationType: "Behavior"
+    observationTypeOntologyId: "MP:0005386"
+    details: |
+      On the Erasmus ladder test, Nf1(+/-) mice showed no impairment in motor coordination, 
+      with step time and number of missteps not different from controls. This indicates 
+      that fine motor coordination abilities are preserved in this model, despite 
+      general motor performance deficits.
+    foundIn: "abstract"
+    contextSnippet: "...Nf1(+/-) mice showed no impairment on the Erasmus ladder, as step time and number of missteps were not different..."
+    confidence: 0.85
+    doi: "10.1111/j.1601-183X.2011.00685.x"
+
+  - resourceName: "Nf1(+/-) mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Compensatory eye movement testing revealed no performance deficits in optokinetic 
+      reflex and vestibulo-ocular reflex (both in dark VOR and light VVOR conditions). 
+      Additionally, mice successfully completed both short-term and long-term VOR 
+      adaptation paradigms, which are tests dependent on cerebellar function. These 
+      results indicate preserved cerebellar function despite motor deficits.
+    foundIn: "abstract"
+    contextSnippet: "...no performance deficits were found in the optokinetic reflex and vestibulo-ocular reflex in the dark (VOR) or in the light (VVOR). Finally, Nf1(+/-) mice successfully completed short- and long-term VOR adaptation paradigms..."
+    confidence: 0.9
+    doi: "10.1111/j.1601-183X.2011.00685.x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Motor Activity: 1
+    Behavior: 1
+    Nervous System: 1
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - The mining system failed to detect a validated animal model (Nf1(+/-) mice) explicitly described as "a validated mouse model for NF1"
+    - Multiple behavioral assessment tools (Rotarod, Erasmus ladder, reflex tests) were not detected
+    - The absence of a formal Methods section may have affected tool detection, but the abstract contains sufficient experimental detail
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the mining system:
+    - The Nf1(+/-) mouse model should definitely be added - it's explicitly described as validated
+    - Behavioral assessment tools (Rotarod, Erasmus ladder, reflex tests) are standard neuroscience research tools
+    - The suggested patterns would help catch similar tools in future mining
+    - Despite lacking a Methods section, the abstract provides clear experimental context
+    - All 6 potentially missed tools should be added to improve mining coverage
+    - The observations extracted demonstrate meaningful scientific findings about motor deficits and cerebellar function

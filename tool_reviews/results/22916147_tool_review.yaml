@@ -1,0 +1,237 @@
+publicationMetadata:
+  pmid: "22916147"
+  title: "Applying microsatellite multiplex PCR analysis (MMPA) for determining allele copy-number status and percentage of normal cells within tumors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a molecular biology/genetics laboratory study developing and validating a new 
+    analytical method (MMPA). Expected tools include:
+    - Genetic reagents (DNA extraction kits, PCR reagents, molecular biology kits)
+    - Computational tools (analysis software, custom scripts, programming languages)
+    - Laboratory equipment/instruments (though these may not be captured by current mining patterns)
+    
+    The study involves extensive molecular biology techniques, DNA analysis, and computational 
+    method development, making it highly likely to contain multiple research tools across 
+    genetic reagents and computational categories.
+  overallAssessment: |
+    This is a clear laboratory research publication developing and validating a new molecular 
+    analysis method (MMPA) for tumor genetic analysis. The study involves extensive wet lab 
+    work including DNA extraction, PCR amplification, and electrophoresis, combined with 
+    computational analysis and custom software development. Research tools are expected and 
+    extensively used throughout the experimental workflow.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "mmpa.rb"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "This automated analysis has been implemented using the Ruby programming language in a script named mmpa.rb. The script calculates and outputs the Kμ, comparing the reactions of control-tumor pairs"
+    whyMissed: "Custom computational tool with specific name and clear usage context - should have been detected by software/script mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Peak Scanner software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Peak height values for each microsatellite allele were extracted using Peak Scanner software (Applied Biosystems)"
+    whyMissed: "Commercial software with vendor name - should have been detected by software mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Ruby programming language"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "This automated analysis has been implemented using the Ruby programming language in a script named mmpa.rb"
+    whyMissed: "Programming language used for actual analysis implementation, not just cited"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Wizard Genomic DNA purification kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "DNA from blood was isolated either by the Wizard Genomic DNA purification kit (Promega) according to the manufacturer's instructions"
+    whyMissed: "Commercial kit with vendor name (Promega) - should have been detected by reagent/kit mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Gentra Puregene Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "DNA from skin or neurofibromas was extracted using the Gentra Puregene Kit (Qiagen) following manufacturer's instructions"
+    whyMissed: "Commercial kit with vendor name (Qiagen) - should have been detected by reagent/kit mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Multiplex PCR Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We used a Multiplex PCR Kit (Qiagen) with which we obtained good global microsatellite amplification"
+    whyMissed: "Commercial PCR kit with vendor name - should have been detected by reagent/kit mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Quant-iT PicoGreen reagent"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "For an accurate quantification of DNA concentration, samples were further quantified using Quant-iT PicoGreen reagent (Invitrogen)"
+    whyMissed: "Commercial reagent with vendor name (Invitrogen) - should have been detected by reagent mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ABI 3130 xl Genetic Analyzer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PCR fragments were separated by capillary electrophoresis on an ABI 3130 xl Genetic Analyzer"
+    whyMissed: "Laboratory instrument with specific model number - may not be covered by current mining patterns focused on software"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b\\w+\\.rb\\b"
+    toolType: "computational_tool"
+    examples: ["mmpa.rb"]
+    reasoning: "Ruby script files with .rb extension - specific pattern for custom computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "script named \\w+"
+    toolType: "computational_tool"
+    examples: ["script named mmpa.rb"]
+    reasoning: "Phrase indicating custom script development and naming"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b\\w+\\s+Kit\\s*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["Wizard Genomic DNA purification kit (Promega)", "Gentra Puregene Kit (Qiagen)", "Multiplex PCR Kit (Qiagen)"]
+    reasoning: "Commercial kits with vendor names in parentheses - common pattern for molecular biology reagents"
+
+  - patternType: "term"
+    pattern: "Peak Scanner software"
+    toolType: "computational_tool"
+    examples: ["Peak Scanner software (Applied Biosystems)"]
+    reasoning: "Specific commercial analysis software commonly used in molecular biology"
+
+  - patternType: "context_phrase"
+    pattern: "implemented using the \\w+ programming language"
+    toolType: "computational_tool"
+    examples: ["implemented using the Ruby programming language"]
+    reasoning: "Phrase indicating actual implementation/usage of programming language, not just citation"
+
+  - patternType: "naming_convention"
+    pattern: "\\bQuant-iT\\s+\\w+\\s+reagent"
+    toolType: "genetic_reagent"
+    examples: ["Quant-iT PicoGreen reagent"]
+    reasoning: "Invitrogen/Thermo Fisher reagent naming convention for quantification reagents"
+
+observations:
+  - resourceName: "mmpa.rb"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Custom Ruby script developed for automated MMPA calculations. The script calculates and outputs 
+      the Kμ (constant of proportionality), compares control-tumor pairs, determines average percentage 
+      of normal tissue contamination in tumors, and identifies overall mechanism of allelic imbalance. 
+      Released under GNU GPL license with source code and detailed instructions available for download 
+      at http://www.imppc.org/research-activities/genetic-variation-and-cancer/mmpa.html. Can be easily 
+      customized to any MMPA design.
+    foundIn: "methods"
+    contextSnippet: "This automated analysis has been implemented using the Ruby programming language in a script named mmpa.rb. The script calculates and outputs the Kμ, comparing the reactions of control-tumor pairs, the average percentage of normal tissue contamination in the tumor, and the overall mechanism of AI for the test sample."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0042682"
+
+  - resourceName: "Peak Scanner software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Applied Biosystems software used for extracting peak height values from microsatellite allele 
+      electropherograms. Essential component of the MMPA workflow for processing capillary 
+      electrophoresis data from the ABI 3130 xl Genetic Analyzer. Peak height values extracted 
+      by this software are then processed by the custom mmpa.rb script for downstream analysis.
+    foundIn: "methods"
+    contextSnippet: "Peak height values for each microsatellite allele were extracted using Peak Scanner software (Applied Biosystems)."
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0042682"
+
+  - resourceName: "Multiplex PCR Kit"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Qiagen Multiplex PCR Kit provided good global microsatellite amplification with good peak 
+      heights and robust band patterns in electropherogram readings. Successfully used for 
+      simultaneous amplification of 16 microsatellites in the MMPA protocol. Primer pair 
+      concentrations were adjusted to obtain similar product yields across different amplicons.
+    foundIn: "methods"
+    contextSnippet: "We used a Multiplex PCR Kit (Qiagen) with which we obtained good global microsatellite amplification, providing good peak heights and a robust band pattern in the electropherogram readings."
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0042682"
+
+  - resourceName: "Wizard Genomic DNA purification kit"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Promega kit used successfully for DNA isolation from blood samples according to manufacturer's 
+      instructions. Used as alternative to "salting out" method for obtaining control/reference DNA 
+      for allelic imbalance analysis of patient tumor samples. DNA quality and concentration were 
+      assessed using nanodrop spectrophotometry and gel electrophoresis.
+    foundIn: "methods"
+    contextSnippet: "DNA from blood was isolated either by the Wizard Genomic DNA purification kit (Promega) according to the manufacturer's instructions or by the "salting out" method"
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0042682"
+
+  - resourceName: "Gentra Puregene Kit"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Qiagen kit used for DNA extraction from skin tissue and neurofibromas following manufacturer's 
+      instructions. Successfully provided DNA suitable for downstream microsatellite multiplex PCR 
+      analysis. DNA quality and purity were assessed using nanodrop spectrophotometry and gel 
+      electrophoresis before quantification with PicoGreen reagent.
+    foundIn: "methods"
+    contextSnippet: "DNA from skin or neurofibromas was extracted using the Gentra Puregene Kit (Qiagen) following manufacturer's instructions."
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0042682"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite clear laboratory research publication
+    - Multiple commercial kits with vendor names were missed (Promega, Qiagen, Invitrogen)
+    - Custom computational tool (mmpa.rb) with clear naming and usage context was missed
+    - Commercial analysis software (Peak Scanner) with vendor attribution was missed
+    - Programming language used for actual implementation (Ruby) was missed
+    - Laboratory instruments may not be covered by current mining patterns
+  recommendations: |
+    This publication represents a significant mining failure - 8 clear research tools were missed 
+    despite being a typical laboratory research study with detailed methods. The mining system 
+    needs immediate improvement in several areas:
+    
+    1. **Genetic Reagent Detection**: Add patterns for commercial kits with vendor names in 
+       parentheses (e.g., "Kit Name (Vendor)")
+    2. **Custom Software Detection**: Add patterns for script files (.rb, .py, .pl extensions) 
+       and "script named X" phrases
+    3. **Commercial Software**: Improve detection of analysis software with vendor attribution
+    4. **Programming Languages**: Better context analysis to distinguish actual usage from citations
+    5. **Laboratory Instruments**: Consider whether to include analytical instruments in mining scope
+    
+    All 8 missed tools should be added to the database. The suggested patterns would significantly 
+    improve mining accuracy for similar molecular biology publications. The observations extracted 
+    provide valuable usage information for each validated tool.

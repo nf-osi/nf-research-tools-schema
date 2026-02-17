@@ -1,0 +1,275 @@
+publicationMetadata:
+  pmid: "10705390"
+  title: "A unique method for mutation analysis of tumor suppressor genes in colorectal carcinomas using a crypt isolation technique."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, computational tools, genetic reagents, potentially advanced cellular models
+    
+    This publication describes laboratory research involving:
+    - Immunohistochemistry (antibodies expected)
+    - Next-generation sequencing (computational tools expected)
+    - PCR and molecular biology (genetic reagents expected)
+    - Crypt isolation technique (potentially advanced cellular models)
+    - Statistical analysis (computational tools expected)
+    
+    The publication spans multiple tool categories as it combines wet lab molecular biology 
+    with computational analysis and statistical methods.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that develops and validates a crypt isolation 
+    technique for genetic analysis of colorectal carcinomas. The study clearly uses multiple research 
+    tools including antibodies for immunohistochemistry, computational software for sequencing analysis, 
+    and statistical tools for data analysis. The presence of detailed Methods, Results, and Discussion 
+    sections with experimental procedures strongly indicates genuine tool usage rather than just citations.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "p53 antibody clone DO-7"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "P53 was visualized using the p53 antibody clone DO-7 (DAKO). P53 IHC staining patterns were evaluated by two independent, experienced pathologists"
+    whyMissed: "Specific antibody clone with vendor information clearly mentioned in immunohistochemistry methods"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DAKO autostainer Link48"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "P53 IHC was performed according to the NordicQC method using a DAKO autostainer platform (DAKO autostainer Link48)"
+    whyMissed: "Automated laboratory equipment/platform used for immunohistochemistry processing"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "SZ60 dissecting microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The fixed isolated crypts were observed under a dissecting microscope (SZ60; Olympus, Tokyo)"
+    whyMissed: "Laboratory equipment with specific model number and vendor (Olympus)"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Illumina custom panel"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NGS libraries were prepared using a custom panel (Illumina, San Diego, CA, USA) containing 753 amplicons covering 82 exonic regions across 28 genes"
+    whyMissed: "Specific sequencing panel/reagent kit with detailed specifications from Illumina"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MiSeq Reporter software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "MiSeq Reporter software (Illumina) was used for demultiplexing, sequence alignment, and variant calling"
+    whyMissed: "Bioinformatics software specifically used for sequencing data analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina Variant Studio version 2.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Annotation of detected variants was performed using Illumina Variant Studio version 2.2 software (Illumina)"
+    whyMissed: "Bioinformatics software with specific version number for variant annotation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "JMP Pro 16.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used JMP Pro 16.1 (SAS Institute, Cary, NC, USA) for statistical analysis"
+    whyMissed: "Statistical analysis software with specific version number and vendor"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R version 4.3.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Finally, the sample size required to identify a correlation between p53 IHC patterns and TP53 mutation status was determined using sample size package in R (version 4.3.1)"
+    whyMissed: "Programming language/statistical software with specific version used for analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "irr package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The statistical power of the study was set to 0.8, which is commonly used based on the 'Cantor method' using a statistical package in R (the irr package)"
+    whyMissed: "Specific R package used for statistical analysis (inter-rater reliability)"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "sample size package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "the sample size required to identify a correlation between p53 IHC patterns and TP53 mutation status was determined using sample size package in R"
+    whyMissed: "Specific R package used for sample size calculations"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "antibody clone [A-Z0-9-]+"
+    toolType: "antibody"
+    examples: ["p53 antibody clone DO-7"]
+    reasoning: "Pattern to catch specific antibody clones with alphanumeric identifiers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ autostainer\\b"
+    toolType: "computational_tool"
+    examples: ["DAKO autostainer Link48"]
+    reasoning: "Automated laboratory equipment often follows this naming pattern"
+
+  - patternType: "context_phrase"
+    pattern: "using .+ software \\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["using Illumina Variant Studio version 2.2 software (Illumina)"]
+    reasoning: "Common phrase structure for software tools with vendor information"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z]+ Pro [0-9]+\\.[0-9]+\\b"
+    toolType: "computational_tool"
+    examples: ["JMP Pro 16.1"]
+    reasoning: "Professional software versions often follow this naming convention"
+
+  - patternType: "term"
+    pattern: "\\bR \\(version [0-9]+\\.[0-9]+\\.[0-9]+\\)"
+    toolType: "computational_tool"
+    examples: ["R (version 4.3.1)"]
+    reasoning: "Specific pattern for R programming language version mentions"
+
+  - patternType: "term"
+    pattern: "\\b[a-z]+ package\\b"
+    toolType: "computational_tool"
+    examples: ["irr package", "sample size package"]
+    reasoning: "R/Python packages often mentioned as 'package name + package'"
+
+  - patternType: "context_phrase"
+    pattern: "custom panel \\([^)]+\\) containing [0-9]+ amplicons"
+    toolType: "genetic_reagent"
+    examples: ["custom panel (Illumina, San Diego, CA, USA) containing 753 amplicons"]
+    reasoning: "Specific pattern for sequencing panels with amplicon specifications"
+
+observations:
+  - resourceName: "p53 antibody clone DO-7"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The p53 antibody clone DO-7 from DAKO was used successfully for immunohistochemistry 
+      following the NordicQC method. The antibody showed reliable performance in detecting 
+      p53 protein expression patterns across different mutation types. Inter-rater variability 
+      for assessment of p53 expression by independent observers showed very good agreement.
+    foundIn: "results"
+    contextSnippet: "Inter-rater variability for assessment of p53 expression by independent observers showed very good agreement"
+    confidence: 0.90
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+  - resourceName: "p53 antibody clone DO-7"
+    resourceType: "Antibody"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The DO7 antibody used in this study detects p53 expression in normal cells, including 
+      stromal fibroblasts and lymphocytes, when used with recently improved polymer-based 
+      IHC detection systems. This is important for distinguishing wild-type from null-type 
+      p53 expression patterns.
+    foundIn: "discussion"
+    contextSnippet: "the DO7 antibody used in this study detects p53 expression in normal cells, including stromal fibroblasts and lymphocytes, when used with recently improved polymer-based IHC detection systems"
+    confidence: 0.85
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+  - resourceName: "MiSeq Reporter software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MiSeq Reporter software (Illumina) was successfully used for demultiplexing, sequence 
+      alignment, and variant calling. The software generated FASTQ files for each sample pool 
+      and a single genomic variant call file (VCF) from successful sequencing runs.
+    foundIn: "results"
+    contextSnippet: "MiSeq Reporter software (Illumina) was used for demultiplexing, sequence alignment, and variant calling. Successful sequencing runs generated a FASTQ file for each sample pool and a single genomic variant call file (VCF)"
+    confidence: 0.90
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+  - resourceName: "Illumina Variant Studio version 2.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Illumina Variant Studio version 2.2 software was used for annotation of detected variants. 
+      Variants with variant allele frequency <10% were filtered and excluded before review. 
+      Detected variants were marked with a PASS filter flag based on specific quality criteria 
+      including presence in each pool, cumulative depth of 1000× per pool, and average depth of 500× per pool.
+    foundIn: "methods"
+    contextSnippet: "Annotation of detected variants was performed using Illumina Variant Studio version 2.2 software (Illumina). Every variant with a variant allele frequency <10% was filtered and excluded before review"
+    confidence: 0.90
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+  - resourceName: "JMP Pro 16.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      JMP Pro 16.1 (SAS Institute) was used for statistical analysis including calculation of 
+      diagnostic test performance metrics. The software was used to quantify Cohen's kappa for 
+      agreement and calculate sensitivity and specificity accuracy of p53 IHC compared to TP53 
+      mutation status.
+    foundIn: "methods"
+    contextSnippet: "We used JMP Pro 16.1 (SAS Institute, Cary, NC, USA) for statistical analysis. The diagnostic test performance of p53 IHC patterns was quantified by Cohen's kappa for agreement"
+    confidence: 0.90
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+  - resourceName: "R version 4.3.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R version 4.3.1 was used with specific packages for statistical power analysis and sample 
+      size determination. The statistical power was set to 0.8 using the 'Cantor method' with 
+      the irr package, and sample size calculations were performed using the sample size package 
+      to determine that minimally 86 cases were required.
+    foundIn: "methods"
+    contextSnippet: "The statistical power of the study was set to 0.8, which is commonly used based on the 'Cantor method' using a statistical package in R (the irr package). Finally, the sample size required was determined using sample size package in R (version 4.3.1) to be minimally 86 cases"
+    confidence: 0.90
+    doi: "10.5858/2000-124-0382-AUMFMA"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 7
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 5
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive laboratory research study
+    - Multiple clear research tools were missed including antibodies, computational software, and genetic reagents
+    - The mining system failed to detect tools with vendor information and version numbers
+    - Laboratory equipment and automated platforms were not captured
+    - R packages and statistical software were not identified
+  recommendations: |
+    All 10 potentially missed tools should be added to the database as they represent genuine research 
+    tools used in this laboratory study. The tools include:
+    
+    HIGH PRIORITY (should definitely be added):
+    - p53 antibody clone DO-7 (DAKO) - specific antibody with clone information
+    - MiSeq Reporter software (Illumina) - bioinformatics tool for sequencing analysis
+    - Illumina Variant Studio version 2.2 - variant annotation software
+    - JMP Pro 16.1 (SAS Institute) - statistical analysis software
+    - R version 4.3.1 - programming language for statistical analysis
+    - irr package - R package for inter-rater reliability
+    - sample size package - R package for sample size calculations
+    - Illumina custom panel - genetic reagent for targeted sequencing
+    
+    MEDIUM PRIORITY (consider adding):
+    - DAKO autostainer Link48 - automated laboratory platform
+    - SZ60 dissecting microscope (Olympus) - laboratory equipment
+    
+    The 7 suggested patterns should be implemented to improve future mining accuracy, particularly 
+    for antibody clones, software with version numbers, and R packages. The 6 scientific observations 
+    provide valuable usage information and performance data for the validated tools.

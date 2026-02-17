@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "18055911"
+  title: "Deletions of NF1 gene and exons detected by multiplex ligation-dependent probe amplification."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research - molecular genetics study), expected tool types include:
+    - Genetic reagents (MLPA probes, qPCR primers, FISH probes)
+    - Computational tools (MLPA analysis software, qPCR analysis software, statistical analysis)
+    - Potentially antibodies or cell lines if functional studies were performed
+    
+    This is a molecular diagnostic study using specialized genetic analysis techniques, so genetic reagents
+    and computational tools for data analysis are highly expected. The study involves patient samples
+    but focuses on molecular analysis rather than clinical assessment tools.
+
+  overallAssessment: |
+    This is a molecular genetics laboratory study that definitely uses research tools, particularly
+    genetic reagents and computational analysis tools. The study employs multiple molecular techniques
+    (MLPA, qPCR, FISH, dHPLC, PTT) which require specific reagents, equipment, and analysis software.
+    While only abstract text is available, the described methodology clearly indicates systematic use
+    of research tools for genetic analysis of NF1 deletions in patient samples.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MLPA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...analysed using multiplex ligation-dependent probe amplification (MLPA), which allows detection of deletions or duplications encompassing >=1 NF1 exons..."
+    whyMissed: "MLPA is a specific molecular technique requiring specialized probe sets and reagents, but may not have been recognized as a research tool by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "real-time quantitative PCR"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...MLPA results were validated using real-time quantitative PCR (qPCR) or fluorescent in situ hybridisation..."
+    whyMissed: "qPCR is a standard molecular biology technique requiring specific primers and reagents, but may be considered too general by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "fluorescent in situ hybridisation"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...MLPA results were validated using real-time quantitative PCR (qPCR) or fluorescent in situ hybridisation..."
+    whyMissed: "FISH requires specific fluorescent probes and is a research tool, but may not have been captured by current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "denaturing high-performance liquid chromatography"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...138 had previously been found, using denaturing high-performance liquid chromatography or protein truncation test..."
+    whyMissed: "dHPLC is a specialized molecular analysis technique but may not be recognized as a research tool by current patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "protein truncation test"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...using denaturing high-performance liquid chromatography or protein truncation test, to be heterozygous for intragenic NF1 point mutations..."
+    whyMissed: "PTT is a specific molecular biology assay requiring specialized reagents, but may not be captured by current mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "MLPA|multiplex ligation-dependent probe amplification"
+    toolType: "genetic_reagent"
+    examples: ["multiplex ligation-dependent probe amplification (MLPA)", "MLPA screening"]
+    reasoning: "MLPA is a widely used molecular technique in genetics research that requires specific probe sets and should be captured as a genetic reagent"
+
+  - patternType: "term"
+    pattern: "real-time quantitative PCR|qPCR|quantitative PCR"
+    toolType: "genetic_reagent"
+    examples: ["real-time quantitative PCR (qPCR)", "qPCR detected"]
+    reasoning: "qPCR is a fundamental molecular biology technique requiring specific primers and probes, commonly used in research"
+
+  - patternType: "term"
+    pattern: "fluorescent in situ hybridisation|FISH|fluorescence in situ hybridization"
+    toolType: "genetic_reagent"
+    examples: ["fluorescent in situ hybridisation", "FISH analysis"]
+    reasoning: "FISH requires specific fluorescent probes and is a standard cytogenetic research tool"
+
+  - patternType: "term"
+    pattern: "denaturing high-performance liquid chromatography|dHPLC|DHPLC"
+    toolType: "genetic_reagent"
+    examples: ["denaturing high-performance liquid chromatography", "dHPLC screening"]
+    reasoning: "dHPLC is a specialized mutation detection technique used in molecular genetics research"
+
+  - patternType: "term"
+    pattern: "protein truncation test|PTT"
+    toolType: "genetic_reagent"
+    examples: ["protein truncation test", "PTT analysis"]
+    reasoning: "PTT is a specific molecular assay for detecting nonsense mutations and requires specialized reagents"
+
+  - patternType: "context_phrase"
+    pattern: "analysed using|validated using|detected using|screening using"
+    toolType: "general"
+    examples: ["analysed using multiplex ligation-dependent probe amplification", "validated using real-time quantitative PCR"]
+    reasoning: "These phrases often precede mentions of research techniques and tools that should be captured"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of multiple research tools
+    - Only abstract text available, limiting ability to extract detailed tool information
+    - Multiple molecular techniques mentioned that should qualify as genetic reagents
+    - Missing computational tools that would be required for data analysis (MLPA analysis software, statistical analysis)
+    - Current mining patterns appear to miss standard molecular biology techniques
+  recommendations: |
+    - All 5 identified molecular techniques should be added as genetic reagents
+    - Mining patterns need improvement to capture standard molecular biology techniques
+    - Consider MLPA, qPCR, FISH, dHPLC, and PTT as legitimate research tools requiring specific reagents
+    - Full text review would likely reveal additional computational tools and specific reagent details
+    - The publication represents a clear case where molecular techniques were not properly captured by current mining approaches
+    - No observations could be extracted due to lack of Results/Discussion sections, but this is a legitimate research study using multiple research tools
