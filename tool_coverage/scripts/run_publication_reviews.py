@@ -16,6 +16,7 @@ import argparse
 import synapseclient
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import time
 
 # Configuration
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
@@ -332,7 +333,7 @@ def safe_print(*args, **kwargs):
     with print_lock:
         print(*args, **kwargs)
 
-def run_goose_review(pmid, input_file, results_dir, doi=''):
+def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
     """Run goose tool validation for a single publication."""
     safe_print(f"\n{'='*80}")
     safe_print(f"Reviewing {pmid}")
@@ -344,52 +345,67 @@ def run_goose_review(pmid, input_file, results_dir, doi=''):
     # Don't change directory - use absolute paths instead
     results_path = Path(results_dir).resolve()
 
-    try:
-        # Build goose command
-        recipe_path = Path(RECIPE_PATH).resolve()
+    # Retry loop for database conflicts
+    for attempt in range(max_retries):
+        try:
+            # Build goose command
+            recipe_path = Path(RECIPE_PATH).resolve()
 
-        # Sanitize PMID for filename (remove colons and invalid chars)
-        clean_pmid = sanitize_pmid_for_filename(pmid)
+            # Sanitize PMID for filename (remove colons and invalid chars)
+            clean_pmid = sanitize_pmid_for_filename(pmid)
 
-        cmd = [
-            'goose', 'run',
-            '--recipe', str(recipe_path),
-            '--params', f'pmid={clean_pmid}',
-            '--params', f'inputFile={input_file}',
-            '--params', f'doi={doi}',  # Add DOI parameter for observation attribution
-            '--no-session'  # Don't create session files for automated runs
-        ]
+            cmd = [
+                'goose', 'run',
+                '--recipe', str(recipe_path),
+                '--params', f'pmid={clean_pmid}',
+                '--params', f'inputFile={input_file}',
+                '--params', f'doi={doi}',  # Add DOI parameter for observation attribution
+                '--no-session'  # Don't create session files for automated runs
+            ]
 
-        safe_print(f"Running: {' '.join(cmd)}")
+            if attempt > 0:
+                safe_print(f"Retry attempt {attempt + 1}/{max_retries}...")
+            safe_print(f"Running: {' '.join(cmd)}")
 
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=600,  # 10 minute timeout
-            cwd=str(results_path)  # Run in results directory
-        )
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=600,  # 10 minute timeout
+                cwd=str(results_path)  # Run in results directory
+            )
 
-        safe_print(result.stdout)
+            safe_print(result.stdout)
 
-        if result.returncode != 0:
-            safe_print(f"❌ Error (exit code {result.returncode}):")
-            safe_print(result.stderr)
+            if result.returncode != 0:
+                # Check if this is a database conflict error (exit code 101)
+                is_db_conflict = (
+                    result.returncode == 101 and
+                    'table schema_version already exists' in result.stderr
+                )
+
+                if is_db_conflict and attempt < max_retries - 1:
+                    safe_print(f"⚠️  Database conflict (exit code {result.returncode}), retrying...")
+                    time.sleep(1 + attempt)  # Exponential backoff
+                    continue
+                else:
+                    safe_print(f"❌ Error (exit code {result.returncode}):")
+                    safe_print(result.stderr)
+                    return None
+
+            # Look for generated YAML file (clean_pmid already set above)
+            yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
+            if yaml_file.exists():
+                safe_print(f"✅ Review completed: {yaml_file}")
+                return yaml_file
+            else:
+                safe_print(f"⚠️  No YAML file generated")
+                return None
+
+        except subprocess.TimeoutExpired:
+            safe_print(f"❌ Timeout after 10 minutes")
             return None
-
-        # Look for generated YAML file (clean_pmid already set above)
-        yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
-        if yaml_file.exists():
-            safe_print(f"✅ Review completed: {yaml_file}")
-            return yaml_file
-        else:
-            safe_print(f"⚠️  No YAML file generated")
-            return None
-
-    except subprocess.TimeoutExpired:
-        safe_print(f"❌ Timeout after 10 minutes")
-        return None
-    except Exception as e:
+        except Exception as e:
         safe_print(f"❌ Error: {e}")
         return None
 
