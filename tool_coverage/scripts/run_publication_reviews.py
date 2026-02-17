@@ -739,7 +739,7 @@ def main():
 
             # Remove duplicates by pmid (keep first occurrence - mined takes precedence)
             before_dedup = len(mining_df)
-            mining_df = mining_df.drop_duplicates(subset=['pmid'], keep='first')
+            mining_df = mining_df.drop_duplicates(subset=['pmid'], keep='first').reset_index(drop=True)
             duplicates_removed = before_dedup - len(mining_df)
 
             added_count = len(mining_df) - original_count
