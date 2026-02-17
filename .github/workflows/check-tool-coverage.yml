@@ -351,15 +351,15 @@ jobs:
             echo "pattern_improvements_applied=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Format mining results for submission
+      - name: Format validated results for submission
         id: formatting
         run: |
-          echo "Formatting mining results into submission CSVs..."
-          if [ -f "tool_coverage/outputs/processed_publications.csv" ]; then
-            python tool_coverage/scripts/format_mining_for_submission.py 2>&1 | tee tool_coverage/outputs/formatting_output.log
+          echo "Formatting AI-validated results into VALIDATED_*.csv files..."
+          if [ -f "tool_reviews/validation_summary.json" ] || [ -f "tool_reviews/potentially_missed_tools.csv" ]; then
+            python tool_coverage/scripts/format_validation_for_submission.py 2>&1 | tee tool_coverage/outputs/formatting_output.log
             echo "formatting_complete=true" >> $GITHUB_OUTPUT
           else
-            echo "⚠️ Skipping formatting - no mining results found"
+            echo "⚠️ Skipping formatting - no validation results found"
           fi
 
       - name: Analyze tool coverage

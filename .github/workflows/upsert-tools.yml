@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'VALIDATED_*.csv'
-      - 'SUBMIT_*.csv'
+      - 'tool_coverage/outputs/VALIDATED_*.csv'
+      - 'tool_coverage/outputs/SUBMIT_*.csv'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -39,6 +39,7 @@ jobs:
       - name: Check for validated or submit files
         id: check_files
         run: |
+          cd tool_coverage/outputs
           if ls VALIDATED_*.csv 1> /dev/null 2>&1; then
             echo "has_validated=true" >> $GITHUB_OUTPUT
             echo "✅ Found VALIDATED_*.csv files (AI-validated)"
@@ -58,7 +59,8 @@ jobs:
           echo "=========================================="
           echo "VALIDATING CSV Schema"
           echo "=========================================="
-          python tool_coverage/scripts/clean_submission_csvs.py --validate
+          cd tool_coverage/outputs
+          python ../scripts/clean_submission_csvs.py --validate
 
           if [ $? -ne 0 ]; then
             echo "❌ Validation failed - stopping workflow"
@@ -71,7 +73,8 @@ jobs:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "Cleaning submission files..."
-          python tool_coverage/scripts/clean_submission_csvs.py --validate
+          cd tool_coverage/outputs
+          python ../scripts/clean_submission_csvs.py --validate
 
           echo ""
           echo "Files prepared for upload:"
@@ -85,7 +88,8 @@ jobs:
           echo "=========================================="
           echo "DRY-RUN: Preview of Synapse uploads"
           echo "=========================================="
-          python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
+          cd tool_coverage/outputs
+          python ../scripts/clean_submission_csvs.py --upsert --dry-run
 
       - name: Confirm and upload to Synapse
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
@@ -95,7 +99,8 @@ jobs:
           echo "=========================================="
           echo "UPLOADING to Synapse"
           echo "=========================================="
-          python tool_coverage/scripts/clean_submission_csvs.py --upsert
+          cd tool_coverage/outputs
+          python ../scripts/clean_submission_csvs.py --upsert
 
           echo ""
           echo "✅ Upload completed successfully"
