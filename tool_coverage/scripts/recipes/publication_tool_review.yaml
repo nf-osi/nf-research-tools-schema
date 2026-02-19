@@ -35,49 +35,117 @@ prompt: |
      - **Usage Type**: Is the tool being DEVELOPED, USED in experiments, or just CITED from other work?
      - **Methods Presence**: Does the publication have a Methods section indicating actual lab work?
 
-  3. DETECT POTENTIALLY MISSED TOOLS:
-     After reviewing mined tools, scan the full text (Abstract, Methods, Introduction, Results) for:
+  3. DETECT POTENTIALLY MISSED TOOLS (WITH NF-SPECIFIC FOCUS):
+     **CRITICAL REQUIREMENT**: We are building a catalog of NF-SPECIFIC research resources, NOT generic lab tools.
+     Only flag tools that are directly relevant to neurofibromatosis research.
 
-     **Lab Research Tools:**
-     - Specific tool names with catalog numbers, vendor names, or RRID identifiers
-     - Cell line names following standard naming conventions (e.g., HEK293, MCF-7, iPSC-derived)
-     - Mouse strain nomenclature (e.g., Nf1+/-, B6.129-Nf1tm1Tyj)
-     - Antibody targets or clones (e.g., anti-NF1 [D7R7D], rabbit polyclonal)
-     - Plasmids, vectors, or constructs (e.g., pCMV-NF1, AAV-GFP)
+     After reviewing mined tools, scan the full text (Abstract, Methods, Introduction, Results) for NF-specific tools:
 
-     **Computational Tools:**
-     - Software names with versions (e.g., "R v4.2", "Python 3.8", "ImageJ v1.52")
-     - Analysis pipelines (e.g., "Cell Ranger", "STAR aligner", "DESeq2")
-     - Repository URLs (github.com, gitlab.com, zenodo.org)
-     - Programming languages in analysis context (not just citations)
-     - Bioinformatics tools (GATK, BWA, SAMtools, Seurat, scanpy)
+     **Cell Lines (NF-SPECIFIC ONLY):**
+     ✅ KEEP:
+     - NF-modified cell lines: "NF1-deficient U87", "NF2-null HEI-193", "NF1-/- MEFs"
+     - Specific NF tumor cell lines: "S462", "ST88-14", "STS-26T", "ipNF95.11b C", "Ben-Men-1"
+     - Patient-derived NF cell lines with specific identifiers
+     - Cell lines with NF context: "plexiform neurofibroma-derived", "MPNST patient-derived"
 
-     **Advanced Cellular Models:**
-     - Organoid mentions (cerebral organoid, brain organoid, tumoroid)
-     - Assembloid or fused organoid systems
-     - 3D culture systems with Matrigel/ECM
-     - Spheroid or neurosphere cultures
-     - Patient-derived organoids
+     ❌ REJECT:
+     - Generic cell lines WITHOUT NF modifications: "U87", "U251", "HEK293", "HeLa", "MCF7"
+     - Vague descriptors: "cultured cells", "tumor cells", "MPNST cells", "schwannoma cells"
+     - Control/normal cells without NF context: "normal fibroblasts", "control schwann cells"
 
-     **Patient-Derived Models:**
-     - PDX models (patient-derived xenograft)
-     - PDOX (patient-derived orthotopic xenograft)
-     - Humanized mouse systems
-     - Host strain names (NSG, NOG, SCID)
-     - Xenograft establishment procedures
+     **Antibodies (NF-RELEVANT PROTEINS ONLY):**
+     ✅ KEEP - Antibodies targeting NF-relevant proteins:
+     - Core NF genes: NF1, Neurofibromin, NF2, Merlin, Schwannomin, LZTR1, SMARCB1
+     - RAS/MAPK pathway: KRAS, BRAF, MEK1/2, ERK1/2, p-ERK, p-MEK
+     - Hippo pathway: YAP, TAZ, LATS1/2
+     - NF tumor markers: S100, SOX10, GFAP, Ki-67 (when studying NF tumors)
+     - NF-relevant receptors: EGFR, c-MET, PDGFR, c-KIT (when studying NF)
 
-     **Clinical Assessment Tools:**
-     - Validated questionnaires (SF-36, PedsQL, PROMIS, EQ-5D)
-     - Pain scales (VAS, NRS, Wong-Baker)
-     - Quality of life instruments
-     - Patient-reported outcome measures (PROMs)
-     - Symptom assessment scales
-     - Functional assessment tools
+     ❌ REJECT:
+     - Generic housekeeping proteins: GAPDH, β-actin, tubulin
+     - Generic signaling proteins without NF context: AKT, mTOR, STAT3 (unless studying NF)
+     - Fluorophore conjugates: "Alexa Fluor 488", "FITC", "PE-conjugated"
+     - Secondary antibodies: "goat anti-rabbit IgG", "anti-mouse HRP"
 
-     **General tool usage phrases:**
-     - "we used", "we generated", "obtained from", "purchased from"
-     - "analyzed using", "processed with", "assessed using"
-     - "administered", "completed", "measured with"
+     **Genetic Reagents (NF-RELEVANT ONLY):**
+     ✅ KEEP:
+     - NF gene constructs: "pLenti-NF1", "NF1-shRNA", "NF2-CRISPR", "Merlin expression vector"
+     - Constructs targeting NF-relevant genes: "MEK1-shRNA", "BRAF-siRNA", "YAP-overexpression"
+     - Specific named constructs with catalog numbers or RRIDs
+
+     ❌ REJECT:
+     - Generic vectors: "lentiviral vector", "AAV vector", "luciferase reporter"
+     - Small molecule drugs: "trametinib", "selumetinib" (MEK inhibitors - these are drugs, not genetic reagents)
+     - Assay kits: "CellTiter-Glo", "BCA Protein Assay", "Dual-Luciferase Assay"
+     - Generic reagents: "Trizol", "Lipofectamine", "FuGENE"
+     - Generic CRISPR tools: "Cas9", "CRISPR/Cas9" (without specific target)
+     - Compound codes: "PD0325901", "AZD6244" (pharmaceutical compounds)
+
+     **Animal Models (NF-SPECIFIC ONLY):**
+     ✅ KEEP:
+     - NF-specific mutations: "Nf1+/-", "Nf1flox/flox", "Nf2+/-", "Dhh-Cre;Nf1flox/flox"
+     - Named NF models with formal nomenclature: "B6.129-Nf1tm1Tyj/J"
+     - NF phenotype models: "Nf1 optic glioma model", "Nf1 neurofibroma model"
+
+     ❌ REJECT:
+     - Generic strains: "nude mice", "C57BL/6", "BALB/c", "NSG mice" (without NF mutation)
+     - Generic xenograft hosts: "NOD/SCID mice", "athymic nude" (unless established NF PDX line)
+     - Cas9-expressing strains: "Rosa26-Cas9" (generic genome editing tool, not NF-specific)
+
+     **Computational Tools (NF-SPECIFIC OR NOVEL):**
+     ✅ KEEP:
+     - NF-specific tools: "SpliceAI" (when validating NF1 variants), "RENOVO-NF1" (NF-specific predictor)
+     - Novel/custom tools: Named pipelines with GitHub repos, custom analysis scripts with specific names
+     - Specialized bioinformatics tools: "Cell Ranger", "Seurat" (when used for NF analysis)
+
+     ❌ REJECT:
+     - Generic programming languages: "R", "Python", "MATLAB", "R v4.2", "Python 3.8"
+     - Generic software: "ImageJ", "GraphPad Prism", "SPSS", "Excel", "FlowJo"
+     - Generic packages: "ggplot2", "pandas", "DESeq2", "limma", "PyTorch"
+     - Generic databases: "PubMed", "NCBI", "OMIM", "Gene Ontology"
+     - Generic analysis tools: "BLAST", "GATK", "BWA", "SAMtools"
+
+     **Advanced Cellular Models (NF-SPECIFIC OR NAMED):**
+     ✅ KEEP:
+     - Named NF-specific organoids: "neurofibromasphere", "NF1-derived cerebral organoids", "TAME chips"
+     - Patient-derived NF organoids with specific identifiers
+     - Specific 3D culture systems with proper names (not just "3D culture")
+
+     ❌ REJECT:
+     - Generic methodologies: "3D culture", "organoid culture", "sphere culture", "spheroid assay"
+     - Generic terms: "tumor spheroids", "3D spheres", "multicellular spheroids"
+     - Hanging drop method, liquid overlay technique (methods, not tools)
+
+     **Patient-Derived Models (SPECIFIC IDENTIFIERS):**
+     ✅ KEEP:
+     - Named PDX lines: "JH-2-002", "JH-2-031", "WU-356", "WU-386", "MPNST-NF1-09"
+     - Patient-derived models with passage numbers or formal IDs
+     - Established NF PDX collections
+
+     ❌ REJECT:
+     - Generic terms: "patient-derived xenograft", "PDX model", "xenograft model"
+     - Host strain mentions: "NSG", "NOD/SCID" (these are hosts, not PDX lines)
+
+     **Clinical Assessment Tools (VALIDATED INSTRUMENTS):**
+     ✅ KEEP:
+     - Validated questionnaires: "PedsQL NF1 Module", "NFTI-QOL", "SF-36", "PROMIS"
+     - Specific scales: "NRS-11", "Visual Analogue Scale", "Rey Complex Figure Test"
+     - Diagnostic criteria: "NIH NF1 diagnostic criteria", "Manchester criteria"
+
+     ❌ REJECT:
+     - Generic measurement tools: "caliper", "ruler", "measuring tape"
+     - Generic imaging: "MRI", "CT scan", "photography"
+     - Generic lab methods: "flow cytometry", "Western blot", "ELISA"
+
+     **SCAN FOR TOOL USAGE PHRASES:**
+     - "we used [SPECIFIC TOOL NAME]", "obtained from [VENDOR] (cat# [NUMBER])"
+     - "analyzed using [NAMED SOFTWARE/PIPELINE]", "generated using [SPECIFIC CONSTRUCT]"
+     - "administered [VALIDATED QUESTIONNAIRE]", "assessed using [NAMED SCALE]"
+
+     **DO NOT FLAG:**
+     - Generic references: "using standard methods", "analyzed with statistical software"
+     - Methodological descriptions: "cultured in 3D", "transfected with plasmid", "stained with antibodies"
+     - Drug treatments: "treated with MEK inhibitor", "exposed to rapamycin"
 
   4. SUGGEST NEW PATTERNS:
      Based on your analysis, recommend NEW search patterns that could improve mining:
@@ -146,27 +214,89 @@ prompt: |
      - "Assessed using", "administered", "completed" context
      - Publication type can be Clinical Study, Observational Study, or Clinical Trial
 
-  7. USE SCHEMA-VALIDATED VALUES:
-     When extracting tool metadata, use EXACT values from submission schemas to ensure consistency:
+  7. EXTRACT METADATA FIELDS FOR VALIDATED TOOLS:
+     When validating tools, extract as much metadata as possible from the publication text.
+     This metadata will be used to populate Synapse submission tables.
 
-     **Computational Tools - softwareType (REQUIRED):**
-     - Analysis Software, Pipeline, Package/Library, Workflow, Database,
-       Web Application, Command-line Tool, Plugin, Other
+     **Cell Lines:**
+     - organ: Brain, Nerve, Blood, Peripheral nerve, Skin, Spinal cord
+     - tissue: Schwann cells, Fibroblasts, Neurons, Astrocytes, etc.
+     - cellLineManifestation: ['MPNST'], ['Neurofibroma'], ['Schwannoma'], ['Glioma'], etc.
+     - cellLineCategory: Primary cells, Immortalized cells, Cancer cell line
+     - cellLineGeneticDisorder: ['Neurofibromatosis type 1'], ['Neurofibromatosis type 2']
 
-     **Advanced Cellular Models - modelType (REQUIRED):**
-     - Organoid, Assembloid, Spheroid, 3D Culture, Other
+     **Animal Models:**
+     - backgroundStrain: C57BL/6, 129/SvEv, FVB, BALB/c, etc.
+     - backgroundSubstrain: C57BL/6J, C57BL/6N, etc. (if specified)
+     - animalModelOfManifestation: ['Neurofibroma'], ['Optic Glioma'], ['MPNST'], ['Learning Deficits']
+     - animalModelGeneticDisorder: ['Neurofibromatosis type 1'], ['Neurofibromatosis type 2']
+     - animalState: Available, Not Available (if mentioned)
 
-     **Patient-Derived Models - modelSystemType (REQUIRED):**
-     - PDX (Patient-Derived Xenograft), Humanized Mouse,
-       Patient-Derived Organoid, Patient-Derived Cell Line, Other
+     **Genetic Reagents:**
+     - vectorType: ['Plasmid'], ['Lentiviral vector'], ['AAV'], ['Retroviral vector'], ['shRNA'], ['siRNA'], ['CRISPR guide RNA']
+     - vectorBackbone: pLenti, pGEX, pCMV, pcDNA3, pEGFP, etc. (exact name from text)
+     - selectableMarker: Puromycin, Ampicillin, Kanamycin, Neomycin, etc.
+     - insertSpecies: ['Homo sapiens'], ['Mus musculus'], ['Rattus norvegicus']
+     - gRNAshRNASequence: actual nucleotide sequence (if provided)
 
-     **Clinical Assessment Tools - assessmentType (REQUIRED):**
-     - Quality of Life, Pain Assessment, Functional Assessment,
-       Cognitive Assessment, Symptom Scale, Psychological Assessment,
-       Patient-Reported Outcome, Other
+     **Antibodies:**
+     - targetAntigen: NF1, NF2, Merlin, p-ERK, S100, GFAP, Ki-67, etc.
+     - reactiveSpecies: ['Human'], ['Mouse'], ['Rat'] (species mentioned in context)
+     - hostOrganism: Rabbit, Mouse, Goat, Rat, Chicken (antibody host)
+     - clonality: Monoclonal, Polyclonal (if mentioned)
 
-     **IMPORTANT**: Use EXACT values as listed. Do not invent new categories.
-     If uncertain, use "Other" and explain in tool notes.
+     **Computational Tools:**
+     - softwareType: Web application, Command-line tool, Software library, Algorithm/Method,
+       Machine learning model, Sequencing analysis tool, Image analysis tool
+     - programmingLanguage: Python, R, Java, C++, MATLAB (if mentioned)
+     - sourceRepository: GitHub/GitLab/Bitbucket URLs (if provided)
+     - documentation: Website URLs or documentation links (if provided)
+     - licenseType: Open source, Commercial, Free (if mentioned)
+
+     **Patient-Derived Models:**
+     - modelSystemType: Patient-derived xenograft (PDX), Primary cell culture,
+       Organoid/Spheroid culture, Patient-derived xenoline, Allograft model
+     - patientDiagnosis: Neurofibromatosis type 1 (NF1), Neurofibromatosis type 2 (NF2),
+       Sporadic (non-NF1)
+     - tumorType: MPNST, Plexiform neurofibroma, Cutaneous neurofibroma, Neurofibroma,
+       Vestibular schwannoma, Schwannoma, Glioma, Glioblastoma
+     - engraftmentSite: Subcutaneous, Orthotopic, Intracranial, Sciatic nerve, Flank
+     - hostStrain: NOD/SCID, Nude mice, NSG, SCID mice, Immunodeficient mice
+
+     **Advanced Cellular Models:**
+     - modelType: Organoid, Spheroid, 3D culture, iPSC-derived model, Primary cell culture,
+       Slice culture, Pellet culture, Microfluidic culture
+     - derivationSource: Patient-derived tissue, Induced pluripotent stem cells (iPSC),
+       Human embryonic stem cells, Primary cells
+     - cellTypes: Schwann cells, Neurons, Fibroblasts, Melanocytes, Microglia,
+       Neural crest cells, Neural stem cells, Sensory neurons
+     - organoidType: Neurofibromasphere, Cerebral organoid, Schwannoma organoid,
+       Neurofibroma organoid (specific organoid names)
+     - cultureSystem: 3D overlay culture, Suspension culture, Microfluidic system,
+       Pellet culture system, Slice culture system, PDMS substrate culture
+
+     **Clinical Assessment Tools:**
+     - assessmentType: Questionnaire/Scale, Neuropsychological test, Diagnostic criteria,
+       Imaging-based assessment, Quality of life measure, Pain assessment scale,
+       Visual assessment, Motor function assessment, Intelligence assessment,
+       Auditory assessment, Reflex assessment, Tumor response criteria, Clinical guideline
+     - targetPopulation: Pediatric, Adult, NF1 patients, NF2 patients, Schwannomatosis patients
+     - diseaseSpecific: Yes, No (is it NF-specific?)
+     - numberOfItems: number (if mentioned for questionnaires)
+     - scoringMethod: Likert scale, Numerical rating scale, Visual analogue scale,
+       Weighted scoring algorithm, Manual counting
+     - administrationTime: time in minutes (if mentioned)
+
+     **METADATA EXTRACTION GUIDELINES:**
+     - Extract ALL available metadata fields from the publication text
+     - Use exact terminology from the text when possible
+     - Format array fields with brackets: ['Value'] or ['Value1'], ['Value2']
+     - Only include metadata that is explicitly stated or clearly implied
+     - Leave fields empty if information not found - do NOT guess
+     - Prioritize Methods section for tool details
+     - Check Results/Discussion for phenotypic information (animal models)
+     - For computational tools, look for version numbers, URLs, repository links
+     - For clinical tools, look for validation studies, scoring systems, population tested
 
   8. EXTRACT SCIENTIFIC OBSERVATIONS:
      After validating tools, extract scientific observations about each validated tool from the Results and Discussion sections.
@@ -278,6 +408,55 @@ prompt: |
       usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
       recommendation: "Keep" | "Remove" | "Manual Review Required"
       notes: Additional observations or concerns (if any)
+      metadata:  # Extract as many fields as possible from publication text
+        # Cell Lines (extract if toolType is "cell_line"):
+        organ: ""  # Brain, Nerve, Blood, Peripheral nerve, Skin, Spinal cord
+        tissue: ""  # Schwann cells, Fibroblasts, Neurons, etc.
+        cellLineManifestation: []  # ['MPNST'], ['Neurofibroma'], ['Schwannoma'], etc.
+        cellLineCategory: ""  # Primary cells, Immortalized cells, Cancer cell line
+        cellLineGeneticDisorder: []  # ['Neurofibromatosis type 1'], etc.
+        # Animal Models (extract if toolType is "animal_model"):
+        backgroundStrain: ""  # C57BL/6, 129/SvEv, FVB, BALB/c, etc.
+        backgroundSubstrain: ""  # C57BL/6J, C57BL/6N, etc.
+        animalModelOfManifestation: []  # ['Neurofibroma'], ['Optic Glioma'], etc.
+        animalModelGeneticDisorder: []  # ['Neurofibromatosis type 1'], etc.
+        animalState: ""  # Available, Not Available
+        # Genetic Reagents (extract if toolType is "genetic_reagent"):
+        vectorType: []  # ['Plasmid'], ['Lentiviral vector'], ['AAV'], etc.
+        vectorBackbone: ""  # pLenti, pGEX, pCMV, pcDNA3, etc.
+        selectableMarker: ""  # Puromycin, Ampicillin, Kanamycin, etc.
+        insertSpecies: []  # ['Homo sapiens'], ['Mus musculus'], etc.
+        gRNAshRNASequence: ""  # actual sequence if provided
+        # Antibodies (extract if toolType is "antibody"):
+        targetAntigen: ""  # NF1, NF2, Merlin, p-ERK, S100, etc.
+        reactiveSpecies: []  # ['Human'], ['Mouse'], ['Rat']
+        hostOrganism: ""  # Rabbit, Mouse, Goat, etc.
+        clonality: ""  # Monoclonal, Polyclonal
+        # Computational Tools (extract if toolType is "computational_tool"):
+        softwareType: []  # Web application, Command-line tool, etc.
+        programmingLanguage: []  # Python, R, Java, C++, MATLAB
+        sourceRepository: []  # GitHub/GitLab URLs
+        documentation: []  # Documentation URLs
+        licenseType: []  # Open source, Commercial, Free
+        # Patient-Derived Models (extract if toolType is "patient_derived_model"):
+        modelSystemType: []  # PDX, Primary cell culture, Organoid, etc.
+        patientDiagnosis: []  # NF1, NF2, Sporadic
+        tumorType: []  # MPNST, Neurofibroma, Schwannoma, etc.
+        engraftmentSite: []  # Subcutaneous, Orthotopic, Intracranial, etc.
+        hostStrain: []  # NOD/SCID, Nude mice, NSG, etc.
+        # Advanced Cellular Models (extract if toolType is "advanced_cellular_model"):
+        modelType: []  # Organoid, Spheroid, 3D culture, iPSC-derived, etc.
+        derivationSource: []  # Patient-derived tissue, iPSC, etc.
+        cellTypes: []  # Schwann cells, Neurons, Fibroblasts, etc.
+        organoidType: []  # Neurofibromasphere, Cerebral organoid, etc.
+        cultureSystem: []  # 3D overlay, Suspension, Microfluidic, etc.
+        # Clinical Assessment Tools (extract if toolType is "clinical_assessment_tool"):
+        assessmentType: []  # Questionnaire/Scale, Neuropsychological test, etc.
+        targetPopulation: []  # Pediatric, Adult, NF1 patients, etc.
+        diseaseSpecific: []  # Yes, No
+        numberOfItems: ""  # number (for questionnaires)
+        scoringMethod: []  # Likert scale, Numerical rating, etc.
+        administrationTime: ""  # time in minutes
 
     # Repeat for each mined tool
 

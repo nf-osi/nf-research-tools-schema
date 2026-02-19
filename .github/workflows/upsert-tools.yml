@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'tool_coverage/outputs/VALIDATED_*.csv'
-      - 'tool_coverage/outputs/SUBMIT_*.csv'
+      - 'tool_coverage/outputs/FILTERED_*.csv'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -36,22 +35,30 @@ jobs:
         run: |
           pip install -r tool_coverage/requirements.txt
 
-      - name: Check for validated or submit files
+      - name: Check for FILTERED files
         id: check_files
         run: |
           cd tool_coverage/outputs
-          if ls VALIDATED_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=true" >> $GITHUB_OUTPUT
-            echo "✅ Found VALIDATED_*.csv files (AI-validated)"
-          elif ls SUBMIT_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=false" >> $GITHUB_OUTPUT
-            echo "⚠️  Found SUBMIT_*.csv files (not AI-validated)"
+          if ls FILTERED_*.csv 1> /dev/null 2>&1; then
+            echo "has_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found FILTERED_*.csv files (high-completeness subset, confidence ≥0.7, ≥60% critical fields)"
+            echo ""
+            echo "Files to upload:"
+            ls -lh FILTERED_*.csv
+            echo ""
+            # Rename FILTERED to VALIDATED for processing (clean_submission_csvs expects VALIDATED_*.csv)
+            for f in FILTERED_*.csv; do
+              mv "$f" "${f/FILTERED_/VALIDATED_}"
+            done
+            echo "Renamed to VALIDATED_*.csv for processing"
           else
             echo "has_files=false" >> $GITHUB_OUTPUT
-            echo "❌ No CSV files found to upload"
+            echo "❌ No FILTERED_*.csv files found"
+            echo ""
+            echo "This workflow only processes FILTERED_*.csv files (high-completeness subset)."
+            echo "To upload all validated tools, manually commit VALIDATED_*.csv files."
             exit 0
           fi
-          echo "has_files=true" >> $GITHUB_OUTPUT
 
       - name: Validate CSV schema
         if: steps.check_files.outputs.has_files == 'true'
@@ -147,12 +154,10 @@ jobs:
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ steps.check_files.outputs.has_validated }}" = "true" ]; then
-            echo "- Using VALIDATED_*.csv (AI-validated, false positives removed)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Using SUBMIT_*.csv (not AI-validated)" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "- Using FILTERED_*.csv files" >> $GITHUB_STEP_SUMMARY
+          echo "  - High-completeness subset (≥60% critical fields filled)" >> $GITHUB_STEP_SUMMARY
+          echo "  - Confidence threshold: ≥0.7" >> $GITHUB_STEP_SUMMARY
+          echo "  - NF-specific filtering applied (generic tools removed)" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY

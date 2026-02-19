@@ -316,6 +316,14 @@ jobs:
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Initialize VALIDATED templates
+        id: init_templates
+        if: steps.mining.outputs.mining_complete == 'true'
+        run: |
+          echo "Initializing VALIDATED_*.csv template files..."
+          python tool_coverage/scripts/initialize_validated_templates.py 2>&1 | tee tool_coverage/outputs/init_templates_output.log
+          echo "init_templates_complete=true" >> $GITHUB_OUTPUT
+
       - name: Run AI validation with Sonnet
         id: validation
         if: steps.check_api_key.outputs.api_key_exists == 'true'
@@ -361,6 +369,22 @@ jobs:
           else
             echo "⚠️ Skipping formatting - no validation results found"
           fi
+
+      - name: Enrich tool metadata
+        id: enrichment
+        if: steps.formatting.outputs.formatting_complete == 'true'
+        run: |
+          echo "Enriching tool metadata from validated tools..."
+          python tool_coverage/scripts/enrich_all_metadata.py 2>&1 | tee tool_coverage/outputs/enrichment_output.log
+          echo "enrichment_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Generate PMID review summary
+        id: review_summary
+        if: steps.formatting.outputs.formatting_complete == 'true'
+        run: |
+          echo "Generating PMID-level review summary table..."
+          python tool_coverage/scripts/generate_review_summary_table.py 2>&1 | tee tool_coverage/outputs/review_summary_output.log
+          echo "review_summary_complete=true" >> $GITHUB_OUTPUT
 
       - name: Analyze tool coverage
         id: coverage
