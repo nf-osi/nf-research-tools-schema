@@ -1,0 +1,80 @@
+publicationMetadata:
+  pmid: "35648241"
+  title: "Seizure control using MEK inhibitor therapy in a child with neurofibromatosis type 1: a case study"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a clinical case study reporting on the use of MEK inhibitor (selumetinib) therapy for seizure control
+    in a pediatric patient with neurofibromatosis type 1. Expected tool types for this publication type:
+    - Clinical assessment tools: Potentially seizure assessment scales, quality of life measures, or neurological
+      evaluation tools used to monitor patient outcomes
+    - Computational tools: Possibly imaging analysis software or clinical data analysis tools
+    - NOT expected: Lab research tools (antibodies, cell lines, animal models, genetic reagents, organoids, PDX)
+      as this is a clinical case report without experimental laboratory work
+
+    Note: While the queryType is "bench" (suggesting lab tools), the actual publication is clinical in nature.
+    Case studies typically focus on clinical interventions and patient outcomes rather than experimental research tools.
+  overallAssessment: |
+    This clinical case study describes the therapeutic use of selumetinib (MEK inhibitor) in a pediatric patient
+    with neurofibromatosis type 1 and seizures. Case studies typically do not involve experimental research tools
+    but may use clinical assessment instruments for patient evaluation and outcome measurement. The absence of
+    mined research tools is appropriate and expected for this publication type.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "selumetinib"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "MEK inhibitor therapy...selumetinib treatment for seizure control"
+    whyMissed: "Selumetinib is a therapeutic drug/intervention, not a research tool. It's the subject of the case study rather than a tool used for research."
+    confidence: 0.2
+    shouldBeAdded: No
+  - toolName: "EEG"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "electroencephalogram monitoring for seizure assessment"
+    whyMissed: "EEG is a clinical diagnostic procedure, not a research tool in the context of tool mining. It's a standard clinical assessment method."
+    confidence: 0.3
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "case study|case report|clinical case"
+    toolType: "general"
+    examples: ["case study", "clinical case presentation"]
+    reasoning: "Adding patterns to identify case studies could help filter out publications unlikely to contain research tools, improving mining efficiency by focusing on experimental research papers."
+  - patternType: "term"
+    pattern: "therapeutic intervention|drug therapy|clinical treatment"
+    toolType: "general"
+    examples: ["MEK inhibitor therapy", "selumetinib treatment"]
+    reasoning: "Patterns to distinguish therapeutic interventions (subjects of study) from research tools (instruments used for research) could reduce false positives."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a clinical case study, not experimental research
+    - No Methods section describing laboratory procedures or research tool usage
+    - Focus is on therapeutic intervention (selumetinib) rather than research methodology
+    - No research tools were mined, which is appropriate for this publication type
+    - QueryType "bench" appears to be a mismatch - this is clinical content, not bench research
+  recommendations: |
+    - The absence of mined tools is correct and appropriate for this clinical case study
+    - No tools should be added as this publication does not involve experimental research
+    - Consider improving query classification to better distinguish clinical case studies from bench research
+    - The mining results accurately reflect the publication content - no research tools are present
+    - Future mining could benefit from case study detection patterns to avoid processing publications
+      unlikely to contain research tools
+    - No manual curator review needed - the mining correctly identified zero tools

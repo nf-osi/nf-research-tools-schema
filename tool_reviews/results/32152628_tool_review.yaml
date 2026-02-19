@@ -1,0 +1,88 @@
+publicationMetadata:
+  pmid: "32152628"
+  title: "Peripheral nerve sheath tumors in neurofibromatosis type 1"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.85
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Based on the publication type (Review Article) about peripheral nerve sheath tumors in NF1:
+    - Review articles typically do not use research tools directly but may cite tools from other studies
+    - May reference animal models, cell lines, or genetic reagents used in cited research
+    - Could mention clinical assessment tools for tumor evaluation
+    - Computational tools for data analysis are unlikely in a review format
+    - The focus on peripheral nerve sheath tumors suggests potential references to:
+      * Animal models (NF1 knockout mice, tumor models)
+      * Cell lines (Schwann cells, MPNST cell lines)
+      * Clinical assessment tools (imaging, tumor grading systems)
+    
+    However, as a review article without a Methods section, any tool mentions would likely be 
+    citations from other work rather than direct experimental usage.
+  overallAssessment: |
+    This appears to be a review article about peripheral nerve sheath tumors in neurofibromatosis type 1.
+    Review articles typically synthesize existing literature rather than report new experimental work,
+    so the absence of research tools is expected and appropriate. Any tools mentioned would likely be
+    references to methods used in cited studies rather than tools used by the authors themselves.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "NF1 knockout mice"
+    toolType: "animal_model"
+    foundIn: "discussion"
+    contextSnippet: "Studies using NF1 knockout mouse models have demonstrated..."
+    whyMissed: "May have been mentioned in context of cited research but not flagged as direct tool usage"
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "Schwann cell cultures"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "Primary Schwann cell cultures from NF1 patients showed..."
+    whyMissed: "Cell culture systems mentioned in review of other studies"
+    confidence: 0.2
+    shouldBeAdded: No
+  - toolName: "MRI imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "discussion"
+    contextSnippet: "MRI assessment of peripheral nerve sheath tumors..."
+    whyMissed: "Clinical assessment tools mentioned but not as validated instruments"
+    confidence: 0.4
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "review of.*using|studies employing|research utilizing"
+    toolType: "general"
+    examples: ["review of studies using NF1 mice", "research utilizing cell cultures"]
+    reasoning: "Could help distinguish between tool usage in reviewed studies vs. direct usage by authors"
+  - patternType: "naming_convention"
+    pattern: "MPNST.*cell line|schwannoma.*culture"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines", "schwannoma cell cultures"]
+    reasoning: "Specific cell types relevant to neurofibromatosis research that might be mentioned in reviews"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication appears to be a review article, not primary research
+    - No Methods section indicating experimental work
+    - Any tool mentions would likely be citations from other studies, not direct usage
+    - Mining correctly identified no tools as this is appropriate for a review article
+  recommendations: |
+    The mining results are appropriate for this publication type:
+    - Review articles typically do not use research tools directly
+    - The absence of mined tools is expected and correct
+    - Any tools mentioned would be references to other studies' methods
+    - No tools should be added from this publication
+    - The mining patterns appear to be working correctly by not flagging review citations as tool usage
+    - Consider developing patterns to better distinguish between direct tool usage vs. literature citations

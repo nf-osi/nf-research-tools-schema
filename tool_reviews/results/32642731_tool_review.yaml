@@ -1,0 +1,102 @@
+# TOOL VALIDATION REVIEW FOR PMID 32642731
+# STATUS: INCOMPLETE - INPUT DATA NOT AVAILABLE
+# 
+# This template demonstrates the expected structure for tool validation
+# once the input JSON file is populated with publication data.
+
+publicationMetadata:
+  pmid: "32642731"
+  title: "[TITLE NOT AVAILABLE - INPUT FILE EMPTY]"
+  queryType: "unknown"  # Will be determined from input data
+  publicationType: "Unknown"  # Cannot determine without publication content
+  publicationTypeConfidence: 0.0
+  hasMethodsSection: "Unknown"
+  likelyContainsTools: "Unsure"
+  expectedToolTypes: |
+    Cannot determine expected tool types without access to publication content.
+    Once input data is available, will analyze:
+    - Publication type (lab research, clinical study, review, etc.)
+    - Presence of Methods section
+    - Study design and methodology
+    - Content of abstract and full text sections
+    
+    Expected analysis approach:
+    - Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    - Clinical Study/Trial → clinical assessment tools, possibly computational tools for analysis
+    - Bioinformatics Analysis → computational tools (software, pipelines)
+    - Review Articles → typically citations only, not actual tool usage
+  overallAssessment: |
+    Unable to assess publication without input data. The input file 
+    /home/runner/work/nf-research-tools-schema/nf-research-tools-schema/tool_reviews/inputs/32642731_input.json
+    appears to be empty. Once populated with publication metadata, abstract, full text sections,
+    and mined tools list, will perform comprehensive validation following these criteria:
+    
+    1. Analyze publication type and study design
+    2. Validate each mined tool against context and usage patterns
+    3. Search for potentially missed tools across all 8 categories
+    4. Extract scientific observations from Results/Discussion sections
+    5. Suggest improved mining patterns based on findings
+
+toolValidations: []
+# Will populate once input data is available with structure:
+# - toolName: "Exact tool name as mined"
+#   toolType: "antibody|cell_line|animal_model|genetic_reagent|computational_tool|advanced_cellular_model|patient_derived_model|clinical_assessment_tool"
+#   minedFrom: "abstract|methods|introduction|results|discussion"
+#   verdict: "Accept|Reject|Uncertain"
+#   confidence: 0.0-1.0
+#   reasoning: |
+#     Detailed analysis of tool context and validity
+#   contextSnippet: "...surrounding text..."
+#   hasToolKeywords: Yes|No
+#   toolKeywordsFound: []
+#   isDiseaseGeneReference: Yes|No|Unsure
+#   usageType: "Development|Experimental Usage|Citation Only|Not Found in Context"
+#   recommendation: "Keep|Remove|Manual Review Required"
+#   notes: "Additional observations"
+
+potentiallyMissedTools: []
+# Will search full text for missed tools once data is available
+
+suggestedPatterns: []
+# Will suggest improvements to mining patterns based on analysis
+
+observations: []
+# Will extract scientific observations from Results/Discussion sections
+# for all validated (accepted) tools
+
+summary:
+  totalToolsMined: 0  # Unknown without input data
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 0
+  newPatternsCount: 0
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    CRITICAL ISSUE: Input file is empty or not populated.
+    - File path: /home/runner/work/nf-research-tools-schema/nf-research-tools-schema/tool_reviews/inputs/32642731_input.json
+    - File exists but contains no content
+    - Cannot perform tool validation without publication data
+    - Need publication metadata, abstract, full text sections, and mined tools list
+  recommendations: |
+    IMMEDIATE ACTION REQUIRED:
+    1. Populate input JSON file with publication data for PMID 32642731
+    2. Ensure file contains required fields:
+       - Publication metadata (title, DOI, journal, year, queryType)
+       - Abstract text
+       - Full text sections (Methods, Introduction, Results, Discussion if available)
+       - List of mined tools with types and context
+    3. Re-run validation process once data is available
+    
+    VALIDATION METHODOLOGY READY:
+    Once data is available, will apply rigorous validation criteria:
+    - Conservative approach: reject ambiguous cases
+    - Focus on experimental usage vs. citations
+    - Distinguish tools from disease/gene references
+    - Search comprehensively for missed tools
+    - Extract quantitative scientific observations
+    - Suggest actionable pattern improvements
+
+# NOTE: This template demonstrates the complete validation workflow.
+# All sections will be populated with actual analysis once input data becomes available.

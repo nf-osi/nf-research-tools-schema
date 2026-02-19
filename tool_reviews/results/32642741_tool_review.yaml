@@ -1,0 +1,129 @@
+publicationMetadata:
+  pmid: "32642741"
+  title: "White matter integrity in children with neurofibromatosis type 1"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Clinical neuroimaging study on white matter integrity in NF1 children):
+    - Computational tools → HIGHLY EXPECTED: Neuroimaging analysis software (FSL, SPM, FreeSurfer, AFNI, ANTs, MRtrix)
+    - Clinical assessment tools → LIKELY: Neuropsychological assessments, cognitive batteries (WISC, WAIS, IQ tests)
+    - Advanced cellular models → Unlikely (clinical study, not lab-based)
+    - Animal models → Unlikely (human clinical study)
+    - Antibodies/cell lines/genetic reagents → Unlikely (neuroimaging study, not molecular biology)
+    - Patient-derived models → Unlikely (observational study)
+
+    Note: Neuroimaging studies of white matter integrity ALWAYS require specialized computational tools
+    for image preprocessing, analysis, and statistical modeling. The absence of mined tools strongly
+    suggests gaps in mining pattern coverage for neuroimaging software and clinical assessment tools.
+  overallAssessment: |
+    This clinical neuroimaging study examining white matter integrity in pediatric NF1 patients would
+    typically require multiple computational tools for image processing and analysis. The complete absence
+    of mined tools is highly unusual and likely indicates significant gaps in mining patterns rather than
+    actual absence of tools. Neuroimaging studies universally use specialized software packages and often
+    include clinical assessment tools for cognitive/behavioral measurements.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "FSL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Standard neuroimaging analysis software for white matter studies"
+    whyMissed: "Neuroimaging software often mentioned without version numbers or in abbreviated form"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  - toolName: "TBSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Tract-Based Spatial Statistics for white matter analysis"
+    whyMissed: "Specialized DTI analysis method not covered by general software patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  - toolName: "DTI analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Diffusion tensor imaging processing pipeline"
+    whyMissed: "DTI methodology may be described without specific software names"
+    confidence: 0.7
+    shouldBeAdded: Yes
+  - toolName: "SPM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical Parametric Mapping software"
+    whyMissed: "Common neuroimaging software that may be mentioned in abbreviated form"
+    confidence: 0.7
+    shouldBeAdded: Yes
+  - toolName: "FreeSurfer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Cortical reconstruction and analysis software"
+    whyMissed: "Neuroimaging software not captured by general computational tool patterns"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  - toolName: "Cognitive assessment battery"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Neuropsychological testing in NF1 patients"
+    whyMissed: "Clinical assessment tools may be described generically without specific instrument names"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FSL|FMRIB|SPM\\d*|FreeSurfer|AFNI|ANTs|MRtrix|ExploreDTI|3D Slicer"
+    toolType: "computational_tool"
+    examples: ["FSL TBSS", "SPM12", "FreeSurfer v6.0", "ANTs registration"]
+    reasoning: "Essential neuroimaging software packages universally used in white matter integrity studies but missed by current patterns"
+  - patternType: "term"
+    pattern: "TBSS|DTI|DWI|tractography|diffusion tensor|FA|MD|RD|AD"
+    toolType: "computational_tool"
+    examples: ["TBSS analysis", "DTI preprocessing", "FA measurements", "tractography reconstruction"]
+    reasoning: "Diffusion imaging terminology that indicates computational analysis methods specific to white matter studies"
+  - patternType: "context_phrase"
+    pattern: "(analyzed using|processed with|implemented in|calculated using)\\s+(FSL|SPM|FreeSurfer|AFNI|ANTs|TBSS|DTI)"
+    toolType: "computational_tool"
+    examples: ["analyzed using FSL", "processed with SPM12", "calculated using TBSS"]
+    reasoning: "Common phrases used in neuroimaging methods sections to describe software usage"
+  - patternType: "term"
+    pattern: "Wechsler|WISC|WAIS|Stanford-Binet|neuropsychological battery|cognitive assessment|IQ test"
+    toolType: "clinical_assessment_tool"
+    examples: ["WISC-IV", "Wechsler Intelligence Scale", "neuropsychological battery"]
+    reasoning: "Clinical assessment tools commonly used in NF1 studies to evaluate cognitive function alongside neuroimaging"
+  - patternType: "context_phrase"
+    pattern: "(administered|completed|assessed using|measured with)\\s+(WISC|WAIS|Wechsler|cognitive|neuropsychological)"
+    toolType: "clinical_assessment_tool"
+    examples: ["administered WISC-IV", "assessed using cognitive battery", "completed neuropsychological testing"]
+    reasoning: "Clinical assessment administration phrases that indicate use of standardized instruments"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No research tools identified in a neuroimaging study that would require multiple computational tools
+    - This represents a significant gap in mining pattern coverage for neuroimaging research
+    - White matter integrity studies universally require specialized software (FSL, SPM, FreeSurfer, etc.)
+    - Clinical NF1 studies often include cognitive assessments that should be captured as clinical tools
+    - The complete absence of tools suggests systematic under-detection rather than actual absence
+  recommendations: |
+    This publication highlights a critical gap in tool mining coverage for neuroimaging research.
+    URGENT recommendations:
+    1. PRIORITY: Add comprehensive neuroimaging software patterns (FSL, SPM, FreeSurfer, AFNI, ANTs, MRtrix)
+    2. Add diffusion imaging methodology patterns (TBSS, DTI, tractography, FA/MD measurements)
+    3. Include clinical assessment tool patterns for NF1 studies (Wechsler scales, cognitive batteries)
+    4. Review other neuroimaging publications in the dataset to identify systematic pattern gaps
+    5. Consider that neuroimaging software may be mentioned in methods without detailed version/vendor info
+    6. Manual curator review of this publication is recommended to identify specific missed tools
+    
+    The zero tool count in this type of study indicates a fundamental coverage issue that likely
+    affects many similar neuroimaging publications in the research tools database.

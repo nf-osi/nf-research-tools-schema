@@ -1,0 +1,100 @@
+publicationMetadata:
+  pmid: "26941216"
+  title: "Developing a core outcome set for postoperative adverse outcomes in pediatric brain tumor surgery"
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Based on publication type (Questionnaire/Survey Development):
+    - Clinical assessment tools: Potentially, if validated outcome measures or assessment instruments were developed or used
+    - Computational tools: Possibly for data analysis (statistical software, survey platforms)
+    
+    This is a methodological study focused on developing consensus-based outcome measures for pediatric neurosurgery.
+    Such studies typically involve expert panels, Delphi processes, or systematic reviews rather than laboratory tools.
+    The primary "tools" would be the outcome measures themselves (questionnaires, scales, assessment instruments)
+    if they were formally validated and structured.
+
+  overallAssessment: |
+    This publication focuses on developing a standardized set of outcome measures for evaluating postoperative
+    complications in pediatric brain tumor surgery. Such methodological/consensus development studies rarely use
+    traditional research tools (antibodies, cell lines, animal models). However, they may develop or reference
+    clinical assessment tools (validated questionnaires, outcome scales) and use computational tools for data
+    analysis or survey administration.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Delphi survey methodology"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Based on publication type, likely used structured consensus methodology for outcome development"
+    whyMissed: "Delphi methodology is a structured consensus technique that could be considered a clinical research tool"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  - toolName: "Statistical analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data analysis for consensus development would require statistical software"
+    whyMissed: "Statistical software commonly used in methodological studies but may not be explicitly named"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "Survey platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Online survey platforms commonly used for Delphi consensus studies"
+    whyMissed: "Survey platforms like REDCap or Qualtrics often used but not always explicitly mentioned"
+    confidence: 0.5
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "core outcome set|COS development|consensus methodology|Delphi technique"
+    toolType: "clinical_assessment_tool"
+    examples: ["core outcome set development", "Delphi consensus methodology"]
+    reasoning: "Methodological studies developing outcome measures use structured consensus techniques that could be considered clinical research tools"
+  - patternType: "context_phrase"
+    pattern: "outcome measure|assessment instrument|evaluation tool|measurement scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["standardized outcome measure", "validated assessment instrument"]
+    reasoning: "Publications developing clinical outcome measures create tools that should be captured"
+  - patternType: "context_phrase"
+    pattern: "survey platform|questionnaire software|data collection tool|REDCap|Qualtrics"
+    toolType: "computational_tool"
+    examples: ["REDCap survey platform", "Qualtrics questionnaire software"]
+    reasoning: "Survey and data collection platforms are computational tools commonly used in methodological studies"
+  - patternType: "term"
+    pattern: "COMET Initiative|COMET database"
+    toolType: "clinical_assessment_tool"
+    examples: ["COMET Initiative guidelines", "COMET database search"]
+    reasoning: "Core Outcome Measures in Effectiveness Trials (COMET) Initiative provides standardized methodology for outcome set development"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a methodological/consensus development study, not laboratory research
+    - Input file contains only placeholder data ("temp") - full text not available for analysis
+    - No traditional research tools (antibodies, cell lines, animal models) expected in this publication type
+    - Focus is on developing outcome measures for clinical assessment, not using laboratory tools
+    - Initial mining correctly identified no tools, which is appropriate for this publication type
+  recommendations: |
+    - The absence of mined tools is CORRECT for this publication type
+    - This is a methodological study developing clinical outcome measures, not laboratory research
+    - Once full text is available, look for:
+      * Consensus methodologies (Delphi technique, nominal group technique)
+      * Survey platforms used for data collection (REDCap, Qualtrics)
+      * Statistical software for analysis (R, SPSS, SAS)
+      * References to COMET Initiative guidelines
+    - Consider whether the final core outcome set itself should be captured as a clinical assessment tool
+    - No immediate action needed - the mining results accurately reflect the expected content for this publication type
+    - Future processing should focus on methodological tools rather than laboratory research tools

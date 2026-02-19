@@ -1,0 +1,134 @@
+publicationMetadata:
+  pmid: "32187457"
+  title: "Selumetinib for children with inoperable plexiform neurofibromas"
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a Phase 2 clinical trial in pediatric patients with neurofibromatosis type 1:
+    - Clinical assessment tools → Expected (quality of life measures, pain scales, functional assessments)
+    - Computational tools → Possible (statistical analysis software, imaging analysis tools)
+    - Lab research tools → Unlikely (this is a clinical trial, not bench research)
+    
+    Clinical trials typically use validated questionnaires and assessment instruments to measure
+    patient outcomes, symptom severity, quality of life, and functional status. Pediatric trials
+    often use age-appropriate assessment tools like PedsQL, pain scales, and functional measures.
+    
+    Note: Publications can contain multiple tool types. Even clinical trials may use computational
+    tools for statistical analysis or imaging processing.
+  overallAssessment: |
+    This Phase 2 clinical trial of selumetinib in children with inoperable plexiform neurofibromas
+    would be expected to use clinical assessment tools for measuring patient outcomes, quality of life,
+    pain, and functional status. Clinical trials require validated instruments to assess efficacy
+    and safety endpoints. The absence of identified tools suggests potential mining gaps for clinical
+    assessment instruments, which are legitimate research tools in clinical research contexts.
+
+toolValidations: []  # No tools were initially mined according to metadata
+
+potentiallyMissedTools:
+  - toolName: "Pediatric Quality of Life Inventory (PedsQL)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Quality of life assessments commonly used in pediatric NF1 trials"
+    whyMissed: "Clinical assessment tools may not be captured by current mining patterns focused on lab tools"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+  
+  - toolName: "Visual Analog Scale (VAS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Pain assessment tools typically used in pediatric clinical trials"
+    whyMissed: "Pain scales and patient-reported outcome measures may be under-represented in mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "Functional Assessment Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Functional outcome measures for pediatric patients with plexiform neurofibromas"
+    whyMissed: "Functional assessment tools may not match current mining vocabulary"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  
+  - toolName: "Statistical Analysis Software (SAS/R/SPSS)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis methods for clinical trial data"
+    whyMissed: "Generic statistical software mentions may be filtered out"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "MRI Volumetric Analysis Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Imaging analysis tools for measuring plexiform neurofibroma volume"
+    whyMissed: "Medical imaging analysis tools may not be captured by current patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL|Pediatric Quality of Life Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL 4.0 Generic Core Scales", "Pediatric Quality of Life Inventory"]
+    reasoning: "PedsQL is a widely used validated instrument in pediatric clinical trials"
+  
+  - patternType: "term"
+    pattern: "Visual Analog Scale|VAS|Numeric Rating Scale|NRS"
+    toolType: "clinical_assessment_tool"
+    examples: ["Visual Analog Scale for pain", "VAS scores", "10-point NRS"]
+    reasoning: "Pain scales are standard tools in clinical trials involving symptomatic conditions"
+  
+  - patternType: "context_phrase"
+    pattern: "quality of life was assessed using|administered.*questionnaire|completed.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["quality of life was assessed using PedsQL", "patients completed the pain scale"]
+    reasoning: "These phrases indicate active use of clinical assessment instruments"
+  
+  - patternType: "term"
+    pattern: "PROMIS|Patient-Reported Outcomes Measurement Information System"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS pediatric measures", "PROMIS pain interference"]
+    reasoning: "PROMIS tools are increasingly used in pediatric clinical research"
+  
+  - patternType: "context_phrase"
+    pattern: "volumetric analysis.*performed using|analyzed using.*software"
+    toolType: "computational_tool"
+    examples: ["volumetric analysis was performed using ImageJ", "MRI data analyzed using custom software"]
+    reasoning: "Medical imaging analysis requires specialized computational tools"
+  
+  - patternType: "term"
+    pattern: "ImageJ|3D Slicer|ITK-SNAP|FreeSurfer"
+    toolType: "computational_tool"
+    examples: ["ImageJ version 1.52", "3D Slicer software", "FreeSurfer analysis pipeline"]
+    reasoning: "Common medical imaging analysis software used in clinical research"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No research tools were initially identified in this Phase 2 clinical trial
+    - Clinical assessment tools (questionnaires, scales) are likely missing from mining results
+    - Computational tools for statistical analysis and imaging may be under-captured
+    - Current mining patterns may be biased toward laboratory research tools
+    - Clinical trials represent a different tool ecosystem than bench research
+  recommendations: |
+    Recommendations for this publication and future mining:
+    - Expand mining patterns to capture clinical assessment tools (PedsQL, VAS, PROMIS, etc.)
+    - Include patterns for patient-reported outcome measures and validated questionnaires
+    - Add computational tool patterns for medical imaging analysis software
+    - Consider clinical trial-specific vocabulary and methodology sections
+    - Manual review recommended to identify specific assessment instruments used
+    - This publication type should contain clinical assessment tools - their absence suggests mining gaps
+    - Future mining should distinguish between lab research and clinical research tool vocabularies
