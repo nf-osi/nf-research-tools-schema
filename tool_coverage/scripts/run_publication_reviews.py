@@ -511,22 +511,22 @@ def compile_validation_results(mining_df, results_dir):
 
         if tool_validations:
             for tool_val in tool_validations:
-            tool_info = {
-                'pmid': pmid,
-                'toolName': tool_val.get('toolName'),
-                'toolType': tool_val.get('toolType'),
-                'verdict': tool_val.get('verdict'),
-                'confidence': tool_val.get('confidence'),
-                'recommendation': tool_val.get('recommendation'),
-                'reasoning': tool_val.get('reasoning', '')
-            }
+                tool_info = {
+                    'pmid': pmid,
+                    'toolName': tool_val.get('toolName'),
+                    'toolType': tool_val.get('toolType'),
+                    'verdict': tool_val.get('verdict'),
+                    'confidence': tool_val.get('confidence'),
+                    'recommendation': tool_val.get('recommendation'),
+                    'reasoning': tool_val.get('reasoning', '')
+                }
 
-            if tool_val.get('recommendation') == 'Keep':
-                accepted_tools.append(tool_info)
-            elif tool_val.get('recommendation') == 'Remove':
-                rejected_tools.append(tool_info)
-            else:  # Manual Review Required
-                uncertain_tools.append(tool_info)
+                if tool_val.get('recommendation') == 'Keep':
+                    accepted_tools.append(tool_info)
+                elif tool_val.get('recommendation') == 'Remove':
+                    rejected_tools.append(tool_info)
+                else:  # Manual Review Required
+                    uncertain_tools.append(tool_info)
 
         # Collect missed tools
         for missed_tool in missed_tools:
