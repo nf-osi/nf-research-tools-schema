@@ -1,0 +1,68 @@
+publicationMetadata:
+  pmid: "34230202"
+  title: "Perspective of Adults With Neurofibromatosis type 1 and Cutaneous Neurofibromas"
+  queryType: "unknown"  # From PubMed query (hint only)
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95  # High confidence - clearly a survey study
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Based on publication type (Observational Study - Survey):
+    - Clinical assessment tools → Potentially, if validated questionnaires were used
+    - Computational tools → Unlikely, as this is a descriptive survey analysis
+    - Lab research tools → No, this is not laboratory research
+    
+    This is a patient perspective survey study that collected opinions about cutaneous neurofibromas
+    and treatment preferences. Such studies typically do not use research tools in the traditional sense,
+    though they might use validated survey instruments or questionnaires if they exist.
+    
+    The study used an "online survey developed by multidisciplinary experts" but does not specify
+    if this was a validated clinical assessment tool or a custom questionnaire.
+  overallAssessment: |
+    This is a patient perspective survey study that assessed attitudes toward cutaneous neurofibroma
+    treatments among adults with NF1. Survey/questionnaire studies rarely contain traditional research
+    tools unless they use validated clinical assessment instruments. The methodology describes a custom
+    survey rather than established validated tools, making research tool identification unlikely.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "REiNS cNF Working Group Survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "An online survey developed by multidisciplinary experts and patient representatives of the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) cNF Working Group"
+    whyMissed: "Custom survey instrument mentioned but may not be a validated clinical assessment tool - appears to be study-specific rather than a standardized instrument"
+    confidence: 0.3  # Low confidence - likely a custom survey, not a validated tool
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "validated questionnaire|validated survey|standardized questionnaire|clinical assessment scale|patient-reported outcome measure|PROM"
+    toolType: "clinical_assessment_tool"
+    examples: ["No examples found in this paper - suggestion for future mining"]
+    reasoning: "Survey studies may use validated clinical assessment tools, but this study used a custom survey. Adding patterns to detect validated instruments would help distinguish between custom surveys and established clinical assessment tools."
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1  # REiNS survey (but low confidence)
+  newPatternsCount: 1  # Pattern for validated clinical assessment tools
+  observationsExtracted: 0  # No tools to extract observations from
+  observationsByType: {}  # Empty since no observations
+  majorIssuesFound: |
+    - Publication is a patient perspective survey study, not laboratory research
+    - No research tools were mined (correctly - none present)
+    - Study used a custom survey rather than validated clinical assessment tools
+    - Publication type makes research tool usage highly unlikely
+  recommendations: |
+    - Correctly identified as having no research tools
+    - The mining algorithm appropriately found zero tools for this survey study
+    - One potential tool (REiNS survey) was considered but rejected as it appears to be a custom
+      study-specific instrument rather than a validated clinical assessment tool
+    - Suggested adding patterns to better detect validated clinical assessment instruments in future
+      survey studies, though this particular study would still yield zero tools
+    - No manual curator review needed - the zero-tool result is accurate for this publication type

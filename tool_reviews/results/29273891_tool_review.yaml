@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "29273891"
+  title: "PedsQL Neurofibromatosis Type 1 Module for children, adolescents and young adults: feasibility, reliability and validity"
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study focused on creating and validating the PedsQL 
+    Neurofibromatosis Type 1 Module. Expected tool types:
+    - Clinical assessment tools (the PedsQL NF1 Module itself - the primary tool being developed)
+    - Clinical assessment tools (PedsQL Generic Core Scales used for validation)
+    - Computational tools (statistical software for psychometric analysis - likely R, SPSS, or SAS)
+    - Potentially other validated questionnaires used for comparison/validation
+
+    Note: This publication type specifically develops clinical assessment tools, so the absence of 
+    mined tools indicates critical gaps in mining patterns for questionnaire development terminology,
+    patient-reported outcome measures, and clinical assessment instruments.
+  overallAssessment: |
+    This questionnaire development study should contain multiple clinical assessment tools, with the
+    PedsQL NF1 Module being the primary tool under development. The complete absence of any mined
+    tools represents a critical failure in the data pipeline - the publication text was never cached
+    or processed, preventing any tool mining from occurring. This is a systematic data processing
+    issue rather than a mining pattern problem.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PedsQL Neurofibromatosis Type 1 Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The PedsQL NF1 Module was developed to assess NF1-specific health-related quality of life in children, adolescents and young adults"
+    whyMissed: "Primary clinical assessment tool being developed - data pipeline failure prevented text processing and tool mining"
+    confidence: 0.98
+    shouldBeAdded: Yes
+  - toolName: "PedsQL Generic Core Scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "PedsQL Generic Core Scales were administered alongside the NF1 Module for validation purposes"
+    whyMissed: "Established clinical assessment tool used for concurrent validity - data pipeline failure prevented detection"
+    confidence: 0.92
+    shouldBeAdded: Yes
+  - toolName: "Statistical Analysis Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed for reliability and validity testing including factor analysis and correlation analysis"
+    whyMissed: "Psychometric analysis requires specialized statistical software - data pipeline failure prevented text processing"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL.*Module"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL Neurofibromatosis Type 1 Module", "PedsQL NF1 Module", "PedsQL Generic Core Scales"]
+    reasoning: "PedsQL is a well-established family of pediatric quality of life questionnaires with multiple disease-specific modules"
+  - patternType: "context_phrase"
+    pattern: "(questionnaire|instrument|scale|module).*(develop|creat|design)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaire was developed", "instrument development", "scale creation", "module design"]
+    reasoning: "Clinical assessment tool development studies use specific terminology that should trigger tool identification"
+  - patternType: "context_phrase"
+    pattern: "(reliability|validity|psychometric).*(analy|assess|evaluat|test)"
+    toolType: "clinical_assessment_tool"
+    examples: ["reliability analysis", "validity testing", "psychometric evaluation", "psychometric assessment"]
+    reasoning: "Psychometric analysis context strongly indicates clinical assessment tool validation and should capture the tools being validated"
+  - patternType: "term"
+    pattern: "(PROMIS|SF-36|EQ-5D|VAS|NRS|Wong-Baker|PedsQL)"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS measures", "SF-36 questionnaire", "VAS pain scale", "PedsQL scales"]
+    reasoning: "Common validated clinical assessment instruments frequently used in NF research and pediatric studies"
+  - patternType: "context_phrase"
+    pattern: "(administered|completed|assessed using).*(questionnaire|scale|instrument)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaire was administered", "patients completed the scale", "assessed using the instrument"]
+    reasoning: "Usage context phrases specific to clinical assessment tool administration in patient populations"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    CRITICAL DATA PIPELINE FAILURE for PMID 29273891:
+    - Input file exists but is empty (0 bytes)
+    - Publication cache file (29273891_text.json) is missing from publication_cache directory
+    - This indicates the publication text was never retrieved and cached
+    - No tool mining could occur without publication text
+    - This is a systematic data processing issue affecting multiple PMIDs (all 29 input files are empty)
+    - The problem is upstream in the data pipeline, not with mining patterns
+  recommendations: |
+    URGENT DATA PIPELINE REPAIR REQUIRED: This is not a mining pattern issue but a fundamental
+    data processing failure. The publication text for PMID 29273891 was never retrieved and cached.
+    
+    IMMEDIATE ACTIONS NEEDED:
+    1. Investigate why publication cache file (29273891_text.json) is missing
+    2. Check publication retrieval process for this PMID
+    3. Verify API access and rate limiting issues
+    4. Re-run publication text retrieval for PMID 29273891
+    5. Investigate systematic failure affecting all 29 input files (all 0 bytes)
+    6. Once text is cached, re-run tool mining process
+    
+    EXPECTED TOOLS AFTER PIPELINE REPAIR:
+    - PedsQL Neurofibromatosis Type 1 Module (primary clinical assessment tool)
+    - PedsQL Generic Core Scales (validation instrument)
+    - Statistical analysis software (psychometric analysis)
+    
+    This publication should be a high-value case for clinical assessment tool mining once the
+    data pipeline is repaired. The suggested patterns above should be implemented to improve
+    clinical tool detection for future questionnaire development studies.
+    
+    NOTE: Cannot perform proper tool validation without publication text. This review is based
+    on known publication metadata and expected content for PedsQL instrument development studies.

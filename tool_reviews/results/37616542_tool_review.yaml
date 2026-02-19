@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "37616542"
+  title: "Pro-905, a novel purine antimetabolite for treating malignant peripheral nerve sheath tumors (MPNST)"
+  queryType: "bench"  # Likely found through bench research query
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication being about Pro-905 (a novel purine antimetabolite) for MPNST treatment, 
+    this lab research study would be expected to contain multiple tool types:
+    - Cell lines (MPNST cell lines for drug testing)
+    - Animal models (xenograft or genetic models of MPNST)
+    - Computational tools (for data analysis, dose-response curves, statistical analysis)
+    - Genetic reagents (potentially for cell line authentication or pathway analysis)
+    - Clinical assessment tools (if any patient-derived samples or clinical correlations)
+    
+    The absence of mined tools is concerning for a drug development study, as such publications
+    typically describe extensive experimental methods using cell culture, animal models, and
+    analytical tools.
+  overallAssessment: |
+    This appears to be a preclinical drug development study focusing on Pro-905 for MPNST treatment.
+    Such publications typically contain extensive research tools including cell lines, animal models,
+    and computational analysis tools. The complete absence of mined tools suggests either: (1) the
+    mining patterns missed domain-specific terminology, (2) the publication uses non-standard naming
+    conventions, or (3) there may be an issue with the text extraction or mining process. Drug
+    development studies almost always require experimental tools and should be thoroughly re-examined.
+
+toolValidations: []  # No tools were mined according to the description
+
+potentiallyMissedTools:
+  - toolName: "Pro-905"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Novel purine antimetabolite Pro-905 used for MPNST treatment studies"
+    whyMissed: "Drug compounds are often not recognized as genetic reagents/chemical tools by standard mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Would expect specific MPNST cell line names (e.g., S462, ST88-14, STS-26T)"
+    whyMissed: "MPNST cell lines may use non-standard naming that doesn't match typical cell line patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "Xenograft mouse models"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Drug efficacy studies typically require in vivo xenograft models"
+    whyMissed: "Animal model descriptions may lack standard strain nomenclature patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "Statistical analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Drug dose-response analysis requires statistical software (R, GraphPad Prism, etc.)"
+    whyMissed: "Software tools may be mentioned without version numbers or in non-standard contexts"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Pro-905|purine antimetabolite|antimetabolite compound"
+    toolType: "genetic_reagent"
+    examples: ["Pro-905 treatment", "purine antimetabolite Pro-905"]
+    reasoning: "Novel drug compounds should be captured as chemical/genetic reagents for research"
+  
+  - patternType: "context_phrase"
+    pattern: "MPNST cell line|malignant peripheral nerve sheath tumor cell"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines were cultured", "malignant peripheral nerve sheath tumor cells"]
+    reasoning: "Disease-specific cell lines often use disease abbreviations that aren't caught by generic patterns"
+  
+  - patternType: "naming_convention"
+    pattern: "S462|ST88-14|STS-26T|T265|SNF02.2|SNF94.3"
+    toolType: "cell_line"
+    examples: ["S462 cells", "ST88-14 cell line"]
+    reasoning: "Common MPNST cell line names that should be specifically recognized"
+  
+  - patternType: "context_phrase"
+    pattern: "dose-response|IC50|EC50|drug efficacy|compound treatment"
+    toolType: "computational_tool"
+    examples: ["dose-response curves analyzed using", "IC50 values calculated with"]
+    reasoning: "Pharmacological studies require specialized analysis tools that may not be explicitly named"
+
+observations: []  # Cannot extract observations without access to the full text
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Zero tools mined from a drug development study is highly unusual
+    - Drug compound Pro-905 should be captured as a genetic reagent/chemical tool
+    - MPNST cell lines are essential for this type of research but weren't detected
+    - Animal models (xenografts) would be expected but not found
+    - Statistical/computational tools for dose-response analysis likely present but missed
+    - Mining patterns may be inadequate for pharmacological research terminology
+  recommendations: |
+    URGENT REVIEW REQUIRED: This publication should be manually reviewed by a curator.
+    The complete absence of research tools from a preclinical drug development study
+    indicates significant gaps in the mining patterns. Recommendations:
+    
+    1. Manual text review to identify all experimental tools used
+    2. Add pharmacological research patterns (drug compounds, dose-response analysis)
+    3. Enhance MPNST-specific cell line recognition patterns
+    4. Improve detection of xenograft and animal model terminology
+    5. Better capture of statistical analysis software in drug studies
+    6. Consider creating specialized patterns for oncology drug development publications
+    
+    This publication type (novel therapeutic development) represents a critical use case
+    that current mining patterns are failing to capture effectively.

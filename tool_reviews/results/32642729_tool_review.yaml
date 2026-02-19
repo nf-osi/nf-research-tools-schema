@@ -1,0 +1,111 @@
+publicationMetadata:
+  pmid: "32642729"
+  title: "Neurofibromatosis research paper"
+  queryType: "bench"  # From PubMed query that found this publication
+  publicationType: "Lab Research"  # Neurofibromatosis research suggests experimental work
+  publicationTypeConfidence: 0.6  # Moderate confidence without seeing full content
+  hasMethodsSection: Unsure  # Cannot determine from available information
+  likelyContainsTools: Unsure  # Zero detection could be accurate or indicate missed tools
+  expectedToolTypes: |
+    Based on neurofibromatosis research context, this publication could potentially contain:
+    
+    **Lab Research Tools** (commonly used in NF research):
+    - Antibodies: Anti-NF1, anti-NF2, anti-neurofibromin antibodies
+    - Cell lines: NF1-deficient cell lines, Schwann cells, neurofibroma cell lines
+    - Animal models: Nf1+/- mice, Nf1 knockout models, neurofibromatosis mouse strains
+    - Genetic reagents: NF1 plasmids, shRNA constructs, CRISPR reagents
+    
+    **Computational Tools** (for analysis):
+    - Bioinformatics software for genomic analysis
+    - Statistical analysis packages
+    - Imaging analysis tools
+    
+    **Clinical Assessment Tools** (if patient studies):
+    - Quality of life questionnaires
+    - Pain assessment scales
+    - Functional outcome measures
+    
+    The zero detection across all categories warrants careful review to determine if this
+    represents accurate results or potential false negatives.
+  overallAssessment: |
+    This neurofibromatosis research publication shows zero detected tools across all categories,
+    which is unusual for experimental research in this field. This could indicate either: (1) the
+    publication is a review/commentary without experimental methods, (2) the mining algorithms
+    missed tools due to non-standard naming or context, or (3) the publication genuinely uses
+    no standard research tools. Manual review of the publication content is needed to validate
+    this result and identify any potentially missed tools.
+
+toolValidations: []  # No tools were mined - zero detection across all categories
+
+potentiallyMissedTools:
+  - toolName: "NF1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromatosis type 1 (NF1)..."
+    whyMissed: "Disease name NF1 commonly mentioned in NF research but often refers to condition, not research tool"
+    confidence: 0.2
+    shouldBeAdded: No
+  - toolName: "neurofibromatosis"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromatosis tumor cells..."
+    whyMissed: "Disease terminology that could be confused with animal model names in some contexts"
+    confidence: 0.1
+    shouldBeAdded: No
+  - toolName: "tumor cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromatosis tumor cells of origin..."
+    whyMissed: "Generic cell terminology that might indicate specific cell lines in experimental context"
+    confidence: 0.3
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\b(NF1|NF2)\\b(?=\\s+(antibody|Ab|clone|plasmid|construct|knockout|mutant|cell\\s+line|mice|mouse))"
+    toolType: "general"
+    examples: ["NF1 antibody", "NF1 knockout mice", "NF2 plasmid construct"]
+    reasoning: "Distinguish disease references from actual research tools by requiring tool-specific keywords after NF1/NF2 mentions"
+  - patternType: "context_phrase"
+    pattern: "\\b(tumor\\s+cells?)\\b(?=\\s+(derived|isolated|cultured|established|from|line))"
+    toolType: "cell_line"
+    examples: ["tumor cells derived from", "tumor cell line established"]
+    reasoning: "Identify when generic 'tumor cells' refers to specific cell lines rather than general terminology"
+  - patternType: "term"
+    pattern: "\\b(neurofibromin|merlin)\\b(?=\\s+(antibody|Ab|expression|construct|plasmid))"
+    toolType: "general"
+    examples: ["neurofibromin antibody", "merlin expression construct"]
+    reasoning: "Capture protein-specific research tools that might be missed by gene-name-only patterns"
+
+observations: []  # No validated tools, so no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    **ZERO TOOL DETECTION IN NEUROFIBROMATOSIS RESEARCH:**
+    - Comprehensive mining across all tool categories yielded zero results
+    - Unusual for neurofibromatosis research, which typically uses specialized tools
+    - Could indicate: (1) review/commentary article, (2) clinical study without lab tools, 
+      (3) missed tools due to non-standard naming, or (4) genuinely tool-free publication
+    - Without access to full publication text, cannot definitively validate this result
+    - Part of large-scale mining project (63+ publications) - systematic analysis needed
+  recommendations: |
+    **VALIDATION APPROACH:**
+    - Accept zero detection as potentially accurate but flag for manual review
+    - Neurofibromatosis research often uses specialized tools that may require domain-specific patterns
+    - Suggested patterns could improve detection of NF-specific research tools
+    - Consider manual review of original publication to verify zero detection accuracy
+    - Compare with other NF publications in the dataset to identify common missed patterns
+    - This case highlights need for disease-specific mining patterns in specialized research areas
+    
+    **PATTERN IMPROVEMENT:**
+    - The suggested context-based patterns could help distinguish disease references from tools
+    - Focus on protein names (neurofibromin, merlin) rather than just gene names (NF1, NF2)
+    - Consider tissue-specific and cell-type-specific terminology common in NF research
