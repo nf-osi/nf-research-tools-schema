@@ -100,34 +100,299 @@ prompt: |
        containerized    (e.g. "Docker", "Singularity", "None") — if described
        maintainer       (author name or contact email, if provided)
 
-     advanced_cellular_model:
-       modelType*       [organoid | spheroid | tumoroid | assembloid | other]
-       derivationSource* [patient tissue | iPSC | primary cell | cell line | other]
-       cellTypes        (e.g. "Schwann cells, fibroblasts")
-       organoidType     (e.g. "brain organoid", "nerve organoid")
-       matrixType       (e.g. "Matrigel", "collagen")
-       cultureSystem    (e.g. "suspension", "embedded")
-       maturationTime   (e.g. "21 days", "4 weeks") — if described
-       characterizationMethods (e.g. "IHC, RNA-seq, flow cytometry") — methods used to validate the model
-       passageNumber    (passage used in experiments, e.g. "P5–P10") — if mentioned
+     **DO NOT suggest patterns for:**
+     - Generic statistical software or programming languages (R, Python, SAS, MATLAB, Excel, SPSS, Stata, GraphPad Prism, JMP) — these match nearly every biomedical publication and add no specificity
+     - Generic bioinformatics tools already standard across all fields (bedtools, SAMtools, FastQC) unless in a specifically NF-focused pipeline context
+     - Tools that are not specific to NF or rare disease research
 
-     patient_derived_model:
-       modelSystemType* [PDX | PDO | cell line | organoid | other]
-       patientDiagnosis* (e.g. "NF1-associated MPNST", "plexiform neurofibroma")
-       hostStrain       (e.g. "NSG", "nude mouse") — for PDX
-       tumorType        (e.g. "MPNST", "neurofibroma")
-       engraftmentSite  (e.g. "subcutaneous", "orthotopic")
-       passageNumber    (passage used in experiments, e.g. "P3") — if mentioned
-       molecularCharacterization (e.g. "NF1 loss, CDKN2A deletion") — mutations/characterization described
+  5. CRITICAL FALSE POSITIVE PATTERNS TO REJECT:
+     **For Lab Research Tools (antibodies, cell lines, animal models, genetic reagents):**
+     - Gene/disease names (NF1, NF2) mentioned without tool keywords
+     - Review articles or meta-analyses that cite tools but don't use them
+     - Publications without Methods sections describing experimental procedures
 
-     clinical_assessment_tool:
-       assessmentType*   [scale | questionnaire | structured interview | performance test | biomarker assay | other]
-       targetPopulation* [pediatric | adult | caregiver | all ages | clinician-rated | other]
-       diseaseSpecific   [Yes | No]
-       numberOfItems     (integer, e.g. 36)
-       scoringMethod     (e.g. "0–100 scale", "Likert 1–5", "sum score")
-       validatedLanguages (e.g. "English, French, Spanish") — if stated
-       administrationTime (e.g. "5–10 minutes") — if mentioned
+     **For Computational Tools:**
+     - Common words that happen to match software names (e.g., "Table 1", "Figure 3A", "using the")
+     - Programming languages mentioned without actual usage context
+     - Software cited in references but not used in analysis
+     - Generic statistical software and languages (R, Python, SAS, MATLAB, Excel, SPSS, Stata, GraphPad Prism, JMP) — these are ubiquitous across all biomedical research and are NOT NF-specific. Only flag if the tool implements a custom NF-focused algorithm or pipeline
+
+     **For Advanced Cellular Models (organoids, assembloids):**
+     - 2D cell culture mentioned as "culture" without 3D context
+     - Standard adherent cell lines (not organoids)
+     - References to organoids in other studies without usage
+
+     **For Patient-Derived Models (PDX, xenografts):**
+     - Xenograft mentioned in general discussion without actual usage
+     - PDX/xenograft cited from other papers
+     - Mouse strains without xenograft context
+
+     **For Clinical Assessment Tools (questionnaires, scales):**
+     - Generic mentions of "quality of life" without specific instrument
+     - Physical measurement devices (e.g., calipers, imaging) NOT questionnaires
+     - Clinical terms without validated instrument names (SF-36, PROMIS, PedsQL, etc.)
+     - Assessment tools cited from other studies but not used in this publication
+
+  6. ACCEPT IF:
+     **Lab Research Tools:**
+     - Clear tool-specific context (e.g., "NF1 antibody", "NF1-deficient cell line", "NF1 knockout mice")
+     - Methods section describes experimental procedures using the tool
+     - Publication type is laboratory research (molecular biology, cell biology, animal models)
+     - Context indicates tool development or experimental usage
+
+     **Computational Tools:**
+     - Software version specified (e.g., "ImageJ v1.52", "Python 3.8")
+     - Usage context present (e.g., "analyzed using", "processed with")
+     - Repository URLs (GitHub, GitLab) for custom tools
+     - Methods describe computational analysis using the tool
+
+     **Advanced Cellular Models:**
+     - 3D culture context (organoid, spheroid, assembloid)
+     - Derivation from stem cells or primary tissue
+     - Generation/culture methods described
+     - Extracellular matrix usage (Matrigel, hydrogel)
+
+     **Patient-Derived Models:**
+     - PDX establishment described (patient tumor → mouse)
+     - Xenograft/engraftment procedures in methods
+     - Host strain specified (NSG, NOG, etc.)
+     - Passage number or model ID mentioned
+
+     **Clinical Assessment Tools:**
+     - **ACCEPT even without traditional Methods section** - clinical studies have different structure
+     - Validated instrument names (SF-36, PROMIS, PedsQL, VAS, etc.)
+     - Questionnaire/scale administered to patients
+     - Patient-reported outcomes measured
+     - "Assessed using", "administered", "completed" context
+     - Publication type can be Clinical Study, Observational Study, or Clinical Trial
+
+  7. USE SCHEMA-VALIDATED VALUES:
+     When extracting tool metadata, use EXACT values from submission schemas to ensure consistency:
+
+     **Computational Tools - softwareType (REQUIRED):**
+     - Analysis Software, Pipeline, Package/Library, Workflow, Database,
+       Web Application, Command-line Tool, Plugin, Other
+
+     **Advanced Cellular Models - modelType (REQUIRED):**
+     - Organoid, Assembloid, Spheroid, 3D Culture, Other
+
+     **Patient-Derived Models - modelSystemType (REQUIRED):**
+     - PDX (Patient-Derived Xenograft), Humanized Mouse,
+       Patient-Derived Organoid, Patient-Derived Cell Line, Other
+
+     **Clinical Assessment Tools - assessmentType (REQUIRED):**
+     - Quality of Life, Pain Assessment, Functional Assessment,
+       Cognitive Assessment, Symptom Scale, Psychological Assessment,
+       Patient-Reported Outcome, Other
+
+     **IMPORTANT**: Use EXACT values as listed. Do not invent new categories.
+     If uncertain, use "Other" and explain in tool notes.
+
+  8. EXTRACT SCIENTIFIC OBSERVATIONS:
+     After validating tools, extract scientific observations about each validated tool from the Results and Discussion sections.
+
+     OBSERVATION TYPES (from Synapse schema syn26486836):
+
+     **Phenotypic/Morphometric:**
+     - Body Length - Physical length measurements
+     - Body Weight - Weight measurements and changes
+     - Coat Color - Fur/coat coloration observations
+     - Organ Development - Developmental characteristics
+
+     **Growth/Metabolic:**
+     - Growth Rate - Growth patterns and kinetics
+     - Lifespan - Survival and longevity data
+     - Feed Intake - Feeding amounts and patterns
+     - Feeding Behavior - Feeding-related behaviors
+
+     **Behavioral:**
+     - Motor Activity - Movement and locomotion
+     - Swimming Behavior - Swimming patterns (zebrafish, etc.)
+     - Social Behavior - Social interactions
+     - Reproductive Behavior - Mating and reproduction
+     - Reflex Development - Reflex responses
+
+     **Disease/Pathology:**
+     - Disease Susceptibility - Disease predisposition
+     - Tumor Growth - Tumor formation and progression
+
+     **System-Level:**
+     - Behavior - Behavioral phenotypes (general)
+     - Metabolism - Metabolic characteristics
+     - Nervous System - Nervous system phenotypes
+     - Cardiovascular System - Cardiovascular phenotypes
+     - Immune System - Immune system phenotypes
+     - Developmental - Developmental characteristics
+     - Cellular - Cellular phenotypes
+     - Molecular - Molecular-level observations
+
+     **Practical/Documentation:**
+     - Usage Instructions - Best practices, protocols
+     - Issue - Problems, limitations, caveats
+     - Depositor Comment - Notes from tool creator
+     - General Comment or Review - Other observations
+     - Other - Any other relevant observations
+
+     EXTRACTION GUIDELINES:
+     - **HARD REQUIREMENT: only extract observations for tools with verdict: Accept in toolValidations** — if toolValidations is empty or a tool has verdict: Reject/Uncertain, the observations list MUST be empty (`observations: []`). Do NOT extract observations for tools in potentiallyMissedTools.
+     - **Focus on Results and Discussion sections** - these report experimental findings
+     - **Link to specific tools** - each observation must reference a tool whose resourceName exactly matches a toolValidations entry with verdict: Accept
+     - **Include quantitative data** when available (e.g., "15% weight reduction at 8 weeks")
+     - **Capture sufficient context** - enough detail to understand the observation
+     - **Be precise about the finding** - quote or paraphrase accurately from the text
+     - **Only extract explicit observations** - do not infer beyond what's stated
+     - **Multiple observations per tool are allowed** - extract all relevant findings
+     - **Skip if no observations found** - empty list is acceptable
+     - **Assign MP Ontology IDs** - Use tool_coverage/config/observation_ontology_mappings.json to map observationType to MP ID
+     - **MP ID format validation** - Must match pattern MP:[0-9]{7} (e.g., MP:0001262)
+     - **Leave MP ID empty** for non-phenotypic observations (Issue, Usage Instructions, Depositor Comment, General Comment or Review, Other)
+
+     EXAMPLE OBSERVATIONS:
+     - "Nf1+/- mice showed significantly reduced body weight (15% decrease) compared to wild-type littermates at 8 weeks (p<0.01)"
+     - "Tumor formation observed in 30% of animals by 12 months, with higher penetrance in females"
+     - "Cell line exhibited slow proliferation and required extended culture time"
+     - "Antibody showed strong cross-reactivity with mouse NF2, use with caution"
+
+  9. Create a YAML file named `{{ pmid }}_tool_review.yaml` with this exact structure:
+
+  ```yaml
+  publicationMetadata:
+    pmid: "{{ pmid }}"
+    title: "Full publication title"
+    queryType: "bench" | "clinical" | "bench,clinical" | "unknown"  # From PubMed query (hint only)
+    publicationType: "Lab Research" | "Clinical Study" | "Clinical Trial" | "Observational Study" | "Review Article" | "Questionnaire/Survey Development" | "Epidemiological Study" | "Bioinformatics Analysis" | "Other"
+    publicationTypeConfidence: 0.0-1.0  # Confidence in the classification
+    hasMethodsSection: Yes | No
+    likelyContainsTools: Yes | No | Unsure
+    expectedToolTypes: |
+      List which tool categories are expected based on publication type (NOT queryType):
+      - Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+      - Clinical Study/Trial → clinical assessment tools, possibly computational tools for analysis
+      - Bioinformatics Analysis → computational tools (software, pipelines)
+      - Observational Study → clinical assessment tools for patient outcomes
+
+      Note: Publications can contain MULTIPLE tool types. A clinical study may use computational tools
+      for analysis. A lab study may use clinical assessment tools to measure phenotypes. Always scan
+      for ALL 9 tool types regardless of publication type or queryType.
+    overallAssessment: |
+      2-3 sentence summary of whether this publication type would typically use/develop research tools.
+      Explain why tools are expected or unlikely based on the study design and methods.
+      For clinical studies, note that assessment tools (questionnaires, scales) are valid tools even without traditional lab methods.
+      Consider that publications may contain multiple tool types across different categories.
+
+  toolValidations:
+    - toolName: "Exact tool name as mined"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+      minedFrom: "abstract" | "methods" | "introduction"
+      verdict: "Accept" | "Reject" | "Uncertain"
+      confidence: 0.0-1.0
+      reasoning: |
+        Detailed explanation (3-5 sentences) covering:
+        - Why this is/isn't a genuine research tool
+        - Whether context supports tool usage vs gene/disease reference
+        - Presence/absence of tool-specific keywords
+        - Assessment of experimental vs observational context
+      contextSnippet: "...150 chars before...[TOOL_NAME]...150 chars after..."
+      hasToolKeywords: Yes | No
+      toolKeywordsFound: ["antibody", "plasmid", etc.] or []
+      isDiseaseGeneReference: Yes | No | Unsure
+      usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
+      recommendation: "Keep" | "Remove" | "Manual Review Required"
+      notes: Additional observations or concerns (if any)
+
+    # Repeat for each mined tool
+
+  potentiallyMissedTools:
+    - toolName: "Exact tool name found in text"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+      foundIn: "abstract" | "methods" | "introduction"
+      contextSnippet: "...text showing this tool mention..."
+      whyMissed: "Explanation of why this wasn't caught by initial mining"
+      confidence: 0.0-1.0  # How confident this is a real tool
+      shouldBeAdded: Yes | No | Maybe
+    # Include all potentially missed tools (if any)
+
+  suggestedPatterns:
+    - patternType: "term" | "context_phrase" | "naming_convention" | "vendor_indicator"
+      pattern: "Specific pattern or regex to add"
+      toolType: "antibody" | "cell_line" | "animal_model" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool" | "general"
+      examples: ["Example 1 from this paper", "Example 2 from this paper"]
+      reasoning: "Why this pattern would improve mining accuracy"
+    # Include all pattern suggestions (if any)
+
+  observations:
+    - resourceName: "Exact tool name (must match a validated tool)"
+      resourceType: "Animal Model" | "Antibody" | "Cell Line" | "Genetic Reagent" | "Computational Tool" | "Advanced Cellular Model" | "Patient-Derived Model" | "Clinical Assessment Tool"
+      observationType: "Body Length" | "Body Weight" | "Coat Color" | "Organ Development" | "Growth Rate" | "Lifespan" | "Feed Intake" | "Feeding Behavior" | "Motor Activity" | "Swimming Behavior" | "Social Behavior" | "Reproductive Behavior" | "Reflex Development" | "Disease Susceptibility" | "Tumor Growth" | "Behavior" | "Metabolism" | "Nervous System" | "Cardiovascular System" | "Immune System" | "Developmental" | "Cellular" | "Molecular" | "Usage Instructions" | "Issue" | "Depositor Comment" | "General Comment or Review" | "Other"
+      observationTypeOntologyId: "MP:XXXXXXX"  # Optional MP ontology term ID (use tool_coverage/config/observation_ontology_mappings.json as reference)
+      details: |
+        Detailed observation text including:
+        - Specific findings (quantitative data preferred)
+        - Experimental conditions if relevant
+        - Comparison groups if applicable
+        - Statistical significance if reported
+        - Any important caveats or notes
+      foundIn: "results" | "discussion" | "both"
+      contextSnippet: "...relevant excerpt from Results or Discussion sections..."
+      confidence: 0.0-1.0  # Confidence this is a legitimate scientific observation
+      doi: "{{ doi }}"  # Publication DOI for attribution
+    # Repeat for each observation found. Use empty list [] if no observations.
+
+  summary:
+    totalToolsMined: 6
+    toolsAccepted: 2
+    toolsRejected: 3
+    toolsUncertain: 1
+    potentiallyMissedCount: 2  # Number of tools that might have been missed
+    newPatternsCount: 3  # Number of new patterns suggested
+    observationsExtracted: 5  # Number of scientific observations found
+    observationsByType:  # Breakdown by observation type
+      Body Weight: 2
+      Tumor Growth: 2
+      Usage Instructions: 1
+    majorIssuesFound: |
+      List major issues found during review:
+      - Example: "Publication is questionnaire development, not lab research"
+      - Example: "All NF1/NF2 mentions refer to disease, not tools"
+      - Example: "No Methods section found indicating lab work"
+    recommendations: |
+      Overall recommendations for this publication:
+      - Should all tools be rejected? Why?
+      - Are there specific tools that need manual curator review?
+      - Any other concerns about the mining results?
+      - Any tools that were potentially missed?
+      - Any patterns that should be added to improve future mining?
+      - What observations were extracted and their quality?
+  ```
+
+  IMPORTANT INSTRUCTIONS:
+
+  **Tool Validation:**
+  - Be highly critical and conservative - when in doubt, recommend "Remove" or "Manual Review Required"
+  - Look for clear evidence of EXPERIMENTAL usage, not just mentions
+  - Publications about quality of life, patient outcomes, clinical trials, surveys, or epidemiology rarely use research tools
+  - Gene/disease names (NF1, NF2) are almost always false positives unless accompanied by tool keywords
+  - If the publication has no Methods section, be extremely skeptical
+  - Provide detailed reasoning for every decision to enable audit trail
+  - Use "Uncertain" verdict sparingly - only when genuinely ambiguous after thorough analysis
+  - ACTIVELY search for potentially missed tools - don't just validate what was found
+  - Look for tools mentioned with vendor/catalog info, RRIDs, or specific experimental context
+  - Suggest concrete, actionable patterns that would catch tools missed in this paper
+  - If no tools were missed and no patterns are needed, set potentiallyMissedTools: [] and suggestedPatterns: []
+  - **NF-SPECIFIC ONLY**: Only report tools and patterns relevant to NF/rare disease research. Do NOT report generic statistical software (R, Python, SAS, MATLAB, GraphPad Prism, Excel, SPSS), standard bioinformatics tools ubiquitous across all fields, or general lab equipment. The goal is to catalog tools uniquely useful for understanding or treating neurofibromatosis.
+
+  **Observation Extraction:**
+  - ONLY extract observations for tools with verdict: Accept in toolValidations. If toolValidations is empty or has no Accept verdicts, set observations: [] — no exceptions
+  - Do NOT extract observations for tools listed only in potentiallyMissedTools — those have not been validated
+  - Focus on Results and Discussion sections - these contain experimental findings
+  - Include quantitative data whenever possible (numbers, percentages, p-values)
+  - Be precise and faithful to the original text - do not embellish or infer
+  - Choose the most specific observationType that fits (use "Other" only when necessary)
+  - Extract multiple observations per tool if multiple distinct findings are reported
+  - Empty observations list is acceptable if publication reports no specific findings
+  - Link each observation to the exact tool name (must match resourceName from validated tools)
+  - Include enough context to make the observation meaningful and interpretable
+  - Note the section where observation was found (results, discussion, or both)
 
 activities:
   - Evaluate each mined tool (or discover tools in discovery mode)

@@ -584,11 +584,48 @@ def prepare_input_data(pub_row, cached):
     """
     pmid = pub_row['pmid']
 
-    abstract_text = cached.get('abstract', '')
-    methods_text = cached.get('methods', '')
-    intro_text = cached.get('introduction', '')
-    results_text = cached.get('results', '')
-    discussion_text = cached.get('discussion', '')
+    # Try to load from cache first
+    cached = load_cached_text(pmid)
+
+    if cached:
+        print(f"  ✅ Using cached text (skipping API calls)")
+        abstract_text = cached.get('abstract', '')
+        methods_text = cached.get('methods', '')
+        intro_text = cached.get('introduction', '')
+        # Load Results and Discussion sections (with backwards compatibility)
+        results_text = cached.get('results', '')
+        discussion_text = cached.get('discussion', '')
+    else:
+        # Fall back to fetching (backwards compatibility)
+        # Import mining functions to fetch text
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from fetch_fulltext_and_mine import (
+            fetch_pubmed_abstract,
+            fetch_pmc_fulltext,
+            extract_methods_section,
+            extract_introduction_section,
+            extract_results_section,
+            extract_discussion_section
+        )
+
+        # Fetch abstract from PubMed
+        print(f"  Fetching abstract from PubMed...")
+        abstract_text = fetch_pubmed_abstract(pmid)
+
+        # Fetch full text from PMC
+        print(f"  Fetching full text from PMC...")
+        fulltext_xml = fetch_pmc_fulltext(pmid)
+        methods_text = ""
+        intro_text = ""
+        results_text = ""
+        discussion_text = ""
+
+        if fulltext_xml:
+            print(f"  Extracting sections from full text...")
+            methods_text = extract_methods_section(fulltext_xml)
+            intro_text = extract_introduction_section(fulltext_xml)
+            results_text = extract_results_section(fulltext_xml)
+            discussion_text = extract_discussion_section(fulltext_xml)
 
     # Parse mined tools from JSON columns (handle NaN values)
     novel_tools_raw = pub_row.get('novel_tools', '{}')
@@ -749,11 +786,14 @@ def process_single_publication(row, idx, total_pubs, results_dir, client, force_
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
-    # Load cache — skip immediately if absent (no file → no review possible)
+    # Skip abstract_only publications - no methods section means tool mining will fail
     cached = load_cached_text(pmid)
-    if cached is None:
-        safe_print(f"⏭️  Skipping {pmid} (no cache file - run Phase 1 first)")
-        return (pmid, 'skipped_no_cache', None)
+    if cached and cached.get('cache_level') == 'abstract_only' and not force_rereviews:
+        safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
+        return (pmid, 'skipped_abstract_only', None)
+
+    # Prepare input file
+    input_file = prepare_goose_input(row, inputs_dir)
 
     # Skip abstract_only — no methods section means tool mining will find nothing
     if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
@@ -1303,121 +1343,6 @@ def main():
         mining_df = mining_df[mining_df['pmid'].isin(pmid_file_list)]
         print(f"\nFiltered to {len(mining_df)} publications from {args.pmids_file}")
 
-    # ── Phase 2: Observation Extraction ─────────────────────────────────────────
-    # When --extract-observations is set, skip Phase 1 tool validation entirely.
-    # Instead, read existing Phase 1 YAMLs for accepted tool names, then call
-    # run_observation_extraction() for each publication that has Results/Discussion.
-    if args.extract_observations:
-        print("\n" + "=" * 80)
-        print("Phase 2: Extracting Observations from Results + Discussion")
-        print("=" * 80)
-
-        obs_extracted = 0
-        obs_skipped = 0
-        all_obs_rows = []
-
-        for _, row in mining_df.iterrows():
-            pmid = row['pmid']
-            clean_pmid = sanitize_pmid_for_filename(pmid)
-
-            # Need Phase 1 YAML with accepted tools
-            yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
-            if not yaml_path.exists():
-                obs_skipped += 1
-                continue
-
-            phase1_data = parse_review_yaml(yaml_path)
-            if not phase1_data:
-                obs_skipped += 1
-                continue
-
-            accepted_names = [
-                t.get('toolName', '') for t in (phase1_data.get('toolValidations') or [])
-                if t.get('recommendation') == 'Keep' and t.get('confidence', 0) >= 0.8
-            ]
-            accepted_names = [n for n in accepted_names if n]
-
-            if not accepted_names:
-                obs_skipped += 1
-                continue
-
-            # Skip if observations already extracted (unless force)
-            obs_yaml_path = Path(results_dir) / f'{clean_pmid}_observations.yaml'
-            if obs_yaml_path.exists() and not args.force_rereviews:
-                safe_print(f"⏭️  {pmid}: observations already extracted")
-                obs_skipped += 1
-                # Still collect existing observations
-                try:
-                    existing = yaml.safe_load(obs_yaml_path.read_text())
-                    for obs in (existing.get('observations') or []):
-                        all_obs_rows.append({
-                            '_pmid': pmid,
-                            '_doi': row.get('doi', ''),
-                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
-                            'resourceName': obs.get('resourceName', ''),
-                            'resourceType': obs.get('resourceType', ''),
-                            'observationType': obs.get('observationType', ''),
-                            'details': obs.get('details', ''),
-                            'foundIn': obs.get('foundIn', ''),
-                            'contextSnippet': obs.get('contextSnippet', ''),
-                            'confidence': obs.get('confidence', ''),
-                        })
-                except Exception:
-                    pass
-                continue
-
-            # Load cache
-            cached = load_cached_text(pmid)
-            if not cached:
-                obs_skipped += 1
-                continue
-
-            input_data = prepare_input_data(row, cached)
-            result_path = run_observation_extraction(
-                pmid, input_data, accepted_names, results_dir, anthropic_client
-            )
-
-            if result_path:
-                obs_extracted += 1
-                try:
-                    obs_data = yaml.safe_load(result_path.read_text())
-                    for obs in (obs_data.get('observations') or []):
-                        all_obs_rows.append({
-                            '_pmid': pmid,
-                            '_doi': row.get('doi', ''),
-                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
-                            'resourceName': obs.get('resourceName', ''),
-                            'resourceType': obs.get('resourceType', ''),
-                            'observationType': obs.get('observationType', ''),
-                            'details': obs.get('details', ''),
-                            'foundIn': obs.get('foundIn', ''),
-                            'contextSnippet': obs.get('contextSnippet', ''),
-                            'confidence': obs.get('confidence', ''),
-                        })
-                except Exception as e:
-                    print(f"  ⚠️  Could not parse observations YAML: {e}")
-            else:
-                obs_skipped += 1
-
-            time.sleep(0.5)  # Light rate-limiting between API calls
-
-        print(f"\n{'='*80}")
-        print(f"Observation Extraction Summary:")
-        print(f"  ✅ Extracted: {obs_extracted} publications")
-        print(f"  ⏭️  Skipped: {obs_skipped} publications")
-        print(f"  📊 Total observations collected: {len(all_obs_rows)}")
-        print(f"{'='*80}")
-
-        if all_obs_rows:
-            Path('tool_coverage/outputs').mkdir(parents=True, exist_ok=True)
-            obs_df = pd.DataFrame(all_obs_rows)
-            obs_file = Path('tool_coverage/outputs') / 'observations.csv'
-            obs_df.to_csv(obs_file, index=False)
-            print(f"\n✅ Observations saved: {obs_file} ({len(obs_df)} rows)")
-
-        return  # Phase 2 complete — do not run Phase 1 tool validation
-
-    # ── Phase 1: Tool Validation ─────────────────────────────────────────────
     # Run goose reviews (unless skip or compile-only)
     if not args.skip_goose and not args.compile_only:
         # Apply --max-reviews cap: pre-filter out already-reviewed and no-cache publications,
@@ -1468,7 +1393,6 @@ def main():
         reviewed_count = 0
         skipped_count = 0
         skipped_abstract_only_count = 0
-        skipped_no_cache_count = 0
         failed_count = 0
 
         # Use parallel processing if requested
@@ -1490,8 +1414,6 @@ def main():
                         skipped_count += 1
                     elif status == 'skipped_abstract_only':
                         skipped_abstract_only_count += 1
-                    elif status == 'skipped_no_cache':
-                        skipped_no_cache_count += 1
                     elif status == 'failed':
                         failed_count += 1
         else:
@@ -1505,8 +1427,6 @@ def main():
                     skipped_count += 1
                 elif status == 'skipped_abstract_only':
                     skipped_abstract_only_count += 1
-                elif status == 'skipped_no_cache':
-                    skipped_no_cache_count += 1
                 elif status == 'failed':
                     failed_count += 1
 
@@ -1517,8 +1437,6 @@ def main():
         print(f"  ⏭️  Skipped (cached): {skipped_count}")
         if skipped_abstract_only_count > 0:
             print(f"  ⏭️  Skipped (abstract_only, no methods): {skipped_abstract_only_count}")
-        if skipped_no_cache_count > 0:
-            print(f"  ⏭️  Skipped (no cache file): {skipped_no_cache_count}")
         if failed_count > 0:
             print(f"  ❌ Failed: {failed_count}")
         print(f"  📊 Total processed: {total_pubs}")
