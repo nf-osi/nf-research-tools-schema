@@ -378,6 +378,14 @@ jobs:
           python tool_coverage/scripts/enrich_all_metadata.py 2>&1 | tee tool_coverage/outputs/enrichment_output.log
           echo "enrichment_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Regenerate FILTERED subset
+        id: regenerate_filtered
+        if: steps.enrichment.outputs.enrichment_complete == 'true'
+        run: |
+          echo "Regenerating FILTERED_*.csv files from enriched data..."
+          python tool_coverage/scripts/regenerate_filtered_subset.py 2>&1 | tee tool_coverage/outputs/refilter_output.log
+          echo "refilter_complete=true" >> $GITHUB_OUTPUT
+
       - name: Generate PMID review summary
         id: review_summary
         if: steps.formatting.outputs.formatting_complete == 'true'

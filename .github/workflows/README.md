@@ -420,12 +420,30 @@ Quality filtering happens at specific steps in the workflow:
 5. Apply pattern improvements → Suggest new mining patterns
 6. ✨ Apply confidence threshold → Filter tools below 0.7
 7. ✨ Calculate completeness → Score metadata (0-30 points)
-8. ✨ Generate FILTERED subset → Select high-completeness tools
+8. ✨ Generate FILTERED subset → Select high-completeness tools (initial)
 9. Format results → Create VALIDATED_*.csv files
-10. ✨ Save FILTERED_*.csv → Priority review subset
-11. Enrichment → Fill remaining metadata gaps
-12. Generate review summary → PMID-level tracking table
+10. ✨ Save FILTERED_*.csv → Initial priority review subset
+11. Enrichment → Fill remaining metadata gaps from context snippets
+12. 🆕 Regenerate FILTERED subset → Update with enriched completeness
+13. Generate review summary → PMID-level tracking table
 ```
+
+### Completeness Calculation Fix
+
+**Issue**: Tools with 0% completeness were incorrectly included in FILTERED files.
+
+**Root Cause**:
+1. **Tool type mismatch**: Raw data uses `patient_derived_model` (underscores), but completeness check expected `Patient-Derived Model` (hyphens). This caused the check to skip completeness validation.
+2. **Timing issue**: Completeness was calculated BEFORE metadata enrichment, so schema fields (like `modelSystemType`, `tumorType`) didn't exist yet in the raw data.
+
+**Solution**:
+1. **Tool type normalization**: Added `normalize_tool_type()` function to convert all variants (`patient_derived_model`, `cell_line`, etc.) to standardized format (`Patient-Derived Model`, `Cell Line`)
+2. **Missing fields detection**: If critical fields don't exist in data, mark as incomplete (exclude from FILTERED)
+3. **Re-filtering after enrichment**: Added `regenerate_filtered_subset.py` to recalculate completeness on enriched data and update FILTERED files
+
+**Result**: FILTERED files now only include tools with ≥60% critical fields, accurately calculated on enriched metadata.
+
+**Testing**: Run `python tool_coverage/scripts/test_completeness_fix.py` to verify the fix.
 
 ### Review Workflow Recommendations
 

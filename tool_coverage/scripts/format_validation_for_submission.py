@@ -1072,6 +1072,44 @@ def is_nf_relevant_publication(pmid, pub_metadata, context_snippet=''):
 # QUALITY FILTERING FUNCTIONS
 # ============================================================================
 
+def normalize_tool_type(tool_type):
+    """
+    Normalize tool type to match CRITICAL_FIELDS_BY_TYPE keys.
+
+    Converts from various formats (e.g., 'patient_derived_model', 'cell_line')
+    to standardized format (e.g., 'Patient-Derived Model', 'Cell Line').
+
+    Args:
+        tool_type: Raw tool type string
+
+    Returns:
+        Normalized tool type string
+    """
+    # Mapping from raw formats to normalized formats
+    type_mapping = {
+        'animal_model': 'Animal Model',
+        'cell_line': 'Cell Line',
+        'antibody': 'Antibody',
+        'genetic_reagent': 'Genetic Reagent',
+        'computational_tool': 'Computational Tool',
+        'patient_derived_model': 'Patient-Derived Model',
+        'advanced_cellular_model': 'Advanced Cellular Model',
+        'clinical_assessment_tool': 'Clinical Assessment Tool'
+    }
+
+    # Try exact match first
+    if tool_type in CRITICAL_FIELDS_BY_TYPE:
+        return tool_type
+
+    # Try lowercase with underscores
+    normalized = type_mapping.get(tool_type.lower().replace('-', '_').replace(' ', '_'))
+    if normalized:
+        return normalized
+
+    # Return as-is if no mapping found
+    return tool_type
+
+
 def has_minimum_critical_fields(tool_row, tool_type):
     """
     Check if a tool has the minimum critical fields required for its type.
@@ -1083,11 +1121,21 @@ def has_minimum_critical_fields(tool_row, tool_type):
     Returns:
         Tuple of (has_minimum, filled_count, total_count, missing_fields)
     """
+    # Normalize tool type to match dictionary keys
+    tool_type = normalize_tool_type(tool_type)
     critical_fields = CRITICAL_FIELDS_BY_TYPE.get(tool_type, [])
 
     if not critical_fields:
-        # No critical fields required for this type
+        # No critical fields required for this type (e.g., Computational Tool)
         return True, 0, 0, []
+
+    # Check if ANY of the critical fields exist in the data
+    # If none exist, we can't verify completeness (fields haven't been formatted yet)
+    fields_exist = any(field in tool_row for field in critical_fields)
+    if not fields_exist:
+        # Critical fields expected but don't exist in raw data yet
+        # Mark as NOT having minimum to exclude from FILTERED until enriched
+        return False, 0, len(critical_fields), critical_fields
 
     filled_count = 0
     missing_fields = []
@@ -1123,6 +1171,8 @@ def calculate_completeness_score(tool_row, tool_type):
     Returns:
         Tuple of (completeness_score, critical_score, missing_critical_fields)
     """
+    # Normalize tool type to match dictionary keys
+    tool_type = normalize_tool_type(tool_type)
     critical_fields = CRITICAL_FIELDS_BY_TYPE.get(tool_type, [])
 
     # Calculate critical fields score (30 points max)
