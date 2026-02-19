@@ -492,7 +492,14 @@ format_validation_for_submission.py (uses cached metadata)
 
 ## Additional Optimizations
 
-### 1. Batch Fetching in Phase 1
+**Implementation Status**:
+- ✅ **Implemented**: #2 (Cache-First Architecture)
+- ⚠️ **Ready, Not Enabled**: #6 (Parallel Phase 2 Upgrades)
+- ⏳ **Future Work**: #1, #3, #4, #5, #7, #8
+
+---
+
+### 1. Batch Fetching in Phase 1 (⏳ Future Optimization)
 **Current**: Sequential fetching with 0.34s rate limit
 **Optimization**: Use async/await for concurrent PubMed API calls
 ```python
@@ -504,9 +511,9 @@ async def batch_fetch_metadata(pmids_batch):
 ```
 **Benefit**: 50% faster Phase 1 cache creation
 
-### 2. Cache-First Architecture
-**Current**: Some scripts may still call PubMed API
-**Optimization**: All downstream scripts read from cache ONLY
+### 2. Cache-First Architecture (✅ IMPLEMENTED)
+**Status**: Fully implemented in Phase 1
+**Implementation**: All downstream scripts read from cache ONLY
 ```python
 def get_publication_metadata(pmid, cache_dir):
     """Always read from cache - never call API."""
@@ -516,16 +523,41 @@ def get_publication_metadata(pmid, cache_dir):
 ```
 **Benefit**: Zero redundant API calls, consistent metadata
 
-### 3. Selective Abstract Screening
+### 3. Selective Abstract Screening (⏳ Future Optimization)
 **Current**: Haiku screens ALL abstracts after title screening
-**Optimization**: Skip abstract screening for obvious matches
-```yaml
-# If title contains "developed novel", "new tool", "computational method"
-# → Skip abstract screening, go straight to Phase 1 cache
-```
-**Benefit**: 20% reduction in Haiku API calls
+**Optimization**: Enhance title screening for novel tool development
 
-### 4. Incremental Cache Updates
+**Rationale**: For novel tool development publications (computational tools, clinical assessment tools, advanced cellular models), the tool acronym or name is usually in the TITLE.
+
+**Proposed Enhancement**:
+```yaml
+Step 1: Title screening (Haiku)
+  - Check for novel tool keywords: "developed", "new tool", "novel method"
+  - Check for tool type indicators: computational, algorithm, software, questionnaire, 3D culture
+  - If development detected in title → Mark as high-confidence candidate
+
+Step 2: Abstract screening (Haiku) - Selective
+  - For high-confidence title candidates: Quick abstract check for MORE CONFIDENCE
+  - For uncertain titles: Full abstract screening as currently done
+  - Skip abstract screening for very obvious development titles
+
+Step 3: Phase 1 cache
+  - Proceed directly with all candidates
+```
+
+**Workflow Example**:
+- Title: "MitoScore: A novel computational tool for mitochondrial dysfunction assessment in NF1"
+  → High confidence from title alone
+  → Quick abstract check to confirm
+  → Proceed to Phase 1
+
+- Title: "Mitochondrial dysfunction in NF1-associated tumors"
+  → Unclear from title (could be observation, not tool development)
+  → Full abstract screening needed
+
+**Benefit**: 20-30% reduction in Haiku API calls for abstract screening
+
+### 4. Incremental Cache Updates (⏳ Future Optimization)
 **Current**: Re-fetch entire publication if any field missing
 **Optimization**: Patch missing fields only
 ```python
@@ -536,7 +568,7 @@ def update_cache_fields(pmid, fields_to_update):
 ```
 **Benefit**: Faster cache corrections, no data loss
 
-### 5. Cache Compression
+### 5. Cache Compression (⏳ Future Optimization)
 **Current**: JSON files with full text
 **Optimization**: gzip compression for full caches
 ```python
@@ -545,7 +577,7 @@ def update_cache_fields(pmid, fields_to_update):
 ```
 **Benefit**: 60% storage savings for Phase 2 caches
 
-### 6. Parallel Phase 2 Upgrades
+### 6. Parallel Phase 2 Upgrades (⚠️ Ready, Not Enabled)
 **Current**: Sequential upgrade in Phase 2
 **Optimization**: Parallel workers for PMC fetching
 ```yaml
@@ -556,7 +588,7 @@ def update_cache_fields(pmid, fields_to_update):
 ```
 **Benefit**: 4x faster Phase 2 upgrades
 
-### 7. Smart Cache Expiration
+### 7. Smart Cache Expiration (⏳ Future Optimization)
 **Current**: Caches never expire
 **Optimization**: Refresh old caches periodically
 ```python
@@ -566,7 +598,7 @@ def update_cache_fields(pmid, fields_to_update):
 ```
 **Benefit**: Capture newly available full text, maintain freshness
 
-### 8. Prefetch for Known High-Value Publications
+### 8. Prefetch for Known High-Value Publications (⏳ Future Optimization)
 **Current**: Phase 1 → Validate → Phase 2
 **Optimization**: Predict Phase 2 candidates and prefetch
 ```python
