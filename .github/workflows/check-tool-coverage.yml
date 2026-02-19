@@ -289,32 +289,68 @@ jobs:
             echo "capped=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Extract publication sections
-        id: mining
+      - name: Phase 1 - Fetch minimal cache (title + abstract + methods + metadata)
+        id: phase1_cache
         if: steps.prep_list.outputs.prep_complete == 'true'
-        env:
-          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          echo "Step 3: Extracting publication sections for Sonnet review..."
+          echo "Step 3: Phase 1 - Fetching minimal cache for tool mining..."
+          echo "  Fetching: title + abstract + methods + publication metadata"
+          echo "  Purpose: Tool mining, cell lines, models (48% smaller, 30% faster than full)"
 
-          # Use improved mining script (tool mining disabled by default)
-          CMD="python tool_coverage/scripts/mine_publications_improved.py"
+          python tool_coverage/scripts/fetch_minimal_fulltext.py \
+            --pmids-file tool_coverage/outputs/screened_publications.csv \
+            --output-dir tool_reviews/publication_cache \
+            2>&1 | tee tool_coverage/outputs/phase1_cache_output.log || echo "phase1_failed=true" >> $GITHUB_OUTPUT
 
-          # Input is already capped by timeout protection
-          CMD="$CMD --input tool_coverage/outputs/screened_publications.csv"
-          CMD="$CMD --output tool_coverage/outputs/processed_publications_improved.csv"
+          echo "phase1_complete=true" >> $GITHUB_OUTPUT
 
-          # Note: Tool mining is disabled by default. To enable, add --enable-tool-mining flag
-          # This extracts intro, methods, results, discussion for later Sonnet review
-          echo "Running: $CMD"
-          $CMD 2>&1 | tee tool_coverage/outputs/mining_output.log || echo "mining_failed=true" >> $GITHUB_OUTPUT
+      - name: Prepare publications list from cache
+        id: prep_from_cache
+        if: steps.phase1_cache.outputs.phase1_complete == 'true'
+        run: |
+          echo "Creating processed_publications.csv from cache..."
 
-          # Use improved output as the main processed_publications.csv
-          if [ -f "tool_coverage/outputs/processed_publications_improved.csv" ]; then
-            cp tool_coverage/outputs/processed_publications_improved.csv tool_coverage/outputs/processed_publications.csv
-          fi
+          # Read cache files and create processed_publications.csv with all metadata
+          python3 <<'EOF'
+          import json
+          import csv
+          from pathlib import Path
 
-          echo "mining_complete=true" >> $GITHUB_OUTPUT
+          cache_dir = Path('tool_reviews/publication_cache')
+          output_file = 'tool_coverage/outputs/processed_publications.csv'
+
+          publications = []
+          for cache_file in cache_dir.glob('*_text.json'):
+              with open(cache_file) as f:
+                  cache = json.load(f)
+
+              # Extract PMID number
+              pmid = cache['pmid'].replace('PMID:', '')
+
+              publications.append({
+                  'pmid': f"PMID:{pmid}",
+                  'title': cache.get('title', ''),
+                  'abstract': cache.get('abstract', ''),
+                  'methods': cache.get('methods', ''),
+                  'authors': cache.get('authors', ''),
+                  'journal': cache.get('journal', ''),
+                  'publicationDate': cache.get('publicationDate', ''),
+                  'doi': cache.get('doi', ''),
+                  'cache_level': cache.get('cache_level', ''),
+                  'has_fulltext': cache.get('has_fulltext', False)
+              })
+
+          # Write to CSV
+          if publications:
+              with open(output_file, 'w', newline='') as f:
+                  writer = csv.DictWriter(f, fieldnames=publications[0].keys())
+                  writer.writeheader()
+                  writer.writerows(publications)
+
+              print(f"Created {output_file} with {len(publications)} publications")
+          EOF
+
+          echo "prep_from_cache_complete=true" >> $GITHUB_OUTPUT
 
       - name: Run AI validation with Sonnet
         id: validation
@@ -338,6 +374,22 @@ jobs:
           $CMD 2>&1 | tee tool_coverage/outputs/validation_output.log || echo "validation_failed=true" >> $GITHUB_OUTPUT
 
           echo "validation_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Phase 2 - Selective cache upgrade (results + discussion for observations)
+        id: phase2_cache
+        if: steps.validation.outputs.validation_complete == 'true'
+        run: |
+          echo "Step 4b: Phase 2 - Selectively upgrading cache for observation extraction..."
+          echo "  Criteria: High-confidence validated tools (confidence ≥0.8)"
+          echo "  Adding: Results + Discussion sections"
+          echo "  Purpose: Extract observations (efficacy, safety, outcomes)"
+
+          python tool_coverage/scripts/upgrade_cache_for_observations.py \
+            --reviews-dir tool_reviews/results \
+            --cache-dir tool_reviews/publication_cache \
+            2>&1 | tee tool_coverage/outputs/phase2_cache_output.log
+
+          echo "phase2_complete=true" >> $GITHUB_OUTPUT
 
       - name: Apply pattern improvements
         id: pattern_improvements
