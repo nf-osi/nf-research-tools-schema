@@ -1,0 +1,183 @@
+publicationMetadata:
+  pmid: "37608248"
+  title: "Aberrant oscillatory activity in neurofibromatosis type 1: an EEG study of resting state and working memory."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical neurophysiological study design, expected tool types include:
+    - Clinical assessment tools (questionnaires, cognitive assessments, behavioral scales)
+    - Computational tools (EEG analysis software, statistical packages)
+    - Equipment/hardware (EEG recording systems)
+    
+    This is a clinical research study comparing NF1 patients to controls using EEG and cognitive assessments.
+    The study uses validated clinical assessment instruments (VABS-III, n-back tasks) and sophisticated
+    EEG analysis pipelines requiring multiple computational tools. While queryType suggests "bench",
+    this is clearly a clinical study that would contain clinical assessment tools and computational tools.
+  overallAssessment: |
+    This clinical neurophysiological study would be expected to contain multiple research tools across
+    different categories. The extensive methods section describes validated clinical assessment instruments,
+    EEG recording equipment, and computational analysis pipelines. The absence of any mined tools suggests
+    significant gaps in the mining patterns, particularly for clinical assessment tools and computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Vineland Adaptive Behaviour Scale (VABS-III)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...parent-reported Adaptive Behaviour Composite (ABC) scores on the Vineland Adaptive Behaviour Scale (VABS-III) [44], performance on an adaptive auditory n-back task..."
+    whyMissed: "Clinical assessment tool with standard abbreviation and version number not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "n-back task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...performance on an adaptive auditory n-back task [16], and performance on a non-adaptive visual n-back task [16] performed during EEG..."
+    whyMissed: "Working memory assessment tool, both adaptive and non-adaptive versions used"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Sky search attention"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...poorer performance relative to typically developing controls on various cognitive measures, including measures of working memory (i.e. digit-span forward/backwards) and attention (Sky search attention, TEACh)..."
+    whyMissed: "Attention assessment tool mentioned as part of cognitive battery"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "TEACh"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...and attention (Sky search attention, TEACh)..."
+    whyMissed: "Attention assessment tool, likely Test of Everyday Attention for Children"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...MATLAB (2019a) and SPM12 (version 7771) were used to conduct data analyses..."
+    whyMissed: "Analysis software with version number clearly specified"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SPM12"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...MATLAB (2019a) and SPM12 (version 7771) were used to conduct data analyses..."
+    whyMissed: "Neuroimaging analysis software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "EEGLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Custom functions [46, 47] calling several functions from EEGLAB (version 13.6.5b) and FieldTrip (embedded in SPM release) were used..."
+    whyMissed: "EEG analysis toolbox with specific version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FieldTrip"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Custom functions [46, 47] calling several functions from EEGLAB (version 13.6.5b) and FieldTrip (embedded in SPM release) were used..."
+    whyMissed: "EEG/MEG analysis toolbox embedded in SPM"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical analyses were conducted using SPSS (Version 25)..."
+    whyMissed: "Statistical analysis software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "G*Power"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Post hoc analysis of Ribeiro et al.'s [17] resting state theta effect in NF1 using G*Power [42] suggests that n = 17 participants per group..."
+    whyMissed: "Power analysis software used for sample size calculation"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ActiveTwo system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...EEG data were recorded using an ActiveTwo system (BioSemi, Amsterdam, Netherlands) with 64 EEG channels..."
+    whyMissed: "EEG recording system with vendor information, could be considered equipment/hardware"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Vineland Adaptive Behaviour Scale|VABS-III|VABS-II"
+    toolType: "clinical_assessment_tool"
+    examples: ["Vineland Adaptive Behaviour Scale (VABS-III)"]
+    reasoning: "Widely used adaptive behavior assessment scale with standard abbreviations"
+
+  - patternType: "term"
+    pattern: "n-back task|N-back task"
+    toolType: "clinical_assessment_tool"
+    examples: ["adaptive auditory n-back task", "non-adaptive visual n-back task"]
+    reasoning: "Standard working memory assessment paradigm used in cognitive research"
+
+  - patternType: "context_phrase"
+    pattern: "assessed using|administered|completed|measured with|performance on.*task"
+    toolType: "clinical_assessment_tool"
+    examples: ["performance on an adaptive auditory n-back task", "assessed using SPSS"]
+    reasoning: "Context phrases indicating tool usage in assessment or analysis"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]+\\s*\\(version\\s+[0-9\\.]+[a-z]*\\)|\\b[A-Z]+\\s+\\(Version\\s+[0-9]+\\)"
+    toolType: "computational_tool"
+    examples: ["MATLAB (2019a)", "SPM12 (version 7771)", "EEGLAB (version 13.6.5b)", "SPSS (Version 25)"]
+    reasoning: "Software names with version numbers in parentheses indicate computational tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z\\s]+,\\s*[A-Za-z\\s]+,\\s*[A-Za-z\\s]+\\)"
+    toolType: "computational_tool"
+    examples: ["ActiveTwo system (BioSemi, Amsterdam, Netherlands)"]
+    reasoning: "Equipment/system names followed by vendor and location information"
+
+  - patternType: "term"
+    pattern: "TEACh|Test of Everyday Attention|Sky search attention"
+    toolType: "clinical_assessment_tool"
+    examples: ["Sky search attention, TEACh"]
+    reasoning: "Specific attention assessment tools commonly used in pediatric neuropsychology"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to detect any tools despite extensive tool usage in methods
+    - Missing clinical assessment tools (VABS-III, n-back tasks, attention assessments)
+    - Missing computational tools (MATLAB, SPM12, EEGLAB, FieldTrip, SPSS, G*Power)
+    - Missing equipment/hardware (EEG recording system)
+    - Query type "bench" incorrect for this clinical study
+  recommendations: |
+    This publication represents a significant mining failure - 11 clear research tools were missed.
+    The study uses multiple validated clinical assessment instruments and sophisticated computational
+    analysis pipelines that should have been detected. Key recommendations:
+    
+    1. Add patterns for clinical assessment tools (VABS, n-back, attention tests)
+    2. Improve detection of software with version numbers
+    3. Add patterns for equipment with vendor information
+    4. Include context phrases like "assessed using", "performance on", "administered"
+    5. Consider reclassifying query type - this is clinical research, not bench research
+    
+    No observations were extracted since no tools were initially mined to validate.
+    This publication would likely contain valuable observations about EEG patterns and
+    cognitive performance in NF1 patients if tools were properly detected.

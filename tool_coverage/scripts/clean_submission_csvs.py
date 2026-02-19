@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Clean SUBMIT_*.csv files by removing tracking columns (prefixed with '_').
+Clean VALIDATED_*.csv files by removing tracking columns (prefixed with '_').
 Optionally upsert cleaned data to Synapse tables.
 
 These columns are for manual review only and must be removed before
 uploading to Synapse.
+
+VALIDATED files contain AI-validated tools (false positives removed by Sonnet).
 """
 
 import pandas as pd
@@ -120,7 +122,7 @@ def clean_csv(input_file):
     if not tracking_cols:
         print(f"   {input_file}: No tracking columns to remove")
         # Still save even if no tracking columns
-        output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+        output_file = input_file.replace('VALIDATED_', 'CLEAN_')
         df.to_csv(output_file, index=False)
         return output_file, df
 
@@ -128,7 +130,7 @@ def clean_csv(input_file):
     df_clean = df.drop(columns=tracking_cols)
 
     # Save to CLEAN_ prefixed file
-    output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+    output_file = input_file.replace('VALIDATED_', 'CLEAN_')
     df_clean.to_csv(output_file, index=False)
 
     print(f"   {input_file}: Removed {len(tracking_cols)} columns → {output_file}")
@@ -185,7 +187,7 @@ def upsert_to_synapse(syn, clean_file, df_clean):
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Clean SUBMIT_*.csv files and optionally upsert to Synapse',
+        description='Clean VALIDATED_*.csv files and optionally upsert to Synapse',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -218,9 +220,9 @@ Examples:
     args = parser.parse_args()
 
     print("=" * 80)
-    print("CLEANING SUBMISSION CSVs FOR SYNAPSE UPLOAD")
+    print("CLEANING VALIDATED CSVs FOR SYNAPSE UPLOAD")
     print("=" * 80)
-    print("\nRemoving tracking columns (prefixed with '_') from SUBMIT_*.csv files...")
+    print("\nRemoving tracking columns (prefixed with '_') from VALIDATED_*.csv files...")
     print("These columns are for manual review only.\n")
 
     if args.upsert:
@@ -229,14 +231,14 @@ Examples:
         else:
             print("⚠️  UPSERT MODE - Data will be uploaded to Synapse!\n")
 
-    # Find all SUBMIT_*.csv files
-    submit_files = glob.glob('SUBMIT_*.csv')
+    # Find all VALIDATED_*.csv files
+    validated_files = glob.glob('VALIDATED_*.csv')
 
-    if not submit_files:
-        print("❌ No SUBMIT_*.csv files found!")
+    if not validated_files:
+        print("❌ No VALIDATED_*.csv files found!")
         return
 
-    print(f"Found {len(submit_files)} files to clean:\n")
+    print(f"Found {len(validated_files)} files to clean:\n")
 
     # Initialize Synapse client if upserting
     syn = None
@@ -255,7 +257,7 @@ Examples:
     upload_summary = []
     validation_errors = []
 
-    for file in sorted(submit_files):
+    for file in sorted(validated_files):
         # Validate if requested
         if args.validate:
             df_to_validate = pd.read_csv(file)

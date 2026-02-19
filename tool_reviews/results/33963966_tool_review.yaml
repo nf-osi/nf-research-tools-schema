@@ -1,0 +1,112 @@
+publicationMetadata:
+  pmid: "33963966"
+  title: "Cognitive and Electrophysiological Correlates of Working Memory Impairments in Neurofibromatosis Type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a clinical EEG study examining cognitive function in NF1 patients:
+    - Clinical assessment tools: Working memory assessment tasks, cognitive batteries
+    - Computational tools: EEG analysis software, statistical analysis packages
+    - Potentially: EEG equipment (though hardware is not typically considered a "research tool" in our schema)
+    
+    This is a clinical/behavioral study, not lab research, so lab tools (antibodies, cell lines, 
+    animal models, genetic reagents, organoids, PDX) are not expected. However, the study 
+    involves EEG recording and cognitive testing, which would require specific assessment 
+    tools and analysis software.
+
+  overallAssessment: |
+    This clinical study examining working memory and EEG in NF1 patients would typically use 
+    clinical assessment tools (cognitive tests, working memory tasks) and computational tools 
+    (EEG analysis software, statistical packages). The absence of a Methods section limits 
+    detailed tool identification, but the study design clearly involves specialized assessment 
+    instruments and analysis software that qualify as research tools.
+
+toolValidations: []
+  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "n-back task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "EEG was recorded during a WM nback task. The NF1 group showed poorer performance on measures of WM"
+    whyMissed: "The n-back task is a standardized cognitive assessment tool for working memory, but may not have been recognized by mining patterns focused on questionnaire names"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "P300 event-related potential"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "investigate P300 event-related potential (ERP) associated with WM in NF1"
+    whyMissed: "P300 ERP is a specific electrophysiological measure/assessment tool, but mining patterns may not recognize neurophysiological measures as clinical assessment tools"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "EEG"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "EEG was recorded during a WM nback task"
+    whyMissed: "EEG recording is a clinical assessment method, though this might be considered equipment rather than a standardized assessment tool"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "n-back task|nback task|N-back task"
+    toolType: "clinical_assessment_tool"
+    examples: ["EEG was recorded during a WM nback task"]
+    reasoning: "The n-back task is a widely used standardized cognitive assessment tool for working memory that should be captured"
+
+  - patternType: "term"
+    pattern: "P300|P3[0-9][0-9]|event-related potential|ERP"
+    toolType: "clinical_assessment_tool"
+    examples: ["investigate P300 event-related potential (ERP) associated with WM"]
+    reasoning: "Event-related potentials like P300 are specific neurophysiological assessment measures used in clinical research"
+
+  - patternType: "context_phrase"
+    pattern: "measures of [A-Z]{2,}|performance on measures|assessed using|recorded during"
+    toolType: "clinical_assessment_tool"
+    examples: ["performance on measures of WM", "EEG was recorded during"]
+    reasoning: "These phrases often indicate the use of specific assessment tools or measurement procedures"
+
+  - patternType: "term"
+    pattern: "working memory task|WM task|cognitive task|behavioral task"
+    toolType: "clinical_assessment_tool"
+    examples: ["WM nback task"]
+    reasoning: "Standardized cognitive and behavioral tasks are clinical assessment tools that should be captured"
+
+observations: []
+  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined despite this being a clinical study that clearly uses assessment tools
+    - Missing Methods section limits detailed tool identification
+    - Mining patterns appear inadequate for clinical assessment tools used in neuropsychological research
+    - QueryType "bench" is misleading - this is a clinical/behavioral study, not lab research
+  recommendations: |
+    This publication represents a significant gap in clinical assessment tool mining. The study 
+    clearly uses standardized cognitive assessment tools (n-back task) and neurophysiological 
+    measures (P300 ERP) that should be captured. The mining patterns need enhancement for:
+    
+    1. Cognitive assessment tasks and paradigms
+    2. Neurophysiological measures and ERPs
+    3. Clinical assessment contexts in EEG/neuroimaging studies
+    
+    The n-back task should definitely be added as it's a well-established working memory assessment 
+    tool. P300 ERP could be considered as it represents a specific clinical measure. The absence 
+    of a Methods section makes it impossible to identify specific software tools used for EEG 
+    analysis, which would likely include computational tools for signal processing and statistical analysis.
+    
+    This case highlights the need for better pattern coverage of clinical assessment tools beyond 
+    traditional questionnaires to include cognitive tasks and neurophysiological measures.

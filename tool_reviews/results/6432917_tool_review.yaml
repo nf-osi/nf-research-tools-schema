@@ -1,0 +1,250 @@
+publicationMetadata:
+  pmid: "6432917"
+  title: "The nature and origin of the melanin macroglobule."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, cell lines, computational tools, genetic reagents
+    
+    This is a 1984 laboratory study investigating melanoma ultrastructure using:
+    - Animal experiments (BDF1 hybrid mice)
+    - Tumor transplantation (B16/F10 melanoma)
+    - Electron microscopy techniques
+    - Statistical analysis software
+    
+    Expected tools: animal models (mouse strains), cell lines (B16 melanoma), 
+    computational tools (GraphPad Prism), and various laboratory reagents.
+  overallAssessment: |
+    This is a classic laboratory research publication with detailed experimental methods.
+    The study uses animal models, transplantable tumor cell lines, and sophisticated
+    microscopy techniques, indicating high likelihood of containing multiple research tools.
+    The comprehensive Methods section describes specific procedures that would require
+    validated research tools across multiple categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "BDF1 hybrid mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The study was conducted on male BDF1 hybrid mice (n = 50) at the age of 8 weeks, with body weight of 21–22 g"
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "B16/F10 melanoma"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "B16/F10 melanoma was transplanted to each animal by standard subcutaneous injection of 0.5 mL of a suspension"
+    whyMissed: "Cell line with subclone designation (F10) not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "B16 melanoma"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "ultrastructural peculiarities of transplantable malignant melanoma cells...study of the ultrastructure of cells of transplantable malignant B16 melanoma"
+    whyMissed: "Standard melanoma cell line name not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism 6.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The obtained data were analyzed using the GraphPad Prism 6.0 program by calculating average values, standard deviation"
+    whyMissed: "Statistical analysis software with version number not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "JEM-100CX transmission electron microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "viewed with a JEM-100CX transmission electron microscope (JEOL, Tokyo, Japan)"
+    whyMissed: "Scientific instrument with model number and vendor not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "LKB-III ultramicrotome"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Ultrathin sections were obtained on an LKB-III ultramicrotome (LKB Produkter, Sweden)"
+    whyMissed: "Laboratory instrument with model designation not recognized"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Gatan ES500W Erlangshen camera"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "photofixation of preparations was carried out using a Gatan ES500W Erlangshen camera (Model 782), (Gatan Inc., Pleasanton, CA, USA)"
+    whyMissed: "Specialized imaging equipment with full model details not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+[0-9]+(/[A-Z]+[0-9]+)? (hybrid )?mice"
+    toolType: "animal_model"
+    examples: ["BDF1 hybrid mice", "C57BL/6 mice", "BALB/c mice"]
+    reasoning: "Standard laboratory mouse strain nomenclature with optional hybrid designation"
+
+  - patternType: "naming_convention"
+    pattern: "B16(/F[0-9]+)? melanoma"
+    toolType: "cell_line"
+    examples: ["B16/F10 melanoma", "B16 melanoma"]
+    reasoning: "B16 melanoma cell line with optional subclone designations (F1, F10, etc.)"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using (the )?GraphPad Prism [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["analyzed using the GraphPad Prism 6.0 program"]
+    reasoning: "Statistical analysis software usage with version specification"
+
+  - patternType: "vendor_indicator"
+    pattern: "[A-Z]+-[0-9A-Z]+ [a-z]+ [a-z]+ microscope \\([A-Z]+, [A-Za-z, ]+\\)"
+    toolType: "computational_tool"
+    examples: ["JEM-100CX transmission electron microscope (JEOL, Tokyo, Japan)"]
+    reasoning: "Scientific instruments with model numbers and vendor information in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "(obtained|prepared|viewed|analyzed) (on|with|using) (an? )?[A-Z]+-[A-Z0-9]+"
+    toolType: "computational_tool"
+    examples: ["obtained on an LKB-III ultramicrotome", "viewed with a JEM-100CX"]
+    reasoning: "Laboratory instrument usage context with model designations"
+
+  - patternType: "naming_convention"
+    pattern: "Gatan [A-Z0-9]+ [A-Za-z]+ camera"
+    toolType: "computational_tool"
+    examples: ["Gatan ES500W Erlangshen camera"]
+    reasoning: "Gatan imaging equipment with model and product names"
+
+observations:
+  - resourceName: "BDF1 hybrid mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Male BDF1 hybrid mice at 8 weeks of age had body weight of 21-22 g at baseline.
+      Under constant illumination conditions, body weight significantly increased to 
+      24.50 ± 0.42 g compared to 22.16 ± 0.44 g in control animals maintained under 
+      fixed light regime (p ≤ 0.05).
+    foundIn: "results"
+    contextSnippet: "in animals kept under constant illumination, the body weight significantly increased, amounting to 24.50 ± 0.42 g against 22.16 ± 0.44 in the control"
+    confidence: 0.95
+    doi: "10.1111/1523-1747.ep12263325"
+
+  - resourceName: "B16/F10 melanoma"
+    resourceType: "Cell Line"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      B16/F10 melanoma transplanted subcutaneously showed significantly increased tumor 
+      mass under constant illumination (5.64 ± 0.28 g) compared to fixed light regime 
+      controls (4.98 ± 0.27 g). Tumor volume also increased from 2.07 ± 0.37 cm³ in 
+      control to 5.70 ± 0.25 cm³ under constant lighting conditions.
+    foundIn: "results"
+    contextSnippet: "tumor mass (5.64 ± 0.28 g against 4.98 ± 0.27 g in control) and its volume—2.07 ± 0.37 cm³ in mice of control group and 5.70 ± 0.25 cm³ in the group kept under constant lighting"
+    confidence: 0.95
+    doi: "10.1111/1523-1747.ep12263325"
+
+  - resourceName: "B16 melanoma"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Under fixed light regime, B16 melanoma cells were 20-25 μm in diameter, polyhedral, 
+      irregular, or spindle-shaped with highly irregular nuclei and relatively low melanin 
+      content. Under constant illumination, cells became smaller (10-15 μm diameter), round, 
+      non-connected with increased nuclear-cytoplasmic ratio and significantly higher melanin 
+      content in mature melanosomes.
+    foundIn: "results"
+    contextSnippet: "Cells are 20–25 μm in diameter, polyhedral, irregular, or spindle-shaped...In animals exposed to constant illumination, the tumor tissue pattern is represented by small (10–15 μm in diameter), round, non-connected cells"
+    confidence: 0.9
+    doi: "10.1111/1523-1747.ep12263325"
+
+  - resourceName: "B16 melanoma"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Constant illumination induced morphological embryonization (dedifferentiation) of 
+      B16 melanoma cells, characterized by high mitotic activity without reaching synthetic 
+      phase, small size, round shape, and low differentiation typical of highly aggressive 
+      malignant tumors. Extensive necrosis with karyorrhexis progressing to karyolysis was observed.
+    foundIn: "results"
+    contextSnippet: "cells exhibit high mitotic activity without reaching the synthetic phase of the cell cycle, i.e., there is a well-known phenomenon of morphological embryonization (dedifferentiation, anaplasia) of cells"
+    confidence: 0.9
+    doi: "10.1111/1523-1747.ep12263325"
+
+  - resourceName: "GraphPad Prism 6.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      GraphPad Prism 6.0 was used for statistical analysis including calculation of 
+      average values, standard deviation, and arithmetic mean error. Data were presented 
+      as mean ± SEM, and Student's t-test was used to assess significance of differences 
+      with p ≤ 0.05 considered statistically significant.
+    foundIn: "methods"
+    contextSnippet: "The obtained data were analyzed using the GraphPad Prism 6.0 program by calculating average values, standard deviation, and arithmetic mean error. The data are presented as mean ± SEM. To assess the significance of differences, the Student's t-test was used"
+    confidence: 0.95
+    doi: "10.1111/1523-1747.ep12263325"
+
+  - resourceName: "JEM-100CX transmission electron microscope"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      JEM-100CX transmission electron microscope (JEOL, Tokyo, Japan) was used to view 
+      ultrathin sections that were counterstained with lead citrate. Photofixation was 
+      performed using Gatan ES500W camera at magnifications of ×5000, ×6700, ×8000, 
+      ×10,000, ×14,000, ×20,000 and ×40,000 for detailed ultrastructural analysis.
+    foundIn: "methods"
+    contextSnippet: "viewed with a JEM-100CX transmission electron microscope (JEOL, Tokyo, Japan). The photofixation of preparations was carried out using a Gatan ES500W Erlangshen camera (Model 782), (Gatan Inc., Pleasanton, CA, USA) at magnifications"
+    confidence: 0.9
+    doi: "10.1111/1523-1747.ep12263325"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 6
+  observationsByType:
+    Body Weight: 1
+    Tumor Growth: 1
+    Cellular: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear laboratory research content
+    - Multiple obvious research tools were missed including standard animal models, cell lines, and computational tools
+    - Mining patterns failed to capture standard nomenclature for mouse strains (BDF1 hybrid mice)
+    - Cell line designations with subclones (B16/F10) were not recognized
+    - Statistical analysis software with version numbers was not detected
+    - Scientific instruments with model numbers and vendor information were missed
+  recommendations: |
+    This publication should have yielded multiple validated tools across several categories:
+    
+    SHOULD BE ADDED:
+    - BDF1 hybrid mice (animal model) - standard laboratory mouse strain
+    - B16/F10 melanoma and B16 melanoma (cell lines) - well-established melanoma models
+    - GraphPad Prism 6.0 (computational tool) - statistical analysis software
+    - JEM-100CX microscope, LKB-III ultramicrotome, Gatan camera (computational tools) - scientific instruments
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Better recognition of mouse strain nomenclature
+    - Cell line naming with subclone designations
+    - Scientific instrument model numbers with vendor information
+    - Statistical software usage contexts
+    
+    OBSERVATIONS EXTRACTED:
+    - Significant body weight and tumor growth differences under lighting conditions
+    - Detailed cellular morphology changes and ultrastructural observations
+    - Proper usage instructions for computational tools
+    
+    This represents a significant mining failure that missed 7 legitimate research tools
+    from a classic laboratory research publication.

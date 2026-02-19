@@ -1,0 +1,125 @@
+publicationMetadata:
+  pmid: "34230204"
+  title: "Measuring the Effect of Cutaneous Neurofibromas on Quality of Life in Neurofibromatosis Type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study):
+    - Clinical assessment tools → Expected (quality of life measures, questionnaires, scales)
+    - Computational tools → Possibly (for statistical analysis)
+    
+    This is a clinical study measuring quality of life in NF1 patients across two clinical sites.
+    The study specifically mentions using "Skindex" scoring and "Riccardi scores" which are
+    validated clinical assessment instruments. Clinical studies routinely use standardized
+    assessment tools even without traditional laboratory methods sections.
+  overallAssessment: |
+    This clinical study would typically use clinical assessment tools for measuring patient outcomes.
+    The study design involves administering questionnaires (Skindex) to assess skin-related quality of life
+    in NF1 patients, which represents legitimate tool usage in clinical research. Clinical assessment tools
+    are valid research instruments even in observational studies without laboratory methods.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Skindex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...explore the use of Skindex scoring in patients with neurofibromatosis type 1 (NF1) across multiple clinical sites...analyzed correlations between Skindex, site, and clinical measures...Female sex, total number of cutaneous neurofibroma (cNF), and whether cNF were present on the face correlated highly with Skindex..."
+    whyMissed: "Clinical assessment tool name 'Skindex' not recognized by mining patterns. This is a validated dermatology-specific quality of life questionnaire."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Riccardi scores"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Female sex, total number of cutaneous neurofibroma (cNF), and whether cNF were present on the face correlated highly with Skindex and not Riccardi scores..."
+    whyMissed: "Clinical assessment tool 'Riccardi scores' not recognized. This appears to be a clinical scoring system for NF1 assessment."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Skindex"
+    toolType: "clinical_assessment_tool"
+    examples: ["Skindex scoring", "Skindex scores", "correlations between Skindex"]
+    reasoning: "Skindex is a validated dermatology-specific quality of life questionnaire commonly used in skin disease research. Should be recognized as a clinical assessment tool."
+
+  - patternType: "term"
+    pattern: "Riccardi score[s]?"
+    toolType: "clinical_assessment_tool"
+    examples: ["Riccardi scores"]
+    reasoning: "Riccardi scores appear to be a clinical assessment system for NF1. Pattern should capture both singular and plural forms."
+
+  - patternType: "context_phrase"
+    pattern: "quality of life measure[s]?"
+    toolType: "clinical_assessment_tool"
+    examples: ["design of additional quality of life measures", "more specific NF1 skin-related quality of life measures"]
+    reasoning: "Publications discussing quality of life measures often contain or reference clinical assessment tools that should be captured."
+
+  - patternType: "context_phrase"
+    pattern: "(scoring|scores) in patients"
+    toolType: "clinical_assessment_tool"
+    examples: ["Skindex scoring in patients with neurofibromatosis"]
+    reasoning: "Context phrase indicating clinical assessment tool usage in patient populations."
+
+observations:
+  - resourceName: "Skindex"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Skindex scores correlated highly with female sex, total number of cutaneous neurofibromas (cNF), 
+      and presence of cNF on the face, but not with Riccardi scores. The University of Minnesota site 
+      had lower average Skindex scores compared to Royal North Shore Hospital, but these differences 
+      were almost entirely removed after adjusting for age, sex, facial cNF, and total cNF number.
+    foundIn: "both"
+    contextSnippet: "Female sex, total number of cutaneous neurofibroma (cNF), and whether cNF were present on the face correlated highly with Skindex and not Riccardi scores. The UMN site had lower average scores, but these differences were almost entirely removed after adjusting for age, sex, facial cNF, and total cNF number."
+    confidence: 0.90
+    doi: "10.1212/WNL.0000000000012427"
+
+  - resourceName: "Skindex"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Skindex has been used to assess skin-related quality of life in NF1 previously but is not specific 
+      to NF1. The findings suggest that facial cNF and higher total number of cNF correlates with poorer 
+      skin-related quality of life, which may benefit design of more specific NF1 skin-related quality 
+      of life measures.
+    foundIn: "both"
+    contextSnippet: "Skindex has been used to assess skin-related quality of life in NF1 previously but is not specific to NF1. These findings highlight the need for a low threshold for referral to dermatologists for all patients with NF1 regardless of the severity of disease."
+    confidence: 0.85
+    doi: "10.1212/WNL.0000000000012427"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 4
+  observationsExtracted: 2
+  observationsByType:
+    General Comment or Review: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Mining completely missed clinical assessment tools despite this being a clinical study
+    - "Skindex" is a well-established dermatology quality of life questionnaire that should have been captured
+    - "Riccardi scores" appears to be an NF1-specific clinical assessment tool that was missed
+    - No tools were mined from a publication that clearly uses clinical assessment instruments
+  recommendations: |
+    This publication demonstrates a significant gap in clinical assessment tool mining patterns.
+    Two clear clinical assessment tools were missed:
+    1. Skindex - A validated dermatology-specific quality of life questionnaire
+    2. Riccardi scores - An NF1 clinical assessment system
+    
+    Both tools should be added to the database as they represent legitimate clinical research instruments
+    used for patient assessment. The mining patterns need enhancement to capture clinical assessment
+    tools, particularly quality of life measures and disease-specific scoring systems.
+    
+    The observations extracted show meaningful clinical findings about tool performance and usage
+    recommendations. This publication type (clinical study) regularly uses assessment tools even
+    without traditional laboratory methods sections.

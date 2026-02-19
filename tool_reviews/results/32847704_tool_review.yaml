@@ -1,0 +1,189 @@
+publicationMetadata:
+  pmid: "32847704"
+  title: "Cognitive functioning and pain interference mediate pain predictive effects on health-related quality of life in pediatric patients with Neurofibromatosis Type 1"
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Clinical Study investigating health-related quality of life):
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - HIGHLY EXPECTED
+    - Computational tools (statistical software for analysis) - LIKELY
+    - Lab research tools (antibodies, cell lines, animal models) - UNLIKELY for this study type
+    
+    This is a clinical outcomes study using validated questionnaires and statistical analysis.
+    The study specifically mentions using PedsQL scales and statistical software (SPSS, PROCESS macro).
+    Clinical assessment tools are the primary research instruments for this type of study.
+  overallAssessment: |
+    This clinical study investigating quality of life predictors in pediatric patients would be expected to use clinical assessment tools (validated questionnaires/scales) and computational tools for statistical analysis. The study design focuses on patient-reported outcomes rather than laboratory research, making clinical assessment tools the primary research instruments. Statistical software for mediation analysis would also be expected.
+
+toolValidations: []
+  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "PedsQL Neurofibromatosis Type 1 Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Pain, Cognitive Functioning, and Pain Impact Scales from the PedsQL Neurofibromatosis Type 1 Module and the PedsQL 4.0 Generic Core Scales were completed"
+    whyMissed: "Specific validated clinical assessment tool mentioned in abstract but not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL 4.0 Generic Core Scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "the PedsQL Neurofibromatosis Type 1 Module and the PedsQL 4.0 Generic Core Scales were completed in a multi-site national study"
+    whyMissed: "Widely used validated quality of life assessment tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL Sickle Cell Disease Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Pain Scale from the PedsQL Sickle Cell Disease Module, General Fatigue Scale and Sleep Disturbance Item from the PedsQL Multidimensional Fatigue Scale"
+    whyMissed: "Disease-specific validated assessment tool mentioned in methods section"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL Multidimensional Fatigue Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "General Fatigue Scale and Sleep Disturbance Item from the PedsQL Multidimensional Fatigue Scale, and the PedsQL 4.0 Generic Core Scales"
+    whyMissed: "Validated fatigue assessment scale not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "IBM SPSS Statistics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "These statistical analyses were conducted using IBM SPSS Statistics 29 (Armonk, New York)"
+    whyMissed: "Statistical software with version number not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROCESS macro"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "These analyses were conducted using the PROCESS macro for IBM SPSS Statistics (processmacro.org) as described in Hayes"
+    whyMissed: "Specialized statistical analysis macro/plugin not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL [A-Za-z0-9\\s]+ (Module|Scale|Scales)"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL Neurofibromatosis Type 1 Module", "PedsQL 4.0 Generic Core Scales", "PedsQL Multidimensional Fatigue Scale"]
+    reasoning: "PedsQL is a widely used family of pediatric quality of life assessment tools with disease-specific modules"
+
+  - patternType: "term"
+    pattern: "IBM SPSS Statistics( \\d+)?"
+    toolType: "computational_tool"
+    examples: ["IBM SPSS Statistics 29"]
+    reasoning: "Statistical software with optional version number commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "PROCESS macro"
+    toolType: "computational_tool"
+    examples: ["PROCESS macro for IBM SPSS Statistics"]
+    reasoning: "Specialized statistical analysis tool for mediation/moderation analysis"
+
+  - patternType: "context_phrase"
+    pattern: "(completed|administered|using|utilized|measured with|assessed using) .{0,50}(Scale|Module|Questionnaire|Instrument|Assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed in a multi-site national study by 323 patients", "assessed using the PedsQL"]
+    reasoning: "Context phrases indicating administration or use of clinical assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "(analyses were conducted using|analyzed using|statistical analysis.{0,30}using)"
+    toolType: "computational_tool"
+    examples: ["analyses were conducted using IBM SPSS Statistics", "analyzed using the PROCESS macro"]
+    reasoning: "Context phrases indicating use of computational tools for statistical analysis"
+
+observations:
+  - resourceName: "PedsQL Neurofibromatosis Type 1 Module"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Pain, Cognitive Functioning, and Pain Impact Scales from the PedsQL NF1 Module were completed by 323 patients ages 5-25 and 335 parents in a multi-site national study. The tool demonstrated strong predictive validity, with pain, cognitive functioning and pain interference accounting for 66% of the variance in patient-reported generic HRQOL and 57% of the variance in parent proxy-reported generic HRQOL (P<0.001), reflecting large effect sizes.
+    foundIn: "results"
+    contextSnippet: "pain, cognitive functioning and pain interference accounted for 66% of the variance in patient-reported generic HRQOL and 57% of the variance in parent proxy-reported generic HRQOL (P<0.001)"
+    confidence: 0.95
+    doi: "10.1016/j.ejpn.2020.07.014"
+
+  - resourceName: "PedsQL 4.0 Generic Core Scales"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The 23-item PedsQL 4.0 Generic Core Scales encompass Physical Functioning (8 items), Emotional Functioning (5 items), Social Functioning (5 items), and School Functioning (5 items). The Total Scale Score measures overall generic HRQOL. Higher scores indicate better HRQOL. The tool was completed by both patients and parents in the study.
+    foundIn: "both"
+    contextSnippet: "The 23-item PedsQL 4.0 Generic Core Scales encompass the following: (1) Physical Functioning (eight items), (2) Emotional Functioning (five items), (3) Social Functioning (five items), and (4) School Functioning (five items)"
+    confidence: 0.90
+    doi: "10.1016/j.ejpn.2020.07.014"
+
+  - resourceName: "IBM SPSS Statistics"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      IBM SPSS Statistics 29 was used for hierarchical multiple regression analyses and correlation analyses. The software was used to test the percent variability accounted for and conduct statistical analyses controlling for demographic covariates (age and sex). All statistical analyses achieved significance at P<0.001 level.
+    foundIn: "results"
+    contextSnippet: "These statistical analyses were conducted using IBM SPSS Statistics 29 (Armonk, New York)"
+    confidence: 0.95
+    doi: "10.1016/j.ejpn.2020.07.014"
+
+  - resourceName: "PROCESS macro"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PROCESS macro for IBM SPSS Statistics was used to conduct serial multiple mediator model analyses. The analysis utilized 10,000 bias-corrected bootstrapped resamples with replacement yielding 95% confidence intervals. The Hayes Model 6 statistical diagram configuration for two mediators was specifically employed.
+    foundIn: "results"
+    contextSnippet: "These analyses were conducted using the PROCESS macro for IBM SPSS Statistics (processmacro.org) as described in Hayes"
+    confidence: 0.90
+    doi: "10.1016/j.ejpn.2020.07.014"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 4
+  majorIssuesFound: |
+    - NO TOOLS WERE MINED despite clear presence of clinical assessment tools and computational tools
+    - Content mismatch: Abstract mentions NF1 study but full text describes SCD research (possible data error)
+    - Mining patterns completely missed validated clinical assessment tools (PedsQL family)
+    - Statistical software and specialized analysis tools not captured
+    - This represents a significant failure of the mining system for clinical studies
+  recommendations: |
+    CRITICAL MINING FAILURE: This publication contains multiple clear research tools that were completely missed:
+    
+    SHOULD BE ADDED:
+    - PedsQL Neurofibromatosis Type 1 Module (clinical assessment tool)
+    - PedsQL 4.0 Generic Core Scales (clinical assessment tool) 
+    - PedsQL Sickle Cell Disease Module (clinical assessment tool)
+    - PedsQL Multidimensional Fatigue Scale (clinical assessment tool)
+    - IBM SPSS Statistics 29 (computational tool)
+    - PROCESS macro (computational tool)
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Add PedsQL family recognition patterns
+    - Improve statistical software detection
+    - Better context recognition for clinical assessment tools
+    - Include version numbers for software tools
+    
+    DATA QUALITY ISSUE:
+    - Investigate content mismatch between abstract (NF1) and full text (SCD)
+    - This may indicate a data processing error in the input file
+    
+    OBSERVATIONS:
+    - Successfully extracted 4 usage observations for the missed tools
+    - All tools showed strong validation and effectiveness in the study
+    - Clinical assessment tools demonstrated large effect sizes and statistical significance

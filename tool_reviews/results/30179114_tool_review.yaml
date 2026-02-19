@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "30179114"
+  title: "Abnormal Morphology of Select Cortical and Subcortical Regions in Neurofibromatosis Type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"  # Neuroimaging study comparing NF1 patients to controls
+  publicationTypeConfidence: 0.9  # High confidence - clear patient vs control comparison design
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this neuroimaging study design, expected tool types include:
+    - Computational tools for MRI image analysis, segmentation, and statistical analysis
+    - Potentially clinical assessment tools if patient phenotypes were assessed
+    - Image analysis software and pipelines for brain morphometry
+    
+    This is a clinical neuroimaging study, not bench research, despite the "bench" queryType.
+    The study uses "established image analysis methods" which likely involves computational tools
+    that may not have been captured by the mining process.
+  overallAssessment: |
+    This neuroimaging study would typically use computational tools for MRI image processing,
+    brain segmentation, and statistical analysis. The methods mention "established image analysis
+    methods" and statistical approaches (linear models, hierarchic cluster analysis) which
+    suggest computational tools were used but may not have been explicitly named in the text.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "three-dimensional T1-weighted MR images"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...by using clinically obtained three-dimensional T1-weighted MR images and established image analysis methods..."
+    whyMissed: "This refers to MRI imaging protocol/sequence, but not a specific computational tool"
+    confidence: 0.2
+    shouldBeAdded: No
+    
+  - toolName: "linear models"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...By using linear models, ROI cortical thicknesses and volumes were compared between patients with NF1 and control subjects..."
+    whyMissed: "Statistical method mentioned but no specific software implementation identified"
+    confidence: 0.3
+    shouldBeAdded: Maybe
+    
+  - toolName: "hierarchic cluster analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...With hierarchic cluster analysis and partial correlations, differences in the pattern of association..."
+    whyMissed: "Statistical analysis method mentioned but no specific software implementation identified"
+    confidence: 0.3
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "established image analysis methods"
+    toolType: "computational_tool"
+    examples: ["established image analysis methods"]
+    reasoning: "This phrase suggests computational tools were used but not explicitly named. Could trigger manual review for neuroimaging studies."
+    
+  - patternType: "context_phrase"
+    pattern: "quantitatively assessed.*ROI"
+    toolType: "computational_tool"
+    examples: ["10 intracranial volume–corrected subcortical and 34 cortical regions of interest (ROIs) were quantitatively assessed"]
+    reasoning: "ROI-based quantitative analysis typically requires specialized neuroimaging software that should be captured."
+    
+  - patternType: "term"
+    pattern: "intracranial volume.*corrected"
+    toolType: "computational_tool"
+    examples: ["intracranial volume–corrected subcortical"]
+    reasoning: "Volume correction in neuroimaging requires specific computational methods/software that should be identified."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Statistical/analysis methods that might represent tools
+  newPatternsCount: 3  # Patterns for neuroimaging computational tools
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this neuroimaging study, but computational tools were likely used
+    - Methods section mentions "established image analysis methods" without naming specific software
+    - Statistical analysis methods (linear models, hierarchic cluster analysis) mentioned but no software specified
+    - This appears to be a clinical neuroimaging study, not bench research despite "bench" queryType
+    - The study design (patient vs control comparison) suggests this should have been found by "clinical" query
+  recommendations: |
+    This publication represents a common challenge in neuroimaging literature where computational
+    tools are used but not explicitly named. The mining correctly found no specific tools since
+    none were explicitly mentioned with software names or versions. However, the study clearly
+    used computational methods that would benefit from better documentation.
+    
+    Recommendations:
+    1. The lack of mined tools is appropriate given the vague methods description
+    2. Consider adding patterns to flag neuroimaging studies for manual review
+    3. This study type often uses tools like FreeSurfer, FSL, SPM, or similar but they're not mentioned
+    4. The queryType classification as "bench" appears incorrect - this is clinical neuroimaging
+    5. No observations can be extracted since no specific tools were validated

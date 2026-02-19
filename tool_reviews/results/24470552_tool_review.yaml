@@ -1,0 +1,225 @@
+publicationMetadata:
+  pmid: "24470552"
+  title: "Treatment of orthotopic malignant peripheral nerve sheath tumors with oncolytic herpes simplex virus."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study involving:
+    - Cell lines (mouse NF1(-) MPNST cell lines, human NF1(-) MPNST stemlike cells)
+    - Animal models (immunocompetent and athymic mice)
+    - Genetic reagents (oncolytic HSV G47Δ, armed G47Δ expressing PF4 or IL-12)
+    - Potentially computational tools for data analysis
+    
+    The study describes development of preclinical MPNST models and testing of oncolytic viruses,
+    which clearly involves multiple research tool categories typical of cancer research.
+  overallAssessment: |
+    This is a clear laboratory research publication describing preclinical cancer models and 
+    therapeutic testing. The study involves cell line implantation, animal model development,
+    and viral vector testing - all of which require specific research tools. The presence of
+    a Methods section and detailed experimental procedures strongly indicates tool usage.
+    The mining system appears to have missed several obvious tools that should have been detected.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "S462"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...sciatic nerve tumors derived from human S462 MSLCs in athymic mice or mouse M2..."
+    whyMissed: "Cell line name not recognized - appears to be a human MPNST stemlike cell line"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "M2 (37-3-18-4)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...athymic mice or mouse M2 (37-3-18-4) cells in immunocompetent mice significantly..."
+    whyMissed: "Mouse cell line with specific clone identifier not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "athymic mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...human NF1(-) MPNST stemlike cells (MSLCs) were implanted into the sciatic nerves of immunocompetent and athymic mice..."
+    whyMissed: "Immunodeficient mouse strain not detected by animal model patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "immunocompetent mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...implanted into the sciatic nerves of immunocompetent and athymic mice, respectively..."
+    whyMissed: "General mouse strain descriptor not caught by specific strain patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "G47Δ"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Oncolytic HSV G47Δ as well as \"armed\" G47Δ expressing platelet factor 4 (PF4)..."
+    whyMissed: "Oncolytic virus strain/construct not recognized as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "G47Δ expressing platelet factor 4"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...\"armed\" G47Δ expressing platelet factor 4 (PF4) or interleukin (IL)-12 were injected..."
+    whyMissed: "Modified viral vector expressing therapeutic protein not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "G47Δ expressing IL-12"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...G47Δ expressing platelet factor 4 (PF4) or interleukin (IL)-12 were injected intratumorally..."
+    whyMissed: "Modified viral vector expressing cytokine not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "hind-limb scoring system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...sciatic nerve deficit using a hind-limb scoring system. Oncolytic HSV G47Δ..."
+    whyMissed: "Functional assessment scale for neurological deficits not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][0-9]{2,4}\\b"
+    toolType: "cell_line"
+    examples: ["S462", "M2"]
+    reasoning: "Cell lines often use alphanumeric naming conventions that weren't captured"
+
+  - patternType: "context_phrase"
+    pattern: "athymic mice|immunodeficient mice|nude mice"
+    toolType: "animal_model"
+    examples: ["athymic mice"]
+    reasoning: "Immunodeficient mouse strains are commonly used but may not be caught by specific strain patterns"
+
+  - patternType: "term"
+    pattern: "G47Δ|G47Delta"
+    toolType: "genetic_reagent"
+    examples: ["G47Δ"]
+    reasoning: "Specific oncolytic virus strains should be recognized as genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "expressing [A-Z]{2,4}[0-9]*|expressing [a-z-]+ factor|expressing interleukin"
+    toolType: "genetic_reagent"
+    examples: ["G47Δ expressing platelet factor 4", "G47Δ expressing IL-12"]
+    reasoning: "Modified vectors expressing therapeutic proteins are genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "scoring system|assessment scale|functional scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["hind-limb scoring system"]
+    reasoning: "Functional assessment tools used in animal studies should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "\\([0-9-]+\\)"
+    toolType: "cell_line"
+    examples: ["M2 (37-3-18-4)"]
+    reasoning: "Cell line clone identifiers in parentheses indicate specific cell line variants"
+
+observations:
+  - resourceName: "S462"
+    resourceType: "Cell Line"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Human S462 MPNST stemlike cells (MSLCs) formed tumors when implanted into sciatic nerves 
+      of athymic mice. Single intratumoral injection of G47Δ significantly inhibited tumor 
+      growth and prolonged survival in this model.
+    foundIn: "results"
+    contextSnippet: "...single intratumoral injection of G47Δ in sciatic nerve tumors derived from human S462 MSLCs in athymic mice...significantly inhibited tumor growth and prolonged survival..."
+    confidence: 0.9
+    doi: "10.1093/neuonc/not317"
+
+  - resourceName: "M2 (37-3-18-4)"
+    resourceType: "Cell Line"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Mouse M2 (37-3-18-4) MPNST cells formed tumors with varying growth kinetics when 
+      implanted in immunocompetent mice. Single intratumoral injection of G47Δ significantly 
+      inhibited tumor growth and prolonged survival.
+    foundIn: "results"
+    contextSnippet: "...Mouse MPNST cell lines formed tumors with varying growth kinetics. A single intratumoral injection of G47Δ...mouse M2 (37-3-18-4) cells in immunocompetent mice significantly inhibited tumor growth..."
+    confidence: 0.9
+    doi: "10.1093/neuonc/not317"
+
+  - resourceName: "G47Δ expressing IL-12"
+    resourceType: "Genetic Reagent"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Local IL-12 expression significantly improved the efficacy of G47Δ in syngeneic mice 
+      compared to unmodified G47Δ, demonstrating enhanced therapeutic potential of the 
+      cytokine-armed oncolytic virus.
+    foundIn: "results"
+    contextSnippet: "...Local IL-12 expression significantly improved the efficacy of G47Δ in syngeneic mice..."
+    confidence: 0.95
+    doi: "10.1093/neuonc/not317"
+
+  - resourceName: "G47Δ expressing platelet factor 4"
+    resourceType: "Genetic Reagent"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      PF4 expression prolonged survival in the MPNST model, though the effect was less 
+      pronounced than IL-12 expression, indicating moderate therapeutic benefit of this 
+      anti-angiogenic approach.
+    foundIn: "results"
+    contextSnippet: "...while PF4 expression prolonged survival..."
+    confidence: 0.85
+    doi: "10.1093/neuonc/not317"
+
+  - resourceName: "athymic mice"
+    resourceType: "Animal Model"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Injection of G47Δ directly into the sciatic nerve of athymic mice resulted in only 
+      mild symptoms that did not differ from phosphate buffered saline control, demonstrating 
+      safety of the oncolytic virus in this immunodeficient model.
+    foundIn: "results"
+    contextSnippet: "...Injection of G47Δ directly into the sciatic nerve of athymic mice resulted in only mild symptoms that did not differ from phosphate buffered saline control..."
+    confidence: 0.9
+    doi: "10.1093/neuonc/not317"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    General Comment or Review: 2
+    Issue: 1
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear laboratory research context
+    - Multiple obvious cell lines (S462, M2) were missed
+    - Animal models (athymic mice, immunocompetent mice) not detected
+    - Genetic reagents (oncolytic viruses G47Δ and modified variants) not recognized
+    - Clinical assessment tool (hind-limb scoring system) not captured
+    - This represents a significant failure of the mining patterns for this publication type
+  recommendations: |
+    This publication should have yielded 7-8 validated research tools but the mining system 
+    detected none. This indicates major gaps in the mining patterns, particularly for:
+    1. Cell line naming conventions (alphanumeric patterns like S462, M2)
+    2. Oncolytic virus strains and modified vectors
+    3. Immunodeficient mouse strain terminology
+    4. Functional assessment scales used in animal studies
+    
+    All 8 potentially missed tools should be added to the database as they represent genuine 
+    research tools used in this study. The suggested patterns should be implemented to prevent 
+    similar misses in future mining. The extracted observations provide valuable scientific 
+    context about tool performance and characteristics.

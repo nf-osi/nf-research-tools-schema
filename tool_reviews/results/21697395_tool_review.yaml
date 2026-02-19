@@ -1,0 +1,125 @@
+publicationMetadata:
+  pmid: "21697395"
+  title: "Discovery of a small molecule targeting IRA2 deletion in budding yeast and neurofibromin loss in malignant peripheral nerve sheath tumor cells."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence based on experimental design described
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool types include:
+    - Cell lines: NF1(+/+) and NF1(-/-) MPNST cell lines are explicitly mentioned
+    - Animal models: Budding yeast strains (ira2Δ deletion strain) are described
+    - Genetic reagents: Various yeast genetic constructs and deletions (IRA2, NAB3)
+    - Computational tools: Potentially used for data analysis (though not explicitly mentioned)
+    
+    This is clearly a laboratory research study involving cell culture, yeast genetics, and 
+    small molecule screening, which typically requires multiple research tools.
+  overallAssessment: |
+    This is a laboratory research publication describing small molecule discovery using both 
+    mammalian cell lines and yeast genetic models. The study involves experimental work with 
+    NF1-deficient cell lines and yeast deletion strains, which are classic research tools. 
+    Despite lacking a Methods section in the provided text, the abstract clearly describes 
+    experimental approaches that would require validated research tools.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "NF1(+/+) MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we developed assays in NF1(+/+) and NF1(-/-) MPNST cell lines and in budding yeast..."
+    whyMissed: "Cell line naming pattern may not have been recognized - NF1(+/+) indicates wild-type neurofibromin expression"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF1(-/-) MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we developed assays in NF1(+/+) and NF1(-/-) MPNST cell lines and in budding yeast..."
+    whyMissed: "Cell line naming pattern may not have been recognized - NF1(-/-) indicates neurofibromin knockout"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ira2Δ budding yeast"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...NF1(-/-) MPNST cell lines and in budding yeast lacking the NF1 homologue IRA2 (ira2Δ)..."
+    whyMissed: "Yeast strain nomenclature (ira2Δ) may not have been recognized as deletion strain"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NAB3 deletion strains"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Strains with deletion of IRA2 are sensitive to genetic inactivation of NAB3..."
+    whyMissed: "Genetic deletion/inactivation constructs may not have been captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "UC1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we describe UC1, a small molecule that targets NF1(-/-) cell lines and ira2Δ budding yeast..."
+    whyMissed: "Small molecule compounds may not be included in genetic reagent patterns"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z0-9]+\\([+/-]+\\)\\s+.*cell\\s+lines?"
+    toolType: "cell_line"
+    examples: ["NF1(+/+) MPNST cell lines", "NF1(-/-) MPNST cell lines"]
+    reasoning: "Genetic notation with +/+ or -/- indicates wild-type vs knockout cell lines, commonly used in cancer research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[a-z0-9]+[ΔΔ]\\s+.*yeast|yeast.*\\b[a-z0-9]+[ΔΔ]"
+    toolType: "animal_model"
+    examples: ["ira2Δ budding yeast"]
+    reasoning: "Greek delta (Δ) symbol indicates gene deletion in yeast strain nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "deletion of [A-Z0-9]+|genetic inactivation of [A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["deletion of IRA2", "genetic inactivation of NAB3"]
+    reasoning: "Phrases indicating genetic modifications or knockouts represent genetic reagents"
+
+  - patternType: "term"
+    pattern: "small molecule [A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["small molecule UC1"]
+    reasoning: "Named small molecules used in research are chemical reagents/tools"
+
+  - patternType: "context_phrase"
+    pattern: "developed assays in|using.*cell lines|.*strains.*lacking"
+    toolType: "general"
+    examples: ["developed assays in NF1(+/+) and NF1(-/-) MPNST cell lines", "budding yeast lacking the NF1 homologue"]
+    reasoning: "Context phrases that strongly indicate experimental tool usage"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined despite clear evidence of research tool usage in abstract
+    - Multiple cell lines and yeast strains mentioned that should have been captured
+    - Genetic reagents (deletion strains, small molecules) were not detected
+    - Mining patterns appear to miss standard genetic nomenclature (NF1(+/+), ira2Δ)
+    - Only abstract available - full Methods section would likely contain more tools
+  recommendations: |
+    Strong recommendations for this publication:
+    - This publication clearly contains multiple research tools that were completely missed
+    - At least 4-5 tools should be added: NF1(+/+) and NF1(-/-) cell lines, ira2Δ yeast strain, NAB3 deletion constructs
+    - Mining patterns need improvement for genetic nomenclature and yeast strain naming
+    - Small molecule compounds (UC1) should be considered as chemical reagents
+    - This represents a significant false negative - tools are clearly present but not detected
+    - Suggested patterns would help capture similar tools in other publications
+    - Full text access would likely reveal additional tools in Methods section

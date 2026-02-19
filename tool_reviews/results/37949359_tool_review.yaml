@@ -1,0 +1,112 @@
+publicationMetadata:
+  pmid: "37949359"
+  title: "Characterization of Immune Cell Populations of Cutaneous Neurofibromas in Neurofibromatosis 1"
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract describing immunolabeling, T cell receptor sequencing, and mass spectrometry:
+    - Antibodies (for immunolabeling CD3, CD163, and other immune markers)
+    - Computational tools (for T cell receptor sequence analysis and mass spectrometry data processing)
+    - Potentially genetic reagents (primers/probes for TCR sequencing)
+    
+    This is clearly a lab research study involving multiple experimental techniques that would require
+    specific research tools, despite the absence of a Methods section in the available text.
+
+  overallAssessment: |
+    This is a laboratory research study involving immunohistochemistry, T cell receptor sequencing, and mass spectrometry
+    analysis of cutaneous neurofibromas. Such studies typically require multiple research tools including antibodies for
+    immunolabeling and computational tools for sequence and proteomic data analysis. The absence of tools in the mining
+    results suggests significant under-detection, likely due to the lack of Methods section text where tools are typically described.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "CD3 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...Most samples displayed intratumoral or peritumoral aggregations of CD3-positive cells..."
+    whyMissed: "Abstract mentions CD3-positive cells indicating immunolabeling with CD3 antibody, but specific antibody not explicitly named"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "CD163 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...CD163-positive cells, suggestive of M2 macrophages, were abundant in cNFs..."
+    whyMissed: "Abstract mentions CD163-positive cells indicating immunolabeling with CD163 antibody, but specific antibody not explicitly named"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "T cell receptor sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...T cell receptor CDR domain sequences...T cell receptor sequencing demonstrated that the skin and cNFs host distinct T cell populations..."
+    whyMissed: "TCR sequencing methodology mentioned but specific sequencing platform or analysis software not detailed in abstract"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "Mass spectrometry"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...mass spectrometry of 15 cNFs and the overlying skin was performed to study immune-related processes..."
+    whyMissed: "Mass spectrometry analysis mentioned but specific instrument or analysis software not detailed in abstract"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "([A-Z]+[0-9]*)-positive cells"
+    toolType: "antibody"
+    examples: ["CD3-positive cells", "CD163-positive cells"]
+    reasoning: "Pattern to catch antibodies used for immunolabeling when described as 'marker-positive cells' rather than explicit antibody mentions"
+
+  - patternType: "context_phrase"
+    pattern: "immunolabeled for ([A-Z][A-Za-z0-9]+)"
+    toolType: "antibody"
+    examples: ["immunolabeled for different types of T cells and macrophages"]
+    reasoning: "Pattern to catch immunolabeling contexts that indicate antibody usage even when specific markers aren't named"
+
+  - patternType: "term"
+    pattern: "T cell receptor sequencing|TCR sequencing|TCR-seq"
+    toolType: "computational_tool"
+    examples: ["T cell receptor sequencing"]
+    reasoning: "Specific methodology that involves both wet lab protocols and computational analysis tools"
+
+  - patternType: "context_phrase"
+    pattern: "mass spectrometry.*performed|performed.*mass spectrometry"
+    toolType: "computational_tool"
+    examples: ["mass spectrometry of 15 cNFs and the overlying skin was performed"]
+    reasoning: "Mass spectrometry analysis requires both instrumentation and computational tools for data processing"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - Methods section would likely contain detailed tool information
+    - Immunolabeling experiments mentioned but specific antibodies not captured
+    - T cell receptor sequencing and mass spectrometry mentioned but analysis tools not identified
+    - Significant under-detection of research tools due to limited text availability
+  recommendations: |
+    This publication clearly describes laboratory research involving multiple experimental techniques that require
+    research tools, but none were captured in the mining process. The main issues are:
+    
+    1. Limited text availability (only abstract) - Methods section would contain detailed tool information
+    2. Need for better pattern recognition for immunolabeling contexts (CD3-positive, CD163-positive cells)
+    3. Need to capture methodology-based tools (TCR sequencing, mass spectrometry) even when specific platforms aren't named
+    4. Consider developing patterns that can infer tool usage from experimental descriptions
+    
+    Recommend manual curator review to determine if full text is available elsewhere, as this study likely uses
+    multiple antibodies, computational tools, and potentially other reagents that would be described in the Methods section.
+    The suggested patterns could help capture similar cases where tool usage is implied but not explicitly stated.

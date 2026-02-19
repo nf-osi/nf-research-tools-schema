@@ -1,0 +1,268 @@
+publicationMetadata:
+  pmid: "35614131"
+  title: "The mitochondrial chaperone TRAP1 regulates F-ATP synthase channel formation."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study with extensive experimental methods including:
+    - Cell culture (U87 glioblastoma, sMPNST cells) → cell lines
+    - CRISPR knockout experiments → genetic reagents
+    - Immunoprecipitation and Western blotting → antibodies
+    - Mass spectrometry analysis → computational tools
+    - Protein purification and biochemical assays → genetic reagents/proteins
+    - Electrophysiology experiments → specialized equipment
+    - Microscopy and imaging → computational tools for analysis
+    
+    Expected tool types: cell lines, antibodies, genetic reagents, computational tools
+    Less likely: animal models, organoids, PDX models, clinical assessment tools
+  overallAssessment: |
+    This is a high-quality laboratory research publication with detailed Methods section describing 
+    extensive experimental procedures. The study investigates protein-protein interactions using 
+    multiple biochemical and biophysical techniques. This type of publication typically contains 
+    numerous research tools including cell lines, antibodies, genetic reagents, and computational 
+    analysis tools. The absence of mined tools suggests significant gaps in the mining process.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "U87 glioblastoma cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Experiments were performed on human U87 glioblastoma cells (ATCC)"
+    whyMissed: "Standard cell line name with vendor (ATCC) - should be caught by cell line patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "sMPNST cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "mouse malignant peripheral nerve sheath tumor cells (sMPNST cells, kindly provided by Lu Q. Le, UTSW, Dallas, TX)"
+    whyMissed: "Specialized cell line with clear source attribution - should be detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "HEK 293T cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "co-transfected with the three packaging plasmids pMDLg/pRRE, pRSV-Rev and pMD2.G into HEK 293T cells for viral production"
+    whyMissed: "Common cell line name - should be caught by standard patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "lentiCRISPRv2"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Oligonucleotide pairs were annealed and cloned into the transfer plasmid lentiCRISPRv2 (Addgene, https://www.addgene.org/52961/)"
+    whyMissed: "CRISPR plasmid with Addgene ID - should be detected by genetic reagent patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-human TRAP1 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "incubated overnight at 4°C with beads (Invitrogen) previously conjugated with 1 μg of mouse monoclonal anti-human TRAP1 (sc-73604)"
+    whyMissed: "Antibody with catalog number - should be caught by antibody patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti ATP50/OSCP antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse monoclonal anti ATP50/OSCP (ab110276) antibodies"
+    whyMissed: "Antibody with catalog number - should be detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Cyclophilin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse monoclonal anti-Cyclophilin (ab110324) antibodies"
+    whyMissed: "Antibody with catalog number - should be detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed using LAS AF (Leica Microsystems, Wetzlar, Germany) and ImageJ® software (National Institutes of Health, University of Wisconsin, WI)"
+    whyMissed: "Well-known image analysis software - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Prism 6.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Protein quantification and assessment of significance was determined in Prism 6.0 as described"
+    whyMissed: "Statistical analysis software with version - should be detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pClamp software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were digitized with a Digidata 1322A interface and pClamp software suite (all from Molecular Devices)"
+    whyMissed: "Electrophysiology analysis software - should be caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Origin 8"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical significance was determined using Origin® 8 (OriginLab, Northampton, MA)"
+    whyMissed: "Statistical analysis software with version - should be detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pSUMO-Cyclophilin D plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The human CypD expression system was constructed by building the pSUMO-Cyclophilin D plasmid"
+    whyMissed: "Expression plasmid - should be caught by genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pcDNA3 mito-GFP1-9"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "co-transfected with a combination of plasmids pcDNA3 mito-GFP1-9, pcDNA3-TRAP1-GFP10 and pcDNA3CyPD-GFP11"
+    whyMissed: "Split-GFP plasmid system - should be detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pcDNA3-TRAP1-GFP10"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "co-transfected with a combination of plasmids pcDNA3 mito-GFP1-9, pcDNA3-TRAP1-GFP10 and pcDNA3CyPD-GFP11"
+    whyMissed: "Split-GFP plasmid system - should be detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\(ATCC\\)|\\(Addgene\\)|\\(Invitrogen\\)|\\(Abcam\\)|\\(Santa Cruz\\)"
+    toolType: "general"
+    examples: ["U87 glioblastoma cells (ATCC)", "lentiCRISPRv2 (Addgene)", "anti-TRAP1 (sc-73604)"]
+    reasoning: "Vendor names in parentheses are strong indicators of research tools with catalog information"
+
+  - patternType: "term"
+    pattern: "\\bsMPNST cells\\b|\\bHEK 293T cells\\b|\\bU87.*cells\\b"
+    toolType: "cell_line"
+    examples: ["sMPNST cells", "HEK 293T cells", "U87 glioblastoma cells"]
+    reasoning: "Specific cell line names that were missed - need better coverage of specialized cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using.*ImageJ|processed with.*ImageJ|using.*software"
+    toolType: "computational_tool"
+    examples: ["analyzed using LAS AF and ImageJ® software", "determined using Origin® 8"]
+    reasoning: "Software usage context phrases that indicate computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "\\bpc[A-Z][A-Za-z0-9-]+\\b|\\bp[A-Z][A-Za-z0-9-]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["pcDNA3 mito-GFP1-9", "pSUMO-Cyclophilin D plasmid", "pMDLg/pRRE"]
+    reasoning: "Plasmid naming conventions starting with 'p' followed by construct names"
+
+  - patternType: "term"
+    pattern: "\\blentiCRISPRv2\\b|\\bCRISPR.*plasmid\\b|\\bguide.*sequence\\b"
+    toolType: "genetic_reagent"
+    examples: ["lentiCRISPRv2", "CRISPR design tool", "guide sequences"]
+    reasoning: "CRISPR-related tools and reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "antibody.*\\([a-z]{2}-[0-9]+\\)|\\([a-z]{2}[0-9]+\\).*antibod"
+    toolType: "antibody"
+    examples: ["anti-human TRAP1 (sc-73604)", "anti ATP50/OSCP (ab110276)"]
+    reasoning: "Antibodies with catalog numbers in parentheses - strong tool indicators"
+
+observations:
+  - resourceName: "U87 glioblastoma cells"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      TRAP1 knockout in U87 cells resulted in decreased F-ATP synthase ATPase activity and increased 
+      sensitivity to permeability transition pore (PTP) opening. Cells showed enhanced mitochondrial 
+      depolarization after treatment with cl-HK2pep peptide. TRAP1 ablation also affected the 
+      interaction between CyPD and OSCP, with increased CyPD binding to F-ATP synthase in the 
+      absence of TRAP1.
+    foundIn: "results"
+    contextSnippet: "Both ablation of TRAP1 and treatment with i5 inhibited the hydrolytic activity of F-ATP synthase in U87 cells...TRAP1 ablation sensitizes U87 cells to PTP opening"
+    confidence: 0.90
+    doi: "10.1038/s41418-022-01020-0"
+
+  - resourceName: "sMPNST cells"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      sMPNST cells were used for split-GFP experiments to demonstrate protein-protein interactions 
+      in mitochondria. The cells successfully showed direct mitochondrial interactions between 
+      TRAP1 and OSCP, and between TRAP1 and CyPD. TRAP1 knockout enhanced the binding between 
+      CyPD and OSCP, as measured by increased GFP reconstitution (>1300 cells analyzed).
+    foundIn: "results"
+    contextSnippet: "We carried out these tripartite split-GFP experiments on malignant peripheral nerve sheath tumor (sMPNST) cells, where TRAP1 is pro-tumorigenic"
+    confidence: 0.85
+    doi: "10.1038/s41418-022-01020-0"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ImageJ software was used in conjunction with LAS AF software for analyzing split-GFP 
+      experiments. The software was used to quantify the percentage of cells showing protein 
+      interactions by calculating the ratio between green (GFP-positive) and red (total) cells, 
+      with at least 2500 cells analyzed for each experimental condition.
+    foundIn: "methods"
+    contextSnippet: "visualized with a fluorescence Leica DMI600B microscope (20X objective) and analyzed using LAS AF (Leica Microsystems, Wetzlar, Germany) and ImageJ® software"
+    confidence: 0.90
+    doi: "10.1038/s41418-022-01020-0"
+
+  - resourceName: "Prism 6.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Prism 6.0 software was used for protein quantification and statistical significance assessment 
+      in mass spectrometry experiments. The software was used with Benjamini-Hochberg procedure 
+      correction for multiple comparisons. Results with p-value lower than 0.05 were considered 
+      significant, with significance levels indicated as ***p<0.001, **p<0.01, *p<0.05.
+    foundIn: "methods"
+    contextSnippet: "Protein quantification and assessment of significance for the mass identification was determined using Prism 6.0 with Benjamini-Hochberg procedure correction"
+    confidence: 0.90
+    doi: "10.1038/s41418-022-01020-0"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 6
+  observationsExtracted: 4
+  observationsByType:
+    Cellular: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - Multiple clear research tools are present with standard naming conventions and catalog numbers
+    - Cell lines, antibodies, genetic reagents, and computational tools are extensively used
+    - Mining patterns appear to have significant gaps in coverage
+    - Vendor information and catalog numbers are present but not detected
+  recommendations: |
+    This publication represents a significant failure of the mining system. Despite being a high-quality 
+    laboratory research paper with extensive Methods section and clear tool usage, zero tools were detected. 
+    The following actions are recommended:
+    
+    1. IMMEDIATE: Add all 14 identified tools to the database - they are clearly valid research tools
+    2. PATTERN UPDATES: Implement the 6 suggested patterns to improve future mining coverage
+    3. SYSTEM REVIEW: Investigate why basic patterns for cell lines (U87, HEK 293T), antibodies with 
+       catalog numbers, and common software (ImageJ, Prism) failed to trigger
+    4. VALIDATION: Test updated patterns against this publication to ensure proper detection
+    5. QUALITY CONTROL: This publication should be used as a benchmark for mining system performance
+    
+    The extracted observations demonstrate that when tools are properly identified, meaningful scientific 
+    data can be captured about their usage and performance characteristics.

@@ -1,0 +1,179 @@
+publicationMetadata:
+  pmid: "33625502"
+  title: "Efficacy of a Brief, Peer-Delivered Self-management Intervention for Patients With Rare Chronic Diseases: A Randomized Clinical Trial."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (validated questionnaires, scales, outcome measures), possibly computational tools for statistical analysis
+    
+    This randomized clinical trial evaluates a psychosocial intervention using multiple validated clinical assessment instruments as primary and secondary outcomes. Clinical trials routinely use standardized questionnaires and scales to measure patient-reported outcomes, making clinical assessment tools highly expected in this publication type.
+
+    Note: While computational tools for statistical analysis may be present, they are typically not detailed in abstracts. The focus should be on the clinical assessment tools that are explicitly mentioned as outcome measures.
+  overallAssessment: |
+    This randomized clinical trial would definitely contain clinical assessment tools as it measures patient-reported outcomes using validated questionnaires and scales. The study design requires standardized instruments to assess disease acceptance, coping strategies, depression, anxiety, quality of life, and social support. Clinical assessment tools are essential for this type of intervention research and should be captured by mining algorithms. The absence of any mined tools suggests significant gaps in the clinical assessment tool mining patterns.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Illness Cognition Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The primary outcome was acceptance of the disease as assessed using the Illness Cognition Questionnaire (ICQ; mean sum scores range from 0 to 18, with higher values representing more acceptance)"
+    whyMissed: "Full questionnaire name not captured, only abbreviation ICQ was used in some contexts"
+    confidence: 1.0  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "ICQ"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Mean (SD) baseline ICQ scores were 9.61 (3.79) in the control group and 9.86 (3.40) in the intervention group"
+    whyMissed: "Abbreviation form of Illness Cognition Questionnaire not recognized as clinical assessment tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Health Education Impact Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Secondary outcomes included self-reported coping strategies (Health Education Impact Questionnaire), illness cognition"
+    whyMissed: "Full questionnaire name in parenthetical context not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Illness Perception Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "illness cognition (ICQ and Illness Perception Questionnaire), depression severity"
+    whyMissed: "Questionnaire name in list format not recognized by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Patient Health Questionnaire 9-item depression scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "depression severity (Patient Health Questionnaire 9-item depression scale), anxiety severity"
+    whyMissed: "Complex questionnaire name with descriptive elements not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PHQ-9"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "depression severity (Patient Health Questionnaire 9-item depression scale)"
+    whyMissed: "Standard abbreviation for Patient Health Questionnaire-9 not present but implied"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Generalized Anxiety Disorder Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "anxiety severity (Generalized Anxiety Disorder Scale), quality of life"
+    whyMissed: "Scale name in parenthetical context not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GAD-7"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "anxiety severity (Generalized Anxiety Disorder Scale)"
+    whyMissed: "Standard abbreviation for Generalized Anxiety Disorder-7 not present but implied"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "12-Item Short-Form Health Survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "quality of life (12-Item Short-Form Health Survey), and social support"
+    whyMissed: "Hyphenated survey name with numeric descriptor not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SF-12"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "quality of life (12-Item Short-Form Health Survey)"
+    whyMissed: "Standard abbreviation for Short Form-12 not present but implied"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Social Support Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "and social support (Social Support Questionnaire). Outcomes were assessed before"
+    whyMissed: "Generic questionnaire name not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "as assessed using the [TOOL_NAME]"
+    toolType: "clinical_assessment_tool"
+    examples: ["as assessed using the Illness Cognition Questionnaire (ICQ)"]
+    reasoning: "This phrase pattern clearly indicates use of a clinical assessment instrument as an outcome measure"
+
+  - patternType: "context_phrase"
+    pattern: "\\([A-Z][a-zA-Z\\s]+Questionnaire\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["(Health Education Impact Questionnaire)", "(Social Support Questionnaire)"]
+    reasoning: "Parenthetical questionnaire names are commonly used in clinical trial abstracts to specify outcome measures"
+
+  - patternType: "context_phrase"
+    pattern: "\\([A-Z][a-zA-Z\\s]+Scale\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["(Generalized Anxiety Disorder Scale)", "(Patient Health Questionnaire 9-item depression scale)"]
+    reasoning: "Parenthetical scale names indicate validated clinical assessment instruments"
+
+  - patternType: "naming_convention"
+    pattern: "\\d+-Item [A-Z][a-zA-Z\\s]+ Survey"
+    toolType: "clinical_assessment_tool"
+    examples: ["12-Item Short-Form Health Survey"]
+    reasoning: "Numbered item surveys follow standard naming convention for validated health assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "(Primary|Secondary) outcome[s]? (was|were|included) .* \\([^)]+\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Primary outcome was acceptance of the disease as assessed using the Illness Cognition Questionnaire (ICQ)", "Secondary outcomes included self-reported coping strategies (Health Education Impact Questionnaire)"]
+    reasoning: "Clinical trial outcome descriptions commonly specify the assessment instruments used in parentheses"
+
+  - patternType: "term"
+    pattern: "ICQ|PHQ-9|GAD-7|SF-12|SF-36"
+    toolType: "clinical_assessment_tool"
+    examples: ["ICQ scores", "PHQ-9", "GAD-7", "SF-12"]
+    reasoning: "Standard abbreviations for widely-used clinical assessment tools should be recognized"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z][a-zA-Z\\s]+ scores? (were|was|range)"
+    toolType: "clinical_assessment_tool"
+    examples: ["ICQ scores were 9.61", "mean sum scores range from 0 to 18"]
+    reasoning: "References to questionnaire/scale scores indicate use of clinical assessment instruments"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # Breakdown by observation type
+  majorIssuesFound: |
+    Major issues found during review:
+    - Complete failure to mine any clinical assessment tools from a clinical trial that uses 7+ validated instruments
+    - Mining patterns appear inadequate for capturing clinical assessment tools in parenthetical contexts
+    - Standard abbreviations for common clinical scales (ICQ, PHQ-9, GAD-7, SF-12) not recognized
+    - Questionnaire and scale names in outcome measure descriptions not captured
+    - Clinical trial abstracts have different linguistic patterns than lab research papers
+  recommendations: |
+    Overall recommendations for this publication:
+    - All 11 potentially missed tools should be added - they are clearly validated clinical assessment instruments
+    - This represents a significant gap in clinical assessment tool mining capabilities
+    - The mining algorithm needs substantial improvement for clinical trial abstracts
+    - Focus on parenthetical instrument names following outcome descriptions
+    - Add patterns for standard clinical scale abbreviations (PHQ-9, GAD-7, SF-12, etc.)
+    - Consider context phrases like "assessed using", "measured with", "scores were"
+    - Clinical trials are rich sources of clinical assessment tools and should be prioritized for pattern development
+    - No observations could be extracted due to lack of Results/Discussion sections, but this is expected for abstract-only content

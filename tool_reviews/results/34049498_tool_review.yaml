@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "34049498"
+  title: "Early differences in auditory processing relate to Autism Spectrum Disorder traits in infants with Neurofibromatosis Type I."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical neurodevelopmental study examining auditory processing in infants with NF1.
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, developmental assessments) - HIGHLY LIKELY
+    - Computational tools (EEG analysis software, statistical analysis) - LIKELY
+    - Lab research tools are NOT expected as this is not a molecular/cellular biology study
+    
+    The study uses standardized developmental and behavioral assessments which are valid research tools
+    even though this was found via "bench" query. Clinical studies routinely use validated assessment
+    instruments as research tools.
+  overallAssessment: |
+    This clinical study examines auditory processing differences in infants with NF1 using EEG and standardized
+    developmental assessments. Clinical assessment tools (MSEL, AOSI, IBQ-R, CDI) are legitimate research tools
+    used to measure developmental outcomes and behavioral traits. The study also likely uses computational tools
+    for EEG processing and statistical analysis, though specific software details may be limited.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Mullen Scales of Early Learning (MSEL)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Mullen Scales of Early Learning (MSEL) is a standardised measure that assesses developmental ability across five domains: Gross Motor, Visual Reception, Fine Motor, Receptive Language and Expressive Language."
+    whyMissed: "Standardized developmental assessment tool not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Autism Observation Score for Infants (AOSI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Autism Observation Score for Infants (AOSI) is a standardised research assessment that examines ASD traits in infants in the first two years of life."
+    whyMissed: "Standardized autism assessment tool not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Infant Behaviour Questionnaire-Revised (IBQ-R)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "To measure ADHD-related early behaviours, we used the Activity Level subscale of the Infant Behaviour Questionnaire-Revised. The IBQ-R is a parent-report questionnaire consisting of 191 items and 14 scales that relate to different aspects of infant temperament."
+    whyMissed: "Standardized temperament questionnaire not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MacArthur Bates Communicative Development Inventory (CDI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Parents completed the MacArthur Bates Communicative Development Inventory (CDI) long form. The CDI measures early language abilities by assessing vocabulary comprehension and expression, use of gestures and grammar."
+    whyMissed: "Standardized language development assessment not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "EGI 128-electrode Hydrocel Sensor Net"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We recorded EEG data with an EGI (Philips Neuro, Oregon, USA) 128-electrode Hydrocel Sensor Net, with the vertex electrode acting as a reference online and the data sampled at 500 Hz."
+    whyMissed: "EEG recording system with specific vendor and model information not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Linear Mixed Models (LMMs)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "separate linear mixed models (LMMs) with the following dependent variables were run"
+    whyMissed: "Statistical analysis method not detected by mining patterns"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(MSEL|Mullen Scales?)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Mullen Scales of Early Learning (MSEL)", "MSEL was administered"]
+    reasoning: "MSEL is a widely used standardized developmental assessment in pediatric research"
+
+  - patternType: "term"
+    pattern: "\\b(AOSI|Autism Observation Score)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Autism Observation Score for Infants (AOSI)", "administered the AOSI"]
+    reasoning: "AOSI is a standardized research assessment for autism traits in infants"
+
+  - patternType: "term"
+    pattern: "\\b(IBQ-R|Infant Behaviour Questionnaire)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Infant Behaviour Questionnaire-Revised (IBQ-R)", "completed the IBQ-R"]
+    reasoning: "IBQ-R is a standardized temperament questionnaire used in developmental research"
+
+  - patternType: "term"
+    pattern: "\\b(CDI|MacArthur.*Communicative Development)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["MacArthur Bates Communicative Development Inventory (CDI)", "CDI long form"]
+    reasoning: "CDI is a widely used standardized language development assessment"
+
+  - patternType: "context_phrase"
+    pattern: "standardised (measure|assessment|research assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["standardised measure that assesses", "standardised research assessment that examines"]
+    reasoning: "Phrase commonly used to introduce validated clinical assessment tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "EGI.*electrode.*Net"
+    toolType: "computational_tool"
+    examples: ["EGI 128-electrode Hydrocel Sensor Net"]
+    reasoning: "EEG systems with vendor and electrode specifications are research tools"
+
+  - patternType: "context_phrase"
+    pattern: "(parent-report questionnaire|questionnaire consisting of \\d+ items)"
+    toolType: "clinical_assessment_tool"
+    examples: ["parent-report questionnaire consisting of 191 items"]
+    reasoning: "Specific item counts and parent-report format indicate standardized questionnaires"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Multiple standardized clinical assessment tools were completely missed by mining
+    - All 4 major clinical assessment tools (MSEL, AOSI, IBQ-R, CDI) used in this study were not detected
+    - EEG recording system with vendor/model specifications was missed
+    - Mining patterns appear inadequate for clinical assessment tools despite "bench" query finding this paper
+    - This represents a significant gap in tool detection for clinical neurodevelopmental research
+  recommendations: |
+    - ADD all 4 clinical assessment tools (MSEL, AOSI, IBQ-R, CDI) - these are legitimate, standardized research instruments
+    - ADD EGI EEG system as computational tool with vendor/model specifications
+    - IMPLEMENT suggested patterns to improve detection of clinical assessment tools
+    - Clinical studies use validated assessment instruments as research tools even if found via "bench" queries
+    - Consider that "standardised measure", "standardised assessment" are strong indicators of research tools
+    - Mining patterns need significant improvement for clinical assessment tool detection
+    - This publication demonstrates that clinical studies contain legitimate research tools that current mining misses

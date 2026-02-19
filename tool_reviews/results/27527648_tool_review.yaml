@@ -1,0 +1,206 @@
+publicationMetadata:
+  pmid: "27527648"
+  title: "Patient-reported outcomes of pain and physical functioning in neurofibromatosis clinical trials."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study focusing on patient-reported outcomes):
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - HIGHLY EXPECTED
+    - Computational tools for statistical analysis - POSSIBLY EXPECTED
+    
+    This is a clinical study by the REiNS (Response Evaluation in Neurofibromatosis and Schwannomatosis) 
+    International Collaboration that systematically reviewed and recommended patient-reported outcome (PRO) 
+    measures for neurofibromatosis clinical trials. The study specifically focuses on pain and physical 
+    functioning assessment tools, making clinical assessment tools the primary expected tool type.
+  overallAssessment: |
+    This publication is a clinical study that systematically reviews and recommends validated patient-reported 
+    outcome measures for neurofibromatosis clinical trials. Clinical assessment tools (questionnaires, scales, 
+    outcome measures) are highly expected and explicitly mentioned in the Results section. The study methodology 
+    involves reviewing existing PRO measures, which constitutes legitimate tool usage in the clinical research context. 
+    This type of publication should contain multiple clinical assessment tools as the primary research focus.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Numeric Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "The REiNS PRO group chose the Numeric Rating Scale–11 (≥8 years) to assess pain intensity"
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns - may need pattern for 'Rating Scale' or 'NRS-11'"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NRS-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "The REiNS PRO group chose the Numeric Rating Scale–11 (≥8 years) to assess pain intensity"
+    whyMissed: "Abbreviated form of Numeric Rating Scale-11 - mining may need patterns for common clinical scale abbreviations"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Pain Interference Index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "the Pain Interference Index (6–24 years) and the Patient-Reported Outcome Measurement Information System (PROMIS) Pain Interference Scale"
+    whyMissed: "Clinical assessment tool name not captured - may need pattern for 'Index' as clinical measure indicator"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS Pain Interference Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Patient-Reported Outcome Measurement Information System (PROMIS) Pain Interference Scale (≥18 years) to evaluate pain interference"
+    whyMissed: "PROMIS is a well-known clinical assessment system - mining should capture PROMIS scales"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS Physical Functioning Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "the PROMIS Physical Functioning Scale to measure upper extremity function and mobility (≥5 years) for NF clinical trials"
+    whyMissed: "Another PROMIS scale that should be captured - indicates need for comprehensive PROMIS pattern matching"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Patient-Reported Outcome Measurement Information System"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Patient-Reported Outcome Measurement Information System (PROMIS) Pain Interference Scale (≥18 years)"
+    whyMissed: "Full name of PROMIS system - mining should capture both abbreviated and full forms"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PROMIS.*Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS Pain Interference Scale", "PROMIS Physical Functioning Scale"]
+    reasoning: "PROMIS (Patient-Reported Outcomes Measurement Information System) is a widely used clinical assessment framework with many validated scales"
+
+  - patternType: "term"
+    pattern: "Numeric Rating Scale.*\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Numeric Rating Scale-11"]
+    reasoning: "Numeric Rating Scales are standard pain assessment tools, often abbreviated as NRS with numbers indicating scale range"
+
+  - patternType: "term"
+    pattern: "NRS-\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["NRS-11"]
+    reasoning: "Common abbreviation for Numeric Rating Scale with scale range number"
+
+  - patternType: "term"
+    pattern: "Pain.*Index"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Interference Index"]
+    reasoning: "Pain-related indices are common clinical assessment tools for measuring pain impact and interference"
+
+  - patternType: "context_phrase"
+    pattern: "to assess|to evaluate|to measure.*(?:pain|functioning|quality|interference|intensity)"
+    toolType: "clinical_assessment_tool"
+    examples: ["to assess pain intensity", "to evaluate pain interference", "to measure upper extremity function"]
+    reasoning: "Context phrases indicating clinical assessment tool usage for measuring patient outcomes"
+
+  - patternType: "term"
+    pattern: "Patient-Reported Outcome.*System"
+    toolType: "clinical_assessment_tool"
+    examples: ["Patient-Reported Outcome Measurement Information System"]
+    reasoning: "Full form of PROMIS and similar patient-reported outcome systems should be captured"
+
+observations:
+  - resourceName: "Numeric Rating Scale-11"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The REiNS PRO group recommends the Numeric Rating Scale-11 for assessing pain intensity in patients 
+      aged 8 years and older in neurofibromatosis clinical trials. This recommendation is based on systematic 
+      review using four main criteria: patient characteristics, item content, psychometric properties, and 
+      feasibility for clinical trials.
+    foundIn: "results"
+    contextSnippet: "The REiNS PRO group chose the Numeric Rating Scale–11 (≥8 years) to assess pain intensity"
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000002927"
+
+  - resourceName: "Pain Interference Index"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The REiNS PRO group recommends the Pain Interference Index for evaluating pain interference in 
+      patients aged 6-24 years in neurofibromatosis clinical trials. This is part of their systematic 
+      recommendations for patient-reported outcome measures.
+    foundIn: "results"
+    contextSnippet: "the Pain Interference Index (6–24 years) and the Patient-Reported Outcome Measurement Information System (PROMIS) Pain Interference Scale"
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000002927"
+
+  - resourceName: "PROMIS Pain Interference Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The REiNS PRO group recommends the PROMIS Pain Interference Scale for evaluating pain interference 
+      in patients aged 18 years and older in neurofibromatosis clinical trials. PROMIS scales are part 
+      of the Patient-Reported Outcome Measurement Information System and were selected based on systematic 
+      review criteria including psychometric properties and clinical trial feasibility.
+    foundIn: "results"
+    contextSnippet: "Patient-Reported Outcome Measurement Information System (PROMIS) Pain Interference Scale (≥18 years) to evaluate pain interference"
+    confidence: 0.98
+    doi: "10.1212/WNL.0000000000002927"
+
+  - resourceName: "PROMIS Physical Functioning Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The REiNS PRO group recommends the PROMIS Physical Functioning Scale for measuring upper extremity 
+      function and mobility in patients aged 5 years and older in neurofibromatosis clinical trials. 
+      This scale is part of the PROMIS system and was selected through systematic review of existing 
+      patient-reported outcome measures.
+    foundIn: "results"
+    contextSnippet: "the PROMIS Physical Functioning Scale to measure upper extremity function and mobility (≥5 years) for NF clinical trials"
+    confidence: 0.98
+    doi: "10.1212/WNL.0000000000002927"
+
+  - resourceName: "Patient-Reported Outcome Measurement Information System"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The REiNS Collaboration notes that further research is needed to evaluate the use of PROMIS and 
+      other recommended patient-reported outcome measures specifically in individuals with neurofibromatosis. 
+      A final consensus recommendation for pain interference measures will be disseminated in future 
+      publications based on additional research findings.
+    foundIn: "discussion"
+    contextSnippet: "further research is needed to evaluate their use in individuals with NF. A final consensus recommendation for the pain interference measure will be disseminated"
+    confidence: 0.90
+    doi: "10.1212/WNL.0000000000002927"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 4
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - CRITICAL: Mining completely failed to capture any clinical assessment tools despite this being a clinical study specifically focused on patient-reported outcome measures
+    - Multiple validated clinical assessment tools (NRS-11, PROMIS scales, Pain Interference Index) were explicitly mentioned and recommended but not detected
+    - Mining patterns appear inadequate for clinical assessment tools, particularly PROMIS system scales and standard pain assessment measures
+    - This represents a significant gap in clinical tool detection capabilities
+  recommendations: |
+    - URGENT: Add comprehensive patterns for PROMIS scales and system (widely used in clinical research)
+    - Add patterns for Numeric Rating Scale variations and abbreviations (NRS-X format)
+    - Include "Index" as indicator for clinical assessment tools (Pain Interference Index, etc.)
+    - Implement context-based detection for clinical assessment phrases ("to assess", "to evaluate", "to measure")
+    - This publication demonstrates that clinical assessment tool mining needs substantial improvement
+    - All 6 missed tools should be added to the database as they are validated clinical instruments recommended by expert consensus
+    - The observations extracted provide valuable usage guidance and age-specific recommendations for these tools in neurofibromatosis research

@@ -1,0 +1,187 @@
+publicationMetadata:
+  pmid: "25377441"
+  title: "Development and validation of the English Pain Interference Index and Pain Interference Index-Parent report."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development and validation study, which should contain:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY FOCUS
+    - Possibly computational tools for statistical analysis
+    
+    The study develops new clinical assessment tools (Pain Interference Index) and validates them
+    against existing tools (Modified Brief Pain Inventory, Visual Analogue Scale). This type of
+    publication typically contains multiple clinical assessment tools.
+  overallAssessment: |
+    This publication is specifically focused on developing and validating clinical assessment tools
+    for measuring pain interference in children with chronic conditions. The study should contain
+    multiple clinical assessment tools including the newly developed PII and PII-Parent, as well
+    as existing validated measures used for comparison (MBPI, VAS). The mining completely missed
+    these tools despite clear mentions throughout the abstract and methods.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Pain Interference Index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...investigated the psychometric properties of the Pain Interference Index (PII), a six-item questionnaire originally developed in Swedish..."
+    whyMissed: "Primary tool being developed - should be captured as main clinical assessment tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pain Interference Index-Parent report"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Development and validation of the English Pain Interference Index and Pain Interference Index-Parent report..."
+    whyMissed: "Parent proxy version of the main tool - distinct clinical assessment instrument"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Modified Brief Pain Inventory"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...validity was examined by correlating PII scores with existing measures of pain interference (Modified Brief Pain Inventory [MBPI])..."
+    whyMissed: "Established clinical assessment tool used for validation - should be captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "visual analogue scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...and pain intensity (visual analogue scale [VAS]), and with measures of disease severity..."
+    whyMissed: "Standard pain assessment tool used for validation - should be captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "VAS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...PII scores correlated with MBPI (r = 0.81, P < 0.0001) and VAS (r = 0.55, P < 0.0001) scores..."
+    whyMissed: "Abbreviation for Visual Analogue Scale - commonly used pain assessment tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Pain Interference Index"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Interference Index (PII)", "Pain Interference Index-Parent report"]
+    reasoning: "Specific questionnaire name that should be captured as clinical assessment tool"
+
+  - patternType: "term"
+    pattern: "Modified Brief Pain Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["Modified Brief Pain Inventory [MBPI]"]
+    reasoning: "Established pain assessment questionnaire commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "visual analogue scale|VAS"
+    toolType: "clinical_assessment_tool"
+    examples: ["visual analogue scale [VAS]", "VAS rating"]
+    reasoning: "Standard pain intensity measurement tool used across clinical studies"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire originally developed"
+    toolType: "clinical_assessment_tool"
+    examples: ["six-item questionnaire originally developed in Swedish"]
+    reasoning: "Indicates development/adaptation of clinical assessment instruments"
+
+  - patternType: "context_phrase"
+    pattern: "psychometric properties of"
+    toolType: "clinical_assessment_tool"
+    examples: ["investigated the psychometric properties of the Pain Interference Index"]
+    reasoning: "Strong indicator of clinical assessment tool validation studies"
+
+  - patternType: "context_phrase"
+    pattern: "parent proxy measure|parent proxy report"
+    toolType: "clinical_assessment_tool"
+    examples: ["created a parallel parent proxy measure", "Pain Interference Index-Parent report"]
+    reasoning: "Indicates clinical assessment tools designed for parent/caregiver completion"
+
+observations:
+  - resourceName: "Pain Interference Index"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Internal consistency reliability was high (Cronbach's alpha = 0.84 for child self-report).
+      The PII demonstrated strong convergent validity with established pain measures, correlating
+      significantly with the Modified Brief Pain Inventory (r = 0.81, P < 0.0001) and Visual
+      Analogue Scale (r = 0.55, P < 0.0001). The tool successfully differentiated between
+      patients with mild vs moderate/severe NF1 disease severity (P < 0.05).
+    foundIn: "results"
+    contextSnippet: "PII internal consistency was 0.84...PII scores correlated with MBPI (r = 0.81, P < 0.0001) and VAS (r = 0.55, P < 0.0001) scores and differentiated between patients with mild vs moderate/severe NF1 disease severity (P < 0.05)"
+    confidence: 1.0
+    doi: "10.1111/pme.12620"
+
+  - resourceName: "Pain Interference Index-Parent report"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Internal consistency reliability was excellent (Cronbach's alpha = 0.96 for parent report).
+      The PII-Parent demonstrated significant correlations with both mothers' and fathers' VAS
+      ratings of their child's pain intensity (Ps < 0.01), supporting its validity as a parent
+      proxy measure.
+    foundIn: "results"
+    contextSnippet: "PII internal consistency was...0.96, respectively. The PII-Parent was significantly correlated with the mothers' and fathers' VAS rating of the child's pain intensity (Ps < 0.01)"
+    confidence: 1.0
+    doi: "10.1111/pme.12620"
+
+  - resourceName: "Modified Brief Pain Inventory"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Used as a validation criterion for the newly developed Pain Interference Index.
+      Demonstrated strong correlation with PII scores (r = 0.81, P < 0.0001), supporting
+      the convergent validity of the PII as a measure of pain interference.
+    foundIn: "results"
+    contextSnippet: "PII scores correlated with MBPI (r = 0.81, P < 0.0001)"
+    confidence: 1.0
+    doi: "10.1111/pme.12620"
+
+  - resourceName: "visual analogue scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Used to measure pain intensity for validation purposes. Showed moderate correlation
+      with PII scores (r = 0.55, P < 0.0001). Parent VAS ratings of child's pain intensity
+      were significantly correlated with PII-Parent scores (Ps < 0.01), supporting the
+      validity of both child and parent measures.
+    foundIn: "results"
+    contextSnippet: "PII scores correlated with...VAS (r = 0.55, P < 0.0001) scores...The PII-Parent was significantly correlated with the mothers' and fathers' VAS rating of the child's pain intensity (Ps < 0.01)"
+    confidence: 1.0
+    doi: "10.1111/pme.12620"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 4
+  observationsByType:
+    General Comment or Review: 4
+  majorIssuesFound: |
+    - Complete failure to detect clinical assessment tools in a questionnaire development study
+    - Mining missed the primary tools being developed (PII and PII-Parent)
+    - Mining missed established validation tools (MBPI, VAS)
+    - This represents a significant gap in clinical assessment tool detection patterns
+  recommendations: |
+    This publication should have captured 4-5 clinical assessment tools but found none. This indicates
+    major gaps in the mining patterns for clinical assessment tools. The tools that should be added are:
+    1. Pain Interference Index (primary tool being developed)
+    2. Pain Interference Index-Parent report (parent proxy version)
+    3. Modified Brief Pain Inventory (validation tool)
+    4. Visual Analogue Scale/VAS (validation tool)
+    
+    All of these are legitimate clinical assessment tools with clear usage context and validation data.
+    The suggested patterns should significantly improve detection of clinical assessment tools in
+    questionnaire development and validation studies. The observations extracted provide valuable
+    psychometric data about tool performance and validity.

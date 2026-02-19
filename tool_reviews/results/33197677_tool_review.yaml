@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "33197677"
+  title: "Effects of a mind-body program on symptoms of depression and perceived stress among adults with neurofibromatosis type 2 who are deaf: A live-video randomized controlled trial."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Clinical Trial) and study design, this publication should contain:
+    - Clinical assessment tools: PHQ-9 (depression scale), PSS-10 (perceived stress scale) mentioned in abstract
+    - Possibly computational tools for statistical analysis of trial data
+    - Communication technology tools: CART (Communication Access Realtime Translation) mentioned
+    
+    Note: This is a behavioral intervention trial, so lab research tools (antibodies, cell lines, animal models) 
+    would not be expected. However, validated clinical assessment instruments are legitimate research tools 
+    in this context.
+  overallAssessment: |
+    This is a randomized controlled trial testing a mind-body intervention program for NF2 patients. Clinical 
+    trials typically use validated assessment tools to measure outcomes, which are legitimate research tools. 
+    The abstract specifically mentions PHQ-9 and PSS-10 scales, which are standardized clinical assessment 
+    instruments. However, there's a data quality issue where the methods/results sections appear to be from 
+    a different study about tinnitus treatment, making full validation challenging.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PHQ-9"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...completed measures of depression (PHQ-9) and perceived stress (PSS-10) at baseline, post-intervention, and six-month follow-up."
+    whyMissed: "This is a validated depression assessment scale that should have been detected as a clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+  - toolName: "PSS-10"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...completed measures of depression (PHQ-9) and perceived stress (PSS-10) at baseline, post-intervention, and six-month follow-up."
+    whyMissed: "This is a validated perceived stress scale that should have been detected as a clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+  - toolName: "CART"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...delivered via live-video and assisted by Communication Access Realtime Translation (CART)."
+    whyMissed: "Communication Access Realtime Translation is an assistive technology tool used in clinical research with deaf populations"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PHQ-9|PHQ-8|PHQ-2"
+    toolType: "clinical_assessment_tool"
+    examples: ["PHQ-9"]
+    reasoning: "Patient Health Questionnaire variants are widely used depression screening tools in clinical research"
+  - patternType: "term"
+    pattern: "PSS-10|PSS-14|Perceived Stress Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["PSS-10"]
+    reasoning: "Perceived Stress Scale variants are standard instruments for measuring perceived stress in clinical studies"
+  - patternType: "context_phrase"
+    pattern: "completed measures of|administered.*scale|assessed using.*questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed measures of depression (PHQ-9)"]
+    reasoning: "These phrases typically indicate administration of clinical assessment instruments"
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,5}-[0-9]{1,2}"
+    toolType: "clinical_assessment_tool"
+    examples: ["PHQ-9", "PSS-10"]
+    reasoning: "Many clinical assessment tools follow this naming pattern (acronym-number)"
+
+observations:
+  - resourceName: "PHQ-9"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The d3RP-NF2 program showed significant decreases in PHQ-9 depression scores from baseline to post-test, 
+      which were maintained at six-month follow-up (within group analysis). However, improvements were not 
+      significantly higher than the control group (between group analysis). This demonstrates the tool's 
+      sensitivity to detect within-group changes in this population.
+    foundIn: "results"
+    contextSnippet: "Patients randomized to the d3RP-NF2 program, but not to the control condition, experienced significant decreases on both measures from baseline to post-test, which were maintained at follow-up (within group tests)."
+    confidence: 0.90
+    doi: "10.1016/j.ctim.2020.102581"
+  - resourceName: "PSS-10"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The PSS-10 perceived stress scale showed significant decreases in the d3RP-NF2 group from baseline to 
+      post-test, maintained at follow-up (within group analysis). Like the PHQ-9, between-group differences 
+      were not significant. This indicates the scale was responsive to intervention effects within the 
+      treatment group in this deaf NF2 population.
+    foundIn: "results"
+    contextSnippet: "Patients randomized to the d3RP-NF2 program, but not to the control condition, experienced significant decreases on both measures from baseline to post-test, which were maintained at follow-up (within group tests)."
+    confidence: 0.90
+    doi: "10.1016/j.ctim.2020.102581"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 2
+  observationsByType:
+    General Comment or Review: 2
+  majorIssuesFound: |
+    - No tools were mined from this clinical trial publication despite clear usage of validated assessment instruments
+    - Data quality issue: Methods/Results sections appear to be from a different study about tinnitus treatment, not the NF2 mind-body intervention described in the abstract
+    - Mining patterns appear to miss standard clinical assessment tools (PHQ-9, PSS-10) that are commonly used in clinical research
+    - The publication clearly describes a randomized controlled trial that used validated outcome measures, which are legitimate research tools
+  recommendations: |
+    - Add the missed clinical assessment tools (PHQ-9, PSS-10) to the database as they are clearly used in this study
+    - Investigate the data quality issue with mismatched methods/results sections
+    - Improve mining patterns to better detect clinical assessment tools, especially those following the acronym-number naming convention
+    - Consider CART (Communication Access Realtime Translation) for inclusion as an assistive technology tool used in clinical research
+    - The observations extracted show how these tools performed in this specific population (deaf NF2 patients)
+    - This publication demonstrates the importance of including clinical assessment tools in research tool databases, as they are essential instruments for measuring outcomes in clinical trials

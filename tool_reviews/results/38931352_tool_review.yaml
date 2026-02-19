@@ -1,0 +1,169 @@
+publicationMetadata:
+  pmid: "38931352"
+  title: "PET Imaging of Neurofibromatosis Type 1 with a Fluorine-18 Labeled Tryptophan Radiotracer."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a laboratory research study involving:
+    - Animal model development and characterization (NF1 triple mutant mice)
+    - Radiotracer synthesis and validation
+    - PET imaging studies
+    - Immunohistochemistry analysis
+    - Computational analysis of imaging data
+    
+    Expected tool types: animal models, antibodies, genetic reagents (PCR primers), computational tools
+  overallAssessment: |
+    This is a clear laboratory research publication involving radiotracer development, animal model studies, and imaging analysis.
+    The study uses genetically modified mouse models, multiple antibodies for immunohistochemistry, PCR primers for genotyping,
+    and several computational tools for data analysis. Tools are expected and extensively used throughout the experimental workflow.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Trp53, Nf1, Suz12 triple mutant mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The NF1 mice were purchased from The Jackson Laboratory (Bar Harbor, ME, USA) and bred at Nemours. The triple mutant line from the vendor carries Trp53, Nf1, Suz12 mutations on chromosome 11 and develops tumors at approximately four months"
+    whyMissed: "Complex multi-gene mutation nomenclature not captured by standard animal model patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent ChemStation software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quality control of L-[18F]FETrp was performed in an Agilent Infinity 1260 HPLC system. An Agilent ChemStation software (version C.01.07) was used for data analysis."
+    whyMissed: "Software name with version number not captured by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "VivoQuant software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ROIs were manually drawn with VivoQuant software version 4.0 (Invicro, Needham, MA, USA) following image normalization based on weight and injected dose, and PET imaging data analysis was performed using VivoQuant."
+    whyMissed: "Specialized imaging analysis software not in computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "indoleamine 2,3-dioxygenase rabbit monoclonal antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The slides were incubated in their prospective antibodies for 30 min: indoleamine 2,3-dioxygenase rabbit monoclonal (1:100, Abcam, Cambridge, UK)"
+    whyMissed: "Antibody with full target name and vendor information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AHR antibody mouse monoclonal"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "AHR antibody mouse monoclonal (1:50, Santa Cruz, Dallas, TX, USA)"
+    whyMissed: "Antibody with dilution and vendor information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TDO2 rabbit polyclonal antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "antibody-TDO2, rabbit/IgG polyclonal (1:100, Proteintech, Rosemont, IL, USA)"
+    whyMissed: "Antibody with target, species, and vendor information not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Trp53 PCR primers"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Trp53, TGGATGGTGGTATACTCAGAGC (common), CAGCCTCTGTTCCACATACACT (mutant forward), AGGCTTAGAGGTGCAAGCTG (wild-type forward)"
+    whyMissed: "PCR primer sequences for genotyping not captured by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 PCR primers"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Nf1, GGTATTGAATTGAAGCAC (wild-type forward), TTCAATACCTGCCCAAGG (common), ATTCGCCAATGACAAGAC (mutant forward)"
+    whyMissed: "PCR primer sequences for genotyping not captured by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Suz12 PCR primers"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Suz12, CAGGTCTTCGAATGCTGAGTC (common), AGAGAGGGAGAAGGAGAAGCA (wild-type reverse), CTTCACATCCATGCTGAGGA (mutant reverse)"
+    whyMissed: "PCR primer sequences for genotyping not captured by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "triple mutant.*mice|[A-Z][a-z0-9]+,\\s*[A-Z][a-z0-9]+,\\s*[A-Z][a-z0-9]+.*mutant"
+    toolType: "animal_model"
+    examples: ["Trp53, Nf1, Suz12 triple mutant mice"]
+    reasoning: "Multi-gene knockout mouse models often use comma-separated gene names with 'triple mutant' or similar descriptors"
+
+  - patternType: "context_phrase"
+    pattern: "software\\s+version\\s+[0-9]+\\.[0-9]+|software\\s+\\(version\\s+[^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["Agilent ChemStation software (version C.01.07)", "VivoQuant software version 4.0"]
+    reasoning: "Software tools with explicit version numbers indicate actual usage rather than citations"
+
+  - patternType: "context_phrase"
+    pattern: "antibody.*\\([0-9]+:[0-9]+,\\s*[^,]+,\\s*[^)]+\\)|[A-Z0-9]+\\s+antibody.*monoclonal|[A-Z0-9]+\\s+antibody.*polyclonal"
+    toolType: "antibody"
+    examples: ["indoleamine 2,3-dioxygenase rabbit monoclonal (1:100, Abcam, Cambridge, UK)", "AHR antibody mouse monoclonal"]
+    reasoning: "Antibodies with dilution ratios and vendor information indicate experimental usage"
+
+  - patternType: "context_phrase"
+    pattern: "PCR primers.*[ATCG]{15,}|primers were used.*[ATCG]{15,}|[A-Z][a-z0-9]+,\\s*[ATCG]{15,}"
+    toolType: "genetic_reagent"
+    examples: ["Trp53, TGGATGGTGGTATACTCAGAGC (common)", "PCR primers were used for the genotyping"]
+    reasoning: "PCR primer sequences with gene names indicate genotyping reagents"
+
+  - patternType: "vendor_indicator"
+    pattern: "purchased from.*Jackson Laboratory|obtained from.*Jackson Laboratory"
+    toolType: "animal_model"
+    examples: ["The NF1 mice were purchased from The Jackson Laboratory"]
+    reasoning: "Jackson Laboratory is a major supplier of research mouse models"
+
+  - patternType: "context_phrase"
+    pattern: "imaging.*performed.*using|analysis.*performed.*using|data.*analyzed.*using"
+    toolType: "computational_tool"
+    examples: ["PET imaging data analysis was performed using VivoQuant"]
+    reasoning: "Analysis context phrases indicate computational tool usage rather than citations"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure of tool mining - 9 clear research tools were missed
+    - Animal model with complex multi-gene nomenclature not detected
+    - Multiple antibodies with vendor/dilution information not captured
+    - PCR primers with sequences not identified as genetic reagents
+    - Computational tools with version numbers not detected
+    - No tools were initially mined despite extensive tool usage in methods
+  recommendations: |
+    This publication represents a significant mining failure with 9 clear research tools completely missed.
+    The tools include:
+    - 1 animal model (triple mutant mice from Jackson Laboratory)
+    - 2 computational tools (ChemStation, VivoQuant with versions)
+    - 3 antibodies (IDO, AHR, TDO2 with vendors and dilutions)
+    - 3 genetic reagents (PCR primer sets for genotyping)
+    
+    All missed tools should be added to the database. The suggested patterns would significantly improve
+    detection of similar tools in future mining. This case highlights the need for better patterns
+    covering multi-gene animal models, versioned software, antibodies with experimental details,
+    and PCR primers with sequences.
+    
+    No observations were extracted since no tools were initially validated, but the publication
+    contains extensive experimental data that would yield valuable observations once tools are properly identified.

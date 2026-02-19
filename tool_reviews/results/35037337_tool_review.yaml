@@ -1,0 +1,240 @@
+publicationMetadata:
+  pmid: "35037337"
+  title: "Neurofibromatosis type 2 versus sporadic vestibular schwannoma: The utility of MR diffusion and dynamic contrast-enhanced imaging."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0  # Very high confidence - extensive molecular biology methods
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive lab research study with extensive molecular biology methods including:
+    - Animal models (Periostin-CRE mice, NF2 fl/fl mice)
+    - Cell lines and primary cultures (human schwannoma cultures, normal Schwann cells)
+    - Antibodies (for Western blot, immunohistochemistry, ChIP-seq)
+    - Computational tools (extensive bioinformatics pipeline: Seurat, Scanpy, Cell Ranger, etc.)
+    - Genetic reagents (various constructs and reagents)
+    
+    The publication contains detailed protocols for single-cell RNA sequencing, chromatin accessibility,
+    spatial transcriptomics, immunohistochemistry, Western blotting, and other molecular techniques.
+    This type of study should contain dozens of research tools across multiple categories.
+  overallAssessment: |
+    This publication is a comprehensive molecular biology study that should contain numerous research tools.
+    The extensive Methods section describes detailed protocols using animal models, cell cultures, antibodies,
+    and computational analysis pipelines. The complete absence of mined tools (0 tools found) indicates
+    a significant mining failure rather than a lack of tools in the publication.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Periostin-CRE mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Periostin-CRE mice were provided by S. Conway (Indiana University) and as previously described, mice were crossed with NF2 fl/fl mice"
+    whyMissed: "Animal model strain name not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NF2 fl/fl mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "mice were crossed with NF2 7 fl/fl mice (RIKEN Bioresource Research Centre) to generate Periostin-CRE;NF2 fl/fl mice"
+    whyMissed: "Genetic mouse strain notation not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Filtered and raw .h5 files from Cell Ranger were processed in RStudio using Seurat v5.0.1"
+    whyMissed: "R package name with version not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cell Ranger"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "10X Genomics's CellRanger mkfastq software (V3.0.2)" and "Cell Ranger-arc count function"
+    whyMissed: "Bioinformatics software name not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Scanpy"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "create a merlin depletion score (MDS) using the tl.rank_genes_groups() function in Scanpy"
+    whyMissed: "Python package name not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "10X Genomics Chromium"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "10X Genomics' Chromium instrument and Single Cell 3′ Reagent kit (V3 and 3.1) were used"
+    whyMissed: "Instrument/platform name not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-pan-TEAD"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Pan-TEAD Primary antibody (#13295) at a dilution of 1:100" and "anti-pan-TEAD (S13295)"
+    whyMissed: "Antibody name with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-YAP"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-YAP (4912S)"
+    whyMissed: "Antibody name with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-VEGF-A"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-VEGF-A (50661S)"
+    whyMissed: "Antibody name with catalog number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Human Tumor Dissociation Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "dissociated using the Human Tumor Dissociation Kit in gentleMACS C tubes"
+    whyMissed: "Commercial kit name not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "gentleMACS dissociator"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using the gentleMACS dissociator (Bergisch Gladbach, North Rhine-Westphalia, Germany)"
+    whyMissed: "Instrument name not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "VT3989"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "30mg/kg of TEAD auto-palmitoylation inhibitor (VT3989, Vivace Therapeutics, San Mateo, CA)"
+    whyMissed: "Chemical compound identifier not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "QuPath"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Nuclear segmentation was performed in QuPath using the Cell Detection module"
+    whyMissed: "Image analysis software name not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed using ImageJ" (implied from image analysis context)
+    whyMissed: "Common image analysis software not mentioned explicitly"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "Primary Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We derived primary cells from patient of NF2 schwannoma - S2290, NF2 meningioma – S2348, Sporadic vestibular NF2 schwannoma - S2470"
+    whyMissed: "Primary cell culture names not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Normal Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The normal Schwann cells were bought from Neuromics Inc"
+    whyMissed: "Commercial cell line not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[-_][A-Z]{2,}\\b"
+    toolType: "animal_model"
+    examples: ["Periostin-CRE", "NF2 fl/fl"]
+    reasoning: "Mouse strain naming conventions with gene names and genetic modifications"
+
+  - patternType: "term"
+    pattern: "Seurat|Scanpy|Cell Ranger|QuPath"
+    toolType: "computational_tool"
+    examples: ["Seurat v5.0.1", "Scanpy", "Cell Ranger", "QuPath"]
+    reasoning: "Common bioinformatics software packages used in single-cell analysis"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z0-9-]+\\s*\\([#A-Z0-9]+\\)"
+    toolType: "antibody"
+    examples: ["anti-pan-TEAD (#13295)", "anti-YAP (4912S)"]
+    reasoning: "Antibody naming with catalog numbers in parentheses"
+
+  - patternType: "vendor_indicator"
+    pattern: "Kit|Reagent|System\\b.*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["Human Tumor Dissociation Kit", "Single Cell 3′ Reagent kit"]
+    reasoning: "Commercial kits and reagents with vendor information"
+
+  - patternType: "term"
+    pattern: "VT[0-9]+|compound\\s+[#0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["VT3989", "VT104", "VT106"]
+    reasoning: "Chemical compound identifiers used in the study"
+
+  - patternType: "context_phrase"
+    pattern: "primary cells?\\s+from\\s+patient|bought from|obtained from"
+    toolType: "cell_line"
+    examples: ["primary cells from patient", "bought from Neuromics Inc"]
+    reasoning: "Context indicating cell line sources and derivation"
+
+  - patternType: "naming_convention"
+    pattern: "S[0-9]{4}"
+    toolType: "cell_line"
+    examples: ["S2290", "S2348", "S2470"]
+    reasoning: "Patient-derived cell line identifiers used in this study"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 15  # Number of tools that were clearly missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # No tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    CRITICAL MINING FAILURE: This comprehensive lab research study contains numerous research tools
+    but the mining system captured ZERO tools. Major issues identified:
+    
+    - Complete failure to capture animal models (Periostin-CRE mice, NF2 fl/fl mice)
+    - Missed all computational tools (Seurat, Scanpy, Cell Ranger, QuPath) despite explicit versions
+    - Failed to identify antibodies with catalog numbers (anti-pan-TEAD #13295, anti-YAP 4912S)
+    - Did not capture cell lines and primary cultures (patient-derived cells S2290, S2348, S2470)
+    - Missed genetic reagents and chemical compounds (VT3989, Human Tumor Dissociation Kit)
+    - No recognition of commercial kits and instruments (10X Genomics Chromium, gentleMACS)
+    
+    This represents a systematic failure across ALL tool categories in a publication that should
+    have yielded 15+ high-confidence research tools.
+  recommendations: |
+    URGENT MINING SYSTEM REVIEW REQUIRED:
+    
+    1. IMMEDIATE ACTION: This publication should be completely re-mined with improved patterns
+    2. PATTERN UPDATES: Implement the 7 suggested patterns to capture missed tool types
+    3. SYSTEM VALIDATION: Test mining system on similar molecular biology publications
+    4. QUALITY CONTROL: Establish minimum tool thresholds for lab research publications
+    
+    This publication demonstrates that the current mining system has significant gaps in:
+    - Animal model nomenclature (genetic strain notation)
+    - Bioinformatics software recognition (R/Python packages)
+    - Antibody identification (catalog number patterns)
+    - Cell line naming conventions (patient-derived identifiers)
+    - Chemical compound recognition (VT-series compounds)
+    
+    The complete absence of tools from such a tool-rich publication indicates fundamental
+    issues with the mining patterns and algorithms that need immediate attention.

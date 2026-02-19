@@ -1,0 +1,101 @@
+publicationMetadata:
+  pmid: "41168866"
+  title: "Artificial intelligence-based tools for precision diagnosis and treatment of neurofibromatosis type 1 associated peripheral and central glial tumors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very clear from title and methods describing "narrative review"
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does NOT contain actual research tools used by authors.
+    Review articles cite and discuss tools used in OTHER studies but do not use tools themselves.
+    
+    However, this specific review focuses on "AI-based tools" which could potentially include:
+    - Computational tools (AI software, algorithms, platforms) if the authors developed or tested them
+    - Clinical assessment tools if reviewing diagnostic/assessment applications
+    
+    But based on the methods section describing a "narrative review" with database searches,
+    this appears to be a literature review that discusses tools rather than using them.
+    
+    Expected: Likely no actual research tools used by the authors themselves.
+  overallAssessment: |
+    This is a narrative review article about AI applications in NF1-associated glial tumors.
+    The methods describe a literature search and review methodology, not experimental procedures.
+    Review articles typically cite and discuss tools from other studies but do not use research tools themselves.
+    While the review focuses on "AI-based tools," these are discussed as subjects of review rather than tools used by the authors.
+
+toolValidations: []
+  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "PubMed/MEDLINE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A comprehensive search strategy was deployed across the databases: PubMed/MEDLINE and Google Scholar."
+    whyMissed: "Database search platforms used in systematic review methodology - these are research tools for literature search"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "Google Scholar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A comprehensive search strategy was deployed across the databases: PubMed/MEDLINE and Google Scholar."
+    whyMissed: "Database search platform used in systematic review methodology"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "SYNAPSE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "manual additions from SYNAPSE, the CTF data portal, and BioArchives, to collect technical reports and preprints"
+    whyMissed: "Data portal/repository used for collecting research materials - could be considered a computational tool"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "search strategy.*deployed.*across.*databases?:?\\s*([A-Z][a-zA-Z/]+)"
+    toolType: "computational_tool"
+    examples: ["PubMed/MEDLINE", "Google Scholar"]
+    reasoning: "Review articles often use database search tools that could be considered computational tools for research methodology"
+  - patternType: "context_phrase"
+    pattern: "manual additions from\\s+([A-Z][A-Z]+)"
+    toolType: "computational_tool"
+    examples: ["SYNAPSE"]
+    reasoning: "Data portals and repositories used in systematic reviews could be computational tools"
+  - patternType: "term"
+    pattern: "\\b(CTF data portal|BioArchives)\\b"
+    toolType: "computational_tool"
+    examples: ["CTF data portal", "BioArchives"]
+    reasoning: "Specialized data portals and archives used in research methodology"
+
+observations: []
+  # No validated tools, therefore no observations can be extracted
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # PubMed/MEDLINE, Google Scholar, SYNAPSE
+  newPatternsCount: 3  # Database search patterns for review methodology
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a narrative review article, not experimental research
+    - No experimental tools were mined (correctly - review articles don't use research tools)
+    - Methods section describes literature search methodology, not lab procedures
+    - Limited text available (no Introduction, Results, or Discussion sections)
+    - Query type "bench" is misleading - this is not bench research
+  recommendations: |
+    This publication was correctly identified as having no research tools. It is a narrative review
+    that discusses AI applications in NF1 research but does not use experimental tools itself.
+    
+    The potentially missed tools (PubMed/MEDLINE, Google Scholar, SYNAPSE) are debatable - they are
+    computational platforms used for literature search methodology rather than research tools in the
+    traditional sense. These could be added if the mining scope includes research methodology tools.
+    
+    The query type "bench" appears to be incorrect for this publication - it should be classified
+    as a review article. This suggests the PubMed query may need refinement to better distinguish
+    between experimental research and review articles.
+    
+    No observations can be extracted since no tools were validated and no Results/Discussion sections
+    are available.

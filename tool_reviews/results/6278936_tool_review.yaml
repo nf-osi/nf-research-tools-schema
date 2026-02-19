@@ -1,0 +1,94 @@
+publicationMetadata:
+  pmid: "6278936"
+  title: "S-100 protein in soft-tissue tumors derived from Schwann cells and melanocytes."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a 1982 pathology study using immunohistochemistry to detect S-100 protein in various tumor types.
+    Expected tools include:
+    - Antibodies (anti-S-100 antibody for immunohistochemical detection)
+    - Potentially tissue samples/specimens (though these are typically not considered "tools")
+    
+    The study uses "peroxidase-antiperoxidase immunohistochemical method" which requires specific antibodies
+    and reagents, but only the abstract is available for analysis.
+  overallAssessment: |
+    This is a laboratory pathology study that would typically use research tools, specifically antibodies
+    for immunohistochemical detection of S-100 protein. The study design involves experimental analysis
+    of tumor specimens using established immunohistochemical methods. However, only the abstract is available,
+    limiting detailed tool identification. The lack of Methods section makes it difficult to identify
+    specific reagents, antibodies, or protocols used.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "S-100 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Using the peroxidase-antiperoxidase immunohistochemical method S-100 was also found in tumors derived from Schwann cells and melanocytes"
+    whyMissed: "The abstract mentions detection of S-100 protein using immunohistochemistry, which requires anti-S-100 antibody, but this wasn't explicitly stated as 'S-100 antibody'"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "peroxidase-antiperoxidase"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Using the peroxidase-antiperoxidase immunohistochemical method S-100 was also found in tumors"
+    whyMissed: "PAP (peroxidase-antiperoxidase) is a specific immunohistochemical detection system/reagent, but may not have been recognized as a tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "immunohistochemical method"
+    toolType: "antibody"
+    examples: ["peroxidase-antiperoxidase immunohistochemical method"]
+    reasoning: "Immunohistochemical methods typically require specific antibodies and detection reagents that should be captured as tools"
+  
+  - patternType: "naming_convention"
+    pattern: "[protein_name] protein.*immunohistochemical|immunohistochemical.*[protein_name] protein"
+    toolType: "antibody"
+    examples: ["S-100 protein...immunohistochemical method"]
+    reasoning: "When proteins are detected by immunohistochemistry, this implies use of specific antibodies against those proteins"
+  
+  - patternType: "term"
+    pattern: "peroxidase-antiperoxidase"
+    toolType: "antibody"
+    examples: ["peroxidase-antiperoxidase immunohistochemical method"]
+    reasoning: "PAP is a specific immunohistochemical detection system that should be captured as a reagent/tool"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear use of immunohistochemical methods
+    - Only abstract available - no Methods section to provide detailed tool information
+    - Publication from 1982 may have different reporting standards for reagent details
+    - Clear evidence of antibody usage (S-100 detection) but not explicitly stated in mineable format
+  recommendations: |
+    This publication clearly describes laboratory research using immunohistochemical methods, which requires
+    specific antibodies and reagents. The mining system missed these tools, likely because:
+    1. Only abstract was available (no detailed Methods section)
+    2. 1982 publication may not follow modern reagent reporting standards
+    3. Tools were described functionally rather than by specific product names
+    
+    Recommendations:
+    - Add patterns to detect immunohistochemical methods as indicators of antibody usage
+    - Consider protein detection contexts as evidence of corresponding antibodies
+    - Improve pattern matching for older publications with different reporting styles
+    - Manual review recommended to determine if S-100 antibody should be added retroactively
+    
+    No observations could be extracted due to lack of Results/Discussion sections.
+    The abstract only provides methodology and general findings without specific quantitative data.

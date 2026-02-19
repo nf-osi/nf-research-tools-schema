@@ -1,0 +1,136 @@
+publicationMetadata:
+  pmid: "27021207"
+  title: "Acceptance and commitment therapy in youth with neurofibromatosis type 1 (NF1) and chronic pain and their parents: A pilot study of feasibility and preliminary efficacy."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (pain scales, functional disability measures, depression/anxiety scales, pain acceptance measures)
+    This type of psychological intervention study would typically use multiple validated questionnaires and scales to measure:
+    - Pain interference and intensity (likely VAS, NRS, or similar pain scales)
+    - Functional disability measures
+    - Depression and anxiety scales (possibly HADS, PHQ-9, GAD-7)
+    - Pain acceptance measures (likely CPAQ - Chronic Pain Acceptance Questionnaire)
+    - Patient satisfaction scales
+    
+    The abstract explicitly mentions "baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety" which strongly suggests validated clinical assessment tools were used.
+  overallAssessment: |
+    This clinical intervention study would definitely be expected to use validated clinical assessment tools. The abstract explicitly states that "Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety" and mentions satisfaction ratings on "1-5 scales." However, the mining found zero tools, which appears to be a significant oversight. Clinical studies like this typically use multiple validated questionnaires and scales that should be captured as clinical assessment tools. The lack of a full Methods section limits detailed validation, but the abstract provides sufficient evidence that assessment tools were used.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "pain interference measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific validated instrument name. Could be BPI (Brief Pain Inventory), PROMIS Pain Interference, or similar validated scale."
+    confidence: 0.85
+    shouldBeAdded: Maybe
+    
+  - toolName: "pain intensity measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific instrument name. Likely VAS (Visual Analog Scale), NRS (Numeric Rating Scale), or similar pain intensity measure."
+    confidence: 0.85
+    shouldBeAdded: Maybe
+    
+  - toolName: "functional disability measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific instrument name. Could be FDI (Functional Disability Inventory), PROMIS Physical Function, or similar validated scale."
+    confidence: 0.80
+    shouldBeAdded: Maybe
+    
+  - toolName: "pain acceptance measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific instrument name. Likely CPAQ (Chronic Pain Acceptance Questionnaire) or similar validated pain acceptance scale."
+    confidence: 0.80
+    shouldBeAdded: Maybe
+    
+  - toolName: "depression measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific instrument name. Could be PHQ-9, BDI-II, HADS-Depression, or similar validated depression scale."
+    confidence: 0.80
+    shouldBeAdded: Maybe
+    
+  - toolName: "anxiety measure"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety..."
+    whyMissed: "Generic term used instead of specific instrument name. Could be GAD-7, STAI, HADS-Anxiety, or similar validated anxiety scale."
+    confidence: 0.80
+    shouldBeAdded: Maybe
+    
+  - toolName: "satisfaction scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Mean satisfaction with the study was moderate to high (3.9 for patients and 4.6 for parents on a 1-5 scales)..."
+    whyMissed: "Mentioned as '1-5 scales' but likely a validated satisfaction questionnaire or custom satisfaction rating scale used in clinical research."
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "completed baseline measures of"
+    toolType: "clinical_assessment_tool"
+    examples: ["Patients and parents completed baseline measures of pain interference, pain intensity, functional disability, pain acceptance, depression, and anxiety"]
+    reasoning: "This phrase strongly indicates the use of validated clinical assessment instruments, even when specific tool names aren't mentioned. Should trigger deeper analysis for clinical assessment tools."
+    
+  - patternType: "context_phrase"
+    pattern: "measures of [clinical_domain]"
+    toolType: "clinical_assessment_tool"
+    examples: ["measures of pain interference", "measures of functional disability", "measures of depression and anxiety"]
+    reasoning: "Pattern indicating clinical measurement instruments. Should be combined with domain-specific keywords (pain, depression, anxiety, function, etc.) to identify assessment tools."
+    
+  - patternType: "context_phrase"
+    pattern: "on a [0-9]+-[0-9]+ scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["on a 1-5 scales"]
+    reasoning: "Indicates use of rating scales or questionnaires with specific scoring ranges. Common in clinical assessment tools and patient-reported outcome measures."
+    
+  - patternType: "term"
+    pattern: "(pain interference|pain intensity|functional disability|pain acceptance)"
+    toolType: "clinical_assessment_tool"
+    examples: ["pain interference", "functional disability", "pain acceptance"]
+    reasoning: "These are specific clinical domains that are typically measured using validated instruments. When mentioned as 'measures of X', they likely represent clinical assessment tools."
+    
+  - patternType: "context_phrase"
+    pattern: "(baseline|follow-up|post-treatment) measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["baseline measures", "post-treatment measures"]
+    reasoning: "Clinical studies use validated instruments for baseline and outcome measurement. This context strongly suggests clinical assessment tools are being used."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely missed clinical assessment tools in a clinical intervention study
+    - Abstract explicitly mentions multiple validated measures but none were captured
+    - Generic terminology used instead of specific instrument names may have caused tools to be missed
+    - Lack of full Methods section limits ability to identify specific validated instruments
+    - This represents a significant gap in clinical assessment tool mining capabilities
+  recommendations: |
+    - All potentially missed tools should be investigated further with access to full text Methods section
+    - The mining patterns need significant improvement for clinical assessment tools
+    - Generic clinical measurement terms should trigger deeper analysis for specific validated instruments
+    - Consider developing domain-specific patterns for pain research, psychological assessment, and functional outcome measures
+    - This publication demonstrates the need for better clinical assessment tool detection, especially when generic terms are used
+    - Future mining should look for phrases like "completed measures of", "baseline assessment", and specific clinical domains
+    - No observations could be extracted due to lack of Results/Discussion sections and no validated tools to link observations to

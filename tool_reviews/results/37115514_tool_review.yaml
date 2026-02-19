@@ -1,0 +1,141 @@
+publicationMetadata:
+  pmid: "37115514"
+  title: "Long-term safety and efficacy of selumetinib in children with neurofibromatosis type 1 on a phase 1/2 trial for inoperable plexiform neurofibromas"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, scales, outcome measures), computational tools for data analysis
+    
+    This phase 1/2 clinical trial would be expected to use:
+    - Clinical assessment tools for measuring patient-reported outcomes (pain scales, quality of life measures)
+    - Computational tools for volumetric imaging analysis and statistical analysis
+    - Potentially imaging analysis software for MRI volumetric measurements
+    
+    Note: Clinical trials typically use validated clinical assessment instruments to measure outcomes,
+    which are legitimate research tools even though they differ from traditional lab tools.
+  overallAssessment: |
+    This clinical trial publication would typically contain clinical assessment tools for measuring patient outcomes.
+    The study specifically mentions patient-reported outcome measures for pain assessment, which are validated research tools.
+    Clinical trials require standardized, validated instruments to measure efficacy and safety endpoints, making tool usage highly likely.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Numeric Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Phase 2 participants completed patient-reported outcome measures assessing tumor pain intensity (Numeric Rating Scale-11) and interference of pain in daily life"
+    whyMissed: "Clinical assessment tool not captured by current mining patterns - specific pain scale with numerical identifier"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "pain interference index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Phase 2 participants completed patient-reported outcome measures assessing tumor pain intensity (Numeric Rating Scale-11) and interference of pain in daily life (pain interference index)"
+    whyMissed: "Clinical assessment tool not captured - pain interference measurement instrument"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "volumetric magnetic resonance imaging analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PN response assessed by volumetric magnetic resonance imaging analysis: Confirmed partial response (cPR) ≥20% decrease from baseline on 2 consecutive evaluations"
+    whyMissed: "Computational analysis method not captured - likely involves specialized imaging software"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Numeric Rating Scale-\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Numeric Rating Scale-11"]
+    reasoning: "Captures numbered pain rating scales commonly used in clinical trials - specific pattern for NRS with numerical identifiers"
+    
+  - patternType: "term"
+    pattern: "pain interference index"
+    toolType: "clinical_assessment_tool"
+    examples: ["pain interference index"]
+    reasoning: "Specific clinical assessment tool for measuring pain impact on daily activities"
+    
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measures? assessing"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcome measures assessing tumor pain intensity"]
+    reasoning: "Context phrase that reliably indicates clinical assessment tool usage in trials"
+    
+  - patternType: "context_phrase"
+    pattern: "volumetric .* imaging analysis"
+    toolType: "computational_tool"
+    examples: ["volumetric magnetic resonance imaging analysis"]
+    reasoning: "Captures computational analysis methods for medical imaging that require specialized software"
+
+observations:
+  - resourceName: "Numeric Rating Scale-11"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # No MP ID for non-phenotypic observations
+    details: |
+      Tumor pain intensity showed durable improvement from baseline to 48 cycles (n = 19, P = .015).
+      This represents sustained pain reduction over extended treatment period in pediatric NF1 patients
+      with plexiform neurofibromas receiving selumetinib treatment.
+    foundIn: "results"
+    contextSnippet: "Tumor pain intensity (n = 19, P = .015) and pain interference (n = 18, P = .0059) showed durable improvement from baseline to 48 cycles"
+    confidence: 0.95
+    doi: "https://doi.org/10.1093/neuonc/noad086"
+    
+  - resourceName: "pain interference index"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # No MP ID for non-phenotypic observations
+    details: |
+      Pain interference in daily life showed durable improvement from baseline to 48 cycles (n = 18, P = .0059).
+      This indicates sustained reduction in pain's impact on daily activities over extended selumetinib treatment
+      in children with NF1-related plexiform neurofibromas.
+    foundIn: "results"
+    contextSnippet: "Tumor pain intensity (n = 19, P = .015) and pain interference (n = 18, P = .0059) showed durable improvement from baseline to 48 cycles"
+    confidence: 0.95
+    doi: "https://doi.org/10.1093/neuonc/noad086"
+    
+  - resourceName: "volumetric magnetic resonance imaging analysis"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # No MP ID for non-phenotypic observations
+    details: |
+      Overall confirmed partial response (cPR) rate was 70% (52/74 children), defined as ≥20% decrease
+      from baseline tumor volume on 2 consecutive evaluations. Responses were generally sustained with
+      59% (44) lasting ≥ 12 cycles, demonstrating durable tumor shrinkage over extended treatment.
+    foundIn: "results"
+    contextSnippet: "For the 74 children (median age 10.3 years; range 3–18.5) enrolled, overall cPR rate was 70% (52/74); median duration of treatment was 57.5 cycles (range 1–100). Responses were generally sustained with 59% (44) lasting ≥ 12 cycles"
+    confidence: 0.90
+    doi: "https://doi.org/10.1093/neuonc/noad086"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 3
+  observationsByType:
+    General Comment or Review: 3
+  majorIssuesFound: |
+    - No tools were mined from this clinical trial publication despite clear usage of clinical assessment tools
+    - Mining patterns appear inadequate for capturing clinical assessment instruments used in trials
+    - Specific pain scales and outcome measures were completely missed
+    - Computational imaging analysis methods not detected
+  recommendations: |
+    This publication demonstrates a significant gap in mining clinical assessment tools from clinical trials.
+    Three legitimate research tools were missed:
+    1. Numeric Rating Scale-11 (validated pain assessment tool)
+    2. Pain interference index (quality of life assessment)
+    3. Volumetric MRI analysis (computational tool for tumor measurement)
+    
+    All three tools should be added to the database as they represent validated research instruments
+    used to measure clinical outcomes. The suggested patterns would help capture similar tools in
+    future clinical trial publications. The observations extracted show meaningful clinical findings
+    related to sustained pain improvement and tumor response over extended treatment periods.

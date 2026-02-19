@@ -1,0 +1,134 @@
+publicationMetadata:
+  pmid: "40737523"
+  title: "Clinician Perspectives of a Magnetic Resonance Imaging-Based 3D Volumetric Analysis Tool for Neurofibromatosis Type 2-Related Schwannomatosis: Qualitative Pilot Study."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95  # Very high confidence - clear survey/interview methodology
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Questionnaire/Survey Development):
+    - Clinical assessment tools: Likert scale questionnaire (25 statements), survey instruments
+    - Computational tools: Survey platforms (Qualtrics), transcription software (Zoom transcription), 
+      qualitative analysis software (Dedoose)
+    
+    This study develops and validates a clinical assessment instrument (Likert scale questionnaire)
+    to evaluate clinician perspectives on 3D volumetric analysis tools. The questionnaire itself
+    is a clinical assessment tool. Additionally, the study uses computational tools for data
+    collection and analysis.
+    
+    Note: While the study discusses a 3D volumetric analysis tool under development, this tool
+    is the SUBJECT of study, not a tool USED in the research methodology.
+  overallAssessment: |
+    This qualitative pilot study develops and validates a clinical assessment instrument (25-statement
+    Likert scale questionnaire) to evaluate clinician perspectives on 3D volumetric analysis tools.
+    The questionnaire itself represents a clinical assessment tool, and the study employs computational
+    tools for survey administration and qualitative data analysis. Tools are expected and present.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Likert scale questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "A Likert scale questionnaire was used to survey clinicians' levels of agreement with 25 statements related to 2D and 3D tumor analyses."
+    whyMissed: "Clinical assessment tools (questionnaires, surveys, scales) may not be captured by current mining patterns focused on lab tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "25-statement questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Surveys were conducted via Qualtrics and included 25 statements organized into eight categories...The survey questions were structured as a Likert scale questionnaire"
+    whyMissed: "Specific questionnaire instruments may not be recognized as research tools by current patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Qualtrics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Surveys were conducted via Qualtrics and included 25 statements organized into eight categories"
+    whyMissed: "Survey platform software may not be included in computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Zoom transcription feature"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Audio recordings from the FGDs and individual interviews were then transcribed verbatim by Zoom's transcription feature"
+    whyMissed: "Transcription software/features may not be captured by current computational tool patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "Dedoose"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The codes assigned to each quote were then reviewed for a final time by the first author as part of entering the coded transcripts using Dedoose"
+    whyMissed: "Qualitative data analysis software may not be included in computational tool mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Likert scale|likert scale|Likert Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Likert scale questionnaire", "structured as a Likert scale questionnaire"]
+    reasoning: "Likert scales are standardized clinical assessment instruments commonly used in research"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire was used to|survey.*to assess|scale.*to measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["A Likert scale questionnaire was used to survey clinicians' levels of agreement"]
+    reasoning: "These phrases indicate active use of assessment instruments in research methodology"
+
+  - patternType: "term"
+    pattern: "Qualtrics|SurveyMonkey|REDCap"
+    toolType: "computational_tool"
+    examples: ["Surveys were conducted via Qualtrics"]
+    reasoning: "Survey platforms are computational tools commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "Dedoose|NVivo|ATLAS\\.ti|MaxQDA"
+    toolType: "computational_tool"
+    examples: ["entering the coded transcripts using Dedoose"]
+    reasoning: "Qualitative data analysis software packages are important computational tools in social science research"
+
+  - patternType: "context_phrase"
+    pattern: "transcribed.*by|transcription feature|transcription software"
+    toolType: "computational_tool"
+    examples: ["transcribed verbatim by Zoom's transcription feature"]
+    reasoning: "Transcription tools are computational resources used for qualitative data processing"
+
+  - patternType: "naming_convention"
+    pattern: "[0-9]+-statement questionnaire|[0-9]+-item scale|[0-9]+-question survey"
+    toolType: "clinical_assessment_tool"
+    examples: ["25-statement questionnaire", "25 statements organized into eight categories"]
+    reasoning: "Numbered questionnaires/scales indicate structured clinical assessment instruments"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite clear presence of research tools
+    - Clinical assessment tools (Likert scale questionnaire) were completely missed
+    - Computational tools for survey administration and qualitative analysis were not captured
+    - Current mining patterns appear to focus heavily on lab tools and miss clinical research tools
+    - This represents a significant gap in tool coverage for clinical/survey research publications
+  recommendations: |
+    Strong recommendations for this publication:
+    - ADD the 5 identified tools that were missed during initial mining
+    - This publication clearly contains legitimate research tools used in the methodology
+    - The Likert scale questionnaire is a validated clinical assessment instrument
+    - Computational tools (Qualtrics, Dedoose, Zoom transcription) are essential research infrastructure
+    - Implement suggested patterns to improve capture of clinical assessment tools and survey platforms
+    - This publication demonstrates need for better coverage of qualitative research methodologies
+    - Consider expanding mining patterns to include survey research and qualitative analysis tools

@@ -1,0 +1,117 @@
+publicationMetadata:
+  pmid: "23356716"
+  title: "Miniaturized handheld confocal microscopy identifies focal brain invasion in a mouse model of aggressive meningioma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content analysis, expected tool types include:
+    - Animal models (mouse models for meningioma research)
+    - Computational tools (confocal imaging devices/software)
+    - Potentially patient-derived models (xenograft models mentioned)
+    
+    This is clearly a laboratory research study involving mouse models and imaging technology.
+    The study tests imaging devices on mouse models of meningioma, which indicates both
+    animal models and computational/imaging tools should be present.
+  overallAssessment: |
+    This is a laboratory research publication that describes testing handheld confocal microscopy
+    devices on mouse models of meningioma. The study clearly involves experimental animal models
+    and imaging technology, making it highly likely to contain research tools. Despite lacking
+    a formal Methods section, the abstract describes experimental procedures using specific
+    mouse models and imaging devices that should have been detected as research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "genetically engineered mouse model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...tested the sensitivity of two handheld confocal imaging devices to detect foci of brain invasion in two types of meningioma mouse models: in a genetically engineered mouse model and in a syngeneic xenograft model..."
+    whyMissed: "This is a clear reference to a genetically engineered mouse model used for meningioma research, but was not detected by the mining algorithm"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "syngeneic xenograft model"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...tested the sensitivity of two handheld confocal imaging devices to detect foci of brain invasion in two types of meningioma mouse models: in a genetically engineered mouse model and in a syngeneic xenograft model..."
+    whyMissed: "This is a xenograft model system used for meningioma research, representing a patient-derived model that was not detected"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "handheld confocal imaging devices"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...we tested the sensitivity of two handheld confocal imaging devices to detect foci of brain invasion in two types of meningioma mouse models..."
+    whyMissed: "These are specialized imaging devices/tools used for microscopic analysis, representing computational/imaging tools that were not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "meningioma mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...detect foci of brain invasion in two types of meningioma mouse models: in a genetically engineered mouse model and in a syngeneic xenograft model. Confocal imaging offered precise images of meningothelial and fibroblastic mouse meningiomas..."
+    whyMissed: "General reference to mouse models specifically developed for meningioma research, which should be captured as animal models"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "genetically engineered mouse model"
+    toolType: "animal_model"
+    examples: ["genetically engineered mouse model"]
+    reasoning: "This exact phrase indicates a genetically modified animal model and should be captured as a research tool"
+
+  - patternType: "context_phrase"
+    pattern: "syngeneic xenograft model"
+    toolType: "patient_derived_model"
+    examples: ["syngeneic xenograft model"]
+    reasoning: "Xenograft models are patient-derived model systems and this specific terminology should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "handheld confocal imaging"
+    toolType: "computational_tool"
+    examples: ["handheld confocal imaging devices"]
+    reasoning: "Specialized imaging devices are computational tools used in research and should be captured when mentioned with specific descriptors"
+
+  - patternType: "naming_convention"
+    pattern: "[disease/tissue] mouse model[s]?"
+    toolType: "animal_model"
+    examples: ["meningioma mouse models"]
+    reasoning: "Disease-specific mouse models follow this naming pattern and represent specialized animal model tools"
+
+  - patternType: "context_phrase"
+    pattern: "mouse model[s]? of [disease/condition]"
+    toolType: "animal_model"
+    examples: ["mouse model of aggressive meningioma"]
+    reasoning: "This pattern captures disease-specific mouse models that are research tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - The publication describes experimental use of mouse models and imaging devices
+    - Mining algorithm failed to detect obvious animal models and computational tools
+    - Abstract contains multiple tool references that should have been captured
+    - Lack of Methods section may have contributed to missed tools, but abstract contains sufficient information
+  recommendations: |
+    Strong recommendations for this publication:
+    - All 4 potentially missed tools should be added to the database
+    - The mining patterns need improvement to capture mouse model terminology
+    - Imaging device terminology should be better recognized
+    - This represents a significant failure of the mining algorithm for a clear lab research publication
+    - The suggested patterns should be implemented to prevent similar misses
+    - Despite lacking detailed Methods, the abstract provides clear evidence of tool usage
+    - This publication demonstrates the need for better pattern recognition for animal models and imaging tools

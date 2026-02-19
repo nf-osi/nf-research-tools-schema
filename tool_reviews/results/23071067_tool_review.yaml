@@ -1,0 +1,105 @@
+publicationMetadata:
+  pmid: "23071067"
+  title: "Genetically mediated Nf1 loss in mice promotes diverse radiation-induced tumors modeling second malignant neoplasms."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - animal experiments, genetic analysis, radiation studies
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool types include:
+    - Animal models: Nf1(+/-) and wild-type mice are clearly mentioned
+    - Genetic reagents: LOH analysis suggests genetic analysis tools/methods
+    - Computational tools: Genetic signature analysis likely requires bioinformatics tools
+    - Potentially clinical assessment tools: If survival/tumor assessment used standardized measures
+    
+    This is clearly a laboratory research study involving mouse models, radiation treatment,
+    genetic analysis, and tumor assessment. The abstract describes experimental procedures
+    that would require multiple research tools, particularly animal models and genetic
+    analysis reagents.
+  overallAssessment: |
+    This is a legitimate laboratory research publication describing experimental studies using
+    mouse models to investigate radiation-induced tumorigenesis. The study involves animal
+    experiments, genetic analysis, and clinical sample examination, which would typically
+    require multiple research tools including animal models, genetic reagents, and potentially
+    computational tools for genetic signature analysis.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...delivered fractionated abdominal irradiation to Nf1(+/-) and wild-type mice. Similar to irradiated cancer survivors, irradiated wild-type and Nf1(+/-) mice developed diverse in-field malignancies..."
+    whyMissed: "This is a genetically modified mouse strain that should be recognized as an animal model. The Nf1(+/-) notation indicates heterozygous knockout mice."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "wild-type mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...delivered fractionated abdominal irradiation to Nf1(+/-) and wild-type mice. Similar to irradiated cancer survivors, irradiated wild-type and Nf1(+/-) mice developed diverse..."
+    whyMissed: "Wild-type control mice are essential research tools in comparative studies. These serve as the control group for the Nf1(+/-) experimental group."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "fractionated abdominal irradiation"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we replicated clinical radiotherapy and delivered fractionated abdominal irradiation to Nf1(+/-) and wild-type mice..."
+    whyMissed: "This represents a specific experimental treatment protocol/method that could be considered a research tool or technique."
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "This pattern would catch heterozygous knockout mouse strains using the standard (+/-) notation, which is commonly used in genetics literature."
+
+  - patternType: "naming_convention"
+    pattern: "\\bwild-type\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["wild-type mice"]
+    reasoning: "Wild-type control mice are fundamental research tools that should be captured when mentioned in experimental contexts."
+
+  - patternType: "context_phrase"
+    pattern: "\\b(delivered|administered|performed)\\s+[^.]+\\s+to\\s+[^.]*mice\\b"
+    toolType: "animal_model"
+    examples: ["delivered fractionated abdominal irradiation to Nf1(+/-) and wild-type mice"]
+    reasoning: "This pattern would help identify experimental procedures performed on animal models, indicating active use of research animals."
+
+  - patternType: "term"
+    pattern: "\\b(LOH|loss of heterozygosity)\\b"
+    toolType: "genetic_reagent"
+    examples: ["LOH of NF1", "loss of heterozygosity"]
+    reasoning: "LOH analysis represents a specific genetic analysis technique that should be captured as a research method/tool."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Nf1(+/-) mice, wild-type mice, fractionated irradiation
+  newPatternsCount: 4  # Mouse strain patterns, wild-type pattern, experimental context, LOH pattern
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Missing Methods section limits detailed tool identification, but abstract contains sufficient evidence
+    - Animal models (Nf1(+/-) mice, wild-type mice) were completely missed by mining algorithms
+    - Genetic analysis techniques (LOH analysis) were not captured
+    - This represents a significant false negative - legitimate research tools were not detected
+  recommendations: |
+    Strong recommendations for this publication:
+    - ADD the missed animal models: Nf1(+/-) mice and wild-type mice are clearly research tools
+    - Consider adding LOH analysis as a genetic analysis technique
+    - Implement suggested patterns to catch similar mouse strain nomenclature in future mining
+    - This publication demonstrates gaps in animal model detection, particularly for genetic strain notation
+    - The mining system needs improvement for detecting standard laboratory animal nomenclature
+    - Despite lacking full-text sections, the abstract provides sufficient evidence for tool identification
+    - This case highlights the importance of comprehensive pattern matching for animal model detection

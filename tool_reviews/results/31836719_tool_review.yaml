@@ -1,0 +1,79 @@
+publicationMetadata:
+  pmid: "31836719"
+  title: "Engaging a community to enable disease-centric data sharing with the NF Data Portal."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Other"  # This is a data portal/infrastructure paper
+  publicationTypeConfidence: 0.95  # Very confident - clearly about data sharing infrastructure
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a data portal/infrastructure paper describing the development of the NF Data Portal
+    for neurofibromatosis research data sharing. Such papers typically:
+    - Describe data sharing platforms and web portals (computational tools)
+    - May mention analysis software used in the portal
+    - Focus on community engagement and data governance rather than experimental tools
+    
+    Expected tool types: Possibly computational tools (web applications, databases)
+    Unlikely tool types: Lab research tools (antibodies, cell lines, animal models, genetic reagents, organoids, PDX)
+    Very unlikely: Clinical assessment tools (this is about data sharing, not patient assessment)
+  overallAssessment: |
+    This publication describes the development of a data sharing portal for the neurofibromatosis research community.
+    It focuses on community engagement and data governance rather than experimental research methods.
+    While it might mention computational infrastructure (databases, web applications), it would not typically
+    contain traditional research tools like antibodies, cell lines, or clinical assessment instruments.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "NF Data Portal"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...stakeholders from the neurofibromatosis (NF) research community collaborated to develop a disease-focused data portal with the goal of supporting scientists..."
+    whyMissed: "The NF Data Portal itself is a computational tool (web application/database) that was developed as the main subject of this paper, but may not have been caught by mining patterns focused on traditional research tools"
+    confidence: 0.85  # High confidence this is a legitimate computational tool
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "data portal"
+    toolType: "computational_tool"
+    examples: ["NF Data Portal"]
+    reasoning: "Data portals are computational tools (web applications/databases) that enable data sharing and analysis. This pattern would catch disease-specific or research-focused data portals that serve as research infrastructure."
+  - patternType: "context_phrase"
+    pattern: "developed.*portal"
+    toolType: "computational_tool"
+    examples: ["developed a disease-focused data portal"]
+    reasoning: "Context phrases indicating portal development would help identify computational tools that are web-based platforms for data sharing or analysis."
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}\\s+Data\\s+Portal"
+    toolType: "computational_tool"
+    examples: ["NF Data Portal"]
+    reasoning: "Disease or research area acronyms followed by 'Data Portal' represent computational tools for data sharing and analysis in specific research domains."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1  # NF Data Portal
+  newPatternsCount: 3  # Patterns for data portals
+  observationsExtracted: 0  # No tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is about data sharing infrastructure, not experimental research
+    - Only abstract available - no Methods, Results, or Discussion sections
+    - Zero tools were mined, but the NF Data Portal itself is a computational tool that was missed
+    - This type of publication (data portal/infrastructure) requires different mining patterns
+  recommendations: |
+    This publication describes the development of the NF Data Portal, which is itself a computational tool
+    (web application/database) that should have been captured. The mining patterns appear to miss
+    infrastructure tools like data portals, databases, and web applications.
+    
+    Recommendations:
+    1. Add the NF Data Portal as a computational tool (web application/database type)
+    2. Implement suggested patterns to catch data portals and similar infrastructure tools
+    3. Consider that infrastructure papers may contain fewer traditional research tools
+    4. No experimental observations can be extracted due to lack of Results/Discussion sections
+    5. This publication type (infrastructure/data sharing) should be recognized as potentially containing computational tools even without traditional experimental methods

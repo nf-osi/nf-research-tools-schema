@@ -1,0 +1,191 @@
+publicationMetadata:
+  pmid: "39321200"
+  title: "Multidimensional Immunotyping of Human NF1-Associated Peripheral Nerve Sheath Tumors Uncovers Tumor-Associated Macrophages as Key Drivers of Immune Evasion in the Tumor Microenvironment"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the experimental design described (immunohistochemistry, multiparameter flow cytometry, 
+    and comparative transcriptomic studies), this publication should contain:
+    - Antibodies (for IHC and flow cytometry targeting CD163, PD-1, PD-L1, H3K27me3)
+    - Computational tools (for transcriptomic analysis and data processing)
+    - Potentially clinical assessment tools (for progression-free survival analysis)
+    
+    The study involves fresh and FFPE tissue analysis with multiple experimental techniques,
+    indicating substantial tool usage that was not captured by the initial mining.
+  overallAssessment: |
+    This is a laboratory research study with clear experimental methods that would require multiple 
+    research tools. The study uses immunohistochemistry, flow cytometry, and transcriptomics - all 
+    techniques that require specific antibodies and computational analysis tools. The complete absence 
+    of mined tools suggests significant under-detection by the mining algorithm.
+
+toolValidations: []  # No tools were initially mined
+
+potentiallyMissedTools:
+  - toolName: "CD163 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...infiltrating myeloid cells, particularly CD163+ tumor-associated macrophages (TAM)..."
+    whyMissed: "Antibody target mentioned without explicit 'antibody' keyword - mining likely missed CD163 as a marker requiring antibody detection"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PD-1 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...T cells within MPNST exhibited signs of tumor activation, characterized by high programmed cell death 1 expression..."
+    whyMissed: "PD-1 expression measurement requires antibody but was mentioned as 'programmed cell death 1 expression' rather than direct antibody reference"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PD-L1 antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...MPNST specimens demonstrated elevated levels of immunosuppressive TAM, with heightened PD-L1 expression..."
+    whyMissed: "PD-L1 expression measurement requires antibody detection but mentioned only as expression level"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "H3K27me3 antibody"
+    toolType: "antibody"
+    foundIn: "results"
+    contextSnippet: "...loss of H3K27 trimethylation correlated with low immune cell infiltration in MPNST..."
+    whyMissed: "H3K27 trimethylation detection requires specific antibody but mentioned only as epigenetic modification"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Flow cytometry"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...we dissected the TIME by using immunohistochemistry, multiparameter flow cytometry, and comparative transcriptomic studies..."
+    whyMissed: "Flow cytometry mentioned as technique but analysis software/tools not explicitly named"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "Transcriptomic analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...multiparameter flow cytometry, and comparative transcriptomic studies..."
+    whyMissed: "Transcriptomic studies require bioinformatics tools but specific software not mentioned in available text"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\b(CD\\d+)\\+?\\s+(tumor-associated macrophages|TAM|cells|expression)"
+    toolType: "antibody"
+    examples: ["CD163+ tumor-associated macrophages", "CD163+ myeloid cells"]
+    reasoning: "CD markers followed by cell type or expression context strongly indicate antibody usage for detection"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(PD-1|PD-L1|programmed cell death)\\s+(expression|positive|negative|high|low)"
+    toolType: "antibody"
+    examples: ["high programmed cell death 1 expression", "heightened PD-L1 expression"]
+    reasoning: "Immune checkpoint molecule expression measurements require specific antibodies"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(H3K\\d+me\\d+|histone modification)\\s+(trimethylation|methylation|loss|expression)"
+    toolType: "antibody"
+    examples: ["H3K27 trimethylation", "loss of H3K27 trimethylation"]
+    reasoning: "Histone modification detection requires specific antibodies against modified histones"
+
+  - patternType: "context_phrase"
+    pattern: "multiparameter flow cytometry|comparative transcriptomic studies"
+    toolType: "computational_tool"
+    examples: ["multiparameter flow cytometry", "comparative transcriptomic studies"]
+    reasoning: "These techniques require specialized analysis software that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "progression-free survival|overall survival|clinical outcome"
+    toolType: "clinical_assessment_tool"
+    examples: ["progression-free survival"]
+    reasoning: "Clinical outcome measures may involve validated assessment tools or scales"
+
+observations:
+  - resourceName: "CD163 antibody"
+    resourceType: "Antibody"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The proportion of CD163+ myeloid cells within the tumor immune microenvironment (TIME) 
+      correlated with poorer progression-free survival in patients with MPNST. This indicates 
+      that higher levels of CD163+ tumor-associated macrophages are associated with worse 
+      clinical outcomes and potentially more aggressive tumor behavior.
+    foundIn: "results"
+    contextSnippet: "The proportion of CD163+ myeloid cells within the TIME correlated with poorer progression free survival."
+    confidence: 0.90
+    doi: "10.1158/1078-0432.CCR-24-1454"
+
+  - resourceName: "PD-L1 antibody"
+    resourceType: "Antibody"
+    observationType: "Immune System"
+    observationTypeOntologyId: "MP:0005387"
+    details: |
+      MPNST specimens demonstrated elevated levels of immunosuppressive tumor-associated 
+      macrophages with heightened PD-L1 expression. This elevated PD-L1 expression is 
+      associated with inferior clinical outcomes and contributes to the immunosuppressive 
+      microenvironment that characterizes malignant transformation.
+    foundIn: "both"
+    contextSnippet: "MPNST specimens demonstrated elevated levels of immunosuppressive TAM, with heightened PD-L1 expression...associated with inferior outcomes."
+    confidence: 0.85
+    doi: "10.1158/1078-0432.CCR-24-1454"
+
+  - resourceName: "PD-1 antibody"
+    resourceType: "Antibody"
+    observationType: "Immune System"
+    observationTypeOntologyId: "MP:0005387"
+    details: |
+      T cells within MPNST exhibited signs of tumor activation, characterized by high 
+      programmed cell death 1 (PD-1) expression. This high PD-1 expression indicates 
+      T cell exhaustion and dysfunction within the tumor microenvironment.
+    foundIn: "results"
+    contextSnippet: "The T cells within MPNST exhibited signs of tumor activation, characterized by high PD-1 expression."
+    confidence: 0.85
+    doi: "10.1158/1078-0432.CCR-24-1454"
+
+  - resourceName: "H3K27me3 antibody"
+    resourceType: "Antibody"
+    observationType: "Immune System"
+    observationTypeOntologyId: "MP:0005387"
+    details: |
+      Loss of H3K27 trimethylation correlated with low immune cell infiltration in MPNST. 
+      This epigenetic modification appears to be associated with reduced immune cell 
+      recruitment or retention within the tumor microenvironment.
+    foundIn: "results"
+    contextSnippet: "Notably, loss of H3K27 trimethylation correlated with low immune cell infiltration in MPNST."
+    confidence: 0.80
+    doi: "10.1158/1078-0432.CCR-24-1454"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Tumor Growth: 1
+    Immune System: 3
+  majorIssuesFound: |
+    - Complete failure of mining algorithm to detect any tools despite clear experimental study
+    - Multiple antibodies used for immunohistochemistry and flow cytometry not detected
+    - Computational tools for transcriptomic analysis not captured
+    - Pattern matching appears to miss protein markers when mentioned without explicit "antibody" keyword
+    - Expression-based mentions (CD163+, PD-L1 expression) not recognized as antibody usage
+  recommendations: |
+    This publication represents a significant mining failure - it's a clear laboratory research study 
+    with multiple experimental techniques that require specific research tools, yet none were detected. 
+    The mining algorithm needs substantial improvement to capture:
+    
+    1. Protein markers mentioned in expression context (CD163+, PD-L1 expression) as antibody usage
+    2. Immune checkpoint molecules (PD-1, PD-L1) that require antibody detection
+    3. Epigenetic modifications (H3K27me3) that require specific antibodies
+    4. Computational tools implied by transcriptomic studies
+    
+    All 6 potentially missed tools should be added to improve coverage. The suggested patterns 
+    would significantly improve detection of immunology-focused research tools. The extracted 
+    observations provide valuable scientific insights about tumor-associated macrophages and 
+    immune evasion mechanisms in NF1-associated tumors.

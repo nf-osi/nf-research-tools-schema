@@ -1,0 +1,157 @@
+publicationMetadata:
+  pmid: "37328102"
+  title: "Inhibition of Erb-B2 Receptor Tyrosine Kinase 3 and Associated Regulatory Pathways Potently Impairs Malignant Peripheral Nerve Sheath Tumor Proliferation and Survival"
+  queryType: "unknown"  # Not specified in input data
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content, this is clearly a laboratory research study that should contain:
+    - Cell lines (MPNST cell lines and Schwann cells mentioned)
+    - Genetic reagents (shRNA screens mentioned)
+    - Computational tools (kinomic and microarray analyses mentioned)
+    - Chemical compounds/inhibitors (multiple drug inhibitors mentioned: canertinib, sapitinib, saracatinib, AZD1208, trifluoperazine)
+    
+    The study involves molecular biology techniques, cell culture, drug screening, and genomic analyses,
+    all of which typically require specific research tools and reagents.
+  overallAssessment: |
+    This publication describes laboratory research involving MPNST cell lines, drug screening, and molecular
+    analyses. The abstract mentions specific techniques (shRNA screens, kinomic analysis, microarray analysis)
+    and multiple drug compounds, indicating extensive use of research tools. The absence of mined tools suggests
+    significant under-mining, likely because only the abstract was available for analysis rather than full text.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "canertinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...inhibition of upstream (canertinib, sapitinib, saracatinib, and calmodulin) and parallel (AZD1208) signaling pathways..."
+    whyMissed: "Drug inhibitor mentioned multiple times in abstract but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "sapitinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...inhibition of upstream (canertinib, sapitinib, saracatinib, and calmodulin) and parallel (AZD1208) signaling pathways..."
+    whyMissed: "Drug inhibitor mentioned multiple times in abstract but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "saracatinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...inhibition of upstream (canertinib, sapitinib, saracatinib, and calmodulin) and parallel (AZD1208) signaling pathways..."
+    whyMissed: "Src family kinase inhibitor mentioned multiple times but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "AZD1208"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...inhibition of upstream (canertinib, sapitinib, saracatinib, and calmodulin) and parallel (AZD1208) signaling pathways..."
+    whyMissed: "PIM kinase inhibitor mentioned multiple times but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "trifluoperazine"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...calmodulin [trifluoperazine (TFP)], or proviral integration site of Moloney murine leukemia kinase (AZD1208) inhibition..."
+    whyMissed: "Calmodulin inhibitor with abbreviation TFP mentioned but not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...erbB3 is commonly expressed in MPNSTs and MPNST cell lines and that erbB3 knockdown inhibits MPNST proliferation..."
+    whyMissed: "Cell lines mentioned but generic term not captured by specific cell line naming patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Kinomic and microarray analyses of Schwann and MPNST cells implicate Src- and erbB3-mediated..."
+    whyMissed: "Primary cell type mentioned in experimental context but not captured"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "shRNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...previous studies used genome-scale shRNA screens that implicated the neuregulin-1 receptor..."
+    whyMissed: "Genetic screening tool mentioned but not captured by current patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z]{2,}[0-9]{3,4}\\b"
+    toolType: "genetic_reagent"
+    examples: ["AZD1208", "canertinib", "sapitinib"]
+    reasoning: "Many drug inhibitors follow alphanumeric naming conventions that could be captured with this pattern"
+
+  - patternType: "context_phrase"
+    pattern: "inhibitor|inhibition|antagonist|agonist"
+    toolType: "genetic_reagent"
+    examples: ["canertinib inhibitor", "saracatinib inhibition", "TFP inhibition"]
+    reasoning: "Drug compounds are often mentioned with inhibitor/inhibition context that could help identify chemical tools"
+
+  - patternType: "term"
+    pattern: "\\bshRNA\\b|\\bsiRNA\\b|\\bmiRNA\\b"
+    toolType: "genetic_reagent"
+    examples: ["shRNA screens", "shRNA knockdown"]
+    reasoning: "RNA interference tools are commonly used genetic reagents that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "cell lines?|cells? lines?|cultured cells?"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines", "Schwann cells"]
+    reasoning: "Generic cell line mentions could be captured when followed by specific cell type names"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z]+tinib\\b"
+    toolType: "genetic_reagent"
+    examples: ["canertinib", "sapitinib"]
+    reasoning: "Many kinase inhibitors end in '-tinib' suffix and represent important chemical tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined despite clear evidence of extensive tool usage in the abstract
+    - Only abstract text was available for analysis, missing Methods section that would contain detailed tool information
+    - Multiple drug inhibitors (canertinib, sapitinib, saracatinib, AZD1208, trifluoperazine) mentioned but not captured
+    - Cell lines (MPNST cell lines, Schwann cells) mentioned but not identified
+    - Genetic reagents (shRNA) mentioned but not captured
+    - This represents significant under-mining of a tool-rich laboratory research publication
+  recommendations: |
+    This publication should be re-mined with improved patterns to capture:
+    1. Drug inhibitors and chemical compounds (canertinib, sapitinib, saracatinib, AZD1208, trifluoperazine)
+    2. Genetic reagents (shRNA screens)
+    3. Cell lines (MPNST cell lines, Schwann cells)
+    
+    The mining patterns need enhancement to capture:
+    - Alphanumeric drug names (AZD1208 pattern)
+    - Kinase inhibitors ending in '-tinib'
+    - RNA interference tools (shRNA, siRNA)
+    - Generic cell line mentions with specific cell types
+    
+    Full text access would significantly improve tool identification as Methods sections typically
+    contain detailed protocols and reagent information. The abstract-only analysis likely missed
+    many additional tools that would be present in the complete manuscript.
+    
+    No observations could be extracted since no tools were validated and Results/Discussion sections
+    were not available.

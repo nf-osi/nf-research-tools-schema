@@ -1,0 +1,227 @@
+publicationMetadata:
+  pmid: "40217315"
+  title: "A single-cell atlas of Schwannoma across genetic backgrounds and anatomic locations."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research publication focused on single-cell RNA sequencing analysis of schwannoma tumors.
+    Expected tool types include:
+    - Antibodies (for cell sorting and immunohistochemistry)
+    - Computational tools (for scRNA-seq analysis, data processing, statistical analysis)
+    - Genetic reagents (cell dissociation kits, fluorescent dyes)
+    - Advanced cellular models (primary tumor cells, single-cell suspensions)
+    
+    The publication involves extensive wet lab procedures (tumor dissociation, cell sorting, immunostaining) 
+    and computational analysis (scRNA-seq processing, clustering, differential expression), making it highly 
+    likely to contain multiple research tools across several categories.
+  overallAssessment: |
+    This is a comprehensive single-cell RNA sequencing study that should contain numerous research tools.
+    The detailed Methods section describes extensive experimental procedures including tumor processing,
+    cell sorting with multiple antibodies, single-cell sequencing, and computational analysis pipelines.
+    The absence of mined tools suggests significant gaps in the mining process rather than lack of tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CD45-Vioblue"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Tumors were stained first with CD45-Vioblue direct antibody conjugate (clone REA747, Miltenyi Biotec) for 30 min at 4°C"
+    whyMissed: "Antibody with specific clone and vendor information not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD24-APC"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD24-APC (human antibody, clone REA832, Miltenyi Biotec) and CD44-VioBlue (human antibody, clone REA690, Miltenyi Biotec)"
+    whyMissed: "Flow cytometry antibody with clone and vendor details not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD44-VioBlue"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD24-APC (human antibody, clone REA832, Miltenyi Biotec) and CD44-VioBlue (human antibody, clone REA690, Miltenyi Biotec)"
+    whyMissed: "Flow cytometry antibody with clone and vendor details not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-HLA Class I ABC antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "HLA-B (anti-HLA Class I ABC antibody, ab225636, Abcam, Cambridge, UK) for MHC I"
+    whyMissed: "Immunohistochemistry antibody with catalog number and vendor not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-MHC Class II antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "DPB1 (anti-MHC Class II antibody, ab55152, Abcam, Cambridge, UK) for MHC II"
+    whyMissed: "Immunohistochemistry antibody with catalog number and vendor not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Smart-seq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Smart-seq2 whole transcriptome amplification, library construction, and sequencing were performed as previously published"
+    whyMissed: "Single-cell RNA sequencing protocol/method not captured by computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "igraph"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We performed Louvain clustering on the centered matrix with the top 7000 genes using the "igraph" package with default parameters"
+    whyMissed: "R package name in quotes not detected by software mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "scdDblFinder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Doublets were identified by combining the results of two methods that were published recently and implemented in R packages—scdDblFinder"
+    whyMissed: "R package for doublet detection not captured by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "scran"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "scdDblFinder and the doubletCells algorithm from scran"
+    whyMissed: "R package for single-cell analysis not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "QuPath"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quantification of staining intensity was performed in QuPath"
+    whyMissed: "Image analysis software not captured by computational tool mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "papain-based tumor dissociation kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tumors were mechanically and enzymatically dissociated using a papain-based tumor dissociation kit (Miltenyi Biotec)"
+    whyMissed: "Commercial reagent kit with vendor information not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "calcein AM"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "1 mL of BSA/HBSS containing 1 mM calcein AM (Life Technologies) and 0.33 mM TO-PRO-3 iodide"
+    whyMissed: "Fluorescent viability dye with vendor not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TO-PRO-3 iodide"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "1 mL of BSA/HBSS containing 1 mM calcein AM (Life Technologies) and 0.33 mM TO-PRO-3 iodide (Life Technologies)"
+    whyMissed: "Fluorescent dead cell dye with vendor not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FACS Aria Fusion Special Order System"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sorting was performed with the FACS Aria Fusion Special Order System (Becton Dickinson)"
+    whyMissed: "Flow cytometry instrument with vendor not detected"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "antibody.*clone.*[A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["CD45-Vioblue direct antibody conjugate (clone REA747", "CD24-APC (human antibody, clone REA832"]
+    reasoning: "Many antibodies are described with clone information that provides strong evidence of actual reagent usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*(?:Miltenyi Biotec|Life Technologies|Abcam|Becton Dickinson)[^)]*\\)"
+    toolType: "general"
+    examples: ["(Miltenyi Biotec)", "(Life Technologies)", "(ab225636, Abcam, Cambridge, UK)"]
+    reasoning: "Vendor names in parentheses strongly indicate commercial reagents and tools being used"
+
+  - patternType: "term"
+    pattern: "ab[0-9]{5,6}"
+    toolType: "antibody"
+    examples: ["ab225636", "ab55152"]
+    reasoning: "Abcam catalog numbers follow this pattern and indicate specific antibody products"
+
+  - patternType: "context_phrase"
+    pattern: "using the [\"']([^\"']+)[\"'] package"
+    toolType: "computational_tool"
+    examples: ["using the \"igraph\" package"]
+    reasoning: "R/Python packages mentioned in quotes with 'using' context indicates computational tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "Smart-seq[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Smart-seq2"]
+    reasoning: "Single-cell RNA sequencing protocols follow this naming pattern"
+
+  - patternType: "context_phrase"
+    pattern: "performed in ([A-Z][a-zA-Z]+)"
+    toolType: "computational_tool"
+    examples: ["performed in QuPath"]
+    reasoning: "Software tools often mentioned with 'performed in' context for analysis"
+
+  - patternType: "term"
+    pattern: "calcein AM|TO-PRO-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["calcein AM", "TO-PRO-3"]
+    reasoning: "Common fluorescent dyes used in cell viability and flow cytometry assays"
+
+  - patternType: "context_phrase"
+    pattern: "dissociation kit.*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["papain-based tumor dissociation kit (Miltenyi Biotec)"]
+    reasoning: "Commercial kits for tissue processing with vendor information"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite extensive experimental methods
+    - Publication contains detailed Methods section with numerous research tools
+    - Multiple antibodies with clone numbers and vendors completely missed
+    - Computational tools (R packages, analysis software) not detected
+    - Commercial reagents and kits with vendor information not captured
+    - Single-cell RNA sequencing protocols not recognized
+    - Flow cytometry reagents and instruments not identified
+  recommendations: |
+    This publication represents a major failure of the mining system. Despite being a comprehensive
+    laboratory research study with extensive experimental methods, zero tools were detected.
+    
+    IMMEDIATE ACTIONS NEEDED:
+    1. Add all 14 identified tools to the database - they represent clear research tools with vendor/catalog information
+    2. Implement the 8 suggested patterns to capture similar tools in future mining
+    3. Review mining patterns for antibodies - multiple clear examples were missed
+    4. Improve computational tool detection for R packages and analysis software
+    5. Add patterns for commercial reagent kits and fluorescent dyes
+    
+    TOOL CATEGORIES COMPLETELY MISSED:
+    - Antibodies: 5 clear examples with clones and catalog numbers
+    - Computational tools: 5 software packages and analysis tools
+    - Genetic reagents: 4 commercial reagents and kits
+    
+    This publication should serve as a test case for validating improved mining patterns.
+    The high-quality Methods section provides excellent examples of how research tools are
+    typically described in scientific literature.

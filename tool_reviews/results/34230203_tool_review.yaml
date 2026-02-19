@@ -1,0 +1,111 @@
+publicationMetadata:
+  pmid: "34230203"
+  title: "Patient Report of Hearing in Neurofibromatosis Type 2: Recommendations for Clinical Trials."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a systematic evaluation of patient-reported outcome measures (clinical assessment tools).
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, patient-reported outcome measures)
+    - Possibly computational tools for systematic review/analysis
+    
+    The publication specifically evaluates 21 different hearing-related assessment instruments
+    (10 for hearing function, 11 for hearing-related quality of life) and recommends specific
+    tools for NF2 clinical trials. These are legitimate clinical assessment tools that should
+    have been captured by the mining process.
+  overallAssessment: |
+    This publication is a systematic evaluation of clinical assessment tools for hearing function
+    and quality of life in NF2 patients. It should contain multiple validated clinical assessment
+    tools as the entire purpose is to review and recommend specific patient-reported outcome measures.
+    The mining process appears to have completely missed the clinical assessment tools that are
+    the primary focus of this study.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Self-Assessment of Communication"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Self-Assessment of Communication and the Self-Assessment of Communication-Adolescent were identified as most useful for adult and pediatric populations with NF2, respectively, for the measurement of both hearing function and hearing-related QoL."
+    whyMissed: "This is the primary recommended clinical assessment tool but was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Self-Assessment of Communication-Adolescent"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Self-Assessment of Communication and the Self-Assessment of Communication-Adolescent were identified as most useful for adult and pediatric populations with NF2, respectively, for the measurement of both hearing function and hearing-related QoL."
+    whyMissed: "This is the primary recommended pediatric clinical assessment tool but was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "REiNS rating procedures"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The REiNS Patient-Reported Outcomes Working Group systematically evaluated published patient-reported outcome measures of (1) hearing function and (2) hearing-related QoL for individuals with hearing loss of various etiologies using previously published REiNS rating procedures."
+    whyMissed: "This is a systematic evaluation methodology/tool used for assessment but was not captured"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Self-Assessment of Communication"
+    toolType: "clinical_assessment_tool"
+    examples: ["Self-Assessment of Communication", "Self-Assessment of Communication-Adolescent"]
+    reasoning: "This is a validated hearing assessment questionnaire that should be captured as a clinical assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["systematically evaluated published patient-reported outcome measures"]
+    reasoning: "Publications discussing patient-reported outcome measures often contain specific clinical assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "measures were numerically scored"
+    toolType: "clinical_assessment_tool"
+    examples: ["Measures were numerically scored and compared primarily on their participant characteristics"]
+    reasoning: "This phrase indicates systematic evaluation of clinical assessment instruments"
+
+  - patternType: "context_phrase"
+    pattern: "recommends.*for the assessment of"
+    toolType: "clinical_assessment_tool"
+    examples: ["REiNS recommends the Self-Assessment of Communication adult and adolescent forms for the assessment of patient-reported hearing function"]
+    reasoning: "Recommendation statements often identify specific clinical assessment tools being endorsed"
+
+  - patternType: "naming_convention"
+    pattern: ".*Assessment.*Communication.*"
+    toolType: "clinical_assessment_tool"
+    examples: ["Self-Assessment of Communication", "Self-Assessment of Communication-Adolescent"]
+    reasoning: "Many clinical assessment tools follow naming patterns with 'Assessment' and domain-specific terms"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining process completely failed to identify clinical assessment tools in a publication specifically about evaluating clinical assessment tools
+    - The abstract and methods clearly mention specific validated instruments (Self-Assessment of Communication, Self-Assessment of Communication-Adolescent)
+    - This represents a significant gap in clinical assessment tool mining patterns
+    - The publication evaluates 21 different hearing-related assessment measures but none were captured
+  recommendations: |
+    This publication should have captured multiple clinical assessment tools as it is entirely focused on
+    evaluating patient-reported outcome measures for hearing function and quality of life. The mining
+    patterns for clinical assessment tools need significant improvement to capture:
+    1. Specific validated questionnaire names (Self-Assessment of Communication)
+    2. Context phrases indicating systematic evaluation of assessment tools
+    3. Recommendation statements for clinical trial endpoints
+    
+    All three potentially missed tools should be added to the database. The suggested patterns should
+    be implemented to improve future mining of clinical assessment tool publications. This represents
+    a clear case where the mining process failed to identify the primary research tools that are the
+    entire focus of the publication.

@@ -1,0 +1,124 @@
+publicationMetadata:
+  pmid: "7474134"
+  title: "Frequent disruption of the Nf1 gene by a novel murine AIDS virus-related provirus in BXH-2 murine myeloid lymphomas."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - molecular virology research
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a 1995 molecular virology study investigating viral integration sites in murine myeloid lymphomas.
+    Expected tools include:
+    - Animal models: BXH-2 mice (recombinant inbred strain)
+    - Genetic reagents: oligonucleotide probes, viral constructs
+    - Cell lines: potentially myeloid lymphoma cell lines
+    - Molecular biology reagents: probes, primers for characterization
+    
+    Note: Only abstract is available, which limits tool detection. Full methods section would likely
+    contain detailed experimental procedures and reagents.
+  overallAssessment: |
+    This is a legitimate laboratory research publication from 1995 investigating viral integration
+    mechanisms in mouse lymphomas. The study involves molecular characterization of proviruses and
+    their integration sites, which would typically require various research tools including animal
+    models, molecular probes, and genetic reagents. However, only the abstract is available, severely
+    limiting tool detection capabilities.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "BXH-2 mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Evi-2, a common site of viral integration in BXH-2 myeloid lymphomas, is located within a large intron of the Nf1 tumor suppressor gene"
+    whyMissed: "BXH-2 is a well-established recombinant inbred mouse strain used in cancer research, but may not have been recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "oligonucleotide probes"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "By using oligonucleotide probes specific for this defective provirus, designated MRV, we showed that MRV-related proviruses are carried as endogenous germ line proviruses"
+    whyMissed: "Generic term 'oligonucleotide probes' may not have specific enough patterns for detection"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MRV provirus"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "oligonucleotide probes specific for this defective provirus, designated MRV"
+    whyMissed: "Novel viral construct/reagent developed in this study, may lack established naming patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "inbred mouse strains"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "MRV-related proviruses are carried as endogenous germ line proviruses in most inbred strains"
+    whyMissed: "Generic reference to multiple inbred strains without specific strain names"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "BXH-[0-9]+ (mice|strain)"
+    toolType: "animal_model"
+    examples: ["BXH-2 myeloid lymphomas", "BXH-2 mice"]
+    reasoning: "BXH recombinant inbred strains are commonly used in cancer genetics research and follow this naming pattern"
+
+  - patternType: "context_phrase"
+    pattern: "oligonucleotide probes? (specific for|targeting|against)"
+    toolType: "genetic_reagent"
+    examples: ["oligonucleotide probes specific for this defective provirus"]
+    reasoning: "Oligonucleotide probes are fundamental molecular biology tools, especially when described with specificity"
+
+  - patternType: "term"
+    pattern: "(provirus|proviral) (designated|named|called) [A-Z]{2,4}"
+    toolType: "genetic_reagent"
+    examples: ["defective provirus, designated MRV"]
+    reasoning: "Novel viral constructs or reagents are often designated with short acronyms and represent research tools"
+
+  - patternType: "context_phrase"
+    pattern: "common (viral )?integration site[s]?"
+    toolType: "genetic_reagent"
+    examples: ["common site of viral integration", "common integration sites"]
+    reasoning: "Integration sites like Evi-2 are genetic loci used as research tools for studying oncogenesis"
+
+  - patternType: "naming_convention"
+    pattern: "Evi-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["Evi-2, a common site of viral integration"]
+    reasoning: "Evi (ecotropic viral integration) sites are established genetic loci used in cancer research"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text is available, limiting comprehensive tool detection
+    - BXH-2 mice (established animal model) was not detected
+    - Oligonucleotide probes (genetic reagents) were not detected
+    - Novel viral constructs (MRV provirus) were not detected
+    - Missing full-text sections (Methods, Results) that would contain detailed tool information
+  recommendations: |
+    This publication clearly describes laboratory research involving multiple research tools that were
+    not detected by the mining process. Key recommendations:
+    
+    1. Add patterns for BXH recombinant inbred mouse strains - these are established animal models
+    2. Improve detection of oligonucleotide probes and molecular biology reagents
+    3. Add patterns for viral integration sites (Evi-2) which are genetic research tools
+    4. Consider novel viral constructs (MRV) as genetic reagents when specifically designated
+    5. The mining system should be more sensitive to tool mentions in abstracts when full text unavailable
+    
+    This case highlights the importance of having access to full-text articles, particularly Methods
+    sections, for comprehensive tool detection. The abstract alone contains evidence of at least 3-4
+    research tools that should have been detected.

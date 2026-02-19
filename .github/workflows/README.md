@@ -81,7 +81,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ### 2. Check Tool Coverage (check-tool-coverage.yml)
 
-**Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation
+**Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation, quality filtering, and completeness scoring
 
 **Trigger**:
 - When PR from `review-tool-annotations` is merged
@@ -91,41 +91,60 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 1. **Runs TWO PubMed queries in parallel** to capture all tool types:
    - **Bench science query**: Lab tools, computational tools, organoids, PDX models
    - **Clinical assessment query**: Questionnaires, scales, patient-reported outcomes
-2. **Merges publication lists** by PMID, preserving query_type tags:
-   - Publications in both queries tagged: `query_type: "bench,clinical"`
-   - Used as hint for AI validation (but all 9 types always scanned)
+2. **Merges publication lists** by PMID, preserving query_type tags
 3. **Title screening with Haiku**: Pre-filters publications (INCLUDES clinical studies)
-4. **Full text mining**: Fetches and mines Methods, Introduction, Results, Discussion
-5. **Searches for ALL 9 tool types** in every publication:
-   - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
-   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
-   - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
-   - **Patient-derived:** PDX, xenografts, humanized mice
-   - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
+4. **Abstract screening with Haiku**: Validates NF tool usage/development
+5. **Full text mining**: Fetches and mines Methods, Introduction, Results, Discussion
 6. **AI validation with Sonnet** (via Goose):
-   - Uses query_type as hint for expected tool categories
-   - Independently classifies publication type
-   - Validates all 9 tool types regardless of query_type
-   - Handles publications with multiple tool types
-7. **Formats results into 9 SUBMIT_*.csv files** (one per tool type)
-8. **Validates and cleans** submission files
+   - Reviews full publication text
+   - Validates tools and extracts metadata
+   - Assigns confidence scores (0.0-1.0)
+   - Detects potentially missed tools
+   - Extracts observations with metadata
+7. **Quality filtering** (NEW):
+   - **Confidence threshold**: Tools/observations with confidence ≥ 0.7
+   - **NF-specific filtering**: Removes generic tools (R, ImageJ, GraphPad, etc.)
+   - **Critical fields requirement**: Tools must have ≥50% of critical metadata fields
+   - **Completeness scoring**: Calculates metadata completeness (0-30 points)
+8. **Metadata enrichment**:
+   - Pattern-based extraction from context snippets
+   - Fills organ, tissue, manifestation, species, etc.
+   - 39 metadata fields across 8 tool types
+9. **Dual output generation**:
+   - **VALIDATED_*.csv**: All tools passing confidence + NF filters (comprehensive)
+   - **FILTERED_*.csv**: High-completeness subset (≥60% critical fields, priority review)
+10. **PMID review summary**: Comprehensive table for manual review tracking
+
+**Quality Metrics Tracked**:
+- Confidence scores (0.7-1.0 scale)
+- Metadata completeness (0-30 points)
+- Critical fields coverage (%)
+- Missing critical fields (explicit list)
 
 **Multi-Query Strategy**: Runs BOTH queries every time to discover all tool types
 - No separate runs needed - comprehensive coverage in single workflow execution
 - Expected monthly discovery: 69-83 tools (vs 18 with old single-query system)
 
 **Outputs**:
-- `tool_coverage/outputs/processed_publications.csv`
-- `tool_coverage/outputs/previously_reviewed_pmids.csv` (cache)
-- `SUBMIT_*.csv` files for various tool types
-- `tool_reviews/validation_report.xlsx`
-- Mining patterns improvements
+- `VALIDATED_*.csv` (8 files) - All validated tools
+- `FILTERED_*.csv` (8 files) - High-completeness priority subset
+- `VALIDATED_resources.csv` - Unique resources
+- `VALIDATED_publications.csv` - Publication metadata
+- `VALIDATED_usage.csv` - Publication-resource links
+- `VALIDATED_development.csv` - NEW tools not in Synapse
+- `VALIDATED_observations.csv` - Scientific observations
+- `PMID_REVIEW_SUMMARY.csv` - Review tracking table
+- `tool_reviews/validation_summary.json` - Full validation results
+- `tool_reviews/potentially_missed_tools.csv` - Tools found by Sonnet
+- `tool_reviews/observations.csv` - Extracted observations
 
 **PR Labels**: `automated-mining`, `tool-coverage`
 
 **Assignee**: BelindaBGarana
 
-**Documentation**: See [`tool_coverage/README.md`](../../tool_coverage/README.md)
+**Documentation**:
+- Main: [`tool_coverage/README.md`](../../tool_coverage/README.md)
+- AI Validation: [`tool_coverage/docs/AI_VALIDATION_README.md`](../../tool_coverage/docs/AI_VALIDATION_README.md)
 
 ---
 
@@ -203,25 +222,45 @@ These workflows support the main sequence but run independently:
 
 ### Upsert Tools to Synapse (upsert-tools.yml)
 
-**Purpose**: Automatically upload validated tool data to Synapse
+**Purpose**: Automatically upload high-quality tool data to Synapse
 
 **Trigger**:
-- When SUBMIT_*.csv or VALIDATED_*.csv files are pushed to main
+- When FILTERED_*.csv files are pushed to main (after PR merge)
 - Manual: workflow_dispatch with optional dry-run
 
 **What it does**:
-1. Detects VALIDATED_*.csv (AI-validated) or SUBMIT_*.csv files
-2. Validates CSV schemas
-3. Cleans tracking columns (prefixed with `_`)
-4. Uploads to corresponding Synapse tables:
+1. **Detects FILTERED_*.csv files**:
+   - High-completeness subset with ≥60% critical fields filled
+   - Confidence ≥0.7 (AI validation)
+   - NF-specific filtering applied (generic tools removed)
+2. **Validates CSV schemas** against Synapse table requirements
+3. **Cleans tracking columns** (prefixed with `_`):
+   - Removes: _pmid, _doi, _publicationTitle, _confidence, _contextSnippet, _completenessScore, _criticalFieldsScore, _missingCriticalFields, _hasMinimumFields
+   - These are for review only, not uploaded to Synapse
+4. **Uploads to corresponding Synapse tables**:
+   - syn73709226 (computational tools)
    - syn26486808 (animal models)
    - syn26486811 (antibodies)
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
-   - syn26450069 (resources)
-5. Regenerates coverage report
+   - syn52659111 (patient-derived models)
+   - syn52659112 (advanced cellular models)
+   - syn52659113 (clinical assessment tools)
+   - syn26450069 (resources - main table)
+5. **Regenerates coverage report**
 
-**No PR Created**: Uploads directly, creates summary in Actions
+**Important Notes**:
+- **ONLY processes FILTERED_*.csv files** (high-quality subset)
+- To upload all validated tools (VALIDATED_*.csv), manually trigger workflow or commit files to main
+- SUBMIT_*.csv files (legacy format) are no longer automatically processed
+
+**Quality Assurance**:
+- Confidence threshold: ≥0.7
+- NF-specific filtering: Generic tools removed (R, ImageJ, GraphPad, etc.)
+- Completeness requirement: ≥60% critical metadata fields filled
+- Manual review: Always review PR before merging to trigger upsert
+
+**No PR Created**: Uploads directly after PR merge, creates summary in Actions
 
 ---
 
@@ -275,6 +314,156 @@ These workflows support the main sequence but run independently:
 **Note**: Keeps CSV and JSON-LD schemas in sync
 
 ---
+
+## 📊 Quality Filtering System
+
+The tool mining workflow implements a comprehensive quality filtering system to ensure high-quality data in Synapse.
+
+### Confidence Threshold (≥0.7)
+
+All tools and observations must meet a minimum confidence threshold:
+- **Confidence score**: 0.0-1.0 scale assigned by Sonnet AI during validation
+- **Threshold**: 0.7 (tools below this are filtered out)
+- **Applied to**: Tools AND observations
+- **Rationale**: Ensures AI predictions are high-certainty
+
+### NF-Specific Filtering
+
+Removes generic lab tools not specific to neurofibromatosis research:
+
+**Generic Tools Filtered Out** (~150+ tools):
+- Programming languages: R, Python, MATLAB
+- Generic software: ImageJ, GraphPad Prism, SPSS, Excel
+- Statistical packages: ggplot2, pandas, DESeq2
+- Generic databases: PubMed, NCBI, Gene Ontology
+- Generic imaging: MRI, CT scan (without NF context)
+- Generic cell lines: HEK293, U87 (without NF modifications)
+- Assay kits: CellTiter-Glo, BCA Protein Assay
+- Drug classes: "MEK inhibitor" (without specific name)
+
+**NF-Specific Tools Kept**:
+- NF-modified cell lines: "NF1-deficient U87", "NF2-null HEI-193"
+- NF-specific models: "Nf1+/-", "Dhh-Cre;Nf1flox/flox"
+- NF-relevant antibodies: Targeting neurofibromin, merlin, BRAF, MEK, ERK
+- Named NF resources: "RENOVO-NF1", "PedsQL NF1 Module"
+
+### Critical Metadata Fields
+
+Each tool type has critical fields that must be filled for completeness:
+
+| Tool Type | Critical Fields |
+|-----------|----------------|
+| **Antibody** | targetAntigen, reactiveSpecies, hostOrganism, clonality |
+| **Cell Line** | cellLineCategory, cellLineGeneticDisorder, cellLineManifestation |
+| **Animal Model** | animalModelGeneticDisorder, backgroundStrain, animalState |
+| **Genetic Reagent** | insertName, insertSpecies, vectorType |
+| **Patient-Derived Model** | modelSystemType, tumorType |
+| **Advanced Cellular Model** | modelType, derivationSource |
+| **Clinical Assessment Tool** | assessmentType, targetPopulation |
+| **Computational Tool** | No required fields (name and type sufficient) |
+
+**Minimum Requirement**: Tools must have ≥50% of critical fields filled (or ≥1 field minimum)
+
+### Completeness Scoring
+
+**Scoring System** (based on `tool_scoring.py`):
+- **Critical fields**: 0-30 points (distributed evenly across required fields)
+- **Calculation**: `(filled_fields / total_critical_fields) × 30`
+- **Example**: Antibody with 3/4 critical fields = 22.5 points
+
+**Tracking Columns** (added to all output files):
+- `_completenessScore`: Overall metadata completeness (0-30 points)
+- `_criticalFieldsScore`: Critical fields score (same as completeness)
+- `_missingCriticalFields`: Semicolon-separated list of missing fields
+- `_hasMinimumFields`: Boolean indicating if minimum requirements met
+
+### Dual Output System
+
+**VALIDATED_*.csv Files** (Comprehensive):
+- **Purpose**: All tools that passed validation
+- **Criteria**: Confidence ≥0.7 + NF-specific + Sonnet validated
+- **Use case**: Comprehensive review, may need manual curation
+- **Quality**: Variable completeness (0-30 points)
+
+**FILTERED_*.csv Files** (Priority):
+- **Purpose**: High-completeness subset for immediate upsert
+- **Criteria**: All VALIDATED criteria + ≥60% critical fields filled
+- **Use case**: Priority manual review, ready for Synapse upsert
+- **Quality**: High completeness (≥18/30 points for critical fields)
+
+**Example Results** (typical distribution):
+- VALIDATED files: ~2,000 tools (all passing confidence threshold)
+- FILTERED files: ~1,900 tools (95%+ of validated tools)
+- Cell lines tend to have lower FILTERED percentage (~94%) due to sparse metadata
+
+### Quality Metrics Reported
+
+Each workflow run reports:
+```
+📊 Quality Metrics:
+   - Confidence threshold: 0.7 (0.0-1.0 scale)
+   - Tools filtered for low confidence: X
+   - Average completeness score: X.X/30 points
+   - Tools with minimum critical fields: X/X
+   - High-completeness tools (priority): X/X (XX.X%)
+```
+
+### Workflow Integration
+
+Quality filtering happens at specific steps in the workflow:
+
+```
+1. Screen publications (Haiku) → Title + abstract filtering
+2. Extract sections → Full text mining
+3. Initialize VALIDATED templates → Create empty CSVs
+4. Run Sonnet reviews → Validate tools + assign confidence scores
+5. Apply pattern improvements → Suggest new mining patterns
+6. ✨ Apply confidence threshold → Filter tools below 0.7
+7. ✨ Calculate completeness → Score metadata (0-30 points)
+8. ✨ Generate FILTERED subset → Select high-completeness tools (initial)
+9. Format results → Create VALIDATED_*.csv files
+10. ✨ Save FILTERED_*.csv → Initial priority review subset
+11. Enrichment → Fill remaining metadata gaps from context snippets
+12. 🆕 Regenerate FILTERED subset → Update with enriched completeness
+13. Generate review summary → PMID-level tracking table
+```
+
+### Completeness Calculation Fix
+
+**Issue**: Tools with 0% completeness were incorrectly included in FILTERED files.
+
+**Root Cause**:
+1. **Tool type mismatch**: Raw data uses `patient_derived_model` (underscores), but completeness check expected `Patient-Derived Model` (hyphens). This caused the check to skip completeness validation.
+2. **Timing issue**: Completeness was calculated BEFORE metadata enrichment, so schema fields (like `modelSystemType`, `tumorType`) didn't exist yet in the raw data.
+
+**Solution**:
+1. **Tool type normalization**: Added `normalize_tool_type()` function to convert all variants (`patient_derived_model`, `cell_line`, etc.) to standardized format (`Patient-Derived Model`, `Cell Line`)
+2. **Missing fields detection**: If critical fields don't exist in data, mark as incomplete (exclude from FILTERED)
+3. **Re-filtering after enrichment**: Added `regenerate_filtered_subset.py` to recalculate completeness on enriched data and update FILTERED files
+
+**Result**: FILTERED files now only include tools with ≥60% critical fields, accurately calculated on enriched metadata.
+
+**Testing**: Run `python tool_coverage/scripts/test_completeness_fix.py` to verify the fix.
+
+### Review Workflow Recommendations
+
+**For Priority Review** (Start here):
+1. Review `FILTERED_*.csv` files first
+2. These have ≥60% critical fields filled
+3. Spot-check for accuracy
+4. Ready for Synapse upsert after brief review
+
+**For Comprehensive Review**:
+1. Review `VALIDATED_*.csv` files
+2. May have sparse metadata (will be enriched)
+3. More manual curation needed
+4. Consider running enrichment first
+
+**For Quality Monitoring**:
+1. Check `PMID_REVIEW_SUMMARY.csv`
+2. Track tools per publication
+3. Identify high-value publications
+4. Monitor observation extraction
 
 ## 🛠️ Setup Requirements
 

@@ -1,0 +1,202 @@
+publicationMetadata:
+  pmid: "34464388"
+  title: "Cell-free DNA ultra-low-pass whole genome sequencing to distinguish malignant peripheral nerve sheath tumor (MPNST) from its benign precursor lesion: A cross-sectional study."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics analysis study using computational genomics approaches to analyze cell-free DNA.
+    Expected tool types:
+    - Computational tools (software, pipelines, analysis packages) - PRIMARY
+    - Genetic reagents (DNA extraction kits, library prep kits) - SECONDARY
+    
+    The study involves sequencing data analysis, copy number analysis, fragment size analysis, and statistical
+    analysis, which typically require multiple computational tools and bioinformatics software packages.
+    Clinical assessment tools are not expected as this is a molecular diagnostic development study.
+  overallAssessment: |
+    This publication is a computational genomics study developing a liquid biopsy approach for cancer detection.
+    It should contain numerous computational tools for sequencing data processing, bioinformatics analysis,
+    and statistical analysis. The extensive methods section describes detailed computational workflows that
+    would require multiple software tools and analysis packages. The complete absence of mined tools suggests
+    significant gaps in the mining patterns for computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "fastp"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing data were demultiplexed, and raw reads were quality filtered using fastp v.0.2."
+    whyMissed: "Version-specific computational tool mention with clear usage context was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BWA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quality-filtered reads were then aligned to the hg19 human genome assembly using BWA v.0.7.17."
+    whyMissed: "Standard bioinformatics alignment tool with version number was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Samtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Aligned reads were deduplicated with Samtools v.1.7, then downsampled to 10 million read pairs"
+    whyMissed: "Well-known bioinformatics tool with version was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MosDepth"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Genomic coverage was estimated using MosDepth [36]."
+    whyMissed: "Specialized genomics tool for coverage analysis was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ichorCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "copy number–based estimation of tumor fraction were then performed using the ichorCNA tool (Broad v.0.2.0)"
+    whyMissed: "Specialized copy number analysis tool with version and institution was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "deepTools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "read-pair fragment sizes for cfDNA samples were calculated using deepTools bamPEFragmentSize"
+    whyMissed: "Bioinformatics toolkit with specific function was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.3.6.1 or Prism 9"
+    whyMissed: "Statistical software with version number was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.3.6.1 or Prism 9 (GraphPad Software)"
+    whyMissed: "Commercial statistical software with vendor was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "caret"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Leave-one-out cross-validation was performed in R using the caret package"
+    whyMissed: "R package for machine learning was not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "QIAamp Circulating Nucleic Acid kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA was extracted from 2 to 8 mL of plasma using the QIAamp Circulating Nucleic Acid kit (Qiagen, Hilden, Germany)"
+    whyMissed: "Commercial DNA extraction kit with vendor was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit dsDNA High-Sensitivity assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Extracted DNA concentration was measured using the Qubit dsDNA High-Sensitivity assay (ThermoFisher, Waltham, Massachusetts)"
+    whyMissed: "Commercial DNA quantification assay with vendor was not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "DNeasy Blood and Tissue kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "germline DNA extraction using the DNeasy Blood and Tissue kit (Qiagen, Hilden, Germany)"
+    whyMissed: "Commercial DNA extraction kit with vendor was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TruSeq Nano"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sequencing libraries were constructed from cfDNA using commercial kits per the manufacturers' instructions: TruSeq Nano (Illumina, San Diego, California)"
+    whyMissed: "Commercial library preparation kit with vendor was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Kapa HyperPrep"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "TruSeq Nano (Illumina, San Diego, California) for NCI samples and Kapa HyperPrep (Roche, Basel, Switzerland) for WUSTL samples"
+    whyMissed: "Commercial library preparation kit with vendor was not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(fastp|BWA|Samtools|MosDepth|ichorCNA|deepTools)\\b"
+    toolType: "computational_tool"
+    examples: ["fastp v.0.2", "BWA v.0.7.17", "Samtools v.1.7", "MosDepth", "ichorCNA tool", "deepTools bamPEFragmentSize"]
+    reasoning: "Common bioinformatics tools that are frequently used in genomics studies but were missed"
+
+  - patternType: "context_phrase"
+    pattern: "(analyzed using|processed with|performed using|calculated using|estimated using)\\s+([A-Za-z0-9]+)"
+    toolType: "computational_tool"
+    examples: ["analyzed using MosDepth", "processed with Samtools", "calculated using deepTools"]
+    reasoning: "Context phrases that indicate computational tool usage in analysis workflows"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+\\s+v?\\d+\\.\\d+(\\.\\d+)?\\b"
+    toolType: "computational_tool"
+    examples: ["R v.3.6.1", "fastp v.0.2", "BWA v.0.7.17"]
+    reasoning: "Software tools with version numbers following standard naming conventions"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][A-Za-z]+\\s+[A-Z][A-Za-z]+\\s+kit)\\s*\\([A-Z][a-z]+[,\\s]"
+    toolType: "genetic_reagent"
+    examples: ["QIAamp Circulating Nucleic Acid kit (Qiagen", "DNeasy Blood and Tissue kit (Qiagen"]
+    reasoning: "Commercial kits with vendor information in parentheses are reliable tool indicators"
+
+  - patternType: "context_phrase"
+    pattern: "(extracted using|constructed using|prepared using|isolated using)\\s+([A-Za-z0-9\\s]+kit)"
+    toolType: "genetic_reagent"
+    examples: ["extracted using the QIAamp kit", "constructed using TruSeq Nano"]
+    reasoning: "Context phrases indicating usage of commercial reagent kits"
+
+  - patternType: "term"
+    pattern: "\\b(TruSeq|Kapa\\s+HyperPrep|QIAamp|DNeasy|AllPrep)\\b"
+    toolType: "genetic_reagent"
+    examples: ["TruSeq Nano", "Kapa HyperPrep", "QIAamp Circulating Nucleic Acid kit"]
+    reasoning: "Common commercial kit names that should be captured as genetic reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Zero tools were mined from a computational genomics study that clearly uses numerous software tools
+    - Mining patterns appear to completely miss standard bioinformatics tools (fastp, BWA, Samtools, etc.)
+    - Commercial reagent kits with vendor information were not captured
+    - Statistical software (R, Prism) with versions were not detected
+    - Specialized genomics tools (ichorCNA, MosDepth, deepTools) were missed
+    - This represents a major gap in computational tool mining capabilities
+  recommendations: |
+    - ALL 14 identified tools should be added to the mining results
+    - Implement the 6 suggested patterns to improve computational tool detection
+    - Focus on capturing software tools with version numbers and vendor information
+    - Add patterns for "using [TOOL]" and "performed with [TOOL]" contexts
+    - This publication demonstrates significant gaps in mining bioinformatics tools
+    - No observations were extracted as this is a methods development study without specific tool performance data
+    - Future mining should prioritize computational tools in genomics/bioinformatics publications

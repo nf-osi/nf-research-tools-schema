@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "24619350"
+  title: "Longitudinal evaluation of quality of life in 288 patients with neurofibromatosis 2."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This longitudinal clinical study evaluating quality of life in NF2 patients would be expected to contain:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY
+    - Computational tools for statistical analysis - SECONDARY
+    
+    The study focuses on validating and applying the NFTI-QOL questionnaire as an outcome measure,
+    making clinical assessment tools the primary tool type expected. Statistical software for data
+    analysis would also be expected given the quantitative nature of the study.
+  overallAssessment: |
+    This is a longitudinal clinical study evaluating quality of life in 288 NF2 patients using validated
+    questionnaires and statistical analysis. Clinical assessment tools are highly expected as the core
+    methodology involves administering and validating the NFTI-QOL questionnaire. The study also compares
+    with other established QOL instruments and uses statistical software for analysis, making both clinical
+    assessment tools and computational tools likely to be present.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NFTI-QOL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The disease-focused NF2 impact on quality of life (NFTI-QOL) patient questionnaire was assessed as an outcome measure for treatment in a multi-centre study."
+    whyMissed: "This is the primary clinical assessment tool being validated and used throughout the study. It's an 8-item questionnaire specifically designed for NF2 patients to measure quality of life impact."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "SF-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "introduction"
+    contextSnippet: "Neary et al. reported that the predominant problems were impaired balance and difficulty with social communication when they used a closed-set questionnaire and the generic Short Form-36 (SF-36) questionnaire to evaluate QOL in NF2 patients"
+    whyMissed: "SF-36 is a well-established generic quality of life questionnaire mentioned as a comparison tool. However, this appears to be cited from other work (Neary et al.) rather than used in this study."
+    confidence: 0.30
+    shouldBeAdded: Maybe
+
+  - toolName: "EuroQOL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "discussion"
+    contextSnippet: "We have demonstrated previously that NFTI-QOL correlates strongly and significantly with all domains of the SF-36 and with the EuroQOL, generic questionnaires that do not focus on NF2-specific problems"
+    whyMissed: "EuroQOL is mentioned as a validated generic QOL instrument that correlates with NFTI-QOL. However, this refers to previous work by the authors, not usage in this current study."
+    confidence: 0.25
+    shouldBeAdded: Maybe
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The NFTI-QOL, clinical, and genetic data were analysed with SPSS using correlation, linear regression, and analysis of variance (ANOVA) tools as required."
+    whyMissed: "SPSS is explicitly mentioned as the statistical software used for data analysis in this study. This is a clear computational tool usage that should have been captured."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NFTI-QOL|NF2 Impact on Quality of Life"
+    toolType: "clinical_assessment_tool"
+    examples: ["NFTI-QOL patient questionnaire", "NF2 Impact on Quality of Life (NFTI-QOL) questionnaire"]
+    reasoning: "Disease-specific questionnaire names should be captured, especially when they are the primary outcome measure being studied."
+
+  - patternType: "context_phrase"
+    pattern: "analysed with [TOOL]|analyzed using [TOOL]|data were analysed with [TOOL]"
+    toolType: "computational_tool"
+    examples: ["analysed with SPSS using correlation, linear regression"]
+    reasoning: "This phrase pattern reliably indicates computational tool usage for data analysis in clinical studies."
+
+  - patternType: "term"
+    pattern: "questionnaire|scale|instrument|assessment tool"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient questionnaire", "disease-focused assessment", "validated instrument"]
+    reasoning: "Generic terms for clinical assessment tools that could help identify tools when specific names aren't captured."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-[A-Z]{2,}|[A-Z]{2,}[0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["SF-36", "NFTI-QOL"]
+    reasoning: "Many clinical assessment tools follow abbreviated naming conventions with hyphens or numbers that could be systematically captured."
+
+observations:
+  - resourceName: "NFTI-QOL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NFTI-QOL demonstrated good internal reliability with Cronbach's alpha score of 0.85 and test-retest reliability r = 0.84. 
+      The questionnaire comprises 8 questions with a maximum score of 24 reflecting greatest impact on QOL. 
+      It can be completed in a few minutes and covers domains of balance/dizziness, hearing, facial weakness, sight, 
+      mobility/walking, role/outlook on life, pain, anxiety, and depression. A five-point change or greater in total 
+      NFTI-QOL score was statistically significant for an individual (95% CI).
+    foundIn: "results"
+    contextSnippet: "The internal reliability of NFTI-QOL was found to be very good, with a Cronbach's alpha score of 0.85 and re-test reliability r = 0.84."
+    confidence: 0.95
+    doi: "10.1007/s00415-014-7303-1"
+
+  - resourceName: "NFTI-QOL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      NFTI-QOL showed moderate correlation with clinician-rated severity (r = 0.41, p < 0.001; r = 0.46 for all visits) 
+      but only weak correlation with genetic severity (r = 0.16, p < 0.05; r = 0.15 for all visits). 
+      This suggests NFTI-QOL captures NF2 patient experiences not encompassed by clinical severity rating or genotype. 
+      The mean NFTI-QOL score was 8.7 (SD 5.4) for first visits and 9.2 (SD 5.4) for all visits, similar to 
+      published norm of 9.4 (5.5).
+    foundIn: "results"
+    contextSnippet: "The NFTI-QOL was related to ClinSev (r = 0.41, p < 0.001; r = 0.46 for all visits), but was only related weakly to GenSev (r = 0.16, p < 0.05; r = 0.15 for all visits)."
+    confidence: 0.90
+    doi: "10.1007/s00415-014-7303-1"
+
+  - resourceName: "NFTI-QOL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NFTI-QOL demonstrated ability to detect significant longitudinal changes in individual patients. 
+      Example case: A 32-year-old male had deteriorating scores (13 to 16) until cochlear implant insertion 
+      and neuro-rehabilitation, after which total score reduced to 9 with improvements in hearing, balance, 
+      mobility, and role/outlook domains. Hearing loss, dizziness/balance, and impact on role/outlook 
+      showed highest severity ratings across all centers.
+    foundIn: "discussion"
+    contextSnippet: "For example, a 32-year-old male had deteriorating total NFTI-QOL scores (from 13 to 16) until a cochlear implant was inserted and specialist neuro-rehabilitation was undertaken for impaired mobility. The total NFTI-QOL score reduced to 9"
+    confidence: 0.85
+    doi: "10.1007/s00415-014-7303-1"
+
+  - resourceName: "SPSS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SPSS was used for statistical analysis of NFTI-QOL, clinical, and genetic data. 
+      Specific analyses performed included correlation analysis, linear regression, and analysis of variance (ANOVA). 
+      The software was used to evaluate relationships between patient-rated quality of life scores, 
+      clinician-rated severity, and genetic severity measures across 288 patients and 464 visits.
+    foundIn: "methods"
+    contextSnippet: "The NFTI-QOL, clinical, and genetic data were analysed with SPSS using correlation, linear regression, and analysis of variance (ANOVA) tools as required."
+    confidence: 0.95
+    doi: "10.1007/s00415-014-7303-1"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Mining completely missed the primary clinical assessment tool (NFTI-QOL) that is the focus of the entire study
+    - Statistical software (SPSS) explicitly mentioned for data analysis was not captured
+    - Clinical assessment tool patterns appear to need significant improvement for questionnaire/scale detection
+    - No tools were mined despite this being a clinical study with clear tool usage
+  recommendations: |
+    This publication represents a significant mining failure - zero tools were captured despite clear usage of clinical assessment tools and computational software. The NFTI-QOL questionnaire is the primary focus of the entire study and should have been captured with high confidence. SPSS usage for statistical analysis is explicitly stated in methods and should also have been captured.
+
+    Key recommendations:
+    1. NFTI-QOL should definitely be added as a clinical assessment tool - it's the main instrument being validated
+    2. SPSS should be added as a computational tool - explicitly used for data analysis
+    3. SF-36 and EuroQOL are mentioned but appear to be from previous work, not current study usage - manual review needed
+    4. Clinical assessment tool patterns need major improvement to capture disease-specific questionnaires
+    5. Statistical software detection patterns should be enhanced to catch explicit usage statements
+    6. Four high-quality scientific observations were extracted about tool performance and validation
+    
+    This case highlights the need for better pattern coverage for clinical assessment tools, particularly disease-specific questionnaires that may not follow standard naming conventions.

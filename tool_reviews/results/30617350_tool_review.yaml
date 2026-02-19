@@ -1,0 +1,114 @@
+publicationMetadata:
+  pmid: "30617350"
+  title: "A cerebellopontine angle mouse model for the investigation of tumor biology, hearing, and neurological function in NF2-related vestibular schwannoma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a Nature Protocols paper describing a laboratory protocol for creating and studying a mouse model.
+    Expected tool types include:
+    - Animal models (mouse strains, genetically modified mice)
+    - Cell lines (schwannoma cells mentioned for injection)
+    - Computational tools (for imaging analysis, hearing assessment)
+    - Potentially genetic reagents (if describing cell line modifications)
+    
+    Note: Even though only abstract is available, this is clearly a methods/protocol paper that would
+    contain detailed tool information in the full Methods section. The abstract mentions specific
+    experimental procedures (cell injection, intravital imaging, hearing assessment) that require tools.
+  overallAssessment: |
+    This is a Nature Protocols paper describing a detailed laboratory protocol for creating a mouse model
+    of NF2-related vestibular schwannoma. Such protocol papers typically contain extensive tool information
+    including animal models, cell lines, imaging equipment, and assessment tools. The absence of a Methods
+    section in the input suggests incomplete text extraction rather than lack of methods. The abstract
+    clearly describes experimental procedures that would require multiple research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we describe how to inject schwannoma cells into the mouse brain cerebellopontine angle (CPA) region..."
+    whyMissed: "Cell line mentioned for injection procedure but not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "mouse brain cerebellopontine angle (CPA) model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...A cerebellopontine angle mouse model for the investigation of tumor biology, hearing, and neurological function..."
+    whyMissed: "Animal model described as main subject of protocol but not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "intravital imaging"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...apply state-of-the-art intravital imaging and hearing assessment techniques to study tumor growth..."
+    whyMissed: "Imaging technique/system mentioned but not captured as computational tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "hearing assessment techniques"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...apply state-of-the-art intravital imaging and hearing assessment techniques to study tumor growth and hearing loss..."
+    whyMissed: "Assessment methodology mentioned but not captured by clinical tool patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "inject .* cells into"
+    toolType: "cell_line"
+    examples: ["inject schwannoma cells into the mouse brain"]
+    reasoning: "Injection procedures often indicate use of specific cell lines that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: ".* mouse model"
+    toolType: "animal_model"
+    examples: ["cerebellopontine angle mouse model"]
+    reasoning: "Mouse model terminology is a strong indicator of animal model tools"
+
+  - patternType: "context_phrase"
+    pattern: "assessment techniques"
+    toolType: "clinical_assessment_tool"
+    examples: ["hearing assessment techniques"]
+    reasoning: "Assessment techniques in research contexts often refer to validated measurement tools"
+
+  - patternType: "term"
+    pattern: "intravital imaging"
+    toolType: "computational_tool"
+    examples: ["state-of-the-art intravital imaging"]
+    reasoning: "Specific imaging modalities represent computational/technical tools for analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a Nature Protocols paper describing laboratory methods
+    - Only abstract text is available - Methods section missing which would contain detailed tool information
+    - Several clear tool mentions in abstract were missed by mining patterns
+    - This appears to be a case of incomplete text extraction rather than absence of tools
+  recommendations: |
+    This publication should be re-processed with complete full-text content including the Methods section.
+    The abstract alone contains clear evidence of multiple research tools (cell lines, animal models, 
+    assessment techniques) that were missed. A Nature Protocols paper describing a mouse model protocol
+    would typically contain extensive tool information. The mining patterns should be improved to capture:
+    1. Cell lines mentioned in injection contexts
+    2. Animal model terminology (e.g., "mouse model")
+    3. Assessment techniques and methodologies
+    4. Imaging modalities and systems
+    
+    Without the full Methods section, this review is necessarily incomplete. The publication should be
+    flagged for re-extraction with complete text before final tool validation.

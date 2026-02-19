@@ -1,0 +1,181 @@
+publicationMetadata:
+  pmid: "28587872"
+  title: "Validation of an automated tractography method for the optic radiations as a biomarker of visual acuity in neurofibromatosis-associated optic pathway glioma."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical imaging study, expected tool types include:
+    - Computational tools: Statistical analysis software (SPSS), image analysis software (ImageJ), specialized medical imaging analysis tools
+    - Clinical assessment tools: Visual field testing equipment, visual acuity assessment protocols, imaging-based biomarker assessment tools
+    - Medical imaging equipment: While primarily clinical devices, specialized research-grade imaging systems with analysis software components may qualify as research tools
+    
+    This study combines clinical assessment with computational analysis, so both clinical assessment tools and computational tools are expected.
+  overallAssessment: |
+    This clinical research study focuses on developing and validating automated tractography methods for assessing visual pathway damage in NF1-associated optic pathway glioma. The study involves sophisticated imaging analysis, statistical computation, and clinical assessment protocols that would typically require specialized research tools. The comprehensive Methods section describes detailed protocols for image analysis, statistical analysis, and clinical assessments, indicating active tool usage rather than just citations.
+
+toolValidations: []  # No tools were initially mined
+
+potentiallyMissedTools:
+  - toolName: "IBM SPSS 24.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The statistical evaluations were carried out using IBM SPSS 24.0 tool. All data were subjected to the Shapiro–Wilk test and found to conform to a normal distribution."
+    whyMissed: "Statistical analysis software with specific version number was not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Image J program (version 1.53) was then used to process and compute these pictures, setting the image threshold and an 8-bit grayscale format."
+    whyMissed: "Image analysis software with version number was not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ADW 4.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All of these assessments were conducted using the ADW 4.2 function tool that is included into the GE 3.0 T MRI scanner."
+    whyMissed: "Specialized medical imaging analysis software was not recognized by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Kowa AP7000 Precise Perimeter"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Patients had a visual field examination both prior to surgery and 1 month following correction of refractive defects, utilizing the Kowa AP7000 Precise Perimeter from Kowa, Japan."
+    whyMissed: "Clinical assessment device with specific model number was not caught by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Heidelberg Engineering Spectralis OCT"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The OCT device used in this study is the Heidelberg Engineering Spectralis OCT, a high-precision ophthalmic imaging equipment manufactured by Heidelberg Engineering in Germany."
+    whyMissed: "Specialized clinical imaging device was not recognized as a research tool"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Visual Field Testing Protocol"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Two reliable visual field tests were conducted, assessing the central 30°. If fixation is lost, or if there are false positives or negatives exceeding 20%, the test is considered unreliable."
+    whyMissed: "Standardized clinical assessment protocol was not recognized as a tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "IBM SPSS [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["IBM SPSS 24.0"]
+    reasoning: "Statistical software with version numbers should be captured as computational tools"
+
+  - patternType: "term"
+    pattern: "ImageJ.*version [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["ImageJ program (version 1.53)"]
+    reasoning: "Image analysis software with version specifications should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "using.*[A-Z]{2,}\\s+[0-9]+\\.[0-9]+.*tool"
+    toolType: "computational_tool"
+    examples: ["using the ADW 4.2 function tool"]
+    reasoning: "Software tools mentioned with version numbers in usage context should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+\\s+[A-Z]{2,}[0-9]+.*Perimeter"
+    toolType: "clinical_assessment_tool"
+    examples: ["Kowa AP7000 Precise Perimeter"]
+    reasoning: "Clinical assessment devices with manufacturer and model numbers should be captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "manufactured by.*Germany|from.*Japan"
+    toolType: "clinical_assessment_tool"
+    examples: ["manufactured by Heidelberg Engineering in Germany", "from Kowa, Japan"]
+    reasoning: "Medical devices with manufacturer location information often indicate specialized research equipment"
+
+observations:
+  - resourceName: "IBM SPSS 24.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Statistical analysis software used for comprehensive data analysis including Shapiro-Wilk normality tests, paired t-tests for pre/post-surgical comparisons, and Pearson correlation analysis. All data processing and statistical evaluations were performed using this software with significance threshold set at P < 0.05.
+    foundIn: "results"
+    contextSnippet: "The statistical evaluations were carried out using IBM SPSS 24.0 tool. All data were subjected to the Shapiro–Wilk test and found to conform to a normal distribution... P values were considered statistically significant if they were less than 0.05."
+    confidence: 0.95
+    doi: "10.1016/j.expneurol.2017.06.004"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Image analysis software (version 1.53) used for processing and computing OCTA images. Specific protocols included setting image threshold, converting to 8-bit grayscale format, and binarizing images to detect micro-vessels for vessel density calculations. Software was essential for quantitative analysis of retinal and optic nerve blood flow density measurements.
+    foundIn: "results"
+    contextSnippet: "The Image J program (version 1.53) was then used to process and compute these pictures, setting the image threshold and an 8-bit grayscale format. After binarizing the images to make micro-vessels easy to detect, the VD of the various strata was computed."
+    confidence: 0.95
+    doi: "10.1016/j.expneurol.2017.06.004"
+
+  - resourceName: "ADW 4.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Specialized MRI analysis function tool integrated with GE 3.0T MRI scanner used for DTI data analysis. Tool was used to measure fractional anisotropy (FA) and apparent diffusion coefficient (ADC) metrics by selecting three distinct regions of interest (ROIs) from optic nerve, optic chiasm, optic tracts, and optic radiation images. ROI size ranged from 8 to 12 mm².
+    foundIn: "results"
+    contextSnippet: "All of these assessments were conducted using the ADW 4.2 function tool that is included into the GE 3.0 T MRI scanner. We were able to determine the FA and ADC metrics by choosing three distinct regions of interest (ROIs)... The ROI size ranged from 8 to 12 mm²."
+    confidence: 0.90
+    doi: "10.1016/j.expneurol.2017.06.004"
+
+  - resourceName: "Kowa AP7000 Precise Perimeter"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Visual field assessment device used for comprehensive perimetry testing in patients before and after pituitary adenoma surgery. Protocol involved two reliable visual field tests assessing the central 30°. Tests were considered unreliable if fixation was lost or if false positives/negatives exceeded 20%. Mean defect (MD) metric was used to assess total visual field impairment.
+    foundIn: "results"
+    contextSnippet: "Patients had a visual field examination both prior to surgery and 1 month following correction of refractive defects, utilizing the Kowa AP7000 Precise Perimeter from Kowa, Japan. Two reliable visual field tests were conducted, assessing the central 30°."
+    confidence: 0.90
+    doi: "10.1016/j.expneurol.2017.06.004"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 4
+  majorIssuesFound: |
+    - Complete failure to detect any research tools despite clear usage of multiple computational and clinical assessment tools
+    - Mining patterns appear to miss statistical software, image analysis software, and clinical assessment devices
+    - Specialized medical imaging analysis software (ADW 4.2) was not recognized
+    - Clinical assessment devices with manufacturer/model information were not captured
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the initial mining:
+    
+    SHOULD BE ADDED:
+    - IBM SPSS 24.0: Statistical analysis software with clear experimental usage
+    - ImageJ v1.53: Image analysis software with detailed protocol description
+    - ADW 4.2: Specialized DTI analysis software integrated with MRI system
+    - Kowa AP7000 Precise Perimeter: Clinical visual field assessment device
+    
+    MAYBE ADD:
+    - Heidelberg Engineering Spectralis OCT: High-precision clinical imaging device used for research
+    - Visual Field Testing Protocol: Standardized clinical assessment methodology
+    
+    The mining patterns need significant improvement to capture:
+    1. Statistical software with version numbers
+    2. Image analysis software in medical contexts
+    3. Clinical assessment devices with manufacturer/model information
+    4. Specialized medical imaging analysis software
+    5. Standardized clinical assessment protocols
+    
+    This represents a major gap in tool detection for clinical research publications that combine computational analysis with clinical assessment methods.

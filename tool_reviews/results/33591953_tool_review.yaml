@@ -1,0 +1,368 @@
+publicationMetadata:
+  pmid: "33591953"
+  title: "Chromosome 8 gain is associated with high-grade transformation in MPNST."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes comprehensive laboratory research including:
+    - Patient-derived xenograft (PDX) model development and characterization
+    - Immunohistochemistry with multiple antibodies
+    - Mouse models (NSG mice)
+    - Extensive computational analysis (RNA-seq, WES, scRNA-seq)
+    - FISH analysis with specific probes
+    - Multiple software tools and pipelines
+    
+    Expected to contain multiple tool types across all laboratory categories.
+  overallAssessment: |
+    This is a comprehensive laboratory research study focused on developing and characterizing NF1-MPNST patient-derived xenograft models. The extensive Methods section describes multiple experimental techniques including genomic sequencing, single-cell RNA sequencing, immunohistochemistry, and FISH analysis. This type of study would typically use numerous research tools including antibodies, animal models, computational tools, and patient-derived models. The fact that no tools were mined suggests significant gaps in the mining algorithm's ability to detect tools in this context.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "NSG mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Tumor tissue was implanted s.c. into the flank of 5- to 6-week-old NSG mice (The Jackson Laboratory)."
+    whyMissed: "Standard mouse strain nomenclature not detected - NSG is a well-known immunodeficient strain"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "S100 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "IHC was performed using the Avidin/Biotin blocking kit (Vector Labs, SP-2001) staining with antibodies against S100 (1:250 dilution; catalog ab41548, Abcam)"
+    whyMissed: "Antibody with catalog number and vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "KI-67 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "KI-67 (prediluted; catalog 790-4286, Ventana)"
+    whyMissed: "Antibody with catalog number and vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "COL4A antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "COL4A (1:1000 dilution; catalog ab6586, Abcam)"
+    whyMissed: "Antibody with catalog number and vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-histone H3 (tri methyl K27) antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunolabeling for anti-histone H3 (tri methyl K27) (1:200 dilution; catalog ab6002, Abcam)"
+    whyMissed: "Antibody with catalog number and vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BWA-MEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "WES and WGS data were aligned against reference sequence hg38 via BWA-MEM"
+    whyMissed: "Bioinformatics alignment tool not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Trim Galore"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All WES/WGS/RNA-seq samples were trimmed and quality controlled via Trim Galore (https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)"
+    whyMissed: "Quality control software with URL not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Disambiguate"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For PDX sequence data, Disambiguate v1.0 was used to filter out mouse-derived reads"
+    whyMissed: "Specialized PDX analysis software with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Manta"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Structural variants (SVs) and large indels were detected using Manta"
+    whyMissed: "Structural variant detection software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "VarScan2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNVs and small indels were detected using VarScan2"
+    whyMissed: "Variant calling software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Strelka2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNVs and small indels were detected using VarScan2, Strelka2"
+    whyMissed: "Variant calling software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MuTect2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNVs and small indels were detected using VarScan2, Strelka2, MuTect2"
+    whyMissed: "Variant calling software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pindel"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNVs and small indels were detected using VarScan2, Strelka2, MuTect2, and Pindel"
+    whyMissed: "Indel detection software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Variant Effect Predictor"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "annotation with Variant Effect Predictor (VEP; version 95)"
+    whyMissed: "Variant annotation software with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GenVisR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Waterfall somatic variant plots were created with GenVisR"
+    whyMissed: "Visualization software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Xenosplit"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Mouse-derived reads were filtered using Xenosplit"
+    whyMissed: "PDX-specific analysis tool not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PartekFlow"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RNA reads were quantified by using the expectation-maximization (EM) quantification on PartekFlow"
+    whyMissed: "RNA analysis platform not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene counts and transcript counts were normalized by using the DESeq2 package"
+    whyMissed: "Popular RNA-seq analysis package not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CNVkit"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CNVkit was used to infer and visualize copy number from high-throughput WGS data"
+    whyMissed: "Copy number analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cell Ranger"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The standard 10X Genomics Cell Ranger (version 3.1.0) pipeline was used"
+    whyMissed: "Single-cell analysis pipeline with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "filtered_feature_bc_matrix was imported using the Read10X function in Seurat (version 3.0)"
+    whyMissed: "Single-cell analysis package with version not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "inferCNV"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Copy number variations of each PDX were inferred from scRNA-seq using the R package inferCNV"
+    whyMissed: "Single-cell CNV analysis package not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Uphyloplot2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Uphyloplot2 (https://github.com/harbourlab/UPhyloplot2) was used to visualize the clonality"
+    whyMissed: "Visualization software with GitHub URL not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ComplexHeatmap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "plotted in a heatmap using R package (ComplexHeatmap)"
+    whyMissed: "R visualization package not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Vysis CEP 8 probe"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Probes used were a centromeric-enumerating probe Vysis CEP 8 (D8Z2) SpectrumGreen"
+    whyMissed: "FISH probe with specific identifier not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Vysis LSI MYC probe"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "locus-specific probe Vysis LSI MYC SpectrumOrange (Abbott Molecular)"
+    whyMissed: "FISH probe with vendor not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-MPNST PDX models"
+    toolType: "patient_derived_model"
+    foundIn: "methods"
+    contextSnippet: "we developed a collection of NF1-MPNST patient-derived xenografts (PDX)"
+    whyMissed: "Patient-derived xenograft models not detected as tools"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "NSG mice|NOD-scid IL2Rgamma|immunodeficient mice"
+    toolType: "animal_model"
+    examples: ["NSG mice (The Jackson Laboratory)"]
+    reasoning: "Standard immunodeficient mouse strain nomenclature used in PDX studies"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies against [A-Z0-9-]+.*catalog [a-z0-9-]+.*[A-Za-z]+"
+    toolType: "antibody"
+    examples: ["antibodies against S100 (1:250 dilution; catalog ab41548, Abcam)"]
+    reasoning: "Antibodies mentioned with catalog numbers and vendors should be captured"
+
+  - patternType: "term"
+    pattern: "BWA-MEM|Trim Galore|Disambiguate|Manta|VarScan2|Strelka2|MuTect2|Pindel|GenVisR|Xenosplit|CNVkit|Cell Ranger|Seurat|inferCNV"
+    toolType: "computational_tool"
+    examples: ["BWA-MEM", "Cell Ranger (version 3.1.0)", "Seurat (version 3.0)"]
+    reasoning: "Common bioinformatics tools used in genomics research should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "patient-derived xenograft|PDX model|PDX line"
+    toolType: "patient_derived_model"
+    examples: ["NF1-MPNST patient-derived xenografts (PDX)"]
+    reasoning: "PDX models are important research tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "Vysis [A-Z0-9 ]+.*probe|FISH probe"
+    toolType: "genetic_reagent"
+    examples: ["Vysis CEP 8 (D8Z2) SpectrumGreen", "Vysis LSI MYC SpectrumOrange"]
+    reasoning: "FISH probes with vendor names should be detected as genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "R package \\([A-Za-z0-9]+\\)|using [A-Za-z0-9]+ \\(version [0-9.]+\\)"
+    toolType: "computational_tool"
+    examples: ["R package (ComplexHeatmap)", "Seurat (version 3.0)"]
+    reasoning: "Software packages with version numbers should be captured"
+
+observations:
+  - resourceName: "NF1-MPNST PDX models"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Engraftment success rate was 50% for NF1-MPNST PDX models. The mean elapsed time for engraftment varied from 21 to 90 days, and engraftment occurred in 2-4 mice. Engraftment success was defined by the ability for the line to be serially transplanted.
+    foundIn: "results"
+    contextSnippet: "Eight MPNST PDX lines were established from 8 biopsy-proven NF1-MPNST between 2014 and 2019 at 2 different institutions: Washington University and John Hopkins University. The engraftment success rate was 50%."
+    confidence: 1.0
+    doi: "e146351"
+
+  - resourceName: "NF1-MPNST PDX models"
+    resourceType: "Patient-Derived Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      PDX models retained histological similarity to parental tumors based on morphology on H&E stains and immunostaining for S100, COL4A, and KI-67. Correlation of variant allele frequency (VAF) between parental tumor and PDX showed median correlation coefficient of 0.474 (range, 0.014-0.791), indicating some clonal selection during engraftment.
+    foundIn: "results"
+    contextSnippet: "All PDX are histologically comparable with the parental tumors based on morphology on H&E stains and S100, COL4A, and KI-67 staining. Correlation of the variant allele frequency (VAF) in the parental tumor versus the VAF in each PDX demonstrated similarity of the PDX compared with its parental tumor."
+    confidence: 1.0
+    doi: "e146351"
+
+  - resourceName: "NF1-MPNST PDX models"
+    resourceType: "Patient-Derived Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Gene expression correlation between parental tumors and PDX showed overall similarity with median correlation coefficient of 0.79 (range, 0.66-0.92). However, some variants showed VAF differences, suggesting clonal selection occurs upon engraftment.
+    foundIn: "results"
+    contextSnippet: "scatter plots comparing the gene expression levels in the parental tumor versus the PDX showed an overall similarity, with a median correlation coefficient of 0.79 (range, 0.66–0.92)"
+    confidence: 1.0
+    doi: "e146351"
+
+  - resourceName: "NF1-MPNST PDX models"
+    resourceType: "Patient-Derived Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      87% of PDX cases showed chromosome 8q gain, which was the most prevalent CNV event present in >90% of cells across all 8 NF1-MPNST PDX models. Chr8q gain appeared to be an early copy number event, appearing in the trunk of 5 of 8 PDX clonality trees.
+    foundIn: "results"
+    contextSnippet: "Notably, 87% of the cases showed a Chr8q gain. A summary of each possible CNV event and the percentage of cells exhibiting these CNV events confirmed that Chr8q gain was the most prevalent and dominant CNV, present in > 90% of cells"
+    confidence: 1.0
+    doi: "e146351"
+
+  - resourceName: "NSG mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NSG mice successfully supported engraftment of NF1-MPNST patient tumor tissue with 50% success rate. Tumor tissue was implanted subcutaneously into the flank of 5- to 6-week-old NSG mice, with engraftment occurring in 2-4 mice per case.
+    foundIn: "results"
+    contextSnippet: "Tumor tissue was implanted s.c. into the flank of 5- to 6-week-old NSG mice (The Jackson Laboratory). The mean elapsed time for engraftment varied from 21 to 90 days, and engraftment occurred in 2–4 mice. Engraftment success of the PDX tumor model was defined by the ability for the line to be serially transplanted."
+    confidence: 1.0
+    doi: "e146351"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 24
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Cellular: 1
+    Molecular: 2
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this comprehensive laboratory research publication
+    - This study contains extensive experimental methods with numerous research tools
+    - Multiple antibodies with catalog numbers and vendors were not detected
+    - Bioinformatics software tools and pipelines were not captured
+    - Patient-derived xenograft models were not recognized as research tools
+    - FISH probes and genetic reagents were missed
+    - Animal models (NSG mice) were not detected
+    - The mining algorithm appears to have significant gaps in tool detection
+  recommendations: |
+    - ALL 24 potentially missed tools should be added to the database
+    - The mining algorithm needs significant improvement to detect:
+      * Antibodies with catalog numbers and vendor information
+      * Bioinformatics software tools commonly used in genomics
+      * Patient-derived model systems (PDX)
+      * FISH probes and genetic reagents
+      * Standard laboratory animal models
+    - Implement the 6 suggested patterns to improve future mining accuracy
+    - This publication demonstrates major gaps in current mining capabilities
+    - Consider manual curation of similar high-impact laboratory research publications
+    - The extracted observations provide valuable scientific context for the validated tools

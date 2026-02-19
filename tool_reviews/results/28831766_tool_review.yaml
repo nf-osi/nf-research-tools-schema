@@ -1,0 +1,126 @@
+publicationMetadata:
+  pmid: "28831766"
+  title: "NMR resonance assignments of the EVH1 domain of neurofibromin's recruitment factor Spred1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a structural biology/NMR spectroscopy study, which typically uses:
+    - Computational tools (NMR analysis software, structure prediction tools)
+    - Genetic reagents (expression plasmids, bacterial strains for protein production)
+    - Potentially antibodies or cell lines (though not evident in this protein structure study)
+    
+    The publication focuses on protein expression, purification, and NMR analysis, so computational
+    tools for data processing and genetic reagents for protein production are highly expected.
+  overallAssessment: |
+    This is a clear laboratory research publication focused on structural biology using NMR spectroscopy.
+    The study involves protein expression, purification, and detailed NMR analysis, which requires
+    specialized computational tools and genetic reagents. Tools are definitely expected and likely
+    present in the detailed Methods section.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NMRPipe"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Collected data were processed with NMRPipe (Delaglio et al. 1995) and analyzed by using CcpNMR (Vranken et al. 2005) software."
+    whyMissed: "Software name not caught by mining patterns - may need better pattern for NMR analysis tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CcpNMR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Collected data were processed with NMRPipe (Delaglio et al. 1995) and analyzed by using CcpNMR (Vranken et al. 2005) software."
+    whyMissed: "Software name not caught by mining patterns - may need better pattern for NMR analysis tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TALOS+"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A TALOS+ prediction (Shen et al. 2009) was conducted using the HN, N, C', Cα, and Cβ chemical shifts of the protein"
+    whyMissed: "Software name with '+' symbol may not be caught by standard patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pET-Spred1(EVH1)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Construction of pET-Spred1(EVH1) encoding the EVH1 domain of human Spred1 (Ser13–Ser130) preceded by a non-native translation initiating methionine"
+    whyMissed: "Plasmid name with complex nomenclature may not be caught by standard patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "BL21(DE3) Star"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The plasmid was transformed into the E. coli strain BL21(DE3) Star (Invitrogen)."
+    whyMissed: "E. coli strain name with parentheses and vendor info may not be caught by standard patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NMRPipe|CcpNMR|TALOS\\+|SPARKY|CARA|NMRView"
+    toolType: "computational_tool"
+    examples: ["NMRPipe", "CcpNMR", "TALOS+"]
+    reasoning: "Common NMR analysis software packages that are frequently used in structural biology studies"
+
+  - patternType: "naming_convention"
+    pattern: "pET-[A-Za-z0-9\\(\\)\\-_]+"
+    toolType: "genetic_reagent"
+    examples: ["pET-Spred1(EVH1)"]
+    reasoning: "pET vectors are extremely common expression plasmids in protein biochemistry"
+
+  - patternType: "naming_convention"
+    pattern: "BL21\\([A-Za-z0-9]+\\)\\s*[A-Za-z]*"
+    toolType: "genetic_reagent"
+    examples: ["BL21(DE3) Star"]
+    reasoning: "BL21 E. coli strains are standard bacterial expression hosts with various modifications"
+
+  - patternType: "context_phrase"
+    pattern: "processed with|analyzed by using|prediction.*conducted|software"
+    toolType: "computational_tool"
+    examples: ["processed with NMRPipe", "analyzed by using CcpNMR"]
+    reasoning: "Context phrases that reliably indicate computational tool usage in data analysis"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z\\s]+Laboratories\\)|\\(Invitrogen\\)|\\(Sigma\\)|\\(Thermo\\)"
+    toolType: "general"
+    examples: ["(Cambridge Isotope Laboratories)", "(Invitrogen)"]
+    reasoning: "Vendor names in parentheses often indicate commercial reagents or tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a clear laboratory research study
+    - Multiple computational tools (NMRPipe, CcpNMR, TALOS+) were missed
+    - Genetic reagents (expression plasmid, bacterial strain) were missed
+    - This represents a significant gap in the mining patterns for structural biology/NMR studies
+  recommendations: |
+    This publication should have yielded at least 5 research tools but none were captured by the mining process.
+    All 5 potentially missed tools should be added as they represent genuine research tools used in the study:
+    - 3 computational tools for NMR data processing and analysis
+    - 2 genetic reagents for protein expression
+    
+    The mining patterns need significant improvement for:
+    - NMR analysis software (specialized field with unique tool names)
+    - Expression vectors with complex nomenclature (pET series)
+    - Bacterial strains with parenthetical modifications
+    
+    No observations were extracted as this is a methods/technical paper focused on NMR assignments
+    rather than biological phenotypes or functional studies. The paper provides structural data
+    but no phenotypic observations suitable for the observation schema.

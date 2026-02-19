@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "9001241"
+  title: "Nf1-deficient mouse Schwann cells are angiogenic and invasive and can be induced to hyperproliferate: reversion of some phenotypes by an inhibitor of farnesyl protein transferase."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this being a laboratory research study on mouse Schwann cells and NF1:
+    - Animal models (Nf1-deficient mice, likely knockout/heterozygous strains)
+    - Cell lines (primary Schwann cell cultures from mutant mice)
+    - Genetic reagents (Nf1 mutations, potentially vectors or constructs)
+    - Computational tools (possibly for data analysis, though not evident from abstract)
+    - Clinical assessment tools (unlikely for this basic research study)
+    
+    The study involves cell culture, genetic manipulation, and phenotypic analysis,
+    suggesting multiple tool types should be present in the full methodology.
+  overallAssessment: |
+    This is clearly a laboratory research study investigating Nf1-deficient mouse Schwann cells
+    and their cellular phenotypes. The work involves primary cell culture, genetic models, and
+    pharmacological interventions, which would typically require multiple research tools including
+    animal models, cell culture systems, and reagents. However, only the abstract is available
+    for analysis, limiting tool detection capabilities.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1-deficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "mouse Schwann cells heterozygous or null at Nf1 display angiogenic and invasive properties"
+    whyMissed: "Animal model not detected - likely due to generic phrasing 'Nf1-deficient' rather than specific strain nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 heterozygous mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "mouse Schwann cells heterozygous or null at Nf1"
+    whyMissed: "Specific genotype mentioned but not recognized as distinct animal model"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 null mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "mouse Schwann cells heterozygous or null at Nf1"
+    whyMissed: "Null mutant genotype mentioned but not captured as animal model"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "mouse Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "We have developed a potential model of Schwann cell tumor formation...mouse Schwann cells heterozygous or null at Nf1"
+    whyMissed: "Primary cell culture system not detected - may need patterns for 'primary cells' or 'cultured cells'"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "farnesyl protein transferase inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "an anti-Ras farnesyl protein transferase inhibitor greatly diminished both clone formation and hyperproliferation"
+    whyMissed: "Pharmacological reagent not captured - may need patterns for 'inhibitor' compounds"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+  - toolName: "P0 protein"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "exhibit decreased expression of the cell differentiation marker P0 protein"
+    whyMissed: "Protein marker mentioned but not detected - could be antibody target or expression construct"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1[+-]deficient|Nf1[+-]null|Nf1[+-]heterozygous"
+    toolType: "animal_model"
+    examples: ["Nf1-deficient mouse", "Nf1 null", "Nf1 heterozygous"]
+    reasoning: "Captures genetic model nomenclature for NF1 research that uses descriptive rather than formal strain names"
+
+  - patternType: "context_phrase"
+    pattern: "(mouse|rat|human)\\s+(\\w+\\s+)?cells?\\s+(heterozygous|null|deficient|mutant)"
+    toolType: "cell_line"
+    examples: ["mouse Schwann cells heterozygous", "mouse Schwann cells null"]
+    reasoning: "Identifies primary cell cultures derived from genetically modified animals"
+
+  - patternType: "term"
+    pattern: "farnesyl\\s+protein\\s+transferase\\s+inhibitor|FTI|farnesyltransferase\\s+inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["farnesyl protein transferase inhibitor", "anti-Ras farnesyl protein transferase inhibitor"]
+    reasoning: "Captures specific class of pharmacological inhibitors commonly used in NF1/Ras pathway research"
+
+  - patternType: "context_phrase"
+    pattern: "(protein|marker)\\s+P0|P0\\s+(protein|marker|expression)"
+    toolType: "genetic_reagent"
+    examples: ["P0 protein", "cell differentiation marker P0 protein"]
+    reasoning: "Identifies P0 as a specific molecular marker that could represent antibody targets or expression constructs"
+
+  - patternType: "context_phrase"
+    pattern: "primary\\s+(\\w+\\s+)?cells?\\s+(from|derived|isolated)"
+    toolType: "cell_line"
+    examples: ["primary Schwann cells from", "primary cells derived"]
+    reasoning: "Better captures primary cell culture systems that are distinct from immortalized cell lines"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage
+    - Only abstract available - full Methods section would likely contain detailed tool information
+    - Multiple animal models and cell culture systems mentioned but not detected
+    - Pharmacological reagents (FTI inhibitor) not captured
+    - Primary cell culture systems not recognized as distinct from cell lines
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by initial mining:
+    
+    1. ANIMAL MODELS: At least 3 distinct Nf1 genotypes (heterozygous, null, wild-type controls) should be added
+    2. CELL CULTURE: Primary mouse Schwann cell cultures from these genetic backgrounds
+    3. REAGENTS: Farnesyl transferase inhibitor as pharmacological tool
+    4. MARKERS: P0 protein as differentiation marker (potential antibody target)
+    
+    The mining patterns need significant improvement for:
+    - Genetic model nomenclature (descriptive vs. formal strain names)
+    - Primary cell culture recognition
+    - Pharmacological inhibitor detection
+    - Protein marker identification
+    
+    This represents a major gap in tool detection for NF1 research publications.
+    All 5-6 missed tools should be manually added to improve database completeness.
+    
+    No observations could be extracted due to lack of Results/Discussion sections,
+    but the abstract suggests multiple phenotypic findings that would be captured
+    from the full text.

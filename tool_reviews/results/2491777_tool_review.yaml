@@ -1,0 +1,172 @@
+publicationMetadata:
+  pmid: "2491777"
+  title: "Genetic linkage mapping of chromosome 17 markers and neurofibromatosis type I."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"  # Genetic linkage mapping study using molecular markers
+  publicationTypeConfidence: 0.9  # High confidence - clear genetic analysis methodology
+  hasMethodsSection: No
+  likelyContainsTools: Yes  # Genetic markers/probes are research tools
+  expectedToolTypes: |
+    Based on publication type (genetic linkage mapping study):
+    - genetic reagents (DNA probes, markers) - PRIMARY expected type
+    - computational tools (linkage analysis software) - SECONDARY expected type
+    
+    This is a molecular genetics study from 1989 using DNA probes for linkage mapping.
+    The study mentions multiple genetic markers/probes (HHH202, D17Z1, EW203, etc.)
+    which are genetic reagents used for genotyping and linkage analysis.
+    
+    Note: While queryType is "bench", this is specifically a genetic mapping study,
+    not typical lab bench work with antibodies/cell lines. The tools are genetic
+    markers and potentially computational tools for lod score calculations.
+  overallAssessment: |
+    This 1989 genetic linkage mapping study would typically use genetic reagents (DNA probes/markers)
+    and computational tools for linkage analysis. The study describes using multiple chromosome 17
+    markers for genotyping families and calculating lod scores, which requires both molecular
+    reagents and statistical analysis software. However, no tools were mined despite clear
+    mentions of genetic markers like HHH202, D17Z1, EW203, etc.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HHH202"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...More than 150 members in six families were typed with probes including HHH202, D17Z1, EW203..."
+    whyMissed: "DNA probe/marker not recognized by mining patterns - likely missing genetic marker nomenclature patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "D17Z1"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207..."
+    whyMissed: "Chromosome-specific marker nomenclature not captured by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "EW203"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301..."
+    whyMissed: "EW-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "EW206"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301..."
+    whyMissed: "EW-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "EW207"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301..."
+    whyMissed: "EW-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "EW301"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301, pA10-41..."
+    whyMissed: "EW-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "pA10-41"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301, pA10-41, D17S37..."
+    whyMissed: "Plasmid-based probe nomenclature (pA prefix) not captured by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "D17S37"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301, pA10-41, D17S37, and D17S36..."
+    whyMissed: "D17S-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+  - toolName: "D17S36"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...typed with probes including HHH202, D17Z1, EW203, EW206, EW207, EW301, pA10-41, D17S37, and D17S36..."
+    whyMissed: "D17S-series marker nomenclature not recognized by mining patterns"
+    confidence: 0.95  # Very high confidence this is a genetic reagent
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "D[0-9]+Z[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["D17Z1"]
+    reasoning: "Centromeric repeat markers follow D[chromosome]Z[number] nomenclature - common in genetic mapping"
+
+  - patternType: "naming_convention"
+    pattern: "D[0-9]+S[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["D17S37", "D17S36"]
+    reasoning: "Single-copy sequence markers follow D[chromosome]S[number] nomenclature - standard in genetic mapping"
+
+  - patternType: "naming_convention"
+    pattern: "EW[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["EW203", "EW206", "EW207", "EW301"]
+    reasoning: "EW-series markers appear to be laboratory-specific probe nomenclature for genetic mapping"
+
+  - patternType: "naming_convention"
+    pattern: "HHH[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["HHH202"]
+    reasoning: "HHH-series markers appear to be laboratory-specific probe nomenclature for genetic mapping"
+
+  - patternType: "naming_convention"
+    pattern: "pA[0-9]+-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["pA10-41"]
+    reasoning: "Plasmid-based probes with pA prefix followed by clone numbers - common in 1980s genetic mapping"
+
+  - patternType: "context_phrase"
+    pattern: "typed with probes"
+    toolType: "genetic_reagent"
+    examples: ["More than 150 members in six families were typed with probes including HHH202, D17Z1..."]
+    reasoning: "Phrase 'typed with probes' strongly indicates use of genetic markers/reagents for genotyping"
+
+  - patternType: "context_phrase"
+    pattern: "lod scores.*versus.*markers"
+    toolType: "genetic_reagent"
+    examples: ["Two-point lod scores for NF1 versus all markers were calculated"]
+    reasoning: "Lod score analysis context indicates genetic markers being used as research tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9  # Nine genetic markers/probes were completely missed
+  newPatternsCount: 7  # Seven new patterns suggested for genetic reagent detection
+  observationsExtracted: 0  # No observations since no tools were validated
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: All genetic markers/probes were missed by mining (9 tools not detected)
+    - Mining patterns completely failed to capture genetic reagent nomenclature from 1980s
+    - Standard genetic mapping markers (D17Z1, D17S37, etc.) not recognized
+    - Laboratory-specific probe names (HHH202, EW-series) not captured
+    - Plasmid-based probes (pA10-41) not detected
+    - Context phrases like "typed with probes" not triggering genetic reagent detection
+  recommendations: |
+    URGENT: This publication reveals major gaps in genetic reagent mining patterns.
+    - ADD all 9 missed genetic markers as validated tools
+    - IMPLEMENT suggested nomenclature patterns for D[chr]S/Z markers, EW-series, HHH-series, pA-series
+    - ADD context phrase patterns like "typed with probes", "lod scores versus markers"
+    - REVIEW other 1980s-1990s genetic mapping papers for similar missed tools
+    - CONSIDER that genetic mapping studies are rich sources of genetic reagents
+    - UPDATE mining to better capture historical genetic marker nomenclature
+    - This represents a systematic failure to detect an entire class of genetic tools

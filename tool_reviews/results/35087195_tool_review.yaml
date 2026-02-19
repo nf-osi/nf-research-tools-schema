@@ -1,0 +1,267 @@
+publicationMetadata:
+  pmid: "35087195"
+  title: "Altered canonical and striatal-frontal resting state functional connectivity in children with pathogenic variants in the Ras/mitogen-activated protein kinase pathway."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"  # Neuroimaging study with experimental methods
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a neuroimaging study examining functional brain connectivity in children with Noonan syndrome.
+    Expected tool types:
+    - Computational tools: Neuroimaging analysis software (FSL, FEAT, melodic, FMRIPrep, etc.)
+    - Clinical assessment tools: Cognitive assessment instruments (Wechsler Intelligence Scale, NEPSY-II)
+    - Potentially animal models: References to mouse models in discussion
+    
+    The study involves fMRI data acquisition, preprocessing, and statistical analysis, which requires
+    specialized neuroimaging software. Clinical assessments are used to measure cognitive phenotypes.
+  overallAssessment: |
+    This neuroimaging study clearly uses research tools across multiple categories. The Methods section
+    describes detailed neuroimaging protocols using specialized software for data processing and analysis.
+    Clinical assessment tools are used to measure cognitive outcomes. The mining system appears to have
+    completely missed these tools, suggesting significant gaps in pattern recognition for neuroimaging
+    and clinical assessment contexts.
+
+toolValidations: []
+  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "FSL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...We used dual regression to estimate individual maps representing participant-specific versions of each network for all participants...randomise tool with threshold-free cluster enhancement..."
+    whyMissed: "FSL is a major neuroimaging software suite mentioned multiple times but not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "melodic"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...First, we ran group-based ICA using melodic v3.15 to produce RSNs across the cohort..."
+    whyMissed: "Specific FSL tool with version number, clear software usage context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FMRIPrep"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...structural and functional scans were of sufficient quality and sufficiently similar in orientation to pass registration procedures as defined by FMRIPrep"
+    whyMissed: "Neuroimaging preprocessing pipeline with URL reference, clear usage context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FEAT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...We used fMRI Expert Analysis Tool (FEAT) to model extracted time series from ROIs in conjunction with all other grey matter voxels..."
+    whyMissed: "FSL analysis tool with full name expansion, clear experimental usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "randomise"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...group differences were estimated using the randomise tool with threshold-free cluster enhancement..."
+    whyMissed: "FSL statistical tool, clear analysis context"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "FSLCC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...We then compared each component to canonical RSNs using spatial correlation (FSLCC)..."
+    whyMissed: "FSL correlation tool, specific analysis function"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "FSLeyes"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...we created anatomical masks for each left and right caudate and putamen using the Harvard-Oxford subcortical atlas in FSLeyes..."
+    whyMissed: "FSL visualization tool, clear usage for mask creation"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Principal components analysis (PCA) was performed for data reduction across all participants...using the prcomp function in R..."
+    whyMissed: "Statistical software with specific function mentioned"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MICE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Prior to PCA we performed data imputation (N=20 imputations) using a predictive mean matching for mixed types and the Multiple Imputation by Chained Equations (MICE) package in R..."
+    whyMissed: "R package for statistical analysis, full name provided"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler Intelligence Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Participants completed age-appropriate versions of the Wechsler Intelligence Scale..."
+    whyMissed: "Standardized cognitive assessment instrument, clear clinical usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NEPSY-II"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...select subtests from A Developmental NEuroPSYchological Assessment (NEPSY-II..."
+    whyMissed: "Neuropsychological assessment battery with full name expansion"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Tanner staging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Pubertal status was assessed by an experienced physician using Tanner staging..."
+    whyMissed: "Clinical assessment scale for pubertal development"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FSL|melodic|FEAT|FMRIPrep|randomise|FSLCC|FSLeyes"
+    toolType: "computational_tool"
+    examples: ["melodic v3.15", "fMRI Expert Analysis Tool (FEAT)", "FMRIPrep"]
+    reasoning: "FSL is a major neuroimaging software suite with multiple component tools that are commonly used in fMRI studies"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+([A-Z][a-zA-Z0-9]+)\\s+v?\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["using melodic v3.15", "using R v4.2"]
+    reasoning: "Software tools are often mentioned with version numbers in this format"
+
+  - patternType: "term"
+    pattern: "Wechsler Intelligence Scale|NEPSY-II|Tanner staging"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler Intelligence Scale", "NEPSY-II", "Tanner staging"]
+    reasoning: "Standard clinical assessment instruments used in pediatric neuropsychological studies"
+
+  - patternType: "context_phrase"
+    pattern: "assessed\\s+using|administered|completed.*versions of|using.*assessment"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed using Tanner staging", "completed age-appropriate versions of the Wechsler"]
+    reasoning: "Common phrases indicating clinical assessment tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}(-[A-Z]{2,})?\\b"
+    toolType: "computational_tool"
+    examples: ["MICE", "PCA", "ICA"]
+    reasoning: "Acronyms for statistical methods and computational tools are common in neuroimaging"
+
+  - patternType: "context_phrase"
+    pattern: "package in R|function in R|using.*R"
+    toolType: "computational_tool"
+    examples: ["MICE package in R", "prcomp function in R"]
+    reasoning: "R packages and functions are commonly mentioned in statistical analysis contexts"
+
+observations:
+  - resourceName: "Wechsler Intelligence Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The NS group demonstrated lower full-scale IQ compared to typically developing children.
+      This represents a cognitive phenotype associated with Noonan syndrome pathogenic variants.
+    foundIn: "results"
+    contextSnippet: "The NS group demonstrated lower full-scale IQ and lower scores for most NEPSY-II subtests"
+    confidence: 0.9
+    doi: "10.1038/s41380-021-01422-5"
+
+  - resourceName: "NEPSY-II"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Children with NS showed lower scores on most NEPSY-II subtests compared to typically developing children.
+      The inhibition/motor component derived from NEPSY-II was significantly related to connectivity within
+      left frontoparietal and limbic networks in the NS group but not in typically developing children.
+    foundIn: "results"
+    contextSnippet: "The NS group demonstrated lower full-scale IQ and lower scores for most NEPSY-II subtests...Within the NS group the inhibition/motor component was significantly related to connectivity"
+    confidence: 0.9
+    doi: "10.1038/s41380-021-01422-5"
+
+  - resourceName: "FSL"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FSL tools were successfully used for comprehensive fMRI analysis including ICA (melodic), 
+      dual regression, statistical analysis (randomise), and visualization (FSLeyes). The study
+      demonstrates effective integration of multiple FSL components for resting-state connectivity analysis.
+    foundIn: "methods"
+    contextSnippet: "group-based ICA using melodic v3.15...randomise tool with threshold-free cluster enhancement...anatomical masks...using the Harvard-Oxford subcortical atlas in FSLeyes"
+    confidence: 0.9
+    doi: "10.1038/s41380-021-01422-5"
+
+  - resourceName: "FMRIPrep"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FMRIPrep was used for quality control of structural and functional scans, ensuring sufficient
+      quality and proper registration procedures. Data inclusion criteria required scans to pass
+      FMRIPrep registration procedures.
+    foundIn: "methods"
+    contextSnippet: "structural and functional scans were of sufficient quality and sufficiently similar in orientation to pass registration procedures as defined by FMRIPrep"
+    confidence: 0.9
+    doi: "10.1038/s41380-021-01422-5"
+
+  - resourceName: "R"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R was used for principal components analysis (PCA) using the prcomp function for data reduction
+      across NEPSY-II scores. Multiple Imputation by Chained Equations (MICE) package in R was used
+      for handling missing data with predictive mean matching.
+    foundIn: "methods"
+    contextSnippet: "Principal components analysis (PCA) was performed...using the prcomp function in R...Multiple Imputation by Chained Equations (MICE) package in R"
+    confidence: 0.9
+    doi: "10.1038/s41380-021-01422-5"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    General Comment or Review: 2
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Complete failure to detect any tools despite clear presence of multiple computational and clinical assessment tools
+    - No recognition of FSL neuroimaging software suite (melodic, FEAT, randomise, FSLCC, FSLeyes)
+    - Missed standard clinical assessment instruments (Wechsler Intelligence Scale, NEPSY-II, Tanner staging)
+    - No detection of statistical software (R) and packages (MICE)
+    - Missing neuroimaging preprocessing pipeline (FMRIPrep)
+    - Suggests major gaps in pattern recognition for neuroimaging and clinical assessment contexts
+  recommendations: |
+    This publication contains numerous genuine research tools that were completely missed by the mining system:
+    
+    COMPUTATIONAL TOOLS (8 missed):
+    - FSL suite components (melodic, FEAT, randomise, FSLCC, FSLeyes) - major neuroimaging software
+    - FMRIPrep - preprocessing pipeline with URL reference
+    - R - statistical software with specific functions mentioned
+    - MICE - R package for statistical analysis
+    
+    CLINICAL ASSESSMENT TOOLS (3 missed):
+    - Wechsler Intelligence Scale - standard IQ assessment
+    - NEPSY-II - neuropsychological assessment battery
+    - Tanner staging - clinical assessment scale
+    
+    URGENT ACTIONS NEEDED:
+    1. Add FSL-specific patterns to capture neuroimaging tools
+    2. Improve detection of clinical assessment instruments
+    3. Enhance recognition of software with version numbers
+    4. Add patterns for R packages and statistical tools
+    5. Include context phrases like "assessed using", "analyzed with"
+    
+    The mining system appears to have significant blind spots for neuroimaging and clinical assessment contexts.
+    This represents a major gap that needs immediate attention to improve tool detection accuracy.

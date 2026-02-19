@@ -1,0 +1,102 @@
+publicationMetadata:
+  pmid: "15446585"
+  title: "Gene expression profiling reveals unique molecular subtypes of Neurofibromatosis Type I-associated and sporadic malignant peripheral nerve sheath tumors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a gene expression profiling study using oligonucleotide microarrays, which clearly indicates
+    the use of computational tools for data analysis and potentially genetic reagents (microarray chips).
+    The study analyzed 42 tumor samples (25 NF1-associated and 17 sporadic MPNSTs), suggesting potential
+    use of patient-derived models or tissue samples. Statistical analysis methods mentioned indicate
+    computational tools were used for clustering and gene expression analysis.
+  overallAssessment: |
+    This is a laboratory research study involving gene expression profiling of tumor samples using
+    oligonucleotide microarrays. Such studies typically require computational tools for data analysis,
+    statistical software for clustering approaches, and potentially genetic reagents (microarray platforms).
+    The mention of "oligonucleotide microarrays representing approximately 8100 unique human gene transcripts"
+    and "statistical approaches" strongly suggests computational tools were used but not captured in the mining.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "oligonucleotide microarrays"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...we performed gene expression profiling on 25 NF1-associated and 17 sporadic MPNSTs using oligonucleotide microarrays representing approximately 8100 unique human gene transcripts..."
+    whyMissed: "This is a specific genetic reagent/platform used for gene expression analysis but may not have been recognized as a research tool by the mining algorithm"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "unsupervised clustering approach"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...However, using an unsupervised clustering approach, we identified an extensive gene expression signature that distinguished 9 of the 42 tumors analyzed..."
+    whyMissed: "This refers to a computational method/algorithm used for data analysis but may be too generic for the mining patterns"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "statistical approaches"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Using several previously reported statistical approaches, we were unable to identify a molecular signature..."
+    whyMissed: "Generic term for computational/statistical methods, likely too broad for specific tool mining"
+    confidence: 0.40
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "oligonucleotide microarray[s]?"
+    toolType: "genetic_reagent"
+    examples: ["oligonucleotide microarrays representing approximately 8100 unique human gene transcripts"]
+    reasoning: "Oligonucleotide microarrays are specific genetic reagents/platforms used for gene expression profiling and should be captured as research tools"
+
+  - patternType: "context_phrase"
+    pattern: "gene expression profiling.*using\\s+([\\w\\s]+microarray[s]?)"
+    toolType: "genetic_reagent"
+    examples: ["gene expression profiling on 25 NF1-associated and 17 sporadic MPNSTs using oligonucleotide microarrays"]
+    reasoning: "Context phrase that indicates the use of microarray technology as a research tool in gene expression studies"
+
+  - patternType: "term"
+    pattern: "unsupervised clustering"
+    toolType: "computational_tool"
+    examples: ["using an unsupervised clustering approach"]
+    reasoning: "Unsupervised clustering is a specific computational method commonly used in genomics research and should be recognized as a computational tool"
+
+  - patternType: "naming_convention"
+    pattern: "representing approximately \\d+ unique.*gene transcripts"
+    toolType: "genetic_reagent"
+    examples: ["representing approximately 8100 unique human gene transcripts"]
+    reasoning: "This pattern indicates the specification of microarray or gene panel content, which is characteristic of genetic reagent descriptions"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available - Methods section would likely contain more detailed tool information
+    - Oligonucleotide microarrays are clearly research tools (genetic reagents) but were not captured
+    - Computational tools for statistical analysis and clustering were used but not identified
+    - Limited text availability (abstract only) may have hindered comprehensive tool mining
+  recommendations: |
+    This publication clearly used research tools but none were captured by the mining process.
+    The most significant missed tool is "oligonucleotide microarrays" which should definitely be added
+    as a genetic reagent. The unsupervised clustering approach represents a computational tool that
+    could be added with moderate confidence. The mining patterns should be enhanced to capture
+    microarray technologies and gene expression profiling platforms. Future mining should include
+    patterns for oligonucleotide microarrays and similar genomic platforms. The lack of full-text
+    sections (Methods, Results, Discussion) significantly limited the ability to identify additional
+    tools and extract scientific observations. No observations could be extracted due to lack of
+    Results/Discussion sections.

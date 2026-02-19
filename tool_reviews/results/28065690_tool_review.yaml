@@ -1,0 +1,127 @@
+publicationMetadata:
+  pmid: "28065690"
+  title: "Medium throughput biochemical compound screening identifies novel agents for pharmacotherapy of neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract describing laboratory research with compound screening and xenograft studies:
+    - Cell lines (human MPNST cells mentioned)
+    - Animal models (xenograft model mentioned)
+    - Genetic reagents (compounds: Cantharidin, Nifedipine)
+    - Computational tools (potentially for screening analysis, though not explicitly mentioned)
+    
+    This is clearly a bench research study involving cell culture, animal models, and compound testing.
+    The lack of full text limits comprehensive tool identification.
+  overallAssessment: |
+    This is a laboratory research publication describing compound screening and preclinical testing,
+    which would typically involve multiple research tools including cell lines, animal models, and
+    chemical reagents. However, no tools were mined and no full text sections are available,
+    severely limiting the ability to identify and validate specific research tools used.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "human NF1-associated malignant peripheral nerve sheath tumor (MPNST) cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Validation of screening results using human NF1-associated malignant peripheral nerve sheath tumor (MPNST) cells showed that Cantharidin effectively impeded MPNST cell growth"
+    whyMissed: "Cell line mentioned in abstract but not detected by mining algorithms - may need better pattern recognition for disease-associated cell line descriptions"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST xenograft animal model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Nifedipine treatment significantly decreased local tumor growth in an MPNST xenograft animal model"
+    whyMissed: "Xenograft model mentioned but not detected - may need patterns for 'xenograft animal model' terminology"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Cantharidin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Cell-based screening of known bioactive compounds library identified the protein phosphatase 2A (PP2A) inhibitor Cantharidin"
+    whyMissed: "Chemical compound/inhibitor not detected - may need patterns for specific inhibitor names and bioactive compounds"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "Nifedipine"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "the L-type calcium channel blocker Nifedipine as potential candidates for NF1 pharmacotherapy"
+    whyMissed: "Chemical compound/blocker not detected - may need patterns for specific drug/compound names"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "bioactive compounds library"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Cell-based screening of known bioactive compounds library identified"
+    whyMissed: "Compound library not detected - may need patterns for screening libraries and compound collections"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "xenograft animal model"
+    toolType: "animal_model"
+    examples: ["MPNST xenograft animal model"]
+    reasoning: "This phrase clearly indicates use of patient-derived xenograft models in animal studies"
+
+  - patternType: "context_phrase"
+    pattern: "human [disease/tumor type] cells"
+    toolType: "cell_line"
+    examples: ["human NF1-associated malignant peripheral nerve sheath tumor (MPNST) cells"]
+    reasoning: "Pattern to catch disease-associated human cell lines that may not follow standard nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "[compound name] inhibitor|[compound name] blocker"
+    toolType: "genetic_reagent"
+    examples: ["protein phosphatase 2A (PP2A) inhibitor Cantharidin", "L-type calcium channel blocker Nifedipine"]
+    reasoning: "Chemical inhibitors and blockers are important research reagents that should be captured"
+
+  - patternType: "term"
+    pattern: "bioactive compounds library|compound library|screening library"
+    toolType: "genetic_reagent"
+    examples: ["known bioactive compounds library"]
+    reasoning: "Compound libraries used in screening assays are important research resources"
+
+  - patternType: "context_phrase"
+    pattern: "cell-based screening|compound screening"
+    toolType: "computational_tool"
+    examples: ["Cell-based screening of known bioactive compounds library", "Medium throughput biochemical compound screening"]
+    reasoning: "Screening assays often involve computational analysis tools that may not be explicitly named"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - No full text sections available (Methods, Introduction, Results, Discussion all empty)
+    - Only abstract text available for analysis, severely limiting tool identification
+    - Multiple research tools are clearly mentioned in abstract but were not detected
+    - This represents a significant mining failure for a bench research publication
+  recommendations: |
+    This publication clearly describes laboratory research involving cell lines, animal models,
+    and chemical reagents, but no tools were detected by the mining process. This suggests
+    major gaps in the mining patterns. Recommendations:
+    
+    1. Add the 5 potentially missed tools identified from the abstract
+    2. Implement the 5 suggested patterns to improve future mining
+    3. Investigate why no tools were detected from this bench research publication
+    4. Consider obtaining full text to identify additional tools in Methods section
+    5. Review mining algorithms for compound screening and xenograft model terminology
+    
+    The lack of full text severely limits comprehensive tool validation and observation
+    extraction. This publication would benefit from manual curator review with full text access.

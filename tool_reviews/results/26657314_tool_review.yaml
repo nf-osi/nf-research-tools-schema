@@ -1,0 +1,280 @@
+publicationMetadata:
+  pmid: "26657314"
+  title: "Immortalized Human Schwann Cell Lines Derived From Tumors of Schwannomatosis Patients."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a laboratory research study focused on:
+    - Developing immortalized human Schwann cell lines from patient tumors
+    - Cell culture techniques and characterization
+    - Gene expression analysis using microarrays and qRT-PCR
+    - Immunocytochemistry for cell marker validation
+    
+    Expected tool types:
+    - Cell lines (the newly developed schwannomatosis cell lines)
+    - Antibodies (S100B, Thy-1, p75NTR for cell characterization)
+    - Genetic reagents (SV40 large T antigen for immortalization, primers for qRT-PCR)
+    - Computational tools (microarray analysis software, qRT-PCR analysis tools)
+    
+    Note: Despite being found by "clinical" query, this is clearly bench research developing cellular models.
+  overallAssessment: |
+    This is a laboratory research study that developed immortalized human Schwann cell lines from schwannomatosis patient tumors. The publication extensively describes experimental methods including cell culture, immortalization techniques, immunocytochemistry, gene expression analysis, and microarray studies. Multiple research tools are used throughout including antibodies for cell characterization, genetic reagents for immortalization, and computational tools for data analysis. The complete absence of mined tools indicates significant gaps in the mining patterns for this type of cellular biology research.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Hp-SWN-14F"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We established 2 cells lines from separate schwannomatosis (SWN) patients. One tumor caused the patient great pain (Hp-SWN-14F)"
+    whyMissed: "Cell line naming convention not recognized - patient-derived cell line with custom nomenclature"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Hnp-SWN-14O"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "and the other was removed due to neurological deficit but was not associated with pain (Hnp-SWN-14O)"
+    whyMissed: "Cell line naming convention not recognized - patient-derived cell line with custom nomenclature"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "S100B antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The schwannomatosis cell lines were stained with S100B antibodies to confirm Schwann cell identity"
+    whyMissed: "Antibody mentioned without specific vendor/catalog information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Thy-1 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "After passaging the cells were examined by immunocytochemistry for the Schwann cell marker S100B, and the fibroblast marker Thy-1"
+    whyMissed: "Antibody mentioned in immunocytochemistry context without vendor details"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pLenti-SV40"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cells were immortalized using pLenti-SV40 from ABM (catalog number G203)"
+    whyMissed: "Plasmid/vector name not recognized despite having catalog number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina Human HT-12 microarray"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RNA from SWN tumor samples, SWN cell lines, and normal primary Human Schwann cells were analyzed using the Illumina Human HT-12 microarray"
+    whyMissed: "Microarray platform not recognized as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Ingenuity iReport software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differences in expression between the two groups were identified using the Ingenuity iReport software"
+    whyMissed: "Bioinformatics software name not in pattern database"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nexus Gene expression software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differences in expression between the two groups were identified using the Ingenuity iReport software, and Nexus Gene expression software"
+    whyMissed: "Gene expression analysis software not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "DAVID gene ontology software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Functional gene groupings were complied using DAVID gene ontology software"
+    whyMissed: "Bioinformatics tool for gene ontology analysis not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "QuantiTect SYBR Green PCR kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "One microliter of each tumor, cell line, and normal primary human Schwann cell cDNA, was used for real-time qRT-PCR using QuantiTect SYBR Green PCR kit (Qiagen)"
+    whyMissed: "PCR reagent kit not recognized despite vendor information"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Quantitect Reverse Transcription kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "1ug of total RNA was converted to cDNA using the Quantitect Reverse Transcription kit (Qiagen)"
+    whyMissed: "RT-PCR kit not recognized despite vendor information"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]*-[A-Z]{2,4}-[0-9]{2}[A-Z]"
+    toolType: "cell_line"
+    examples: ["Hp-SWN-14F", "Hnp-SWN-14O"]
+    reasoning: "Patient-derived cell line naming convention with phenotype prefix, disease abbreviation, year and patient identifier"
+
+  - patternType: "context_phrase"
+    pattern: "stained with .* antibod(y|ies)"
+    toolType: "antibody"
+    examples: ["stained with S100B antibodies"]
+    reasoning: "Immunocytochemistry context indicating antibody usage for cell characterization"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized using [A-Za-z0-9-]+"
+    toolType: "genetic_reagent"
+    examples: ["immortalized using pLenti-SV40"]
+    reasoning: "Cell immortalization context indicating genetic reagent usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(catalog number [A-Z0-9]+\\)"
+    toolType: "general"
+    examples: ["(catalog number G203)"]
+    reasoning: "Catalog number in parentheses strongly indicates commercial research tool"
+
+  - patternType: "term"
+    pattern: "microarray|gene chip|expression array"
+    toolType: "computational_tool"
+    examples: ["Illumina Human HT-12 microarray"]
+    reasoning: "Microarray platforms are computational tools for gene expression analysis"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|identified using"
+    toolType: "computational_tool"
+    examples: ["analyzed using the Illumina Human HT-12 microarray", "identified using the Ingenuity iReport software"]
+    reasoning: "Analysis context phrases indicating computational tool usage"
+
+  - patternType: "term"
+    pattern: "DAVID|Ingenuity|Nexus Gene|gene ontology software"
+    toolType: "computational_tool"
+    examples: ["DAVID gene ontology software", "Ingenuity iReport software", "Nexus Gene expression software"]
+    reasoning: "Specific bioinformatics software names commonly used in genomics research"
+
+  - patternType: "context_phrase"
+    pattern: "PCR kit|RT kit|reverse transcription kit"
+    toolType: "genetic_reagent"
+    examples: ["QuantiTect SYBR Green PCR kit", "Quantitect Reverse Transcription kit"]
+    reasoning: "Commercial molecular biology kits are genetic reagents"
+
+observations:
+  - resourceName: "Hp-SWN-14F"
+    resourceType: "Cell Line"
+    observationType: "Growth Rate"
+    observationTypeOntologyId: "MP:0005378"
+    details: |
+      Population doubling time was similar between immortalized Hp-SWN-14F schwannomatosis cell line and non-immortalized human Schwann cells in culture at passage 6. Growth curve analysis showed comparable proliferation rates, indicating that SV40 immortalization did not significantly alter the growth characteristics of the schwannomatosis cells.
+    foundIn: "results"
+    contextSnippet: "At passage 6 we performed a growth curve for Hp-SWN-14F schwannomatosis cell and non-immortalized human Schwann cells in culture. Population doubling time was similar in all cells"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "Hp-SWN-14F"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Hp-SWN-14F cell line maintained Schwann cell characteristics after multiple passages and freeze-thaw cycles, including positive S100B staining and expression of Schwann cell markers (p75/NGFR, S100B, NGF). Cell morphology was retained following multiple passaging cycles.
+    foundIn: "results"
+    contextSnippet: "Primary Human Schwann cells, and schwannomatosis cell lines (Hp-SWN-14F and Hnp-SWN-14O) all positively stained for S100B after multiple passages and freeze-thaw cycles"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "Hnp-SWN-14O"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Hnp-SWN-14O cell line retained S100B staining and Schwann cell properties at passage 11, demonstrating stable phenotype maintenance through extended passaging. The cell line maintained expression of key Schwann cell markers including p75/NGFR, S100B, and NGF.
+    foundIn: "results"
+    contextSnippet: "Hnp-SWN-14O retains S100B staining and Schwann cell properties at passage 11"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "Hp-SWN-14F"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Gene expression analysis revealed that 509/31,000 (1.6%) of genes showed 2-fold difference in the immortalized Hp-SWN-14F cell line compared to parent tumor tissue. Upregulated genes clustered into mitosis-related categories, while downregulated genes related to immune response and myelination. When compared to normal primary human Schwann cells, 471/510 (92%) of differentially expressed genes showed similar expression levels.
+    foundIn: "results"
+    contextSnippet: "509/31,000 (1.6%) of genes showed a 2 fold difference in the immortalized cell line when compared to the parent tissue"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "Hnp-SWN-14O"
+    resourceType: "Cell Line"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      SMARCB1 expression was significantly downregulated (5-fold) in the Hnp-SWN-14O cell line compared to non-schwannomatosis schwannomas and neurofibromas. SMARCB1 levels were similar between the parent tumor and corresponding cell line, supporting retention of the key genetic characteristic associated with schwannomatosis.
+    foundIn: "results"
+    contextSnippet: "SMARCB1 expression was downregulated 8 fold in painful schwannomatosis tumor and 5 fold in the non-painful schwannomatosis tumor compared to a non-schwannomatosis schwannomas"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "pLenti-SV40"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SV40 immortalization protocol: Cells at passage 3 were infected with 2 ml/well of viral supernatant in presence of 5μg/ml Polybrene in morning, re-infected 6-8 hours later with fresh supernatant, then incubated for ~72 hours before subculturing. Successful immortalization was confirmed by qRT-PCR screening for SV40 transgene using specific primers.
+    foundIn: "methods"
+    contextSnippet: "cells at passage 3 were infected with 2 ml/well of viral supernatant in the presence of 5μg/ml Polybrene, in the morning. 6–8 hours later, the viral supernatant from first infection was removed"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0144620"
+
+  - resourceName: "S100B antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      S100B antibodies successfully used for immunocytochemistry to confirm Schwann cell identity in both primary cultures and immortalized cell lines. Positive staining was maintained after multiple passages and freeze-thaw cycles, demonstrating reliable performance for Schwann cell characterization.
+    foundIn: "results"
+    contextSnippet: "The schwannomatosis cell lines were stained with S100B antibodies to confirm Schwann cell identity"
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0144620"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 8
+  observationsExtracted: 7
+  observationsByType:
+    Growth Rate: 1
+    Cellular: 2
+    Molecular: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete failure to mine any tools from a tool-rich laboratory research publication
+    - Patient-derived cell line naming conventions not recognized (Hp-SWN-14F, Hnp-SWN-14O)
+    - Antibodies mentioned in immunocytochemistry context not detected
+    - Genetic reagents with catalog numbers missed (pLenti-SV40 catalog G203)
+    - Multiple bioinformatics software tools not recognized (DAVID, Ingenuity, Nexus Gene)
+    - Commercial molecular biology kits not detected despite vendor information
+    - Microarray platforms not classified as computational tools
+  recommendations: |
+    This publication represents a significant mining failure - 11 legitimate research tools were completely missed from a standard laboratory research study. The tools span multiple categories including newly developed cell lines, commercial antibodies, genetic reagents, and computational analysis tools.
+
+    Critical improvements needed:
+    1. Add patterns for patient-derived cell line nomenclature (disease-specific naming conventions)
+    2. Improve antibody detection in immunocytochemistry contexts
+    3. Recognize genetic reagents with catalog numbers and vendor information
+    4. Expand bioinformatics software database (DAVID, Ingenuity, Nexus Gene)
+    5. Include microarray platforms as computational tools
+    6. Add patterns for commercial molecular biology kits
+
+    The extracted observations demonstrate the value of these cell lines as research tools, with detailed characterization of growth rates, cellular phenotypes, and molecular profiles. This type of tool development publication should be a high-priority target for mining improvement.
+
+    All 11 missed tools should be added to the database, and the suggested patterns should be implemented to prevent similar failures in cellular biology research publications.

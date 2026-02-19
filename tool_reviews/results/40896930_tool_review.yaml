@@ -1,0 +1,106 @@
+publicationMetadata:
+  pmid: "40896930"
+  title: "High resolution nerve ultrasound in neurofibromatosis type 1: a prospective and descriptive study."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical study examining high-resolution nerve ultrasound (HRUS) in NF1 patients.
+    Expected tool types:
+    - Clinical assessment tools: Medical Research Council scale (MRC), standardized clinical examination protocols
+    - Computational tools: R studio for statistical analysis
+    - Medical devices/equipment: Ultrasound machines (though these are typically not considered "research tools" in our schema)
+    
+    Note: While the queryType is "bench", this is clearly a clinical study. Clinical studies can contain
+    computational tools for data analysis and clinical assessment tools for patient evaluation.
+  overallAssessment: |
+    This is a prospective clinical study evaluating ultrasound imaging in NF1 patients. Clinical studies
+    typically use clinical assessment tools (questionnaires, scales, outcome measures) and computational
+    tools for statistical analysis. The Medical Research Council scale mentioned is a validated clinical
+    assessment tool. R studio is a computational tool used for data analysis.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Medical Research Council scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The motor function of 9 muscle groups (deltoid, biceps, triceps, wrist flexors and extensors, interossei, abductor pollicis brevis, ankle flexors, and extensors) was graded bilaterally using the Medical Research Council scale (MRC)"
+    whyMissed: "This is a validated clinical assessment tool for grading muscle strength, commonly abbreviated as MRC scale. It's a standardized instrument used in neurological examinations."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R studio"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data was analyzed using R studio version 4.4.1."
+    whyMissed: "This is a computational tool with a specific version number mentioned, indicating actual usage for statistical analysis rather than just citation."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Philips EPIQ Elite"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the Philips EPIQ Elite or Philips IU22 ultrasound machine (Philips, Eindhoven, The Netherlands), with a 4 to 18 MHz linear array transducer"
+    whyMissed: "While this is medical equipment, ultrasound machines are typically not considered research tools in our schema as they are clinical devices rather than research-specific tools."
+    confidence: 0.30
+    shouldBeAdded: No
+
+  - toolName: "Philips IU22"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the Philips EPIQ Elite or Philips IU22 ultrasound machine (Philips, Eindhoven, The Netherlands), with a 4 to 18 MHz linear array transducer"
+    whyMissed: "Similar to EPIQ Elite, this is medical equipment rather than a research tool in our schema."
+    confidence: 0.30
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Medical Research Council scale|MRC scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Medical Research Council scale (MRC)"]
+    reasoning: "The MRC scale is a widely used, validated clinical assessment tool for muscle strength grading. It should be captured as it's a standardized research instrument."
+
+  - patternType: "context_phrase"
+    pattern: "graded.*using|assessed.*using|measured.*using|administered.*using"
+    toolType: "clinical_assessment_tool"
+    examples: ["graded bilaterally using the Medical Research Council scale"]
+    reasoning: "These phrases often indicate the use of clinical assessment tools or scales in patient evaluation."
+
+  - patternType: "term"
+    pattern: "R studio|RStudio"
+    toolType: "computational_tool"
+    examples: ["R studio version 4.4.1"]
+    reasoning: "R studio with version numbers indicates actual computational tool usage for data analysis, not just citation."
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|calculated using"
+    toolType: "computational_tool"
+    examples: ["Data was analyzed using R studio version 4.4.1"]
+    reasoning: "These phrases indicate active use of computational tools for data analysis rather than just mentions."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # MRC scale and R studio
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a clinical study that uses research tools
+    - The queryType "bench" is misleading - this is clearly a clinical study, not bench research
+    - Two legitimate research tools were missed: Medical Research Council scale (clinical assessment tool) and R studio (computational tool)
+    - The mining system may not be adequately capturing clinical assessment tools and computational tools in clinical studies
+  recommendations: |
+    - Add the Medical Research Council scale as a clinical assessment tool - it's a validated, standardized instrument
+    - Add R studio as a computational tool - version number indicates actual usage for statistical analysis
+    - Improve pattern matching for clinical assessment tools, especially standardized scales and grading systems
+    - Enhance detection of computational tools mentioned with version numbers in methods sections
+    - Consider that clinical studies (even those found by "bench" queries) can contain legitimate research tools
+    - The ultrasound machines mentioned are medical devices rather than research tools and should not be added

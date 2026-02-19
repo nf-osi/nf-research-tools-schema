@@ -1,0 +1,310 @@
+publicationMetadata:
+  pmid: "21980365"
+  title: "The haploinsufficient hematopoietic microenvironment is critical to the pathological fracture repair in murine models of neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory research study investigating skeletal manifestations
+    in NF1 using multiple mouse models, bone analysis techniques, cell culture methods, and 
+    transplantation experiments. Expected tools include:
+    - Animal models (multiple transgenic mouse strains)
+    - Genetic reagents (Cre recombinase systems, reporter genes)
+    - Computational tools (imaging analysis software, statistical analysis)
+    - Cell culture systems (MSCs, osteoblasts)
+    - Antibodies (for histological staining)
+  overallAssessment: |
+    This is a high-quality laboratory research publication with extensive experimental methods
+    describing animal model development, bone analysis, cell culture, and transplantation studies.
+    The paper should contain numerous research tools including transgenic mouse models, genetic
+    reagents, computational analysis tools, and cell culture systems. The complete absence of
+    mined tools indicates significant gaps in the mining process for this type of publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1+/− mice were obtained from Dr. Tyler Jacks at the Massachusetts Institute of Technology (Cambridge, MA)"
+    whyMissed: "Standard mouse strain nomenclature not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1flox/flox mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 mice were provided by Dr. Luis Parada at the University of Texas Southwestern Medical Center flox/flox"
+    whyMissed: "Conditional knockout mouse strain nomenclature not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PeriCre transgenic mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "3.9kb ( peri-EGFP/Cre PeriCre ) transgenic mice were generated as described elsewhere"
+    whyMissed: "Custom transgenic mouse line name not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Col2.3Cre transgenic mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Col2.3Cre transgenic mice were generated as described elsewhere"
+    whyMissed: "Tissue-specific Cre driver mouse line not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ROSA26 reporter mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "adult PeriCre transgenic mice were crossed with ROSA26 reporter mice"
+    whyMissed: "Standard reporter mouse strain not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6-TgN(ACTbEGFP) 1Osb transgenic mouse"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The C57BL/6-TgN(ACTbEGFP) 1Osb transgenic mouse line was obtained from Jackson Laboratory"
+    whyMissed: "Complex transgenic mouse nomenclature with catalog information not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PIXImus II"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "bone mineral density (BMD) of the tibial diaphysis was evaluated in vivo using pDEXA (PIXImus II; GE-Lunar Corp., Madison, WI)"
+    whyMissed: "Specialized imaging system with vendor information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "μCT-20"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "high-resolution desktop microcomputed tomography imaging system (μCT-20; Scanco Medical AG, Basserdorf, Switzerland)"
+    whyMissed: "Micro-CT system model number not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Image Pro Plus version 4.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using Image Pro Plus version 4.1 software (Media Cybernetics, Silver Spring, MD)"
+    whyMissed: "Image analysis software with version number not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SPOT digital camera"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "image captured using a SPOT digital camera (Diagnostic Instruments, Inc., Sterling Heights, MI)"
+    whyMissed: "Imaging hardware with vendor information not recognized"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Leitz DMRXE microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "viewed at 160× magnification on a Leitz DMRXE microscope (Leica Mikroskopie und System GmbH, Wetzlar, Germany)"
+    whyMissed: "Microscope model with vendor information not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "MesenCult basal medium"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cultured in mouse MesenCult basal medium containing MesenCult Supplement (Stem Cell Technologies Inc.)"
+    whyMissed: "Specialized cell culture medium with vendor not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "pixRay-100"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Fracture repair was monitored by weekly radiography (pixRay-100, Bioptics, Phoenix, AZ)"
+    whyMissed: "X-ray imaging system with vendor information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+[+/-]+ mice|[A-Za-z0-9]+flox/flox mice|[A-Za-z0-9]+flox/- mice"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "Nf1flox/flox mice", "PeriCre+;Nf1flox/- mice"]
+    reasoning: "Standard mouse genetics nomenclature for knockout and conditional alleles"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+Cre[+]? mice|[A-Za-z0-9]+Cre transgenic mice"
+    toolType: "animal_model"
+    examples: ["PeriCre transgenic mice", "Col2.3Cre transgenic mice"]
+    reasoning: "Cre recombinase driver mouse lines commonly used in conditional genetics"
+
+  - patternType: "vendor_indicator"
+    pattern: "obtained from [A-Za-z ]+Laboratory|provided by Dr\\. [A-Za-z ]+ at [A-Za-z ]+"
+    toolType: "animal_model"
+    examples: ["obtained from Dr. Tyler Jacks at the Massachusetts Institute of Technology", "obtained from Jackson Laboratory"]
+    reasoning: "Source attribution indicates research tool acquisition"
+
+  - patternType: "term"
+    pattern: "ROSA26 reporter|Rosa26|R26"
+    toolType: "animal_model"
+    examples: ["ROSA26 reporter mice", "Rosa26 locus"]
+    reasoning: "Standard reporter mouse strain used for lineage tracing"
+
+  - patternType: "context_phrase"
+    pattern: "imaging system \\([A-Za-z0-9-]+;[^)]+\\)|software \\([^)]+\\)|microscope \\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["imaging system (μCT-20; Scanco Medical AG)", "software (Media Cybernetics, Silver Spring, MD)"]
+    reasoning: "Equipment and software with vendor information in parentheses"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z]+Cult [a-z]+ medium|[A-Za-z]+ basal medium"
+    toolType: "genetic_reagent"
+    examples: ["MesenCult basal medium", "α-MEM medium"]
+    reasoning: "Specialized cell culture media with proprietary names"
+
+  - patternType: "context_phrase"
+    pattern: "transgenic mouse line was obtained from|mice were obtained from|provided by Dr\\."
+    toolType: "animal_model"
+    examples: ["transgenic mouse line was obtained from Jackson Laboratory", "mice were obtained from Dr. Tyler Jacks"]
+    reasoning: "Source attribution phrases indicate research tool acquisition"
+
+observations:
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      PeriCre+;Nf1flox/- mice had reduced body weight compared to WT, Nf1+/-, or PeriCre+;Nf1flox/flox mice.
+      The reduction was statistically significant and consistent across experimental groups.
+    foundIn: "results"
+    contextSnippet: "PeriCre+;Nf1flox/- mice had reduced body weight and length as compared to WT, Nf1+/-, or PeriCre+;Nf1flox/flox mice"
+    confidence: 0.9
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002164"
+    details: |
+      PeriCre+;Nf1flox/- mice were smaller than the other three groups of mice, showing overall
+      developmental differences in addition to specific skeletal phenotypes.
+    foundIn: "results"
+    contextSnippet: "syngeneic adult PeriCre+;Nf1flox/- mice were smaller than the other three groups of mice"
+    confidence: 0.9
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0008271"
+    details: |
+      Significantly greater osteoclast surface/bone surface (OcS/BS) ratio in trabecular bone was observed
+      in Nf1+/- mice compared to WT controls, indicating increased osteoclast activity.
+    foundIn: "results"
+    contextSnippet: "A significantly greater OcS/BS ratio in the trabecular bone was observed in Nf1+/- and PeriCre+;Nf1flox/- mice than WT"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0008271"
+    details: |
+      Significantly lower number of osteoblasts was observed in Nf1+/- mice compared to WT mice,
+      as evaluated by counting osteoblasts in tibial trabecular bone on MacNeal's stained sections.
+    foundIn: "results"
+    contextSnippet: "a significantly lower number of osteoblasts was observed in Nf1+/-, PeriCre+;Nf1flox/flox and PeriCre+;Nf1flox/- mice compared to WT mice"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "Col2.3Cre transgenic mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Col2.3Cre+;Nf1flox/- mice displayed an ~20% reduction in body weight compared to WT, Nf1+/-, 
+      or Col2.3Cre+;Nf1flox/flox mice, similar to the PeriCre model.
+    foundIn: "results"
+    contextSnippet: "Col2.3Cre+;Nf1flox/- mice displayed an ~20% reduction in body weight and a 10% reduction in body length"
+    confidence: 0.9
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "PeriCre transgenic mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002164"
+    details: |
+      PeriCre+;Nf1flox/- mice had reduced body length (10% reduction) as compared to control groups,
+      indicating overall developmental impact beyond skeletal-specific effects.
+    foundIn: "results"
+    contextSnippet: "PeriCre+;Nf1flox/- mice had reduced body weight and length as compared to WT, Nf1+/-, or PeriCre+;Nf1flox/flox mice"
+    confidence: 0.9
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "PeriCre transgenic mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: ""
+    details: |
+      LacZ expression was abundant in osteoblasts within cartilaginous ribs, long bone, and vertebrae
+      cartilage of adult PeriCre+;Rosa26flox/flox mice, confirming tissue-specific Cre expression pattern.
+    foundIn: "results"
+    contextSnippet: "LacZ expression was abundant in the peripheral nervous system as expected but was also detected in osteoblasts within the cartilaginous ribs"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0024917"
+
+  - resourceName: "Image Pro Plus version 4.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Software was used for measuring histomorphometric parameters including single label (sL.Pm),
+      double label (dL.Pm) and the area of bone (dL.Ar) between calcein and alizarin labels for
+      bone formation analysis.
+    foundIn: "methods"
+    contextSnippet: "using Image Pro Plus version 4.1 software (Media Cybernetics, Silver Spring, MD). Derived histomorphometric parameters included mineralizing surface"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0024917"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 7
+  observationsExtracted: 8
+  observationsByType:
+    Body Weight: 2
+    Developmental: 2
+    Cellular: 2
+    Molecular: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Complete failure to mine any tools from a comprehensive laboratory research publication
+    - Multiple transgenic mouse models with standard nomenclature not captured
+    - Specialized equipment and software with vendor information not recognized
+    - Cell culture reagents and media not identified
+    - Standard reporter systems (ROSA26) not captured
+    - Imaging and analysis systems not detected despite detailed vendor information
+  recommendations: |
+    This publication represents a significant failure of the mining system for laboratory research tools.
+    Despite containing extensive experimental methods with multiple animal models, genetic reagents,
+    computational tools, and specialized equipment, zero tools were captured. The mining patterns
+    need substantial enhancement to capture:
+    
+    1. Mouse genetics nomenclature (knockout, conditional, transgenic strains)
+    2. Equipment and software with vendor information in parentheses
+    3. Specialized cell culture media and reagents
+    4. Standard research tools like reporter systems
+    5. Source attribution phrases indicating tool acquisition
+    
+    All 13 potentially missed tools should be added to the database. The suggested patterns would
+    significantly improve mining accuracy for similar laboratory research publications. The extracted
+    observations demonstrate rich phenotypic data available when tools are properly identified.

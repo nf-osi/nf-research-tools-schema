@@ -1,0 +1,112 @@
+publicationMetadata:
+  pmid: "34230205"
+  title: "Recommendations for Social Skills End Points for Clinical Trials in Neurofibromatosis Type 1."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # High confidence - this is clearly a clinical recommendations paper
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study focused on outcome measure recommendations):
+    - Clinical assessment tools (questionnaires, scales) - HIGHLY EXPECTED
+    - Computational tools for analysis - POSSIBLE but not primary focus
+    
+    This publication specifically aims to recommend social skills assessment tools for NF1 clinical trials.
+    The methods describe systematic review of existing clinical assessment instruments.
+    Lab tools (antibodies, cell lines, animal models, etc.) are NOT expected in this type of study.
+  overallAssessment: |
+    This is a clinical recommendations paper that systematically reviews and recommends social skills 
+    assessment tools for use in NF1 clinical trials. Clinical assessment tools are highly expected and 
+    appropriate for this publication type. The study methodology involves evaluating existing validated 
+    instruments rather than developing new tools or conducting lab experiments.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Social Responsiveness Scale-2 (SRS-2)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Two measures were ultimately recommended by the committee: the Social Responsiveness Scale-2 (SRS-2) and the Social Skills Improvement System-Rating Scale (SSIS-RS)."
+    whyMissed: "This is a validated clinical assessment tool specifically recommended for NF1 clinical trials. Should have been captured as it's a primary outcome of the study."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Social Skills Improvement System-Rating Scale (SSIS-RS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Two measures were ultimately recommended by the committee: the Social Responsiveness Scale-2 (SRS-2) and the Social Skills Improvement System-Rating Scale (SSIS-RS)."
+    whyMissed: "This is a validated clinical assessment tool specifically recommended for NF1 clinical trials. Should have been captured as it's a primary outcome of the study."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PubMed"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Searches were conducted via PubMed and ClinicalTrials.gov to identity social skills outcome measures"
+    whyMissed: "PubMed is a computational database tool used for systematic literature searches in this study."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ClinicalTrials.gov"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Searches were conducted via PubMed and ClinicalTrials.gov to identity social skills outcome measures"
+    whyMissed: "ClinicalTrials.gov is a computational database tool used for systematic searches in this study."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Social Responsiveness Scale|SRS-2|SRS-II"
+    toolType: "clinical_assessment_tool"
+    examples: ["Social Responsiveness Scale-2 (SRS-2)"]
+    reasoning: "Specific validated clinical assessment instrument with standard abbreviations that should be captured"
+
+  - patternType: "term"
+    pattern: "Social Skills Improvement System|SSIS-RS|SSIS Rating Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Social Skills Improvement System-Rating Scale (SSIS-RS)"]
+    reasoning: "Specific validated clinical assessment instrument with standard abbreviations that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "measures were.*recommended|recommended.*measures|assessment.*recommended"
+    toolType: "clinical_assessment_tool"
+    examples: ["Two measures were ultimately recommended by the committee"]
+    reasoning: "Context phrases indicating clinical assessment tool recommendations in systematic reviews"
+
+  - patternType: "term"
+    pattern: "ClinicalTrials\\.gov"
+    toolType: "computational_tool"
+    examples: ["ClinicalTrials.gov"]
+    reasoning: "Clinical trials database commonly used in systematic reviews and meta-analyses"
+
+  - patternType: "context_phrase"
+    pattern: "searches were conducted via|searched using|database searches"
+    toolType: "computational_tool"
+    examples: ["Searches were conducted via PubMed and ClinicalTrials.gov"]
+    reasoning: "Context phrases indicating use of computational databases for systematic searches"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # SRS-2, SSIS-RS, PubMed, ClinicalTrials.gov
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    Major mining gaps identified:
+    - Two primary clinical assessment tools (SRS-2, SSIS-RS) that are the main outcomes of this study were completely missed
+    - Computational databases (PubMed, ClinicalTrials.gov) used in methodology were not captured
+    - This represents a significant failure to capture the core tools discussed in this clinical recommendations paper
+  recommendations: |
+    Critical recommendations for this publication:
+    - ADD the two clinical assessment tools (SRS-2, SSIS-RS) as these are the primary recommendations of the study
+    - ADD the computational databases (PubMed, ClinicalTrials.gov) as these are methodological tools
+    - This publication demonstrates that clinical assessment tool mining patterns need significant improvement
+    - The suggested patterns should be implemented to catch similar validated clinical instruments
+    - No observations were extracted as this is a recommendations paper rather than an experimental study
+    - Future mining should better recognize clinical recommendations papers as rich sources of assessment tools

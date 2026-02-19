@@ -1,0 +1,95 @@
+publicationMetadata:
+  pmid: "7570581"
+  title: "Evidence for the presence of two amino-terminal isoforms of neurofibromin, a gene product responsible for neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence based on molecular cloning described
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and content analysis:
+    - genetic_reagent: cDNA clones are mentioned (N-isoform 10, N-isoform 11)
+    - computational_tool: Molecular analysis and sequence comparison likely used
+    - cell_line: In vitro translation systems mentioned
+    
+    This is molecular biology research involving cDNA cloning and protein analysis.
+    Despite being from 1995, this type of work typically uses multiple research tools
+    including cloning vectors, expression systems, and analytical software.
+  overallAssessment: |
+    This is a molecular biology research paper describing the cloning and characterization
+    of neurofibromin isoforms. The work involves cDNA cloning, in vitro translation, and
+    molecular weight determination - all indicating active lab research that would use
+    genetic reagents and potentially computational tools for sequence analysis.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "N-isoform 10 cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Previously, we cloned a cDNA coding for a similar isoform of 551 amino acid residues, termed N-isoform 10"
+    whyMissed: "Specific cDNA clone with defined characteristics (551 amino acids, first ten exons) - represents a genetic reagent"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "N-isoform 11 cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "we have cloned a cDNA encoding a newly identified species...tentatively termed N-isoform 11"
+    whyMissed: "Specific cDNA clone with defined characteristics (593 amino acids, 2.7 kb insert) - represents a genetic reagent"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "in vitro translation system"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "consistent with the values determined by in vitro translation of the mRNA transcribed from each N-isoform cDNA"
+    whyMissed: "In vitro translation system used for protein expression and molecular weight determination"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]-isoform \\d+"
+    toolType: "genetic_reagent"
+    examples: ["N-isoform 10", "N-isoform 11"]
+    reasoning: "Standardized naming convention for protein/gene isoforms that represent specific cloned constructs"
+
+  - patternType: "context_phrase"
+    pattern: "we have cloned a cDNA"
+    toolType: "genetic_reagent"
+    examples: ["we have cloned a cDNA encoding a newly identified species"]
+    reasoning: "Direct indication of cDNA cloning work, suggesting genetic reagent development"
+
+  - patternType: "context_phrase"
+    pattern: "in vitro translation"
+    toolType: "genetic_reagent"
+    examples: ["in vitro translation of the mRNA transcribed from each N-isoform cDNA"]
+    reasoning: "Indicates use of translation systems for protein expression studies"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were initially mined despite clear evidence of molecular biology research
+    - Only abstract text available - full Methods section would likely contain more tools
+    - Multiple cDNA clones described that should be captured as genetic reagents
+    - In vitro translation systems mentioned but not captured
+    - Publication from 1995 may have different terminology that current patterns miss
+  recommendations: |
+    Overall recommendations for this publication:
+    - Add the missed cDNA clones (N-isoform 10, N-isoform 11) as genetic reagents
+    - Consider adding in vitro translation system as a genetic reagent
+    - Implement suggested patterns to catch similar isoform naming conventions
+    - This publication demonstrates that older papers (1995) may use different terminology
+    - Full text access would likely reveal additional tools (vectors, cell lines, enzymes)
+    - The mining patterns may need adjustment for historical molecular biology terminology

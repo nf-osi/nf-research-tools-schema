@@ -1,0 +1,175 @@
+publicationMetadata:
+  pmid: "24912773"
+  title: "Structural basis of DDB1-and-Cullin 4-associated Factor 1 (DCAF1) recognition by merlin/NF2 and its implication in tumorigenesis by CD44-mediated inhibition of merlin suppression of DCAF1 function."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content analysis, this study should contain:
+    - Computational tools (bioinformatics software, structural analysis tools, databases)
+    - Potentially genetic reagents (protein constructs, expression vectors)
+    - Possibly antibodies (if protein detection/validation was performed)
+    
+    This is a structural biology/bioinformatics study focusing on CD44 protein variant analysis,
+    crystal structure analysis, and computational modeling. The extensive Methods section describes
+    multiple computational approaches including sequence alignment tools, structural analysis software,
+    and database searches. Such studies typically rely heavily on computational tools and may also
+    use molecular biology reagents for protein expression and purification.
+  overallAssessment: |
+    This is a comprehensive structural biology and bioinformatics study that should definitely contain
+    research tools, particularly computational tools. The detailed Methods section describes extensive
+    use of bioinformatics software, databases, and structural analysis tools. The study involves
+    sequence analysis, structural modeling, and hot spot analysis - all requiring specialized software.
+    The absence of any mined tools suggests significant under-mining of computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Clustal Omega"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...using the Clustal Omega Multiple Sequence Alignment tool for protein sequences [90] (ClustalW with character counts version 1.2.4)..."
+    whyMissed: "Specific bioinformatics tool with version number mentioned in Methods section"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BLASTp"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...BLASTp local alignment programme version 2.17.0 [91, 92] (expect threshold 0.05; word size 3; max matches in a query range 0; matrix BLOSUM45..."
+    whyMissed: "Widely used bioinformatics tool with specific version and parameters"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "COBALT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...and COBALT [93] version 1.26.0 (gap penalties: opening -11, extension -1; end-gap penalties: opening -5, extension -1..."
+    whyMissed: "Sequence alignment tool with version number and detailed parameters"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PyMOL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...were analyzed using PyMOL (version 2.5.2, Schrödinger, LLC, New York, NY, USA)..."
+    whyMissed: "Molecular visualization software with version and vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Flare"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...or Flare TM (version 10.0.0) from Cresset ® (Buenos Aires, Argentina)..."
+    whyMissed: "Molecular modeling software with version and vendor details"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ChemSketch"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Chemical structures of the molecules were drawn in ChemSketch (version 2023.2.4, ACD/Labs, Toronto, ON, Canada)..."
+    whyMissed: "Chemical drawing software with version and vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FTMap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Hot spot detection on the CD44 surface was performed using the FTMap server available at http://ftmap.bu.edu..."
+    whyMissed: "Web-based computational tool for hot spot analysis with URL"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "UniProt"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The human protein sequences were obtained from UniProt and the NCBI databases..."
+    whyMissed: "Major protein database used as data source"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NCBI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The human protein sequences were obtained from UniProt and the NCBI databases..."
+    whyMissed: "Major biological database used as data source"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PDB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The PDB [82] was searched using the 'CD44' query, resulting in 72 structures..."
+    whyMissed: "Protein Data Bank - major structural biology database"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using\\s+([A-Z][a-zA-Z0-9]+)\\s+\\(version\\s+[0-9]+\\.[0-9]+(?:\\.[0-9]+)?\\)"
+    toolType: "computational_tool"
+    examples: ["using PyMOL (version 2.5.2", "using Flare TM (version 10.0.0)"]
+    reasoning: "Pattern to catch software tools mentioned with version numbers in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using\\s+([A-Z][a-zA-Z0-9]+)"
+    toolType: "computational_tool"
+    examples: ["analyzed using PyMOL", "performed using the FTMap server"]
+    reasoning: "Common phrase indicating computational tool usage in analysis"
+
+  - patternType: "context_phrase"
+    pattern: "([A-Z][a-zA-Z0-9]+)\\s+server\\s+available\\s+at\\s+http"
+    toolType: "computational_tool"
+    examples: ["FTMap server available at http://ftmap.bu.edu"]
+    reasoning: "Pattern for web-based computational tools with URLs"
+
+  - patternType: "naming_convention"
+    pattern: "version\\s+[0-9]+\\.[0-9]+(?:\\.[0-9]+)?"
+    toolType: "computational_tool"
+    examples: ["version 2.5.2", "version 1.26.0", "version 2023.2.4"]
+    reasoning: "Version numbers strongly indicate software tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*(?:LLC|Inc|Corp|Ltd|Labs)\\s*,\\s*[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["(Schrödinger, LLC, New York, NY, USA)", "(ACD/Labs, Toronto, ON, Canada)"]
+    reasoning: "Vendor information in parentheses typically indicates commercial software"
+
+  - patternType: "context_phrase"
+    pattern: "obtained from\\s+([A-Z][a-zA-Z0-9]+)\\s+(?:and|database)"
+    toolType: "computational_tool"
+    examples: ["obtained from UniProt and the NCBI databases"]
+    reasoning: "Pattern for database sources used in bioinformatics studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Significant under-mining of computational tools: This bioinformatics/structural biology study
+      extensively uses computational tools but none were detected by the mining algorithm
+    - Methods section contains detailed descriptions of at least 10 computational tools with
+      version numbers, vendor information, and specific parameters
+    - Missing database tools (UniProt, NCBI, PDB) that are fundamental to bioinformatics research
+    - Missing molecular visualization and analysis software (PyMOL, Flare, ChemSketch)
+    - Missing sequence alignment tools (Clustal Omega, BLASTp, COBALT)
+    - Missing web-based analysis tools (FTMap server)
+  recommendations: |
+    - All 10 identified computational tools should be added to the mining results
+    - The mining algorithm needs significant improvement for detecting computational tools
+    - Patterns should be added to catch software with version numbers and vendor information
+    - Database mentions (UniProt, NCBI, PDB) should be recognized as computational tools
+    - Context phrases like "analyzed using", "performed using", "obtained from" are strong indicators
+    - Version numbers and vendor information are reliable indicators of software tools
+    - Web-based tools with URLs should be captured
+    - This publication demonstrates the need for better computational tool mining patterns

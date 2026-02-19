@@ -1,0 +1,127 @@
+publicationMetadata:
+  pmid: "21111000"
+  title: "A novel imaging-compatible sciatic nerve schwannoma model."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes the development of a novel schwannoma model using cell lines and animal models.
+    Based on the abstract, we expect to find:
+    - Cell lines (HEI-193 schwannoma cell line)
+    - Animal models (nude mice)
+    - Genetic reagents (fluorescent protein and luciferase reporters)
+    
+    The publication focuses on model development for preclinical testing, which typically involves
+    multiple research tool categories.
+  overallAssessment: |
+    This is a laboratory research publication describing the development of a novel schwannoma tumor model.
+    The study involves cell line transduction, animal implantation, and reporter systems, indicating
+    extensive use of research tools. Despite lacking a formal Methods section, the abstract clearly
+    describes experimental procedures using multiple tool types including cell lines, animal models,
+    and genetic reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "HEI-193"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...an immortalized human schwannoma cell line, HEI-193, established from an neurofibromatosis type 2 patient, has been stably transduced..."
+    whyMissed: "Cell line name not detected by mining patterns - may need pattern for immortalized cell line nomenclature"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...luciferase reporters and implanted within the sciatic nerve of nude mice. These cells reliably formed a tumor..."
+    whyMissed: "Common animal model strain not detected - may need pattern for immunodeficient mouse strains"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "fluorescent protein"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...has been stably transduced with fluorescent protein and luciferase reporters and implanted..."
+    whyMissed: "Generic reporter protein term not detected - may need patterns for reporter systems"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "luciferase reporters"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...has been stably transduced with fluorescent protein and luciferase reporters and implanted..."
+    whyMissed: "Reporter system not detected - may need patterns for luciferase-based tools"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}-[0-9]{2,4}"
+    toolType: "cell_line"
+    examples: ["HEI-193"]
+    reasoning: "Pattern to catch cell line names with letter-number format commonly used for immortalized cell lines"
+
+  - patternType: "term"
+    pattern: "nude mice|NUDE mice|athymic mice|immunodeficient mice"
+    toolType: "animal_model"
+    examples: ["nude mice"]
+    reasoning: "Common immunodeficient mouse strains used for xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized.*cell line|cell line.*immortalized"
+    toolType: "cell_line"
+    examples: ["immortalized human schwannoma cell line, HEI-193"]
+    reasoning: "Context phrase that reliably indicates cell line tools"
+
+  - patternType: "term"
+    pattern: "luciferase reporter|luciferase reporters|fluorescent protein|GFP|RFP|mCherry"
+    toolType: "genetic_reagent"
+    examples: ["fluorescent protein", "luciferase reporters"]
+    reasoning: "Reporter proteins and imaging reagents commonly used in cell biology"
+
+  - patternType: "context_phrase"
+    pattern: "stably transduced with|transduced.*with|transfected with"
+    toolType: "genetic_reagent"
+    examples: ["stably transduced with fluorescent protein and luciferase reporters"]
+    reasoning: "Context phrases indicating genetic modification tools and reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely failed to detect any tools despite clear presence of multiple research tools
+    - Cell line HEI-193 is explicitly described as an immortalized human schwannoma cell line
+    - Nude mice are clearly identified as the animal model used for implantation
+    - Fluorescent protein and luciferase reporters are genetic reagents used for cell transduction
+    - Abstract-only publication limits detailed analysis but tools are clearly present
+  recommendations: |
+    The mining system failed to detect any tools in this publication despite clear presence of at least 4 research tools.
+    This represents a significant false negative issue. All 4 missed tools should be added:
+    
+    1. HEI-193 cell line - well-established schwannoma cell line from NF2 patient
+    2. Nude mice - standard immunodeficient animal model for xenografts
+    3. Fluorescent protein - genetic reporter reagent
+    4. Luciferase reporters - bioluminescent reporter reagent
+    
+    The suggested patterns should be implemented to catch similar tools in future mining.
+    This publication demonstrates the need for better pattern coverage of:
+    - Cell line nomenclature (letter-number combinations)
+    - Common animal model strains
+    - Reporter protein systems
+    - Genetic modification context phrases
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the tools
+    themselves are clearly valid research instruments used in model development.

@@ -1,0 +1,156 @@
+publicationMetadata:
+  pmid: "18328429"
+  title: "A conditional mouse model for malignant mesothelioma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract, this is a lab research study developing conditional knockout mouse models.
+    Expected tool types:
+    - Animal models (conditional knockout mice: Nf2;Ink4a/Arf and Nf2;p53)
+    - Genetic reagents (knockout constructs, Cre recombinase systems)
+    - Potentially computational tools for survival analysis
+    
+    However, there's a data processing issue - the introduction and discussion sections appear to be
+    from a different publication (a review about malignant pleural effusions), not the original
+    2008 Jongsma et al. study described in the abstract.
+  overallAssessment: |
+    This publication should contain multiple research tools based on the abstract describing conditional
+    knockout mouse model development. The study reports creating Nf2;Ink4a/Arf and Nf2;p53 conditional
+    knockout mice, which are clear animal model tools. However, there's a data integrity issue where
+    the full text sections don't match the abstract, preventing proper tool validation.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf2;Ink4a/Arf conditional knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Mesothelioma developed at high incidence in Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively."
+    whyMissed: "Mining algorithm failed to identify conditional knockout mouse strains as animal models"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2;p53 conditional knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Mesothelioma developed at high incidence in Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively."
+    whyMissed: "Mining algorithm failed to identify conditional knockout mouse strains as animal models"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "conditional Nf2;Ink4a/Arf mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Conditional Nf2;Ink4a/Arf mice showed increased pleural invasion compared to conditional Nf2;p53 mice."
+    whyMissed: "Alternative naming convention for the same mouse model not captured"
+    confidence: 0.9
+    shouldBeAdded: Maybe
+
+  - toolName: "conditional Nf2;p53 mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Conditional Nf2;Ink4a/Arf mice showed increased pleural invasion compared to conditional Nf2;p53 mice."
+    whyMissed: "Alternative naming convention for the same mouse model not captured"
+    confidence: 0.9
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+;[A-Za-z0-9/]+\\s+conditional\\s+knockout\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf2;Ink4a/Arf conditional knockout mice", "Nf2;p53 conditional knockout mice"]
+    reasoning: "Captures conditional knockout mouse strains with gene combination naming (Gene1;Gene2 conditional knockout mice)"
+
+  - patternType: "naming_convention"
+    pattern: "\\bconditional\\s+[A-Za-z0-9]+;[A-Za-z0-9/]+\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["conditional Nf2;Ink4a/Arf mice", "conditional Nf2;p53 mice"]
+    reasoning: "Captures alternative naming convention for conditional knockout mice (conditional Gene1;Gene2 mice)"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(developed|generated|created|established)\\s+.{0,50}\\s+(mouse|mice)\\s+model"
+    toolType: "animal_model"
+    examples: ["We introduced similar lesions in the mesothelial lining of the thoracic cavity of mice"]
+    reasoning: "Identifies mouse model development context that often indicates animal model tools"
+
+observations:
+  - resourceName: "Nf2;Ink4a/Arf conditional knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Mesothelioma developed at high incidence in Nf2;Ink4a/Arf conditional knockout mice with 
+      median survival time of approximately 30 weeks. These mice showed increased pleural invasion 
+      compared to conditional Nf2;p53 mice.
+    foundIn: "both"
+    contextSnippet: "Mesothelioma developed at high incidence in Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively. Conditional Nf2;Ink4a/Arf mice showed increased pleural invasion compared to conditional Nf2;p53 mice."
+    confidence: 0.95
+    doi: "10.1016/j.ccr.2008.01.030"
+
+  - resourceName: "Nf2;p53 conditional knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Mesothelioma developed at high incidence in Nf2;p53 conditional knockout mice with 
+      median survival time of approximately 20 weeks. Upon Ink4a loss in these mice, 
+      median survival was significantly reduced and all tumors were highly invasive.
+    foundIn: "both"
+    contextSnippet: "Mesothelioma developed at high incidence in Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively. Interestingly, upon Ink4a loss in the latter mice median survival was significantly reduced and all tumors were highly invasive."
+    confidence: 0.95
+    doi: "10.1016/j.ccr.2008.01.030"
+
+  - resourceName: "Nf2;p53 conditional knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Lifespan"
+    observationTypeOntologyId: "MP:0010768"
+    details: |
+      Median survival time was approximately 20 weeks for Nf2;p53 conditional knockout mice.
+      Upon additional Ink4a loss, median survival was significantly reduced, suggesting that 
+      Ink4a loss substantially contributes to the poor clinical outcome of malignant mesothelioma.
+    foundIn: "both"
+    contextSnippet: "Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively. Interestingly, upon Ink4a loss in the latter mice median survival was significantly reduced"
+    confidence: 0.9
+    doi: "10.1016/j.ccr.2008.01.030"
+
+  - resourceName: "Nf2;Ink4a/Arf conditional knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Lifespan"
+    observationTypeOntologyId: "MP:0010768"
+    details: |
+      Median survival time was approximately 30 weeks for Nf2;Ink4a/Arf conditional knockout mice,
+      which was longer than the Nf2;p53 conditional knockout mice (20 weeks).
+    foundIn: "both"
+    contextSnippet: "Mesothelioma developed at high incidence in Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice with median survival times of approximately 30 and 20 weeks, respectively."
+    confidence: 0.9
+    doi: "10.1016/j.ccr.2008.01.030"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 4
+  observationsByType:
+    Tumor Growth: 2
+    Lifespan: 2
+  majorIssuesFound: |
+    - Critical data integrity issue: The introduction and discussion sections appear to be from a 
+      different publication (a review about malignant pleural effusions) rather than the original 
+      2008 Jongsma et al. study described in the abstract
+    - Mining algorithm completely failed to identify obvious animal model tools mentioned in the abstract
+    - No Methods section available, limiting ability to validate experimental procedures
+    - The abstract clearly describes conditional knockout mouse models that should have been captured
+  recommendations: |
+    - URGENT: Investigate data processing pipeline - wrong full text sections were associated with this PMID
+    - Add the missed animal model tools (Nf2;Ink4a/Arf and Nf2;p53 conditional knockout mice)
+    - Implement suggested patterns to capture conditional knockout mouse strain nomenclature
+    - This publication should be flagged for manual curator review due to data integrity issues
+    - The abstract alone provides clear evidence of 2-4 animal model tools that were missed
+    - Consider re-processing this PMID with correct full text sections to enable proper validation
+    - The observations extracted are based solely on the abstract due to mismatched full text sections

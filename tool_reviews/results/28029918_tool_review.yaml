@@ -1,0 +1,207 @@
+publicationMetadata:
+  pmid: "28029918"
+  title: "Activity of Selumetinib in Neurofibromatosis Type 1-Related Plexiform Neurofibromas."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95  # Very clear this is a Phase 1 clinical trial
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial publications typically contain:
+    - Animal models (for preclinical validation)
+    - Computational tools (for imaging analysis, data processing)
+    - Clinical assessment tools (for outcome measurement)
+    - Genetic reagents (therapeutic compounds/drugs)
+    
+    This publication combines clinical trial methodology with preclinical animal model validation,
+    so it spans both clinical and laboratory research domains. The presence of mouse model testing
+    and volumetric MRI analysis indicates multiple tool types should be present.
+  overallAssessment: |
+    This is a Phase 1 clinical trial testing selumetinib in children with NF1-related plexiform neurofibromas.
+    The study includes both clinical (human patients) and preclinical (mouse model) components, indicating
+    multiple research tools should be present. Clinical trials routinely use computational tools for data
+    analysis, imaging analysis, and may reference animal models used for drug validation.
+
+toolValidations: []  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "selumetinib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We conducted a phase 1 trial of selumetinib (AZD6244 or ARRY-142886), an oral selective inhibitor of MAPK kinase (MEK) 1 and 2"
+    whyMissed: "Drug compounds/therapeutic agents are research tools but may not be captured by standard mining patterns focused on lab reagents"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "AZD6244"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We conducted a phase 1 trial of selumetinib (AZD6244 or ARRY-142886), an oral selective inhibitor of MAPK kinase (MEK) 1 and 2"
+    whyMissed: "Alternative drug name/code not captured - pharmaceutical compounds often have multiple identifiers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ARRY-142886"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We conducted a phase 1 trial of selumetinib (AZD6244 or ARRY-142886), an oral selective inhibitor of MAPK kinase (MEK) 1 and 2"
+    whyMissed: "Alternative drug name/code not captured - pharmaceutical compounds often have multiple identifiers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "mouse model of neurofibromatosis type 1-related neurofibroma"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "We also tested selumetinib using a mouse model of neurofibromatosis type 1–related neurofibroma"
+    whyMissed: "Animal model described functionally rather than by specific strain name - mining patterns may focus on standard nomenclature"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "volumetric magnetic resonance imaging analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Response to treatment was monitored by using volumetric magnetic resonance imaging analysis to measure the change in size of the plexiform neurofibroma"
+    whyMissed: "Imaging analysis methods are computational tools but may not be captured by patterns focused on software names"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "ClinicalTrials.gov"
+    toolType: "computational_tool"
+    foundIn: "discussion"
+    contextSnippet: "ClinicalTrials.gov number, NCT01362803"
+    whyMissed: "Clinical trial registries are databases/computational resources but may not be recognized as research tools"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "selumetinib|AZD6244|ARRY-142886"
+    toolType: "genetic_reagent"
+    examples: ["selumetinib (AZD6244 or ARRY-142886)"]
+    reasoning: "Pharmaceutical compounds with multiple identifiers should be captured - these are research tools used in clinical trials"
+
+  - patternType: "context_phrase"
+    pattern: "mouse model of [disease/condition]"
+    toolType: "animal_model"
+    examples: ["mouse model of neurofibromatosis type 1-related neurofibroma"]
+    reasoning: "Animal models described by disease/condition rather than strain name should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "volumetric.*imaging analysis|imaging.*analysis|MRI analysis"
+    toolType: "computational_tool"
+    examples: ["volumetric magnetic resonance imaging analysis"]
+    reasoning: "Imaging analysis methods are computational tools that should be captured"
+
+  - patternType: "term"
+    pattern: "ClinicalTrials\\.gov"
+    toolType: "computational_tool"
+    examples: ["ClinicalTrials.gov number, NCT01362803"]
+    reasoning: "Clinical trial registries are important computational resources/databases used in research"
+
+  - patternType: "context_phrase"
+    pattern: "selective inhibitor of|inhibitor of.*kinase|MEK inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["oral selective inhibitor of MAPK kinase (MEK) 1 and 2"]
+    reasoning: "Functional descriptions of pharmaceutical compounds should trigger tool detection"
+
+observations:
+  - resourceName: "mouse model of neurofibromatosis type 1-related neurofibroma"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Treatment with selumetinib resulted in decreases from baseline in neurofibroma volume in 12 of 18 mice (67%).
+      This demonstrates the efficacy of selumetinib in reducing tumor volume in the preclinical mouse model,
+      supporting the clinical trial results.
+    foundIn: "results"
+    contextSnippet: "Treatment with selumetinib resulted in confirmed partial responses (tumor volume decreases from baseline of ≥20%) in 17 of the 24 children (71%) and decreases from baseline in neurofibroma volume in 12 of 18 mice (67%)"
+    confidence: 0.95
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "selumetinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Maximum tolerated dose was 25 mg per square meter (approximately 60% of the recommended adult dose).
+      Selumetinib was administered twice daily at a dose of 20 to 30 mg per square meter of body-surface area
+      on a continuous dosing schedule (in 28-day cycles). Patients were able to receive selumetinib on a
+      long-term basis with median number of cycles of 30 (range, 6 to 56).
+    foundIn: "both"
+    contextSnippet: "The maximum tolerated dose was 25 mg per square meter (approximately 60% of the recommended adult dose). Patients were able to receive selumetinib on a long-term basis; the median number of cycles was 30 (range, 6 to 56)"
+    confidence: 0.9
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "selumetinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      The most common toxic effects associated with selumetinib included acneiform rash, gastrointestinal effects,
+      and asymptomatic creatine kinase elevation. These side effects should be monitored during treatment.
+    foundIn: "results"
+    contextSnippet: "The most common toxic effects associated with selumetinib included acneiform rash, gastrointestinal effects, and asymptomatic creatine kinase elevation"
+    confidence: 0.9
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "selumetinib"
+    resourceType: "Genetic Reagent"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Treatment with selumetinib resulted in confirmed partial responses (tumor volume decreases from baseline of ≥20%)
+      in 17 of the 24 children (71%). Disease progression (tumor volume increase from baseline of ≥20%) has not been
+      observed to date. Anecdotal evidence of decreases in tumor-related pain, disfigurement, and functional impairment was observed.
+    foundIn: "results"
+    contextSnippet: "Treatment with selumetinib resulted in confirmed partial responses (tumor volume decreases from baseline of ≥20%) in 17 of the 24 children (71%) and decreases from baseline in neurofibroma volume in 12 of 18 mice (67%). Disease progression (tumor volume increase from baseline of ≥20%) has not been observed to date"
+    confidence: 0.95
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "volumetric magnetic resonance imaging analysis"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Volumetric magnetic resonance imaging analysis was used to measure the change in size of plexiform neurofibromas
+      to monitor response to treatment (i.e., an increase or decrease from baseline in the volume of plexiform neurofibromas).
+      This method was essential for quantifying treatment response in both the clinical trial and mouse model studies.
+    foundIn: "both"
+    contextSnippet: "Response to treatment (i.e., an increase or decrease from baseline in the volume of plexiform neurofibromas) was monitored by using volumetric magnetic resonance imaging analysis to measure the change in size of the plexiform neurofibroma"
+    confidence: 0.85
+    doi: "10.1056/NEJMoa1605943"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 1
+    Usage Instructions: 2
+    Issue: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear presence of multiple research tools
+    - Mining patterns appear to miss pharmaceutical compounds/drugs used in clinical trials
+    - Animal models described functionally rather than by strain name were not captured
+    - Computational analysis methods (imaging analysis) were not recognized as tools
+    - Clinical trial registries/databases were not identified as computational resources
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the mining process.
+    The tools include: selumetinib and its alternative names (AZD6244, ARRY-142886) as genetic reagents,
+    a mouse model of NF1-related neurofibroma as an animal model, and volumetric MRI analysis as a computational tool.
+    
+    The mining patterns need significant enhancement to capture:
+    1. Pharmaceutical compounds and their alternative identifiers
+    2. Animal models described by disease/condition rather than strain nomenclature
+    3. Imaging analysis methods as computational tools
+    4. Clinical trial registries as computational resources
+    
+    All 6 potentially missed tools should be added to improve coverage of clinical trial publications.
+    The 5 suggested patterns would significantly improve future mining accuracy for similar publications.
+    
+    The observations extracted demonstrate the scientific value of these tools, with quantitative efficacy data
+    for both the drug compound and animal model, plus important usage and safety information.

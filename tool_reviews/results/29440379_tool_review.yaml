@@ -1,0 +1,137 @@
+publicationMetadata:
+  pmid: "29440379"
+  title: "Targeting the cMET pathway augments radiation response without adverse effect on hearing in NF2 schwannoma models."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - clear experimental study with animal models
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes experimental work with:
+    - Animal models (mouse schwannoma models, cerebellopontine angle model)
+    - Advanced cellular models (organoid brain slice culture)
+    - Genetic reagents (cMET gene knockdown)
+    - Potentially computational tools for data analysis
+    
+    The study involves developing mouse models, genetic manipulation, drug treatments, 
+    radiation therapy, and organoid cultures - all indicating extensive tool usage.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving extensive experimental work with 
+    animal models, genetic manipulation, and advanced cellular models. The study describes 
+    developing a cerebellopontine angle schwannoma model, using cMET gene knockdown, and 
+    employing organoid brain slice cultures. Despite lacking a formal Methods section in the 
+    provided text, the abstract indicates substantial tool usage that should have been detected.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "cerebellopontine angle (CPA) schwannoma model"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Here, we developed a cerebellopontine angle (CPA) schwannoma model that faithfully recapitulates the tumor-induced hearing loss."
+    whyMissed: "Animal model development not detected - may need patterns for 'developed a [anatomical location] model'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "cMET gene knockdown"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "This cMET gene knockdown study independently confirmed the role of the cMET pathway in mediating the effect of CRZ."
+    whyMissed: "Gene knockdown reagent not detected - may need patterns for '[gene] knockdown' or 'gene knockdown study'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "organoid brain slice culture"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "Using organoid brain slice culture, cMET blockade inhibited the growth of patient-derived schwannomas."
+    whyMissed: "Organoid model not detected - may need patterns for 'organoid [tissue] slice culture' or 'brain slice culture'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "patient-derived schwannomas"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "Using organoid brain slice culture, cMET blockade inhibited the growth of patient-derived schwannomas."
+    whyMissed: "Patient-derived model not detected - may need patterns for 'patient-derived [tumor type]'"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "crizotinib"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "we discovered that cMET blockade by crizotinib (CRZ) enhanced schwannoma radiosensitivity by enhancing DNA damage"
+    whyMissed: "Small molecule inhibitor not detected - may need patterns for drug names used as research reagents"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "developed a .* model"
+    toolType: "animal_model"
+    examples: ["developed a cerebellopontine angle (CPA) schwannoma model"]
+    reasoning: "Captures model development phrases that indicate new animal model creation"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z][A-Za-z0-9]+ gene knockdown"
+    toolType: "genetic_reagent"
+    examples: ["cMET gene knockdown"]
+    reasoning: "Identifies gene knockdown reagents/techniques used in studies"
+
+  - patternType: "term"
+    pattern: "organoid .* slice culture"
+    toolType: "advanced_cellular_model"
+    examples: ["organoid brain slice culture"]
+    reasoning: "Captures organoid-based culture systems that are advanced cellular models"
+
+  - patternType: "context_phrase"
+    pattern: "patient-derived [a-z]+"
+    toolType: "patient_derived_model"
+    examples: ["patient-derived schwannomas"]
+    reasoning: "Identifies patient-derived models including tumors, cells, and tissues"
+
+  - patternType: "context_phrase"
+    pattern: "using .* culture"
+    toolType: "advanced_cellular_model"
+    examples: ["Using organoid brain slice culture"]
+    reasoning: "Captures usage context for various culture systems and cellular models"
+
+  - patternType: "naming_convention"
+    pattern: "faithfully recapitulates"
+    toolType: "animal_model"
+    examples: ["model that faithfully recapitulates the tumor-induced hearing loss"]
+    reasoning: "Phrase commonly used to describe validated animal models"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of extensive tool usage
+    - Publication describes development of animal models, genetic reagents, and advanced cellular models
+    - Mining system appears to have completely missed this lab research publication
+    - Abstract contains multiple research tools that should have been detected
+    - Lack of full text sections may have contributed to poor mining performance
+  recommendations: |
+    Critical recommendations for this publication:
+    - This represents a significant mining failure - multiple clear research tools were missed
+    - All 5 identified tools should be added to the database with high confidence
+    - The suggested patterns should be implemented to catch similar tools in future mining
+    - Consider requiring full text access for comprehensive tool detection
+    - This publication demonstrates the need for better pattern coverage for:
+      * Animal model development phrases
+      * Gene knockdown techniques
+      * Organoid culture systems
+      * Patient-derived models
+      * Small molecule research reagents
+    - The mining system needs improvement to handle publications with rich tool content in abstracts

@@ -1,0 +1,95 @@
+publicationMetadata:
+  pmid: "7949098"
+  title: "Genetic analysis is consistent with the hypothesis that NF1 limits myeloid cell growth through p21ras."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence - genetic analysis of patient samples
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research with genetic analysis):
+    - genetic reagents (primers, probes for mutation detection)
+    - computational tools (sequence analysis software)
+    - potentially cell lines (primary human cancer cells mentioned)
+    
+    This is a genetic analysis study examining RAS mutations in patient samples, which typically
+    requires molecular biology tools for DNA extraction, PCR amplification, sequencing, and
+    mutation detection. The mention of "primary human cancer cells" suggests cell culture work.
+    However, the abstract-only format limits tool identification.
+  overallAssessment: |
+    This is a laboratory research study involving genetic analysis of RAS mutations in patient samples
+    from children with myeloid disorders. Such studies typically require molecular biology tools including
+    genetic reagents (primers, probes) and computational tools for sequence analysis. However, only the
+    abstract is available, which limits comprehensive tool identification. The study design suggests
+    tools should be present but may not be explicitly mentioned in the abstract.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "KRAS"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We studied 71 children...for activating mutations of KRAS and NRAS"
+    whyMissed: "KRAS mentioned as mutation target, but likely refers to gene analysis rather than a specific reagent. Without Methods section, cannot determine if specific primers/probes were used."
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "NRAS"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We studied 71 children...for activating mutations of KRAS and NRAS"
+    whyMissed: "NRAS mentioned as mutation target, but likely refers to gene analysis rather than a specific reagent. Without Methods section, cannot determine if specific primers/probes were used."
+    confidence: 0.3
+    shouldBeAdded: No
+    
+  - toolName: "primary human cancer cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "These data from primary human cancer cells provide strong genetic evidence"
+    whyMissed: "Mentioned as source of data, but this refers to patient-derived samples rather than established cell lines. Primary cells are not typically considered research tools in the same way as immortalized cell lines."
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "genetic analysis of|mutation analysis of|sequencing of"
+    toolType: "genetic_reagent"
+    examples: ["genetic analysis...for activating mutations of KRAS and NRAS"]
+    reasoning: "These phrases often indicate genetic reagent usage but need Methods section context to identify specific tools. Pattern alone insufficient without experimental details."
+    
+  - patternType: "context_phrase"
+    pattern: "primary [tissue/cell type] cells"
+    toolType: "cell_line"
+    examples: ["primary human cancer cells"]
+    reasoning: "Primary cells are mentioned but represent patient samples rather than research tools. Pattern should distinguish between primary samples (not tools) and established cell lines (tools)."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication
+    - Only abstract available - no Methods, Results, or Discussion sections
+    - Abstract mentions genetic analysis work that would typically require molecular tools
+    - Gene names (KRAS, NRAS, NF1) mentioned but without tool-specific context
+    - "Primary human cancer cells" refers to patient samples, not research tools
+    - Without Methods section, cannot identify specific reagents, primers, or analysis software used
+  recommendations: |
+    This publication represents a challenging case for tool mining:
+    1. The study clearly involved laboratory work (genetic mutation analysis) that would require tools
+    2. However, only the abstract is available, which typically doesn't contain detailed tool information
+    3. No tools were correctly missed by the mining algorithm - the gene names mentioned (KRAS, NRAS, NF1) 
+       refer to targets of analysis rather than specific research tools
+    4. The mention of "primary human cancer cells" refers to patient-derived samples, not established cell lines
+    5. Without access to Methods section, specific genetic reagents (primers, probes) and computational 
+       tools (sequencing software) cannot be identified
+    6. This highlights the limitation of abstract-only mining for laboratory research publications
+    7. No new mining patterns are strongly recommended based on this single abstract
+    8. Future mining should focus on publications with full-text Methods sections for better tool identification

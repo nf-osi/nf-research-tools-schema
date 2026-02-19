@@ -1,0 +1,219 @@
+publicationMetadata:
+  pmid: "28051113"
+  title: "A comprehensive custom panel design for routine hereditary cancer testing: preserving control, improving diagnostics and revealing a complex variation landscape."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics/genomics methodology paper describing NGS panel development and validation.
+    Expected tool types:
+    - Computational tools (software, pipelines, databases) - PRIMARY FOCUS
+    - Genetic reagents (custom bait libraries, sequencing reagents) - SECONDARY
+    
+    NOT expected:
+    - Antibodies, cell lines, animal models (not relevant to NGS panel development)
+    - Clinical assessment tools (this is a methods development paper, not clinical study)
+    - Advanced cellular models or PDX models (computational study only)
+    
+    The publication focuses on bioinformatics pipeline development, so computational tools should be abundant.
+  overallAssessment: |
+    This publication describes the development and validation of a custom NGS panel for hereditary cancer testing,
+    including a comprehensive bioinformatics pipeline. The study is primarily computational/bioinformatics focused
+    and should contain numerous computational tools (software, databases, analysis pipelines). The presence of
+    detailed Methods and Results sections with extensive bioinformatics workflows strongly indicates multiple
+    research tools should be present, particularly computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "BWA mem"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "fastq files were mapped against the GRCh37 human genome assembly corresponding to Ensembl release 67 using BWA mem and a sorted bam file was created"
+    whyMissed: "Standard bioinformatics tool name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "samtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using BWA mem and a sorted bam file was created with samtools. Exhaustive coverage metrics were produced"
+    whyMissed: "Common bioinformatics tool name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "bedtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Exhaustive coverage metrics were produced using a combination of bedtools and custom R and Bioconductor scripts"
+    whyMissed: "Bioinformatics toolkit name not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VarScan2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants, including substitutions and small insertions and deletions, were called using VarScan2 with the following parameters"
+    whyMissed: "Variant calling software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "annovar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Finally, variants were annotated with a combination of annovar and custom scripts"
+    whyMissed: "Variant annotation tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "bam-readcount"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "bam-readcount was then used to compute additional quality parameters (quality of the bases supporting the reference and alternative alleles"
+    whyMissed: "BAM analysis tool not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "regioneR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were filtered using the regioneR bioconductor package according to the clinical indication"
+    whyMissed: "Bioconductor package name not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "CLC Genomics Workbench"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CLC Genomics Workbench v6 (Qiagen) was used to analyze data from I2HCP V1"
+    whyMissed: "Commercial genomics software with version not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using a combination of bedtools and custom R and Bioconductor scripts"
+    whyMissed: "Programming language in analysis context not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Bioconductor"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using a combination of bedtools and custom R and Bioconductor scripts"
+    whyMissed: "Bioinformatics software collection not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PostgreSQL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All information, including coverage metrics, variants, variant quality estimators and annotations, was stored in a PostgreSQL database"
+    whyMissed: "Database system not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent eArray"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used Agilent eArray to design our SureSelect bait library V1 (Agilent, California, USA)"
+    whyMissed: "Commercial design platform not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "BWA\\s+(mem|aln)"
+    toolType: "computational_tool"
+    examples: ["BWA mem", "BWA aln"]
+    reasoning: "BWA is a widely used sequence alignment tool with specific algorithms (mem, aln) that should be captured"
+
+  - patternType: "term"
+    pattern: "samtools"
+    toolType: "computational_tool"
+    examples: ["samtools"]
+    reasoning: "samtools is a fundamental bioinformatics tool for SAM/BAM file processing, very commonly used"
+
+  - patternType: "term"
+    pattern: "bedtools"
+    toolType: "computational_tool"
+    examples: ["bedtools"]
+    reasoning: "bedtools is a standard genomics intervals toolkit used for coverage analysis and genomic operations"
+
+  - patternType: "term"
+    pattern: "VarScan2?"
+    toolType: "computational_tool"
+    examples: ["VarScan2", "VarScan"]
+    reasoning: "VarScan is a popular variant calling tool, often with version numbers"
+
+  - patternType: "term"
+    pattern: "annovar"
+    toolType: "computational_tool"
+    examples: ["annovar"]
+    reasoning: "ANNOVAR is a widely used variant annotation tool in genomics"
+
+  - patternType: "term"
+    pattern: "bam-readcount"
+    toolType: "computational_tool"
+    examples: ["bam-readcount"]
+    reasoning: "Tool for extracting base counts from BAM files, commonly used in variant analysis"
+
+  - patternType: "term"
+    pattern: "regioneR"
+    toolType: "computational_tool"
+    examples: ["regioneR"]
+    reasoning: "Bioconductor package for genomic region analysis"
+
+  - patternType: "term"
+    pattern: "CLC\\s+Genomics\\s+Workbench"
+    toolType: "computational_tool"
+    examples: ["CLC Genomics Workbench v6"]
+    reasoning: "Commercial genomics analysis software with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|mapped against.*using|called using|annotated with"
+    toolType: "computational_tool"
+    examples: ["analyzed using R", "called using VarScan2", "mapped using BWA"]
+    reasoning: "These phrases reliably indicate computational tool usage in bioinformatics contexts"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[A-Z][a-z]*\\d*\\b"
+    toolType: "computational_tool"
+    examples: ["VarScan2", "PolyPhen2", "MutationTaster"]
+    reasoning: "Many bioinformatics tools follow CamelCase naming with optional version numbers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(Qiagen\\)|\\(Illumina\\)|\\(Agilent.*USA\\)"
+    toolType: "computational_tool"
+    examples: ["CLC Genomics Workbench v6 (Qiagen)", "Agilent eArray (Agilent, California, USA)"]
+    reasoning: "Vendor information in parentheses often indicates commercial software tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 11
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite it being a comprehensive bioinformatics methodology paper
+    - The publication extensively describes computational tools and software used in NGS analysis pipeline
+    - At least 12 computational tools were clearly mentioned with usage context but not captured
+    - Mining patterns appear to be inadequate for capturing standard bioinformatics tools
+    - This represents a significant false negative rate for computational tool detection
+  recommendations: |
+    - ALL 12 identified computational tools should be added to the database
+    - Mining patterns need significant improvement for bioinformatics tools
+    - The suggested patterns should be implemented to capture standard genomics software
+    - Consider adding patterns for programming languages (R, Python) when used in analysis context
+    - Add patterns for commercial software with vendor information
+    - This publication demonstrates the need for better computational tool mining coverage
+    - No observations were extracted as no tools were initially validated, but the computational tools
+      identified could have associated usage instructions and performance metrics from the Results section

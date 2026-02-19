@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "21478499"
+  title: "Neurofibromin (Nf1) is required for skeletal muscle development."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving mouse genetics, developmental biology, 
+    and cell culture. Expected tools include:
+    - Animal models (Nf1 knockout mice, Prx1-cre mice)
+    - Genetic reagents (Cre-lox system, gene targeting constructs)
+    - Cell lines (satellite cells, myoblasts)
+    - Potentially antibodies for protein detection
+    - Computational tools for data analysis
+  overallAssessment: |
+    This is a laboratory research publication focused on mouse developmental biology and skeletal muscle 
+    formation. The study clearly uses genetically modified mouse models (Nf1(Prx1) mice with Prx1-cre), 
+    involves cell isolation and culture (satellite cells), and includes molecular/cellular analysis. 
+    Despite having no formal Methods section, the abstract contains sufficient detail to identify multiple 
+    research tools that should have been mined but were missed entirely.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1(Prx1) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Nf1 gene inactivation in the early limb bud mesenchyme using Prx1-cre (Nf1(Prx1)) resulted in muscle dystrophy characterized by fibrosis, reduced number of muscle fibers and reduced muscle force."
+    whyMissed: "Specific mouse strain nomenclature not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Prx1-cre"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Nf1 gene inactivation in the early limb bud mesenchyme using Prx1-cre (Nf1(Prx1)) resulted in muscle dystrophy"
+    whyMissed: "Cre recombinase system not recognized as genetic reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "satellite cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Satellite cells isolated from Nf1(Prx1) mice showed normal self-renewal, but their differentiation was impaired as indicated by diminished myotube formation."
+    whyMissed: "Primary cell isolation not recognized as cell line/culture system"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "myoblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "This was caused by an early defect in myogenesis affecting the terminal differentiation of myoblasts between E12.5 and E14.5."
+    whyMissed: "Cell type mentioned in developmental context not recognized"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\([A-Z][a-z0-9]+\\)\\s+mice"
+    toolType: "animal_model"
+    examples: ["Nf1(Prx1) mice"]
+    reasoning: "Mouse strain nomenclature with gene(promoter) format commonly used in genetics research"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-z0-9]+-cre\\b"
+    toolType: "genetic_reagent"
+    examples: ["Prx1-cre"]
+    reasoning: "Cre recombinase systems are fundamental genetic tools for conditional gene targeting"
+
+  - patternType: "context_phrase"
+    pattern: "satellite cells isolated from"
+    toolType: "cell_line"
+    examples: ["Satellite cells isolated from Nf1(Prx1) mice"]
+    reasoning: "Primary cell isolation represents a cell culture system/tool used in research"
+
+  - patternType: "context_phrase"
+    pattern: "gene inactivation.*using"
+    toolType: "genetic_reagent"
+    examples: ["Nf1 gene inactivation in the early limb bud mesenchyme using Prx1-cre"]
+    reasoning: "Indicates use of genetic tools for gene manipulation"
+
+  - patternType: "term"
+    pattern: "\\bmyoblasts?\\b"
+    toolType: "cell_line"
+    examples: ["myoblasts"]
+    reasoning: "Specific cell types used in muscle development research"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools despite clear laboratory research content
+    - Mouse genetic models (Nf1(Prx1) mice, Prx1-cre system) completely missed
+    - Primary cell culture systems (satellite cells, myoblasts) not recognized
+    - No Methods section available, but abstract contains sufficient tool information
+    - Mining patterns appear inadequate for mouse genetics nomenclature
+  recommendations: |
+    This publication represents a significant mining failure - a clear laboratory research study with 
+    multiple identifiable research tools yielded zero mined tools. Key recommendations:
+    
+    1. URGENT: Add patterns for mouse strain nomenclature, especially Gene(Promoter) format
+    2. Add Cre recombinase system recognition as genetic reagents
+    3. Improve primary cell culture detection (satellite cells, myoblasts)
+    4. Consider context-based mining for "gene inactivation using X" patterns
+    5. This paper should be manually reviewed to recover the missed tools
+    6. No observations could be extracted due to lack of Results/Discussion sections
+    
+    The mining system needs significant improvement for mouse genetics research papers.
+    All 4 potentially missed tools should be added to improve coverage.

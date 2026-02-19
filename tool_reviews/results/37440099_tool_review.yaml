@@ -1,0 +1,131 @@
+publicationMetadata:
+  pmid: "37440099"
+  title: "The impact of a virtual mind-body program on resilience factors among international English-speaking adults with neurofibromatoses: secondary analysis of a randomized clinical trial."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools for measuring patient-reported outcomes and resilience factors.
+    This study used multiple validated questionnaires and scales to assess coping, mindfulness, gratitude, 
+    optimism, and social support. These are legitimate clinical assessment tools even though no traditional
+    lab methods are present. The study design (randomized clinical trial) inherently requires standardized
+    outcome measurement instruments.
+  overallAssessment: |
+    This randomized clinical trial would definitely use clinical assessment tools to measure patient outcomes.
+    The study tested a mind-body resilience program and measured multiple resilience factors using validated
+    questionnaires and scales. Clinical assessment tools are essential for this type of intervention study
+    to quantify treatment effects on psychological and behavioral outcomes.
+
+toolValidations: []  # No tools were mined, but several should have been found
+
+potentiallyMissedTools:
+  - toolName: "Measure of Current Status-A"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "We measured resilience factors via the Measure of Current Status-A (adaptive coping), Cognitive and Affective Mindfulness Scale-Revised"
+    whyMissed: "Clinical assessment tool name not recognized by mining patterns - may need pattern for 'Measure of [Name]-[Version]' format"
+    confidence: 0.95  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "Cognitive and Affective Mindfulness Scale-Revised"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Measure of Current Status-A (adaptive coping), Cognitive and Affective Mindfulness Scale-Revised (mindfulness), Gratitude Questionnaire-6"
+    whyMissed: "Long clinical assessment tool name with 'Scale-Revised' suffix not captured by current patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Gratitude Questionnaire-6"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Cognitive and Affective Mindfulness Scale-Revised (mindfulness), Gratitude Questionnaire-6 (gratitude), Life Orientation Test"
+    whyMissed: "Questionnaire with number suffix (Questionnaire-6) not recognized by current patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Life Orientation Test Optimism Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Gratitude Questionnaire-6 (gratitude), Life Orientation Test Optimism Scale (optimism), and Medical Outcomes Study Social Support Survey"
+    whyMissed: "Complex multi-word clinical assessment tool name not captured by current patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Medical Outcomes Study Social Support Survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Life Orientation Test Optimism Scale (optimism), and Medical Outcomes Study Social Support Survey (perceived social support) at baseline"
+    whyMissed: "Long clinical assessment tool name starting with 'Medical Outcomes Study' not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+(?:Scale|Questionnaire|Survey|Test|Inventory|Assessment)(?:-[A-Z0-9]+)?\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Cognitive and Affective Mindfulness Scale-Revised", "Gratitude Questionnaire-6", "Life Orientation Test Optimism Scale"]
+    reasoning: "Many clinical assessment tools follow naming patterns with descriptive names ending in Scale/Questionnaire/Survey/Test, sometimes with version suffixes"
+
+  - patternType: "naming_convention"
+    pattern: "\\bMeasure of [A-Z][a-zA-Z\\s]+-[A-Z]\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Measure of Current Status-A"]
+    reasoning: "Specific pattern for 'Measure of [Name]-[Version]' format commonly used in clinical assessment tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\bMedical Outcomes Study [A-Z][a-zA-Z\\s]+(?:Scale|Survey|Questionnaire)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Medical Outcomes Study Social Support Survey"]
+    reasoning: "Medical Outcomes Study (MOS) instruments are widely used validated clinical assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "(?:measured|assessed|evaluated|administered)\\s+(?:via|using|with)\\s+the\\s+([A-Z][a-zA-Z\\s]+(?:Scale|Questionnaire|Survey|Test|Inventory)(?:-[A-Z0-9]+)?)"
+    toolType: "clinical_assessment_tool"
+    examples: ["measured resilience factors via the Measure of Current Status-A"]
+    reasoning: "Context phrases indicating administration of clinical assessment instruments"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(?:questionnaires?|scales?|surveys?|assessments?|instruments?)\\s+(?:included?|used|administered)\\s*:?\\s*([A-Z][a-zA-Z\\s,]+)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaires included: Gratitude Questionnaire-6, Life Orientation Test"]
+    reasoning: "Lists of clinical assessment tools often introduced with these context phrases"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major mining failure - 5 validated clinical assessment tools were completely missed:
+    - All tools are legitimate, validated clinical assessment instruments
+    - Tools were clearly mentioned in context of outcome measurement
+    - Current mining patterns appear inadequate for clinical assessment tools
+    - This represents a significant gap in clinical tool detection capability
+  recommendations: |
+    CRITICAL: This publication demonstrates major gaps in clinical assessment tool mining:
+    
+    1. ADD ALL 5 MISSED TOOLS: All identified tools are validated clinical assessment instruments
+       that should be included in the research tools database
+    
+    2. IMPLEMENT SUGGESTED PATTERNS: The 5 new patterns would significantly improve detection
+       of clinical assessment tools with complex naming conventions
+    
+    3. REVIEW CLINICAL TOOL PATTERNS: Current patterns appear focused on lab tools and miss
+       many clinical assessment instruments with descriptive names
+    
+    4. VALIDATE PATTERN EFFECTIVENESS: Test new patterns against other clinical publications
+       to ensure they don't create false positives
+    
+    5. CONSIDER CLINICAL CONTEXT: Clinical trials and intervention studies routinely use
+       validated assessment tools that should be captured systematically
+    
+    This publication type (clinical trial) is exactly where clinical assessment tools should
+    be found, and the complete mining failure indicates systematic pattern deficiencies.

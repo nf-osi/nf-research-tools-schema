@@ -1,0 +1,180 @@
+publicationMetadata:
+  pmid: "25475340"
+  title: "Validity and interexaminer reliability of a new method to quantify skin neurofibromas of neurofibromatosis 1 using paper frames."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical methodology study that developed and validated a new quantification method for skin neurofibromas.
+    Expected tool types:
+    - Clinical assessment tools: The paper frames method itself is a clinical assessment tool for quantifying neurofibromas
+    - Computational tools: Statistical software (SPSS, Excel) and image analysis software (Paint®) used for data analysis
+    - Potentially missed: Digital camera (Sony Cyber-shot DSC-W30) could be considered a clinical assessment tool for documentation
+    
+    Note: While queryType is "bench", this is actually a clinical study developing a clinical assessment methodology.
+    The study involves human subjects and clinical measurements, not laboratory bench work.
+  overallAssessment: |
+    This clinical methodology study developed and validated a new method for quantifying skin neurofibromas in NF1 patients.
+    The study contains clinical assessment tools (the paper frames method) and computational tools for statistical analysis.
+    Despite being found by a "bench" query, this is clearly a clinical study with clinical assessment tools, not laboratory tools.
+
+toolValidations: []  # No tools were initially mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "Paper frames method"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Paper frames, with a central square measuring 100 cm2, were placed on the back, abdomen and thigh. Images were taken, transferred to a computer and two independent examiners counted the neurofibromas."
+    whyMissed: "This is the main clinical assessment tool developed and validated in this study - a standardized method for quantifying skin neurofibromas using 100cm² paper frames"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For statistical analysis, we used the SPSS software (IBM® SPSS®, v. 20.0, Armonk, NY, USA)"
+    whyMissed: "Statistical analysis software with specific version number (v. 20.0) - clear computational tool usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Paint®"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All the pictures were analyzed using the software Paint® (Microsoft Corporation, Redmond, WA, USA). The examiner used the spray tool to highlight the skin neurofibromas that had already been counted"
+    whyMissed: "Image analysis software used for counting neurofibromas in photographs - computational tool with specific vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Excel 2011"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For statistical analysis, we used the SPSS software (IBM® SPSS®, v. 20.0, Armonk, NY, USA) and Excel 2011 (Microsoft Corporation, Redmond, WA, USA)"
+    whyMissed: "Statistical analysis software with specific version (2011) - computational tool usage"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Intraclass correlation coefficient (ICC)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The differences in the quantity of neurofibromas counted by two examiners were evaluated with Intraclass correlation coefficient (ICC), paired t-test, Bland-Altman and survival-agreement plots"
+    whyMissed: "Statistical method used for assessing interexaminer reliability - could be considered a clinical assessment methodology"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Bland-Altman plot"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The reliability of the paper frames method performed by the two independent examiners was analyzed by ICC, Bland-Altman plot associated with Spearman's rho correlation coefficient"
+    whyMissed: "Statistical visualization method for assessing agreement between examiners - clinical assessment methodology"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "paper frames method"
+    toolType: "clinical_assessment_tool"
+    examples: ["Paper frames, with a central square measuring 100 cm2", "quantification of neurofibromas using the paper frames method"]
+    reasoning: "This is a novel clinical assessment tool developed in this study - should be captured as a standardized quantification method"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using the software"
+    toolType: "computational_tool"
+    examples: ["All the pictures were analyzed using the software Paint®"]
+    reasoning: "Clear indication of software usage for analysis - reliable pattern for computational tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(Microsoft Corporation, Redmond, WA, USA\\)"
+    toolType: "computational_tool"
+    examples: ["Paint® (Microsoft Corporation, Redmond, WA, USA)", "Excel 2011 (Microsoft Corporation, Redmond, WA, USA)"]
+    reasoning: "Vendor information with location indicates commercial software tools"
+
+  - patternType: "term"
+    pattern: "statistical analysis.*software"
+    toolType: "computational_tool"
+    examples: ["For statistical analysis, we used the SPSS software"]
+    reasoning: "Pattern to catch statistical software used for data analysis"
+
+  - patternType: "naming_convention"
+    pattern: "v\\. [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["SPSS®, v. 20.0"]
+    reasoning: "Version numbers indicate specific software tools rather than general mentions"
+
+observations:
+  - resourceName: "Paper frames method"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The paper frames method demonstrated excellent interexaminer reliability with ICC values ranging from 0.992-0.997.
+      The method uses 100cm² paper frames placed on back, abdomen, and thigh to count neurofibromas.
+      Agreement between examiners was >90% when threshold of 10 neurofibromas was reached, and ~96% at 20 neurofibromas.
+      Method can predict total number of skin neurofibromas using specific formulas: 65.6 + 9.7x (examiner A, R²=0.63) 
+      and 38.6 + 10.3x (examiner B, R²=0.64).
+    foundIn: "results"
+    contextSnippet: "There was excellent agreement between examiners (ICC range 0.992-0.997) and the total number of skin neurofibromas could be predicted by the adhesive frames technique using a specific formula (P < 0.0001)"
+    confidence: 0.95
+    doi: "10.1186/s13023-014-0202-9"
+
+  - resourceName: "Paper frames method"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Issue"
+    observationTypeOntologyId: ""  # Not applicable for issues
+    details: |
+      Proportional bias observed in individuals with ≥100 neurofibromas - counting errors tend to be higher as 
+      the number of skin neurofibromas increases. Examiner A tended to obtain higher values than examiner B, 
+      particularly in individuals with >100 neurofibromas. This discrepancy may occur due to superposition 
+      of neurofibromas in areas with high tumor concentration.
+    foundIn: "results"
+    contextSnippet: "This discrepancy was more evident in individuals with more than 100 skin neurofibromas... counting errors in individuals with ≥100 neurofibromas tended to be higher as the number of skin neurofibromas increased (proportional bias)"
+    confidence: 0.90
+    doi: "10.1186/s13023-014-0202-9"
+
+  - resourceName: "Paper frames method"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for general comments
+    details: |
+      The method is described as reliable, easy, and rapid for quantifying skin neurofibromas. 
+      It can be used for longitudinal studies to track evolution of neurofibroma number and size over time.
+      The method has potential for automation through computerized picture analysis.
+      Skin color (white vs black) was not a confounding factor and did not affect counting accuracy.
+    foundIn: "discussion"
+    contextSnippet: "In this article we describe a reliable, easy and rapid technique using paper frames to quantify skin neurofibromas that accurately predicts the total number of these tumors in patients with NF1"
+    confidence: 0.95
+    doi: "10.1186/s13023-014-0202-9"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 1
+    Issue: 1
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a methodology study that developed and used several tools
+    - The main clinical assessment tool (paper frames method) was completely missed
+    - Statistical software tools (SPSS, Excel, Paint®) with specific versions were not captured
+    - Publication was classified as "bench" query but is actually a clinical methodology study
+  recommendations: |
+    This publication should have several tools added:
+    - Paper frames method: The primary clinical assessment tool developed and validated in this study
+    - SPSS v. 20.0: Statistical analysis software with specific version
+    - Paint® software: Image analysis tool used for neurofibroma counting
+    - Excel 2011: Additional statistical analysis software
+    
+    The mining patterns need improvement to capture:
+    - Novel clinical assessment methodologies being developed/validated
+    - Statistical software with vendor information and version numbers
+    - Image analysis software used in clinical studies
+    
+    Three high-quality scientific observations were extracted documenting the tool's performance,
+    limitations, and practical applications. The observations provide valuable information about
+    interexaminer reliability, bias issues, and clinical utility of the paper frames method.

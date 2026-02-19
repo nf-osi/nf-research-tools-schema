@@ -1,0 +1,103 @@
+publicationMetadata:
+  pmid: "28735371"
+  title: "Identifying Symptoms of Distress in Youth Living with Neurofibromatosis Type 1 (NF1)."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # Very clear from abstract content
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    
+    This publication specifically describes the testing and validation of the Distress Thermometer (DT) 
+    and accompanying symptom checklist in pediatric NF1 patients. These are validated clinical assessment 
+    tools that should be captured as research tools. The study involves 80 youth participants and evaluates 
+    the usability, acceptability, and concordance of these assessment instruments.
+    
+    Expected tool types:
+    - Clinical assessment tools (Distress Thermometer, symptom checklist)
+    - Possibly computational tools for statistical analysis (though not explicitly mentioned)
+  overallAssessment: |
+    This is a clinical validation study that tests psychosocial screening tools in pediatric NF1 patients.
+    The study clearly uses and evaluates clinical assessment tools (Distress Thermometer and symptom checklist)
+    which are legitimate research instruments that should be captured. The absence of these tools in the mining
+    results represents a significant gap, as clinical assessment tools are valid research tools even without
+    traditional laboratory methods sections.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Distress Thermometer"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...test the overall usability of the Distress Thermometer (DT) and symptom checklist and concordance of DT ratings between pediatric patients, their caregivers and medical providers..."
+    whyMissed: "Clinical assessment tool not captured by current mining patterns. The Distress Thermometer is a validated psychosocial screening instrument widely used in oncology and other medical settings."
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "symptom checklist"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...test the overall usability of the Distress Thermometer (DT) and symptom checklist and concordance of DT ratings...the DT and symptom checklist was acceptable and feasible to complete in a clinic setting..."
+    whyMissed: "Clinical assessment tool mentioned multiple times but not captured. This appears to be an accompanying checklist used with the Distress Thermometer for comprehensive symptom assessment."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Distress Thermometer|DT"
+    toolType: "clinical_assessment_tool"
+    examples: ["Distress Thermometer (DT)", "DT ratings"]
+    reasoning: "The Distress Thermometer is a widely used validated clinical assessment tool in psycho-oncology and should be captured when mentioned in clinical studies."
+    
+  - patternType: "context_phrase"
+    pattern: "\\b(symptom checklist|checklist)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["symptom checklist", "accompanying checklist"]
+    reasoning: "Symptom checklists are standardized clinical assessment tools used for systematic symptom evaluation and should be captured when used in clinical studies."
+    
+  - patternType: "context_phrase"
+    pattern: "\\b(screening tool|assessment tool|psychosocial screening)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["psychosocial screening tool", "screening tool has been developed"]
+    reasoning: "These phrases often indicate the development or use of clinical assessment instruments that are legitimate research tools."
+    
+  - patternType: "context_phrase"
+    pattern: "\\b(usability|feasible to complete|acceptable.*complete)\\b.*\\b(clinic setting|clinical setting)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["acceptable and feasible to complete in a clinic setting"]
+    reasoning: "Phrases describing clinical usability testing often indicate validation studies of clinical assessment tools."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Significant gap in clinical assessment tool detection: Two clear clinical assessment tools were missed
+    - The Distress Thermometer is a well-established, validated psychosocial screening instrument
+    - The accompanying symptom checklist is also a legitimate clinical assessment tool
+    - Current mining patterns appear inadequate for detecting clinical assessment tools in psychosocial studies
+    - This represents a systematic issue where clinical validation studies are not properly capturing their primary research instruments
+  recommendations: |
+    This publication should have captured at least 2 clinical assessment tools:
+    1. Distress Thermometer (DT) - a validated psychosocial screening tool
+    2. Symptom checklist - an accompanying assessment instrument
+    
+    Both tools are clearly described as being tested for usability, acceptability, and clinical utility in pediatric NF1 patients.
+    This is a clinical validation study where the assessment tools themselves are the primary research instruments.
+    
+    The mining patterns need significant improvement for clinical assessment tools, particularly:
+    - Psychosocial screening instruments
+    - Symptom assessment checklists
+    - Patient-reported outcome measures
+    - Clinical validation contexts
+    
+    This case highlights the need for better coverage of clinical research tools beyond traditional laboratory instruments.
+    The suggested patterns should help capture similar clinical assessment tools in future mining efforts.

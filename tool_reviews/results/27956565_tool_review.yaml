@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "27956565"
+  title: "Randomized placebo-controlled study of lovastatin in children with neurofibromatosis type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (neuropsychological tests, questionnaires, outcome measures), possibly computational tools for statistical analysis
+    
+    This is a randomized controlled trial testing lovastatin efficacy in children with NF1. The study uses validated neuropsychological assessment instruments as primary and secondary outcome measures. Clinical trials typically employ standardized assessment tools to measure treatment effects, making clinical assessment tools highly expected. Lab research tools (antibodies, cell lines, animal models) would not be expected in this type of clinical study.
+  overallAssessment: |
+    This randomized placebo-controlled clinical trial would be expected to use clinical assessment tools extensively. The study employed validated neuropsychological tests as primary outcomes (Cambridge Neuropsychological Test Automated Battery, Test of Everyday Attention for Children) and secondary outcome measures for cognitive and behavioral assessment. Clinical assessment tools are the primary research instruments in this type of study design. No laboratory research tools would be expected as this is purely a clinical intervention trial.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Primary outcomes were total errors on the Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task (visuospatial learning)"
+    whyMissed: "Specific neuropsychological test name with clear assessment context was not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Test of Everyday Attention for Children"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "and the Score subtest from the Test of Everyday Attention for Children (sustained attention)"
+    whyMissed: "Validated attention assessment tool with specific subtest mentioned was not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cambridge Neuropsychological Test Automated Battery"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Primary outcomes were total errors on the Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task"
+    whyMissed: "Broader test battery name that encompasses multiple cognitive assessments"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Cambridge Neuropsychological Test Automated Battery"
+    toolType: "clinical_assessment_tool"
+    examples: ["Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task"]
+    reasoning: "Specific validated neuropsychological test battery commonly used in clinical trials"
+
+  - patternType: "term"
+    pattern: "Test of Everyday Attention for Children"
+    toolType: "clinical_assessment_tool"
+    examples: ["Test of Everyday Attention for Children (sustained attention)"]
+    reasoning: "Standardized pediatric attention assessment tool used in clinical research"
+
+  - patternType: "context_phrase"
+    pattern: "Primary outcomes were.*on the"
+    toolType: "clinical_assessment_tool"
+    examples: ["Primary outcomes were total errors on the Cambridge Neuropsychological Test"]
+    reasoning: "Context phrase indicating primary outcome measures in clinical trials often contain assessment tool names"
+
+  - patternType: "context_phrase"
+    pattern: "Secondary outcomes measured"
+    toolType: "clinical_assessment_tool"
+    examples: ["Secondary outcomes measured executive function, attention, visuospatial skills"]
+    reasoning: "Phrase indicating secondary outcome measures that may reference specific assessment tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+Test\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Test of Everyday Attention for Children"]
+    reasoning: "Pattern to capture formal test names that follow standard naming conventions"
+
+observations:
+  - resourceName: "Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Primary outcome measure for visuospatial learning assessment. Study found no significant effect of lovastatin treatment on visuospatial learning as measured by total errors on this task (Cohen d = -0.15, 95% confidence interval -0.47 to 0.18) after 16 weeks of treatment.
+    foundIn: "results"
+    contextSnippet: "Lovastatin had no significant effect on primary outcomes after 16 weeks of treatment: visuospatial learning (Cohen d = -0.15, 95% confidence interval -0.47 to 0.18)"
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000003435"
+
+  - resourceName: "Test of Everyday Attention for Children"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Primary outcome measure for sustained attention assessment using the Score subtest. Study found no significant effect of lovastatin treatment on sustained attention (Cohen d = 0.19, 95% confidence interval -0.14 to 0.53) after 16 weeks of treatment.
+    foundIn: "results"
+    contextSnippet: "or sustained attention (Cohen d = 0.19, 95% confidence interval -0.14 to 0.53)"
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000003435"
+
+  - resourceName: "Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used as primary outcome measure for visuospatial learning assessment in children with NF1 aged 8-15 years. Total errors on the task were measured as the primary endpoint in this randomized controlled trial.
+    foundIn: "methods"
+    contextSnippet: "Primary outcomes were total errors on the Cambridge Neuropsychological Test Automated Battery Paired Associate Learning task (visuospatial learning)"
+    confidence: 0.90
+    doi: "10.1212/WNL.0000000000003435"
+
+  - resourceName: "Test of Everyday Attention for Children"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Score subtest used as primary outcome measure for sustained attention assessment in children with NF1. Administered as part of the primary endpoint evaluation in this clinical trial testing lovastatin efficacy.
+    foundIn: "methods"
+    contextSnippet: "and the Score subtest from the Test of Everyday Attention for Children (sustained attention)"
+    confidence: 0.90
+    doi: "10.1212/WNL.0000000000003435"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    General Comment or Review: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Mining system completely missed clinical assessment tools in this clinical trial
+    - No tools were mined despite clear presence of validated neuropsychological assessment instruments
+    - Primary and secondary outcome measures are legitimate clinical assessment tools that should have been captured
+    - This represents a significant gap in clinical assessment tool mining patterns
+  recommendations: |
+    This publication contains legitimate clinical assessment tools that were completely missed by the mining system. The Cambridge Neuropsychological Test Automated Battery and Test of Everyday Attention for Children are validated, standardized assessment instruments commonly used in clinical research. These should be added to the tool database as they represent genuine research tools used for outcome measurement in clinical trials.
+    
+    The mining patterns need significant enhancement for clinical assessment tools, particularly:
+    1. Neuropsychological test batteries and their subtests
+    2. Standardized pediatric assessment instruments
+    3. Context phrases indicating primary/secondary outcome measures
+    4. Formal test naming conventions
+    
+    All three identified tools should be added to the database with high confidence. The observations extracted provide valuable information about their usage and efficacy findings in the NF1 population.

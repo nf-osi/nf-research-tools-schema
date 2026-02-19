@@ -1,0 +1,133 @@
+publicationMetadata:
+  pmid: "38170419"
+  title: "Development of the PROMIS pediatric stigma and extension to the PROMIS pediatric stigma: skin item banks."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study, which typically develops and validates clinical assessment tools.
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, patient-reported outcome measures)
+    - Computational tools (statistical software for psychometric analysis - IRT, EFA, CFA)
+    
+    The study develops new PROMIS pediatric stigma scales and uses existing validated instruments,
+    which are legitimate clinical assessment tools even without traditional lab methods.
+  overallAssessment: |
+    This publication is a psychometric study developing new clinical assessment tools (PROMIS Pediatric Stigma scales).
+    Such studies routinely develop, validate, and use clinical assessment instruments, which are legitimate research tools.
+    The absence of a Methods section is typical for instrument development papers where methodology is described in the abstract and results.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PROMIS Pediatric Stigma"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "To develop the PROMIS Pediatric Stigma (PPS) and Skin (PPS-Skin) by constructing a common metric for measuring stigma in children with various conditions"
+    whyMissed: "This is the primary clinical assessment tool being developed in this study - a validated pediatric stigma scale"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PROMIS Pediatric Stigma: Skin"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "To develop the PROMIS Pediatric Stigma (PPS) and Skin (PPS-Skin) by constructing a common metric...The PPS-Skin (18 cores items + 6 skin items) was developed"
+    whyMissed: "This is the skin-specific extension of the PROMIS Pediatric Stigma scale being developed"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Neuro-QoL Stigma"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Children with epilepsy, pNF and MD (sample-1) completed the original 18-item Neuro-QoL Stigma"
+    whyMissed: "This is an existing validated clinical assessment tool used as the foundation for the new PROMIS scales"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Exploratory factor analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Exploratory factor analysis (EFA) and confirmatory analysis (CFA) were used to evaluate unidimensionality"
+    whyMissed: "Statistical analysis method used for psychometric validation - should be captured as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "Confirmatory factor analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Exploratory factor analysis (EFA) and confirmatory analysis (CFA) were used to evaluate unidimensionality"
+    whyMissed: "Statistical analysis method used for psychometric validation - should be captured as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "Item response theory"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Item response theory model (IRT) was used to construct the final measure...We used IRT techniques to successfully develop the PPS"
+    whyMissed: "Statistical modeling approach used for scale development - should be captured as computational tool"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PROMIS\\s+[A-Za-z\\s]+(?:Scale|Bank|Measure|Item|Tool)"
+    toolType: "clinical_assessment_tool"
+    examples: ["PROMIS Pediatric Stigma", "PROMIS Pediatric Stigma: Skin"]
+    reasoning: "PROMIS (Patient-Reported Outcomes Measurement Information System) instruments are widely used validated clinical assessment tools"
+
+  - patternType: "term"
+    pattern: "Neuro-QoL\\s+[A-Za-z\\s]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Neuro-QoL Stigma"]
+    reasoning: "Neuro-QoL is a validated neurological quality of life measurement system with multiple subscales"
+
+  - patternType: "context_phrase"
+    pattern: "(?:develop|developing|developed)\\s+(?:the\\s+)?[A-Z][A-Za-z\\s]+(?:scale|questionnaire|measure|instrument|tool|bank)"
+    toolType: "clinical_assessment_tool"
+    examples: ["develop the PROMIS Pediatric Stigma", "developed by calibrating"]
+    reasoning: "Phrases indicating development of new clinical assessment instruments"
+
+  - patternType: "context_phrase"
+    pattern: "(?:completed|administered|used)\\s+(?:the\\s+)?(?:original\\s+)?\\d+-item\\s+[A-Za-z\\s-]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed the original 18-item Neuro-QoL Stigma"]
+    reasoning: "Phrases indicating administration of existing validated instruments with item counts"
+
+  - patternType: "term"
+    pattern: "(?:exploratory|confirmatory)\\s+factor\\s+analysis"
+    toolType: "computational_tool"
+    examples: ["Exploratory factor analysis (EFA)", "confirmatory analysis (CFA)"]
+    reasoning: "Statistical methods commonly used in psychometric validation studies"
+
+  - patternType: "term"
+    pattern: "item\\s+response\\s+theory"
+    toolType: "computational_tool"
+    examples: ["Item response theory model (IRT)"]
+    reasoning: "Advanced statistical modeling approach for scale development and validation"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a clear instrument development study
+    - Three major clinical assessment tools were completely missed: PROMIS Pediatric Stigma, PROMIS Pediatric Stigma: Skin, and Neuro-QoL Stigma
+    - Statistical analysis methods (EFA, CFA, IRT) used for psychometric validation were also missed
+    - The mining system appears to lack patterns for detecting PROMIS instruments and psychometric analysis methods
+    - This represents a significant gap in clinical assessment tool detection
+  recommendations: |
+    - All 6 potentially missed tools should be added to improve mining coverage
+    - The suggested patterns should be implemented to catch PROMIS instruments and psychometric methods
+    - This publication demonstrates the need for better pattern coverage of instrument development studies
+    - No observations could be extracted due to lack of Results/Discussion sections in the available text
+    - The mining system needs improvement for detecting clinical assessment tools in instrument development contexts
+    - Consider adding patterns for other major clinical assessment frameworks (PedsQL, SF-36, etc.)

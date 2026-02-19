@@ -1,0 +1,269 @@
+publicationMetadata:
+  pmid: "40394150"
+  title: "Mass spectrometric insights into the protein composition of human cutaneous neurofibromas: comparison of neurofibromas with the overlying skin."
+  queryType: "bench,clinical"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a mass spectrometry-based proteomics study with immunohistochemistry validation. Expected tools include:
+    - Computational tools for mass spectrometry data analysis (Spectronaut, R packages)
+    - Antibodies for immunohistochemistry validation
+    - Laboratory equipment and reagents for sample processing
+    - Bioinformatics tools for Gene Ontology analysis
+    
+    Note: Publications can contain MULTIPLE tool types. This study combines wet lab techniques (mass spec, IHC) 
+    with computational analysis, so both lab reagents and software tools are expected.
+  overallAssessment: |
+    This is a clear laboratory research study using mass spectrometry proteomics and immunohistochemistry to compare 
+    tumor and normal tissue. The study involves extensive wet lab methods and computational analysis, making it highly 
+    likely to contain multiple research tools including antibodies, computational software, and laboratory reagents. 
+    The detailed Methods section describes specific protocols that would require various research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Spectronaut Pulsar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...processed with the Spectronaut Pulsar software (Biognosys, Schlieren, Switzerland). Pulsar is a search engine, integrated into Spectronaut for spectral library generation..."
+    whyMissed: "Specific software name with vendor information for mass spectrometry data processing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Thermo Xcalibur"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The data were acquired automatically using Thermo Xcalibur 4.1 software (Thermo Fisher Scientific)..."
+    whyMissed: "Mass spectrometry acquisition software with version number and vendor"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...All analyses were performed using the R software for statistical computing, version 4.0.0..."
+    whyMissed: "Statistical computing software with specific version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "lmerTest"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...using the R software for statistical computing, version 4.0.0, and package lmerTest, version 3.1-2..."
+    whyMissed: "R package for linear mixed effects modeling with version number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "CONFIRM anti-Ki67 (clone 30-9)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...12-min incubation with the CONFIRM anti-Ki67 (clone 30-9) rabbit monoclonal primary antibody (Roche)..."
+    whyMissed: "Specific antibody with clone information and vendor for immunohistochemistry"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-collagen XV"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...incubation with polyclonal anti-collagen XV (Sigma-Aldrich, HPA017913, 1:1000)..."
+    whyMissed: "Antibody with catalog number and vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-collagen XVIII"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...in-house monoclonal anti-collagen XVIII (ref. [46], DB144-N2, 7 μg/ml)..."
+    whyMissed: "In-house antibody with clone designation and reference"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Easy-nLC 1200"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...nanoflow high-performance liquid chromatography system Easy-nLC 1200 coupled to the Q Exactive HF mass spectrometer..."
+    whyMissed: "HPLC system model name for mass spectrometry analysis"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "Q Exactive HF"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Easy-nLC 1200 coupled to the Q Exactive HF mass spectrometer (Thermo Fisher Scientific, Bremen, Germany)..."
+    whyMissed: "Mass spectrometer model with vendor information"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "BenchMark Ultra"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The Ki67 immunohistochemistry was performed using the BenchMark Ultra system (Roche)..."
+    whyMissed: "Automated immunohistochemistry system with vendor"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b\\w+\\s+software\\s+\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["Spectronaut Pulsar software (Biognosys, Schlieren, Switzerland)", "Thermo Xcalibur 4.1 software (Thermo Fisher Scientific)"]
+    reasoning: "Pattern to catch software names followed by vendor information in parentheses"
+
+  - patternType: "term"
+    pattern: "\\banti-[A-Za-z0-9]+\\s+\\([^)]*clone[^)]*\\)"
+    toolType: "antibody"
+    examples: ["CONFIRM anti-Ki67 (clone 30-9)", "anti-collagen XVIII (ref. [46], DB144-N2)"]
+    reasoning: "Pattern to catch antibodies with clone information"
+
+  - patternType: "context_phrase"
+    pattern: "performed using the \\w+\\s+\\w+\\s+system"
+    toolType: "computational_tool"
+    examples: ["performed using the BenchMark Ultra system"]
+    reasoning: "Context phrase indicating use of automated laboratory systems"
+
+  - patternType: "naming_convention"
+    pattern: "\\bR\\s+software.*version\\s+[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["R software for statistical computing, version 4.0.0"]
+    reasoning: "Specific pattern for R software with version numbers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\s+[A-Z0-9]+\\s+\\([A-Za-z\\s,]+\\)"
+    toolType: "computational_tool"
+    examples: ["Q Exactive HF mass spectrometer (Thermo Fisher Scientific, Bremen, Germany)"]
+    reasoning: "Pattern for instrument names with full vendor and location information"
+
+  - patternType: "term"
+    pattern: "package\\s+\\w+,\\s+version\\s+[0-9]+\\.[0-9]+-[0-9]+"
+    toolType: "computational_tool"
+    examples: ["package lmerTest, version 3.1-2"]
+    reasoning: "Pattern for R packages with specific version formatting"
+
+observations:
+  - resourceName: "CONFIRM anti-Ki67 (clone 30-9)"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Antibody used for cell proliferation marker detection in immunohistochemistry validation. 
+      Protocol: 36-min pretreatment with Cell Conditioning Solution CC1 followed by 12-min 
+      incubation with primary antibody, detected with UltraView Universal DAB detection kit. 
+      Used to validate mass spectrometry findings showing decreased cell proliferation in 
+      cutaneous neurofibromas compared to overlying skin.
+    foundIn: "methods"
+    contextSnippet: "...Ki67 immunohistochemistry was performed using the BenchMark Ultra system (Roche). A 36-min pretreatment with the Cell Conditioning Solution CC1 (Roche) was followed by a 12-min incubation with the CONFIRM anti-Ki67 (clone 30-9) rabbit monoclonal primary antibody..."
+    confidence: 0.95
+    doi: "10.1038/s41416-025-03055-9"
+
+  - resourceName: "anti-collagen XV"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Polyclonal antibody used at 1:1000 dilution for immunohistochemistry validation of 
+      mass spectrometry findings. Protocol: heat-mediated epitope retrieval for 15 min 
+      with Tris/EDTA buffer (pH 9), followed by incubation with primary antibody and 
+      detection using peroxidase-based Dako EnVision kit. Used to validate extracellular 
+      matrix protein differences between neurofibromas and skin.
+    foundIn: "methods"
+    contextSnippet: "...epitope retrieval was performed using a heat-mediated method for 15 min with Tris/EDTA buffer (pH 9), followed by an incubation with polyclonal anti-collagen XV (Sigma-Aldrich, HPA017913, 1:1000)..."
+    confidence: 0.95
+    doi: "10.1038/s41416-025-03055-9"
+
+  - resourceName: "anti-collagen XVIII"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      In-house monoclonal antibody (clone DB144-N2) used at 7 μg/ml concentration for 
+      immunohistochemistry validation. Same protocol as collagen XV with heat-mediated 
+      epitope retrieval and peroxidase-based detection. Used to validate mass spectrometry 
+      findings regarding extracellular matrix protein expression differences between 
+      cutaneous neurofibromas and overlying skin tissue.
+    foundIn: "methods"
+    contextSnippet: "...or in-house monoclonal anti-collagen XVIII (ref. [46], DB144-N2, 7 μg/ml) primary antibody. The labeling was carried out using the peroxidase-based Dako EnVision kit..."
+    confidence: 0.90
+    doi: "10.1038/s41416-025-03055-9"
+
+  - resourceName: "Spectronaut Pulsar"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Mass spectrometry data processing software used for spectral library generation and 
+      protein identification. Pulsar search engine integrated into Spectronaut was used to 
+      generate spectral library containing data from all DIA runs, and proteins from 
+      individual samples were identified by comparison against the generated spectral library. 
+      Raw dataset covered 3002 different proteins before filtering.
+    foundIn: "methods"
+    contextSnippet: "...processed with the Spectronaut Pulsar software (Biognosys, Schlieren, Switzerland). Pulsar is a search engine, integrated into Spectronaut for spectral library generation. A spectral library containing data from all DIA runs was generated with Pulsar..."
+    confidence: 0.95
+    doi: "10.1038/s41416-025-03055-9"
+
+  - resourceName: "R software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Statistical computing software version 4.0.0 used for all data analyses including 
+      linear mixed effects regression modeling, Gene Ontology term analysis, hierarchical 
+      clustering, and correlation analyses. Used with lmerTest package version 3.1-2 for 
+      mixed effects modeling. P values <0.05 were considered statistically significant 
+      with Bonferroni correction for multiple comparisons.
+    foundIn: "methods"
+    contextSnippet: "...All analyses were performed using the R software for statistical computing, version 4.0.0, and package lmerTest, version 3.1-2. P values <0.05 were considered statistically significant..."
+    confidence: 0.95
+    doi: "10.1038/s41416-025-03055-9"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite this being a tool-rich publication
+    - Multiple high-confidence computational tools missed (Spectronaut, R, Xcalibur)
+    - Several antibodies with clear catalog/clone information missed
+    - Laboratory instruments and systems not detected
+    - No patterns appear to exist for mass spectrometry software detection
+    - Missing patterns for antibodies with clone information
+  recommendations: |
+    This publication represents a significant mining failure - zero tools were detected despite containing 
+    at least 10 clear research tools. Major recommendations:
+    
+    1. IMMEDIATE PATTERN ADDITIONS NEEDED:
+       - Software with vendor information in parentheses
+       - Antibodies with clone designations
+       - R packages with version numbers
+       - Laboratory instrument model names
+    
+    2. TOOL CATEGORIES MISSED:
+       - All computational tools (5+ missed)
+       - All antibodies (3 missed)
+       - Laboratory instruments (2+ missed)
+    
+    3. SYSTEMATIC ISSUES:
+       - No patterns exist for mass spectrometry software
+       - Antibody detection limited to basic "anti-" patterns
+       - Version numbers not being captured
+       - Vendor information not being used as tool indicators
+    
+    4. QUALITY CONTROL:
+       - Publications with detailed Methods sections should trigger manual review if zero tools found
+       - Proteomics/mass spectrometry studies should have computational tool requirements
+    
+    5. OBSERVATIONS:
+       - Successfully extracted 5 usage instruction observations for the missed tools
+       - All observations provide valuable protocol and application information
+       - Demonstrates the scientific value of proper tool detection
+    
+    This case highlights critical gaps in the mining system that need immediate attention.

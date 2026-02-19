@@ -1,0 +1,137 @@
+publicationMetadata:
+  pmid: "23457304"
+  title: "Platelet-derived growth factor-BB activates calcium/calmodulin-dependent and -independent mechanisms that mediate Akt phosphorylation in the neurofibromin-deficient human Schwann cell line ST88-14."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study investigating cellular signaling mechanisms in Schwann cells.
+    The abstract describes experimental work using cell lines, chemical reagents, and immunoprecipitation
+    techniques. Despite lacking a Methods section in the available text, the experimental design described
+    in the abstract strongly indicates the use of multiple research tools including cell lines, chemical
+    reagents, and likely antibodies for immunoprecipitation and Western blotting.
+  overallAssessment: |
+    This is a laboratory research publication investigating PDGF-BB signaling pathways in neurofibromin-deficient
+    Schwann cells. The study clearly uses experimental approaches including cell culture, pharmacological
+    interventions, and protein interaction studies. Research tools are expected and likely present, including
+    cell lines, chemical reagents, and antibodies for immunoprecipitation studies.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ST88-14"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Using the human MPNST Schwann cell line ST88-14, we demonstrate that, in addition to a transient phosphorylation of Akt, PDGF-BB stimulation produces an atypical sustained phosphorylation of Akt"
+    whyMissed: "This is a well-established human Schwann cell line derived from malignant peripheral nerve sheath tumors (MPNSTs). It should have been detected as it's clearly identified as a 'cell line' in the text."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BAPTA-AM"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The sustained Akt phosphorylation induced by PDGF-BB was inhibited by pretreatment of the cells with either the intracellular calcium chelator 1,2-bis(2-aminophenoxy)ethane-N,N,N',N'-tetraacetic acid tetrakis(acetoxymethyl) ester (BAPTA-AM)"
+    whyMissed: "BAPTA-AM is a commonly used chemical reagent/tool for calcium chelation in cell biology experiments. The full chemical name is provided, indicating experimental usage."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "W7"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The sustained Akt phosphorylation induced by PDGF-BB was inhibited by pretreatment of the cells with either the intracellular calcium chelator BAPTA-AM or the CaM antagonist W7"
+    whyMissed: "W7 is a well-known calmodulin antagonist used as a research tool in cell signaling studies. It's clearly described as a pharmacological agent used experimentally."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "normal human Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The sustained Akt phosphorylation did not occur in PDGF-BB-stimulated normal human Schwann cells or ST88-14 cells stimulated with stem cell factor"
+    whyMissed: "These are primary human Schwann cells used as a control comparison to the ST88-14 cell line. They represent a distinct cell culture tool used in the experiments."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "stem cell factor"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The sustained Akt phosphorylation did not occur in PDGF-BB-stimulated normal human Schwann cells or ST88-14 cells stimulated with stem cell factor"
+    whyMissed: "Stem cell factor (SCF) is a growth factor/cytokine used as a research reagent for cell stimulation experiments. It's used as an experimental control."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PDGF-BB"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Platelet-derived growth factor-BB activates calcium/calmodulin-dependent and -independent mechanisms that mediate Akt phosphorylation"
+    whyMissed: "PDGF-BB is a platelet-derived growth factor used as a research reagent for cell stimulation. It's the primary experimental stimulus used throughout the study."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "ST88-14|ST-88-14"
+    toolType: "cell_line"
+    examples: ["ST88-14 cell line", "human MPNST Schwann cell line ST88-14"]
+    reasoning: "This specific cell line name should be recognized. ST88-14 is a well-established neurofibromatosis-related cell line that appears in multiple publications."
+
+  - patternType: "context_phrase"
+    pattern: "(?:intracellular calcium chelator|calcium chelator)\\s+[A-Z0-9-]+(?:\\s*\\([^)]+\\))?"
+    toolType: "genetic_reagent"
+    examples: ["intracellular calcium chelator BAPTA-AM", "calcium chelator 1,2-bis(2-aminophenoxy)ethane-N,N,N',N'-tetraacetic acid tetrakis(acetoxymethyl) ester (BAPTA-AM)"]
+    reasoning: "Chemical reagents are often described with their function followed by the compound name. This pattern would catch calcium chelators and similar functional reagents."
+
+  - patternType: "context_phrase"
+    pattern: "(?:CaM antagonist|calmodulin antagonist)\\s+[A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["CaM antagonist W7", "calmodulin antagonist W7"]
+    reasoning: "Pharmacological antagonists are commonly described by their target followed by the compound name. This would help identify signaling pathway modulators."
+
+  - patternType: "context_phrase"
+    pattern: "(?:normal human|primary human)\\s+\\w+\\s+cells?"
+    toolType: "cell_line"
+    examples: ["normal human Schwann cells", "primary human Schwann cells"]
+    reasoning: "Primary cell cultures are important research tools but may be missed if not explicitly labeled as 'cell line'. This pattern would catch primary cell cultures."
+
+  - patternType: "term"
+    pattern: "(?:growth factor|cytokine)(?:\\s+[A-Z0-9-]+)?"
+    toolType: "genetic_reagent"
+    examples: ["platelet-derived growth factor-BB", "stem cell factor"]
+    reasoning: "Growth factors and cytokines are commonly used research reagents for cell stimulation experiments but may not be caught by current patterns."
+
+  - patternType: "context_phrase"
+    pattern: "co-immunoprecipitat(?:ed|ion)"
+    toolType: "antibody"
+    examples: ["Akt also co-immunoprecipitated with CaM"]
+    reasoning: "Co-immunoprecipitation experiments require antibodies, but the antibodies themselves may not be explicitly mentioned. This context suggests antibody usage."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of research tool usage
+    - Multiple research tools are present in the abstract but were not detected by current mining patterns
+    - The publication lacks Methods, Results, and Discussion sections, limiting detailed tool validation
+    - Co-immunoprecipitation is mentioned, suggesting antibody usage, but specific antibodies are not named
+    - This represents a significant gap in tool detection for cell biology/biochemistry publications
+  recommendations: |
+    This publication contains multiple research tools that were completely missed by the initial mining:
+    - ST88-14 cell line should definitely be added - it's a well-established research tool
+    - Chemical reagents BAPTA-AM and W7 are standard research tools used experimentally
+    - Growth factors PDGF-BB and stem cell factor are research reagents used for cell stimulation
+    - Normal human Schwann cells represent primary cell culture tools
+    - The mining patterns need significant improvement to catch cell biology tools
+    - Consider adding patterns for chemical reagents described by function (chelators, antagonists)
+    - Pattern improvements are critical as this type of cell signaling research is common in NF studies
+    - No observations could be extracted due to lack of Results/Discussion sections in available text

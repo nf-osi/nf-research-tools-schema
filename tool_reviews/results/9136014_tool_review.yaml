@@ -1,0 +1,100 @@
+publicationMetadata:
+  pmid: "9136014"
+  title: "Isolation of mutations in the Drosophila homologues of the human Neurofibromatosis 2 and yeast CDC42 genes using a simple and efficient reverse-genetic method."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a Drosophila genetics methodology paper focused on developing a reverse genetic screening approach.
+    Expected tools include:
+    - Animal models (Drosophila strains)
+    - Genetic reagents (P elements, transgenes, cosmids)
+    - Potentially computational tools for genetic analysis
+    
+    The publication describes development of genetic tools and methods, so genetic reagents and animal models
+    are highly expected. Clinical assessment tools are not expected as this is basic research in fruit flies.
+  overallAssessment: |
+    This is a laboratory research publication describing development of a reverse genetic screening method in Drosophila.
+    The study involves genetic manipulation using P transposable elements and cosmid transgenes, indicating use of
+    genetic reagents and animal models. Despite lacking a formal Methods section (common in older publications),
+    the abstract describes experimental genetic approaches that would typically involve research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Drosophila"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Reverse genetic analysis in Drosophila has been greatly aided by a growing collection of lethal P transposable element insertions"
+    whyMissed: "Generic organism name without strain-specific identifiers may not match typical animal model patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+    
+  - toolName: "P transposable element insertions"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...aided by a growing collection of lethal P transposable element insertions that provide molecular tags for the identification of essential genetic loci"
+    whyMissed: "Complex multi-word genetic reagent name may not match standard patterns for plasmids/constructs"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "cosmid-based transgene"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...together with a cosmid-based transgene that serves as an autosomally linked duplication of a small region of the X chromosome"
+    whyMissed: "Compound genetic construct name may not match typical plasmid/vector patterns"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[Pp] transposable element\\b|\\bP element\\b|\\bP-element\\b"
+    toolType: "genetic_reagent"
+    examples: ["P transposable element insertions", "P-element insertions"]
+    reasoning: "P elements are standard genetic tools in Drosophila research for mutagenesis and gene tagging"
+    
+  - patternType: "term"
+    pattern: "\\bcosmid\\b.*\\btransgene\\b|\\btransgene\\b.*\\bcosmid\\b"
+    toolType: "genetic_reagent"
+    examples: ["cosmid-based transgene"]
+    reasoning: "Cosmid transgenes are genetic constructs used for complementation and rescue experiments"
+    
+  - patternType: "context_phrase"
+    pattern: "\\bmutations in [A-Z][a-z]+ homologues\\b"
+    toolType: "genetic_reagent"
+    examples: ["mutations in Drosophila homologues"]
+    reasoning: "Indicates generation of mutant strains/alleles which are genetic reagents"
+    
+  - patternType: "naming_convention"
+    pattern: "\\bDrosophila\\b(?!.*\\b(gene|protein|homolog|homologue)\\b)"
+    toolType: "animal_model"
+    examples: ["Drosophila" (when not followed by gene/protein context)]
+    reasoning: "Drosophila as model organism should be captured when used in experimental context, not just gene references"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear genetic methodology content
+    - Publication lacks Methods, Results, and Discussion sections (only abstract available)
+    - Three significant genetic tools were potentially missed: Drosophila model system, P transposable elements, and cosmid transgenes
+    - Mining patterns may be inadequate for older genetics papers or complex genetic reagent terminology
+  recommendations: |
+    This publication describes development of genetic methodology and clearly uses research tools, but none were detected.
+    The three potentially missed tools (Drosophila, P elements, cosmid transgenes) should be added as they represent
+    legitimate genetic reagents and animal models used in the experimental approach. The suggested patterns would help
+    capture similar genetic tools in future mining. No observations could be extracted due to lack of Results/Discussion
+    sections, but the abstract indicates successful isolation of mutations which could be valuable phenotypic data if
+    full text were available. This case highlights the need for better pattern coverage of classical genetics terminology.

@@ -1,0 +1,186 @@
+publicationMetadata:
+  pmid: "24414536"
+  title: "mTORC1 inhibition delays growth of neurofibromatosis type 2 schwannoma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research), expected tool categories include:
+    - Animal models (genetically modified mouse model, allografted mice)
+    - Cell lines (Nf2(-/-) Schwann cells, in vitro cell models)
+    - Genetic reagents (Nf2 knockout constructs)
+    - Computational tools (potentially for data analysis)
+    
+    This is a laboratory research study involving both in vitro cell culture experiments
+    and in vivo mouse models to test therapeutic interventions. The methods clearly
+    indicate experimental usage of multiple research tools.
+  overallAssessment: |
+    This is a laboratory research publication that clearly uses multiple research tools
+    for experimental purposes. The study involves in vitro cell models, genetically
+    modified mouse models, and therapeutic compounds (rapamycin, sirolimus). The presence
+    of a Methods section and experimental design strongly indicates tool usage.
+
+toolValidations: []  # No tools were mined, so no validations to perform
+
+potentiallyMissedTools:
+  - toolName: "Nf2(-/-) Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We studied in vitro cell models, cohorts of mice allografted with Nf2(-/-) Schwann cells, and a genetically modified mouse model"
+    whyMissed: "Cell line with genetic modification notation should have been detected by cell line patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "genetically modified mouse model of NF2 schwannoma"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "cohorts of mice allografted with Nf2(-/-) Schwann cells, and a genetically modified mouse model of NF2 schwannoma in order to evaluate"
+    whyMissed: "Explicit mention of genetically modified mouse model should have been caught by animal model patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "rapamycin"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "We found that treatment with the mTORC1 inhibitor rapamycin reduced the severity of NF2-related Schwann cell tumorigenesis"
+    whyMissed: "Therapeutic compound used in experimental treatment should be detected as genetic reagent/small molecule"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "sirolimus"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "in an NF2 patient with growing vestibular schwannomas, the rapalog sirolimus induced tumor growth arrest"
+    whyMissed: "Therapeutic compound (rapalog) used in treatment should be detected as genetic reagent/small molecule"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "in vitro cell models"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We studied in vitro cell models, cohorts of mice allografted with Nf2(-/-) Schwann cells"
+    whyMissed: "General reference to cell models, though less specific than the Nf2(-/-) Schwann cells"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf2\\(-/-\\)|Nf2\\+/-|[A-Za-z0-9]+\\(-/-\\)|[A-Za-z0-9]+\\+/-"
+    toolType: "cell_line"
+    examples: ["Nf2(-/-) Schwann cells"]
+    reasoning: "Genetic knockout/heterozygous notation is a strong indicator of genetically modified cell lines or animal models"
+
+  - patternType: "context_phrase"
+    pattern: "genetically modified mouse model|transgenic mouse|knockout mouse|mouse model of"
+    toolType: "animal_model"
+    examples: ["genetically modified mouse model of NF2 schwannoma"]
+    reasoning: "These phrases explicitly indicate engineered animal models used for research"
+
+  - patternType: "context_phrase"
+    pattern: "treatment with|treated with|inhibitor [a-zA-Z]+|compound [a-zA-Z]+"
+    toolType: "genetic_reagent"
+    examples: ["treatment with the mTORC1 inhibitor rapamycin"]
+    reasoning: "Treatment context with specific compounds indicates experimental use of chemical reagents"
+
+  - patternType: "term"
+    pattern: "rapamycin|sirolimus|rapalog"
+    toolType: "genetic_reagent"
+    examples: ["rapamycin", "sirolimus", "rapalog sirolimus"]
+    reasoning: "Specific therapeutic compounds used in experimental treatments should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "allografted with|transplanted with|injected with"
+    toolType: "cell_line"
+    examples: ["mice allografted with Nf2(-/-) Schwann cells"]
+    reasoning: "Transplantation context indicates experimental use of cell lines in animal models"
+
+observations:
+  - resourceName: "Nf2(-/-) Schwann cells"
+    resourceType: "Cell Line"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Nf2(-/-) Schwann cells were used in allografted mouse models and showed reduced
+      tumorigenesis severity when treated with rapamycin. The cells demonstrated
+      tumorigenic potential when transplanted into mice, and this tumorigenesis
+      was reduced by mTORC1 inhibition without significant toxicity.
+    foundIn: "results"
+    contextSnippet: "treatment with the mTORC1 inhibitor rapamycin reduced the severity of NF2-related Schwann cell tumorigenesis without significant toxicity"
+    confidence: 0.9
+    doi: "10.1093/neuonc/not242"
+
+  - resourceName: "genetically modified mouse model of NF2 schwannoma"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      The genetically modified mouse model of NF2 schwannoma was used to evaluate
+      targeted therapy efficacy. The model demonstrated tumor growth that could
+      be modulated by mTORC1 pathway inhibition, providing evidence for therapeutic
+      intervention effectiveness.
+    foundIn: "results"
+    contextSnippet: "treatment with the mTORC1 inhibitor rapamycin reduced the severity of NF2-related Schwann cell tumorigenesis"
+    confidence: 0.85
+    doi: "10.1093/neuonc/not242"
+
+  - resourceName: "rapamycin"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Rapamycin was used as an mTORC1 inhibitor and demonstrated efficacy in reducing
+      NF2-related Schwann cell tumorigenesis severity without significant toxicity.
+      The compound showed therapeutic potential for NF2 treatment in both cell culture
+      and animal model systems.
+    foundIn: "results"
+    contextSnippet: "treatment with the mTORC1 inhibitor rapamycin reduced the severity of NF2-related Schwann cell tumorigenesis without significant toxicity"
+    confidence: 0.9
+    doi: "10.1093/neuonc/not242"
+
+  - resourceName: "sirolimus"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Sirolimus (a rapalog) was used in an NF2 patient with growing vestibular
+      schwannomas and induced tumor growth arrest. This clinical observation
+      supports the therapeutic potential of mTORC1 inhibitors for NF2 treatment.
+    foundIn: "results"
+    contextSnippet: "in an NF2 patient with growing vestibular schwannomas, the rapalog sirolimus induced tumor growth arrest"
+    confidence: 0.85
+    doi: "10.1093/neuonc/not242"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Tumor Growth: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Mining system completely failed to detect obvious tools including:
+      * Nf2(-/-) Schwann cells (genetically modified cell line)
+      * Genetically modified mouse model of NF2 schwannoma
+      * Therapeutic compounds (rapamycin, sirolimus)
+    - This represents a significant mining failure for a laboratory research publication
+    - The publication clearly describes experimental usage of multiple tool types
+  recommendations: |
+    This publication should have yielded multiple validated research tools but the mining
+    system detected none. This indicates serious gaps in the mining patterns:
+    
+    1. All 5 potentially missed tools should be added to the database
+    2. The suggested patterns should be implemented to catch similar tools in future mining
+    3. Special attention needed for genetic knockout notation (Nf2(-/-)) and therapeutic compounds
+    4. This case demonstrates the need for better detection of:
+       - Genetically modified cell lines with knockout notation
+       - Animal models described with "genetically modified" terminology
+       - Therapeutic compounds used in experimental treatments
+    5. The observations extracted show clear experimental findings that validate tool usage
+    6. This publication type (laboratory research with Methods section) should reliably yield tools

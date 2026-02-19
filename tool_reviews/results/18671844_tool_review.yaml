@@ -1,0 +1,275 @@
+publicationMetadata:
+  pmid: "18671844"
+  title: "Modelling neurofibromatosis type 1 tibial dysplasia and its treatment with lovastatin."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a comprehensive laboratory research study involving:
+    - Animal models (conditional knockout mice)
+    - Molecular biology techniques (Western blot, in situ hybridization)
+    - Histological analysis methods
+    - Computational analysis (micro-CT, statistical analysis)
+    - Genetic reagents (mouse strains, constructs)
+    
+    Expected to contain multiple tool types across antibodies, animal models, genetic reagents, and computational tools.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that extensively uses research tools across multiple categories.
+    The study involves conditional knockout mouse models, molecular biology techniques, histological analysis, and computational methods.
+    The detailed Methods section describes experimental procedures that clearly require and utilize various research tools including animal models, antibodies, and analysis software.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1Prx1 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Cortical injury was induced bilaterally in the tuberositas tibiae in Nf1Prx1 mutant mice and littermate controls according to a method described previously."
+    whyMissed: "This is a conditional knockout mouse model that is the primary experimental system used throughout the study"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1flox mice"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The Nf1flox and Prx1Cre lines were maintained by continuous backcrossing to wild-type C57BL/6J mice to minimise genetic drift."
+    whyMissed: "This is a floxed mouse strain used to generate conditional knockouts"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Prx1Cre mice"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The female Nf1flox mice were crossed to male Nf1flox heterozygous Prx1-Cre positive males."
+    whyMissed: "This is a Cre recombinase transgenic mouse line used for conditional gene deletion"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6J mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The Nf1flox and Prx1Cre lines were maintained by continuous backcrossing to wild-type C57BL/6J mice to minimise genetic drift."
+    whyMissed: "This is a standard inbred mouse strain used as genetic background"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "phospho-p42/44 (pERK1/2) #9102 Cell Signaling"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "For Western blot analysis, membranes were probed with the following antibodies: phospho-p42/44 (pERK1/2) #9102 Cell Signaling (diluted 1:1000)"
+    whyMissed: "This is a specific antibody with catalog number and vendor information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p44 (ERK1) #4372 Cell Signaling"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "p44 (ERK1) #4372 Cell Signaling (diluted 1:1000)"
+    whyMissed: "This is a specific antibody with catalog number and vendor information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "vivaCT40 scanner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Methacrylate embedded tibiae were scanned in plastic blocks using a vivaCT40 scanner from ScancoMedical."
+    whyMissed: "This is a micro-CT scanner used for 3D imaging analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Scanco evaluation software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All VOIs were analysed under identical settings with the Scanco evaluation software."
+    whyMissed: "This is analysis software used for micro-CT data processing"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "METRA Serum PYD EIA Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Serum deoxypyridinoline (D-PYD) was measured with a METRA Serum PYD EIA Kit (Osteomedical GmbH) according to the supplied protocol."
+    whyMissed: "This is a commercial assay kit for biochemical measurements"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Technovit 9100 Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Subsequently tissue samples destined for calcified bone histology and micro computed tomography (μCT) analysis were processed according to the Technovit 9100 Kit manual (Heraeus Kulzer GmbH, Germany)."
+    whyMissed: "This is a commercial embedding kit for histological processing"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[A-Z][a-z0-9]+ mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1Prx1 mice", "C57BL/6J mice"]
+    reasoning: "Mouse strain names often follow CamelCase or alphanumeric patterns followed by 'mice'"
+
+  - patternType: "vendor_indicator"
+    pattern: "#\\d{4,5}\\s+Cell Signaling"
+    toolType: "antibody"
+    examples: ["#9102 Cell Signaling", "#4372 Cell Signaling"]
+    reasoning: "Cell Signaling Technology antibodies are commonly referenced with catalog numbers in this format"
+
+  - patternType: "term"
+    pattern: "\\bflox\\b|\\bCre\\b"
+    toolType: "genetic_reagent"
+    examples: ["Nf1flox", "Prx1Cre"]
+    reasoning: "Flox and Cre are standard genetic engineering terms indicating conditional knockout systems"
+
+  - patternType: "context_phrase"
+    pattern: "scanned.*using.*scanner"
+    toolType: "computational_tool"
+    examples: ["scanned in plastic blocks using a vivaCT40 scanner"]
+    reasoning: "This phrase pattern indicates imaging equipment usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "Kit.*\\([^)]+GmbH\\)"
+    toolType: "genetic_reagent"
+    examples: ["Technovit 9100 Kit manual (Heraeus Kulzer GmbH, Germany)", "METRA Serum PYD EIA Kit (Osteomedical GmbH)"]
+    reasoning: "Commercial kits from German companies (GmbH) are commonly used reagents"
+
+  - patternType: "context_phrase"
+    pattern: "analysed.*with.*software"
+    toolType: "computational_tool"
+    examples: ["analysed under identical settings with the Scanco evaluation software"]
+    reasoning: "This phrase pattern indicates software usage for data analysis"
+
+observations:
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Bone Development"
+    observationTypeOntologyId: "MP:0005390"
+    details: |
+      Nf1Prx1 mice show bowing of the tibia caused by decreased bone mineralisation and increased bone vascularisation.
+      However, in contrast to NF1 patients, spontaneous fractures do not occur in Nf1Prx1 mice probably due to the relatively low mechanical load.
+    foundIn: "results"
+    contextSnippet: "Mice with conditionally inactivated neurofibromin (Nf1) in the developing limbs and cranium (Nf1Prx1) show bowing of the tibia caused by decreased bone mineralisation and increased bone vascularisation."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Bone Development"
+    observationTypeOntologyId: "MP:0005390"
+    details: |
+      In Nf1Prx1 mice bone repair is delayed and characterised by the excessive formation and the persistence of fibro-cartilaginous tissue and impaired extracellular matrix mineralisation.
+      Quantification by μCT showed that the bone volume to total volume fraction (BV/TV) in mutants was decreased by 40% in the bone marrow cavity (0.086 ± 0.034 versus 0.051 ± 0.005) and reduced five fold in the cortical regions (0.028 ± 0.015 versus 0.004 ± 0.007) when compared with controls.
+    foundIn: "results"
+    contextSnippet: "In Nf1Prx1 mice bone repair is delayed and characterised by the excessive formation and the persistence of fibro-cartilaginous tissue and impaired extracellular matrix mineralisation."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Correspondingly, expression of Runx2 is downregulated in Nf1Prx1 mice.
+      In situ expression analysis showed a decreased level of Runx2 expression in the bone marrow cavity at day 7 post injury indicating impaired osteoblast formation and/or recruitment of progenitor cells.
+    foundIn: "results"
+    contextSnippet: "Correspondingly, expression of Runx2 is downregulated. High-dose systemic lovastatin treatment restores Runx2 expression"
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Osteoclast numbers were increased in the injury site in Nf1Prx1 mice when compared with controls.
+      This was paralleled by an increased serum D-PYD in Nf1Prx1 animals (control 2.5 ± 0.39 nMol/l; Nf1Prx1 3.95 ± 0.71 nMol/l; Nf1Prx1 +lovastatin 3.49 ± 0.83; n = 3).
+    foundIn: "results"
+    contextSnippet: "Osteoclast numbers were increased in the injury site in Nf1Prx1 mice when compared with controls and lovastatin treatment did not significantly change this"
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      High-dose systemic lovastatin treatment restores Runx2 expression and accelerates new bone formation, thus improving cortical bone repair in Nf1Prx1 tibia.
+      The bone anabolic effects correlate with a reduction of the mitogen activated protein kinase pathway hyper-activation in Nf1-deficient cells.
+      Lovastatin treatment normalises the cortical bone quality around the injury site and recruited mesenchymal progenitor cells deposit collagenous matrix.
+    foundIn: "results"
+    contextSnippet: "High-dose systemic lovastatin treatment restores Runx2 expression and accelerates new bone formation, thus improving cortical bone repair in Nf1Prx1 tibia."
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "vivaCT40 scanner"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The following instrument settings were chosen for the measurements: voxel size 0.1 mm × 0.1 mm × 0.5 m; scan speed of 2 mm/second; contour mode 1; cortical threshold 350 mg/cm³.
+      The cortical injury was located and a volume of interest (VOI) was defined comprising the complete injury site.
+    foundIn: "methods"
+    contextSnippet: "The following instrument settings were chosen for the measurements: voxel size 0.1 mm × 0.1 mm × 0.5 m; scan speed of 2 mm/second; contour mode 1; cortical threshold 350 mg/cm³"
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "phospho-p42/44 (pERK1/2) #9102 Cell Signaling"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      For Western blot analysis, membranes were probed with phospho-p42/44 (pERK1/2) #9102 Cell Signaling antibody diluted 1:1000.
+      Used to analyze mitogen activated protein kinase (MAPK) pathway activation status (pErk1/Erk1 ratio) in calvaria bones of Nf1Prx1 mice.
+    foundIn: "methods"
+    contextSnippet: "For Western blot analysis, membranes were probed with the following antibodies: phospho-p42/44 (pERK1/2) #9102 Cell Signaling (diluted 1:1000)"
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+  - resourceName: "p44 (ERK1) #4372 Cell Signaling"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      For Western blot analysis, membranes were probed with p44 (ERK1) #4372 Cell Signaling antibody diluted 1:1000.
+      Used as loading control for MAPK pathway analysis in conjunction with phospho-ERK antibody.
+    foundIn: "methods"
+    contextSnippet: "p44 (ERK1) #4372 Cell Signaling (diluted 1:1000)"
+    confidence: 1.0
+    doi: "10.1186/1741-7015-6-21"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 8
+  observationsByType:
+    Bone Development: 2
+    Cellular: 2
+    Molecular: 1
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - Complete failure of tool mining: No tools were detected despite this being a comprehensive laboratory research study
+    - Multiple clear research tools were missed including:
+      * Primary animal model (Nf1Prx1 mice) that is the focus of the entire study
+      * Genetic reagents (Nf1flox, Prx1Cre mouse strains)
+      * Commercial antibodies with catalog numbers and vendor information
+      * Computational tools (vivaCT40 scanner, Scanco evaluation software)
+      * Commercial assay kits and reagents
+    - The mining system appears to have completely failed to identify any tools in this publication
+  recommendations: |
+    - All 10 potentially missed tools should be added to the database as they represent genuine research tools used experimentally
+    - The mining patterns need significant improvement to catch:
+      * Mouse strain nomenclature (conditional knockout naming conventions)
+      * Antibody catalog numbers with vendor information
+      * Commercial kit and reagent names
+      * Imaging equipment and analysis software
+    - Implement the 6 suggested patterns to improve future mining accuracy
+    - This publication demonstrates a systematic failure in tool detection that needs immediate attention
+    - The extracted observations provide valuable phenotypic data for the animal model and usage information for the tools
+    - Consider manual review of similar publications to identify additional missed tools

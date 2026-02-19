@@ -1,0 +1,127 @@
+publicationMetadata:
+  pmid: "33507258"
+  title: "Assessment of RAS Dependency for BRAF Alterations Using Cancer Genomic Databases"
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (databases, statistical software, analysis pipelines)
+    - Possibly clinical assessment tools if patient outcomes measured (but this study focuses on genomic data analysis)
+    
+    This is a cross-sectional data analysis study using existing cancer genomic databases to assess 
+    RAS dependency of BRAF alterations. Expected tools include databases, statistical analysis software,
+    and data processing tools. No lab research tools (antibodies, cell lines, animal models) expected
+    as this is purely computational analysis of existing datasets.
+  overallAssessment: |
+    This bioinformatics analysis publication would typically use computational tools including databases,
+    statistical software, and data analysis platforms. The study analyzes existing genomic datasets rather
+    than generating new experimental data, so lab research tools are not expected. However, several
+    computational resources and databases are mentioned that should be considered as research tools.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "GENIE"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...cross-sectional data analysis of 119 538 nonredundant cancer samples using cancer genomics databases including GENIE (Genomics Evidence Neoplasia Information Exchange) and databases in cBioPortal..."
+    whyMissed: "Database name with full expansion provided - should be recognized as computational resource"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "cBioPortal"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...using cancer genomics databases including GENIE (Genomics Evidence Neoplasia Information Exchange) and databases in cBioPortal including TCGA (The Cancer Genome Atlas)..."
+    whyMissed: "Well-known cancer genomics portal/database platform used for analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TCGA"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...databases in cBioPortal including TCGA (The Cancer Genome Atlas) (accessed March 24, 2020)..."
+    whyMissed: "Major cancer genomics database with full name expansion provided"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ACE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...cancer samples (lung cancer, colorectal cancer, and melanoma) that have undergone clinical testing at Mayo Clinic Genomics Laboratory from January 1, 2015, to July 1, 2020, were collected with ACE (Advanced Cohort Explorer)..."
+    whyMissed: "Data collection tool with full name expansion - Advanced Cohort Explorer"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "COSMIC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Variants with less than 2 Catalogue of Somatic Mutations in Cancer counts were excluded as passenger alterations..."
+    whyMissed: "Well-known cancer mutation database, though mentioned by full name rather than acronym"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "GENIE|Genomics Evidence Neoplasia Information Exchange"
+    toolType: "computational_tool"
+    examples: ["GENIE (Genomics Evidence Neoplasia Information Exchange)"]
+    reasoning: "Major cancer genomics database that should be recognized"
+
+  - patternType: "term"
+    pattern: "cBioPortal"
+    toolType: "computational_tool"
+    examples: ["databases in cBioPortal"]
+    reasoning: "Widely used cancer genomics portal for data analysis and visualization"
+
+  - patternType: "term"
+    pattern: "TCGA|The Cancer Genome Atlas"
+    toolType: "computational_tool"
+    examples: ["TCGA (The Cancer Genome Atlas)"]
+    reasoning: "Major cancer genomics database that should be captured"
+
+  - patternType: "term"
+    pattern: "ACE|Advanced Cohort Explorer"
+    toolType: "computational_tool"
+    examples: ["collected with ACE (Advanced Cohort Explorer)"]
+    reasoning: "Data collection and cohort management tool"
+
+  - patternType: "context_phrase"
+    pattern: "collected with|accessed.*database|using.*database"
+    toolType: "computational_tool"
+    examples: ["collected with ACE", "accessed March 24, 2020", "using cancer genomics databases"]
+    reasoning: "Context phrases indicating active use of computational resources/databases"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}\\s*\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["GENIE (Genomics Evidence Neoplasia Information Exchange)", "ACE (Advanced Cohort Explorer)"]
+    reasoning: "Acronym followed by full name expansion often indicates tools/databases"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this bioinformatics analysis publication despite clear usage of multiple computational resources
+    - Several major cancer genomics databases and tools are mentioned with usage context but were not captured
+    - Mining patterns appear to miss database names and computational resources commonly used in genomics research
+    - The publication clearly describes using multiple databases and computational tools for analysis
+  recommendations: |
+    This publication should have captured several computational tools:
+    - GENIE, cBioPortal, TCGA, and ACE are all legitimate computational resources used in the analysis
+    - The mining patterns need improvement to capture database names and genomics analysis platforms
+    - Consider adding patterns for acronym-expansion formats common in scientific literature
+    - Database access dates and usage context phrases should trigger tool recognition
+    - Future mining should better recognize computational resources in bioinformatics studies
+    - No observations were extracted since no tools were initially validated, but the missed tools could potentially have usage observations

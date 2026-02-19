@@ -1,0 +1,115 @@
+publicationMetadata:
+  pmid: "32642737"
+  title: "Assessing interobserver variability and accuracy in the histological diagnosis and classification of cutaneous neurofibromass."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95  # High confidence - clear observational design evaluating pathologist agreement
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes  # Digital pathology tools and database systems are research tools
+  expectedToolTypes: |
+    Based on this observational pathology study, expected tool types include:
+    - Computational tools: Digital pathology scanners, image viewers, databases (REDCap), statistical analysis software
+    - Clinical assessment tools: Potentially histopathological classification systems or diagnostic criteria
+    
+    This is NOT a lab research study, so antibodies, cell lines, animal models, genetic reagents, 
+    organoids, and PDX models are not expected. However, the digital pathology workflow and 
+    data management systems represent legitimate computational research tools.
+  overallAssessment: |
+    This observational pathology study evaluates interobserver agreement among pathologists reviewing 
+    digitized histological slides. While not traditional lab research, it uses several research tools 
+    including digital pathology scanners, image analysis software, and database systems. The study 
+    design focuses on developing standardized diagnostic criteria, which could constitute clinical 
+    assessment tools for pathological diagnosis.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "Aperio XT scanner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Twenty-eight (H&E)-stained slides of cNF were scanned using an Aperio XT scanner. The digital images were reviewed by 6 pathologists"
+    whyMissed: "Digital pathology scanner is a specialized computational tool for digitizing histological slides - should be captured as research equipment"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CaloPix viewer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Digital slides were downloaded using the native image format, Aperio SVS files and analyzed using the CaloPix viewer (TRIBVN-HEALTHCARE, Chatillon, France)"
+    whyMissed: "Specialized image analysis software with vendor information - clear computational tool for digital pathology"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "REDCap database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "who entered free text of up to a 200 word description for each case into a REDcap database"
+    whyMissed: "REDCap is a widely used research database platform - should be captured as computational tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Aperio SVS files"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Digital slides were downloaded using the native image format, Aperio SVS files and analyzed using the CaloPix viewer"
+    whyMissed: "Specific file format/standard for digital pathology - represents a computational tool/format"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b\\w+\\s+\\w+\\s+scanner\\b"
+    toolType: "computational_tool"
+    examples: ["Aperio XT scanner"]
+    reasoning: "Digital pathology scanners are specialized research equipment that should be captured. Pattern would catch '[Vendor] [Model] scanner' format."
+
+  - patternType: "term"
+    pattern: "\\bREDCap\\b"
+    toolType: "computational_tool"
+    examples: ["REDCap database"]
+    reasoning: "REDCap is a widely used research database platform that appears frequently in clinical and observational studies."
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using the \\w+ viewer"
+    toolType: "computational_tool"
+    examples: ["analyzed using the CaloPix viewer"]
+    reasoning: "Image analysis viewers are computational tools - this pattern would catch software used for image analysis."
+
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+\\s+SVS\\s+files\\b"
+    toolType: "computational_tool"
+    examples: ["Aperio SVS files"]
+    reasoning: "Proprietary file formats for specialized equipment represent computational tools/standards in digital pathology."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Aperio XT scanner, CaloPix viewer, REDCap database, Aperio SVS files
+  newPatternsCount: 4  # Scanner pattern, REDCap term, viewer pattern, file format pattern
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication, but several computational tools were missed
+    - Digital pathology workflow uses specialized equipment and software that constitute research tools
+    - REDCap database system is a widely used research platform that should be captured
+    - Mining patterns need improvement for digital pathology and clinical research tools
+  recommendations: |
+    This publication contains several legitimate computational research tools that were missed by the 
+    initial mining process:
+    1. Aperio XT scanner - specialized digital pathology equipment
+    2. CaloPix viewer - image analysis software with vendor information
+    3. REDCap database - research data management platform
+    4. Aperio SVS files - proprietary digital pathology file format
+    
+    The mining patterns should be enhanced to better capture:
+    - Digital pathology equipment (scanners, viewers)
+    - Research database platforms (REDCap, etc.)
+    - Specialized file formats and standards
+    - Clinical research computational tools
+    
+    While this is not a traditional lab study, it represents legitimate use of research tools in 
+    clinical/observational research that should be captured for completeness.

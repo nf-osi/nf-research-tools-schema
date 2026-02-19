@@ -1,0 +1,85 @@
+publicationMetadata:
+  pmid: "7947096"
+  title: "Loss of heterozygosity on chromosome 22 in ovarian carcinoma is distal to and is not accompanied by mutations in NF2 at 22q12."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular genetics study analyzing mutations in ovarian carcinoma samples using SSCP 
+    (Single-Strand Conformational Polymorphism) analysis. Expected tools include:
+    - Genetic reagents (primers, probes for PCR/SSCP)
+    - Computational tools (for sequence analysis, LOH analysis)
+    - Potentially cell lines or tissue samples (67 ovarian carcinomas mentioned)
+    
+    Note: While only abstract is available, the experimental approach described (SSCP analysis of 
+    17 exons in 67 samples) clearly indicates laboratory-based molecular analysis requiring 
+    specific reagents and methodologies.
+  overallAssessment: |
+    This 1994 molecular genetics study would typically use multiple research tools including genetic 
+    reagents for SSCP analysis and computational tools for data analysis. The study analyzed 9 of 17 
+    exons of NF2 gene in 67 ovarian carcinoma samples, which requires specific primers, PCR reagents, 
+    and analytical methods. However, only the abstract is available, limiting tool identification.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SSCP"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Analysis of 9 of the 17 exons of NF2 by single-strand conformational polymorphism (SSCP) in 67 ovarian carcinomas"
+    whyMissed: "SSCP (Single-Strand Conformational Polymorphism) is a molecular biology technique/method that may not have been recognized as a computational tool, though it involves both wet lab and analytical components"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "LOH analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "LOH data support this conclusion and that the putative tumour-suppressor gene lies distal to NF2"
+    whyMissed: "Loss of heterozygosity (LOH) analysis requires computational methods to analyze genetic markers and determine allelic loss patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SSCP|single-strand conformational polymorphism"
+    toolType: "computational_tool"
+    examples: ["single-strand conformational polymorphism (SSCP)"]
+    reasoning: "SSCP is a standard molecular biology technique that combines wet lab procedures with analytical methods, often requiring specialized software for band pattern analysis"
+  - patternType: "term"
+    pattern: "LOH analysis|loss of heterozygosity analysis"
+    toolType: "computational_tool"
+    examples: ["LOH data support this conclusion"]
+    reasoning: "LOH analysis requires computational tools to compare allelic patterns between normal and tumor samples, involving statistical analysis of genetic markers"
+  - patternType: "context_phrase"
+    pattern: "analysis of.*exons.*by"
+    toolType: "genetic_reagent"
+    examples: ["Analysis of 9 of the 17 exons of NF2 by single-strand conformational polymorphism"]
+    reasoning: "Exon analysis typically requires specific primers and PCR reagents, though these may not be explicitly named in abstracts"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of laboratory research
+    - Only abstract text available - Methods section would likely contain specific tool details
+    - SSCP analysis and LOH analysis are legitimate research methodologies that should be captured
+    - Limited text availability (abstract only) restricts comprehensive tool identification
+  recommendations: |
+    This publication represents a clear case where molecular biology techniques were missed by initial mining:
+    - LOH analysis should definitely be added as a computational tool - it requires specialized software for genetic marker analysis
+    - SSCP may warrant inclusion as it involves analytical components, though it's primarily a wet lab technique
+    - The absence of Methods section limits identification of specific reagents (primers, enzymes) that would typically be used
+    - Future mining should better capture molecular biology analysis techniques mentioned in abstracts
+    - Consider expanding patterns to catch "analysis by [technique]" constructions
+    - No observations could be extracted due to lack of Results/Discussion sections

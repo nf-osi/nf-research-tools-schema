@@ -1,0 +1,125 @@
+publicationMetadata:
+  pmid: "25074460"
+  title: "Neurofibromatosis type 1 molecular diagnosis: what can NGS do for you when you have a large gene with loss of function mutations?"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9  # High confidence - this is clearly a molecular diagnostics/NGS methodology paper
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis/Molecular Diagnostics):
+    - Computational tools: NGS analysis software, sequencing platforms, bioinformatics pipelines
+    - Genetic reagents: PCR primers, sequencing reagents, multiplex PCR components
+    - Laboratory equipment: PGM sequencer (Ion Torrent), NGS platforms
+    
+    This is a molecular diagnostics methodology paper describing targeted NGS for NF1/SPRED1 mutation detection.
+    The abstract mentions specific technical approaches (multiplex PCR, PGM sequencer, bar-coding) that would
+    typically involve multiple computational and laboratory tools. However, only abstract text is available,
+    which limits tool identification to high-level mentions.
+  overallAssessment: |
+    This publication describes a targeted next-generation sequencing approach for NF1 molecular diagnosis,
+    which would typically involve multiple research tools including sequencing platforms, bioinformatics
+    software, and laboratory reagents. However, only the abstract is available, limiting detailed tool
+    identification. The methodology described (multiplex PCR, NGS on PGM sequencer, bioinformatics analysis)
+    strongly suggests computational and laboratory tools were used, but specific tool names are not provided
+    in the abstract.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "PGM sequencer"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...targeted next-generation sequencing (NGS) of NF1 and SPRED1 using a multiplex PCR approach (230 amplicons of ~150 bp) on a PGM sequencer. The chip capacity allowed mixing 48 bar-coded samples..."
+    whyMissed: "Ion Torrent PGM is a specific NGS platform/sequencer that should be captured as a computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "multiplex PCR"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...targeted next-generation sequencing (NGS) of NF1 and SPRED1 using a multiplex PCR approach (230 amplicons of ~150 bp) on a PGM sequencer..."
+    whyMissed: "Multiplex PCR approach with 230 amplicons represents a specific genetic reagent/assay design"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NGS"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...what can NGS do for you when you have a large gene with loss of function mutations?...targeted next-generation sequencing (NGS) of NF1 and SPRED1..."
+    whyMissed: "Next-generation sequencing is mentioned multiple times as the core methodology, though this is quite general"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "Sanger sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Genotyping throughput was increased over 10 times, as compared with Sanger, with ~90€ for consumables per sample..."
+    whyMissed: "Sanger sequencing is mentioned as a comparison method, representing a specific sequencing technology"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PGM sequencer|Ion Torrent PGM|Personal Genome Machine"
+    toolType: "computational_tool"
+    examples: ["PGM sequencer"]
+    reasoning: "Ion Torrent PGM is a specific NGS platform that should be captured as a computational tool"
+
+  - patternType: "context_phrase"
+    pattern: "multiplex PCR approach|multiplex PCR assay|multiplex PCR design"
+    toolType: "genetic_reagent"
+    examples: ["multiplex PCR approach (230 amplicons)"]
+    reasoning: "Multiplex PCR approaches with specific amplicon designs represent genetic reagents/assays"
+
+  - patternType: "term"
+    pattern: "Sanger sequencing|Sanger method"
+    toolType: "computational_tool"
+    examples: ["compared with Sanger"]
+    reasoning: "Sanger sequencing is a specific sequencing methodology that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "bar-coded samples|sample bar-coding|molecular barcoding"
+    toolType: "genetic_reagent"
+    examples: ["48 bar-coded samples"]
+    reasoning: "Molecular barcoding systems for sample multiplexing represent genetic reagents"
+
+  - patternType: "naming_convention"
+    pattern: "[0-9]+X coverage|[0-9]+X sequencing depth"
+    toolType: "computational_tool"
+    examples: ["covered by at least 20X", "96% by at least 100X"]
+    reasoning: "Coverage depth metrics often indicate bioinformatics analysis tools for NGS data processing"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # PGM sequencer, multiplex PCR, NGS, Sanger sequencing
+  newPatternsCount: 5  # Patterns for NGS platforms, PCR assays, sequencing methods, barcoding, coverage metrics
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - Only abstract text available - no Methods, Results, or Discussion sections
+    - No tools were initially mined despite clear methodology description
+    - Publication describes NGS-based molecular diagnostics which typically involves multiple tools
+    - Limited context available for detailed tool validation due to abstract-only content
+    - Several specific tools mentioned in abstract were missed by initial mining
+  recommendations: |
+    This publication clearly describes a molecular diagnostics methodology using NGS, but the mining
+    captured no tools. Several specific tools should be added:
+    
+    1. PGM sequencer (Ion Torrent) - specific NGS platform mentioned
+    2. Multiplex PCR approach - genetic reagent/assay design with 230 amplicons
+    3. Sanger sequencing - comparison method mentioned
+    4. NGS/next-generation sequencing - core methodology
+    
+    The abstract-only format limits detailed validation, but the methodology described strongly
+    indicates computational and laboratory tools were used. The mining patterns should be
+    enhanced to capture NGS platforms, PCR assay designs, and sequencing methodologies.
+    
+    No observations could be extracted due to lack of Results/Discussion sections and no
+    validated tools. Future mining should focus on methodology papers that may only have
+    abstracts but contain specific tool mentions.

@@ -1,0 +1,281 @@
+publicationMetadata:
+  pmid: "24465906"
+  title: "Multiscale, converging defects of macro-porosity, microstructure and matrix mineralization impact long bone fragility in NF1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory study investigating bone fragility in NF1 using:
+    - Conditional mouse models (animal models)
+    - Immunohistochemistry (antibodies)
+    - Advanced imaging and analysis (computational tools)
+    - Human tissue samples (not PDX, but clinical specimens)
+    
+    Expected tool types: animal models, antibodies, computational tools
+    Less likely: cell lines, genetic reagents, organoids, PDX, clinical assessment tools
+  overallAssessment: |
+    This is a high-quality laboratory research publication with extensive experimental methods investigating bone pathology in NF1.
+    The study uses multiple mouse models, immunohistochemistry, advanced imaging techniques, and computational analysis.
+    Should definitely contain research tools including animal models, antibodies, and computational software.
+    The absence of any mined tools suggests significant mining failures that need to be addressed.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1Prx1 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1Prx1 and Nf1Col1 mice were bred and genotyped as described previously [11], [13]. All experimental procedures were approved by the 'Landesamt für Gesundheitsschutz und Technische Sicherheit (LaGeTSi), Berlin, Germany"
+    whyMissed: "Standard mouse model nomenclature not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1Col1 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1Prx1 and Nf1Col1 mice were bred and genotyped as described previously [11], [13]. All experimental procedures were approved by the 'Landesamt für Gesundheitsschutz und Technische Sicherheit"
+    whyMissed: "Standard mouse model nomenclature not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "panendothelial cell antigen"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The following antibodies were used for immunodetection: panendothelial cell antigen (550563, BD Pharmingen, USA) and anti-ratAlexa555 (A11081, Invitrogen, USA)."
+    whyMissed: "Antibody name without 'anti-' prefix not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-ratAlexa555"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The following antibodies were used for immunodetection: panendothelial cell antigen (550563, BD Pharmingen, USA) and anti-ratAlexa555 (A11081, Invitrogen, USA)."
+    whyMissed: "Secondary antibody with non-standard naming not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NRecon"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw data reconstruction occurred with NRecon, with a defined threshold of 0.00 to 0.10, smoothing 3, ring artefact correction 9, and beam hardening correction 30%."
+    whyMissed: "Specialized imaging software not in current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CTan"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quantitative evaluation was performed with CTan after definition of appropriated regions of interest (ROIs)."
+    whyMissed: "Specialized analysis software not in current patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "AxioVision Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Histomorphometric analysis was performed with AxioVision Software (Zeiss, Germany)."
+    whyMissed: "Commercial analysis software not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analysis of EDX images was performed with ImageJ (Rasband WS. ImageJ, U.S. National Institutes of Health, Bethesda, Maryland, USA, imagej.nih.gov/ij/, 1997–2012)."
+    whyMissed: "Common analysis software should have been captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Labview 7.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Both the camera and the tensile tester were controlled by customized software (Labview 7.0, National Instruments)."
+    whyMissed: "Programming/control software with version number not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1[A-Za-z0-9]+ mice"
+    toolType: "animal_model"
+    examples: ["Nf1Prx1 mice", "Nf1Col1 mice"]
+    reasoning: "Conditional knockout mouse models follow this naming pattern with Nf1 + tissue-specific promoter"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies were used for immunodetection:"
+    toolType: "antibody"
+    examples: ["The following antibodies were used for immunodetection: panendothelial cell antigen"]
+    reasoning: "Clear context phrase indicating antibody usage that should trigger extraction of following terms"
+
+  - patternType: "term"
+    pattern: "panendothelial.*antigen"
+    toolType: "antibody"
+    examples: ["panendothelial cell antigen"]
+    reasoning: "Antibodies targeting endothelial markers are common and should be captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([0-9]+,\\s*[A-Z][a-z]+\\s+[A-Za-z]+.*USA\\)"
+    toolType: "antibody"
+    examples: ["(550563, BD Pharmingen, USA)", "(A11081, Invitrogen, USA)"]
+    reasoning: "Catalog numbers with vendor information strongly indicate research reagents"
+
+  - patternType: "term"
+    pattern: "NRecon|CTan"
+    toolType: "computational_tool"
+    examples: ["NRecon", "CTan"]
+    reasoning: "Specialized microCT analysis software commonly used in bone research"
+
+  - patternType: "context_phrase"
+    pattern: "analysis was performed with"
+    toolType: "computational_tool"
+    examples: ["Histomorphometric analysis was performed with AxioVision Software", "Analysis of EDX images was performed with ImageJ"]
+    reasoning: "Strong indicator of computational tool usage for data analysis"
+
+  - patternType: "term"
+    pattern: "AxioVision\\s+Software"
+    toolType: "computational_tool"
+    examples: ["AxioVision Software"]
+    reasoning: "Commercial imaging analysis software should be captured"
+
+  - patternType: "term"
+    pattern: "Labview\\s+[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Labview 7.0"]
+    reasoning: "Programming software with version numbers used for instrument control"
+
+observations:
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Nf1Prx1 mice showed significant shortening and bowing of long bones compared to controls.
+      The study focused on humerus analysis due to compromised hind limb movement from hip joint fusion.
+      Bone tissue slices showed 50% reduction of E-modulus (ctrl = 27.5±9.9 GPa; Nf1Prx1 = 15.0±6.7 GPa)
+      and 35% decrease of ultimate strength (ctrl = 103.9±35.8 MPa; Nf1Prx1 = 67.8±27.5 MPa).
+    foundIn: "results"
+    contextSnippet: "Long bones of Nf1Prx1 mice show significant shortening, bowing and reduced trabecular bone mass [11]. Bone tissue slices from adult Nf1Prx1 humeri showed a 50% reduction of E-modulus"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002164"
+    details: |
+      Nf1Prx1 mice exhibited enlarged and porous tuberositas deltoideus, massively enlarged arteria nutriens,
+      and massive cortical bone defects in the distal humerus. These defects were regions of non-mineralized
+      bone matrix (osteoid) adjacent to ectopic blood vessels. The relative osteoid area was increased 25-fold
+      and blood vessel area 12-fold compared to controls.
+    foundIn: "results"
+    contextSnippet: "In Nf1Prx1 mice microCT scans revealed enlarged and porous tuberositas deltoideus (B1) compared to controls. Additionally, massive cortical bone defects (B3) were present in the distal humerus"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "Nf1Prx1 mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0008271"
+    details: |
+      Increased micro-porosity due to enlarged osteocyte lacunae. The summed osteocyte lacunae volume per bone volume
+      was almost doubled in Nf1Prx1 mice (ctrl = 0.020±0.007%, Nf1Prx1 = 0.034±0.011%). Lacunae volume distribution
+      shifted toward larger sizes with peak maximum at 600 μm³ vs 300 μm³ in controls. Osteocyte lacunae were enlarged
+      in all measured dimensions (x, y, z).
+    foundIn: "results"
+    contextSnippet: "The summed Ot. lacunae volume per bone volume (Lc.V/BV) was almost doubled in Nf1Prx1 and significantly increased in Nf1Col1 mice compared to respective controls"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "Nf1Col1 mice"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002164"
+    details: |
+      Nf1Col1 mice showed a much milder bone phenotype compared to Nf1Prx1. The tuberositas deltoideus was enlarged
+      and irregularly shaped, but the arteria nutriens had normal size. Fewer and smaller non-mineralized areas
+      were observed compared to Nf1Prx1 mice. No significant increase in blood vessel related bone porosity was observed.
+    foundIn: "results"
+    contextSnippet: "In Nf1Col1 mice, characterized by Nf1 inactivation in osteoblasts, the tuberositas deltoideus was enlarged and irregularly shaped (C1); however, the arteria nutriens had normal size (C2)"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "Nf1Col1 mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0008271"
+    details: |
+      Nf1Col1 mice showed significantly increased osteocyte lacunae volume (ctrl = 0.036±0.003%, Nf1Col1 = 0.041±0.002%)
+      but to a lesser extent than Nf1Prx1 mice. Lacunae volume distribution was shifted toward larger size intervals.
+      Osteocyte lacunae morphology was enlarged in all measured dimensions similar to Nf1Prx1 mice.
+    foundIn: "results"
+    contextSnippet: "The summed Ot. lacunae volume per bone volume (Lc.V/BV) was almost doubled in Nf1Prx1 and significantly increased in Nf1Col1 mice compared to respective controls"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "panendothelial cell antigen"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used for immunodetection to confirm vascular endothelial identity of cells within macro-porotic
+      bone defects in Nf1Prx1 mice. Applied on frozen tissue sections (5 μm) with standard immunohistochemistry
+      protocol including permeabilization with 0.1% saponin and blocking with 5% donkey serum.
+      Analyzed with confocal microscopy.
+    foundIn: "results"
+    contextSnippet: "We confirmed the vascular endothelial identity of the cells within macro-porotic bone defects in Nf1Prx1 mice using immune-staining against pan-endothelial antigen"
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for analysis of EDX (Energy Dispersive X-ray spectroscopy) images to assess mineralization degree
+      and element gradients in whole humeri tissues from Nf1Prx1 samples. Successfully processed EDX maps
+      created to map mineralization patterns.
+    foundIn: "methods"
+    contextSnippet: "Analysis of EDX images was performed with ImageJ (Rasband WS. ImageJ, U.S. National Institutes of Health, Bethesda, Maryland, USA, imagej.nih.gov/ij/, 1997–2012)."
+    confidence: 1.0
+    doi: "10.1371/journal.pone.0086115"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 8
+  observationsExtracted: 7
+  observationsByType:
+    Body Weight: 1
+    Developmental: 2
+    Cellular: 2
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - zero tools extracted from a publication rich in research tools
+    - Missing animal models: Two conditional knockout mouse models (Nf1Prx1, Nf1Col1) not captured
+    - Missing antibodies: Two antibodies with catalog numbers and vendor information not captured
+    - Missing computational tools: Five software tools (NRecon, CTan, AxioVision, ImageJ, Labview) not captured
+    - Pattern gaps: Current patterns fail to capture standard mouse model nomenclature and specialized software
+  recommendations: |
+    All 9 identified tools should be added to the database - this represents a complete mining failure.
+    
+    Priority additions:
+    1. Animal models (Nf1Prx1, Nf1Col1) - core experimental models with extensive phenotypic data
+    2. Antibodies with catalog numbers - clear research reagents with vendor information
+    3. Computational tools - essential for data analysis and reproducibility
+    
+    Pattern improvements needed:
+    - Add conditional knockout mouse nomenclature patterns (Nf1[tissue]+ mice)
+    - Improve antibody detection for non-standard naming conventions
+    - Add specialized imaging/analysis software patterns
+    - Include vendor/catalog number context as strong tool indicators
+    
+    This publication provides excellent examples of tools that should be captured and demonstrates
+    significant gaps in current mining patterns. The extracted observations show the scientific
+    value of properly capturing these tools for phenotypic data linkage.

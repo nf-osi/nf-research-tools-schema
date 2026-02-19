@@ -1,0 +1,128 @@
+publicationMetadata:
+  pmid: "26941216"
+  title: "Considerations for conducting qualitative research with pediatric patients for the purpose of PRO development."
+  queryType: "unknown"  # From PubMed query (hint only)
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.9  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a methodology/protocol paper focused on developing patient-reported outcome measures and core outcome sets for pediatric patients. Expected tool types include:
+    - Clinical assessment tools: questionnaires, scales, outcome measures (Wong-Baker scale, Likert scales, PROMs)
+    - Computational tools: qualitative analysis software (NVivo), data management tools (Microsoft Excel), survey platforms (eDelphi)
+    
+    The publication describes both methodological considerations for PRO development (abstract) and a specific protocol for developing a Core Outcome Set for pediatric brain tumor surgery (methods section). This dual focus suggests it may contain multiple types of assessment and analysis tools.
+  overallAssessment: |
+    This publication is primarily a methodology/protocol paper that would be expected to contain clinical assessment tools and computational analysis tools. The abstract focuses on qualitative research methods for developing patient-reported outcome measures, while the methods section describes a detailed protocol for developing a Core Outcome Set using various assessment instruments and analysis software. Clinical assessment tools (scales, questionnaires) and computational tools (analysis software, survey platforms) are highly expected in this type of research.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Wong-Baker scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Alternative scoring system such as modified Wong-Baker scale [ 25 ] or a traffic light system [ 26 ] which will correlate to the Likert style scale for younger children to use..."
+    whyMissed: "This is a validated pediatric pain assessment scale mentioned as an alternative scoring system for younger children in the eDelphi survey methodology"
+    confidence: 0.95  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "Likert scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...1–9 Likert style scale (1 not that important, 9 critically important)..."
+    whyMissed: "This is a standard rating scale methodology used for consensus building in the eDelphi survey"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "eDelphi survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Consensus on the most important harms will be sought using a two-round eDelphi survey completed by national and international participants..."
+    whyMissed: "This is a structured consensus methodology/tool used for gathering expert opinions and building consensus"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NVivo"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data will be stored in Microsoft Excel spreadsheets, [ 31 ] NVivo [ 32 ] and Delphi management software..."
+    whyMissed: "This is qualitative data analysis software specifically mentioned for data storage and analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Microsoft Excel"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Data will be stored in Microsoft Excel spreadsheets, [ 31 ] NVivo [ 32 ] and Delphi management software..."
+    whyMissed: "This is data management software specifically mentioned for data storage"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "semi-structured interviews"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...traditional semi-structured interviews with children younger than eight lack characteristics necessary to yield meaningful information..."
+    whyMissed: "This is a qualitative research methodology/tool used for data collection from pediatric patients"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Wong-Baker.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["modified Wong-Baker scale"]
+    reasoning: "The Wong-Baker FACES Pain Rating Scale is a validated pediatric assessment tool that should be captured when mentioned in clinical contexts"
+
+  - patternType: "term"
+    pattern: "Likert.*scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["1–9 Likert style scale"]
+    reasoning: "Likert scales are standard rating instruments used in clinical assessment and survey research"
+
+  - patternType: "term"
+    pattern: "eDelphi.*survey"
+    toolType: "clinical_assessment_tool"
+    examples: ["two-round eDelphi survey"]
+    reasoning: "eDelphi methodology is a structured consensus-building tool commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "NVivo"
+    toolType: "computational_tool"
+    examples: ["NVivo"]
+    reasoning: "NVivo is a widely used qualitative data analysis software that should be captured when mentioned with version numbers or in analysis contexts"
+
+  - patternType: "context_phrase"
+    pattern: "semi-structured interviews?"
+    toolType: "clinical_assessment_tool"
+    examples: ["semi-structured interviews", "traditional semi-structured interviews"]
+    reasoning: "Semi-structured interviews are a specific qualitative research methodology/tool used for data collection"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measures?|PROMs?"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcome measures", "PROMs"]
+    reasoning: "PROMs are clinical assessment instruments that should be captured when mentioned in development or usage contexts"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    - No tools were initially mined from this publication, but several clinical assessment tools and computational tools were missed
+    - The publication has a dual focus: methodological considerations for PRO development (abstract) and a specific COS development protocol (methods)
+    - The mining system appears to have missed several legitimate assessment tools and analysis software mentioned in the methodology
+    - This type of methodology/protocol paper commonly contains assessment instruments and analysis tools that should be captured
+  recommendations: |
+    - Add the missed clinical assessment tools (Wong-Baker scale, Likert scale, eDelphi survey, semi-structured interviews) as they are legitimate research instruments
+    - Add the computational tools (NVivo) as it's specifically mentioned for qualitative data analysis
+    - Consider adding Microsoft Excel with lower confidence as it's mentioned for data management
+    - Implement the suggested patterns to improve capture of assessment scales, survey methodologies, and qualitative analysis software
+    - This publication demonstrates that methodology/protocol papers can contain valuable research tools that current mining patterns may miss
+    - The mining system should be enhanced to better capture clinical assessment methodologies and qualitative research tools

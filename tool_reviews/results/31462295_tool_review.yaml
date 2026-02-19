@@ -1,0 +1,310 @@
+publicationMetadata:
+  pmid: "31462295"
+  title: "Telomere alterations in neurofibromatosis type 1-associated solid tumors."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory research study involving:
+    - Immunohistochemistry (antibodies expected)
+    - Next generation sequencing (computational tools expected)
+    - Telomere-specific FISH/CISH assays (genetic reagents expected)
+    - Tissue sample analysis (potential cell lines or animal models)
+    
+    The study analyzes 426 tumor samples with detailed molecular techniques, so multiple tool types
+    are expected across antibodies, computational tools, and genetic reagents categories.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that should definitely contain research tools.
+    The methods section describes extensive experimental procedures including immunohistochemistry,
+    FISH/CISH assays, next generation sequencing, and statistical analysis. The complete absence
+    of mined tools suggests significant mining failures rather than genuine absence of tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "ATRX antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemical studies were systematically performed in most cases using an ATRX antibody (Rabbit polyclonal, 1:200 dilution, catalog# HPA001906 Sigma-Aldrich)"
+    whyMissed: "Clear antibody mention with catalog number and vendor - should have been caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DAXX antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemistry for DAXX (Rabbit polyclonal, 1:100 dilution, catalog# HPA008736, Atlas Antibodies) was performed manually"
+    whyMissed: "Clear antibody mention with catalog number and vendor - should have been caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "H3K27me3 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemistry for H3K27me3 was performed manually in whole tissue sections using a mouse monoclonal antibody (Abcam, Cat# ab6002, Cambridge, MA) at 1:1600 dilution"
+    whyMissed: "Clear antibody mention with catalog number and vendor - should have been caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Cy3/Cy5 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "incubated with a monoclonal anti-Cy3/Cy5 antibody (ab52060, Abcam, 1:2500) for 1 h at room temperature"
+    whyMissed: "Clear antibody mention with catalog number and vendor - should have been caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cy3-labeled PNA probe"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "hybridization with a Cy3-labeled peptide nucleic acid (PNA) probe complementary to the mammalian telomere repeat sequence [(N-terminus to C-terminus) CCCTAACCCTAACCCTAA]"
+    whyMissed: "Specific genetic reagent (probe) with sequence information - should have been caught by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Alexa Fluor-488 PNA probe"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "an Alexa Fluor-488–labeled PNA probe specific to human centromeric DNA repeats was also included as a control to assess the validity of the hybridization"
+    whyMissed: "Specific genetic reagent (probe) for centromeric DNA - should have been caught by genetic reagent patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent SureSelect-XT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DNA libraries were prepared using Agilent SureSelect-XT reagents (Agilent Technologies, Inc., Santa Clara, CA)"
+    whyMissed: "Commercial library preparation system/kit - could be considered computational tool or reagent"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "Illumina HiSeq 2500"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing of libraries was achieved to an average unique read depth of greater than 500X using Sequencing by Synthesis (SBS) 2×100 base pairs (bp) paired-end cluster generation on the Illumina HiSeq 2500 plataform"
+    whyMissed: "Sequencing platform - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "bcl2fastq"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "FASTQ files were generated from Binary Cluster Files (.bcl) using the Illumina bcl2fastq v1.8.4 software with parameters set as per vendor's specifications"
+    whyMissed: "Software with version number - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Burrows-Wheeler Aligner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "FASTQ files were aligned to the human genome reference hg19 (GRCh37) using the Burrows-Wheeler Aligner v0.7.10 algorithm with default settings"
+    whyMissed: "Bioinformatics software with version number - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Picard Tools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "BAM files (.bam) were generated using Picard Tools v1.119"
+    whyMissed: "Bioinformatics software with version number - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MDLVC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "variant calling was performed using in-house variant caller algorithm (MDLVC v5.0)"
+    whyMissed: "Custom software with version number - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HaplotypeCaller"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "cross referenced with HaplotypeCaller (Genome Analysis Tool Kit 3.3) under discovery mode"
+    whyMissed: "GATK component with version - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Integrated Genomics Viewer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All variant calls were inspected using Integrated Genomics Viewer v2.3.4 (IGV; Broad Institute, MIT Harvard, Cambridge, MA)"
+    whyMissed: "Software with version number and institution - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using GraphPad Prism version 8.0 (San Diego, CA)"
+    whyMissed: "Statistical software with version - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SAS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using GraphPad Prism version 8.0 (San Diego, CA), SAS version 9.4 (Cary, NC)"
+    whyMissed: "Statistical software with version - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using GraphPad Prism version 8.0 (San Diego, CA), SAS version 9.4 (Cary, NC), and R version 3.3.2"
+    whyMissed: "Statistical software with version - should have been caught by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit 2.0 Fluorometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quantification of Genomic DNA was performed using the Qubit 2.0 Fluorometer (Life Technologies, Carlsbad, CA)"
+    whyMissed: "Laboratory instrument for DNA quantification - could be considered computational tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "antibody.*catalog.*|catalog.*antibody"
+    toolType: "antibody"
+    examples: ["ATRX antibody (Rabbit polyclonal, 1:200 dilution, catalog# HPA001906 Sigma-Aldrich)", "monoclonal anti-Cy3/Cy5 antibody (ab52060, Abcam, 1:2500)"]
+    reasoning: "Many antibodies are mentioned with catalog numbers but weren't caught - need patterns that capture antibody + catalog combinations"
+
+  - patternType: "term"
+    pattern: "PNA probe|peptide nucleic acid probe"
+    toolType: "genetic_reagent"
+    examples: ["Cy3-labeled peptide nucleic acid (PNA) probe", "Alexa Fluor-488–labeled PNA probe"]
+    reasoning: "PNA probes are specific genetic reagents that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+\\s+[A-Z][a-z]+\\s+v?\\d+\\.\\d+|[A-Z][a-z]+\\s+version\\s+\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["GraphPad Prism version 8.0", "SAS version 9.4", "R version 3.3.2", "bcl2fastq v1.8.4"]
+    reasoning: "Software with version numbers in format 'Software version X.Y' or 'Software vX.Y' should be captured"
+
+  - patternType: "term"
+    pattern: "Burrows-Wheeler Aligner|BWA|Picard Tools|HaplotypeCaller|GATK"
+    toolType: "computational_tool"
+    examples: ["Burrows-Wheeler Aligner v0.7.10", "Picard Tools v1.119", "HaplotypeCaller (Genome Analysis Tool Kit 3.3)"]
+    reasoning: "Common bioinformatics tools that are frequently used in genomics studies"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+[A-Z][a-zA-Z\\s]+\\s+v?\\d+\\.\\d+|performed using\\s+[A-Z][a-zA-Z\\s]+"
+    toolType: "computational_tool"
+    examples: ["using the Burrows-Wheeler Aligner v0.7.10", "performed using GraphPad Prism version 8.0"]
+    reasoning: "Context phrases that indicate software usage with version information"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z\\s]+,\\s+[A-Z][a-zA-Z\\s]+,\\s+[A-Z]{2}\\)"
+    toolType: "general"
+    examples: ["(Agilent Technologies, Inc., Santa Clara, CA)", "(Life Technologies, Carlsbad, CA)"]
+    reasoning: "Vendor information pattern that often accompanies research tools and reagents"
+
+observations:
+  - resourceName: "ATRX antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ATRX antibody used at 1:200 dilution with automated immunostaining on BenchMark instruments.
+      Immunoreactivity preservation in internal non-neoplastic cell components was required for 
+      valid interpretation. Loss was interpreted as "partial" when clearly limited to a subset 
+      of neoplastic cells with preserved reactivity in non-neoplastic components.
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemical studies were systematically performed in most cases using an ATRX antibody (Rabbit polyclonal, 1:200 dilution, catalog# HPA001906 Sigma-Aldrich). Immunostaining was performed on automated instruments (BenchMark, Ventana Medical Systems, Tucson, AZ, USA)"
+    confidence: 1.0
+    doi: "10.1186/s40478-019-0792-5"
+
+  - resourceName: "DAXX antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      DAXX antibody used at 1:100 dilution with manual immunohistochemistry protocol.
+      Sections incubated with primary antibody for 2 hours at room temperature followed 
+      by secondary antibody for 30 minutes and DAB detection after 10 minutes.
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemistry for DAXX (Rabbit polyclonal, 1:100 dilution, catalog# HPA008736, Atlas Antibodies) was performed manually. Sections were incubated with primary antibody for 2 h at room temperature followed by secondary antibody (Leica Microsystems) for 30 min"
+    confidence: 1.0
+    doi: "10.1186/s40478-019-0792-5"
+
+  - resourceName: "H3K27me3 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      H3K27me3 mouse monoclonal antibody used at 1:1600 dilution with overnight incubation 
+      at 4°C for manual immunohistochemistry in whole tissue sections. Some MPNST cases 
+      in TMA format were tested as part of previous study.
+    foundIn: "methods"
+    contextSnippet: "Immunohistochemistry for H3K27me3 was performed manually in whole tissue sections using a mouse monoclonal antibody (Abcam, Cat# ab6002, Cambridge, MA) at 1:1600 dilution an incubated overnight at 4°C"
+    confidence: 1.0
+    doi: "10.1186/s40478-019-0792-5"
+
+  - resourceName: "Cy3-labeled PNA probe"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Cy3-labeled peptide nucleic acid probe complementary to mammalian telomere repeat 
+      sequence (CCCTAACCCTAACCCTAA) used for both FISH and CISH assays. Tissue slides 
+      were deparaffinized, steamed in citrate buffer for 25 minutes, then hybridized 
+      with the probe.
+    foundIn: "methods"
+    contextSnippet: "hybridization with a Cy3-labeled peptide nucleic acid (PNA) probe complementary to the mammalian telomere repeat sequence [(N-terminus to C-terminus) CCCTAACCCTAACCCTAA]"
+    confidence: 1.0
+    doi: "10.1186/s40478-019-0792-5"
+
+  - resourceName: "Alexa Fluor-488 PNA probe"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Alexa Fluor-488 labeled PNA probe specific to human centromeric DNA repeats 
+      used as control in FISH approach to assess validity of hybridization. 
+      Used in conjunction with telomere-specific probe.
+    foundIn: "methods"
+    contextSnippet: "In the FISH approach, an Alexa Fluor-488–labeled PNA probe specific to human centromeric DNA repeats was also included as a control to assess the validity of the hybridization"
+    confidence: 1.0
+    doi: "10.1186/s40478-019-0792-5"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 17
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - 0 tools found in a comprehensive lab research study
+    - Multiple antibodies with catalog numbers completely missed (ATRX, DAXX, H3K27me3, anti-Cy3/Cy5)
+    - Genetic reagents (PNA probes) with specific sequences missed
+    - Extensive computational tools missed (16+ software tools with versions)
+    - All tools have clear vendor information, catalog numbers, or version numbers
+    - Methods section contains detailed protocols that should trigger tool detection
+  recommendations: |
+    URGENT: This represents a complete mining system failure. A comprehensive laboratory study 
+    with detailed methods yielded zero tools, indicating fundamental problems with mining patterns.
+    
+    Immediate actions needed:
+    1. Review and fix antibody detection patterns - multiple clear antibodies with catalogs missed
+    2. Add computational tool patterns for software with versions (GraphPad, SAS, R, BWA, etc.)
+    3. Add genetic reagent patterns for probes and PNA sequences
+    4. Test patterns against this publication to ensure they capture the missed tools
+    5. Consider this a high-priority test case for pattern validation
+    
+    All 17 potentially missed tools should be added to the database as they represent clear,
+    unambiguous research tools with proper vendor/catalog information or version numbers.
+    
+    The 5 usage instruction observations provide valuable protocol information for antibodies
+    and genetic reagents that could benefit other researchers.

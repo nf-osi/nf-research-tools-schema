@@ -1,0 +1,268 @@
+publicationMetadata:
+  pmid: "37410426"
+  title: "CDK4/6-MEK Inhibition in MPNSTs Causes Plasma Cell Infiltration, Sensitization to PD-L1 Blockade, and Tumor Regression"
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a preclinical cancer research study that should contain multiple tool types:
+    - Patient-derived xenografts (PDX models) - explicitly mentioned
+    - Animal models (de novo mouse MPNSTs) - explicitly mentioned  
+    - Cell lines (MPNST cell lines) - explicitly mentioned
+    - Computational tools (RNA sequencing, Connectivity-Map analyses) - mentioned
+    - Potentially antibodies for IHC and flow cytometry
+    - Genetic reagents for creating mouse models
+    
+    This publication spans both lab research tools and patient-derived models, making it a comprehensive
+    preclinical study that should have yielded multiple validated research tools.
+  overallAssessment: |
+    This is a comprehensive preclinical cancer research study that extensively uses research tools including
+    patient-derived xenografts, mouse models, cell lines, and computational analysis methods. The study
+    describes experimental procedures using these tools to test drug combinations and immune responses.
+    The complete absence of mined tools represents a major failure in the mining process, as this publication
+    clearly contains multiple categories of research tools that are central to the experimental design.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "patient-derived xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "Antitumor activity of CDK4/6 and MEK inhibitors was measured in MPNST cell lines, patient-derived xenografts (PDX), and de novo mouse MPNSTs"
+    whyMissed: "Standard PDX terminology should have been detected by patient-derived model patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PDX"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "dual CDK4/6-MEK inhibition slowed tumor growth in 4 of 5 MPNST PDXs"
+    whyMissed: "PDX abbreviation is standard terminology for patient-derived xenografts"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Antitumor activity of CDK4/6 and MEK inhibitors was measured in MPNST cell lines, patient-derived xenografts (PDX)"
+    whyMissed: "Cell line terminology with disease context should have been detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "de novo mouse MPNSTs"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "measured in MPNST cell lines, patient-derived xenografts (PDX), and de novo mouse MPNSTs, with the latter used to determine anti-PD-L1 response"
+    whyMissed: "Mouse model terminology should have been detected by animal model patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "RNA sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Patient-matched MPNSTs and precursor lesions were examined by FISH, RNA sequencing, IHC, and Connectivity-Map analyses"
+    whyMissed: "RNA sequencing is a standard computational analysis method"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RNAseq"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Patient-matched MPNSTs and precursor lesions were examined by FISH, RNAseq, IHC, and Connectivity-Map analyses"
+    whyMissed: "RNAseq abbreviation is standard terminology for RNA sequencing"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Connectivity-Map"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "examined by FISH, RNA sequencing, IHC, and Connectivity-Map analyses"
+    whyMissed: "Connectivity Map (CMap) is a well-known computational tool for drug discovery"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "immunocompetent mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "In immunocompetent mice, combination therapy of de novo MPNSTs caused tumor regression"
+    whyMissed: "Specific mouse strain/type terminology should be detected"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "immune-deficient mice"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "In immune-deficient mice, dual CDK4/6-MEK inhibition slowed tumor growth in 4 of 5 MPNST PDXs"
+    whyMissed: "Specific mouse strain/type terminology should be detected"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "patient-derived xenograft[s]?"
+    toolType: "patient_derived_model"
+    examples: ["patient-derived xenografts (PDX)"]
+    reasoning: "Standard terminology for PDX models that should always be detected"
+
+  - patternType: "term"
+    pattern: "PDX[s]?"
+    toolType: "patient_derived_model"
+    examples: ["4 of 5 MPNST PDXs"]
+    reasoning: "Common abbreviation for patient-derived xenografts"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+cell lines?"
+    toolType: "cell_line"
+    examples: ["MPNST cell lines"]
+    reasoning: "Disease/tissue-specific cell lines are commonly named this way"
+
+  - patternType: "context_phrase"
+    pattern: "de novo\\s+mouse\\s+\\w+"
+    toolType: "animal_model"
+    examples: ["de novo mouse MPNSTs"]
+    reasoning: "De novo mouse models are standard terminology in cancer research"
+
+  - patternType: "term"
+    pattern: "RNA\\s*sequencing|RNAseq|RNA-seq"
+    toolType: "computational_tool"
+    examples: ["RNA sequencing", "RNAseq"]
+    reasoning: "Standard computational analysis method with multiple naming conventions"
+
+  - patternType: "term"
+    pattern: "Connectivity[\\s-]?Map|CMap"
+    toolType: "computational_tool"
+    examples: ["Connectivity-Map analyses"]
+    reasoning: "Well-known computational drug discovery tool"
+
+  - patternType: "context_phrase"
+    pattern: "immune[\\s-]?deficient\\s+mice|immunocompetent\\s+mice"
+    toolType: "animal_model"
+    examples: ["immune-deficient mice", "immunocompetent mice"]
+    reasoning: "Specific mouse strain types commonly used in cancer research"
+
+  - patternType: "context_phrase"
+    pattern: "measured in\\s+[^,]+cell lines?|activity.*in\\s+[^,]+cell lines?"
+    toolType: "cell_line"
+    examples: ["measured in MPNST cell lines"]
+    reasoning: "Context phrases indicating experimental use of cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "examined by\\s+[^,]*(?:FISH|IHC|sequencing|analyses)"
+    toolType: "computational_tool"
+    examples: ["examined by FISH, RNA sequencing, IHC, and Connectivity-Map analyses"]
+    reasoning: "Context indicating use of analytical/computational methods"
+
+observations:
+  - resourceName: "patient-derived xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Dual CDK4/6-MEK inhibition slowed tumor growth in 4 of 5 MPNST PDXs in immune-deficient mice.
+      This represents an 80% response rate to the combination therapy, indicating significant antitumor
+      activity across multiple patient-derived models.
+    foundIn: "results"
+    contextSnippet: "In immune-deficient mice, dual CDK4/6-MEK inhibition slowed tumor growth in 4 of 5 MPNST PDXs"
+    confidence: 0.95
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+  - resourceName: "de novo mouse MPNSTs"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      In immunocompetent mice, combination CDK4/6-MEK therapy caused tumor regression and delayed
+      resistant tumor outgrowth compared to monotherapies. Some mice showed complete tumor regression
+      when combined with anti-PD-L1 immune checkpoint blockade.
+    foundIn: "results"
+    contextSnippet: "combination therapy of de novo MPNSTs caused tumor regression, delayed resistant tumor outgrowth, and improved survival relative to monotherapies"
+    confidence: 0.95
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+  - resourceName: "de novo mouse MPNSTs"
+    resourceType: "Animal Model"
+    observationType: "Lifespan"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Combination CDK4/6-MEK therapy improved survival relative to monotherapies in mice with
+      de novo MPNSTs. This survival benefit was associated with tumor regression and delayed
+      development of drug resistance.
+    foundIn: "results"
+    contextSnippet: "combination therapy of de novo MPNSTs caused tumor regression, delayed resistant tumor outgrowth, and improved survival relative to monotherapies"
+    confidence: 0.90
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+  - resourceName: "MPNST cell lines"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Low-dose combinations of CDK4/6 and MEK inhibitors synergistically reactivated the retinoblastoma (RB1)
+      tumor suppressor, induced cell death, and decreased clonogenic survival of MPNST cells. This demonstrates
+      the cellular mechanism of action for the drug combination.
+    foundIn: "results"
+    contextSnippet: "Low-dose combinations of CDK4/6 and MEK inhibitors synergistically reactivated the retinoblastoma (RB1) tumor suppressor, induced cell death, and decreased clonogenic survival of MPNST cells"
+    confidence: 0.95
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+  - resourceName: "de novo mouse MPNSTs"
+    resourceType: "Animal Model"
+    observationType: "Immune System"
+    observationTypeOntologyId: "MP:0005387"
+    details: |
+      Drug-sensitive tumors that regressed contained plasma cells and increased cytotoxic T cells,
+      whereas drug-resistant tumors adopted an immunosuppressive microenvironment with elevated
+      MHC II-low macrophages and increased tumor cell PD-L1 expression. This reveals distinct
+      immune microenvironment changes associated with drug sensitivity.
+    foundIn: "results"
+    contextSnippet: "Drug-sensitive tumors that regressed contained plasma cells and increased cytotoxic T cells, whereas drug-resistant tumors adopted an immunosuppressive microenvironment"
+    confidence: 0.90
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+  - resourceName: "RNA sequencing"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      RNA sequencing was used along with FISH, IHC, and Connectivity-Map analyses to examine
+      patient-matched MPNSTs and precursor lesions to identify CDK4/6 and MEK as actionable
+      targets for MPNST therapy.
+    foundIn: "results"
+    contextSnippet: "Patient tumor analyses identified CDK4/6 and MEK as actionable targets for MPNST therapy"
+    confidence: 0.85
+    doi: "https://doi.org/10.1158/1078-0432.CCR-23-0749"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 9
+  observationsExtracted: 6
+  observationsByType:
+    Tumor Growth: 2
+    Lifespan: 1
+    Cellular: 1
+    Immune System: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - zero tools detected despite clear evidence of multiple research tools
+    - Publication contains patient-derived xenografts (PDX), cell lines, animal models, and computational tools
+    - Standard terminology like "PDX", "cell lines", "RNA sequencing" was not detected
+    - This represents a systematic failure of the mining patterns to detect common research tools
+    - All major tool categories present in this preclinical study were missed
+  recommendations: |
+    This publication represents a complete mining failure that requires immediate attention:
+    
+    1. URGENT: Review and update mining patterns - basic terms like "PDX", "cell lines", "RNA sequencing" should never be missed
+    2. Add all 9 identified tools to the database as they represent clear, validated research tools
+    3. Implement the 9 suggested patterns to prevent similar failures in future mining
+    4. This publication should be used as a test case to validate improved mining algorithms
+    5. Consider manual review of other publications from the same mining run to assess scope of the problem
+    6. The 6 extracted observations provide valuable scientific insights about these research tools
+    
+    The complete absence of detected tools in a publication that extensively uses research tools indicates
+    fundamental issues with the current mining approach that need immediate correction.

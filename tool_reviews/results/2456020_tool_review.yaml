@@ -1,0 +1,90 @@
+publicationMetadata:
+  pmid: "2456020"
+  title: "Expression of nerve growth factor receptor in paraffin-embedded soft tissue tumors."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is an immunohistochemical study from 1988 examining nerve growth factor receptor expression
+    in soft tissue tumors. Based on the abstract, this study would be expected to use:
+    - Antibodies (primary antibody against NGF-R for immunohistochemistry)
+    - Possibly tissue processing reagents and detection systems
+    - Human tissue samples (141 soft tissue tumors)
+    
+    The study mentions "antisera capable of working in paraffin-embedded tissue" and describes
+    immunohistochemical staining patterns, indicating laboratory-based experimental work using
+    antibody-based detection methods.
+  overallAssessment: |
+    This is a laboratory-based pathology study that would typically use research tools, particularly
+    antibodies for immunohistochemical detection. The study examined 141 soft tissue tumors using
+    immunohistochemistry to detect nerve growth factor receptor expression, which requires specific
+    antibodies and detection reagents. However, the publication lacks a detailed Methods section,
+    making it difficult to identify specific tools with catalog numbers or vendor information.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "nerve growth factor receptor antibody"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "only 1 antisera capable of working in paraffin-embedded tissue was noted. A detailed study of 141 STT was undertaken to determine the frequency of expression of nerve growth factor receptor (NGF-R)"
+    whyMissed: "The abstract mentions 'antisera' for NGF-R detection but doesn't use standard antibody terminology. The mining patterns may not have captured 'antisera' as an antibody indicator."
+    confidence: 0.85  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "NGF-R antisera"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "only 1 antisera capable of working in paraffin-embedded tissue was noted"
+    whyMissed: "The term 'antisera' is an older terminology for antibodies that may not be captured by modern mining patterns focused on 'antibody', 'Ab', or commercial antibody naming conventions."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "antisera|antiserum"
+    toolType: "antibody"
+    examples: ["antisera capable of working in paraffin-embedded tissue", "NGF-R antisera"]
+    reasoning: "Historical publications (especially pre-1990s) often use 'antisera' or 'antiserum' instead of 'antibody'. This pattern would capture older antibody references that use traditional terminology."
+
+  - patternType: "context_phrase"
+    pattern: "immunohistochemical study|immunohistochemistry|immunoreactivity"
+    toolType: "antibody"
+    examples: ["immunohistochemical study of the expression", "immunoreactivity was seen", "immunoreactivity for NGF-R"]
+    reasoning: "Immunohistochemistry inherently requires antibodies. Publications describing immunohistochemical methods should trigger antibody detection even without explicit antibody mentions."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-R\\s+(antisera|antiserum|antibody)"
+    toolType: "antibody"
+    examples: ["NGF-R antisera", "EGF-R antibody"]
+    reasoning: "Receptor-targeting antibodies often follow the pattern of abbreviated receptor name followed by '-R' and then antibody/antisera terminology."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # Breakdown by observation type
+  majorIssuesFound: |
+    List major issues found during review:
+    - No tools were mined from this publication despite clear evidence of antibody usage
+    - Publication lacks detailed Methods section, making tool identification challenging
+    - Historical terminology ('antisera' instead of 'antibody') not captured by modern mining patterns
+    - Abstract-only content limits ability to extract detailed tool information and experimental observations
+  recommendations: |
+    Overall recommendations for this publication:
+    - Two antibody tools were likely missed and should be added to the database
+    - Mining patterns should be updated to capture historical antibody terminology ('antisera', 'antiserum')
+    - Immunohistochemistry context should trigger antibody detection even without explicit mentions
+    - This publication demonstrates the need for historical terminology awareness in mining patterns
+    - No specific observations could be extracted due to lack of detailed Results/Discussion sections
+    - Future mining should consider that older publications may use different terminology conventions

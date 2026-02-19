@@ -1,0 +1,120 @@
+publicationMetadata:
+  pmid: "32187457"
+  title: "Selumetinib in Children with Inoperable Plexiform Neurofibromas"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0  # Clear Phase 2 clinical trial
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (pain scales, quality of life measures, functional assessments)
+    This Phase 2 clinical trial would be expected to use validated clinical outcome measures to assess:
+    - Pain intensity (numerical rating scales)
+    - Quality of life instruments (likely pediatric-specific)
+    - Functional assessments (strength, range of motion)
+    - Patient-reported outcome measures
+    
+    May also use computational tools for statistical analysis, though these are not typically detailed in abstracts.
+    Lab research tools (antibodies, cell lines, etc.) would not be expected in this type of clinical intervention study.
+  overallAssessment: |
+    This is a Phase 2 clinical trial evaluating selumetinib efficacy in pediatric NF1 patients with plexiform neurofibromas.
+    Clinical trials routinely use validated assessment tools to measure outcomes, and this study explicitly mentions pain scales,
+    quality of life measures, and functional assessments. The mining appears to have missed several clinical assessment tools
+    that are clearly described in the abstract, suggesting the mining patterns may not adequately capture clinical outcome measures.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Pain intensity scale (0-10)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Children rated tumor pain intensity on a scale from 0 (no pain) to 10 (worst pain imaginable)."
+    whyMissed: "Mining patterns may not recognize numerical rating scale descriptions or pain assessment terminology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Quality of life assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "clinical outcome assessments (pain, quality of life, disfigurement, and function) were performed...overall health-related quality of life (48% and 58%, respectively)"
+    whyMissed: "Generic 'quality of life' term without specific instrument name (e.g., PedsQL) may not be captured"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "Pain interference assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "clinically meaningful improvements were seen in child-reported and parent-reported interference of pain in daily functioning (38% and 50%, respectively)"
+    whyMissed: "Pain interference measures may not be recognized without specific instrument names"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Functional strength assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "functional outcomes of strength (56% of patients) and range of motion (38% of patients)"
+    whyMissed: "Functional assessment terminology may not be captured by current mining patterns"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Range of motion assessment"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "functional outcomes of strength (56% of patients) and range of motion (38% of patients)"
+    whyMissed: "Range of motion assessment may not be recognized as a clinical tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "pain intensity scale|numerical rating scale|pain scale.*0.*10|scale from 0.*to.*10"
+    toolType: "clinical_assessment_tool"
+    examples: ["Children rated tumor pain intensity on a scale from 0 (no pain) to 10 (worst pain imaginable)"]
+    reasoning: "Numerical rating scales for pain are standard clinical assessment tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "clinical outcome assessments?|patient-reported outcome|functional outcome|health-related quality of life"
+    toolType: "clinical_assessment_tool"
+    examples: ["clinical outcome assessments (pain, quality of life, disfigurement, and function)", "overall health-related quality of life"]
+    reasoning: "These phrases indicate use of clinical assessment instruments even when specific names aren't provided"
+
+  - patternType: "term"
+    pattern: "interference.*daily functioning|pain interference|functional.*strength|range of motion.*assessment"
+    toolType: "clinical_assessment_tool"
+    examples: ["interference of pain in daily functioning", "functional outcomes of strength", "range of motion"]
+    reasoning: "Functional assessments and pain interference measures are validated clinical tools commonly used in trials"
+
+  - patternType: "context_phrase"
+    pattern: "rated.*on a scale|scored.*using|assessed.*with|measured.*by|administered.*questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["Children rated tumor pain intensity on a scale"]
+    reasoning: "These phrases indicate active use of assessment instruments in clinical studies"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this Phase 2 clinical trial despite clear use of clinical assessment tools
+    - Mining patterns appear inadequate for capturing clinical outcome measures and assessment instruments
+    - Only abstract text available, but clinical trials typically describe assessment tools in abstracts
+    - Multiple pain scales, quality of life measures, and functional assessments are described but not captured
+  recommendations: |
+    This publication represents a significant gap in clinical assessment tool mining. The study clearly uses:
+    1. Pain intensity numerical rating scale (0-10) - should definitely be added
+    2. Quality of life measures (though specific instrument not named)
+    3. Pain interference assessments
+    4. Functional outcome measures (strength, range of motion)
+    
+    The mining patterns need enhancement to capture clinical assessment terminology and outcome measure descriptions.
+    This is a high-quality clinical trial that would provide valuable data about clinical assessment tools used in NF1 research.
+    
+    Recommend adding the pain intensity scale as a definite tool, and developing better patterns to capture clinical
+    outcome measures even when specific instrument names are not provided in abstracts.

@@ -1,0 +1,124 @@
+publicationMetadata:
+  pmid: "19966217"
+  title: "Cardiac and vascular functions of the zebrafish orthologues of the type I neurofibromatosis gene NFI."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study developing and characterizing zebrafish models of neurofibromatosis.
+    The abstract describes "identification and characterization of zebrafish nf1a and nf1b, orthologues of NF1"
+    and "morpholino knockdown" experiments, indicating use of animal models and genetic reagents.
+    
+    Expected tools: animal models (zebrafish), genetic reagents (morpholinos, gene constructs).
+    Less likely: antibodies, cell lines, computational tools (though these could be present in full methods).
+  overallAssessment: |
+    This publication describes the development and characterization of zebrafish models for neurofibromatosis research,
+    which clearly involves research tools including animal models and genetic reagents. The study uses morpholino
+    knockdown techniques and characterizes cardiovascular phenotypes, indicating active experimental tool usage.
+    However, only the abstract is available, limiting comprehensive tool identification.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "zebrafish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Here, we describe the identification and characterization of zebrafish nf1a and nf1b, orthologues of NF1, and show neural crest and cardiovascular defects resulting from morpholino knockdown"
+    whyMissed: "Generic term 'zebrafish' may not have been recognized as a specific animal model, but this represents a zebrafish model system for neurofibromatosis research"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "morpholino"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "show neural crest and cardiovascular defects resulting from morpholino knockdown, including vascular and cardiac valvular abnormalities"
+    whyMissed: "Morpholino knockdown is a specific genetic reagent technique, but 'morpholino' alone may not have been captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "nf1a"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Here, we describe the identification and characterization of zebrafish nf1a and nf1b, orthologues of NF1"
+    whyMissed: "Specific zebrafish gene orthologue that was identified and characterized - represents a genetic reagent/construct"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "nf1b"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Here, we describe the identification and characterization of zebrafish nf1a and nf1b, orthologues of NF1"
+    whyMissed: "Specific zebrafish gene orthologue that was identified and characterized - represents a genetic reagent/construct"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "zebrafish"
+    toolType: "animal_model"
+    examples: ["zebrafish nf1a and nf1b, orthologues", "zebrafish model of von Recklinghausen neurofibromatosis"]
+    reasoning: "Zebrafish is a widely used model organism and should be captured when mentioned in experimental context"
+
+  - patternType: "term"
+    pattern: "morpholino"
+    toolType: "genetic_reagent"
+    examples: ["morpholino knockdown", "resulting from morpholino knockdown"]
+    reasoning: "Morpholinos are specific antisense oligonucleotides used for gene knockdown in zebrafish and other organisms"
+
+  - patternType: "context_phrase"
+    pattern: "orthologues? of \\w+"
+    toolType: "genetic_reagent"
+    examples: ["nf1a and nf1b, orthologues of NF1"]
+    reasoning: "Gene orthologues mentioned in identification/characterization context often represent genetic reagents or constructs being studied"
+
+  - patternType: "context_phrase"
+    pattern: "development of a \\w+ model"
+    toolType: "animal_model"
+    examples: ["Development of a zebrafish model of von Recklinghausen neurofibromatosis"]
+    reasoning: "Phrases describing model development clearly indicate animal model tools being created or used"
+
+  - patternType: "naming_convention"
+    pattern: "nf1[a-z]"
+    toolType: "genetic_reagent"
+    examples: ["nf1a", "nf1b"]
+    reasoning: "Gene names with lowercase letter suffixes often represent specific orthologues or variants used as genetic reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage
+    - Only abstract text available - full Methods section would likely reveal additional tools
+    - Mining patterns appear to miss common model organism names and genetic reagent terminology
+    - Zebrafish model development and morpholino knockdown experiments clearly indicate tool usage
+  recommendations: |
+    This publication clearly describes laboratory research using multiple research tools that were completely missed by initial mining:
+    
+    1. ZEBRAFISH ANIMAL MODEL: The study develops and characterizes zebrafish models of neurofibromatosis - this is a clear animal model tool
+    2. MORPHOLINO GENETIC REAGENTS: Morpholino knockdown experiments are described - these are specific genetic reagents
+    3. GENE ORTHOLOGUES (nf1a, nf1b): These zebrafish gene orthologues were identified and characterized as research tools
+    
+    The mining system needs significant improvement to capture:
+    - Model organism names (zebrafish, mouse, rat, etc.) in experimental contexts
+    - Genetic reagent terminology (morpholino, siRNA, shRNA, etc.)
+    - Gene orthologue naming conventions
+    - Model development language patterns
+    
+    All 4 missed tools should be added to the database. The lack of full-text access limits comprehensive tool identification,
+    but the abstract alone provides clear evidence of multiple research tools. This represents a significant mining failure
+    that suggests systematic gaps in pattern coverage for basic laboratory tools.
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the abstract indicates cardiovascular
+    and neural crest phenotypes were observed in the zebrafish models.

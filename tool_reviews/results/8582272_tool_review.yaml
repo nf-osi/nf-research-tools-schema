@@ -1,0 +1,198 @@
+publicationMetadata:
+  pmid: "8582272"
+  title: "Neurofibromin-deficient fibroblasts fail to form perineurium in vitro."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving transgenic mouse models and primary cell culture work.
+    The abstract describes experimental procedures using transgenic mouse embryos with disrupted NF1 gene,
+    primary cell cultures (neurons, Schwann cells, fibroblasts), and in vitro fascicle formation assays.
+    Expected tools include animal models (transgenic mice) and cell culture systems (primary cells).
+    The study involves genetic manipulation (homologous recombination) and cell biology techniques.
+  overallAssessment: |
+    This is a laboratory research study that would typically use multiple research tools including transgenic
+    animal models and primary cell culture systems. The abstract clearly describes experimental work with
+    transgenic mouse embryos and cell culture techniques, indicating active tool usage rather than just citations.
+    Despite lacking a formal Methods section, the experimental nature is evident from the described procedures.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "transgenic mouse embryos"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "we generated cell cultures containing neurons. Schwann cells and fibroblasts from transgenic mouse embryos in which the type 1 neurofibromatosis gene was disrupted by homologous recombination"
+    whyMissed: "The mining system may not have recognized 'transgenic mouse embryos' as a specific animal model tool, possibly looking for more standard strain nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "transgenic mouse embryos in which the type 1 neurofibromatosis gene was disrupted by homologous recombination (Brannan et al. (1994) Genes Development, 8,1019-1029)"
+    whyMissed: "The tool is described functionally rather than by standard strain name - 'NF1 gene disrupted by homologous recombination' represents a knockout mouse model"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "primary fibroblast cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "we generated cell cultures containing neurons. Schwann cells and fibroblasts from transgenic mouse embryos"
+    whyMissed: "Primary cell cultures may not be captured by patterns looking for established cell line names with standard nomenclature"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "primary Schwann cell cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "we generated cell cultures containing neurons. Schwann cells and fibroblasts from transgenic mouse embryos"
+    whyMissed: "Primary Schwann cell cultures are specialized cell culture tools but may not match standard cell line naming patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "primary neuronal cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "we generated cell cultures containing neurons. Schwann cells and fibroblasts from transgenic mouse embryos"
+    whyMissed: "Primary neuronal cultures are research tools but may not be recognized without standard cell line nomenclature"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "transgenic mouse embryos?"
+    toolType: "animal_model"
+    examples: ["transgenic mouse embryos"]
+    reasoning: "Transgenic mouse embryos are commonly used animal models in developmental biology and should be captured as research tools"
+
+  - patternType: "context_phrase"
+    pattern: "gene was disrupted by homologous recombination"
+    toolType: "animal_model"
+    examples: ["type 1 neurofibromatosis gene was disrupted by homologous recombination"]
+    reasoning: "This phrase indicates a knockout/transgenic animal model created through genetic engineering techniques"
+
+  - patternType: "context_phrase"
+    pattern: "generated cell cultures containing"
+    toolType: "cell_line"
+    examples: ["generated cell cultures containing neurons. Schwann cells and fibroblasts"]
+    reasoning: "This phrase indicates active generation/use of primary cell culture tools for research"
+
+  - patternType: "term"
+    pattern: "primary (\\w+) cultures?"
+    toolType: "cell_line"
+    examples: ["primary fibroblast cultures", "primary Schwann cell cultures", "primary neuronal cultures"]
+    reasoning: "Primary cell cultures are important research tools that should be captured alongside established cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "embryos lacking neurofibromin"
+    toolType: "animal_model"
+    examples: ["embryos lacking neurofibromin"]
+    reasoning: "This describes a genetic knockout model and should be recognized as an animal model tool"
+
+  - patternType: "naming_convention"
+    pattern: "(\\w+) cells? and (\\w+) from transgenic"
+    toolType: "cell_line"
+    examples: ["Schwann cells and fibroblasts from transgenic"]
+    reasoning: "Pattern to capture multiple primary cell types derived from transgenic animals"
+
+observations:
+  - resourceName: "transgenic mouse embryos"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Fibroblasts from transgenic mouse embryos lacking neurofibromin showed increased proliferation 
+      in a majority of cell strains analyzed. This cellular phenotype was observed when comparing 
+      fibroblasts from neurofibromin-deficient embryos to normal controls.
+    foundIn: "both"
+    contextSnippet: "Proliferation was increased in a majority of fibroblast cell strains analyzed from embryos lacking neurofibromin"
+    confidence: 0.9
+    doi: "10.1242/dev.121.11.3583"
+
+  - resourceName: "transgenic mouse embryos"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      Normal fascicle formation by perineurial cells failed to occur in the absence of neurofibromin.
+      This represents a developmental defect in nerve fascicle organization when neurofibromin is absent.
+    foundIn: "both"
+    contextSnippet: "Normal fascicle formation by perineurial cells failed to occur in the absence of neurofibromin"
+    confidence: 0.95
+    doi: "10.1242/dev.121.11.3583"
+
+  - resourceName: "transgenic mouse embryos"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      Fascicles were reduced in number and showed abnormal morphology when normal neurons and Schwann cells 
+      were cultured up to 37 days with fibroblasts lacking neurofibromin. This indicates a time-dependent 
+      developmental abnormality in nerve fascicle formation.
+    foundIn: "both"
+    contextSnippet: "Fascicles were reduced in number and showed abnormal morphology when normal neurons and Schwann cells were cultured up to 37 days with fibroblasts lacking neurofibromin"
+    confidence: 0.9
+    doi: "10.1242/dev.121.11.3583"
+
+  - resourceName: "primary fibroblast cultures"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Proliferation was increased in a majority of fibroblast cell strains analyzed from embryos lacking 
+      neurofibromin compared to normal controls. This represents a cellular growth phenotype associated 
+      with neurofibromin deficiency.
+    foundIn: "both"
+    contextSnippet: "Proliferation was increased in a majority of fibroblast cell strains analyzed from embryos lacking neurofibromin"
+    confidence: 0.85
+    doi: "10.1242/dev.121.11.3583"
+
+  - resourceName: "primary fibroblast cultures"
+    resourceType: "Cell Line"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Fibroblasts from neurofibromin-deficient embryos can be cultured with normal neurons and Schwann cells 
+      for up to 37 days to study fascicle formation defects. This provides a protocol timeframe for 
+      co-culture experiments studying nerve development.
+    foundIn: "both"
+    contextSnippet: "normal neurons and Schwann cells were cultured up to 37 days with fibroblasts lacking neurofibromin"
+    confidence: 0.8
+    doi: "10.1242/dev.121.11.3583"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 2
+    Developmental: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of research tool usage
+    - Publication lacks Methods section but abstract contains sufficient detail about experimental procedures
+    - Multiple animal models and primary cell culture tools were missed by initial mining
+    - The mining system appears to miss primary cell cultures and transgenic animal models described functionally rather than by standard nomenclature
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the initial mining:
+    - Transgenic mouse embryos with NF1 gene disruption (animal model)
+    - Primary fibroblast, Schwann cell, and neuronal cultures (cell culture tools)
+    
+    All identified tools should be added as they represent genuine research tools used experimentally.
+    The mining patterns need improvement to capture:
+    1. Transgenic animal models described functionally rather than by strain names
+    2. Primary cell cultures derived from transgenic animals
+    3. Genetic manipulation techniques that create animal models
+    
+    Despite lacking a formal Methods section, the abstract provides clear evidence of experimental tool usage.
+    The observations extracted show meaningful phenotypic and developmental findings from these tools.
+    This represents a significant gap in the current mining approach for capturing primary research tools.

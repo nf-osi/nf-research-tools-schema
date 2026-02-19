@@ -1,0 +1,135 @@
+publicationMetadata:
+  pmid: "7686619"
+  title: "Multiple dispersed loci produce small cytoplasmic Alu RNA."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - molecular biology research with experimental methods
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study from 1993 investigating Alu RNA transcripts. Based on the abstract,
+    the study involves:
+    - Cell culture work (HeLa cells mentioned)
+    - Microinjection experiments (frog oocytes)
+    - In vitro transcription/processing assays
+    - Molecular cloning (cDNA cloning)
+    - Somatic cell hybrids
+    
+    Expected tools: cell lines (HeLa, somatic cell hybrids), animal models (frog oocytes), 
+    genetic reagents (cloned constructs, synthetic RNAs), potentially antibodies for detection.
+    Computational tools less likely given 1993 timeframe, but possible.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving molecular biology techniques.
+    The abstract describes multiple experimental approaches including cell culture, microinjection,
+    in vitro assays, and molecular cloning, all of which typically require research tools.
+    However, only the abstract is available, which limits tool detection since detailed
+    methodological information is usually in the Methods section.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HeLa cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...a less abundant poly(A)-containing Alu transcript of dimeric size and specificity expected of a transposition intermediary is also detectable in HeLa cells (A. G. Matera, U. Hellmann, M. F. Hintz, and C. W. Schmid, Mol. Cell. Biol. 10:5424-5432, 1990)..."
+    whyMissed: "Standard cell line name mentioned in experimental context but not caught by mining patterns"
+    confidence: 0.95  # Very high confidence - HeLa is a well-known cell line
+    shouldBeAdded: Yes
+
+  - toolName: "frog oocytes"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...An Alu SINE which recently transposed into the neurofibromatosis 1 locus was expressed in microinjected frog oocytes..."
+    whyMissed: "Animal model system mentioned in experimental context but not caught by mining patterns"
+    confidence: 0.90  # High confidence - commonly used model system for expression studies
+    shouldBeAdded: Yes
+
+  - toolName: "HeLa nuclear extract"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...3' processing of a synthetic -300-nt Alu RNA by HeLa nuclear extract in vitro also produced scAlu RNA..."
+    whyMissed: "Biochemical reagent (nuclear extract) used in in vitro assays but not caught by mining patterns"
+    confidence: 0.85  # High confidence - nuclear extracts are standard molecular biology reagents
+    shouldBeAdded: Yes
+
+  - toolName: "synthetic -300-nt Alu RNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...3' processing of a synthetic -300-nt Alu RNA by HeLa nuclear extract in vitro also produced scAlu RNA..."
+    whyMissed: "Synthetic RNA construct used in experiments but not caught by mining patterns"
+    confidence: 0.80  # Good confidence - synthetic RNAs are research reagents
+    shouldBeAdded: Yes
+
+  - toolName: "Rodent x human somatic cell hybrids"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Rodent x human somatic cell hybrids express Alu RNAs whose size, heterogeneous length, and chromosomal distribution indicate their derivation from SINEs..."
+    whyMissed: "Specialized cell line system mentioned in experimental context but not caught by mining patterns"
+    confidence: 0.85  # High confidence - somatic cell hybrids are established research tools
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "HeLa cells?"
+    toolType: "cell_line"
+    examples: ["HeLa cells"]
+    reasoning: "HeLa is one of the most commonly used cell lines in molecular biology research and should be reliably detected"
+
+  - patternType: "context_phrase"
+    pattern: "(microinjected|injected into) (frog|Xenopus) oocytes"
+    toolType: "animal_model"
+    examples: ["microinjected frog oocytes"]
+    reasoning: "Frog/Xenopus oocytes are commonly used for expression studies and microinjection experiments"
+
+  - patternType: "term"
+    pattern: "(nuclear extract|cell extract|cytoplasmic extract)"
+    toolType: "genetic_reagent"
+    examples: ["HeLa nuclear extract"]
+    reasoning: "Cell extracts are standard biochemical reagents used in in vitro assays"
+
+  - patternType: "context_phrase"
+    pattern: "synthetic.*RNA"
+    toolType: "genetic_reagent"
+    examples: ["synthetic -300-nt Alu RNA"]
+    reasoning: "Synthetic RNAs are commonly used research reagents in molecular biology"
+
+  - patternType: "term"
+    pattern: "(somatic cell hybrids?|cell hybrids?)"
+    toolType: "cell_line"
+    examples: ["Rodent x human somatic cell hybrids"]
+    reasoning: "Somatic cell hybrids are specialized cell lines used for genetic mapping and expression studies"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ x [A-Z][a-z]+ (somatic )?cell hybrids?"
+    toolType: "cell_line"
+    examples: ["Rodent x human somatic cell hybrids"]
+    reasoning: "Standard naming convention for interspecies somatic cell hybrids"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of experimental research
+    - Only abstract text available - Methods section would likely contain more detailed tool information
+    - Multiple research tools mentioned in abstract were missed by mining algorithms
+    - This represents a significant false negative case where legitimate research tools were not detected
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded multiple research tools but mining found none
+    - At least 5 legitimate research tools were identified in the abstract alone
+    - The mining patterns need improvement to catch standard molecular biology tools
+    - HeLa cells, frog oocytes, nuclear extracts, synthetic RNAs, and somatic cell hybrids are all legitimate research tools
+    - Suggested patterns should be implemented to improve future mining accuracy
+    - This case highlights the importance of having comprehensive patterns for basic molecular biology tools
+    - Full text access would likely reveal additional tools in the Methods section

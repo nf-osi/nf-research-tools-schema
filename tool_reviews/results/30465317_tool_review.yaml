@@ -1,0 +1,191 @@
+publicationMetadata:
+  pmid: "30465317"
+  title: "Pain, skin sensations symptoms, and cognitive functioning predictors of health-related quality of life in pediatric patients with Neurofibromatosis Type 1"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical study examining health-related quality of life in pediatric patients with NF1.
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY
+    - Computational tools for statistical analysis - SECONDARY
+    
+    The study administered standardized questionnaires to patients and parents to assess HRQoL,
+    behavioral and emotional functioning. This type of clinical research typically uses validated
+    clinical assessment instruments rather than laboratory research tools.
+  overallAssessment: |
+    This clinical study would be expected to use validated clinical assessment tools (questionnaires,
+    scales) to measure patient-reported outcomes. The study design involves administering standardized
+    measures to children and parents, which is typical for HRQoL research. Clinical assessment tools
+    are legitimate research instruments even without traditional laboratory methods sections.
+
+toolValidations: []  # No tools were mined, but several should have been identified
+
+potentiallyMissedTools:
+  - toolName: "PedsQL™ Neurofibromatosis Type 1 Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Pain, Skin Itch Bother, Skin Sensations, and Cognitive Functioning Scales from the PedsQL™ Neurofibromatosis Type 1 Module and the PedsQL™ Generic Core Scales were completed in a multi-site national study by 323 patients and 335 parents."
+    whyMissed: "Disease-specific quality of life assessment tool with trademark symbol may not have been recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL™ Generic Core Scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Pain, Skin Itch Bother, Skin Sensations, and Cognitive Functioning Scales from the PedsQL™ Neurofibromatosis Type 1 Module and the PedsQL™ Generic Core Scales were completed in a multi-site national study by 323 patients and 335 parents."
+    whyMissed: "Generic quality of life assessment tool with trademark symbol may not have been recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BASC-2-SRP"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Within the BASC-2-SRP subscales, the highest percentage of children falling in the AR and CS range was for Attention Problems (43%) and Sense of Inadequacy (11%), respectively"
+    whyMissed: "Abbreviated form of Behavioral Assessment System for Children, Second Edition - Self-Report may not have been recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "BASC-2-PRS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "For BASC-2-PRS subscales, the highest percentage of children falling in the AR range was for Attention Problems (31%) and Functional Communication (31%)."
+    whyMissed: "Abbreviated form of Behavioral Assessment System for Children, Second Edition - Parent Rating Scale may not have been recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Pediatric Quality of Life Inventory"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "PedsQL = Pediatric Quality of Life Inventory"
+    whyMissed: "Full name of PedsQL mentioned in table abbreviations may not have been captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL™?"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL™ Neurofibromatosis Type 1 Module", "PedsQL™ Generic Core Scales"]
+    reasoning: "PedsQL is a widely used pediatric quality of life assessment tool, often with trademark symbol"
+
+  - patternType: "term"
+    pattern: "BASC-2-(SRP|PRS)"
+    toolType: "clinical_assessment_tool"
+    examples: ["BASC-2-SRP", "BASC-2-PRS"]
+    reasoning: "Behavioral Assessment System for Children abbreviated forms are commonly used clinical assessment tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{3,}-\\d+(-[A-Z]{2,3})?\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["BASC-2-SRP", "BASC-2-PRS"]
+    reasoning: "Many clinical assessment tools use abbreviated naming with numbers and sub-scales"
+
+  - patternType: "context_phrase"
+    pattern: "(completed|administered|assessed using|measured with).*?(questionnaire|scale|inventory|assessment)"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed standardized measures", "assessed using questionnaires"]
+    reasoning: "Context phrases indicating administration of clinical assessment instruments"
+
+  - patternType: "term"
+    pattern: "Pediatric Quality of Life Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pediatric Quality of Life Inventory"]
+    reasoning: "Full name of PedsQL should be captured as it's a validated clinical assessment tool"
+
+observations:
+  - resourceName: "PedsQL™ Neurofibromatosis Type 1 Module"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PedsQL™ NF1 Module includes specific scales for Pain, Skin Itch Bother, Skin Sensations, 
+      and Cognitive Functioning. These scales were completed by 323 patients and 335 parents in a 
+      multi-site national study. The tool demonstrated acceptable internal consistency with 
+      Cronbach's alphas ranging from 0.631 to 0.875 for self-report and 0.755 to 0.894 for 
+      parent-proxy reports.
+    foundIn: "results"
+    contextSnippet: "All PedsQL scales in the present study demonstrated acceptable internal consistency, with Cronbach's alphas ranging from 0.631 (School Functioning) to 0.875 (Total Score) for self-report and from 0.755 (School Functioning) to 0.894 (Total Score) for parent proxy report."
+    confidence: 0.95
+    doi: "10.1007/s11136-018-2055-5"
+
+  - resourceName: "PedsQL™ Generic Core Scales"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The PedsQL™ Generic Core Scales were used to assess overall health-related quality of life.
+      Parent-child agreement ranged from poor to moderate reliability across domains: Total Score 
+      (ICC: 0.36), Physical Health (ICC: 0.38), Psychosocial Health (ICC: 0.34), Emotional 
+      Functioning (ICC: 0.25), Social Functioning (ICC: 0.41), and School Functioning (ICC: 0.36).
+    foundIn: "results"
+    contextSnippet: "The level of parent-child agreement ranged from poor to moderate reliability for the Total Score (ICC: 0.36, 95% CI 0.21 to 0.50), Physical Health (ICC: 0.38, 95% CI 0.23 to 0.52), Psychosocial Health (ICC: 0.34, 95% CI 0.18 to 0.48)"
+    confidence: 0.90
+    doi: "10.1007/s11136-018-2055-5"
+
+  - resourceName: "BASC-2-SRP"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The BASC-2 Self-Report Profile showed that 43% of children fell in the at-risk range for 
+      Attention Problems, and 11% fell in the clinically significant range for Sense of Inadequacy. 
+      Social Stress and Attention Problems were significant predictors of psychosocial HRQoL, 
+      accounting for 59% of the variance in scores, with Social Stress being the strongest predictor.
+    foundIn: "results"
+    contextSnippet: "BASC-2-SRP Attention Problems and Social Stress subscales were significant predictors of PedsQL Psychosocial Health self-report, accounting for 59% of the variance in scores"
+    confidence: 0.95
+    doi: "10.1007/s11136-018-2055-5"
+
+  - resourceName: "BASC-2-PRS"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The BASC-2 Parent Rating Scale showed that 31% of children fell in the at-risk range for 
+      both Attention Problems and Functional Communication. 23% fell in the clinically significant 
+      range for Activities of Daily Living. Depression and ADL were significant predictors of 
+      parent-proxy psychosocial HRQoL, accounting for 55% of the variance, with Depression being 
+      the strongest predictor.
+    foundIn: "results"
+    contextSnippet: "BASC-2-PRS Depression and ADL were significant predictors of PedsQL Psychosocial Health parent-proxy report scores, accounting for 55% of the variance in scores"
+    confidence: 0.95
+    doi: "10.1007/s11136-018-2055-5"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 4
+  majorIssuesFound: |
+    - Mining completely failed to identify any clinical assessment tools despite this being a clinical study
+    - Multiple validated clinical assessment instruments were used but not detected
+    - PedsQL tools with trademark symbols were missed
+    - BASC-2 abbreviated forms were not recognized
+    - No computational tools for statistical analysis were identified despite extensive statistical methods
+  recommendations: |
+    This publication should have identified 4-5 clinical assessment tools that were completely missed by mining:
+    - PedsQL™ Neurofibromatosis Type 1 Module (disease-specific QoL tool)
+    - PedsQL™ Generic Core Scales (generic QoL tool)
+    - BASC-2-SRP (behavioral assessment - self-report)
+    - BASC-2-PRS (behavioral assessment - parent-report)
+    - Pediatric Quality of Life Inventory (full name of PedsQL)
+    
+    All of these are legitimate, validated clinical assessment tools used in this study.
+    The mining patterns need significant improvement for clinical assessment tools, particularly:
+    - Recognition of trademark symbols (™)
+    - Abbreviated clinical tool names (BASC-2-SRP/PRS)
+    - Context phrases indicating tool administration
+    - Full names of commonly abbreviated tools
+    
+    Statistical software used for analysis may also have been missed but would require more detailed methods review.
+    
+    The observations extracted show these tools have good psychometric properties and clinical utility
+    for assessing HRQoL and behavioral functioning in pediatric NF1 populations.

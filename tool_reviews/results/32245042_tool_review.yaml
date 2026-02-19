@@ -1,0 +1,322 @@
+publicationMetadata:
+  pmid: "32245042"
+  title: "Kinome Profiling of NF1-Related MPNSTs in Response to Kinase Inhibition and Doxorubicin Reveals Therapeutic Vulnerabilities."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is a comprehensive laboratory research study investigating kinome profiling in NF1-related 
+    malignant peripheral nerve sheath tumors (MPNSTs). The study uses genetically engineered mouse models, 
+    xenograft systems, reverse phase protein arrays (RPPA), and computational analysis tools. Expected tools 
+    include animal models, antibodies for RPPA, computational tools for data analysis, and potentially 
+    patient-derived xenograft models.
+  overallAssessment: |
+    This is a sophisticated laboratory research study that extensively uses research tools across multiple categories.
+    The study employs genetically engineered mouse models, xenograft systems, proteomic analysis platforms, and 
+    computational tools for data analysis. The comprehensive Methods section describes detailed experimental 
+    procedures that clearly indicate the use of multiple research tools. Tools are expected and likely present 
+    across animal models, antibodies, computational tools, and potentially patient-derived models.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF1-MET mouse model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...we developed diverse preclinical NF1-related MPNST models, including an "MET-addicted" model of NF1-related MPNSTs (NF1-MET)..."
+    whyMissed: "Specific genetically engineered mouse model name not caught by standard patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-P53 mouse model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...an Nf1/Trp53-deficient model (NF1-P53)..."
+    whyMissed: "Specific genetically engineered mouse model name not caught by standard patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 mouse model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...and an NF1 model (P53 WT, Hgf-amplified)..."
+    whyMissed: "Specific genetically engineered mouse model name not caught by standard patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NSG-SCID mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...15–25 mg portions of each tumor were transplanted into the flank of NSG-SCID mice using a 10 gauge trochar..."
+    whyMissed: "Standard immunodeficient mouse strain name not caught by patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "R v3.2.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...All analyses were conducted using R v3.2.2 (https://cran.r-project.org/), with an assumed level of significance of α = 0.05..."
+    whyMissed: "Software with version number not caught by computational tool patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "R v3.6.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Plots were generated using R v3.6.1..."
+    whyMissed: "Software with version number not caught by computational tool patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "R v3.6.2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...All analyses were done using R (v3.6.2)..."
+    whyMissed: "Software with version number not caught by computational tool patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "ggplot2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...data were fit by stat_smooth using loess with span = 1 using ggplot2 (v3.2.1)..."
+    whyMissed: "R package name with version not caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MicroVigene software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Acquired images were analysed using the MicroVigene software version 5.1 (Vigene Tech, Carlisle, MA, USA)..."
+    whyMissed: "Specialized analysis software not caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Pixcell II LCM system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...an average of 15,000 tumor cells was isolated from the surrounding microenvironment using a Pixcell II LCM system (Arcturus, Mountain View, CA, USA)..."
+    whyMissed: "Laser capture microdissection system not caught by computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Aushon 2470 arrayer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Using an Aushon 2470 arrayer (Aushon BioSystems, Billerica, MA, USA) equipped with 185 μm pins..."
+    whyMissed: "Specialized laboratory equipment/instrument not caught by patterns"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "PowerScanner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Antibody and Sypro Ruby-stained arrays were scanned using a laser-based PowerScanner (TECAN, Mönnedorf, Switzerland)..."
+    whyMissed: "Specialized scanning equipment not caught by computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "RPPA antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Arrays were probed with a total of 99 antibodies targeting protein kinases involved in major cellular functions..."
+    whyMissed: "Generic reference to antibody panel rather than specific antibody names"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "NF1-[A-Z0-9]+ (mouse )?model"
+    toolType: "animal_model"
+    examples: ["NF1-MET mouse model", "NF1-P53 model", "NF1 model"]
+    reasoning: "Genetically engineered mouse models often follow naming conventions with gene-phenotype combinations"
+
+  - patternType: "naming_convention"
+    pattern: "NSG-SCID|NOD-SCID|SCID"
+    toolType: "animal_model"
+    examples: ["NSG-SCID mice"]
+    reasoning: "Standard immunodeficient mouse strain names used for xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "using R v[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["using R v3.2.2", "using R v3.6.1", "using R (v3.6.2)"]
+    reasoning: "R software versions are commonly specified in methods sections but may not be caught by generic software patterns"
+
+  - patternType: "context_phrase"
+    pattern: "using ggplot2|with ggplot2"
+    toolType: "computational_tool"
+    examples: ["using ggplot2 (v3.2.1)"]
+    reasoning: "Popular R packages for data visualization often mentioned in analysis methods"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z\\s]+,\\s[A-Za-z\\s]+,\\s[A-Z]{2,3},\\sUSA\\)"
+    toolType: "general"
+    examples: ["(Vigene Tech, Carlisle, MA, USA)", "(Arcturus, Mountain View, CA, USA)"]
+    reasoning: "Vendor information in parentheses often indicates specialized equipment or software tools"
+
+  - patternType: "term"
+    pattern: "LCM system|laser capture microdissection"
+    toolType: "computational_tool"
+    examples: ["Pixcell II LCM system"]
+    reasoning: "Laser capture microdissection systems are specialized research instruments"
+
+  - patternType: "context_phrase"
+    pattern: "analysed using|analyzed using|scanned using"
+    toolType: "computational_tool"
+    examples: ["analysed using the MicroVigene software", "scanned using a laser-based PowerScanner"]
+    reasoning: "Analysis and scanning context phrases often indicate computational tools or specialized equipment"
+
+observations:
+  - resourceName: "NF1-MET mouse model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NF1-MET tumors were uniformly sensitive to MET inhibition with capmatinib, showing significant growth 
+      inhibition and tumor regression. After 21 days of capmatinib treatment, significant tumor death was 
+      observed with only a small layer of viable cells present at the edge of the tumors. These tumors are 
+      described as "MET-addicted" and showed the most homogeneous response to treatment compared to other models.
+    foundIn: "results"
+    contextSnippet: "...NF1-MET MPNSTs were uniformly sensitive to MET inhibition, whereas a heterogeneous response to MET inhibition was observed in NF1-P53 and NF1 MPNSTs...After 21 days of capmatinib treatment, significant tumor death was observed in the NF1-MET tumors..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "NF1-P53 mouse model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NF1-P53 tumors showed heterogeneous response to MET inhibition and were more resistant to treatment. 
+      After 21 days of treatment, 90% of NF1-P53 tumors had increasing growth trends despite ongoing treatment. 
+      These tumors had the most aggressive growth, highest response heterogeneity, and least impressive response 
+      to single-agent treatment. P53 deficiency significantly exacerbated resistance to MEK inhibition.
+    foundIn: "results"
+    contextSnippet: "...a heterogeneous response to MET inhibition was observed in NF1-P53 and NF1 MPNSTs...after 21 days of treatment, 90% of NF1-P53 tumors had increasing growth trends...P53 deficiency significantly exacerbates resistance to MEK inhibition..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "NF1 mouse model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      NF1 tumors (P53 WT, HGF-amplified) showed intermediate response to treatments. The most uniform tumor 
+      inhibition was observed in the NF1 MPNST tumors in response to MEK inhibition with trametinib. 
+      NF1 tumor growth was significantly slower than controls when treated with doxorubicin; however, 
+      no tumors ultimately responded to treatment.
+    foundIn: "results"
+    contextSnippet: "...The most uniform tumor inhibition was observed in the NF1 MPNST tumors, whereas some NF1-P53 tumors still displayed aggressive growth after 21 days...NF1 tumor growth was significantly slower than controls; however, no tumors ultimately responded to treatment..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "NSG-SCID mice"
+    resourceType: "Animal Model"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NSG-SCID mice were used as xenograft hosts for tumor transplantation. Tumors were transplanted into 
+      the flank using a 10 gauge trochar. Mice were randomized into treatment groups when tumor volume 
+      reached approximately 150 mm³, and were euthanized when tumor size exceeded 2500 mm³. This strain 
+      is suitable for xenograft studies due to immunodeficiency.
+    foundIn: "methods"
+    contextSnippet: "...15–25 mg portions of each tumor were transplanted into the flank of NSG-SCID mice using a 10 gauge trochar. Tumors were measured twice weekly and euthanized when the tumor size exceeded 2500 mm³..."
+    confidence: 0.90
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "R v3.2.2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R version 3.2.2 was used for tumor growth analysis using linear mixed-effects models with random 
+      slopes and intercepts, and false discovery rate-adjusted contrasts to estimate and compare tumor 
+      growth rates for different mono and combo therapies. Analysis was conducted with an assumed level 
+      of significance of α = 0.05.
+    foundIn: "methods"
+    contextSnippet: "...Linear mixed-effects models, with random slopes and intercepts, and false discovery rate-adjusted contrasts, were used to estimate and compare tumor growth rates...All analyses were conducted using R v3.2.2 (https://cran.r-project.org/), with an assumed level of significance of α = 0.05..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "R v3.6.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R version 3.6.1 was used for generating plots in the proteomic analysis. Specifically used for 
+      creating balloon plots showing fold change in protein expression, with proteins rank-ordered 
+      by median transformed fold change for each treatment-genotype-time group.
+    foundIn: "methods"
+    contextSnippet: "...Head-tail balloon-maps were created by plotting the 30 proteins with the highest and lowest fold change in expression for each treatment-genotype-time group. Plots were generated using R v3.6.1..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "ggplot2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ggplot2 package (version 3.2.1) was used for correlation analysis and plotting. Data were fitted 
+      using stat_smooth with loess smoothing (span = 1) for phospho-AXL and phospho-NFκB correlation 
+      analysis. This package was essential for generating correlation plots in the study.
+    foundIn: "methods"
+    contextSnippet: "...For correlation plots, data were fit by stat_smooth using loess with span = 1 using ggplot2 (v3.2.1)..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+  - resourceName: "MicroVigene software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MicroVigene software version 5.1 (Vigene Tech) was used for analyzing acquired RPPA images. 
+      This commercially available software performs spot finding, averages the triplicates, subtracts 
+      the background from negative control slides, and normalizes each sample to the corresponding 
+      amount of total protein measured by Sypro Ruby staining.
+    foundIn: "methods"
+    contextSnippet: "...Acquired images were analysed using the MicroVigene software version 5.1 (Vigene Tech, Carlisle, MA, USA). This commercially available software performs spot finding, averages the triplicates, subtracts the background from the negative control slide(s), and normalizes each sample..."
+    confidence: 0.95
+    doi: "10.3390/genes11030331"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 7
+  observationsExtracted: 8
+  observationsByType:
+    Tumor Growth: 3
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - Multiple genetically engineered mouse models were completely missed (NF1-MET, NF1-P53, NF1, NSG-SCID)
+    - Computational tools including R software versions and specialized analysis software were not detected
+    - The mining system failed to identify any of the 99 antibodies used in RPPA analysis
+    - Specialized laboratory equipment and analysis platforms were not captured
+  recommendations: |
+    This publication represents a significant failure of the mining system to detect research tools in a 
+    tool-rich laboratory study. All 13 potentially missed tools should be added to improve coverage:
+    
+    CRITICAL ADDITIONS NEEDED:
+    - All four animal models (NF1-MET, NF1-P53, NF1, NSG-SCID mice) - these are core research tools
+    - All computational tools (R versions, ggplot2, MicroVigene, Pixcell II LCM) - essential for analysis
+    - Consider adding patterns for RPPA antibody panels and specialized laboratory equipment
+    
+    PATTERN IMPROVEMENTS:
+    - Add patterns for genetically engineered mouse model naming conventions
+    - Improve detection of software versions (R v3.x.x format)
+    - Add patterns for R package names and specialized analysis software
+    - Include vendor information patterns to catch specialized equipment
+    
+    OBSERVATIONS:
+    - Extracted 8 high-quality observations covering tumor growth characteristics and tool usage instructions
+    - Observations provide valuable phenotypic data for the animal models and usage guidance for computational tools
+    
+    This publication demonstrates the need for more comprehensive mining patterns, especially for animal models 
+    and computational tools commonly used in cancer research.

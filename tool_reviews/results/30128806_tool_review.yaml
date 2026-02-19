@@ -1,0 +1,199 @@
+publicationMetadata:
+  pmid: "30128806"
+  title: "Probing the chemical-biological relationship space with the Drug Target Explorer."
+  queryType: "unknown"  # No queryType provided in input
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics tool development paper describing the creation of the "Drug Target Explorer" 
+    web application. Expected tool types:
+    - Computational tools: The Drug Target Explorer itself, plus underlying software/databases used in development
+    - Potentially other bioinformatics tools mentioned for comparison or integration
+    
+    The paper focuses on software development rather than wet lab research, so lab tools (antibodies, 
+    cell lines, animal models) are unlikely. Clinical assessment tools are also unlikely as this is 
+    a computational methods paper.
+  overallAssessment: |
+    This publication describes the development of a computational tool (Drug Target Explorer) for exploring 
+    drug-target relationships and chemical similarity. As a bioinformatics methods paper, it should contain 
+    computational tools including the main tool being developed and potentially other software tools used 
+    in the development process or for comparison. The absence of a Methods section is typical for tool 
+    development papers where implementation details are often integrated into Results.
+
+toolValidations: []
+  # No tools were mined from this publication, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "Drug Target Explorer"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "To address these challenges, we developed the Drug-Target Explorer. This tool allows users to query molecules within a database of experimentally-derived and curated compound-target interactions"
+    whyMissed: "This is the main computational tool being developed and described in the paper - should have been captured as the primary research output"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "discussion"
+    contextSnippet: "Programming language: R"
+    whyMissed: "Programming language used for tool development - mentioned in requirements section"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "DGIdb"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "DGIdb, DT-Web, BindingDB, Probes and Drugs, CarlsbadOne, Polypharmacology Browser, STITCH, and SuperTarget allow users to identify MoAs/targets of a given compound"
+    whyMissed: "Existing computational tool mentioned for comparison - represents established bioinformatics resource"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "BindingDB"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "DT-Web, BindingDB, Polypharmacology Browser, and STITCH allow users to search by chemical similarity using any query molecule"
+    whyMissed: "Database/tool mentioned for comparison and as data source"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "STITCH"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "STITCH, SuperTarget, and Probes and Drugs, provide the ability to summarize these targets into biological pathways/mechanisms using a gene list enrichment approach"
+    whyMissed: "Computational tool mentioned for comparison of functionality"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "ChEMBL"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "with pChEMBL values >6–8" and "mean pChEMBL = 7.79"
+    whyMissed: "Database referenced through pChEMBL values - ChEMBL is a major chemical database used as data source"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CCLE"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "compare query molecules to cancer cell line screening datasets. Specifically, the app identifies the most similar molecule (Tanimoto similarity) available in these datasets and uses that molecule as a reference to calculate the Spearman correlation of drug response across all drugs within the dataset. For example, a search for ABT-737, a BCL family inhibitor, (Fig. 5 a) tests the Spearman correlation of AUCs in all cell lines treated with ABT-737 to the AUCs across all cell lines for all other drugs in the CCLE dataset"
+    whyMissed: "Cancer Cell Line Encyclopedia (CCLE) dataset used for drug response comparisons"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "GDSC"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "compare the query molecule to drugs in the Cancer Cell Line/CTRP and GDSC/Sanger cell line screening datasets"
+    whyMissed: "Genomics of Drug Sensitivity in Cancer (GDSC) database used for drug screening data"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "we developed the [TOOL_NAME]"
+    toolType: "computational_tool"
+    examples: ["we developed the Drug-Target Explorer"]
+    reasoning: "This phrase pattern reliably indicates tool development and should capture newly created computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "Programming language: [TOOL_NAME]"
+    toolType: "computational_tool"
+    examples: ["Programming language: R"]
+    reasoning: "Technical specifications sections often list programming languages used - these are legitimate computational tools"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z][a-zA-Z]+ values?"
+    toolType: "computational_tool"
+    examples: ["pChEMBL values"]
+    reasoning: "References to pChEMBL, pIC50, pKi values indicate usage of chemical databases like ChEMBL"
+
+  - patternType: "context_phrase"
+    pattern: "dataset|database.*screening"
+    toolType: "computational_tool"
+    examples: ["CCLE dataset", "GDSC/Sanger cell line screening datasets"]
+    reasoning: "Screening datasets and databases are computational resources that should be captured"
+
+  - patternType: "term"
+    pattern: "CCLE|GDSC|ChEMBL|BindingDB|STITCH|DGIdb"
+    toolType: "computational_tool"
+    examples: ["CCLE dataset", "GDSC/Sanger", "pChEMBL values", "BindingDB", "STITCH", "DGIdb"]
+    reasoning: "These are well-known bioinformatics databases and tools that are frequently referenced in drug discovery papers"
+
+observations:
+  - resourceName: "Drug Target Explorer"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Drug Target Explorer enables users to: (1) look up targets for individual molecules and groups of molecules, 
+      (2) explore networks of targets and drugs, (3) perform gene list enrichment of targets to assess target pathways 
+      of compounds, (4) compare query molecules to cancer cell line screening datasets, and (5) discover bioactive 
+      molecules using a query target and exploration of these networks. The tool is designed for biologists and chemists 
+      involved in drug discovery for hypothesis generation of human targets for novel molecules, identifying off-targets 
+      for bioactive small molecules, and exploring polypharmacology.
+    foundIn: "results"
+    contextSnippet: "The Drug Target Explorer was designed to facilitate the following use-cases: hypothesis generation of targets for newly-discovered molecules, identification of off-targets for existing bioactive research molecules, and exploration of polypharmacology, and identification of molecules for known targets"
+    confidence: 1.0
+    doi: "10.1186/s13321-018-0297-4"
+
+  - resourceName: "Drug Target Explorer"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The tool addresses several gaps in existing drug-target exploration tools: it is open-source, allows queries 
+      for molecules affecting multiple targets, enables exploration of chemical space for novel molecules not in 
+      database, provides drug-target network visualization, performs gene list enrichment, and allows comparison 
+      to publicly available high-throughput screening datasets. Contains 280k chemical compounds and 3.6k targets 
+      with both quantitative and qualitative interaction data.
+    foundIn: "introduction"
+    contextSnippet: "To address these gaps, we developed the Drug–Target Explorer. Specifically, the Drug–Target Explorer enables the user to [1] look up targets for individual molecules and groups of molecules, [2] explore networks of targets and drugs, [3] perform gene list enrichment of targets to assess target pathways of compounds, [4] compare query molecules to cancer cell line screening datasets, and [5] discover bioactive molecules using a query target"
+    confidence: 0.9
+    doi: "10.1186/s13321-018-0297-4"
+
+  - resourceName: "Drug Target Explorer"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Technical requirements: Platform independent, requires Chrome/Safari/Firefox browser, programmed in R, 
+      available under Apache 2.0 license. Project home page: http://www.synapse.org/dtexplorer. Future 
+      enhancements planned include locality sensitive hashing for faster similarity calculations, bulk annotation 
+      features for HTS data, and predictive frameworks for target identification.
+    foundIn: "discussion"
+    contextSnippet: "Project name: Drug–Target Explorer Project home page: http://www.synapse.org/dtexplorer Operating system(s): Platform independent Programming language: R Other requirements: Chrome, Safari, or Firefox License: Apache 2.0"
+    confidence: 1.0
+    doi: "10.1186/s13321-018-0297-4"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a clear bioinformatics tool development paper
+    - The main research output (Drug Target Explorer) was completely missed
+    - Several important computational tools and databases mentioned were not captured
+    - Mining patterns appear inadequate for computational tool development papers
+  recommendations: |
+    This publication should have captured multiple computational tools, particularly the Drug Target Explorer 
+    which is the main research contribution. The mining system needs better patterns for:
+    1. Tool development papers that use phrases like "we developed the [TOOL]"
+    2. Programming languages mentioned in technical specifications
+    3. Well-known bioinformatics databases (ChEMBL, CCLE, GDSC, BindingDB, STITCH, DGIdb)
+    4. Database references through naming conventions (pChEMBL values indicating ChEMBL usage)
+    
+    The Drug Target Explorer should definitely be added as a validated computational tool. ChEMBL, CCLE, 
+    and GDSC should also be added as they are actively used in the analysis. The other tools (DGIdb, 
+    BindingDB, STITCH) are mentioned for comparison and could be added but with lower priority.
+    
+    Three usage-focused observations were extracted describing the tool's capabilities, technical requirements, 
+    and planned enhancements. These provide valuable context for researchers considering using this tool.

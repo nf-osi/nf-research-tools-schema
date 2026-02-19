@@ -1,0 +1,96 @@
+publicationMetadata:
+  pmid: "34415582"
+  title: "Notch signaling via Hey1 and Id2b regulates Müller glia's regenerative response to retinal injury"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving:
+    - Zebrafish animal models (injury experiments, genetic manipulations)
+    - Molecular biology techniques (gene expression, chromatin accessibility)
+    - Cell biology (Müller glia studies, progenitor cell analysis)
+    - Likely genetic reagents (for Notch pathway manipulation)
+    - Computational tools (for gene expression and chromatin analysis)
+    
+    The study involves experimental manipulation of signaling pathways, injury models, and 
+    molecular analysis - all typical of lab research requiring multiple tool types.
+  overallAssessment: |
+    This is a laboratory research study investigating zebrafish retinal regeneration mechanisms.
+    The experimental design involves injury models, genetic pathway manipulation, and molecular
+    analysis, which would typically require animal models, genetic reagents, and computational
+    tools for data analysis. However, only abstract text is available, limiting tool detection.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "zebrafish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Zebrafish Müller glia (MG) respond to retinal injury by suppressing Notch signaling and producing progenitors for retinal repair."
+    whyMissed: "Common animal model name not detected by mining patterns - may need specific zebrafish pattern"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "Müller glia"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Zebrafish Müller glia (MG) respond to retinal injury by suppressing Notch signaling"
+    whyMissed: "Primary cell type used in experiments - may be considered a cellular model rather than established cell line"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "zebrafish"
+    toolType: "animal_model"
+    examples: ["Zebrafish Müller glia (MG) respond to retinal injury"]
+    reasoning: "Zebrafish is a widely used model organism in developmental biology and regeneration research. Should be detected as animal model when used in experimental context."
+    
+  - patternType: "context_phrase"
+    pattern: "injury-response|regenerative response|retinal injury"
+    toolType: "animal_model"
+    examples: ["MG's regenerative response to retinal injury", "injury-response threshold"]
+    reasoning: "Context phrases indicating experimental injury models in animal research - could help identify animal model usage."
+    
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ glia|[A-Z][a-z]+ cells"
+    toolType: "cell_line"
+    examples: ["Müller glia"]
+    reasoning: "Pattern for specific cell types used in research - though may need refinement to distinguish primary cells from established cell lines."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear laboratory research content
+    - Only abstract text available - Methods section would likely contain many more tools
+    - Zebrafish animal model not detected despite being central to the study
+    - Missing detection of common model organism names
+    - Potential cellular models (Müller glia) not captured
+  recommendations: |
+    This publication represents a significant mining failure - a clear laboratory research study
+    with zero tools detected. Key recommendations:
+    
+    1. Add zebrafish as a recognized animal model term
+    2. Improve detection of model organism names in experimental contexts
+    3. Consider whether primary cell types (Müller glia) should be captured as cellular models
+    4. The study likely uses many genetic reagents, antibodies, and computational tools that
+       would be revealed in the full Methods section
+    5. This case highlights the importance of having full-text access for accurate tool mining
+    6. No observations could be extracted due to lack of Results/Discussion sections
+    
+    The mining patterns need significant improvement to catch basic model organism usage.
+    This publication should be flagged for manual review to understand what tools are
+    actually used in the experimental procedures.

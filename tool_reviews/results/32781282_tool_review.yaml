@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "32781282"
+  title: "Nf1 heterozygous mice recapitulate the anthropometric and metabolic features of human neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is clearly laboratory research using animal models. Based on the abstract, it describes
+    experimental work with Nf1+/- mice (animal model) and various analytical techniques (NMR, indirect
+    calorimetry, tolerance testing). The study compares wildtype and heterozygous mice across multiple
+    metabolic parameters, indicating controlled laboratory experiments.
+    
+    Expected tool types: Animal models (Nf1+/- mice, C57B/6J strain), potentially computational tools
+    for data analysis, and possibly antibodies/reagents for biochemical assays (though not mentioned
+    in abstract).
+  overallAssessment: |
+    This is a laboratory research study that should definitely contain research tools, particularly
+    animal models. The study uses Nf1+/- mice on C57B/6J background to model human NF1, employs
+    multiple experimental techniques, and reports quantitative metabolic and anthropometric data.
+    The absence of any mined tools suggests significant gaps in the mining patterns, especially
+    for animal model detection.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Nf1 heterozygous (Nf1+/-) mice accurately reflect the dominant inheritance of NF1 and are regularly employed as a model of NF1. Here, we sought to identify whether Nf1+/- mice recapitulate the anthropometric..."
+    whyMissed: "Animal model notation (Nf1+/-) not recognized by mining patterns. This is a standard genetic nomenclature for heterozygous knockout mice."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "C57B/6J mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Littermate 16-20 week-old male wildtype (WT) and Nf1+/- C57B/6J mice underwent nuclear magnetic resonance (NMR), indirect calorimetry..."
+    whyMissed: "Standard mouse strain nomenclature not captured. C57B/6J is a widely used inbred mouse strain."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "nuclear magnetic resonance (NMR)"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Littermate 16-20 week-old male wildtype (WT) and Nf1+/- C57B/6J mice underwent nuclear magnetic resonance (NMR), indirect calorimetry, and glucose/insulin/pyruvate tolerance testing..."
+    whyMissed: "Analytical technique/instrument not recognized. NMR is used for body composition analysis in metabolic studies."
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+  - toolName: "indirect calorimetry"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...underwent nuclear magnetic resonance (NMR), indirect calorimetry, and glucose/insulin/pyruvate tolerance testing..."
+    whyMissed: "Metabolic analysis technique not captured. This is a standard method for measuring energy expenditure and substrate utilization."
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+[+/-]+ mice|[A-Za-z0-9]+[+/-]+ mouse"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "p53+/- mice", "Apc+/- mouse"]
+    reasoning: "Standard genetic nomenclature for heterozygous knockout mice uses gene name followed by +/- notation. This pattern would catch many animal models that are currently missed."
+
+  - patternType: "naming_convention"
+    pattern: "C57B[L/]?6[J]?|BALB/c|129[S/]?[0-9]*|FVB|DBA/[0-9]+"
+    toolType: "animal_model"
+    examples: ["C57B/6J mice", "C57BL/6", "BALB/c", "129S6"]
+    reasoning: "Common inbred mouse strain nomenclature. These are fundamental research tools that should be captured."
+
+  - patternType: "context_phrase"
+    pattern: "mice underwent|mouse model|animal model|littermate.*mice"
+    toolType: "animal_model"
+    examples: ["mice underwent nuclear magnetic resonance", "littermate 16-20 week-old male wildtype (WT) and Nf1+/- C57B/6J mice"]
+    reasoning: "Context phrases that strongly indicate animal model usage in experimental procedures."
+
+  - patternType: "term"
+    pattern: "nuclear magnetic resonance \\(NMR\\)|indirect calorimetry"
+    toolType: "computational_tool"
+    examples: ["nuclear magnetic resonance (NMR)", "indirect calorimetry"]
+    reasoning: "Analytical techniques commonly used in metabolic research that involve computational analysis of data."
+
+  - patternType: "naming_convention"
+    pattern: "wildtype \\(WT\\)|wild-type|wild type"
+    toolType: "animal_model"
+    examples: ["wildtype (WT)", "wild-type controls"]
+    reasoning: "Control animal groups are essential research tools that should be captured alongside experimental strains."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Critical mining failure identified:
+    - Publication is clearly laboratory research using animal models but NO tools were mined
+    - Nf1+/- mice (primary experimental model) completely missed
+    - C57B/6J strain (standard research strain) not detected
+    - Standard genetic nomenclature (gene+/-) not recognized by patterns
+    - Mouse strain nomenclature patterns appear to be missing
+    - Analytical techniques (NMR, calorimetry) not captured
+    - This represents a major gap in animal model detection capabilities
+  recommendations: |
+    URGENT: Major overhaul of animal model mining patterns needed:
+    - Add genetic nomenclature patterns for knockout/heterozygous mice (gene+/-, gene-/-)
+    - Include standard mouse strain patterns (C57B/6J, BALB/c, 129, FVB, DBA)
+    - Add context phrases for animal experiments ("mice underwent", "littermate", "mouse model")
+    - Consider analytical techniques as computational tools when used for data analysis
+    - This publication should have yielded 2-4 validated tools but found zero
+    - Suggests systematic under-mining of animal model studies
+    - Recommend manual curator review of similar "bench" query publications with zero tools
+    - Test new patterns against this publication to verify they capture the missed tools

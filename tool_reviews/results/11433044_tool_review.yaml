@@ -1,0 +1,93 @@
+publicationMetadata:
+  pmid: "11433044"
+  title: "Quantification of splice variants using real-time PCR."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a methodological paper describing a novel real-time PCR approach for quantifying splice variants.
+    Expected tool types:
+    - Computational tools: Real-time PCR analysis software, quantification methods
+    - Genetic reagents: Plasmids used as standards, PCR primers
+    
+    The paper focuses on method development rather than disease research, using NF1 exon 37 skipping as a model system.
+    While only the abstract is available, methodological papers typically describe tools and reagents used in the protocol.
+  overallAssessment: |
+    This is a methodological paper describing a novel real-time PCR quantification approach, which would typically involve
+    computational tools for analysis and genetic reagents (plasmids, primers) for standards. The paper uses NF1 exon 37
+    skipping as a model system but focuses on method development rather than NF1 disease research. Despite lacking a
+    traditional Methods section, methodological papers often contain tool descriptions within the abstract and main text.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "real-time PCR"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "The many advantages of real-time PCR have made this technique attractive to study its application in quantification of splice isoforms. We use skipping of exon 37 in the NF1 gene as a model to compare and evaluate the different strategies for quantitating splice variants using real-time PCR."
+    whyMissed: "Real-time PCR is both a technique and involves computational analysis software for quantification, but may have been missed due to being considered a general laboratory method rather than a specific tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "plasmid containing both alternative transcripts"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We describe here a novel method for creating a reliable standard curve using one plasmid containing both alternative transcripts."
+    whyMissed: "This appears to be a custom-generated plasmid construct used as a standard, which qualifies as a genetic reagent, but may have been missed due to lack of specific naming or catalog information"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "boundary-spanning primer"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We propose the use of a boundary-spanning primer to quantify isoforms that differ greatly in abundance."
+    whyMissed: "This is a specific type of PCR primer designed for splice variant detection, which qualifies as a genetic reagent, but may have been missed due to being described as a general approach rather than a specific reagent"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "real-time PCR|qPCR|quantitative PCR"
+    toolType: "computational_tool"
+    examples: ["real-time PCR", "quantitative PCR analysis"]
+    reasoning: "Real-time PCR involves computational analysis software for quantification and should be captured when used as an analytical method, not just mentioned as a general technique"
+  
+  - patternType: "context_phrase"
+    pattern: "plasmid containing|plasmid with|construct containing"
+    toolType: "genetic_reagent"
+    examples: ["plasmid containing both alternative transcripts"]
+    reasoning: "Custom plasmid constructs used as experimental tools should be captured even when not given specific names or catalog numbers"
+  
+  - patternType: "term"
+    pattern: "boundary-spanning primer|junction primer|exon-spanning primer"
+    toolType: "genetic_reagent"
+    examples: ["boundary-spanning primer"]
+    reasoning: "Specialized primers designed for specific applications (splice variant detection, junction amplification) are genetic reagents that should be captured"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a methodological paper
+    - Only abstract text is available, limiting comprehensive tool detection
+    - The paper describes method development which typically involves computational tools and genetic reagents
+    - Real-time PCR analysis and custom plasmid standards were potentially missed
+  recommendations: |
+    This methodological paper likely contains tools that were missed during initial mining:
+    1. The custom plasmid construct used as a standard should be added as a genetic reagent
+    2. Real-time PCR could be considered a computational tool when used for quantitative analysis
+    3. Boundary-spanning primers represent specialized genetic reagents for splice variant detection
+    
+    The lack of full-text sections limits comprehensive analysis, but methodological papers often contain
+    tool descriptions even in abstracts. The suggested patterns could help capture similar tools in
+    future methodological publications. No observations could be extracted due to lack of Results/Discussion sections.

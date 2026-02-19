@@ -1,0 +1,175 @@
+publicationMetadata:
+  pmid: "34630515"
+  title: "Assessment of Mosaicism and Detection of Cryptic Alleles in CRISPR/Cas9-Engineered Neurofibromatosis Type 1 and TP53 Porcine Models"
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes the development and validation of genetically engineered porcine models for 
+    neurofibromatosis type 1 (NF1) using CRISPR/Cas9 technology. Expected tool types include:
+    - Animal models (genetically engineered pigs)
+    - Cell lines (for validation experiments)
+    - Genetic reagents (CRISPR components, gRNAs, Cas9)
+    - Computational tools (for CRISPR design, sequencing analysis)
+    
+    The publication focuses on methodological development and validation, making it highly likely to contain
+    multiple categories of research tools.
+  overallAssessment: |
+    This is a laboratory research publication describing the development of genetically engineered porcine 
+    models for NF1 research using CRISPR/Cas9 technology. The publication has a comprehensive Methods section
+    detailing experimental procedures, making it highly likely to contain research tools across multiple 
+    categories including animal models, cell lines, genetic reagents, and computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "LLC-PK1"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "In vitro design validation was performed using a porcine kidney epithelial cell line (LLC-PK1 ATCC CL-101™; American Type Culture Collection (ATCC), Manassas, VA)"
+    whyMissed: "Cell line with ATCC catalog number not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR design tool"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Target sites within the genes of interest were selected using Massachusetts Institute of Technology's CRISPR design tool (now unavailable, previously: crispr.mit.edu)"
+    whyMissed: "Web-based computational tool not detected, possibly due to being unavailable"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPOR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Target sites within the genes of interest were selected using Massachusetts Institute of Technology's CRISPR design tool (now unavailable, previously: crispr.mit.edu, ), or later, CRISPOR"
+    whyMissed: "CRISPR design software not detected by computational tool patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPResso"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing data were demultiplexed and analyzed using CRISPResso or CRISPResso2"
+    whyMissed: "Bioinformatics analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPResso2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing data were demultiplexed and analyzed using CRISPResso or CRISPResso2"
+    whyMissed: "Bioinformatics analysis software not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "JMP Pro"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Logistic regressions were performed in JMP (JMP Pro 15.0.0, SAS Institute Inc., Cary, NC)"
+    whyMissed: "Statistical analysis software with version number not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 porcine model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Our process for creating genetically engineered NF1 porcine models is summarized in Figure 1"
+    whyMissed: "Genetically engineered animal model not detected by animal model patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TP53 porcine model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The injection solution contained gRNAs, S. pyogenes Cas9 mRNA and single-stranded donors (when necessary) to create the NF1 or TP53 mutations"
+    whyMissed: "Genetically engineered animal model not detected by animal model patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cas9 mRNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The injection solution contained gRNAs, S. pyogenes Cas9 mRNA (PNA Bio Inc., Thousand Oaks, CA or Millipore Sigma, Burlington, MA)"
+    whyMissed: "CRISPR genetic reagent with vendor information not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "gRNAs"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "All gRNAs were synthesized through in vitro transcription. The injection solution contained gRNAs, S. pyogenes Cas9 mRNA"
+    whyMissed: "Guide RNAs as genetic reagents not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "LLC-PK1|ATCC CL-[0-9]+|ATCC [A-Z]+-[0-9]+"
+    toolType: "cell_line"
+    examples: ["LLC-PK1 ATCC CL-101™"]
+    reasoning: "ATCC catalog numbers are strong indicators of authenticated cell lines"
+
+  - patternType: "term"
+    pattern: "CRISPOR|CRISPResso2?|CRISPR design tool"
+    toolType: "computational_tool"
+    examples: ["CRISPOR", "CRISPResso", "CRISPResso2", "CRISPR design tool"]
+    reasoning: "CRISPR-related bioinformatics tools are commonly used in genome editing research"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|performed in|software|v[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["analyzed using CRISPResso", "performed in JMP (JMP Pro 15.0.0)"]
+    reasoning: "Version numbers and analysis context phrases strongly indicate computational tool usage"
+
+  - patternType: "term"
+    pattern: "porcine model|genetically engineered.*model|CRISPR.*model"
+    toolType: "animal_model"
+    examples: ["genetically engineered NF1 porcine models"]
+    reasoning: "Genetically engineered animal models are key research tools that should be captured"
+
+  - patternType: "term"
+    pattern: "gRNAs?|guide RNAs?|Cas9 mRNA|single-stranded donors?"
+    toolType: "genetic_reagent"
+    examples: ["gRNAs", "Cas9 mRNA", "single-stranded donors"]
+    reasoning: "CRISPR components are genetic reagents essential for genome editing experiments"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*Bio[^)]*\\)|\\([^)]*Sigma[^)]*\\)|\\([^)]*ATCC[^)]*\\)"
+    toolType: "general"
+    examples: ["(PNA Bio Inc., Thousand Oaks, CA)", "(ATCC, Manassas, VA)"]
+    reasoning: "Vendor information in parentheses often indicates commercial research reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a comprehensive laboratory research study
+    - The mining system completely failed to detect multiple categories of research tools
+    - Cell lines with ATCC catalog numbers were not detected
+    - Computational tools with version numbers were not detected
+    - Genetically engineered animal models were not detected
+    - CRISPR genetic reagents were not detected
+    - This represents a significant failure of the mining system for this publication type
+  recommendations: |
+    This publication should have yielded multiple research tools across several categories:
+    - All 10 potentially missed tools should be added to the database
+    - The mining patterns need significant improvement for CRISPR/genome editing publications
+    - Cell line detection patterns should include ATCC catalog numbers
+    - Computational tool patterns should better capture bioinformatics software
+    - Animal model patterns should detect genetically engineered models
+    - Genetic reagent patterns should capture CRISPR components
+    - The complete failure to mine any tools from this rich publication indicates systematic issues with the mining approach
+    - No observations were extracted as no tools were initially validated, but the missed tools could yield valuable observations about model development and validation

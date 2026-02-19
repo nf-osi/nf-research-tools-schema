@@ -1,0 +1,270 @@
+publicationMetadata:
+  pmid: "35673329"
+  title: "Neuroanatomical correlates of working memory performance in Neurofibromatosis 1."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical neuroimaging study examining brain structure-cognition relationships in NF1 patients.
+    Expected tool types:
+    - Clinical assessment tools: Working memory assessments, cognitive batteries, behavioral rating scales
+    - Computational tools: Neuroimaging analysis software, statistical packages
+    - Potentially advanced cellular models: None expected for this type of study
+    - Lab research tools: None expected for this neuroimaging study
+    
+    The study uses detailed cognitive assessments and neuroimaging analysis, so clinical assessment tools
+    and computational tools are highly expected.
+  overallAssessment: |
+    This clinical neuroimaging study would typically contain clinical assessment tools (cognitive tests, 
+    behavioral rating scales) and computational tools (neuroimaging analysis software). The study design
+    involves detailed cognitive assessments of working memory and brain imaging analysis, making these
+    tool types highly expected. No lab-based research tools would be expected for this type of study.
+
+toolValidations: []  # No tools were mined, so empty list
+
+potentiallyMissedTools:
+  - toolName: "n-back task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Verbal and visuospatial working memory was assessed using the n-back task. The task was programmed in-house using E-Prime software."
+    whyMissed: "This is a well-established cognitive assessment tool for working memory, but may have been missed due to hyphenated format or lack of specific clinical assessment patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "E-Prime software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The task was programmed in-house using E-Prime software."
+    whyMissed: "Software name may not have been recognized as a computational tool, lacks version number"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Corsi block task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Memory span was assessed using a computerized Corsi block task on the Psychology Experiment Building Language (PEBL)"
+    whyMissed: "Standard neuropsychological assessment tool, may have been missed due to lack of clinical assessment patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PEBL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "computerized Corsi block task on the Psychology Experiment Building Language (PEBL; Mueller and Piper 2014)"
+    whyMissed: "Psychology Experiment Building Language acronym may not have been recognized as software"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "WISC-IV"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Auditory working memory was assessed using the digit span forward and back task of the Wechslers Intelligence Scale for Children-Fourth edition (WISC-IV"
+    whyMissed: "Standard clinical assessment tool, may lack specific patterns for psychological test batteries"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Vineland Adaptive Behavior Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Parent-rated Vineland Adaptive Behavior Scale—third edition (Hill et al. 2017) was administered to the parents to assess child adaptive behavior"
+    whyMissed: "Clinical assessment scale, may lack patterns for parent-report measures"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Conners 3 rating scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Conners 3 rating scale(Conners et al. 2011) was used as a standardized measure for parent reported ADHD symptoms"
+    whyMissed: "ADHD rating scale, may lack patterns for behavioral rating scales"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SPM12"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were segmented using SPM12 v7771 (Wellcome Trust Centre for Neuroimaging, University College London, United Kingdom)"
+    whyMissed: "Neuroimaging analysis software with version number, should have been caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SPM12 v7771 (Wellcome Trust Centre for Neuroimaging, University College London, United Kingdom) through MATLAB vR2020b"
+    whyMissed: "Programming environment with version, should have been caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "DARTEL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We then used the diffeomorphic anatomical registration using exponentiated lie-algebra (DARTEL) registration method"
+    whyMissed: "Neuroimaging registration algorithm, may lack patterns for specific analysis methods"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MRIcroGL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "all thresholded SPM maps were imported into MRIcroGL (https://www.nitrc.org/projects/mricrogl)"
+    whyMissed: "Neuroimaging visualization software with URL, should have been caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "marsbar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We then used marsbar (Brett et al. 2002) to extract gray matter volumes within this region"
+    whyMissed: "SPM toolbox for region of interest analysis, may lack patterns for neuroimaging toolboxes"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "n-back task|N-back task|nback task"
+    toolType: "clinical_assessment_tool"
+    examples: ["n-back task"]
+    reasoning: "Standard working memory assessment tool, hyphenated format may not be caught by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "assessed using|administered to|measured with|completed.*task|rating scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed using the n-back task", "Conners 3 rating scale", "administered to the parents"]
+    reasoning: "Clinical assessment tools often use these administration/measurement phrases"
+
+  - patternType: "naming_convention"
+    pattern: "WISC-IV|WAIS-IV|Vineland.*Scale|Conners.*rating|PedsQL|SF-36"
+    toolType: "clinical_assessment_tool"
+    examples: ["WISC-IV", "Vineland Adaptive Behavior Scale", "Conners 3 rating scale"]
+    reasoning: "Standard psychological and clinical assessment instruments with established naming conventions"
+
+  - patternType: "term"
+    pattern: "SPM12|SPM8|FSL|AFNI|FreeSurfer|MATLAB|R v[0-9]|Python [0-9]"
+    toolType: "computational_tool"
+    examples: ["SPM12 v7771", "MATLAB vR2020b"]
+    reasoning: "Common neuroimaging and statistical software packages with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|implemented in|programmed.*using|segmented using"
+    toolType: "computational_tool"
+    examples: ["programmed in-house using E-Prime software", "segmented using SPM12"]
+    reasoning: "Computational tools often described with these usage phrases"
+
+  - patternType: "naming_convention"
+    pattern: "DARTEL|VBM|PCA|GLM|ANOVA|t-test"
+    toolType: "computational_tool"
+    examples: ["DARTEL registration method", "voxel-based morphometry approach", "principal component analysis"]
+    reasoning: "Statistical and neuroimaging analysis methods that represent computational approaches"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(.*\\.nitrc\\.org.*\\)|\\(.*github\\.com.*\\)|\\(.*mathworks\\.com.*\\)"
+    toolType: "computational_tool"
+    examples: ["(https://www.nitrc.org/projects/mricrogl)"]
+    reasoning: "URLs often indicate software repositories or vendor sites for computational tools"
+
+observations:
+  - resourceName: "n-back task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The n-back task was programmed in-house using E-Prime software. Participants completed verbal and 
+      visuospatial tasks at 4 levels of complexity (0-back, 1-back, 2-back, and 3-back tasks). For verbal 
+      tasks, random letters were presented and participants responded when the letter matched 1, 2, or 3 
+      letters before. For visuospatial tasks, blue squares were presented on a 2×2 grid and participants 
+      responded when position matched 1, 2, or 3 positions before. All stimuli presented for 500ms with 
+      1,500ms interstimulus interval. Accuracy calculated as proportion of correctly identified hits + 
+      correct omissions within each block.
+    foundIn: "methods"
+    contextSnippet: "Verbal and visuospatial working memory was assessed using the n-back task. The task was programmed in-house using E-Prime software. Each participant completed verbal and visuospatial tasks at 4 levels of complexity—0-back, 1-back, 2-back, and 3-back tasks."
+    confidence: 0.95
+    doi: "tgac021"
+
+  - resourceName: "Corsi block task"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Memory span was assessed using a computerized Corsi block task on PEBL. The task presents 9 identical 
+      blue blocks on screen that light up in sequence, starting with simple 2-block sequences and increasing 
+      in complexity based on participant performance. Participants repeat the observed sequence. A measure 
+      of memory span was computed from performance.
+    foundIn: "methods"
+    contextSnippet: "Memory span was assessed using a computerized Corsi block task on the Psychology Experiment Building Language (PEBL; Mueller and Piper 2014). In this task, 9 identical blue blocks are presented on the screen. These blocks light up on the screen in a sequence, which starts off as a simple sequence of 2 blocks and increases in complexity based on participant performance."
+    confidence: 0.9
+    doi: "tgac021"
+
+  - resourceName: "WISC-IV"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Auditory working memory was assessed using the digit span forward and backward tasks from the 
+      Wechsler Intelligence Scale for Children-Fourth edition (WISC-IV). This provides standardized 
+      assessment of auditory working memory capacity in the pediatric population.
+    foundIn: "methods"
+    contextSnippet: "Auditory working memory was assessed using the digit span forward and back task of the Wechslers Intelligence Scale for Children-Fourth edition (WISC-IV; Goldstein and Naglieri 2011)."
+    confidence: 0.9
+    doi: "tgac021"
+
+  - resourceName: "Vineland Adaptive Behavior Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The overall Vineland adaptive functioning score was 68 in the NF1 sample, well below the normative 
+      mean of 100, indicating significant adaptive behavior impairments. The scale was administered to 
+      parents to assess child adaptive behavior with overall functioning computed as standardized age 
+      equivalent and expressed as an adaptive behavior composite (ABC).
+    foundIn: "results"
+    contextSnippet: "The overall Vineland adaptive functioning score was 68, well below the normative mean of 100. Parent-rated Vineland Adaptive Behavior Scale—third edition (Hill et al. 2017) was administered to the parents to assess child adaptive behavior"
+    confidence: 0.95
+    doi: "tgac021"
+
+  - resourceName: "Conners 3 rating scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Parent-rated Conners-3 rating scale indicated significant impairments in the NF1 sample with T-scores 
+      of 78 on the inattention subscale and 69 on the hyperactivity subscale. The scale consists of 27 items 
+      each rated on a 4-point Likert scale (0 = not true at all to 3 = very much true) across 5 subscales: 
+      attention, hyperactivity, learning problems, oppositionality, and peer problems.
+    foundIn: "results"
+    contextSnippet: "Parent-rated Conners-3 rating scale indicated significant impairments with T-scores of 78 and 69 on the inattention and hyperactivity subscales respectively. It consists of 27 items each rated on a 4-point Likert scale (0 = not true at all to 3 = very much true) in 5 subscales"
+    confidence: 0.95
+    doi: "tgac021"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 2
+  majorIssuesFound: |
+    - No tools were mined from this publication despite containing multiple clinical assessment tools and computational tools
+    - The mining system appears to lack comprehensive patterns for clinical assessment tools (cognitive tests, rating scales)
+    - Neuroimaging analysis software and statistical packages were not detected
+    - This represents a significant gap in tool detection for clinical neuroimaging studies
+  recommendations: |
+    This publication should have 12 tools added to the database:
+    - 5 clinical assessment tools (n-back task, Corsi block task, WISC-IV, Vineland Scale, Conners scale)
+    - 7 computational tools (E-Prime, PEBL, SPM12, MATLAB, DARTEL, MRIcroGL, marsbar)
+    
+    The mining system needs significant improvement for clinical assessment tools and neuroimaging software.
+    New patterns should be added for:
+    - Cognitive assessment tasks and neuropsychological tests
+    - Parent/clinician rating scales and behavioral measures  
+    - Neuroimaging analysis software and statistical packages
+    - Software with version numbers and institutional affiliations
+    
+    This publication demonstrates that clinical studies contain substantial numbers of research tools that
+    are currently being missed by the mining system. The 5 observations extracted show these tools have
+    scientific value and usage details that should be captured.

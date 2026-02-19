@@ -1,0 +1,73 @@
+publicationMetadata:
+  pmid: "3118035"
+  title: "Further exclusion data for the Von Recklinghausen neurofibromatosis gene: a genetic linkage study of 19 polymorphic markers."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis - genetic linkage study):
+    - Computational tools (software, pipelines) - EXPECTED for linkage analysis
+    - Genetic reagents - POSSIBLE (polymorphic markers mentioned)
+    
+    This is a 1987 genetic linkage analysis study using computational methods to analyze
+    19 polymorphic markers across 15 neurofibromatosis families. While it lacks detailed
+    Methods sections typical of modern papers, it explicitly mentions using computer
+    software for analysis, making computational tools highly expected.
+  overallAssessment: |
+    This 1987 genetic linkage study would typically use computational tools for statistical
+    analysis of genetic markers. The abstract explicitly mentions "computer programme M-Link"
+    for linkage analysis, indicating computational tool usage. However, the publication lacks
+    detailed Methods sections typical of modern papers, making tool identification challenging.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "M-Link"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Linkage analysis on a panel of 15 Von Recklinghausen neurofibromatosis (VRNF) families with 19 polymorphic markers was carried out using the computer programme M-Link."
+    whyMissed: "This computational tool for genetic linkage analysis was explicitly mentioned but not captured by mining patterns. May need patterns for older software naming conventions."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "M-Link|MLINK"
+    toolType: "computational_tool"
+    examples: ["computer programme M-Link"]
+    reasoning: "M-Link is a well-known genetic linkage analysis software that should be captured. Pattern should include variations in naming/spacing."
+  - patternType: "context_phrase"
+    pattern: "computer programme\\s+\\w+"
+    toolType: "computational_tool"
+    examples: ["computer programme M-Link"]
+    reasoning: "Older publications may use 'computer programme' instead of 'software' - this pattern could catch similar historical computational tools."
+  - patternType: "context_phrase"
+    pattern: "linkage analysis.*using\\s+\\w+"
+    toolType: "computational_tool"
+    examples: ["linkage analysis...was carried out using the computer programme M-Link"]
+    reasoning: "Genetic linkage analysis typically requires specialized software - this pattern could identify computational tools in linkage studies."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - One computational tool (M-Link) was clearly missed despite explicit mention in abstract
+    - Publication from 1987 may use different terminology ("computer programme" vs "software")
+    - Lack of detailed Methods section limits tool identification, but abstract contains clear tool usage
+    - Mining patterns may be biased toward modern terminology and miss historical computational tools
+  recommendations: |
+    - Add M-Link as a computational tool - it's explicitly mentioned and widely used for genetic linkage analysis
+    - Update mining patterns to capture older terminology for computational tools ("computer programme", "computer program")
+    - Consider that older publications may have different section structures but still contain valid tool usage
+    - This publication demonstrates that even brief abstracts can contain clear tool mentions that should be captured
+    - The missed M-Link tool suggests mining patterns need improvement for historical bioinformatics software

@@ -1,0 +1,165 @@
+publicationMetadata:
+  pmid: "12057013"
+  title: "Complex splicing pattern generates great diversity in human NF1 transcripts."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology/genomics study investigating NF1 gene splicing patterns using RT-PCR,
+    cloning, sequencing, and computational analysis. Expected tools include:
+    - Genetic reagents (vectors, bacterial strains, enzymes)
+    - Computational tools (splice site prediction software, structure prediction programs)
+    - Laboratory reagents (RNA extraction kits, reverse transcriptases, restriction enzymes)
+    
+    The study does not involve animal models, cell culture, antibodies, organoids, or PDX models.
+    Clinical assessment tools are not expected as this is basic molecular research.
+  overallAssessment: |
+    This is a laboratory-based molecular biology study that should contain multiple research tools.
+    The methods section describes detailed experimental procedures including RNA extraction, RT-PCR,
+    cloning, restriction enzyme analysis, sequencing, and computational analysis. Tools are expected
+    across genetic reagents and computational categories, with potential laboratory reagents.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "SSPNN"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Calculations were performed using the Splice Site Prediction by Neural Network (SSPNN, URL address: ) program"
+    whyMissed: "Computational tool name not recognized - SSPNN is an acronym for a specific bioinformatics program"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Splice Site Prediction by Neural Network"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Calculations were performed using the Splice Site Prediction by Neural Network (SSPNN, URL address: ) program"
+    whyMissed: "Full name of computational tool not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "mfold"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The mfold computer program version 3.0 was used to predict the RNA secondary structure and to calculate the folding free energy"
+    whyMissed: "Well-known bioinformatics tool name not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "pCR2.1-TOPO-vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The PCR products were cloned in the pCR2.1-TOPO-vector (Invitrogen) and transformed into TOP-10F' cells"
+    whyMissed: "Cloning vector with vendor information not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TOP-10F'"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The PCR products were cloned in the pCR2.1-TOPO-vector (Invitrogen) and transformed into TOP-10F' cells"
+    whyMissed: "Bacterial strain name not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRIzol LS Reagent"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RNA was isolated from fresh blood leukocytes from two normal individuals using TRIzol LS Reagent (Invitrogen)"
+    whyMissed: "Commercial reagent with vendor information not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SuperScript II Reverse transcriptase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Total RNA (2 μg) was reverse transcribed using SuperScript II Reverse transcriptase (Invitrogen)"
+    whyMissed: "Enzyme with vendor information not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "DELPHI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A program was written in DELPHI to calculate the strength of a branch point"
+    whyMissed: "Programming language/environment used for custom tool development"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SSPNN|Splice Site Prediction by Neural Network"
+    toolType: "computational_tool"
+    examples: ["SSPNN", "Splice Site Prediction by Neural Network (SSPNN)"]
+    reasoning: "Specific bioinformatics tool for splice site analysis, commonly used in genomics research"
+
+  - patternType: "term"
+    pattern: "mfold\\s+(computer\\s+)?program\\s+version\\s+[0-9.]+"
+    toolType: "computational_tool"
+    examples: ["mfold computer program version 3.0"]
+    reasoning: "Well-established RNA secondary structure prediction software with version numbers"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z]{2,}[0-9.-]+.*vector"
+    toolType: "genetic_reagent"
+    examples: ["pCR2.1-TOPO-vector"]
+    reasoning: "Plasmid/vector naming convention starting with 'p' followed by alphanumeric identifiers"
+
+  - patternType: "naming_convention"
+    pattern: "TOP-[0-9]+[A-Z']*\\s+cells"
+    toolType: "genetic_reagent"
+    examples: ["TOP-10F' cells"]
+    reasoning: "Bacterial strain naming convention for competent cells used in cloning"
+
+  - patternType: "vendor_indicator"
+    pattern: "TRIzol\\s+LS\\s+Reagent\\s+\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["TRIzol LS Reagent (Invitrogen)"]
+    reasoning: "Commercial reagent with specific product name and vendor in parentheses"
+
+  - patternType: "vendor_indicator"
+    pattern: "SuperScript\\s+[IVX]+\\s+[Rr]everse\\s+transcriptase\\s+\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["SuperScript II Reverse transcriptase (Invitrogen)"]
+    reasoning: "Commercial enzyme with version number and vendor information"
+
+  - patternType: "context_phrase"
+    pattern: "program was written in\\s+([A-Z]+)"
+    toolType: "computational_tool"
+    examples: ["A program was written in DELPHI"]
+    reasoning: "Indicates custom software development using specific programming languages/environments"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to mine any tools from a methods-rich molecular biology publication
+    - Multiple computational tools missed (SSPNN, mfold, DELPHI)
+    - Genetic reagents with vendor information not captured (vectors, bacterial strains, enzymes)
+    - Commercial reagents with clear product names and vendors missed
+    - Mining patterns appear inadequate for genomics/molecular biology terminology
+  recommendations: |
+    This publication represents a significant mining failure. Despite being a laboratory research study
+    with detailed methods describing multiple tools, zero tools were captured. Key recommendations:
+    
+    1. IMMEDIATE ACTION NEEDED: Add all 7-8 missed tools to improve mining coverage
+    2. PATTERN ENHANCEMENT: Implement suggested patterns for bioinformatics tools, cloning vectors, 
+       bacterial strains, and commercial reagents
+    3. VENDOR RECOGNITION: Improve detection of tools with vendor information in parentheses
+    4. ACRONYM HANDLING: Better recognition of bioinformatics tool acronyms (SSPNN, etc.)
+    5. GENOMICS TERMINOLOGY: Expand patterns for molecular biology and genomics-specific tools
+    
+    The mining system needs significant improvement for genomics/molecular biology publications.
+    This paper should be used as a test case to validate pattern improvements.

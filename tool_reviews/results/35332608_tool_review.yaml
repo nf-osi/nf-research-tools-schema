@@ -1,0 +1,253 @@
+publicationMetadata:
+  pmid: "35332608"
+  title: "Re-evaluation of missense variant classifications in NF2."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, databases, web applications, pipelines) - HIGHLY EXPECTED
+    - Clinical assessment tools (Manchester Criteria for NF2) - POSSIBLE for phenotype classification
+    - Lab research tools (antibodies, cell lines, animal models) - UNLIKELY (this is variant classification study)
+    
+    This is a computational genetics study focused on NF2 missense variant classification using
+    multiple databases and in silico prediction tools. The study systematically compiles variants
+    from clinical databases and applies computational classification frameworks. Expected tools
+    include variant databases, prediction software, and classification guidelines.
+  overallAssessment: |
+    This bioinformatics study would be expected to contain multiple computational tools for variant
+    analysis, database searches, and classification. The detailed Methods section describes systematic
+    use of databases (LOVD, ClinVar, HGMD), prediction software (Alamut Visual, SIFT, PolyPhen-2),
+    and classification frameworks (ACGS guidelines). Clinical assessment tools like Manchester Criteria
+    are also used for phenotype classification.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "Alamut Visual version 2.15"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were imported into the clinical prediction software Alamut Visual version 2.15 (SOPHiA GENETICS), in which multiple variant database information and in silico tools are embedded."
+    whyMissed: "Specific software name with version number and vendor - clear computational tool for variant analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SIFT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results from the following tools were exported from Alamut and factored into classification analysis: Align-GVGD (Mathe et al., 2006), SIFT (Kumar et al., 2009), PolyPhen-2"
+    whyMissed: "Well-known bioinformatics tool for predicting functional effects of amino acid substitutions"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PolyPhen-2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results from the following tools were exported from Alamut and factored into classification analysis: Align-GVGD (Mathe et al., 2006), SIFT (Kumar et al., 2009), PolyPhen-2 (Adzhubei et al., 2010)"
+    whyMissed: "Widely used computational tool for predicting impact of amino acid substitutions on protein function"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MutationTaster2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results from the following tools were exported from Alamut and factored into classification analysis: Align-GVGD (Mathe et al., 2006), SIFT (Kumar et al., 2009), PolyPhen-2 (Adzhubei et al., 2010), MutationTaster2 (Schwarz et al., 2014)"
+    whyMissed: "Computational tool for evaluating pathogenicity of sequence alterations"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "REVEL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Multiple in silico tools were used for variant effect prediction; meta-predictor REVEL (Rare Exome Variant Ensemble Learner) was used as the deciding score for evidence use (PP3 and BP4)"
+    whyMissed: "Meta-predictor tool specifically mentioned as the deciding score for variant classification"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MaxEntScan"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SpliceSiteFinder-like tool (Zhang, 1998), MaxEntScan (Yeo & Burge, 2004). Variant frequencies and ExAC constraint metrics were obtained from gnomAD v2.1.1"
+    whyMissed: "Splice site prediction tool with specific citation and usage described"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "gnomAD v2.1.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variant frequencies and ExAC constraint metrics were obtained from gnomAD v2.1.1 (gnomad.broadinstitute.org) (Lek et al., 2016)"
+    whyMissed: "Major population genetics database with specific version number and URL"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "UCSC LiftOver"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "UCSC LiftOver tool was used for any genomic co-ordinate conversions between genome builds GRCh37/hg19 and GRCh38/hg38 (genome.ucsc.edu/cgi-bin/hgLiftOver)"
+    whyMissed: "Specific bioinformatics tool for genome coordinate conversion with URL"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "alleleFrequencyApp"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Maximum credible population allele frequency was determined using the alleleFrequencyApp (cardiodb.org/allelefrequencyapp) (Whiffin et al., 2017)"
+    whyMissed: "Specific web application tool with URL for calculating population allele frequencies"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ClinPred"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ClinPred (Alirezaie et al., 2018) meta-predictor scores were also produced for variants, although were not included as evidence for ACGS variant classification"
+    whyMissed: "Meta-predictor tool for variant pathogenicity prediction with specific citation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "LOVD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The publically accessible variant databases included were Leiden Open Variation Database (LOVD) (www.lovd.nl) (Fokkema et al., 2021)"
+    whyMissed: "Major variant database with URL and specific usage in systematic compilation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ClinVar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ClinVar NCBI (www.ncbi.nlm.nih.gov/clinvar) (Landrum et al., 2018), the Human Gene Mutation Database (HGMD)"
+    whyMissed: "Major clinical variant database with URL and systematic usage described"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "HGMD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "the Human Gene Mutation Database (HGMD) (www.hgmd.cf.ac.uk/ac/all.php) (Stenson et al., 2020), Clinical Interpretation of Variants in Cancer (CIViC)"
+    whyMissed: "Major mutation database with URL and systematic usage in variant compilation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CIViC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Clinical Interpretation of Variants in Cancer (CIViC) (https://civicdb.org/home) and Mastermind Genomic Search Engine"
+    whyMissed: "Clinical variant interpretation database with URL"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Mastermind"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "and Mastermind Genomic Search Engine (https://www.genomenon.com/mastermind). Details of duplicate variants were merged"
+    whyMissed: "Genomic search engine with URL for literature mining"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "LitVar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "An extra literature mining step was conducted using LitVar to capture any missing variants (Allot et al., 2018)"
+    whyMissed: "Literature mining tool for variant discovery with specific citation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DECIPHER"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The DECIPHER database (Firth et al., 2009) was used to investigate possible mutational hotspots or identify regional constraint within functional domains"
+    whyMissed: "Database for genomic variant interpretation with specific usage described"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "COSMIC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "COSMIC (www.cancer.sanger.ac.uk) (Tate et al., 2019) was used in the investigation of variants that were observed in somatic samples"
+    whyMissed: "Major cancer genomics database with URL and specific usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CanVar-UK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CanVar-UK cancer predisposition gene variant database (www.canvaruk.org) was used in the search for further variant information"
+    whyMissed: "Specialized cancer variant database with URL"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Manchester Criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "patients who fitted Manchester Criteria for NF2 disease (Table S1) (Evans et al., 1992; Smith et al., 2017) were considered to have phenotypic specificity"
+    whyMissed: "Clinical diagnostic criteria used for patient phenotype classification"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+v?\\d+\\.\\d+(\\.\\d+)?\\b"
+    toolType: "computational_tool"
+    examples: ["Alamut Visual version 2.15", "gnomAD v2.1.1"]
+    reasoning: "Pattern to catch software names with version numbers, which are strong indicators of computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(database|tool|software|predictor|algorithm)\\s+\\([^)]*\\)\\s+was\\s+used"
+    toolType: "computational_tool"
+    examples: ["DECIPHER database (Firth et al., 2009) was used", "LitVar to capture any missing variants (Allot et al., 2018)"]
+    reasoning: "Context phrase indicating active usage of computational tools with citations"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*\\.(org|com|edu|gov|uk)/[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["(www.lovd.nl)", "(cardiodb.org/allelefrequencyapp)", "(https://civicdb.org/home)"]
+    reasoning: "URLs in parentheses often indicate web-based tools or databases"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}(-[A-Z]{2,})*\\b"
+    toolType: "computational_tool"
+    examples: ["SIFT", "HGMD", "LOVD", "CIViC"]
+    reasoning: "Acronyms in all caps are common naming convention for bioinformatics tools and databases"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(criteria|guidelines|classification)\\s+\\([^)]*\\d{4}[^)]*\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Manchester Criteria for NF2 disease (Table S1) (Evans et al., 1992; Smith et al., 2017)"]
+    reasoning: "Clinical criteria and guidelines with citations are assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(exported from|imported into|analyzed using|processed with|calculated using)\\s+[A-Z][a-zA-Z]+"
+    toolType: "computational_tool"
+    examples: ["exported from Alamut", "imported into the clinical prediction software"]
+    reasoning: "Action phrases indicating active tool usage in computational workflows"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 20  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues identified during review:
+    - NO TOOLS WERE MINED despite this being a computational study with extensive tool usage
+    - Mining system completely failed to detect 20+ computational tools explicitly mentioned
+    - Multiple databases, software packages, and web applications with URLs were missed
+    - Clinical assessment tool (Manchester Criteria) was not detected
+    - This represents a significant failure of the mining system for bioinformatics publications
+  recommendations: |
+    Critical recommendations for this publication:
+    - ALL 20 potentially missed tools should be added to the database
+    - This publication demonstrates major gaps in computational tool mining patterns
+    - The mining system needs significant improvement for bioinformatics/clinical genetics studies
+    - Suggested patterns should be implemented to catch software versions, URLs, and database names
+    - Clinical criteria and guidelines should be recognized as assessment tools
+    - This type of systematic variant classification study is rich in computational tools
+    - Future mining should specifically target Methods sections of bioinformatics papers
+    - URL patterns and citation contexts are strong indicators of tool usage

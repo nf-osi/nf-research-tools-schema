@@ -1,0 +1,128 @@
+publicationMetadata:
+  pmid: "33817379"
+  title: "Clinical assessment of the use of topical liquid diclofenac following laser microporation of cutaneous neurofibromas in individuals with neurofibromatosis type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (dermatoscopy, measurement tools), medical devices (laser), 
+    computational tools for statistical analysis. This study uses:
+    - Medical devices: P.L.E.A.S.E.® laser device for microporation
+    - Clinical assessment tools: Dermlite DL3 dermatoscope for visual assessment
+    - Computational tools: GraphPad Prism for statistical analysis
+    - Measurement tools: measuring tape, digital camera for documentation
+    
+    Clinical trials typically use multiple tool types: medical devices for intervention, 
+    assessment tools for outcome measurement, and computational tools for data analysis.
+  overallAssessment: |
+    This clinical trial would be expected to contain multiple research tools including medical devices 
+    (laser treatment device), clinical assessment instruments (dermatoscopy equipment), and computational 
+    tools for statistical analysis. The study involves systematic measurement and documentation of treatment 
+    outcomes, which requires specialized tools. The absence of mined tools suggests significant under-detection 
+    of clinical research tools in this publication type.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "P.L.E.A.S.E.® device"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "cNFs were laser-porated using the P.L.E.A.S.E.® device with the following user-defined settings: density of 10%, 5 pulses per pore, repetition rate of 300 Hz, pulse duration of 125 μs, pore array size of 10mm and fluence of 36.2 J/cm2"
+    whyMissed: "Medical device with specific technical parameters not captured by current mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Dermlite DL3"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "visual and dermatoscopy observations (using the Dermlite DL3 [3Gen, San Jan Capistrano, CA, USA]) noting color and presence of necrosis, presence of flaccidity, and size"
+    whyMissed: "Clinical assessment device with manufacturer information not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data was collected on a clinical research form and analyzed using GraphPad Prism version 5.0 for Windows (GraphPad Software, San Diego California USA)"
+    whyMissed: "Statistical analysis software with version information not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Voltaren®"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "researchers topically applied one drop of diclofenac 25 mg/ml (Voltaren®) to the surface of the T neurofibromas"
+    whyMissed: "Pharmaceutical product used as treatment intervention, though this may be borderline as it's a drug rather than assessment tool"
+    confidence: 0.60
+    shouldBeAdded: Maybe
+
+  - toolName: "NIH Consensus Development Conference NF1 diagnostic criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "patients with a clinical diagnosis of NF1 according to the NIH Consensus Development Conference NF1 diagnostic criteria (NIH, 1998)"
+    whyMissed: "Standardized diagnostic criteria used for patient selection - represents a clinical assessment tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "P\\.L\\.E\\.A\\.S\\.E\\.®|PLEASE®"
+    toolType: "clinical_assessment_tool"
+    examples: ["P.L.E.A.S.E.® device"]
+    reasoning: "Medical device names with trademark symbols and periods need specific pattern matching"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using [A-Z][a-zA-Z\\s]+ version \\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["analyzed using GraphPad Prism version 5.0"]
+    reasoning: "Statistical software mentions with version numbers in analysis context"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z\\s]+,\\s[A-Z][a-zA-Z\\s]+,?\\s[A-Z]{2,3}\\s?USA\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["(3Gen, San Jan Capistrano, CA, USA)", "(GraphPad Software, San Diego California USA)"]
+    reasoning: "Manufacturer information in parentheses indicates commercial research tools"
+
+  - patternType: "naming_convention"
+    pattern: "Dermlite\\s[A-Z0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Dermlite DL3"]
+    reasoning: "Dermatoscopy equipment follows specific naming patterns"
+
+  - patternType: "context_phrase"
+    pattern: "diagnostic criteria|consensus criteria"
+    toolType: "clinical_assessment_tool"
+    examples: ["NIH Consensus Development Conference NF1 diagnostic criteria"]
+    reasoning: "Standardized diagnostic criteria represent clinical assessment tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to detect clinical research tools in a clinical trial publication
+    - Medical devices (P.L.E.A.S.E.® laser device) with detailed technical specifications not captured
+    - Clinical assessment equipment (Dermlite DL3 dermatoscope) with manufacturer info not detected
+    - Statistical analysis software (GraphPad Prism) with version information missed
+    - Standardized diagnostic criteria (NIH NF1 criteria) not recognized as clinical assessment tools
+    - Current mining patterns appear optimized for lab research tools but miss clinical trial tools
+  recommendations: |
+    This publication demonstrates a significant gap in clinical tool detection. All 5 missed tools should be added:
+    1. P.L.E.A.S.E.® device - medical laser device with detailed technical parameters
+    2. Dermlite DL3 - dermatoscopy equipment with manufacturer information
+    3. GraphPad Prism - statistical analysis software with version
+    4. NIH NF1 diagnostic criteria - standardized clinical assessment tool
+    5. Voltaren® - pharmaceutical intervention (borderline case)
+    
+    The mining system needs enhanced patterns for clinical trial tools including medical devices, 
+    assessment equipment, and diagnostic criteria. No observations could be extracted due to 
+    missing Results/Discussion sections in the provided text.

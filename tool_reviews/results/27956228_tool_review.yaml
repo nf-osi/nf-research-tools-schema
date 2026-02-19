@@ -1,0 +1,300 @@
+publicationMetadata:
+  pmid: "27956228"
+  title: "Genome-Wide CRISPR Screen Identifies Regulators of Mitogen-Activated Protein Kinase as Suppressors of Liver Tumors in Mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive laboratory research study using CRISPR screening technology. Expected tool types include:
+    - Animal models (nude mice, p53-/- mice, liver-specific knockout mice)
+    - Cell lines (mouse embryonic liver progenitor cells, human and mouse HCC cell lines)
+    - Genetic reagents (CRISPR/Cas9 system, sgRNA libraries, plasmids, lentiviral vectors)
+    - Computational tools (high-throughput sequencing analysis, database queries)
+    - Chemical compounds/inhibitors (MEK inhibitors, multi-kinase inhibitors)
+    
+    The study involves genome-wide screening, cell culture, animal transplantation, molecular biology techniques,
+    and bioinformatics analysis, indicating multiple tool categories should be present.
+  overallAssessment: |
+    This publication represents a sophisticated laboratory research study that extensively uses research tools across
+    multiple categories. The CRISPR-based genome-wide screening approach, combined with cell culture, animal models,
+    and molecular analysis, indicates that numerous research tools should have been identified. The complete absence
+    of mined tools suggests major gaps in the mining patterns, particularly for genetic reagents, animal models,
+    and computational tools used in genomics research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "mGeCKOa lentiviral library"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We infected p53-/-;Myc;Cas9 hepatocytes with the mGeCKOa lentiviral library of 67,000 single-guide RNAs (sgRNAs), targeting 20,611 mouse genes"
+    whyMissed: "Specific CRISPR library name not recognized - needs pattern for 'mGeCKO' and similar library nomenclature"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "transplanted the transduced cells subcutaneously into nude mice. Within 1 month, all the mice that received the sgRNA library developed subcutaneous tumors"
+    whyMissed: "Common immunodeficient mouse strain not recognized - needs pattern for 'nude mice' and similar strain names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p53-/-;Myc;Cas9 hepatocytes"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We performed a genome-wide CRISPR/Cas9-based knockout screen of P53-null mouse embryonic liver progenitor cells that overexpressed MYC"
+    whyMissed: "Genetically modified cell line with specific genotype notation not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR/Cas9 system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We performed a genome-wide CRISPR/Cas9-based knockout screen"
+    whyMissed: "CRISPR system as a tool not recognized - needs pattern for 'CRISPR/Cas9', 'CRISPR-Cas9', etc."
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "sgRNA library"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "library of 67,000 single-guide RNAs (sgRNAs), targeting 20,611 mouse genes"
+    whyMissed: "Single-guide RNA libraries not recognized - needs pattern for 'sgRNA', 'single-guide RNA'"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Cancer Genome Atlas"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "we collected data from patients with hepatocellular carcinoma (HCC) using the Cancer Genome Atlas and COSMIC databases"
+    whyMissed: "Major genomics database not recognized - needs pattern for 'TCGA', 'Cancer Genome Atlas'"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "COSMIC database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the Cancer Genome Atlas and COSMIC databases"
+    whyMissed: "COSMIC mutation database not recognized - needs pattern for 'COSMIC database'"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AZD6244"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Effects of the MEK inhibitors AZD6244, U0126, and trametinib, or the multi-kinase inhibitor sorafenib"
+    whyMissed: "Chemical inhibitor compound not recognized - needs pattern for drug/compound names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "U0126"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Effects of the MEK inhibitors AZD6244, U0126, and trametinib"
+    whyMissed: "Chemical inhibitor compound not recognized - needs pattern for alphanumeric compound names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "trametinib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "MEK inhibitors AZD6244, U0126, and trametinib, or the multi-kinase inhibitor sorafenib"
+    whyMissed: "FDA-approved MEK inhibitor not recognized - needs pattern for drug names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "sorafenib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "or the multi-kinase inhibitor sorafenib, were examined in human and mouse HCC cell lines"
+    whyMissed: "Multi-kinase inhibitor drug not recognized - needs pattern for drug names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "small hairpin RNAs"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "their expression was knocked down using small hairpin RNAs, and tumor growth was examined"
+    whyMissed: "shRNA reagents not recognized - needs pattern for 'small hairpin RNA', 'shRNA'"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "mGeCKO[a-zA-Z0-9]*"
+    toolType: "genetic_reagent"
+    examples: ["mGeCKOa lentiviral library"]
+    reasoning: "CRISPR screening libraries often use mGeCKO nomenclature - this pattern would catch various versions"
+
+  - patternType: "term"
+    pattern: "nude mice|SCID mice|NOD/SCID|NSG mice|NOG mice"
+    toolType: "animal_model"
+    examples: ["nude mice"]
+    reasoning: "Common immunodeficient mouse strains used in cancer research - essential for xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "CRISPR[/-]Cas9|CRISPR/dCas9|CRISPR system"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR/Cas9-based knockout screen"]
+    reasoning: "CRISPR systems are fundamental genetic tools but various naming conventions are used"
+
+  - patternType: "term"
+    pattern: "sgRNA|single-guide RNA|guide RNA library"
+    toolType: "genetic_reagent"
+    examples: ["sgRNA library", "single-guide RNAs (sgRNAs)"]
+    reasoning: "Guide RNAs are essential CRISPR components but abbreviations and full names both used"
+
+  - patternType: "term"
+    pattern: "Cancer Genome Atlas|TCGA|COSMIC database|COSMIC"
+    toolType: "computational_tool"
+    examples: ["Cancer Genome Atlas", "COSMIC databases"]
+    reasoning: "Major genomics databases frequently used in cancer research but not always recognized"
+
+  - patternType: "context_phrase"
+    pattern: "MEK inhibitor[s]?\\s+[A-Z0-9]+|multi-kinase inhibitor\\s+\\w+"
+    toolType: "genetic_reagent"
+    examples: ["MEK inhibitors AZD6244, U0126, and trametinib", "multi-kinase inhibitor sorafenib"]
+    reasoning: "Chemical inhibitors often mentioned with their class - this context helps identify them as tools"
+
+  - patternType: "term"
+    pattern: "small hairpin RNA|shRNA|siRNA|microRNA"
+    toolType: "genetic_reagent"
+    examples: ["small hairpin RNAs"]
+    reasoning: "RNA interference reagents are common molecular tools but various naming conventions exist"
+
+  - patternType: "naming_convention"
+    pattern: "p53[-/+]+|[A-Za-z0-9]+[-/+]+"
+    toolType: "cell_line"
+    examples: ["p53-/-;Myc;Cas9 hepatocytes"]
+    reasoning: "Genetically modified cell lines often use +/- notation for alleles - this pattern would catch them"
+
+  - patternType: "context_phrase"
+    pattern: "lentiviral library|viral library|library of.*sgRNA"
+    toolType: "genetic_reagent"
+    examples: ["mGeCKOa lentiviral library of 67,000 single-guide RNAs"]
+    reasoning: "CRISPR screening libraries delivered via lentivirus are common but specific naming varies"
+
+  - patternType: "vendor_indicator"
+    pattern: "high-throughput sequencing|RNA-seq|ChIP-seq|ATAC-seq"
+    toolType: "computational_tool"
+    examples: ["high-throughput sequencing of tumor DNA"]
+    reasoning: "Sequencing technologies are computational tools but often described by methodology rather than software"
+
+observations:
+  - resourceName: "nude mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      All mice that received the sgRNA library developed subcutaneous tumors within 1 month of transplantation.
+      This demonstrates the nude mouse model's utility for xenograft tumor formation studies and the effectiveness
+      of the CRISPR screening approach in identifying tumor suppressors.
+    foundIn: "results"
+    contextSnippet: "Within 1 month, all the mice that received the sgRNA library developed subcutaneous tumors"
+    confidence: 1.0
+    doi: "10.1053/j.gastro.2016.12.002"
+
+  - resourceName: "CRISPR/Cas9 system"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      CRISPR-mediated knockout of Nf1 accelerated liver tumor formation in mice, demonstrating the system's
+      effectiveness for functional genomics studies. The approach successfully identified 4 candidate liver
+      tumor suppressor genes (Nf1, Plxnb1, Flrt2, and B9d1) not previously associated with liver cancer.
+    foundIn: "results"
+    contextSnippet: "CRISPR-mediated knockout of Nf1, a negative regulator of RAS, accelerated liver tumor formation in mice"
+    confidence: 1.0
+    doi: "10.1053/j.gastro.2016.12.002"
+
+  - resourceName: "mGeCKOa lentiviral library"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The mGeCKOa library containing 67,000 single-guide RNAs targeting 20,611 mouse genes successfully enabled
+      genome-wide screening for liver tumor suppressors. sgRNAs that increased at least 8-fold compared to the
+      initial cell pool were identified through high-throughput sequencing, demonstrating the library's
+      comprehensive coverage and screening utility.
+    foundIn: "results"
+    contextSnippet: "We performed high-throughput sequencing of tumor DNA and identified sgRNAs increased at least 8-fold compared to the initial cell pool"
+    confidence: 1.0
+    doi: "10.1053/j.gastro.2016.12.002"
+
+  - resourceName: "AZD6244"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      MEK inhibitor AZD6244 suppressed the activation of Hmga2 and Sox9 genes that resulted from loss of Nf1
+      or oncogenic activation of RAS. This demonstrates the compound's effectiveness in blocking RAS pathway
+      signaling and its potential therapeutic relevance for liver cancer treatment.
+    foundIn: "results"
+    contextSnippet: "RAS pathway inhibitors suppressed the activation of the Hmga2 and Sox9 genes that resulted from loss of Nf1 or oncogenic activation of RAS"
+    confidence: 0.9
+    doi: "10.1053/j.gastro.2016.12.002"
+
+  - resourceName: "U0126"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      MEK inhibitor U0126 suppressed the activation of Hmga2 and Sox9 genes that resulted from loss of Nf1
+      or oncogenic activation of RAS, similar to other MEK inhibitors tested. This confirms the role of
+      MEK signaling in the observed phenotypes.
+    foundIn: "results"
+    contextSnippet: "RAS pathway inhibitors suppressed the activation of the Hmga2 and Sox9 genes that resulted from loss of Nf1 or oncogenic activation of RAS"
+    confidence: 0.9
+    doi: "10.1053/j.gastro.2016.12.002"
+
+  - resourceName: "trametinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      MEK inhibitor trametinib suppressed the activation of Hmga2 and Sox9 genes that resulted from loss of Nf1
+      or oncogenic activation of RAS. As an FDA-approved drug, this finding has direct clinical relevance for
+      potential liver cancer treatment strategies.
+    foundIn: "results"
+    contextSnippet: "RAS pathway inhibitors suppressed the activation of the Hmga2 and Sox9 genes that resulted from loss of Nf1 or oncogenic activation of RAS"
+    confidence: 0.9
+    doi: "10.1053/j.gastro.2016.12.002"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 10
+  observationsExtracted: 6
+  observationsByType:
+    Tumor Growth: 1
+    Usage Instructions: 2
+    Molecular: 3
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this comprehensive laboratory research study
+    - Missing all major tool categories: animal models, cell lines, genetic reagents, computational tools
+    - CRISPR screening methodology completely missed despite being central to the study
+    - Chemical inhibitors and drugs not recognized as research tools
+    - Major genomics databases (TCGA, COSMIC) not identified
+    - Immunodeficient mouse strains not recognized
+    - RNA interference reagents not detected
+  recommendations: |
+    This publication represents a major failure of the mining system. A sophisticated laboratory study using
+    CRISPR screening, animal models, cell culture, and chemical inhibitors should have yielded 10+ tools
+    across multiple categories. The complete absence of mined tools indicates fundamental gaps in pattern
+    recognition for:
+    
+    1. CRISPR/Cas9 systems and sgRNA libraries (genetic reagents)
+    2. Immunodeficient mouse strains (animal models) 
+    3. Genetically modified cell lines (cell lines)
+    4. Chemical inhibitors and drugs (genetic reagents)
+    5. Genomics databases and analysis tools (computational tools)
+    
+    All 12 potentially missed tools should be added to improve future mining. The suggested patterns would
+    significantly enhance tool detection for genomics and cancer research publications. This case demonstrates
+    the need for comprehensive pattern coverage in laboratory research contexts.

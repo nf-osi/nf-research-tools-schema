@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "38127282"
+  title: "Spatial Gene-Expression Profiling Unveils Immuno-oncogenic Programs of NF1-Associated Peripheral Nerve Sheath Tumor Progression."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - involves gene expression profiling, cell lines, mouse models
+  hasMethodsSection: Yes  # Indicated in metadata, though full text not available
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research) and abstract content, expected tool types include:
+    - Cell lines: Human MPNST cell lines and murine Schwann cell precursors mentioned
+    - Animal models: Mouse models mentioned for NF1 research
+    - Computational tools: Gene expression profiling and spatial analysis require bioinformatics tools
+    - Genetic reagents: Nf1-Cdkn2a-mutant cells suggest genetic constructs/reagents
+    - Potentially antibodies: For protein targets like CENPF and BIRC5
+    
+    This is clearly a molecular biology/cancer research study that would typically use multiple
+    research tool categories for gene expression analysis, cell culture, and animal studies.
+  overallAssessment: |
+    This is a laboratory research publication involving spatial gene expression profiling, cell line
+    experiments, and mouse model studies. Such studies typically require extensive use of research tools
+    including cell lines, animal models, computational analysis software, and potentially antibodies for
+    protein analysis. The mention of specific targets (CENPF, BIRC5) and genetic modifications suggests
+    sophisticated molecular biology techniques requiring multiple tool types.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "human MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...targeting key mediators of these pathways, CENPF and BIRC5, disrupted the growth and viability of human MPNST cell lines and primary murine Nf1-Cdkn2a-mutant Schwann cell precursors..."
+    whyMissed: "Generic term 'human MPNST cell lines' not caught - mining may need patterns for '[organism] [tumor type] cell lines'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "primary murine Nf1-Cdkn2a-mutant Schwann cell precursors"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...disrupted the growth and viability of human MPNST cell lines and primary murine Nf1-Cdkn2a-mutant Schwann cell precursors..."
+    whyMissed: "Complex genetic modification nomenclature not recognized - needs patterns for 'Nf1-Cdkn2a-mutant' and similar genetic modifications"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...gene-expression profiles in PNST across the neurofibroma-to-MPNST continuum in NF1 patients and mouse models..."
+    whyMissed: "Generic term 'mouse models' without specific strain information - may need broader patterns for model organism mentions"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "NF1 patients"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...gene-expression profiles in PNST across the neurofibroma-to-MPNST continuum in NF1 patients and mouse models..."
+    whyMissed: "Patient samples/tissue could be considered patient-derived models for research - needs context analysis for research vs clinical usage"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\b(human|murine|mouse|rat)\\s+\\w+\\s+cell\\s+lines?\\b"
+    toolType: "cell_line"
+    examples: ["human MPNST cell lines"]
+    reasoning: "Catches organism-specific cell line mentions that may not have standard nomenclature"
+
+  - patternType: "naming_convention"
+    pattern: "\\b\\w+-\\w+-mutant\\s+(cells?|precursors?)\\b"
+    toolType: "cell_line"
+    examples: ["Nf1-Cdkn2a-mutant Schwann cell precursors"]
+    reasoning: "Identifies genetically modified cell lines with hyphenated gene modification nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(mouse|murine|rat)\\s+models?\\b"
+    toolType: "animal_model"
+    examples: ["mouse models"]
+    reasoning: "Catches generic model organism references that may indicate specific strains in full text"
+
+  - patternType: "term"
+    pattern: "\\b(CENPF|BIRC5)\\b"
+    toolType: "genetic_reagent"
+    examples: ["CENPF", "BIRC5"]
+    reasoning: "Protein targets mentioned in context of experimental manipulation may indicate antibodies, constructs, or other reagents"
+
+  - patternType: "context_phrase"
+    pattern: "\\bspatial\\s+gene.expression\\s+profiling\\b"
+    toolType: "computational_tool"
+    examples: ["spatial gene-expression profiling"]
+    reasoning: "Spatial transcriptomics requires specialized computational analysis tools that should be captured"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Publication involves laboratory research with cell lines, animal models, and computational analysis
+    - Abstract mentions specific cell lines (human MPNST, murine Schwann cell precursors) that should have been detected
+    - Spatial gene expression profiling indicates computational tools that were missed
+    - Genetic modifications (Nf1-Cdkn2a-mutant) suggest genetic reagents not captured
+  recommendations: |
+    Overall recommendations for this publication:
+    - This appears to be a significant mining failure - multiple clear research tools were not detected
+    - The mining patterns need improvement to catch:
+      * Generic cell line descriptions with organism prefixes
+      * Genetically modified cell lines with complex nomenclature
+      * Spatial transcriptomics and gene expression analysis tools
+      * Model organism references that may indicate specific strains
+    - Full text analysis would likely reveal additional tools (specific software, antibodies, protocols)
+    - This publication should be re-processed with improved mining patterns
+    - Consider manual curation to identify all tools for pattern development
+    - The suggested patterns should be implemented and tested on this publication

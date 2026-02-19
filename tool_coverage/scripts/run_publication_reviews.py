@@ -251,10 +251,22 @@ def prepare_goose_input(pub_row, inputs_dir):
             results_text = extract_results_section(fulltext_xml)
             discussion_text = extract_discussion_section(fulltext_xml)
 
-    # Parse mined tools from JSON columns
-    novel_tools = json.loads(pub_row.get('novel_tools', '{}'))
-    tool_metadata = json.loads(pub_row.get('tool_metadata', '{}'))
-    tool_sources = json.loads(pub_row.get('tool_sources', '{}'))
+    # Parse mined tools from JSON columns (handle NaN values)
+    novel_tools_raw = pub_row.get('novel_tools', '{}')
+    tool_metadata_raw = pub_row.get('tool_metadata', '{}')
+    tool_sources_raw = pub_row.get('tool_sources', '{}')
+
+    # Convert NaN to empty dict string
+    if pd.isna(novel_tools_raw):
+        novel_tools_raw = '{}'
+    if pd.isna(tool_metadata_raw):
+        tool_metadata_raw = '{}'
+    if pd.isna(tool_sources_raw):
+        tool_sources_raw = '{}'
+
+    novel_tools = json.loads(novel_tools_raw)
+    tool_metadata = json.loads(tool_metadata_raw)
+    tool_sources = json.loads(tool_sources_raw)
 
     # Prepare tool list with context - include ALL 9 tool types
     tools_list = []
@@ -406,8 +418,8 @@ def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
             safe_print(f"❌ Timeout after 10 minutes")
             return None
         except Exception as e:
-        safe_print(f"❌ Error: {e}")
-        return None
+            safe_print(f"❌ Error: {e}")
+            return None
 
 def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, force_rereviews):
     """
@@ -425,6 +437,7 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
     # Check if already reviewed
     clean_pmid = sanitize_pmid_for_filename(pmid)
     yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
+
     if yaml_path.exists() and not force_rereviews:
         safe_print(f"⏭️  Skipping {pmid} (already reviewed)")
         return (pmid, 'skipped', None)
@@ -497,23 +510,24 @@ def compile_validation_results(mining_df, results_dir):
         rejected_tools = []
         uncertain_tools = []
 
-        for tool_val in tool_validations:
-            tool_info = {
-                'pmid': pmid,
-                'toolName': tool_val.get('toolName'),
-                'toolType': tool_val.get('toolType'),
-                'verdict': tool_val.get('verdict'),
-                'confidence': tool_val.get('confidence'),
-                'recommendation': tool_val.get('recommendation'),
-                'reasoning': tool_val.get('reasoning', '')
-            }
+        if tool_validations:
+            for tool_val in tool_validations:
+                tool_info = {
+                    'pmid': pmid,
+                    'toolName': tool_val.get('toolName'),
+                    'toolType': tool_val.get('toolType'),
+                    'verdict': tool_val.get('verdict'),
+                    'confidence': tool_val.get('confidence'),
+                    'recommendation': tool_val.get('recommendation'),
+                    'reasoning': tool_val.get('reasoning', '')
+                }
 
-            if tool_val.get('recommendation') == 'Keep':
-                accepted_tools.append(tool_info)
-            elif tool_val.get('recommendation') == 'Remove':
-                rejected_tools.append(tool_info)
-            else:  # Manual Review Required
-                uncertain_tools.append(tool_info)
+                if tool_val.get('recommendation') == 'Keep':
+                    accepted_tools.append(tool_info)
+                elif tool_val.get('recommendation') == 'Remove':
+                    rejected_tools.append(tool_info)
+                else:  # Manual Review Required
+                    uncertain_tools.append(tool_info)
 
         # Collect missed tools
         for missed_tool in missed_tools:
@@ -525,19 +539,20 @@ def compile_validation_results(mining_df, results_dir):
             pattern['pmid'] = pmid
             all_suggested_patterns.append(pattern)
 
-        # Collect observations
-        for obs in observations:
-            obs_info = {
-                'pmid': pmid,
-                'doi': doi if doi else obs.get('doi', ''),
-                'resourceName': obs.get('resourceName'),
-                'resourceType': obs.get('resourceType'),
-                'observationType': obs.get('observationType'),
-                'details': obs.get('details', ''),
-                'foundIn': obs.get('foundIn', ''),
-                'confidence': obs.get('confidence', 1.0)
-            }
-            all_observations.append(obs_info)
+        # Collect observations (handle None case)
+        if observations:
+            for obs in observations:
+                obs_info = {
+                    'pmid': pmid,
+                    'doi': doi if doi else obs.get('doi', ''),
+                    'resourceName': obs.get('resourceName'),
+                    'resourceType': obs.get('resourceType'),
+                    'observationType': obs.get('observationType'),
+                    'details': obs.get('details', ''),
+                    'foundIn': obs.get('foundIn', ''),
+                    'confidence': obs.get('confidence', 1.0)
+                }
+                all_observations.append(obs_info)
 
         validation_results.append({
             'pmid': pmid,

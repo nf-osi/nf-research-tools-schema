@@ -1,0 +1,149 @@
+publicationMetadata:
+  pmid: "2491782"
+  title: "Linkage analysis of neurofibromatosis type I, using chromosome 17 DNA markers."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.8  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (genetic linkage analysis):
+    - genetic reagents (DNA markers, probes) - EXPECTED
+    - computational tools (linkage analysis software) - POSSIBLE
+    
+    This is a 1989 genetic linkage study using chromosome 17 DNA markers. While it's lab research,
+    the focus is on genetic mapping rather than experimental biology. DNA markers/probes would be
+    the primary tools, though they may not be described in detail due to the publication era and
+    abstract-only content available.
+
+  overallAssessment: |
+    This 1989 genetic linkage analysis study would typically use DNA markers/probes as genetic reagents
+    and potentially computational tools for linkage analysis. However, only the abstract is available,
+    and older publications often didn't describe reagents in detail. The study design suggests tools
+    were used but may not be explicitly named in the limited text available.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "D17Z1 (p17H8)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with clone identifier p17H8 - specific genetic reagent used for linkage analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "D17S58 (EW301)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with clone identifier EW301 - specific genetic reagent used for linkage analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "D17S54 (EW203)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with clone identifier EW203 - specific genetic reagent used for linkage analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "D17S57 (EW206)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with clone identifier EW206 - specific genetic reagent used for linkage analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "D17S73 (EW207)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with clone identifier EW207 - specific genetic reagent used for linkage analysis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CRI-L946"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "DNA marker with specific identifier CRI-L946 - genetic reagent used for linkage analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "HOX-2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "HOX-2 gene marker used as genetic reagent for linkage analysis"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "growth hormone"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "The markers used were D17Z1 (p17H8), D17S58 (EW301), D17S54 (EW203), D17S57 (EW206), D17S73 (EW207), CRI-L946, HOX-2, and growth hormone."
+    whyMissed: "Growth hormone gene marker used as genetic reagent for linkage analysis"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "markers used were"
+    toolType: "genetic_reagent"
+    examples: ["The markers used were D17Z1 (p17H8), D17S58 (EW301)..."]
+    reasoning: "This phrase directly indicates DNA markers/genetic reagents being used in linkage analysis"
+
+  - patternType: "naming_convention"
+    pattern: "D[0-9]+S[0-9]+ \\([A-Z0-9]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["D17S58 (EW301)", "D17S54 (EW203)", "D17S57 (EW206)"]
+    reasoning: "Standard nomenclature for DNA markers with clone identifiers in parentheses"
+
+  - patternType: "naming_convention"
+    pattern: "D[0-9]+Z[0-9]+ \\([a-zA-Z0-9]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["D17Z1 (p17H8)"]
+    reasoning: "Centromeric DNA markers with clone identifiers - specific genetic reagents"
+
+  - patternType: "context_phrase"
+    pattern: "linkage analysis using"
+    toolType: "genetic_reagent"
+    examples: ["linkage analysis using chromosome 17 DNA markers"]
+    reasoning: "Context phrase indicating genetic reagents (DNA markers) used for linkage studies"
+
+  - patternType: "term"
+    pattern: "CRI-L[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["CRI-L946"]
+    reasoning: "Collaborative Research Inc. DNA marker nomenclature - specific genetic reagents"
+
+observations: []  # No Results or Discussion sections available for observation extraction
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined despite clear presence of 8 DNA markers/genetic reagents
+    - Publication only has abstract available - no Methods, Results, or Discussion sections
+    - Mining patterns appear to miss standard DNA marker nomenclature from 1989 era
+    - All DNA markers explicitly listed as "markers used were" but not detected
+    - Missing patterns for D-number nomenclature and clone identifiers in parentheses
+  recommendations: |
+    Overall recommendations for this publication:
+    - 8 genetic reagents (DNA markers) should be added that were completely missed
+    - All missed tools have high confidence (0.8-0.9) and clear usage context
+    - New patterns needed for DNA marker nomenclature, especially older naming conventions
+    - This represents a significant gap in genetic reagent detection for linkage studies
+    - The phrase "markers used were" is a strong indicator that should trigger genetic reagent mining
+    - No observations can be extracted due to lack of Results/Discussion sections
+    - This publication demonstrates need for better historical genetic nomenclature coverage

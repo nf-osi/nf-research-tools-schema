@@ -1,0 +1,127 @@
+publicationMetadata:
+  pmid: "36976677"
+  title: "Generation of human iPSC-derived neurofibromaspheres for in vitro and in vivo uses."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a protocol paper describing laboratory methods for generating neurofibromaspheres from iPSCs,
+    using NF1(-/-) Schwann cells, primary fibroblasts, and nude mouse models. Expected tools include:
+    - Cell lines (iPSCs, NF1(-/-) Schwann cells)
+    - Animal models (nude mice for engraftment)
+    - Advanced cellular models (neurofibromaspheres as 3D organoid-like structures)
+    - Genetic reagents (NF1(-/-) constructs)
+    - Potentially computational tools for analysis
+  overallAssessment: |
+    This is a laboratory protocol paper that clearly describes experimental methods for generating 
+    neurofibromaspheres and testing them in mouse models. The publication type strongly suggests 
+    the presence of research tools including cell lines, animal models, and advanced cellular models.
+    However, only the abstract is available, limiting detailed tool identification.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "induced pluripotent stem cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...by differentiating NF1(-/-) Schwann cells from induced pluripotent stem cells and combining them..."
+    whyMissed: "iPSCs are a fundamental cell line tool but may not have been recognized due to descriptive phrasing rather than specific cell line names"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "NF1(-/-) Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...differentiating NF1(-/-) Schwann cells from induced pluripotent stem cells..."
+    whyMissed: "Genetically modified cell line with specific NF1 knockout, likely missed due to descriptive naming"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibroma primary fibroblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...combining them with neurofibroma primary fibroblasts..."
+    whyMissed: "Primary cell cultures are research tools but may not match standard cell line naming patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "neurofibromaspheres"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "We describe a protocol to generate neurofibromaspheres by differentiating..."
+    whyMissed: "3D spheroid/organoid-like model system, may not be recognized as advanced cellular model"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...when neurofibromaspheres are engrafted in the sciatic nerve of nude mice..."
+    whyMissed: "Common immunodeficient mouse strain used for xenograft studies, should be recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "induced pluripotent stem cells?|iPSCs?"
+    toolType: "cell_line"
+    examples: ["induced pluripotent stem cells"]
+    reasoning: "iPSCs are fundamental research tools but may be missed when written out fully rather than abbreviated"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+\\(-/-\\)\\s+\\w+\\s+cells?"
+    toolType: "cell_line"
+    examples: ["NF1(-/-) Schwann cells"]
+    reasoning: "Knockout cell lines with gene(-/-) notation are important genetic tools"
+
+  - patternType: "term"
+    pattern: "primary\\s+fibroblasts?|primary\\s+\\w+\\s+cells?"
+    toolType: "cell_line"
+    examples: ["neurofibroma primary fibroblasts"]
+    reasoning: "Primary cell cultures are research tools that may be missed due to descriptive naming"
+
+  - patternType: "term"
+    pattern: "\\w+spheres?|organoids?|spheroids?"
+    toolType: "advanced_cellular_model"
+    examples: ["neurofibromaspheres"]
+    reasoning: "3D culture systems including spheres, organoids, and spheroids are advanced cellular models"
+
+  - patternType: "term"
+    pattern: "nude\\s+mice|immunodeficient\\s+mice|SCID\\s+mice|NSG\\s+mice|NOG\\s+mice"
+    toolType: "animal_model"
+    examples: ["nude mice"]
+    reasoning: "Immunodeficient mouse strains commonly used for xenograft studies"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available, limiting comprehensive tool identification
+    - Protocol paper describing laboratory methods that clearly involve multiple tool types
+    - Mining patterns appear to miss descriptive tool names and 3D culture systems
+  recommendations: |
+    This publication clearly describes laboratory research involving multiple tool types but none were captured.
+    The mining system needs improvement to catch:
+    1. iPSCs and stem cell derivatives described descriptively
+    2. Genetically modified cell lines with knockout notation
+    3. Primary cell cultures
+    4. 3D culture systems and organoid-like models
+    5. Common immunodeficient mouse strains
+    
+    All 5 potentially missed tools should be added as they represent genuine research tools used in this protocol.
+    The suggested patterns would significantly improve mining accuracy for similar publications.
+    
+    This represents a significant mining failure - a clear laboratory protocol with no tools captured.

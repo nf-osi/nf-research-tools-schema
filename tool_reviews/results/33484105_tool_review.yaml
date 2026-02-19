@@ -1,0 +1,220 @@
+publicationMetadata:
+  pmid: "33484105"
+  title: "Circulating free DNA in the plasma of individuals with neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - extensive methods, WGS, computational analysis
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Lab Research with genomic analysis):
+    - Computational tools (software, pipelines) - HIGHLY EXPECTED for WGS analysis
+    - Genetic reagents - POSSIBLE for DNA extraction/library prep kits
+    - Clinical assessment tools - UNLIKELY for this type of molecular study
+    - Antibodies, cell lines, animal models - UNLIKELY for cfDNA plasma study
+    - Advanced cellular models, PDX models - UNLIKELY for plasma-based study
+
+    This is a molecular genomics study using cfDNA whole-genome sequencing with extensive
+    computational analysis. Multiple computational tools and analysis pipelines are expected.
+  overallAssessment: |
+    This is a laboratory research study involving cfDNA extraction, whole-genome sequencing, and
+    extensive computational analysis. The publication should contain numerous computational tools
+    for sequence analysis, copy number analysis, and fragmentomics. The extensive methods section
+    describes multiple software tools and analysis pipelines that should have been captured.
+
+toolValidations: []
+  # No tools were mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "QIAamp Circulating Nucleic Acid Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA was extracted from 2 to 8 mL of plasma using the QIAamp Circulating Nucleic Acid kit (Qiagen)"
+    whyMissed: "Commercial kit name with vendor - should be captured as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit dsDNA High-Sensitivity Assay kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Extracted DNA concentration was measured using the Qubit dsDNA High-Sensitivity Assay kit (Thermo-Fisher)"
+    whyMissed: "Commercial assay kit with vendor - should be captured as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Bioanalyzer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "cfDNA concentration and quality were assessed using a Bioanalyzer (Agilent Technologies)"
+    whyMissed: "Instrument/analysis tool with vendor - should be captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "KAPA HyperPrep kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA sequencing libraries were constructed from 10 to 60 ng of isolated DNA using the KAPA HyperPrep kit (Roche)"
+    whyMissed: "Commercial library prep kit with vendor - should be captured as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "xGen UDI-UMI Adapters"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA sequencing libraries were constructed from 10 to 60 ng of isolated DNA using the KAPA HyperPrep kit (Roche) and xGen UDI-UMI Adapters (IDT)"
+    whyMissed: "Commercial adapter reagent with vendor - should be captured as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NovaSeq S4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Libraries were sequenced using 150-bp paired-end reads on a NovaSeq S4 platform (lllumina)"
+    whyMissed: "Sequencing platform/instrument - should be captured as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "samtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Resulting bam files were then downsampled to a normalized depth of 25× using subsample seed values 0 to 4 in samtools v1.17"
+    whyMissed: "Software tool with version number - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ichorCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "copy-number–based estimation of tumor fraction were then performed using the ichorCNA tool (Broad v.0.2.0)"
+    whyMissed: "Bioinformatics tool with version - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TruSight Oncology 500"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tissue genomic profiling was performed by Clinical Laboratory Improvement Amendments–certified molecular laboratories using TruSight Oncology 500 (Illumina)"
+    whyMissed: "Commercial genomic profiling panel with vendor - should be captured as genetic reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Picard"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Fragment lengths, extracted from bam files using Picard (v.4.0.1.2)"
+    whyMissed: "Software tool with version number - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Python sklearn"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We then used the Python sklearn library (v.1.3.2) decomposition module"
+    whyMissed: "Software library with version - should be captured as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ComplexHeatmap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "represented by heatmaps using ComplexHeatmap (v.2.14.0)"
+    whyMissed: "Software package with version - should be captured as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.4.2.2"
+    whyMissed: "Statistical software with version - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.4.2.2 or GraphPad Prism 10"
+    whyMissed: "Statistical software with version - should be captured as computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+ (kit|Kit)\\b.*\\([A-Z][a-zA-Z]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["QIAamp Circulating Nucleic Acid Kit (Qiagen)", "KAPA HyperPrep kit (Roche)"]
+    reasoning: "Commercial kits with vendor names in parentheses are commonly used genetic reagents"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+ (Assay|assay) kit\\b.*\\([A-Z][a-zA-Z-]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["Qubit dsDNA High-Sensitivity Assay kit (Thermo-Fisher)"]
+    reasoning: "Assay kits with vendor names are genetic reagents for molecular analysis"
+
+  - patternType: "term"
+    pattern: "\\b(samtools|Picard|ichorCNA)\\b.*v?[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["samtools v1.17", "Picard (v.4.0.1.2)", "ichorCNA tool (Broad v.0.2.0)"]
+    reasoning: "Bioinformatics tools with version numbers are computational tools"
+
+  - patternType: "term"
+    pattern: "\\b(Python sklearn|R)\\b.*v[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Python sklearn library (v.1.3.2)", "R v.4.2.2"]
+    reasoning: "Programming languages and libraries with versions used for analysis"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+ (platform|Platform)\\b.*\\([A-Z][a-zA-Z]+\\)"
+    toolType: "computational_tool"
+    examples: ["NovaSeq S4 platform (lllumina)"]
+    reasoning: "Sequencing platforms with vendor names are computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "(using|with|on a?)\\s+[A-Z][a-zA-Z0-9]+\\s+(v?[0-9]+\\.[0-9]+|\\([A-Z][a-zA-Z]+\\))"
+    toolType: "general"
+    examples: ["using samtools v1.17", "on a NovaSeq S4 platform (Illumina)"]
+    reasoning: "Usage context phrases with versions or vendors indicate tool usage"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+\\s+[0-9]+\\b"
+    toolType: "computational_tool"
+    examples: ["GraphPad Prism 10", "TruSight Oncology 500"]
+    reasoning: "Software names followed by version numbers without 'v' prefix"
+
+observations: []
+  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Critical mining failure - this publication contains numerous research tools that were completely missed:
+    - 14 clear research tools identified in methods section
+    - 5 genetic reagents (commercial kits and reagents with vendors)
+    - 9 computational tools (software, platforms, analysis tools with versions)
+    - All tools have clear usage context and vendor/version information
+    - This represents a major failure of the mining algorithm for this publication type
+  recommendations: |
+    URGENT: Complete re-mining of this publication is required. The mining algorithm failed to capture
+    any of the 14+ research tools clearly present in the methods section. This suggests:
+    
+    1. Mining patterns are inadequate for genomics/bioinformatics publications
+    2. Commercial kit names with vendors are not being captured
+    3. Software tools with version numbers are not being captured
+    4. Sequencing platforms and instruments are not being captured
+    
+    All 14 identified tools should be added to the database as they represent genuine research tools
+    with clear experimental usage context. The suggested patterns should be implemented to prevent
+    similar mining failures in genomics publications.
+    
+    This publication demonstrates the need for specialized mining patterns for:
+    - Molecular biology kits and reagents
+    - Bioinformatics software and pipelines  
+    - Sequencing platforms and instruments
+    - Statistical analysis software

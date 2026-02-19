@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "37378983"
+  title: "Effect of Mind-Body Skills Training on Quality of Life for Geographically Diverse Adults With Neurofibromatosis: A Fully Remote Randomized Clinical Trial."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, scales, outcome measures), computational tools for data analysis
+    
+    This randomized clinical trial evaluates mind-body interventions using validated clinical assessment instruments
+    to measure quality of life outcomes. Clinical trials typically use:
+    - Clinical assessment tools: Validated questionnaires and scales for measuring patient outcomes
+    - Computational tools: Statistical software for data analysis and management platforms for data collection
+    
+    The study design and methods clearly indicate use of validated assessment instruments and statistical analysis software.
+  overallAssessment: |
+    This is a well-designed randomized clinical trial that would be expected to use multiple research tools.
+    Clinical trials require validated assessment instruments to measure outcomes and computational tools for data analysis.
+    The mining process appears to have missed several important clinical assessment tools and computational tools that are clearly described in the methods section.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "WHOQOL-BREF"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The 2 primary outcomes were the physical health and psychological QOL domain scores of the World Health Organization Quality of Life Brief Version (WHOQOL-BREF), recommended by the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) International Collaboration."
+    whyMissed: "This validated quality of life assessment tool was not captured despite being the primary outcome measure"
+    confidence: 1.0  # How confident this is a real tool
+    shouldBeAdded: Yes
+
+  - toolName: "Perceived Stress Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Inclusion criteria were...and (6) Perceived Stress Scale score of 6 or higher."
+    whyMissed: "This validated psychological assessment scale was not captured despite being used for participant screening"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "REDCap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Assessments were completed at baseline, after treatment, and at 6- and 12-month follow-up via REDCap."
+    whyMissed: "This widely-used research data collection platform was not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SAS version 9.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used SAS, version 9.4 (SAS Institute Inc), for analyses."
+    whyMissed: "This statistical analysis software with specific version was not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "WHOQOL-BREF|World Health Organization Quality of Life Brief Version"
+    toolType: "clinical_assessment_tool"
+    examples: ["WHOQOL-BREF", "World Health Organization Quality of Life Brief Version (WHOQOL-BREF)"]
+    reasoning: "WHOQOL-BREF is a widely used validated quality of life assessment tool in clinical research"
+
+  - patternType: "term"
+    pattern: "Perceived Stress Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Perceived Stress Scale score of 6 or higher"]
+    reasoning: "Perceived Stress Scale is a commonly used validated psychological assessment instrument"
+
+  - patternType: "term"
+    pattern: "REDCap"
+    toolType: "computational_tool"
+    examples: ["via REDCap", "managed with REDCap"]
+    reasoning: "REDCap is a widely used research data collection and management platform"
+
+  - patternType: "context_phrase"
+    pattern: "SAS[,\\s]+version\\s+[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["SAS, version 9.4"]
+    reasoning: "Statistical software with version numbers should be captured as computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "(?:completed|administered|measured)\\s+(?:at|via|using|with)\\s+[A-Z][A-Za-z\\s-]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["completed at baseline, after treatment, and at 6- and 12-month follow-up via REDCap"]
+    reasoning: "Clinical assessment context phrases often indicate tool usage"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}(?:-[A-Z]{2,})*"
+    toolType: "clinical_assessment_tool"
+    examples: ["WHOQOL-BREF", "REiNS"]
+    reasoning: "Clinical assessment tools often use acronym naming conventions"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - Mining process failed to capture any tools despite this being a clinical trial with clear tool usage
+    - Four important research tools were completely missed: WHOQOL-BREF, Perceived Stress Scale, REDCap, and SAS v9.4
+    - Clinical assessment tools (validated questionnaires/scales) were not detected despite being primary outcome measures
+    - Computational tools for data collection and analysis were not captured
+    - The mining patterns appear inadequate for clinical trial publications
+  recommendations: |
+    Overall recommendations for this publication:
+    - All four missed tools should be added to the database as they are clearly validated research tools
+    - The WHOQOL-BREF and Perceived Stress Scale are validated clinical assessment instruments widely used in research
+    - REDCap and SAS are standard computational tools for research data management and statistical analysis
+    - Mining patterns need significant improvement for clinical assessment tools and computational tools
+    - Clinical trial publications require different mining strategies than laboratory research papers
+    - The suggested patterns should be implemented to improve future mining of similar publications
+    - This publication demonstrates a significant gap in the current mining approach for clinical research tools

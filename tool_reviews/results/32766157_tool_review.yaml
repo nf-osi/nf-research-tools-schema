@@ -1,0 +1,89 @@
+publicationMetadata:
+  pmid: "32766157"
+  title: "Dynamically Shaping Chaperones. Allosteric Modulators of HSP90 Family as Regulatory Tools of Cell Metabolism in Neoplastic Progression."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a review article focused on HSP90 chaperone biology and drug discovery strategies.
+    Review articles typically do not use research tools directly but rather discuss tools and
+    methods from other studies. Expected tool types would be minimal:
+    - Computational tools: Possibly mentioned for molecular modeling or drug design
+    - Genetic reagents: May reference constructs or mutants from cited studies
+    - Cell lines: May reference cancer cell models from cited studies
+    - Clinical assessment tools: Unlikely for this molecular/biochemical review
+    - Lab tools (antibodies, animal models): May be cited but not experimentally used
+    
+    However, this publication lacks a Methods section and focuses on conceptual frameworks
+    rather than experimental procedures, making genuine tool usage highly unlikely.
+  overallAssessment: |
+    This is a review article discussing HSP90 chaperone biology and potential therapeutic strategies.
+    Review articles typically synthesize information from multiple studies rather than conducting
+    original experiments, making genuine research tool usage extremely unlikely. The absence of
+    a Methods section and Results section confirms this is not an experimental study that would
+    use research tools directly.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CRISPRi"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...complementary methods rooted in molecular biology such as pull-downs, genetic screens, CRISPRi, biochemical assays, proteomic and interactomic analyses..."
+    whyMissed: "CRISPRi (CRISPR interference) is mentioned as a molecular biology method but was not captured by initial mining"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "pull-downs"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "...complementary methods rooted in molecular biology such as pull-downs, genetic screens, CRISPRi, biochemical assays, proteomic and interactomic analyses..."
+    whyMissed: "Pull-down assays are mentioned as molecular biology methods but context suggests these are proposed future approaches rather than tools used in this study"
+    confidence: 0.4
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "methods rooted in molecular biology such as"
+    toolType: "general"
+    examples: ["pull-downs, genetic screens, CRISPRi, biochemical assays"]
+    reasoning: "This phrase introduces a list of molecular biology techniques, but in review articles these are often proposed methods rather than actually used tools. Pattern should distinguish between actual usage and methodological suggestions."
+  - patternType: "context_phrase"
+    pattern: "complementary methods.*such as"
+    toolType: "general"
+    examples: ["complementary methods rooted in molecular biology such as pull-downs, genetic screens, CRISPRi"]
+    reasoning: "Similar to above - indicates methodological suggestions rather than actual tool usage. Useful for identifying potential tools but requires careful context analysis to avoid false positives in review articles."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not an experimental study
+    - No Methods section present, indicating no experimental procedures
+    - No Results section present, confirming lack of original experimental data
+    - All tool mentions are in the context of proposed future approaches or citations from other studies
+    - CRISPRi and pull-downs mentioned in Discussion are suggested methodologies, not tools used in this study
+  recommendations: |
+    This publication should not contribute any tools to the research tools database because:
+    1. It is a review article that discusses concepts and strategies rather than reporting experimental work
+    2. The absence of Methods and Results sections confirms no original experimental procedures were performed
+    3. Tool mentions (CRISPRi, pull-downs) appear in the context of suggested future approaches, not actual usage
+    4. Review articles typically cite tools from other studies but do not use tools themselves
+    
+    The mining algorithm correctly identified zero tools from this publication. The potentially missed
+    tools (CRISPRi, pull-downs) should not be added as they represent methodological suggestions rather
+    than actual tool usage. This case demonstrates the importance of distinguishing between experimental
+    studies and review articles when mining for research tools.
+    
+    No observations were extracted as there are no validated tools and no experimental results reported.
+    The suggested patterns could help identify similar methodological discussions in other review articles
+    but would require careful context analysis to avoid false positives.

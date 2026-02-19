@@ -1,0 +1,122 @@
+publicationMetadata:
+  pmid: "37712888"
+  title: "A common single nucleotide variant in the cytokine receptor-like factor-3 (CRLF3) gene causes neuronal deficits in human and mouse cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content, this lab research publication should contain:
+    - Advanced cellular models (hiPSC cerebral organoids)
+    - Cell lines (CRLF3L389P-mutant hiPSC lines)
+    - Animal models (Crlf3L389P-mutant genetically engineered mice)
+    - Potentially computational tools for data analysis
+    
+    The publication describes experimental work with genetically modified cell lines, 
+    cerebral organoids, and mouse models, which are all legitimate research tools.
+  overallAssessment: |
+    This is a clear lab research publication describing experimental work with genetically 
+    modified cell lines, cerebral organoids, and mouse models. The study investigates 
+    functional consequences of a genetic variant using multiple model systems. Such 
+    publications typically use and develop multiple research tools for experimental work.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "hiPSC cerebral organoids"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "Using human induced pluripotent stem cell (hiPSC) cerebral organoid modeling of the 1.4 megabase Neurofibromatosis type 1 (NF1) deletion syndrome"
+    whyMissed: "Cerebral organoids are advanced 3D cellular models that should be captured as research tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CRLF3L389P-mutant hiPSC lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "we generated CRLF3L389P-mutant hiPSC lines and Crlf3L389P-mutant genetically engineered mice"
+    whyMissed: "Genetically modified hiPSC lines are research tools - cell lines with specific mutations"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Crlf3L389P-mutant genetically engineered mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "we generated CRLF3L389P-mutant hiPSC lines and Crlf3L389P-mutant genetically engineered mice"
+    whyMissed: "Genetically engineered mouse models are standard research tools in neuroscience"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "mouse hippocampal neurons"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Crlf3L389P-mutant mouse hippocampal neurons have decreased firing rates and synaptic current amplitudes"
+    whyMissed: "Primary neuronal cultures derived from the mouse model are research tools"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "cerebral organoid[s]?"
+    toolType: "advanced_cellular_model"
+    examples: ["hiPSC cerebral organoid modeling", "cerebral organoids"]
+    reasoning: "Cerebral organoids are advanced 3D cellular models that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+[A-Z][0-9]+[A-Z]-mutant.*cell[s]?|line[s]?"
+    toolType: "cell_line"
+    examples: ["CRLF3L389P-mutant hiPSC lines"]
+    reasoning: "Pattern to catch genetically modified cell lines with specific mutation nomenclature"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+[A-Z][0-9]+[A-Z]-mutant.*mice|mouse"
+    toolType: "animal_model"
+    examples: ["Crlf3L389P-mutant genetically engineered mice"]
+    reasoning: "Pattern to catch genetically engineered mouse models with specific mutations"
+
+  - patternType: "context_phrase"
+    pattern: "we generated.*mutant.*lines?"
+    toolType: "cell_line"
+    examples: ["we generated CRLF3L389P-mutant hiPSC lines"]
+    reasoning: "Context phrase indicating generation of genetically modified cell lines"
+
+  - patternType: "term"
+    pattern: "hippocampal neurons?"
+    toolType: "cell_line"
+    examples: ["mouse hippocampal neurons"]
+    reasoning: "Primary neuronal cultures are research tools used in neuroscience experiments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple research tools
+    - Publication describes experimental work with cerebral organoids, genetically modified cell lines, and mouse models
+    - Mining system failed to identify obvious research tools mentioned in the abstract
+    - Full text sections (Methods, Results, Discussion) are not available, limiting detailed analysis
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the mining system:
+    1. hiPSC cerebral organoids (advanced cellular model)
+    2. CRLF3L389P-mutant hiPSC lines (genetically modified cell line)
+    3. Crlf3L389P-mutant genetically engineered mice (animal model)
+    4. Mouse hippocampal neurons (primary cell culture)
+    
+    All four tools should be added to the database. The mining patterns need significant improvement
+    to catch organoids, genetically modified cell lines, and mouse models. The absence of full text
+    sections limits the ability to extract detailed observations, but the abstract provides clear
+    evidence of tool usage in experimental contexts.
+    
+    Priority actions:
+    - Add patterns for cerebral organoids and other organoid types
+    - Improve detection of genetically modified cell lines and mouse models
+    - Add context phrases like "we generated" that indicate tool development
+    - Consider primary cell cultures (hippocampal neurons) as research tools

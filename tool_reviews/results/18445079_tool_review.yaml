@@ -1,0 +1,100 @@
+publicationMetadata:
+  pmid: "18445079"
+  title: "Altered adhesive structures and their relation to RhoGTPase activation in merlin-deficient Schwannoma."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9  # High confidence based on in vitro model usage and molecular mechanisms
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes laboratory research using "Schwannoma in vitro model of human primary Schwann and Schwannoma cells"
+    which strongly suggests the use of cell lines or primary cell cultures. The study investigates molecular mechanisms
+    involving focal contacts, RhoGTPase signaling, and protein interactions, which would typically require antibodies
+    for protein detection/localization studies. However, only the abstract is available, limiting tool identification.
+  overallAssessment: |
+    This is clearly a laboratory research study investigating molecular mechanisms in Schwannoma cells using in vitro models.
+    The authors explicitly mention using "our Schwannoma in vitro model of human primary Schwann and Schwannoma cells,"
+    indicating cell culture work that would require research tools. The study of protein localization, focal contacts,
+    and RhoGTPase signaling would typically involve antibodies, cell lines, and possibly genetic reagents, but the
+    absence of Methods/Results sections severely limits tool identification from this abstract-only publication.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "human primary Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Using our Schwannoma in vitro model of human primary Schwann and Schwannoma cells, we here show that Schwannoma cells display"
+    whyMissed: "Primary cell cultures are research tools but may not have been recognized due to 'primary' descriptor rather than established cell line naming"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Using our Schwannoma in vitro model of human primary Schwann and Schwannoma cells, we here show that Schwannoma cells display"
+    whyMissed: "Cell culture model mentioned as research tool but may not match standard cell line naming patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "human primary Schwannoma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The Rac1 guanine exchange factor- beta-Pix, localizes to focal contacts in human primary Schwannoma cells"
+    whyMissed: "Primary cell cultures specifically mentioned as experimental system but not captured by mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "primary [cell_type] cells"
+    toolType: "cell_line"
+    examples: ["human primary Schwann cells", "human primary Schwannoma cells"]
+    reasoning: "Primary cell cultures are legitimate research tools used in laboratory studies but may be missed by patterns focused on established cell line names"
+
+  - patternType: "context_phrase"
+    pattern: "in vitro model of [cell_type]"
+    toolType: "cell_line"
+    examples: ["Schwannoma in vitro model of human primary Schwann and Schwannoma cells"]
+    reasoning: "In vitro models explicitly described as experimental systems should be captured as cell culture tools"
+
+  - patternType: "context_phrase"
+    pattern: "using our [model_name] model"
+    toolType: "cell_line"
+    examples: ["Using our Schwannoma in vitro model"]
+    reasoning: "Authors describing their own established cell culture models indicates tool usage that should be captured"
+
+observations: []  # No validated tools to extract observations from, and no Results/Discussion sections available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of cell culture work
+    - Only abstract available - no Methods, Results, or Discussion sections to provide detailed tool information
+    - Primary cell cultures mentioned as research tools but not captured by mining patterns
+    - Limited context available for comprehensive tool identification
+  recommendations: |
+    This publication clearly describes laboratory research using cell culture models but no tools were captured.
+    The primary issue is that only the abstract is available, severely limiting tool identification opportunities.
+    However, the abstract does mention specific cell culture systems that should be considered research tools:
+    
+    1. "Human primary Schwann cells" and "human primary Schwannoma cells" are legitimate research tools
+    2. The "Schwannoma in vitro model" represents an established experimental system
+    3. Mining patterns should be enhanced to capture primary cell cultures and in vitro models
+    
+    Recommendations:
+    - Add patterns for "primary [cell_type] cells" to capture primary cell cultures
+    - Include "in vitro model" patterns to identify experimental cell culture systems
+    - Consider author-described models ("our [model_name] model") as potential tools
+    - This publication demonstrates the need for better pattern coverage of cell culture systems beyond established cell lines
+    
+    No observations could be extracted due to absence of Results/Discussion sections.

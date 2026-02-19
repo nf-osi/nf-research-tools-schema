@@ -1,0 +1,88 @@
+publicationMetadata:
+  pmid: "35393544"
+  title: "Malignant Peripheral Nerve Sheath Tumor: Models, Biology, and Translation"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review articles typically do not contain actual research tools but may reference or discuss
+    various model systems and methodologies used in the field. Based on the title mentioning
+    "Models, Biology, and Translation", this review likely discusses:
+    - Animal models used in MPNST research (referenced, not used)
+    - Cell line models (referenced, not used)
+    - Potentially computational tools for analysis (referenced, not used)
+    - Clinical assessment approaches (referenced, not used)
+    
+    However, as a review article without Methods section, any tools mentioned would be
+    citations/references rather than actual experimental usage.
+  overallAssessment: |
+    This is clearly a review article that provides an overview of MPNST biology, genetics, and
+    model systems rather than reporting original experimental research. Review articles typically
+    cite and discuss tools used by others but do not use tools themselves experimentally.
+    The absence of Methods, Introduction, and Results sections confirms this is not primary research.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "human iPSCs"
+    toolType: "cell_line"
+    foundIn: "discussion"
+    contextSnippet: "Additionally, using CRISPR gene editing of human iPSCs to engineer specific patient-based mutations could provide a platform for identifying more effective drugs."
+    whyMissed: "iPSCs mentioned in context of future research directions, but this is a suggestion for future work rather than actual usage"
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "CRISPR gene editing"
+    toolType: "genetic_reagent"
+    foundIn: "discussion"
+    contextSnippet: "Additionally, using CRISPR gene editing of human iPSCs to engineer specific patient-based mutations could provide a platform for identifying more effective drugs."
+    whyMissed: "CRISPR mentioned as potential future approach, not as a tool actually used in this study"
+    confidence: 0.2
+    shouldBeAdded: No
+  - toolName: "preclinical mouse models"
+    toolType: "animal_model"
+    foundIn: "discussion"
+    contextSnippet: "While potentially interesting compounds have been identified in small molecule drug screens, they do not always show efficacy in preclinical mouse models"
+    whyMissed: "Mouse models mentioned in general discussion of field challenges, not specific models used"
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "review of|overview of|summarize|discuss findings|current management"
+    toolType: "general"
+    examples: ["provide an overview of MPNST biology", "discuss findings regarding", "summarize the various model systems"]
+    reasoning: "These phrases could help identify review articles that discuss tools without using them, reducing false positives"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 1
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not primary research
+    - No Methods section indicating experimental work
+    - Only abstract and brief discussion section available
+    - All potential tool mentions are in context of future directions or general field discussion
+    - No actual experimental usage of any research tools
+  recommendations: |
+    This publication should not contribute any tools to the database as it is a review article
+    that discusses the field rather than reporting original research. The mining correctly
+    identified zero tools. The few potential tool mentions (iPSCs, CRISPR, mouse models) are
+    in the context of future research suggestions or general field challenges, not actual usage.
+    
+    For future mining, consider adding patterns to identify review articles early in the process
+    to avoid unnecessary processing. Key indicators include:
+    - Titles with "Review", "Overview", "Models, Biology, and Translation"
+    - Absence of Methods sections
+    - Language patterns like "provide an overview", "summarize", "discuss findings"
+    
+    No tools should be added from this publication, and no observations can be extracted
+    since no tools were validated for acceptance.

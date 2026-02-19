@@ -1,0 +1,215 @@
+publicationMetadata:
+  pmid: "34155781"
+  title: "L-carnitine supplementation for muscle weakness and fatigue in children with neurofibromatosis type 1: A Phase 2a clinical trial."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, functional assessment scales, outcome measures)
+    This publication should contain validated clinical assessment instruments used to measure:
+    - Quality of life (PedsQL mentioned in abstract)
+    - Behavioral assessments (CBCL mentioned in abstract)
+    - Functional assessments (6-minute walk test, strength measures)
+    - Safety assessments (biochemical tests)
+    
+    May also contain computational tools for statistical analysis, though these are less commonly mined.
+    Lab tools (antibodies, cell lines, etc.) would not be expected in a clinical trial publication.
+  overallAssessment: |
+    This is a legitimate Phase 2a clinical trial that extensively uses validated clinical assessment tools.
+    The study employed multiple standardized instruments to measure safety, compliance, and efficacy outcomes.
+    Clinical assessment tools are genuine research tools and should be captured by mining algorithms.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...parent-reported questionnaires (PedsQL™, CBCL/6-18). Six children completed..."
+    whyMissed: "Standard clinical assessment tool name not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+  
+  - toolName: "PedsQL Generic 4.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Quality of life was assessed by parent reported questionnaires, including the Pediatric Quality of Life (PedsQL™) Generic 4.0 and Neuromuscular (3.0) modules..."
+    whyMissed: "Specific version of PedsQL not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+  
+  - toolName: "PedsQL Neuromuscular 3.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...the Pediatric Quality of Life (PedsQL™) Generic 4.0 and Neuromuscular (3.0) modules..."
+    whyMissed: "Specific neuromuscular module not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+  
+  - toolName: "CBCL/6-18"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...parent-reported questionnaires (PedsQL™, CBCL/6-18). Six children completed..."
+    whyMissed: "Standard behavioral assessment tool abbreviation not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+  
+  - toolName: "Child Behavior Checklist for ages 6-18"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Quality of life was assessed by parent reported questionnaires, including the Pediatric Quality of Life (PedsQL™) Generic 4.0 and Neuromuscular (3.0) modules, and The Child Behavior Checklist for ages 6–18 or CBCL/6–18..."
+    whyMissed: "Full name of behavioral assessment tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+  
+  - toolName: "6-minute-walk test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...functional measures (muscle strength, long jump, handwriting speed, 6-minute-walk test [6MWT])..."
+    whyMissed: "Standardized functional assessment test not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "6MWT"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...handwriting speed, 6-minute-walk test [6MWT]), and parent-reported..."
+    whyMissed: "Abbreviation for 6-minute walk test not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "Handwriting Speed Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Fine motor endurance was evaluated by the Handwriting Speed Test (Wallen et al., 1996) that gives a raw score in letters per minute..."
+    whyMissed: "Standardized motor assessment test not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "MC-780MA Tanita Tokyo body composition analyzer"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Body fat was measured using the MC-780MA Tanita Tokyo body composition analyzer..."
+    whyMissed: "Medical device used for clinical assessment not captured"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL™", "PedsQL Generic 4.0", "PedsQL Neuromuscular 3.0"]
+    reasoning: "PedsQL is a widely used pediatric quality of life assessment tool with multiple modules"
+  
+  - patternType: "term"
+    pattern: "CBCL"
+    toolType: "clinical_assessment_tool"
+    examples: ["CBCL/6-18", "Child Behavior Checklist"]
+    reasoning: "CBCL is a standard behavioral assessment tool commonly abbreviated"
+  
+  - patternType: "term"
+    pattern: "6-minute.walk.test|6MWT"
+    toolType: "clinical_assessment_tool"
+    examples: ["6-minute-walk test", "6MWT"]
+    reasoning: "6-minute walk test is a standardized functional assessment commonly used in clinical trials"
+  
+  - patternType: "context_phrase"
+    pattern: "assessed by|measured using|evaluated by"
+    toolType: "clinical_assessment_tool"
+    examples: ["Quality of life was assessed by parent reported questionnaires", "Body fat was measured using the MC-780MA"]
+    reasoning: "These phrases commonly precede clinical assessment tool mentions"
+  
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}[/-][0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["CBCL/6-18", "MC-780MA"]
+    reasoning: "Many clinical assessment tools follow abbreviation-number patterns"
+  
+  - patternType: "context_phrase"
+    pattern: "parent.reported questionnaires|parent reported questionnaires"
+    toolType: "clinical_assessment_tool"
+    examples: ["parent-reported questionnaires (PedsQL™, CBCL/6-18)"]
+    reasoning: "Parent-reported questionnaires are a key indicator of clinical assessment tools"
+
+observations:
+  - resourceName: "PedsQL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Parent reports showed no negative impact on quality of life measured by PedsQL.
+      The tool successfully captured quality of life outcomes in children with NF1 
+      receiving L-carnitine supplementation over 12 weeks.
+    foundIn: "results"
+    contextSnippet: "Parent reports showed no negative impact on quality of life, and the perceived benefits led to the majority of individuals remaining on L-carnitine after the study."
+    confidence: 0.9
+    doi: "10.1002/ajmg.a.62392"
+  
+  - resourceName: "6-minute-walk test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Motor Activity"
+    observationTypeOntologyId: "MP:0001392"
+    details: |
+      Mean 10% increase in 6MWT distance (95% CI 5.88-75.45; p = 0.03) after 12 weeks 
+      of L-carnitine supplementation. Comparison with 1000 Norms Project data showed 
+      significant improvement in Z-score for this measure, indicating improved gross 
+      motor endurance in children with NF1.
+    foundIn: "results"
+    contextSnippet: "In terms of muscle performance, there was a mean 10% increase in long jump distance (95% CI 2.97-16.03; p = 0.01) and 6MWT distance (95% CI 5.88-75.45; p = 0.03)."
+    confidence: 1.0
+    doi: "10.1002/ajmg.a.62392"
+  
+  - resourceName: "Handwriting Speed Test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Motor Activity"
+    observationTypeOntologyId: "MP:0001392"
+    details: |
+      Fine motor endurance was evaluated using the Handwriting Speed Test, which 
+      provides a raw score in letters per minute. This test was used to assess 
+      fine motor function changes following L-carnitine supplementation, though 
+      specific results were not detailed in the abstract.
+    foundIn: "methods"
+    contextSnippet: "Fine motor endurance was evaluated by the Handwriting Speed Test (Wallen et al., 1996) that gives a raw score in letters per minute"
+    confidence: 0.8
+    doi: "10.1002/ajmg.a.62392"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    General Comment or Review: 1
+    Motor Activity: 2
+  majorIssuesFound: |
+    - Mining algorithm completely missed this publication's clinical assessment tools
+    - No tools were mined despite publication containing multiple validated instruments
+    - Clinical assessment tools (PedsQL, CBCL, 6MWT, etc.) are legitimate research tools
+    - This represents a significant gap in clinical tool detection patterns
+  recommendations: |
+    This publication demonstrates a major gap in clinical assessment tool mining patterns.
+    Multiple validated clinical instruments were used but none were detected:
+    
+    CRITICAL MISSING TOOLS:
+    - PedsQL (Pediatric Quality of Life) - widely used QoL assessment
+    - CBCL/6-18 (Child Behavior Checklist) - standard behavioral assessment
+    - 6-minute walk test (6MWT) - functional assessment tool
+    - Handwriting Speed Test - motor function assessment
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Add specific clinical assessment tool names (PedsQL, CBCL)
+    - Include functional test patterns (6-minute walk test, handwriting speed)
+    - Capture assessment context phrases ("assessed by", "measured using")
+    - Recognize parent-reported questionnaire indicators
+    
+    OBSERVATIONS EXTRACTED:
+    - Successfully identified functional improvements measured by these tools
+    - Quality of life and motor activity observations linked to specific instruments
+    - Demonstrates clinical utility and research value of these assessment tools
+    
+    This publication should have 5-9 clinical assessment tools added to improve mining coverage.

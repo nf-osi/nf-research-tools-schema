@@ -1,0 +1,164 @@
+publicationMetadata:
+  pmid: "7671302"
+  title: "Loss of neurofibromin results in neurotrophin-independent survival of embryonic sensory and sympathetic neurons."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and the 1995 Cell paper studying neurofibromin function 
+    in embryonic neurons, this study would be expected to contain:
+    - Animal models (NF1 knockout mice, wild-type controls)
+    - Genetic reagents (targeted gene disruption constructs)
+    - Cell lines (primary neuronal cultures from embryos)
+    - Antibodies (potentially for NGF-blocking experiments mentioned in abstract)
+    - Growth factors/reagents (NGF, BDNF mentioned in abstract)
+    
+    Note: This is a 1995 publication, so computational tools would be minimal compared to modern standards.
+    The study focuses on neuronal survival assays and morphological analysis of embryonic neurons.
+  overallAssessment: |
+    This 1995 Cell publication is a classic laboratory research study investigating neurofibromin's role 
+    in neurotrophin-dependent neuronal survival using NF1 knockout mice. The study would typically contain 
+    multiple research tools including animal models, primary cell cultures, growth factors, and potentially 
+    antibodies. However, there is a significant data integrity issue: the methods section provided appears 
+    to be from a completely different, modern publication about EGLN1/PHD2 research including techniques 
+    like iPSCs and next-generation sequencing that did not exist in 1995.
+
+toolValidations: []
+  # No tools were actually mined according to the input data (minedTools: [], totalTools: 0)
+
+potentiallyMissedTools:
+  - toolName: "NF1(-/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...both neural crest- and placode-derived sensory neurons isolated from NF1(-/-) embryos develop, extend neurites, and survive in the absence of neurotrophins..."
+    whyMissed: "Knockout mouse model clearly mentioned in abstract but not captured by mining algorithms"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "wild-type mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...whereas their wild-type counterparts die rapidly unless nerve growth factor (NGF) or brain-derived neurotrophic factor (BDNF) is added..."
+    whyMissed: "Control animal model mentioned but not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "primary sensory neuron cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...both neural crest- and placode-derived sensory neurons isolated from NF1(-/-) embryos..."
+    whyMissed: "Primary cell culture system not recognized as tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "primary sympathetic neuron cultures"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...NF1 (-/-) sympathetic neurons survive for extended periods and acquire mature morphology..."
+    whyMissed: "Primary cell culture system not recognized as tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "nerve growth factor (NGF)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...unless nerve growth factor (NGF) or brain-derived neurotrophic factor (BDNF) is added to the culture medium..."
+    whyMissed: "Growth factor reagent not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "brain-derived neurotrophic factor (BDNF)"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...unless nerve growth factor (NGF) or brain-derived neurotrophic factor (BDNF) is added to the culture medium..."
+    whyMissed: "Growth factor reagent not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NGF-blocking antibodies"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "...NF1 (-/-) sympathetic neurons survive for extended periods and acquire mature morphology in the presence of NGF-blocking antibodies..."
+    whyMissed: "Functional blocking antibody not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "targeted disruption of NF1 gene"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have exploited a targeted disruption of the NF1 gene in mice to examine the role of neurofibromin..."
+    whyMissed: "Gene targeting construct/method not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "isolated from [gene](-/-) embryos"
+    toolType: "animal_model"
+    examples: ["isolated from NF1(-/-) embryos"]
+    reasoning: "This pattern indicates use of knockout mouse models for primary cell isolation"
+
+  - patternType: "context_phrase"
+    pattern: "targeted disruption of the [gene] gene"
+    toolType: "genetic_reagent"
+    examples: ["targeted disruption of the NF1 gene"]
+    reasoning: "Classic phrase for gene knockout/targeting constructs, especially in 1990s literature"
+
+  - patternType: "context_phrase"
+    pattern: "[factor]-blocking antibodies"
+    toolType: "antibody"
+    examples: ["NGF-blocking antibodies"]
+    reasoning: "Functional blocking antibodies are important research tools often missed"
+
+  - patternType: "context_phrase"
+    pattern: "neurons isolated from"
+    toolType: "cell_line"
+    examples: ["sensory neurons isolated from NF1(-/-) embryos"]
+    reasoning: "Primary neuronal cultures are important cellular models that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[gene](+/+|+/-|-/-)"
+    toolType: "animal_model"
+    examples: ["NF1(-/-)", "NF1(+/-)"]
+    reasoning: "Standard genetic nomenclature for mouse genotypes should be recognized"
+
+  - patternType: "term"
+    pattern: "growth factor|neurotrophic factor"
+    toolType: "genetic_reagent"
+    examples: ["nerve growth factor (NGF)", "brain-derived neurotrophic factor (BDNF)"]
+    reasoning: "Growth factors are key reagents in neurobiology research"
+
+observations: []
+  # No validated tools to extract observations from, and Results/Discussion sections not available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL DATA INTEGRITY ISSUE: The methods section appears to be from a completely different publication 
+      about EGLN1/PHD2 research with modern techniques (iPSCs, next-generation sequencing) that did not exist in 1995
+    - No tools were mined from this publication despite it being a clear laboratory research study
+    - Mining algorithms completely failed to capture obvious research tools mentioned in the abstract
+    - The publication is from 1995 but methods describe 2020s-era techniques
+    - Abstract clearly describes multiple research tools (knockout mice, primary cultures, growth factors, antibodies)
+  recommendations: |
+    - URGENT: Investigate data integrity issue - methods section does not match publication metadata
+    - All 8 potentially missed tools should be added to the database
+    - Implement suggested patterns to improve capture of 1990s-era research tools
+    - Review mining algorithms for better recognition of:
+      * Knockout mouse nomenclature [gene](-/-)
+      * Primary cell culture systems
+      * Growth factors and cytokines
+      * Functional blocking antibodies
+      * Gene targeting/disruption constructs
+    - This publication represents a significant mining failure - clear research tools were completely missed
+    - Consider separate pattern sets for historical publications (pre-2000) vs modern publications
+    - Verify that the correct full-text content is being processed for each PMID

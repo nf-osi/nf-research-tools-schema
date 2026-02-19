@@ -1,0 +1,95 @@
+publicationMetadata:
+  pmid: "29704429"
+  title: "Insights into optic pathway glioma vision loss from mouse models of neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very high confidence - abstract clearly states "we review our current understanding"
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Review Article → May reference tools from literature but typically doesn't use them experimentally.
+    However, this review specifically focuses on mouse models, so animal models are expected to be discussed.
+    The abstract mentions "genetically engineered mouse (GEM) strains" and "patient-derived xenografts"
+    which are legitimate research tools even in a review context when they are the subject of review.
+    
+    Expected tool types for this review:
+    - Animal models (Nf1 GEM strains)
+    - Patient-derived models (PDX models mentioned)
+    - Possibly computational tools if bioinformatics analysis is reviewed
+  overallAssessment: |
+    This is a review article focusing specifically on mouse models of NF1, so animal models are the primary
+    research tools expected. While review articles typically don't use tools experimentally, they may
+    discuss and reference specific model systems that are the subject of the review. The abstract explicitly
+    mentions "genetically engineered mouse (GEM) strains" and "patient-derived xenografts" which are
+    legitimate research tools worth capturing even in a review context.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Nf1 GEM strains"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...However, mice genetically engineered to harbor Nf1 gene mutations develop optic gliomas that share many features of their human counterparts. These genetically engineered mouse (GEM) strains have provided important insights..."
+    whyMissed: "Generic reference to 'GEM strains' may not have matched specific animal model patterns. The term 'Nf1 GEM strains' refers to multiple genetically engineered mouse models."
+    confidence: 0.85  # High confidence this represents real animal models
+    shouldBeAdded: Yes
+
+  - toolName: "genetically engineered mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...However, mice genetically engineered to harbor Nf1 gene mutations develop optic gliomas that share many features of their human counterparts..."
+    whyMissed: "Descriptive phrase rather than specific model name may not have been caught by patterns looking for standard nomenclature."
+    confidence: 0.80  # High confidence but more generic than specific strain names
+    shouldBeAdded: Maybe
+
+  - toolName: "patient-derived xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...A paucity of surgical tumor specimens and of patient-derived xenografts for investigative studies has limited our understanding..."
+    whyMissed: "Standard PDX terminology should have been caught. May indicate gap in patient-derived model patterns."
+    confidence: 0.90  # Very high confidence - explicit PDX reference
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "genetically engineered mouse.*strain|GEM.*strain|GEM.*model"
+    toolType: "animal_model"
+    examples: ["genetically engineered mouse (GEM) strains", "Nf1 GEM strains", "Nf1 GEM models"]
+    reasoning: "Captures references to genetically engineered mouse strains using common GEM abbreviation, which is standard terminology in the field."
+
+  - patternType: "term"
+    pattern: "patient-derived xenograft|PDX.*model|xenograft.*model"
+    toolType: "patient_derived_model"
+    examples: ["patient-derived xenografts"]
+    reasoning: "Should capture explicit mentions of PDX models and patient-derived xenografts, which are standard terminology."
+
+  - patternType: "context_phrase"
+    pattern: "mice genetically engineered to|genetically modified.*mice|transgenic.*mice.*model"
+    toolType: "animal_model"
+    examples: ["mice genetically engineered to harbor Nf1 gene mutations"]
+    reasoning: "Captures descriptive phrases that indicate genetically modified animal models even when specific strain names aren't provided."
+
+observations: []  # No validated tools to extract observations from, and no Results/Discussion sections available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # Number of tools that might have been missed
+  newPatternsCount: 3  # Number of new patterns suggested
+  observationsExtracted: 0  # No Results/Discussion sections available
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    - This is a review article with only an abstract available, no Methods/Results/Discussion sections
+    - Mining found 0 tools but missed several legitimate research tools mentioned in abstract
+    - Patient-derived xenografts explicitly mentioned but not caught by mining patterns
+    - Genetically engineered mouse models discussed extensively but not detected
+    - Review context means tools are discussed rather than experimentally used
+  recommendations: |
+    - Add the 3 potentially missed tools, particularly "patient-derived xenografts" and "Nf1 GEM strains"
+    - Implement suggested patterns to catch GEM models and PDX references in future mining
+    - Consider whether review articles should be included in tool mining or flagged separately
+    - The tools mentioned here are legitimate research models even in review context
+    - No experimental observations can be extracted due to lack of Results/Discussion sections
+    - This publication demonstrates gaps in current mining patterns for animal models and PDX systems

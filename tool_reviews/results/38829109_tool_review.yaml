@@ -1,0 +1,114 @@
+publicationMetadata:
+  pmid: "38829109"
+  title: "Concurrent Collection of Fetal Murine Brain and Serum to Assess Effects of Maternal Diet on Nutrition and Neurodevelopment in Neurofibromatosis Type 1."
+  queryType: "unknown"  # Not specified in input file
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content analysis:
+    - Animal models: Expected (mentions Nf1-heterozygous mice and WT controls)
+    - Genetic reagents: Possible (Nf1 mouse strains)
+    - Computational tools: Possible (for data analysis)
+    - Antibodies: Possible (mentions immunostaining)
+    - Clinical assessment tools: Unlikely (this is a lab methods paper)
+    - Cell lines: Unlikely (focuses on in vivo mouse work)
+    - Advanced cellular models: Unlikely (in vivo study)
+    - Patient-derived models: Unlikely (uses mouse models)
+
+    This is a JoVE methods paper describing laboratory protocols for mouse tissue collection
+    and analysis, so research tools are highly expected despite the lack of a traditional
+    Methods section.
+  overallAssessment: |
+    This is a laboratory research methods paper published in JoVE (Journal of Visualized Experiments)
+    describing protocols for concurrent collection of fetal murine brain and serum. The publication
+    type strongly suggests the presence of research tools, particularly animal models and laboratory
+    reagents. Despite lacking traditional Methods/Results sections, the abstract contains sufficient
+    detail to identify several research tools that should have been captured during mining.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf1-heterozygous mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Using this technique, we have identified that maternal obesogenic diet increases fetal serum cholesterol similarly between WT and Nf1-heterozygous pups."
+    whyMissed: "The mining likely missed this because it was referred to as 'Nf1-heterozygous pups' rather than a standard mouse strain nomenclature format"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "WT control mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...maternal obesogenic diet increases fetal serum cholesterol similarly between WT and Nf1-heterozygous pups."
+    whyMissed: "WT (wild-type) controls are essential research tools but may not have been recognized as a distinct tool entity"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "immunostaining"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...the quality of the collected tissue was verified by immunostaining."
+    whyMissed: "This refers to the technique rather than specific antibodies, but implies the use of antibodies for tissue verification"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1[+-]/[+-]|Nf1\\+/-|Nf1-heterozygous|Nf1-deficient|Nf1 knockout|Nf1 KO"
+    toolType: "animal_model"
+    examples: ["Nf1-heterozygous pups", "WT and Nf1-heterozygous"]
+    reasoning: "NF1 mouse models are commonly described using various nomenclature formats that should be captured as animal models rather than just gene references"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(WT|wild[- ]?type)\\s+(controls?|mice|pups|animals?)"
+    toolType: "animal_model"
+    examples: ["WT and Nf1-heterozygous pups"]
+    reasoning: "Wild-type controls are essential research tools in comparative studies and should be recognized as animal models"
+
+  - patternType: "term"
+    pattern: "immunostaining|immunohistochemistry|IHC"
+    toolType: "genetic_reagent"
+    examples: ["verified by immunostaining"]
+    reasoning: "These techniques imply the use of antibodies as research reagents, though specific antibodies may not be named"
+
+  - patternType: "context_phrase"
+    pattern: "(fetal|embryonic|postnatal)\\s+(murine|mouse|rat)\\s+(brain|tissue|serum)"
+    toolType: "animal_model"
+    examples: ["fetal murine brain and serum"]
+    reasoning: "Developmental stage-specific animal tissue collection indicates the use of animal models at specific developmental timepoints"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - This is a JoVE methods paper describing laboratory protocols with animal models
+    - The abstract clearly mentions Nf1-heterozygous mice and WT controls as experimental subjects
+    - Mining patterns appear to miss animal model references when they use non-standard nomenclature
+    - The publication describes tissue collection and analysis methods that would typically involve multiple research tools
+  recommendations: |
+    This publication represents a significant mining failure - it's a clear laboratory research methods
+    paper that should have yielded multiple research tools, particularly animal models. The mining
+    system needs improvement in:
+    
+    1. Recognizing animal model nomenclature variations (Nf1-heterozygous, WT controls)
+    2. Identifying implied tools from technique descriptions (immunostaining → antibodies)
+    3. Better handling of JoVE protocol papers which may lack traditional Methods sections
+    4. Capturing developmental stage-specific animal models (fetal murine models)
+    
+    All suggested tools should be added to improve mining coverage for similar publications.
+    The patterns suggested would help capture NF1 mouse models and control animals that are
+    commonly used in neurofibromatosis research but may be described using varied terminology.
+    
+    No observations could be extracted since no tools were validated, but this publication
+    would likely contain valuable methodological observations if the tools were properly identified.

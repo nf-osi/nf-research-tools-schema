@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "36806881"
+  title: "Proteasomal pathway inhibition as a potential therapy for NF2-associated meningioma and schwannoma"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a preclinical drug screening study using multiple model systems including:
+    - Human primary and immortalized cell lines (meningioma)
+    - Genetically modified cell lines (CRISPR-modified Schwann cells)
+    - Mouse knockout models (Nf2-/- mice)
+    - Orthotopic tumor models
+    - High-throughput screening platforms
+    - RNA-sequencing and flow cytometry analysis
+    
+    Expected tool types: cell lines, animal models, genetic reagents, computational tools
+  overallAssessment: |
+    This is a laboratory research study focused on preclinical drug testing for NF2-associated tumors.
+    The study clearly uses multiple research tools including cell lines, animal models, and analytical methods.
+    The presence of a Methods section and experimental procedures strongly indicates tool usage for drug screening and mechanistic studies.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "human primary meningioma cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Employing human primary and immortalized meningioma (MN) cell lines, CRISPR-modified Schwann cells..."
+    whyMissed: "Generic cell line description without specific names or catalog numbers"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "immortalized meningioma cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...Employing human primary and immortalized meningioma (MN) cell lines, CRISPR-modified Schwann cells..."
+    whyMissed: "Generic cell line description without specific names"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR-modified Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...immortalized meningioma (MN) cell lines, CRISPR-modified Schwann cells (SCs), and mouse Nf2-/- SCs..."
+    whyMissed: "CRISPR modification not recognized as cell line variant"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "mouse Nf2-/- Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...CRISPR-modified Schwann cells (SCs), and mouse Nf2-/- SCs, we performed dose response testing..."
+    whyMissed: "Mouse knockout cell line not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2-/- mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "...Employing human primary and immortalized meningioma (MN) cell lines, CRISPR-modified Schwann cells (SCs), and mouse Nf2−/− SCs..."
+    whyMissed: "Knockout mouse strain notation not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "orthotopic NF2-deficient meningioma tumor models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...In vivo efficacy was also assessed in orthotopic NF2-deficient meningioma and schwannoma tumor models..."
+    whyMissed: "Complex tumor model description not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "orthotopic NF2-deficient schwannoma tumor models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...In vivo efficacy was also assessed in orthotopic NF2-deficient meningioma and schwannoma tumor models..."
+    whyMissed: "Complex tumor model description not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "RNA-sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...flow cytometry-based Annexin V and cell cycle analyses, and RNA-sequencing to identify potential underlying mechanisms..."
+    whyMissed: "RNA-seq mentioned but analysis tools not specified"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "flow cytometry"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...we performed dose response testing, flow cytometry-based Annexin V and cell cycle analyses, and RNA-sequencing..."
+    whyMissed: "Flow cytometry analysis tools not specified"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "CRISPR"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...immortalized meningioma (MN) cell lines, CRISPR-modified Schwann cells (SCs), and mouse Nf2-/- SCs..."
+    whyMissed: "CRISPR system/reagents implied but not explicitly mentioned"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[-+/]+[-+/]+\\s+(mice|cells|cell line)"
+    toolType: "animal_model"
+    examples: ["Nf2-/- mice", "mouse Nf2-/- SCs"]
+    reasoning: "Captures knockout/transgenic mouse nomenclature with gene symbols and allele notation"
+
+  - patternType: "context_phrase"
+    pattern: "CRISPR-modified\\s+\\w+\\s+cells?"
+    toolType: "cell_line"
+    examples: ["CRISPR-modified Schwann cells"]
+    reasoning: "Identifies genetically modified cell lines using CRISPR technology"
+
+  - patternType: "context_phrase"
+    pattern: "orthotopic\\s+\\w+-deficient\\s+\\w+\\s+tumor\\s+models?"
+    toolType: "animal_model"
+    examples: ["orthotopic NF2-deficient meningioma tumor models", "orthotopic NF2-deficient schwannoma tumor models"]
+    reasoning: "Captures complex orthotopic tumor model descriptions"
+
+  - patternType: "term"
+    pattern: "(primary|immortalized)\\s+\\w+\\s+cell\\s+lines?"
+    toolType: "cell_line"
+    examples: ["human primary meningioma cell lines", "immortalized meningioma cell lines"]
+    reasoning: "Identifies primary and immortalized cell lines even without specific names"
+
+  - patternType: "context_phrase"
+    pattern: "RNA-sequencing|RNA-seq"
+    toolType: "computational_tool"
+    examples: ["RNA-sequencing"]
+    reasoning: "Captures RNA sequencing methodology which implies computational analysis tools"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite clear evidence of multiple research tools
+    - This is a laboratory research study with extensive tool usage including cell lines, animal models, and analytical methods
+    - The mining system failed to detect any of the obvious research tools mentioned in the abstract and methods
+    - Multiple cell line types are described (primary, immortalized, CRISPR-modified)
+    - Mouse knockout models (Nf2-/-) are clearly mentioned
+    - Orthotopic tumor models are described
+    - Computational analysis methods (RNA-seq, flow cytometry) are mentioned
+  recommendations: |
+    This represents a significant failure of the mining system. The publication clearly describes:
+    1. Multiple cell line types that should have been detected
+    2. Mouse knockout models with standard genetic nomenclature
+    3. Orthotopic tumor models for drug testing
+    4. Computational analysis methods
+    
+    Immediate actions needed:
+    1. Review and improve cell line detection patterns to capture generic descriptions
+    2. Add patterns for knockout mouse nomenclature (Gene-/-, Gene+/-)
+    3. Improve detection of complex model systems (orthotopic tumor models)
+    4. Consider adding patterns for CRISPR-modified cell lines
+    5. Evaluate whether computational methods should be captured when analysis tools aren't specified
+    
+    This publication should be re-processed with improved mining patterns as it contains numerous valid research tools that were completely missed.

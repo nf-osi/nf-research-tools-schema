@@ -1,0 +1,61 @@
+publicationMetadata:
+  pmid: "33946854"
+  title: "Hexokinase 2 in Cancer: A Prima Donna Playing Multiple Characters."
+  queryType: "unknown"  # queryType was NaN in input
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does not contain research tools as they summarize existing literature
+    rather than conducting original experiments. May reference tools used in cited studies but
+    does not use tools directly. The absence of Methods and Results sections confirms this is
+    not experimental research. Review articles may mention:
+    - Animal models in general terms when discussing literature
+    - Computational tools if reviewing bioinformatics studies
+    - But these are citations/references, not actual tool usage
+  overallAssessment: |
+    This is clearly a review article about hexokinase 2 in cancer, as evidenced by the title
+    ("Prima Donna Playing Multiple Characters"), lack of Methods/Results sections, and content
+    structure. Review articles typically do not use research tools directly but rather summarize
+    findings from other studies that used tools. Any tool mentions would be citations rather
+    than experimental usage, making them inappropriate for tool databases.
+
+toolValidations: []  # No tools were mined
+
+potentiallyMissedTools:
+  - toolName: "mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...HK2 induction in most neoplastic cells contributes to their metabolic rewiring towards aerobic glycolysis, and its genetic ablation inhibits malignant growth in mouse models. HK2 can dock to mitochondria..."
+    whyMissed: "Generic reference to 'mouse models' in review context - not specific model names or experimental usage"
+    confidence: 0.1
+    shouldBeAdded: No
+
+suggestedPatterns: []  # No new patterns needed for review articles
+
+observations: []  # No observations as this is a review article with no experimental data
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1
+  newPatternsCount: 0
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a review article, not experimental research
+    - No Methods section indicating no original experimental work
+    - No Results section indicating no original data
+    - Generic mention of "mouse models" is citation/reference, not tool usage
+    - Title structure ("Prima Donna Playing Multiple Characters") indicates review format
+  recommendations: |
+    All tool mining should be rejected for this publication because:
+    1. This is a review article that summarizes existing literature rather than conducting experiments
+    2. The absence of Methods and Results sections confirms no original research was conducted
+    3. Any mentions of research tools (like "mouse models") are references to other studies, not direct usage
+    4. Review articles should not contribute tools to research tool databases as they don't use tools experimentally
+    5. The mining correctly identified zero tools, which is appropriate for this publication type
+    6. No additional mining patterns are needed as the system correctly avoided false positives from review content

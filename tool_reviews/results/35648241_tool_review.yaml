@@ -1,0 +1,215 @@
+publicationMetadata:
+  pmid: "35648241"
+  title: "Dose-dependent seizure control with MEK inhibitor therapy for progressive glioma in a child with neurofibromatosis type 1."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study (case report) → clinical assessment tools, diagnostic tools, therapeutic agents
+    
+    This case report describes comprehensive clinical evaluation including:
+    - Neurological assessments (EEG, neurologic examination)
+    - Imaging studies (MRI, echocardiogram) 
+    - Seizure monitoring and quantification
+    - Cardiac function assessment
+    - Academic performance evaluation
+    
+    While lacking traditional lab research tools, clinical case reports contain validated clinical
+    assessment instruments and diagnostic procedures that qualify as research tools.
+  overallAssessment: |
+    This clinical case report documents detailed patient assessment and treatment monitoring over time.
+    Clinical assessment tools are expected including EEG monitoring, neurological examinations, 
+    imaging protocols, and seizure frequency tracking methods. The publication describes systematic
+    clinical evaluation that would utilize validated assessment instruments and diagnostic procedures.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "EEG"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Routine awake EEG revealed focal epileptiform discharges...A 24-h EEG captured three electroclinical seizures...A recent 24-h EEG captured no electrographic or clinical seizures"
+    whyMissed: "EEG is a standard clinical assessment tool for epilepsy evaluation but may not have been recognized as a research tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "24-hour EEG monitoring"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "A 24-h EEG captured three electroclinical seizures that lateralized to the right hemisphere but were poorly localized"
+    whyMissed: "Extended EEG monitoring is a specialized clinical assessment tool for seizure characterization"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Brain MRI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "MRI of the brain revealed bilateral OPG with extension into the hypothalamus...Repeat brain MRI revealed slow progression of his glioma"
+    whyMissed: "MRI is a clinical imaging assessment tool used for tumor monitoring and treatment response evaluation"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Neurological examination"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "Physical examination was notable for café-au-lait macules, axillary freckling, and left-sided facial weakness...Examination was notable for dysarthria, left lower facial weakness"
+    whyMissed: "Standardized neurological examination is a clinical assessment tool for evaluating neurological function"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+  - toolName: "Echocardiogram"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "asymptomatic decline in left ventricular ejection fraction, 63% to 47%...upon subsequent normalization of echocardiogram findings"
+    whyMissed: "Echocardiogram is a clinical assessment tool for cardiac function monitoring during treatment"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Seizure frequency tracking"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "seizures occurred in clusters every 5–6 days, with seizure frequency ranging between 1 and 10 seizures per day...significantly decreased seizure frequency"
+    whyMissed: "Systematic seizure frequency monitoring is a clinical outcome assessment tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "EEG|electroencephalogram|electroencephalography"
+    toolType: "clinical_assessment_tool"
+    examples: ["Routine awake EEG revealed", "A 24-h EEG captured"]
+    reasoning: "EEG is a standard clinical assessment tool for neurological evaluation that should be consistently captured"
+
+  - patternType: "term"
+    pattern: "MRI|magnetic resonance imaging"
+    toolType: "clinical_assessment_tool"
+    examples: ["MRI of the brain revealed", "Repeat brain MRI revealed"]
+    reasoning: "MRI is a clinical imaging assessment tool used for diagnosis and treatment monitoring"
+
+  - patternType: "term"
+    pattern: "echocardiogram|ECHO|cardiac ultrasound"
+    toolType: "clinical_assessment_tool"
+    examples: ["normalization of echocardiogram findings"]
+    reasoning: "Echocardiogram is a clinical assessment tool for cardiac function evaluation"
+
+  - patternType: "context_phrase"
+    pattern: "neurological examination|neurologic examination|physical examination"
+    toolType: "clinical_assessment_tool"
+    examples: ["Physical examination was notable for", "Examination was notable for"]
+    reasoning: "Standardized clinical examinations are assessment tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "seizure frequency|seizure monitoring|seizure tracking"
+    toolType: "clinical_assessment_tool"
+    examples: ["seizure frequency ranging between", "decreased seizure frequency"]
+    reasoning: "Systematic seizure assessment is a clinical outcome measurement tool"
+
+observations:
+  - resourceName: "EEG"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Initial routine awake EEG revealed focal epileptiform discharges and prominent localized 
+      slowing in the right temporal region. 24-hour EEG monitoring captured three electroclinical 
+      seizures that lateralized to the right hemisphere but were poorly localized. After treatment 
+      with full-dose selumetinib, a recent 24-hour EEG captured no electrographic or clinical seizures, 
+      demonstrating complete seizure control.
+    foundIn: "results"
+    contextSnippet: "Routine awake EEG revealed focal epileptiform discharges and prominent localized slowing in the right temporal region...A recent 24-h EEG captured no electrographic or clinical seizures"
+    confidence: 0.95
+    doi: "10.1007/s00381-022-05571-y"
+
+  - resourceName: "Brain MRI"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Initial brain MRI revealed bilateral optic pathway glioma with extension into hypothalamus, 
+      basal ganglia, and subcortical white matter, with mass effect on right insular cortex. 
+      Follow-up MRI showed slow progression over 2 years with new enhancement in right frontal lobe. 
+      After selumetinib treatment, MRI showed stable mass size but interval reduction in enhancement 
+      of the right frontal lesion, suggestive of treatment response.
+    foundIn: "results"
+    contextSnippet: "MRI of the brain revealed bilateral OPG with extension into the hypothalamus, basal ganglia, and subcortical white matter...Repeat brain MRI showed stable mass size but interval reduction in enhancement"
+    confidence: 0.9
+    doi: "10.1007/s00381-022-05571-y"
+
+  - resourceName: "Neurological examination"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Initial examination showed café-au-lait macules, axillary freckling, and left-sided facial weakness. 
+      At age 8, examination revealed dysarthria, left lower facial weakness, left upper extremity weakness, 
+      and mild circumduction of left lower extremity while walking. After full-dose selumetinib treatment, 
+      improvements in alertness, left-sided weakness, and gait were noted on neurologic examination.
+    foundIn: "results"
+    contextSnippet: "Physical examination was notable for café-au-lait macules, axillary freckling, and left-sided facial weakness...Improvements in alertness, left-sided weakness, and gait were also noted on neurologic examination"
+    confidence: 0.85
+    doi: "10.1007/s00381-022-05571-y"
+
+  - resourceName: "Echocardiogram"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Cardiovascular System"
+    observationTypeOntologyId: "MP:0005385"
+    details: |
+      Routine cardiac monitoring revealed asymptomatic decline in left ventricular ejection fraction 
+      from 63% to 47% after 12 weeks of selumetinib treatment, indicating cardiac toxicity. 
+      Echocardiogram findings subsequently normalized after drug hold, allowing for treatment resumption 
+      with cardioprotective measures.
+    foundIn: "results"
+    contextSnippet: "he displayed evidence of cardiac toxicity on routine evaluation at this time (asymptomatic decline in left ventricular ejection fraction, 63% to 47%)...upon subsequent normalization of echocardiogram findings"
+    confidence: 0.9
+    doi: "10.1007/s00381-022-05571-y"
+
+  - resourceName: "Seizure frequency tracking"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      Baseline seizure pattern showed clusters every 5-6 days, with frequency ranging between 1-10 
+      seizures per day for 3-5 days during clusters despite multiple antiepileptic drugs. After 12 weeks 
+      of full-dose selumetinib, significantly decreased seizure frequency was observed. Seizure frequency 
+      increased to pre-treatment baseline on 50% dose reduction, then improved dramatically with return 
+      to full dosing. Patient currently remains seizure-free on full-dose selumetinib.
+    foundIn: "results"
+    contextSnippet: "seizures occurred in clusters every 5–6 days, with seizure frequency ranging between 1 and 10 seizures per day...significantly decreased seizure frequency...Currently, the patient remains seizure-free"
+    confidence: 0.8
+    doi: "10.1007/s00381-022-05571-y"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Nervous System: 3
+    Tumor Growth: 1
+    Cardiovascular System: 1
+  majorIssuesFound: |
+    - Mining system failed to identify any clinical assessment tools despite extensive clinical evaluation
+    - Case report format may not be recognized as containing research tools
+    - Clinical assessment tools (EEG, MRI, neurological examination) were not captured
+    - Systematic clinical monitoring and outcome assessment tools were missed
+    - Publication lacks traditional Methods section but contains detailed clinical methodology
+  recommendations: |
+    This clinical case report contains multiple valid clinical assessment tools that were completely 
+    missed by the mining system. All 6 potentially missed tools should be added as they represent 
+    standard clinical assessment instruments used for patient evaluation and treatment monitoring.
+    
+    The mining patterns need significant enhancement to capture clinical assessment tools in case 
+    reports and clinical studies. The suggested patterns would improve detection of EEG, imaging 
+    studies, clinical examinations, and outcome monitoring tools.
+    
+    Five high-quality scientific observations were extracted showing treatment response across 
+    multiple clinical domains (neurological, cardiac, tumor response). This demonstrates the value 
+    of clinical case reports for documenting tool performance and patient outcomes.
+    
+    Future mining should recognize that clinical studies without traditional Methods sections can 
+    still contain valuable research tools and systematic clinical assessments.

@@ -1,0 +1,184 @@
+publicationMetadata:
+  pmid: "37149083"
+  title: "cNF-Skindex in Adults Living with Neurofibromatosis 1: Severity Strata in France and Validation in United States Adults."
+  queryType: "unknown"  # Not provided in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, outcome measures), possibly computational tools for statistical analysis
+    
+    This publication is a clinical validation study of a quality of life questionnaire (cNF-Skindex) in patients with neurofibromatosis 1.
+    Expected tools include:
+    - Clinical assessment tools: cNF-Skindex, EQ-5D-5L, SF-36 (all mentioned in methods)
+    - Computational tools: SPSS version 28.0 (mentioned for statistical analysis)
+    
+    Note: Clinical studies routinely use validated questionnaires and scales as research tools to measure patient outcomes,
+    even without traditional laboratory methods. These are legitimate research tools in the clinical context.
+  overallAssessment: |
+    This is a clinical validation study that develops severity strata for the cNF-Skindex questionnaire and validates it
+    in US populations. Clinical studies like this routinely use validated assessment tools (questionnaires, scales) as
+    research instruments to measure patient-reported outcomes. The study also uses statistical software for data analysis.
+    Multiple clinical assessment tools and computational tools should be present and are expected for this study type.
+
+toolValidations: []  # No tools were initially mined, but several should have been found
+
+potentiallyMissedTools:
+  - toolName: "cNF-Skindex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The cNF-Skindex, validated in a French population, specifically assesses the cNF-related QOL...we validated the score and the strata in a United States population"
+    whyMissed: "This is the primary clinical assessment tool being validated in the study - should have been detected as a quality of life questionnaire"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "EQ-5D-5L"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The EQ-5D-5L and SF-36 were used to evaluate convergent validity...The EQ-5D-5L is a brief and generic health status measure that comprises five dimensions"
+    whyMissed: "Well-known validated health status questionnaire used for convergent validity - should be detected as clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SF-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The EQ-5D-5L and SF-36 were used to evaluate convergent validity...The 36-item Short Form Survey (SF-36) is a generic health-related QoL measure"
+    whyMissed: "Widely used validated quality of life questionnaire - should be detected as clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using SPSS version 28.0"
+    whyMissed: "Statistical software with specific version number - should be detected as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Castor EDC"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A digital version of the cNF-Skindex was administered to the participants using the data capture system Castor EDC"
+    whyMissed: "Electronic data capture system used for questionnaire administration - should be detected as computational tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "cNF-Skindex|Skindex"
+    toolType: "clinical_assessment_tool"
+    examples: ["cNF-Skindex", "Dutch cNF-Skindex"]
+    reasoning: "Disease-specific quality of life questionnaires should be detected, especially when they are the primary outcome measure"
+
+  - patternType: "term"
+    pattern: "EQ-5D-5L|EQ-5D|EuroQol"
+    toolType: "clinical_assessment_tool"
+    examples: ["EQ-5D-5L questionnaire", "EQ-VAS"]
+    reasoning: "EQ-5D is a widely used standardized health status questionnaire that should be consistently detected"
+
+  - patternType: "term"
+    pattern: "SF-36|Short Form Survey|36-item Short Form"
+    toolType: "clinical_assessment_tool"
+    examples: ["SF-36 questionnaire", "36-item Short Form Survey (SF-36)"]
+    reasoning: "SF-36 is one of the most common quality of life questionnaires and should be reliably detected"
+
+  - patternType: "context_phrase"
+    pattern: "administered to.*participants|completed.*questionnaire|questionnaire.*administered"
+    toolType: "clinical_assessment_tool"
+    examples: ["administered to the participants using", "participants also completed"]
+    reasoning: "Context phrases indicating questionnaire administration help distinguish actual tool usage from citations"
+
+  - patternType: "term"
+    pattern: "SPSS version [0-9]+\\.[0-9]+|SPSS v[0-9]+\\.[0-9]+|SPSS [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["SPSS version 28.0"]
+    reasoning: "Statistical software with version numbers should be detected as computational tools"
+
+  - patternType: "term"
+    pattern: "Castor EDC|electronic data capture|EDC system"
+    toolType: "computational_tool"
+    examples: ["data capture system Castor EDC"]
+    reasoning: "Electronic data capture systems are computational tools used in clinical research"
+
+observations:
+  - resourceName: "cNF-Skindex"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for non-phenotypic observation
+    details: |
+      The cNF-Skindex demonstrated good psychometric properties in Dutch validation study. Cut-off values of 12 and 49 
+      provided optimal severity stratification with highest Kappa value (κ = 0.685, 95% CI = 0.604-0.765). The questionnaire 
+      showed adequate internal consistency (Cronbach's α ≥ 0.70) and test-retest reliability (≥ 0.75). Convergent validity 
+      was established with EQ-5D-5L and SF-36. Three severity strata were validated: non-bothersome cNF (0-11), moderately 
+      bothersome cNF (12-48), and importantly/very importantly bothersome cNF (49+).
+    foundIn: "both"
+    contextSnippet: "The cut-off values 12 and 49 provided the highest Kappa value (κ = 0.685, 95% confidence interval = 0.604-0.765)...showed good to excellent psychometric properties"
+    confidence: 0.95
+    doi: "10.1016/j.jid.2023.04.014"
+
+  - resourceName: "EQ-5D-5L"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for non-phenotypic observation
+    details: |
+      EQ-5D-5L was successfully used to evaluate convergent validity of the cNF-Skindex. The questionnaire comprises five 
+      dimensions (mobility, self-care, usual activities, pain/discomfort, anxiety/depression) with five Likert response 
+      options and one-day recall period. Includes visual analog scale (EQ-VAS) for self-rating health from 0-100.
+    foundIn: "both"
+    contextSnippet: "The EQ-5D-5L and SF-36 were used to evaluate convergent validity...comprises five dimensions: mobility, self-care, usual activities, pain/discomfort and anxiety/depression"
+    confidence: 0.90
+    doi: "10.1016/j.jid.2023.04.014"
+
+  - resourceName: "SF-36"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for non-phenotypic observation
+    details: |
+      SF-36 was effectively used to evaluate convergent validity of the cNF-Skindex. The 36-item questionnaire measures 
+      eight domains of health: physical function, limitations due to physical problems, limitations due to emotional problems, 
+      social function, mental health, energy, pain, and health perception. Scores range from 0-100 with higher scores 
+      indicating more favorable health state. Standard 4-week recall period was used.
+    foundIn: "both"
+    contextSnippet: "The EQ-5D-5L and SF-36 were used to evaluate convergent validity...comprises eight domains of health: physical function, limitations because of physical problems"
+    confidence: 0.90
+    doi: "10.1016/j.jid.2023.04.014"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    General Comment or Review: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - Complete failure to detect any tools despite this being a clinical validation study with multiple assessment tools
+    - Primary outcome measure (cNF-Skindex) was not detected despite being mentioned throughout the publication
+    - Well-established clinical assessment tools (EQ-5D-5L, SF-36) were missed
+    - Statistical software (SPSS version 28.0) was not detected
+    - Electronic data capture system (Castor EDC) was missed
+    - Mining patterns appear inadequate for clinical assessment tools and computational tools used in clinical research
+  recommendations: |
+    This publication represents a significant mining failure - 5 legitimate research tools were completely missed.
+    All missed tools should be added to the database:
+    
+    CLINICAL ASSESSMENT TOOLS (high priority):
+    - cNF-Skindex: Primary outcome measure being validated
+    - EQ-5D-5L: Validated health status questionnaire for convergent validity
+    - SF-36: Validated quality of life questionnaire for convergent validity
+    
+    COMPUTATIONAL TOOLS:
+    - SPSS version 28.0: Statistical analysis software
+    - Castor EDC: Electronic data capture system
+    
+    The mining patterns need significant improvement for clinical studies. Current patterns appear biased toward 
+    laboratory research tools and miss clinical assessment instruments. The suggested patterns should be implemented 
+    to improve detection of questionnaires, scales, and clinical research software.
+    
+    This case demonstrates that clinical studies contain legitimate research tools that are currently under-detected.
+    The queryType classification system should be enhanced to better capture clinical assessment tools.

@@ -1,0 +1,214 @@
+publicationMetadata:
+  pmid: "15255999"
+  title: "Molecular profiling of malignant peripheral nerve sheath tumors associated with neurofibromatosis type 1, based on large-scale real-time RT-PCR."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study using real-time RT-PCR for gene expression profiling.
+    Expected tools include:
+    - Computational tools (PCR analysis software, statistical software)
+    - Genetic reagents (primers, probes, RNA extraction reagents)
+    - Laboratory instruments (PCR machines, analysis systems)
+    - Statistical analysis tools
+    
+    Note: Publications can contain MULTIPLE tool types. This lab study uses computational tools
+    for analysis and genetic reagents for molecular biology experiments.
+  overallAssessment: |
+    This is a laboratory research study that uses real-time quantitative RT-PCR to analyze gene expression
+    differences between malignant peripheral nerve sheath tumors and neurofibromas in NF1 patients. The study
+    has a comprehensive Methods section describing experimental procedures, indicating active tool usage.
+    Tools are expected including PCR instruments, analysis software, statistical methods, and molecular reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ABI Prism 7700 Sequence Detection System"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed using an ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems)"
+    whyMissed: "Specific PCR instrument with manufacturer name not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TaqMan PCR Core REAGENTS Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using an ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems) and either the TaqMan ® PCR Core REAGENTS Kit"
+    whyMissed: "Commercial reagent kit with specific brand name not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SYBR Green PCR Core Reagents kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "either the TaqMan ® PCR Core REAGENTS Kit or the SYBR ® Green PCR Core Reagents kit (Perkin-Elmer Applied Biosystems)"
+    whyMissed: "Commercial reagent kit with specific brand name not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Oligo 5.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Primers for TBP , RPLP0 and the 489 target genes (List in annex; supplementary information) were chosen with the assistance of the Oligo 5.0 computer program"
+    whyMissed: "Bioinformatics software for primer design with version number not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PE Biosystems analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "detected by the laser detector of the ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems, Foster City, CA), using PE Biosystems analysis software"
+    whyMissed: "PCR analysis software not detected by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Superscript II RNase H-reverse transcriptase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "100 units of Superscript II RNase H-reverse transcriptase (Invitrogen, Cergy Pontoise, France)"
+    whyMissed: "Specific enzyme reagent with vendor information not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RNasin RNase inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "20 units of RNasin RNase inhibitor (Promega, Madison, WI)"
+    whyMissed: "Specific enzyme reagent with vendor information not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ [A-Z][a-zA-Z0-9]+ \\d+(\\.\\d+)? (computer program|software|system)\\b"
+    toolType: "computational_tool"
+    examples: ["Oligo 5.0 computer program", "PE Biosystems analysis software"]
+    reasoning: "Pattern to catch software/systems with version numbers and descriptive terms"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ [A-Z][a-zA-Z0-9]+ \\d+ [A-Za-z]+ [A-Za-z]+ [A-Za-z]+ System\\b"
+    toolType: "computational_tool"
+    examples: ["ABI Prism 7700 Sequence Detection System"]
+    reasoning: "Pattern to catch laboratory instrument systems with model numbers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+(PCR|RT-PCR)\\s+Core\\s+(REAGENTS?|Reagents?)\\s+Kit\\b"
+    toolType: "genetic_reagent"
+    examples: ["TaqMan PCR Core REAGENTS Kit", "SYBR Green PCR Core Reagents kit"]
+    reasoning: "Pattern to catch commercial PCR reagent kits with brand names"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[IVX]+\\s+[A-Za-z-]+\\s+transcriptase\\b"
+    toolType: "genetic_reagent"
+    examples: ["Superscript II RNase H-reverse transcriptase"]
+    reasoning: "Pattern to catch specific enzyme reagents with Roman numerals in names"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[A-Za-z]+\\s+inhibitor\\s+\\([A-Z][a-zA-Z]+,"
+    toolType: "genetic_reagent"
+    examples: ["RNasin RNase inhibitor (Promega,"]
+    reasoning: "Pattern to catch enzyme inhibitors with vendor information in parentheses"
+
+observations:
+  - resourceName: "ABI Prism 7700 Sequence Detection System"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Successfully used for real-time quantitative RT-PCR analysis of 489 genes in tumor samples.
+      Thermal cycling conditions comprised initial denaturation at 95°C for 10 min, and 50 cycles
+      at 95°C for 15 s and 65°C for 1 min. System effectively detected fluorescence changes during
+      PCR amplification with reliable Ct values (threshold cycles around 26 for control genes).
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed using an ABI Prism 7700 Sequence Detection System...The thermal cycling conditions comprised an initial denaturation step at 95°C for 10 min, and 50 cycles at 95°C for 15 s and 65°C for 1 min."
+    confidence: 0.90
+    doi: "10.1186/1476-4598-3-20"
+
+  - resourceName: "Oligo 5.0"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Computer program successfully used for primer design for TBP, RPLP0, and 489 target genes.
+      Primers were designed with assistance of this software to ensure gene specificity and avoid
+      amplification of contaminating genomic DNA. Amplicons were designed to be between 70 and 120
+      nucleotides long. Software helped confirm total gene specificity and absence of single nucleotide
+      polymorphisms in primer sequences.
+    foundIn: "methods"
+    contextSnippet: "Primers for TBP, RPLP0 and the 489 target genes...were chosen with the assistance of the Oligo 5.0 computer program...We conducted searches in dbEST, htgs and nr databases to confirm the total gene specificity"
+    confidence: 0.85
+    doi: "10.1186/1476-4598-3-20"
+
+  - resourceName: "TaqMan PCR Core REAGENTS Kit"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Commercial reagent kit used successfully for real-time PCR reactions. Kit provided reliable
+      amplification with consistent results across 489 different gene targets. Used in combination
+      with ABI Prism 7700 system for quantitative gene expression analysis. Reactions performed
+      with 10 microliters of diluted sample cDNA added to 15 microliters of PCR master-mix.
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed using an ABI Prism 7700 Sequence Detection System...and either the TaqMan ® PCR Core REAGENTS Kit...Ten microliters of diluted sample cDNA (produced from 2 ng of total RNA) was added to 15 microliters of the PCR master-mix."
+    confidence: 0.85
+    doi: "10.1186/1476-4598-3-20"
+
+  - resourceName: "SYBR Green PCR Core Reagents kit"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Commercial reagent kit used as alternative to TaqMan for real-time PCR reactions. Kit provided
+      reliable fluorescence detection through SYBR Green dye-amplicon complex formation. Successfully
+      used for quantitative analysis with consistent amplification across multiple gene targets.
+      Some genes showed very low expression levels (Ct >32) that were detectable but not reliably
+      quantifiable using this SYBR Green methodology.
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed...using either the TaqMan ® PCR Core REAGENTS Kit or the SYBR ® Green PCR Core Reagents kit...Very low levels of target gene mRNA, that were only detectable but not reliably quantifiable by means of real-time quantitative RT-PCR assays, mainly based on fluorescence SYBR Green methodology (Ct >32)"
+    confidence: 0.85
+    doi: "10.1186/1476-4598-3-20"
+
+  - resourceName: "Superscript II RNase H-reverse transcriptase"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Enzyme successfully used for cDNA synthesis from total RNA samples. Protocol used 100 units
+      of enzyme in 20 μl final volume with 1X RT buffer, incubated at 20°C for 10 min and 42°C
+      for 30 min. Reverse transcriptase was inactivated by heating at 99°C for 5 min and cooling
+      at 5°C for 5 min. Successfully converted 100 ng of total RNA to cDNA for subsequent PCR analysis.
+    foundIn: "methods"
+    contextSnippet: "Total RNA was reverse transcribed in a final volume of 20 μl containing...100 units of Superscript II RNase H-reverse transcriptase (Invitrogen, Cergy Pontoise, France)...The samples were incubated at 20°C for 10 min and 42°C for 30 min, and reverse transcriptase was inactivated by heating at 99°C for 5 min"
+    confidence: 0.90
+    doi: "10.1186/1476-4598-3-20"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a laboratory research study
+    - Multiple computational tools and genetic reagents were missed during mining
+    - Publication contains detailed Methods section with specific tool usage information
+    - Mining patterns failed to detect commercial reagent kits, laboratory instruments, and software tools
+    - Vendor information and model numbers were not captured by existing patterns
+  recommendations: |
+    This publication should have multiple tools added to the database:
+    - 7 tools were potentially missed during initial mining
+    - All missed tools have high confidence scores (0.85-0.95) and clear usage context
+    - Tools include both computational tools (PCR systems, analysis software) and genetic reagents (enzyme kits, reagents)
+    - New mining patterns should be implemented to catch similar tools in future publications
+    - The study provides detailed usage instructions and protocols for each tool
+    - 5 scientific observations were extracted showing successful tool usage and performance characteristics
+    - This represents a significant gap in the mining system's ability to detect laboratory tools with vendor/model information

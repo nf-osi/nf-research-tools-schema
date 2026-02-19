@@ -1,0 +1,226 @@
+publicationMetadata:
+  pmid: "39966622"
+  title: "The development of an artificial intelligence auto-segmentation tool for 3D volumetric analysis of vestibular schwannomas."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis/AI Tool Development):
+    - Computational tools (software, AI models, image processing tools) - HIGHLY EXPECTED
+    - Clinical assessment tools (DICE score, volumetric measurements) - EXPECTED
+    
+    This publication describes the development of an AI auto-segmentation tool and uses multiple
+    software platforms for image processing and analysis. The study involves creating and validating
+    computational models, which typically requires extensive use of computational tools.
+    
+    Note: While queryType is "bench", this is actually a computational/AI development study
+    that should contain multiple computational tools and potentially clinical assessment tools
+    for validation metrics.
+  overallAssessment: |
+    This publication describes the development and validation of an AI-based auto-segmentation tool
+    for medical imaging analysis. Such studies typically use multiple computational tools including
+    image processing software, AI/ML frameworks, statistical analysis tools, and validation metrics.
+    The complete absence of mined tools suggests significant gaps in computational tool mining patterns.
+    The study has a robust Methods section describing detailed computational workflows that should
+    contain numerous identifiable tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Simpleware ScanIP"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "To create the tumor models for the ground truth dataset, an image processing software (Simpleware ScanIP, Synopsys) was used."
+    whyMissed: "Commercial software with vendor name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DPP V1.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The helper (DPP V1.0) was trained using proprietary AI- and ML-based algorithms and information."
+    whyMissed: "Custom AI tool/model name with version number not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DICE coefficient"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "A proof-of-concept AI model achieved a mean DICE score of 0.76 (standard deviation 0.21). After the final testing stage, the model improved to a final mean DICE score of 0.88"
+    whyMissed: "Validation metric/assessment tool not recognized as clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Synopsys Simpleware"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Our segmentation process utilized the Simpleware platform by Synopsys, which integrates proprietary AI-powered auto-segmentation tools."
+    whyMissed: "Platform name with vendor not caught by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "T1 weighted MRI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All images used for the POC were T1 weighted, post-contrast MRI scans."
+    whyMissed: "Medical imaging protocol/technique not recognized as assessment tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "thresholding algorithm"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To highlight the vestibular schwannomas, a thresholding algorithm was used on selected slices containing the tumor mass."
+    whyMissed: "Image processing algorithm not caught by computational tool patterns"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "split regions algorithm"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A 'split regions' algorithm was used to isolate the tumors and remove the non-tumorous voxels."
+    whyMissed: "Specific image processing algorithm not recognized"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "image registration algorithm"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "An image registration algorithm was used to reformat and align the brain across the DICOM images and the generated 3D tumor models."
+    whyMissed: "Medical image processing algorithm not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ellipsoid volume calculation"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Volume measurements were obtained for ten masses using three approaches: manual segmentation, AI-based segmentation, and ellipsoid volume calculation."
+    whyMissed: "Mathematical assessment method not recognized as clinical tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z]+(?:\\s+[A-Z][a-zA-Z]+)*),\\s+([A-Z][a-zA-Z]+(?:\\s+[A-Z][a-zA-Z]+)*)"
+    toolType: "computational_tool"
+    examples: ["Simpleware ScanIP, Synopsys", "Simpleware platform by Synopsys"]
+    reasoning: "Commercial software often mentioned with vendor name in format 'Software, Company' or 'Software by Company'"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z]{2,}\\s+V?\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["DPP V1.0"]
+    reasoning: "Custom tools/models often have version numbers in format 'NAME V1.0' or 'NAME 1.0'"
+
+  - patternType: "context_phrase"
+    pattern: "(?:algorithm|coefficient|score|metric)\\s+(?:was|were)\\s+(?:used|calculated|applied|computed)"
+    toolType: "computational_tool"
+    examples: ["thresholding algorithm was used", "DICE coefficient was calculated"]
+    reasoning: "Computational methods and metrics often described with these usage patterns"
+
+  - patternType: "naming_convention"
+    pattern: "\\b(?:T1|T2|FLAIR|DWI)\\s+weighted\\s+(?:MRI|imaging)"
+    toolType: "clinical_assessment_tool"
+    examples: ["T1 weighted MRI", "T1 weighted, post-contrast MRI scans"]
+    reasoning: "Medical imaging protocols are standardized assessment tools with specific naming conventions"
+
+  - patternType: "term"
+    pattern: "\\bDICE\\s+(?:score|coefficient)"
+    toolType: "clinical_assessment_tool"
+    examples: ["DICE score", "DICE coefficient"]
+    reasoning: "DICE is a standard validation metric in medical imaging that functions as an assessment tool"
+
+  - patternType: "context_phrase"
+    pattern: "(?:image|medical)\\s+processing\\s+software"
+    toolType: "computational_tool"
+    examples: ["image processing software (Simpleware ScanIP, Synopsys)"]
+    reasoning: "Medical image processing software explicitly mentioned as tools"
+
+  - patternType: "naming_convention"
+    pattern: "\\b(?:registration|segmentation|thresholding|split\\s+regions)\\s+algorithm"
+    toolType: "computational_tool"
+    examples: ["image registration algorithm", "thresholding algorithm", "split regions algorithm"]
+    reasoning: "Medical image processing algorithms are computational tools with standard naming patterns"
+
+observations:
+  - resourceName: "Simpleware ScanIP"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Software used for creating 3D tumor models from MRI images. Process involved: 1) Thresholding algorithm 
+      to highlight vestibular schwannomas, 2) Split regions algorithm to isolate tumors, 3) Manual adjustment 
+      using paint function for border voxels, 4) Review in all three planes (coronal, axial, sagittal), 
+      5) Neuroradiologist review and adjustments, 6) Volume measurement tool for 3D volume calculation in mm³.
+    foundIn: "methods"
+    contextSnippet: "To create the tumor models an image processing software (Simpleware, Synopsys, Mountain View, CA) was used... The 'volume' measurement tool was used to calculate the 3D volume (in mm³) of each tumor mask."
+    confidence: 1.0
+    doi: "10.1038/s41598-025-88589-x"
+
+  - resourceName: "DPP V1.0"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      AI helper tool achieved significant performance improvement during development. Initial proof-of-concept 
+      model achieved mean DICE score of 0.76 (SD 0.21). After final testing stage, performance improved to 
+      final mean DICE score of 0.88 (range 0.74-0.93, SD 0.04). No tumors identified in ground truth 
+      segmentation were missed by the helper.
+    foundIn: "both"
+    contextSnippet: "A proof-of-concept AI model achieved a mean DICE score of 0.76... After the final testing stage, the model improved to a final mean DICE score of 0.88... No tumors identified within the ground truth segmentation were missed by the helper."
+    confidence: 0.95
+    doi: "10.1038/s41598-025-88589-x"
+
+  - resourceName: "DICE coefficient"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      DICE coefficient used to compare accuracy of AI-generated 3D models to radiologist-validated manual 
+      segmentation models. Calculation formula: DICE Coefficient = 2 * Area of Overlap / total number of 
+      pixels in both images. Final model achieved mean DICE score of 0.88 (range 0.74-0.93, standard 
+      deviation 0.04), demonstrating high accuracy for vestibular schwannoma segmentation.
+    foundIn: "methods"
+    contextSnippet: "To compare the accuracy of the AI generated 3D models to the radiologist validated manual segmentation models, a DICE score was calculated. The DICE score calculation was calculated using the equation: DICE Coefficient = 2 * the Area of Overlap / by the total number of pixels in both images."
+    confidence: 0.90
+    doi: "10.1038/s41598-025-88589-x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 7
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 1
+    General Comment or Review: 2
+  majorIssuesFound: |
+    - CRITICAL: Zero tools were mined from a computational research paper that clearly uses multiple tools
+    - Mining patterns completely failed to identify commercial software (Simpleware ScanIP, Synopsys)
+    - Custom AI tool/model names with versions not recognized (DPP V1.0)
+    - Standard validation metrics not caught as clinical assessment tools (DICE coefficient)
+    - Image processing algorithms not identified as computational tools
+    - Medical imaging protocols not recognized as clinical assessment tools
+    - This represents a major gap in computational tool mining capabilities
+  recommendations: |
+    URGENT: This publication demonstrates critical gaps in computational tool mining patterns.
+    
+    IMMEDIATE ACTIONS NEEDED:
+    1. Add all 9 potentially missed tools - they are clearly genuine research tools
+    2. Implement the 7 suggested patterns to catch similar tools in future mining
+    3. Review computational tool mining strategy - commercial software with vendors frequently missed
+    4. Add patterns for AI/ML model names with version numbers
+    5. Include validation metrics (DICE, IoU, etc.) as clinical assessment tools
+    6. Recognize image processing algorithms as computational tools
+    7. Include medical imaging protocols as clinical assessment tools
+    
+    QUALITY IMPACT: Missing these tools significantly underrepresents the computational resources
+    used in AI/medical imaging research. The mining system needs substantial improvement for
+    computational publications.
+    
+    OBSERVATIONS: Successfully extracted 3 high-quality observations about tool performance
+    and usage instructions, demonstrating the value of proper tool identification.

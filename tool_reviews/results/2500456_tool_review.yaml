@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "2500456"
+  title: "Type 1 neurofibromatosis: selective expression of extracellular matrix genes by Schwann cells, perineurial cells, and fibroblasts in mixed cultures."
+  queryType: "bench,clinical"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes cell culture experiments, gene expression analysis
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study from 1989 involving:
+    - Cell culture work (Schwann cells, perineurial cells, fibroblasts in mixed cultures)
+    - Molecular biology techniques (Northern hybridizations, in situ hybridizations)
+    - Immunocytochemical analysis
+    - Gene expression studies using cDNA probes
+    
+    Expected tools: cell lines (primary cultures), antibodies (for immunocytochemistry), 
+    genetic reagents (cDNA probes, primers), possibly computational tools for analysis.
+    
+    Note: This is from 1989, so advanced cellular models, PDX models, and modern 
+    computational tools would not be expected.
+  overallAssessment: |
+    This is a classic molecular biology/cell biology research paper that would definitely 
+    use multiple research tools. The study describes cell culture experiments, gene expression 
+    analysis via Northern and in situ hybridization, and immunocytochemical identification 
+    of cell types. The absence of any mined tools suggests significant under-mining, likely 
+    due to the 1989 publication date and different terminology/methodology descriptions 
+    compared to modern papers.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...neurofibromas, characteristic lesions of neurofibromatosis 1, are composed of an abundant extracellular matrix and nerve connective tissue-derived cell types: Schwann cells, perineurial cells, and fibroblasts..."
+    whyMissed: "Primary cell cultures used in experiments - likely missed due to being described as 'cells' rather than 'cell lines' and lack of modern cell line nomenclature"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "perineurial cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...nerve connective tissue-derived cell types: Schwann cells, perineurial cells, and fibroblasts. In this study, the extracellular matrix gene expression by these cells was examined under culture conditions..."
+    whyMissed: "Primary cell cultures used in experiments - missed due to older terminology and lack of standardized cell line naming"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "fibroblasts"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...nerve connective tissue-derived cell types: Schwann cells, perineurial cells, and fibroblasts. In this study, the extracellular matrix gene expression by these cells was examined under culture conditions..."
+    whyMissed: "Primary cell cultures used in experiments - missed due to generic term 'fibroblasts' without specific cell line designation"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "pro alpha 1 (I) cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...In situ hybridizations revealed that all three cell types expressed pro alpha 1 (I), pro alpha 2 (VI), and laminin B1 chain genes..."
+    whyMissed: "cDNA probes used for hybridization experiments - missed due to indirect mention and older molecular biology terminology"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "pro alpha 2 (VI) cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...In situ hybridizations revealed that all three cell types expressed pro alpha 1 (I), pro alpha 2 (VI), and laminin B1 chain genes..."
+    whyMissed: "cDNA probes used for hybridization experiments - missed due to indirect mention"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "laminin B1 chain cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...expressed pro alpha 1 (I), pro alpha 2 (VI), and laminin B1 chain genes. However, fibroblasts did not contain [35S]cDNA-mRNA hybrids specific for type IV collagen..."
+    whyMissed: "cDNA probes used for hybridization - missed due to indirect reference and focus on gene names rather than reagents"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "type IV collagen cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...However, fibroblasts did not contain [35S]cDNA-mRNA hybrids specific for type IV collagen, whereas both Schwann cells and perineurial cells expressed these genes..."
+    whyMissed: "Radioactively labeled cDNA probe - missed despite clear mention of [35S]cDNA-mRNA hybrids"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "fibronectin cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Perineurial cells and fibroblasts readily expressed the fibronectin gene whereas Schwann cells were essentially devoid of the corresponding mRNA..."
+    whyMissed: "cDNA probe for fibronectin gene expression analysis - missed due to indirect reference"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "laminin A chain cDNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Perineurial cells also expressed the gene for laminin A chain. The results indicate that the extracellular matrix gene expression profiles..."
+    whyMissed: "cDNA probe for gene expression analysis - missed due to focus on gene rather than reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\[35S\\]cDNA-mRNA hybrids"
+    toolType: "genetic_reagent"
+    examples: ["[35S]cDNA-mRNA hybrids specific for type IV collagen"]
+    reasoning: "Radioactively labeled cDNA probes are clear genetic reagents used in hybridization experiments - this specific terminology should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "(Northern|in situ) hybridizations? (revealed|demonstrated|showed)"
+    toolType: "genetic_reagent"
+    examples: ["Northern hybridizations demonstrated expression", "In situ hybridizations revealed"]
+    reasoning: "These phrases strongly indicate use of cDNA/RNA probes as genetic reagents for gene expression analysis"
+
+  - patternType: "naming_convention"
+    pattern: "pro alpha \\d+ \\([IVX]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["pro alpha 1 (I)", "pro alpha 2 (VI)"]
+    reasoning: "Collagen gene nomenclature from older papers - these represent specific cDNA probes used in experiments"
+
+  - patternType: "context_phrase"
+    pattern: "cells? (were|was) examined under culture conditions"
+    toolType: "cell_line"
+    examples: ["cells was examined under culture conditions"]
+    reasoning: "Indicates experimental use of cultured cells as research tools, even if not standard cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "immunocytochemical criteria"
+    toolType: "antibody"
+    examples: ["readily identifiable by morphologic and immunocytochemical criteria"]
+    reasoning: "Strong indicator of antibody usage for cell identification, though specific antibodies not mentioned in abstract"
+
+  - patternType: "term"
+    pattern: "mixed cultures"
+    toolType: "cell_line"
+    examples: ["Schwann cells, perineurial cells, and fibroblasts in mixed cultures"]
+    reasoning: "Indicates experimental cell culture system - while not a standard cell line, represents a research tool/model system"
+
+observations: []  # No validated tools to extract observations from, and only abstract available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9  # Number of tools that might have been missed
+  newPatternsCount: 6  # Number of new patterns suggested
+  observationsExtracted: 0  # No observations possible with only abstract and no validated tools
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - Significant under-mining: 0 tools found despite clear laboratory research with multiple tool types
+    - Only abstract available - full Methods section would likely contain many more tools
+    - 1989 publication uses older terminology that may not match modern mining patterns
+    - Clear evidence of cell culture work, molecular biology techniques, and gene expression analysis
+    - Missing obvious genetic reagents (cDNA probes) explicitly mentioned in abstract
+    - Missing primary cell cultures used as experimental models
+    - Radioactively labeled probes ([35S]cDNA-mRNA hybrids) completely missed
+  recommendations: |
+    Overall recommendations for this publication:
+    - This is a clear case of significant under-mining rather than over-mining
+    - All 9 potentially missed tools should be carefully evaluated for addition
+    - The 6 suggested patterns should be implemented to catch similar tools in other 1989-era papers
+    - This publication demonstrates the need for historical/temporal pattern adaptation
+    - Consider developing specific patterns for older molecular biology terminology
+    - The genetic reagents (cDNA probes) are the highest confidence additions
+    - Primary cell cultures may need special consideration as they differ from immortalized cell lines
+    - Full text access would likely reveal many additional tools in Methods section
+    - This paper serves as a good test case for improving mining of older publications

@@ -1,0 +1,166 @@
+publicationMetadata:
+  pmid: "34782607"
+  title: "Pathogenic neurofibromatosis type 1 (NF1) RNA splicing resolved by targeted RNAseq."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology/genomics study developing a targeted RNAseq method for detecting pathogenic 
+    NF1 splicing variants. Expected tools include:
+    - Computational tools (STAR mapper, QURNAs pipeline, bioinformatics software)
+    - Genetic reagents (primers, probes, enrichment kits)
+    - Cell culture reagents and protocols
+    - Laboratory equipment and consumables
+    
+    The study involves RNA extraction, targeted sequencing, computational analysis, and method validation
+    across multiple patient cohorts, indicating extensive use of research tools.
+  overallAssessment: |
+    This is a clear laboratory research study with extensive methods describing RNA extraction, targeted 
+    sequencing, and computational analysis. The publication should contain multiple research tools including 
+    computational software, genetic reagents, and laboratory protocols. The complete absence of mined tools 
+    (0 tools found) indicates a significant failure in the mining process, as the methods section clearly 
+    describes numerous research tools and reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "QURNAs"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Next, an in-house developed tool (QURNAs) was used to calculate the enrichment score (ERS) for each splicing event."
+    whyMissed: "Custom computational tool name not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STAR mapper"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "RNAseq reads were mapped with the STAR mapper (Version 2.4.1d) and an index created from HS.GRCh37"
+    whyMissed: "Standard bioinformatics tool with version number not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Picard tools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Duplicate read pair detection was carried out with Picard tools (https://github.com/broadinstitute/picard)"
+    whyMissed: "Bioinformatics tool with GitHub URL not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NextSeq500"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Paired-end sequencing (2x150bp) was performed on a NextSeq500 instrument (Illumina)"
+    whyMissed: "Sequencing instrument not recognized as computational tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "IGV"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "further inspected in the BAM file in a genome browser (IGV and Alamut)"
+    whyMissed: "Genome browser software not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Alamut"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Alamut v2.15 (Interactive Biosoftware) was used to identify true splice-donor and acceptor sites"
+    whyMissed: "Specialized bioinformatics software with version not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NuGEN SPET"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "These validation samples were enriched for NF1 RNA using NuGEN SPET for RNA"
+    whyMissed: "Commercial RNA enrichment kit not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent SureSelect RNA Target Enrichment"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using Agilent SureSelect RNA Target Enrichment (see RNA isolation and Target enrichment/Library preparation)"
+    whyMissed: "Commercial target enrichment kit not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "RNeasy Plus micro columns"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Total RNA was purified and DNAseI treated using RNeasy Plus micro columns (Qiagen)"
+    whyMissed: "RNA purification kit with vendor name not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NextSeq500/550 high output kit v2"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using NextSeq500/550 high output kit v2 (Illumina)"
+    whyMissed: "Sequencing reagent kit not recognized"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "QURNAs|STAR mapper|Picard tools|IGV|Alamut"
+    toolType: "computational_tool"
+    examples: ["QURNAs", "STAR mapper (Version 2.4.1d)", "Picard tools", "IGV and Alamut", "Alamut v2.15"]
+    reasoning: "Common bioinformatics tools used in genomics research that should be detected"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+Seq\\d+\\b"
+    toolType: "computational_tool"
+    examples: ["NextSeq500"]
+    reasoning: "Sequencing instrument naming pattern (manufacturer + Seq + number)"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(NuGEN|Agilent|Qiagen)\\s+[A-Z][a-zA-Z\\s]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["NuGEN SPET for RNA", "Agilent SureSelect RNA Target Enrichment", "RNeasy Plus micro columns (Qiagen)"]
+    reasoning: "Commercial kits and reagents with vendor names should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "was used to|were mapped with|carried out with|performed on.*instrument"
+    toolType: "general"
+    examples: ["QURNAs was used to calculate", "reads were mapped with the STAR mapper", "performed on a NextSeq500 instrument"]
+    reasoning: "Usage phrases that indicate tool utilization in methods"
+
+  - patternType: "term"
+    pattern: "kit v\\d+|columns \\([A-Z][a-z]+\\)|tools \\(https://github"
+    toolType: "genetic_reagent"
+    examples: ["kit v2 (Illumina)", "columns (Qiagen)", "tools (https://github.com/broadinstitute/picard)"]
+    reasoning: "Reagent kits with versions, vendor names in parentheses, and GitHub URLs indicate research tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - 0 tools detected despite extensive methods section
+    - Publication contains detailed laboratory methods with multiple computational tools, genetic reagents, and protocols
+    - Methods section describes RNA extraction, targeted sequencing, bioinformatics analysis, and validation studies
+    - At least 10 clear research tools were missed including custom software (QURNAs), standard bioinformatics tools (STAR, Picard, IGV, Alamut), sequencing instruments (NextSeq500), and commercial kits (NuGEN, Agilent, Qiagen)
+    - Mining patterns appear inadequate for detecting bioinformatics tools and commercial reagents
+  recommendations: |
+    - ALL 10 identified tools should be added to the database as they represent genuine research tools
+    - Implement suggested patterns to improve detection of bioinformatics software, sequencing instruments, and commercial kits
+    - Review mining patterns for computational tools - many standard bioinformatics tools were missed
+    - Add vendor-based patterns for commercial reagents (NuGEN, Agilent, Qiagen, etc.)
+    - Include GitHub URL patterns for open-source bioinformatics tools
+    - This publication demonstrates significant gaps in current mining capabilities for genomics/bioinformatics studies
+    - No observations extracted as this requires validated tools first - should be revisited after tools are properly mined

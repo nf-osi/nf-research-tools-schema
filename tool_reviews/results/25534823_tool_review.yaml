@@ -1,0 +1,218 @@
+publicationMetadata:
+  pmid: "25534823"
+  title: "Akt- or MEK-mediated mTOR inhibition suppresses Nf1 optic glioma growth."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes experimental laboratory research using:
+    - Primary mouse astrocyte cultures (cell culture systems)
+    - Nf1 optic glioma-bearing mice (animal models)
+    - Pharmacologic inhibitors (genetic/chemical reagents)
+    - In vitro and in vivo experimental approaches
+    
+    Expected tools include animal models (Nf1 knockout/mutant mice), primary cell cultures,
+    and potentially computational tools for data analysis. The study involves both cell culture
+    and animal model experiments with pharmacologic interventions.
+  overallAssessment: |
+    This is a clear laboratory research publication that should contain multiple research tools.
+    The study uses primary mouse astrocyte cultures and Nf1 optic glioma-bearing mice for
+    experimental work, indicating the presence of animal models and cell culture systems.
+    The fact that no tools were initially mined suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 optic glioma-bearing mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 optic glioma–bearing mice were used to assess the effect of Akt and MEK inhibition on tumor volume, proliferation, and retinal ganglion cell dysfunction."
+    whyMissed: "Animal model not captured - likely missing patterns for 'glioma-bearing mice' or Nf1-specific mouse models"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Primary neonatal mouse astrocyte cultures"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Primary neonatal mouse astrocyte cultures were employed to determine the consequence of phosphatidylinositol-3 kinase (PI3K)/Akt and MEK inhibition on Nf1-deficient astrocyte growth."
+    whyMissed: "Primary cell culture system not captured - missing patterns for 'primary astrocyte cultures'"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1-deficient astrocytes"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "Both MEK and Akt were hyperactivated in Nf1-deficient astrocytes in vitro and in Nf1 murine optic gliomas in vivo."
+    whyMissed: "Genetically modified cell line not captured - missing patterns for 'deficient astrocytes' or knockout cell systems"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 murine optic gliomas"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "Both MEK and Akt were hyperactivated in Nf1-deficient astrocytes in vitro and in Nf1 murine optic gliomas in vivo."
+    whyMissed: "Tumor model not captured - missing patterns for 'murine optic gliomas' or Nf1-specific tumor models"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PI3K inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Pharmacologic PI3K or Akt inhibition reduced Nf1-deficient astrocyte proliferation to wild-type levels, while PI3K inhibition decreased Nf1 optic glioma volume and proliferation."
+    whyMissed: "Pharmacologic inhibitor not captured - missing patterns for specific kinase inhibitors"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "Akt inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Pharmacologic PI3K or Akt inhibition reduced Nf1-deficient astrocyte proliferation to wild-type levels"
+    whyMissed: "Pharmacologic inhibitor not captured - missing patterns for Akt inhibitors"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "MEK inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Sustained MEK pharmacologic blockade also attenuated Nf1-deficient astrocytes as well as Nf1 optic glioma volume and proliferation."
+    whyMissed: "Pharmacologic inhibitor not captured - missing patterns for MEK inhibitors or 'pharmacologic blockade'"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+-bearing mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 optic glioma-bearing mice"]
+    reasoning: "Captures tumor-bearing or disease-bearing mouse models commonly used in cancer research"
+
+  - patternType: "context_phrase"
+    pattern: "primary \\w+ \\w+ cultures?"
+    toolType: "cell_line"
+    examples: ["Primary neonatal mouse astrocyte cultures"]
+    reasoning: "Captures primary cell culture systems which are important research tools"
+
+  - patternType: "context_phrase"
+    pattern: "\\w+-deficient \\w+ (cells?|astrocytes?)"
+    toolType: "cell_line"
+    examples: ["Nf1-deficient astrocytes"]
+    reasoning: "Captures genetically modified cell lines with gene knockouts or deficiencies"
+
+  - patternType: "context_phrase"
+    pattern: "murine \\w+ (gliomas?|tumors?)"
+    toolType: "animal_model"
+    examples: ["Nf1 murine optic gliomas"]
+    reasoning: "Captures mouse tumor models used in cancer research"
+
+  - patternType: "context_phrase"
+    pattern: "pharmacologic(al)? \\w+ (inhibition|blockade)"
+    toolType: "genetic_reagent"
+    examples: ["Pharmacologic PI3K inhibition", "MEK pharmacologic blockade"]
+    reasoning: "Captures pharmacological inhibitors used as research reagents"
+
+  - patternType: "term"
+    pattern: "(PI3K|Akt|MEK|mTOR) inhibitor"
+    toolType: "genetic_reagent"
+    examples: ["PI3K inhibitor", "Akt inhibitor", "MEK inhibitor"]
+    reasoning: "Captures specific kinase inhibitors commonly used in cell signaling research"
+
+  - patternType: "naming_convention"
+    pattern: "\\bNf1[+-]?/?[+-]?\\b"
+    toolType: "animal_model"
+    examples: ["Nf1+/-", "Nf1-/-"]
+    reasoning: "Captures standard mouse genetic nomenclature for Nf1 knockout/heterozygous mice"
+
+observations:
+  - resourceName: "Nf1-deficient astrocytes"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Both MEK and Akt were hyperactivated in Nf1-deficient astrocytes in vitro compared to wild-type controls.
+      This represents a key molecular phenotype of the cell line showing altered kinase signaling pathways.
+    foundIn: "results"
+    contextSnippet: "Both MEK and Akt were hyperactivated in Nf1-deficient astrocytes in vitro and in Nf1 murine optic gliomas in vivo."
+    confidence: 0.95
+    doi: "10.1093/neuonc/nou329"
+
+  - resourceName: "Nf1-deficient astrocytes"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      PI3K or Akt inhibition reduced Nf1-deficient astrocyte proliferation to wild-type levels,
+      demonstrating that these pathways are critical for the enhanced proliferation phenotype.
+    foundIn: "results"
+    contextSnippet: "Pharmacologic PI3K or Akt inhibition reduced Nf1-deficient astrocyte proliferation to wild-type levels"
+    confidence: 0.90
+    doi: "10.1093/neuonc/nou329"
+
+  - resourceName: "Nf1 murine optic gliomas"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      PI3K inhibition decreased Nf1 optic glioma volume and proliferation in vivo.
+      This demonstrates the therapeutic potential of targeting this pathway in NF1-associated tumors.
+    foundIn: "results"
+    contextSnippet: "while PI3K inhibition decreased Nf1 optic glioma volume and proliferation."
+    confidence: 0.95
+    doi: "10.1093/neuonc/nou329"
+
+  - resourceName: "Nf1 murine optic gliomas"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Sustained MEK pharmacologic blockade attenuated Nf1 optic glioma volume and proliferation.
+      MEK inhibitory effects resulted from p90RSK-mediated, Akt-independent mTOR activation.
+    foundIn: "results"
+    contextSnippet: "Sustained MEK pharmacologic blockade also attenuated Nf1-deficient astrocytes as well as Nf1 optic glioma volume and proliferation."
+    confidence: 0.90
+    doi: "10.1093/neuonc/nou329"
+
+  - resourceName: "Nf1 optic glioma-bearing mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003633"
+    details: |
+      Both PI3K and MEK inhibition reduced optic glioma-associated retinal ganglion cell loss
+      and nerve fiber layer thinning, indicating neuroprotective effects beyond tumor growth inhibition.
+    foundIn: "results"
+    contextSnippet: "Finally, both PI3K and MEK inhibition reduced optic glioma–associated retinal ganglion cell loss and nerve fiber layer thinning."
+    confidence: 0.85
+    doi: "10.1093/neuonc/nou329"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 2
+    Tumor Growth: 2
+    Nervous System: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research publication
+    - Multiple animal models and cell culture systems were completely missed
+    - Pharmacologic inhibitors used as research reagents were not captured
+    - Mining patterns appear inadequate for capturing NF1-specific research tools
+    - Standard laboratory research terminology was not recognized
+  recommendations: |
+    This publication represents a significant failure of the mining system to capture obvious research tools.
+    All 7 potentially missed tools should be added to the database as they represent genuine research tools
+    used in experimental procedures. The suggested patterns should be implemented to improve future mining
+    of similar publications. This case highlights the need for better coverage of:
+    1. Animal tumor models and disease-bearing mice
+    2. Primary cell culture systems
+    3. Genetically modified cell lines
+    4. Pharmacologic inhibitors as research reagents
+    5. Standard mouse genetic nomenclature
+    The observations extracted demonstrate clear experimental findings that should be preserved in the database.

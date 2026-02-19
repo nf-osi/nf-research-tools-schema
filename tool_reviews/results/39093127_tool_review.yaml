@@ -1,0 +1,263 @@
+publicationMetadata:
+  pmid: "39093127"
+  title: "Early Detection of Malignant and Premalignant Peripheral Nerve Tumors Using Cell-Free DNA Fragmentomics."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a laboratory research study involving:
+    - Computational tools for bioinformatics analysis (sequencing, fragmentomics, machine learning)
+    - Genetic reagents (cfDNA extraction kits, sequencing libraries)
+    - Potentially clinical assessment tools for patient classification
+    
+    The study involves whole-genome sequencing, computational analysis of cfDNA fragments,
+    and machine learning approaches, so computational tools and genetic reagents are highly expected.
+    Clinical assessment tools may be present for patient phenotyping and outcome measures.
+  overallAssessment: |
+    This is a sophisticated laboratory research study combining molecular biology techniques with
+    computational analysis. The study involves cfDNA extraction, whole-genome sequencing, and
+    extensive bioinformatics analysis using multiple computational approaches. Tools are highly
+    expected across computational, genetic reagent, and potentially clinical assessment categories.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "QIAamp Circulating Nucleic Acid kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA was extracted from 2 to 8 mL of plasma using the QIAamp Circulating Nucleic Acid kit (Qiagen)"
+    whyMissed: "Commercial kit with vendor name - should be captured by reagent patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit dsDNA High-Sensitivity Assay kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Extracted DNA concentration was measured using the Qubit dsDNA High-Sensitivity Assay kit (Thermo-Fisher)"
+    whyMissed: "Commercial assay kit with vendor - standard lab reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Bioanalyzer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "cfDNA concentration and quality were assessed using a Bioanalyzer (Agilent Technologies)"
+    whyMissed: "Instrument/software system for DNA analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "KAPA HyperPrep kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA sequencing libraries were constructed from 10 to 60 ng of isolated DNA using the KAPA HyperPrep kit (Roche)"
+    whyMissed: "Library preparation kit with vendor name"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "xGen UDI-UMI Adapters"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "cfDNA sequencing libraries were constructed from 10 to 60 ng of isolated DNA using the KAPA HyperPrep kit (Roche) and xGen UDI-UMI Adapters (IDT)"
+    whyMissed: "Sequencing adapters with vendor name"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NovaSeq S4 platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Libraries were sequenced using 150-bp paired-end reads on a NovaSeq S4 platform (lllumina)"
+    whyMissed: "Sequencing platform/instrument"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ichorCNA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "copy-number–based estimation of tumor fraction were then performed using the ichorCNA tool (Broad v.0.2.0)"
+    whyMissed: "Bioinformatics software tool with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "samtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Resulting bam files were then downsampled to a normalized depth of 25× using subsample seed values 0 to 4 in samtools v1.17"
+    whyMissed: "Bioinformatics software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Picard"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Fragment lengths, extracted from bam files using Picard (v.4.0.1.2)"
+    whyMissed: "Bioinformatics software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Python sklearn"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We then used the Python sklearn library (v.1.3.2) decomposition module incorporating up to 20 components"
+    whyMissed: "Python library with version number for machine learning"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ComplexHeatmap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Compiled sample scores...were represented by heatmaps using ComplexHeatmap (v.2.14.0)"
+    whyMissed: "R package with version number for data visualization"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.4.2.2 or GraphPad Prism 10"
+    whyMissed: "Statistical software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were performed using R v.4.2.2 or GraphPad Prism 10"
+    whyMissed: "Statistical software with version number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TruSight Oncology 500"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tissue genomic profiling was performed by Clinical Laboratory Improvement Amendments–certified molecular laboratories using TruSight Oncology 500 (Illumina)"
+    whyMissed: "Commercial genomic profiling panel with vendor"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+(kit|Kit)\\s*\\([A-Z][a-zA-Z]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["QIAamp Circulating Nucleic Acid kit (Qiagen)", "KAPA HyperPrep kit (Roche)"]
+    reasoning: "Commercial kits with vendor names in parentheses are standard lab reagents"
+
+  - patternType: "term"
+    pattern: "\\b(samtools|Picard|ichorCNA)\\s+\\(?v?[0-9]+\\.[0-9]+(\\.[0-9]+)?\\)?"
+    toolType: "computational_tool"
+    examples: ["samtools v1.17", "Picard (v.4.0.1.2)", "ichorCNA tool (Broad v.0.2.0)"]
+    reasoning: "Bioinformatics tools with version numbers are computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|performed using|extracted using|constructed using"
+    toolType: "general"
+    examples: ["analyzed using ComplexHeatmap", "extracted using QIAamp kit"]
+    reasoning: "These phrases reliably indicate tool usage in experimental context"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+Seq\\s+[A-Z][0-9]+\\s+platform"
+    toolType: "computational_tool"
+    examples: ["NovaSeq S4 platform"]
+    reasoning: "Sequencing platform naming convention indicates instrumentation"
+
+  - patternType: "term"
+    pattern: "\\bPython\\s+[a-zA-Z]+\\s+library\\s*\\(v?[0-9]+\\.[0-9]+(\\.[0-9]+)?\\)"
+    toolType: "computational_tool"
+    examples: ["Python sklearn library (v.1.3.2)"]
+    reasoning: "Python libraries with versions are computational analysis tools"
+
+observations:
+  - resourceName: "ichorCNA"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ichorCNA tool (Broad v.0.2.0) was used for copy-number–based estimation of tumor fraction from cfDNA whole-genome sequencing data. The tool performed GC content and mappability bias correction, depth-based local copy number estimates, and copy-number–based estimation of tumor fraction. Size-selected tumor fraction analysis was performed using in silico size selection of fragment lengths between 90 and 150 bp to enrich for ctDNA fragments.
+    foundIn: "methods"
+    contextSnippet: "Size-selected tumor fraction analysis by CNA was performed as previously described. Briefly, WGS reads were realigned to hg19 and enriched for ctDNA fragments by in silico size selection of fragment lengths between 90 and 150 bp. GC content and mappability bias correction, depth-based local copy number estimates, and copy-number–based estimation of tumor fraction were then performed using the ichorCNA tool (Broad v.0.2.0)"
+    confidence: 0.95
+    doi: "10.1158/1078-0432.CCR-24-0797"
+
+  - resourceName: "Python sklearn"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Python sklearn library (v.1.3.2) was used for non-negative matrix factorization (NMF) decomposition of cfDNA fragment-length profiles. The decomposition module was used with up to 20 components, random initialization, multiplicative updates, and Kullback–Leibler β-divergence. Logistic regression models were also implemented using sklearn with 10 repeats of fivefold cross-validation and hyperparameter optimization via grid search.
+    foundIn: "methods"
+    contextSnippet: "We then used the Python sklearn library (v.1.3.2) decomposition module incorporating up to 20 components, with random initialization, multiplicative updates, and Kullback–Leibler β-divergence. The resulting component weights were used to train logistic regression models"
+    confidence: 0.90
+    doi: "10.1158/1078-0432.CCR-24-0797"
+
+  - resourceName: "samtools"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      samtools v1.17 was used for downsampling BAM files to normalized sequencing depths. The tool was used with subsample seed values 0 to 4 to create replicates at various target coverages (25×, 15×, 10×, 6×, 3×, 1×, 0.6×, 0.3×, and 0.1×) for technical downsampling analysis of cfDNA whole-genome sequencing data.
+    foundIn: "methods"
+    contextSnippet: "Resulting bam files were then downsampled to a normalized depth of 25× using subsample seed values 0 to 4 in samtools v1.17, resulting in five replicates per sample. Downsampling was repeated using seed values 0 to 4 to target coverages of 15×, 10×, 6×, 3×, 1×, 0.6×, 0.3×, and 0.1×"
+    confidence: 0.95
+    doi: "10.1158/1078-0432.CCR-24-0797"
+
+  - resourceName: "NovaSeq S4 platform"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NovaSeq S4 platform (Illumina) was used for high-throughput sequencing of cfDNA libraries. Libraries were sequenced using 150-bp paired-end reads. A total of 167 cfDNA libraries were sequenced for the study, with libraries retained for analysis only if they met quality control criteria: >80% mapped bases, <0.3% error rate, >85% unique reads, and >75% Q30 bases.
+    foundIn: "methods"
+    contextSnippet: "Libraries were sequenced using 150-bp paired-end reads on a NovaSeq S4 platform (lllumina). In total, 167 cfDNA libraries were sequenced for use in this study. Libraries were retained for analysis only if they had >80% mapped bases, <0.3% error rate, >85% unique reads, and >75% Q30 bases"
+    confidence: 0.90
+    doi: "10.1158/1078-0432.CCR-24-0797"
+
+  - resourceName: "R"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R v.4.2.2 was used for statistical analyses including Kruskal–Wallis H test for comparing distributions of feature scores across clinical states, Dunn test for pairwise comparisons, two-sample Kolmogorov–Smirnov tests for fragment-length distribution comparisons, and Welch T test for comparing tumor fractions at different sequencing depths.
+    foundIn: "methods"
+    contextSnippet: "When testing associations between plasma tumor fraction or fragmentomic features and clinical status, the distributions of feature scores for each clinical status were compared using the Kruskal–Wallis H test with pairwise comparisons using the Dunn test. Statistical analyses were performed using R v.4.2.2 or GraphPad Prism 10"
+    confidence: 0.95
+    doi: "10.1158/1078-0432.CCR-24-0797"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 14
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - No tools were mined from this publication despite it being a sophisticated laboratory research study
+    - The publication contains extensive computational analysis and uses multiple commercial reagents and software tools
+    - Mining patterns appear to have missed standard bioinformatics tools, commercial kits, and laboratory reagents
+    - Tool extraction patterns need improvement for capturing vendor-specific reagents and versioned software
+  recommendations: |
+    This publication should have yielded multiple tools across computational and genetic reagent categories:
+    
+    COMPUTATIONAL TOOLS (9 missed):
+    - ichorCNA, samtools, Picard (bioinformatics software with versions)
+    - Python sklearn, ComplexHeatmap (analysis libraries)
+    - R, GraphPad Prism (statistical software)
+    - Bioanalyzer, NovaSeq S4 platform (instruments/platforms)
+    
+    GENETIC REAGENTS (5 missed):
+    - QIAamp Circulating Nucleic Acid kit, KAPA HyperPrep kit (extraction/prep kits)
+    - Qubit dsDNA High-Sensitivity Assay kit (quantification reagent)
+    - xGen UDI-UMI Adapters (sequencing reagents)
+    - TruSight Oncology 500 (genomic profiling panel)
+    
+    The mining system needs significant improvement in pattern recognition for:
+    1. Commercial kits with vendor names in parentheses
+    2. Bioinformatics software with version numbers
+    3. Laboratory instruments and platforms
+    4. Python/R libraries and packages
+    
+    All 14 potentially missed tools should be added to improve mining accuracy for similar publications.
+    The suggested patterns would significantly improve tool capture rates for computational biology studies.

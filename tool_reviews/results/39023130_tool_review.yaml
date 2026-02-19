@@ -1,0 +1,184 @@
+publicationMetadata:
+  pmid: "39023130"
+  title: "Maternal obesogenic diet operates at the tumor cell of origin to increase incidence and decrease latency of Neurofibromatosis Type 1 optic pathway glioma."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study using murine models to investigate NF1 optic pathway gliomas.
+    The study involves experimental manipulation of diet, analysis of fetal neurodevelopment, tumor formation
+    assessment, and likely histological/molecular analyses. Expected tools include:
+    - Animal models (multiple Nf1-OPG mouse strains mentioned)
+    - Potentially antibodies for immunohistochemistry/analysis
+    - Computational tools for statistical analysis
+    - Genetic reagents (Nf1 knockout/mutant strains)
+  overallAssessment: |
+    This is a laboratory research study investigating the effects of maternal obesogenic diet on NF1 optic pathway
+    glioma formation using multiple murine models. The study clearly involves experimental animal work with
+    genetically modified mouse strains, dietary interventions, and analysis of tumor formation and neurodevelopment.
+    Research tools are definitely expected and likely present, particularly animal models and analytical tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "murine models of the neurofibromatosis type 1 (NF1) pediatric brain tumor predisposition syndrome"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "We employed several murine models of the neurofibromatosis type 1 (NF1) pediatric brain tumor predisposition syndrome, in which optic pathway gliomas (Nf1-OPGs) arise from neuroglial progenitor cells"
+    whyMissed: "Generic description rather than specific strain names - mining patterns may require more specific nomenclature"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "high-penetrance Nf1-OPG strain"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Obesogenic diet (Ob) similarly accelerated glioma formation in a high-penetrance Nf1-OPG strain and increased glioma penetrance in 2 low-penetrance Nf1-OPG strains"
+    whyMissed: "Descriptive strain reference without standard nomenclature - patterns may need to capture 'strain' terminology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "low-penetrance Nf1-OPG strains"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Obesogenic diet (Ob) similarly accelerated glioma formation in a high-penetrance Nf1-OPG strain and increased glioma penetrance in 2 low-penetrance Nf1-OPG strains"
+    whyMissed: "Descriptive strain reference without standard nomenclature - patterns may need to capture 'strain' terminology"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "HFHS diet"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We exposed dams and offspring to an obesogenic HFHS diet or control chow and analyzed fetal neurodevelopment at E19.5 and tumor formation"
+    whyMissed: "Specialized diet formulation used as experimental reagent - may need patterns for 'diet' as research tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "murine model[s]? of.*syndrome"
+    toolType: "animal_model"
+    examples: ["murine models of the neurofibromatosis type 1 (NF1) pediatric brain tumor predisposition syndrome"]
+    reasoning: "Captures descriptive animal model references that don't follow standard strain nomenclature"
+
+  - patternType: "naming_convention"
+    pattern: "(high|low)-penetrance.*strain[s]?"
+    toolType: "animal_model"
+    examples: ["high-penetrance Nf1-OPG strain", "low-penetrance Nf1-OPG strains"]
+    reasoning: "Captures strain references based on phenotypic characteristics rather than genetic nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "We employed.*murine model[s]?"
+    toolType: "animal_model"
+    examples: ["We employed several murine models of the neurofibromatosis type 1"]
+    reasoning: "Usage context phrase that indicates active employment of animal models in research"
+
+  - patternType: "term"
+    pattern: "Nf1-OPG[s]?"
+    toolType: "animal_model"
+    examples: ["Nf1-OPGs", "Nf1-OPG strain"]
+    reasoning: "Specific model designation for NF1 optic pathway glioma models that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}[S]? diet"
+    toolType: "genetic_reagent"
+    examples: ["HFHS diet"]
+    reasoning: "Specialized diet formulations used as experimental reagents (HFHS = high-fat high-sugar)"
+
+observations:
+  - resourceName: "high-penetrance Nf1-OPG strain"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Obesogenic diet exposure accelerated glioma formation in this high-penetrance strain.
+      The study demonstrates that maternal obesogenic diet acts as a risk factor for
+      tumor development, with effects dependent on in utero exposure rather than postnatal exposure.
+    foundIn: "results"
+    contextSnippet: "Obesogenic diet (Ob) similarly accelerated glioma formation in a high-penetrance Nf1-OPG strain"
+    confidence: 0.9
+    doi: "https://doi.org/10.1093/neuonc/noae136"
+
+  - resourceName: "low-penetrance Nf1-OPG strains"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Obesogenic diet exposure increased glioma penetrance in 2 low-penetrance strains.
+      This finding suggests that environmental factors (maternal diet) can modify
+      tumor susceptibility even in genetically less predisposed backgrounds.
+    foundIn: "results"
+    contextSnippet: "increased glioma penetrance in 2 low-penetrance Nf1-OPG strains"
+    confidence: 0.9
+    doi: "https://doi.org/10.1093/neuonc/noae136"
+
+  - resourceName: "murine models of the neurofibromatosis type 1 (NF1) pediatric brain tumor predisposition syndrome"
+    resourceType: "Animal Model"
+    observationType: "Developmental"
+    observationTypeOntologyId: "MP:0002152"
+    details: |
+      Progeny from HFHS diet-exposed dams demonstrated increased third ventricular zone (TVZ)
+      neuroglial progenitor cell (NPC) proliferation and enhanced glial differentiation.
+      These developmental changes occurred at embryonic day 19.5 (E19.5) and were dependent
+      on maternal diet rather than maternal weight.
+    foundIn: "results"
+    contextSnippet: "Progeny from HFHS diet-exposed dams demonstrated increased TVZ NPC proliferation and glial differentiation"
+    confidence: 0.95
+    doi: "https://doi.org/10.1093/neuonc/noae136"
+
+  - resourceName: "murine models of the neurofibromatosis type 1 (NF1) pediatric brain tumor predisposition syndrome"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      The effects on neuroglial progenitor cell proliferation and glial differentiation
+      were confirmed to be dependent upon maternal diet exposure rather than maternal weight
+      through dietary switch cohort experiments. Postnatal obesogenic diet exposure alone
+      did not recapitulate these developmental effects.
+    foundIn: "results"
+    contextSnippet: "Dietary switch cohorts confirmed that these effects were dependent upon maternal diet, rather than maternal weight"
+    confidence: 0.9
+    doi: "https://doi.org/10.1093/neuonc/noae136"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Tumor Growth: 2
+    Developmental: 1
+    Cellular: 1
+  majorIssuesFound: |
+    - Complete failure to detect any research tools despite clear laboratory research study
+    - Multiple animal model strains mentioned but not captured by mining patterns
+    - Descriptive strain references (high/low-penetrance) not recognized as tools
+    - Generic "murine models" description missed due to lack of specific nomenclature
+    - Specialized diet formulations (HFHS) not recognized as experimental reagents
+  recommendations: |
+    This publication represents a significant mining failure - it's a clear laboratory research study
+    using multiple animal models, but zero tools were detected. The main issues are:
+    
+    1. ANIMAL MODELS: The study uses "several murine models" and references "high-penetrance" and 
+       "low-penetrance Nf1-OPG strains" but these weren't captured. Mining patterns need to be 
+       expanded to catch descriptive strain references and generic model descriptions.
+    
+    2. MISSING PATTERNS: Need patterns for "murine model[s] of", "strain[s]", "Nf1-OPG", and 
+       penetrance-based strain descriptions.
+    
+    3. EXPERIMENTAL REAGENTS: HFHS diet is a specialized experimental reagent that should be captured.
+    
+    4. LIKELY ADDITIONAL TOOLS: Full paper probably contains antibodies for immunohistochemistry,
+       computational tools for statistical analysis, and more specific strain identifiers.
+    
+    All identified animal models should be added to the database. The mining system needs significant
+    improvement to catch animal models described by phenotype rather than standard genetic nomenclature.
+    
+    Scientific observations were successfully extracted showing tumor growth acceleration, increased
+    penetrance, and developmental effects on neuroglial progenitor cells.

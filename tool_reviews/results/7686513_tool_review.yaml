@@ -1,0 +1,107 @@
+publicationMetadata:
+  pmid: "7686513"
+  title: "An exon-trapping system with a newly constructed trapping vector pEXT2; its application to the proximal region of the human chromosome 21 long arm."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology/genomics paper from 1993 describing the development and application of an exon-trapping system.
+    Expected tools include genetic reagents (vectors, clones), cell lines for testing, and potentially computational tools for sequence analysis.
+    The paper explicitly mentions developing a "newly constructed trapping vector pEXT2" and using "human glioblastoma A172 cell" line.
+  overallAssessment: |
+    This is clearly a laboratory research publication describing the development of a molecular biology tool (exon-trapping vector).
+    The paper should contain multiple research tools including the newly developed vector pEXT2, cell lines (A172), and cosmid clones.
+    Despite lacking detailed Methods sections in the available text, the abstract provides clear evidence of tool development and usage.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "pEXT2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have developed an exon-trapping system with a newly constructed trapping vector containing multiple cloning sites (designated pEXT2)."
+    whyMissed: "Vector name with specific designation should have been caught by genetic reagent patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "A172"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...transcribed fragment hybridized with approximately 1.6 kb RNA from human brain and human glioblastoma A172 cell."
+    whyMissed: "Standard cell line nomenclature (A172) should have been detected by cell line patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "cosmid clones"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have applied the system to the cosmid clones located on human chromosome 21p11-q21"
+    whyMissed: "Generic term 'cosmid clones' may not have specific enough pattern matching"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "p[A-Z]{2,4}[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["pEXT2"]
+    reasoning: "Vector naming convention with 'p' prefix followed by letters and numbers is standard for plasmids/vectors"
+
+  - patternType: "term"
+    pattern: "trapping vector"
+    toolType: "genetic_reagent"
+    examples: ["trapping vector pEXT2"]
+    reasoning: "Specific molecular biology tool terminology that indicates genetic reagent usage"
+
+  - patternType: "context_phrase"
+    pattern: "newly constructed.*vector"
+    toolType: "genetic_reagent"
+    examples: ["newly constructed trapping vector"]
+    reasoning: "Phrase indicating vector development/construction is strong indicator of genetic reagent"
+
+  - patternType: "term"
+    pattern: "cosmid clones"
+    toolType: "genetic_reagent"
+    examples: ["cosmid clones located on human chromosome"]
+    reasoning: "Cosmid clones are standard genetic reagents used in genomic mapping and should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "A[0-9]{3}"
+    toolType: "cell_line"
+    examples: ["A172"]
+    reasoning: "Cell line naming pattern starting with 'A' followed by numbers (common for established cell lines)"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear presence of research tools
+    - pEXT2 vector (main subject of paper) was not detected
+    - A172 cell line was not detected
+    - Cosmid clones were not detected
+    - This represents a significant false negative rate for this publication type
+  recommendations: |
+    This publication contains clear research tools that were completely missed by the mining system:
+    1. pEXT2 should be added as a genetic reagent (newly developed trapping vector)
+    2. A172 should be added as a cell line (human glioblastoma cell line)
+    3. Cosmid clones should be added as genetic reagents
+    
+    The mining patterns need improvement to catch:
+    - Vector naming conventions (pEXT2 pattern)
+    - Standard cell line nomenclature (A172 pattern)
+    - Molecular biology terminology ("trapping vector", "cosmid clones")
+    
+    No observations could be extracted due to lack of Results/Discussion sections in available text.
+    This case highlights the importance of having comprehensive pattern matching for genetic reagents and cell lines.

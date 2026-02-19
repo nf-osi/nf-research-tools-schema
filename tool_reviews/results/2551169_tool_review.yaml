@@ -1,0 +1,108 @@
+publicationMetadata:
+  pmid: "2551169"
+  title: "Transplacental induction of peripheral nervous tumor in the Syrian golden hamster by N-nitroso-N-ethylurea. A new animal model for von Recklinghausen's neurofibromatosis."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → animal models, genetic reagents, computational tools
+    
+    This is clearly a laboratory research study describing the development of a new animal model
+    for neurofibromatosis research. The study involves:
+    - Animal model development (Syrian golden hamsters)
+    - Chemical carcinogen treatment (N-nitroso-N-ethylurea/ENU)
+    - Histological, immunohistochemical, and electron microscopic analysis
+    
+    Expected tools include the animal model itself, the chemical reagent, and potentially
+    analytical tools for characterization, though only abstract is available.
+  overallAssessment: |
+    This is a classic laboratory research publication from 1989 describing the development
+    of a new animal model for neurofibromatosis research. The study clearly involves
+    experimental procedures using Syrian golden hamsters and chemical treatment with ENU.
+    Research tools are definitely expected, particularly the animal model and chemical reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Syrian golden hamster"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Multiple peripheral nervous tumors were induced in 45 of 60 (75.0%) Syrian golden hamsters by transplacental administration of N-ethyl-N-nitro-sourea."
+    whyMissed: "Animal model name not recognized by mining patterns - may need specific hamster strain patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "N-nitroso-N-ethylurea"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Multiple peripheral nervous tumors were induced in 45 of 60 (75.0%) Syrian golden hamsters by transplacental administration of N-ethyl-N-nitro-sourea."
+    whyMissed: "Chemical mutagen/carcinogen not recognized - may need patterns for chemical reagents used in model development"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "ENU"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "With its high incidence of Wilms' tumor, the hamster with ENU-induced tumors is considered to be a good animal model for human neurocristopathy, including VRNF."
+    whyMissed: "Abbreviation for N-ethyl-N-nitrosourea not caught - need patterns for chemical abbreviations"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Syrian golden hamster"
+    toolType: "animal_model"
+    examples: ["Syrian golden hamsters by transplacental administration"]
+    reasoning: "Specific hamster strain used as animal model - should be captured as research tool"
+    
+  - patternType: "term"
+    pattern: "N-nitroso-N-ethylurea|N-ethyl-N-nitrosourea|ENU"
+    toolType: "genetic_reagent"
+    examples: ["N-nitroso-N-ethylurea", "N-ethyl-N-nitro-sourea", "ENU-induced tumors"]
+    reasoning: "Chemical mutagens/carcinogens used for model development are important genetic reagents"
+    
+  - patternType: "context_phrase"
+    pattern: "animal model for"
+    toolType: "animal_model"
+    examples: ["a good animal model for human neurocristopathy"]
+    reasoning: "Phrase indicating development or description of animal models"
+    
+  - patternType: "context_phrase"
+    pattern: "transplacental administration|transplacental induction"
+    toolType: "genetic_reagent"
+    examples: ["transplacental administration of N-ethyl-N-nitro-sourea"]
+    reasoning: "Context indicating experimental use of chemical reagents in animal models"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available - full Methods section would likely contain more detailed tool information
+    - Mining patterns appear to miss animal model strains and chemical reagents used in model development
+    - This represents a significant gap in tool detection for animal model development studies
+  recommendations: |
+    This publication clearly describes the development and characterization of a new animal model
+    for neurofibromatosis research, yet no tools were captured by the mining process. This indicates
+    significant gaps in the mining patterns, particularly for:
+    
+    1. Animal model strains (Syrian golden hamster should be captured)
+    2. Chemical reagents used for model induction (N-nitroso-N-ethylurea/ENU)
+    3. Context phrases indicating model development ("animal model for", "transplacental administration")
+    
+    The suggested patterns should be implemented to improve capture of similar tools in future mining.
+    This type of model development paper is exactly what should be captured by bench research queries.
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the abstract
+    does contain some quantitative data (75% tumor induction rate, specific percentages for different
+    tumor types) that would be valuable if full text were available.

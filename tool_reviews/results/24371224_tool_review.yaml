@@ -1,0 +1,155 @@
+publicationMetadata:
+  pmid: "24371224"
+  title: "Tumor suppressor alterations cooperate to drive aggressive mesotheliomas with enriched cancer stem cells via a p53-miR-34a-c-Met axis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes experimental work with genetically modified mouse models (Nf2+/-, Cdkn2a+/-, 
+    double knockouts), cell culture work (tumor spheroids, CSC spheroids), xenograft experiments (SCID mice), 
+    and molecular analyses. Expected tools include:
+    - Animal models (knockout mice strains)
+    - Cell lines (derived mesothelioma cells)
+    - Genetic reagents (knockout alleles)
+    - Potentially antibodies for CSC marker staining
+    - Advanced cellular models (spheroids)
+    - Patient-derived models (xenografts in SCID mice)
+  overallAssessment: |
+    This is clearly a laboratory research publication involving extensive experimental work with genetically 
+    modified mouse models, cell culture, and xenograft studies. The abstract describes multiple experimental 
+    approaches that would require specific research tools. However, only the abstract is available, which 
+    limits detailed tool identification. The mining system failed to detect any tools, likely missing several 
+    important animal models and cell culture systems described in the abstract.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Nf2+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...germline knockout of one allele of each of these genes causes accelerated onset and progression of asbestos-induced malignant mesothelioma compared with asbestos-exposed Nf2(+/-) or wild-type mice..."
+    whyMissed: "Standard mouse strain nomenclature not detected - Nf2+/- represents a heterozygous knockout mouse model"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cdkn2a+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Ascites from some Nf2(+/-);Cdkn2a(+/-) mice exhibited large tumor spheroids..."
+    whyMissed: "Standard mouse strain nomenclature not detected - Cdkn2a+/- represents a heterozygous knockout mouse model"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2+/-;Cdkn2a+/- double knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Intraperitoneal injections of malignant mesothelioma cells derived from Nf2(+/-);Cdkn2a(+/-) mice into severe combined immunodeficient mice..."
+    whyMissed: "Complex double knockout strain nomenclature not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "severe combined immunodeficient mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...Intraperitoneal injections of malignant mesothelioma cells derived from Nf2(+/-);Cdkn2a(+/-) mice into severe combined immunodeficient mice produced tumors..."
+    whyMissed: "SCID mice strain name written out in full rather than abbreviated"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "malignant mesothelioma cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...tail vein injections of malignant mesothelioma cells established from these mice..."
+    whyMissed: "Primary cell lines derived from mouse models not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "tumor spheroids"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "...Ascites from some Nf2(+/-);Cdkn2a(+/-) mice exhibited large tumor spheroids..."
+    whyMissed: "3D spheroid culture system not detected"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "CSC spheroids"
+    toolType: "advanced_cellular_model"
+    foundIn: "abstract"
+    contextSnippet: "...formed CSC spheroids in vitro more efficiently than counterparts from wild-type mice..."
+    whyMissed: "Cancer stem cell spheroid culture system not detected"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+\\(\\+/-\\)"
+    toolType: "animal_model"
+    examples: ["Nf2(+/-)", "Cdkn2a(+/-)"]
+    reasoning: "Standard mouse genetics nomenclature for heterozygous knockouts using (+/-) notation should be detected"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+\\(\\+/-\\);[A-Z][a-z0-9]+\\(\\+/-\\)"
+    toolType: "animal_model"
+    examples: ["Nf2(+/-);Cdkn2a(+/-)"]
+    reasoning: "Double knockout mouse strains with semicolon separator should be detected"
+
+  - patternType: "term"
+    pattern: "severe combined immunodeficient mice"
+    toolType: "animal_model"
+    examples: ["severe combined immunodeficient mice"]
+    reasoning: "SCID mice written in full form should be detected alongside abbreviated forms"
+
+  - patternType: "context_phrase"
+    pattern: "cells established from.*mice"
+    toolType: "cell_line"
+    examples: ["malignant mesothelioma cells established from these mice"]
+    reasoning: "Primary cell lines derived from animal models should be detected"
+
+  - patternType: "term"
+    pattern: "tumor spheroids"
+    toolType: "advanced_cellular_model"
+    examples: ["tumor spheroids", "CSC spheroids"]
+    reasoning: "Spheroid culture systems should be detected as advanced cellular models"
+
+  - patternType: "term"
+    pattern: "CSC spheroids"
+    toolType: "advanced_cellular_model"
+    examples: ["CSC spheroids"]
+    reasoning: "Cancer stem cell spheroids represent specialized 3D culture systems"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining system completely failed to detect any tools despite clear experimental content
+    - Multiple mouse strains with standard genetic nomenclature were missed
+    - Cell culture systems and 3D models were not detected
+    - Only abstract available - full Methods section would likely contain many more tools
+    - Pattern recognition needs improvement for mouse genetics nomenclature
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the mining system.
+    The abstract alone describes at least 7 distinct tools including genetically modified mouse models, 
+    primary cell lines, and advanced cellular models (spheroids). The mining patterns need significant 
+    improvement to detect:
+    
+    1. Standard mouse genetics nomenclature (Gene+/- format)
+    2. Double knockout strains with semicolon separators
+    3. SCID mice written in full form
+    4. Primary cell lines derived from animal models
+    5. Spheroid culture systems
+    
+    All 7 identified tools should be added to the database. The full paper would likely contain many 
+    additional tools in the Methods section. This represents a significant gap in the current mining 
+    capability for animal model research.

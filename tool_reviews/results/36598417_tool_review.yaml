@@ -1,0 +1,251 @@
+publicationMetadata:
+  pmid: "36598417"
+  title: "Genomic Patterns of Malignant Peripheral Nerve Sheath Tumor (MPNST) Evolution Correlate with Clinical Outcome and Are Detectable in Cell-Free DNA."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a comprehensive genomic analysis study that should contain multiple tool types:
+    - Computational tools: Extensive bioinformatics analysis using sequencing analysis software, statistical packages, and custom pipelines
+    - Genetic reagents: DNA/RNA extraction kits, sequencing library preparation kits
+    - Potentially antibodies: For immunohistochemistry (H3K27me3, MYF-4, S100, Sox10 mentioned)
+    
+    The publication describes whole-genome sequencing, RNA-seq, methylation profiling, and extensive computational analysis, indicating heavy use of bioinformatics tools and laboratory reagents.
+  overallAssessment: |
+    This is a large-scale genomic study with extensive Methods section describing laboratory protocols and computational analysis. The study should contain numerous research tools including sequencing kits, bioinformatics software, and antibodies for immunohistochemistry. The absence of mined tools suggests significant gaps in the mining process for this type of publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "BWA-MEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw sequencing reads were mapped to the GRCh38 build of the human reference genome using BWA-MEM (46) version 0.7.17-r1188."
+    whyMissed: "Standard bioinformatics tool with version number - should be caught by computational tool patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Aligned reads in BAM format were processed following the Genome Analysis Toolkit (GATK, version 4.1.8.0) Best Practices workflow"
+    whyMissed: "Major bioinformatics toolkit with version - standard computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Strelka2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Somatic SNVs were detected using Mutect2 (GATK version 4.1.8.0), MuSE (version v1.0rc; ref. 60), and Strelka2 (version 2.9.2) using default options."
+    whyMissed: "Variant calling software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Mutect2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Somatic SNVs were detected using Mutect2 (GATK version 4.1.8.0), MuSE (version v1.0rc; ref. 60), and Strelka2 (version 2.9.2)"
+    whyMissed: "GATK variant caller with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "STAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing reads were mapped to the transcriptome using the STAR aligner (version 2.7.4a; ref. 74)."
+    whyMissed: "RNA-seq alignment tool with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differential expression analysis was performed using DESeq2 (76)."
+    whyMissed: "Standard R package for differential expression analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HTSeq"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene-expression counts were generated using HTSeq (v.0.6.1p1; ref. 75)"
+    whyMissed: "Gene counting software with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FACETS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For WGS data, the software packages FACETS (version 0.12.1) and ascatNGS (version 2.5.1) were used to detect somatic copy-number alterations"
+    whyMissed: "Copy number analysis software with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used the R package dNdScv (61)" and multiple other R package references
+    whyMissed: "Statistical computing environment - fundamental tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina NovaSeq6000"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "which were sequenced on the Illumina NovaSeq6000 sequencing machine using S4 flow cells"
+    whyMissed: "Sequencing platform - major laboratory instrument"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TruSeq DNA PCR Free 350bp kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Between 350 and 500 ng of tumor DNA were used to prepare DNA sequencing libraries using the TruSeq DNA PCR Free 350bp kit"
+    whyMissed: "Commercial sequencing library preparation kit"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Maxwell RSC Tissue DNA Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "BCH used the Maxwell RSC Tissue DNA Kit for extraction (Promega)"
+    whyMissed: "DNA extraction kit with vendor name"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "QIAamp DNA Mini kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Royal National Orthopaedic Hospital used QIAamp's DNA Mini and Blood Maxi kits (Qiagen) for extraction"
+    whyMissed: "DNA extraction kit with vendor"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "AllPrep DNA/RNA/miRNA Universal Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Fresh-frozen tumor and normal nerve samples in TRIzol were stored at −80°C until transfer to the Broad Institute on dry ice for RNA extraction (AllPrep DNA/RNA/miRNA Universal Kit; Qiagen)."
+    whyMissed: "RNA extraction kit with vendor"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "H3K27me3 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "FFPE tissue blocks were collected for each fresh-frozen tumor which underwent multiomic profiling and were used for pathology review, IHC (MYF-4, H3K7me3, S100, and Sox10)"
+    whyMissed: "Immunohistochemistry antibody - should be caught by antibody patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "S100 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "FFPE tissue blocks were collected for each fresh-frozen tumor which underwent multiomic profiling and were used for pathology review, IHC (MYF-4, H3K7me3, S100, and Sox10)"
+    whyMissed: "Immunohistochemistry antibody"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Sox10 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "FFPE tissue blocks were collected for each fresh-frozen tumor which underwent multiomic profiling and were used for pathology review, IHC (MYF-4, H3K7me3, S100, and Sox10)"
+    whyMissed: "Immunohistochemistry antibody"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MYF-4 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "FFPE tissue blocks were collected for each fresh-frozen tumor which underwent multiomic profiling and were used for pathology review, IHC (MYF-4, H3K7me3, S100, and Sox10)"
+    whyMissed: "Immunohistochemistry antibody"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "HumanMethylationEPIC beadchip"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tumor DNA derived from fresh-frozen tumors and paired normal nerve samples was used for whole-genome DNA methylation array profiling using the HumanMethylationEPIC beadchip platform"
+    whyMissed: "Methylation array platform - commercial reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRIzol"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Two tubes (Sarstedt—Biosphere Safeseal Tube 1.5 mL) with 6 curls each of fresh-frozen scrolls (sectioned at 10 μm each) in 1 mL TRIzol were collected for RNA isolation"
+    whyMissed: "Standard RNA extraction reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9-]+\\s+\\(version\\s+[0-9]+\\.[0-9]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["GATK (version 4.1.8.0)", "STAR (version 2.7.4a)", "FACETS (version 0.12.1)"]
+    reasoning: "Software tools with explicit version numbers in parentheses - very reliable pattern for computational tools"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9-]+\\s+v[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["HTSeq v.0.6.1p1", "MuSE version v1.0rc"]
+    reasoning: "Alternative version notation format commonly used in bioinformatics"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|mapped using|detected using|performed using"
+    toolType: "computational_tool"
+    examples: ["analyzed using DESeq2", "mapped using BWA-MEM", "detected using Mutect2"]
+    reasoning: "Strong contextual indicators of computational tool usage in analysis workflows"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z0-9]+\\s+(Kit|kit)\\b"
+    toolType: "genetic_reagent"
+    examples: ["Maxwell RSC Tissue DNA Kit", "AllPrep DNA/RNA/miRNA Universal Kit"]
+    reasoning: "Commercial kits are fundamental laboratory reagents with standardized naming"
+
+  - patternType: "context_phrase"
+    pattern: "IHC\\s*\\([^)]*\\)|immunohistochemistry.*\\([^)]*\\)"
+    toolType: "antibody"
+    examples: ["IHC (MYF-4, H3K7me3, S100, and Sox10)"]
+    reasoning: "Immunohistochemistry context strongly indicates antibody usage"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Z][a-zA-Z]+\\)$|\\b(Promega|Qiagen|Thermo Fisher|Illumina)\\b"
+    toolType: "genetic_reagent"
+    examples: ["(Promega)", "(Qiagen)", "Thermo Fisher Scientific"]
+    reasoning: "Vendor names in parentheses or major biotech companies indicate commercial reagents"
+
+  - patternType: "term"
+    pattern: "\\bR package\\s+[a-zA-Z0-9]+"
+    toolType: "computational_tool"
+    examples: ["R package dNdScv", "R package survival"]
+    reasoning: "R packages are computational tools commonly used in genomics analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 19
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure of tool mining: This comprehensive genomic study contains numerous research tools but none were detected
+    - Missing computational tools: Extensive bioinformatics analysis using 15+ software tools with versions not captured
+    - Missing genetic reagents: Multiple commercial kits and reagents (DNA/RNA extraction, library prep, arrays) not detected
+    - Missing antibodies: Immunohistochemistry antibodies (H3K27me3, S100, Sox10, MYF-4) not captured
+    - Pattern gaps: Current mining patterns fail to capture standard bioinformatics workflows and laboratory protocols
+  recommendations: |
+    This publication represents a major gap in tool mining effectiveness. Key recommendations:
+    1. URGENT: Implement computational tool patterns for software with version numbers
+    2. Add genetic reagent patterns for commercial kits with vendor names
+    3. Improve antibody detection for immunohistochemistry contexts
+    4. Add R package detection patterns for statistical analysis tools
+    5. Include sequencing platform and instrument detection
+    6. This type of genomics publication should be a high-yield target for tool mining
+    7. Consider this publication as a test case for validating improved mining patterns
+    8. No observations extracted as no tools were validated (all tools missed in mining phase)

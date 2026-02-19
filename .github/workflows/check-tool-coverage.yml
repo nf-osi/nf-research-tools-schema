@@ -316,6 +316,14 @@ jobs:
 
           echo "mining_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Initialize VALIDATED templates
+        id: init_templates
+        if: steps.mining.outputs.mining_complete == 'true'
+        run: |
+          echo "Initializing VALIDATED_*.csv template files..."
+          python tool_coverage/scripts/initialize_validated_templates.py 2>&1 | tee tool_coverage/outputs/init_templates_output.log
+          echo "init_templates_complete=true" >> $GITHUB_OUTPUT
+
       - name: Run AI validation with Sonnet
         id: validation
         if: steps.check_api_key.outputs.api_key_exists == 'true'
@@ -351,16 +359,40 @@ jobs:
             echo "pattern_improvements_applied=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Format mining results for submission
+      - name: Format validated results for submission
         id: formatting
         run: |
-          echo "Formatting mining results into submission CSVs..."
-          if [ -f "tool_coverage/outputs/processed_publications.csv" ]; then
-            python tool_coverage/scripts/format_mining_for_submission.py 2>&1 | tee tool_coverage/outputs/formatting_output.log
+          echo "Formatting AI-validated results into VALIDATED_*.csv files..."
+          if [ -f "tool_reviews/validation_summary.json" ] || [ -f "tool_reviews/potentially_missed_tools.csv" ]; then
+            python tool_coverage/scripts/format_validation_for_submission.py 2>&1 | tee tool_coverage/outputs/formatting_output.log
             echo "formatting_complete=true" >> $GITHUB_OUTPUT
           else
-            echo "⚠️ Skipping formatting - no mining results found"
+            echo "⚠️ Skipping formatting - no validation results found"
           fi
+
+      - name: Enrich tool metadata
+        id: enrichment
+        if: steps.formatting.outputs.formatting_complete == 'true'
+        run: |
+          echo "Enriching tool metadata from validated tools..."
+          python tool_coverage/scripts/enrich_all_metadata.py 2>&1 | tee tool_coverage/outputs/enrichment_output.log
+          echo "enrichment_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Regenerate FILTERED subset
+        id: regenerate_filtered
+        if: steps.enrichment.outputs.enrichment_complete == 'true'
+        run: |
+          echo "Regenerating FILTERED_*.csv files from enriched data..."
+          python tool_coverage/scripts/regenerate_filtered_subset.py 2>&1 | tee tool_coverage/outputs/refilter_output.log
+          echo "refilter_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Generate PMID review summary
+        id: review_summary
+        if: steps.formatting.outputs.formatting_complete == 'true'
+        run: |
+          echo "Generating PMID-level review summary table..."
+          python tool_coverage/scripts/generate_review_summary_table.py 2>&1 | tee tool_coverage/outputs/review_summary_output.log
+          echo "review_summary_complete=true" >> $GITHUB_OUTPUT
 
       - name: Analyze tool coverage
         id: coverage

@@ -1,0 +1,279 @@
+publicationMetadata:
+  pmid: "30192842"
+  title: "Use of machine learning to predict cognitive performance based on brain metabolism in Neurofibromatosis type 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (software, pipelines) - EXPECTED
+    - Clinical assessment tools (neuropsychological tests) - EXPECTED
+    
+    This study combines neuroimaging analysis with cognitive assessment, so both computational
+    tools for image processing/machine learning AND clinical assessment tools for cognitive
+    evaluation are expected. The study uses 18F-FDG PET/CT imaging, neuropsychological testing,
+    and machine learning approaches.
+  overallAssessment: |
+    This is a computational neuroimaging study that should contain multiple research tools.
+    The study uses sophisticated image processing (SPM8, Matlab), machine learning (Gaussian
+    Process Regression in R), and standardized neuropsychological assessments (WAIS-III,
+    WISC-III, etc.). The mining found zero tools, which appears to be a significant
+    under-detection given the clear presence of computational and clinical assessment tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "SPM8"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PET images were spatially processed using the Statistical Parametric Mapping toolbox (SPM8, Wellcome Trust Centre for Neuroimaging, 2008) implemented within Matlab 7.12.0"
+    whyMissed: "Standard neuroimaging software name not detected by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Matlab"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical Parametric Mapping toolbox (SPM8, Wellcome Trust Centre for Neuroimaging, 2008) implemented within Matlab 7.12.0 (MathWorks, Natick, MA, USA)"
+    whyMissed: "Common software name with version number not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "kernlab R library"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For our analysis, we used the Gaussian Process regression (GPR) implementation available within kernlab R library"
+    whyMissed: "R package name not detected by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R prcomp function"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "neuropsychological data was centered and scaled, and R's prcomp function was used to extract the principal components"
+    whyMissed: "Specific R function not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "WAIS-III"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "General intellectual functioning was assessed by the third version of the Brazilian Wechsler Intelligence Scales (WAIS-III for adults and WISC-III for children)"
+    whyMissed: "Standardized neuropsychological test not detected"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "WISC-III"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "General intellectual functioning was assessed by the third version of the Brazilian Wechsler Intelligence Scales (WAIS-III for adults and WISC-III for children)"
+    whyMissed: "Standardized neuropsychological test not detected"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Nine-Hole Peg Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Nine-Hole Peg Test was performed as a measure of finger dexterity. It measures the time (in seconds) needed to complete the test"
+    whyMissed: "Motor assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Rey-Osterrieth Complex Figure Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Rey-Osterrieth Complex Figure Test was implemented as a measure of the visuospatial cognitive domain"
+    whyMissed: "Neuropsychological assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Rey Auditory-Verbal Learning Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Immediate (A6) and delayed recalls (A7) of the Brazilian-Portuguese version of the Rey Auditory-Verbal Learning Test (RAVLT)"
+    whyMissed: "Memory assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Five Digits Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Five Digits Test (FDT) is a numeric-Stroop paradigm designed to assess attentional processes"
+    whyMissed: "Attention assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Corsi block-tapping task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "For working memory evaluation, we used the Digit Span according to the WAIS-III or WISC-III, and the Corsi block-tapping task"
+    whyMissed: "Working memory assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Tower of London Test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Tower of London Test was used as a measure of Planning Skills"
+    whyMissed: "Executive function assessment tool not detected"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "SPM[0-9]+"
+    toolType: "computational_tool"
+    examples: ["SPM8"]
+    reasoning: "Statistical Parametric Mapping is a standard neuroimaging software suite with version numbers"
+
+  - patternType: "term"
+    pattern: "Matlab [0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Matlab 7.12.0"]
+    reasoning: "Matlab with specific version numbers indicates computational tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "R library|R package|kernlab"
+    toolType: "computational_tool"
+    examples: ["kernlab R library"]
+    reasoning: "R packages and libraries are computational tools commonly used in analysis"
+
+  - patternType: "context_phrase"
+    pattern: "R's [a-zA-Z]+ function"
+    toolType: "computational_tool"
+    examples: ["R's prcomp function"]
+    reasoning: "Specific R functions indicate computational analysis tools"
+
+  - patternType: "term"
+    pattern: "WAIS-III|WISC-III|WAIS-IV|WISC-IV"
+    toolType: "clinical_assessment_tool"
+    examples: ["WAIS-III", "WISC-III"]
+    reasoning: "Wechsler Intelligence Scales are standardized neuropsychological assessment tools"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+-[A-Z][a-z]+ [A-Z][a-z]+ Test"
+    toolType: "clinical_assessment_tool"
+    examples: ["Rey-Osterrieth Complex Figure Test", "Nine-Hole Peg Test"]
+    reasoning: "Hyphenated neuropsychological test names follow standard naming conventions"
+
+  - patternType: "context_phrase"
+    pattern: "Test.*was.*performed.*measure|Test.*implemented.*measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["The Nine-Hole Peg Test was performed as a measure of finger dexterity"]
+    reasoning: "Context phrases indicating test administration for measurement purposes"
+
+  - patternType: "term"
+    pattern: "Tower of London|Corsi block-tapping|Five Digits Test"
+    toolType: "clinical_assessment_tool"
+    examples: ["Tower of London Test", "Corsi block-tapping task", "Five Digits Test"]
+    reasoning: "Specific neuropsychological assessment tool names"
+
+observations:
+  - resourceName: "WAIS-III"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The NF1 group had significantly inferior performance compared to controls in intelligence 
+      (full scale IQ) tests. Intelligence and verbal short-term memory were the most impaired 
+      functions, reflecting an overall mild intellectual inefficiency in this NF1 sample.
+      Full scale IQ: NF1 group mean = 91.19 (SD=15.28) vs Control group mean = 107.81 (SD=5.64), p=0.003, Cohen's d=1.38.
+    foundIn: "results"
+    contextSnippet: "The NF1 group had a significantly inferior performance compared to controls in intelligence (full scale IQ) and verbal short-term memory (i.e., Digit Span forward) tests"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0203520"
+
+  - resourceName: "WISC-III"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Used for children in the study as part of intelligence assessment. Combined with WAIS-III 
+      results showed significantly lower IQ scores in NF1 patients compared to controls.
+      The test contributed to the first principal component representing general intelligence/verbal ability processes.
+    foundIn: "results"
+    contextSnippet: "The first component seems to represent general intelligence/verbal ability processes, including IQ measures, verbal memory and verbal fluency"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0203520"
+
+  - resourceName: "Nine-Hole Peg Test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Group differences with medium effects were observed in measures of dexterity (9HPT dominant hand) 
+      with the NF1 group showing worse performance than controls. Scores required log transformation 
+      due to non-normal distribution.
+    foundIn: "results"
+    contextSnippet: "Group differences with medium effects were observed in measures of dexterity (9HPT dominant hand)"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0203520"
+
+  - resourceName: "Rey-Osterrieth Complex Figure Test"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Medium effect size differences observed between groups in visuoconstructive abilities (ROCF copy) 
+      and visual episodic memory (immediate and delayed recalls). NF1 group showed worse performance 
+      than controls. The test contributed to component two representing attentional/visuospatial processes.
+    foundIn: "results"
+    contextSnippet: "Group differences with medium effects were observed in measures of...visuoconstructive abilities (ROCF copy), short-term verbal and visual episodic memory (immediate recalls of RAVLT and ROCF)"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0203520"
+
+  - resourceName: "SPM8"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for spatial processing of PET images including gross manual image reorientation, 
+      spatial normalization onto 18F-FDG PET template in MNI space, and smoothing by 12mm FWHM 
+      Gaussian kernel. Brain mask was used to segment brain from volume, resulting in selection 
+      of 33,570 voxels.
+    foundIn: "methods"
+    contextSnippet: "PET images were spatially processed using the Statistical Parametric Mapping toolbox (SPM8, Wellcome Trust Centre for Neuroimaging, 2008) implemented within Matlab 7.12.0"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0203520"
+
+  - resourceName: "kernlab R library"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for Gaussian Process regression (GPR) implementation. "Vanilladot" was selected as the 
+      linear kernel function, and the initial noise variance and tolerance of termination criteria 
+      were both set to 0.001. Successfully predicted first principal component with high accuracy (r=0.926, p<0.001).
+    foundIn: "methods"
+    contextSnippet: "For our analysis, we used the Gaussian Process regression (GPR) implementation available within kernlab R library"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0203520"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 8
+  observationsExtracted: 6
+  observationsByType:
+    General Comment or Review: 4
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - CRITICAL: Mining detected zero tools despite clear presence of multiple computational and clinical assessment tools
+    - Publication contains extensive use of neuroimaging software (SPM8, Matlab), machine learning tools (R, kernlab), and standardized neuropsychological assessments
+    - This represents a major under-detection failure - at least 12 legitimate research tools were missed
+    - Both computational tools and clinical assessment tools are clearly present and actively used in the study
+  recommendations: |
+    - ALL 12 potentially missed tools should be added to the database - they represent legitimate research tools with clear experimental usage
+    - The mining patterns need significant enhancement to detect:
+      1. Standard neuroimaging software (SPM, Matlab with versions)
+      2. R packages and functions in computational contexts
+      3. Standardized neuropsychological assessment tools
+      4. Clinical assessment instruments with proper naming conventions
+    - This publication demonstrates that current mining is severely under-detecting computational tools and clinical assessment tools
+    - The suggested patterns should be implemented to improve detection of similar tools in future mining
+    - Quality control processes should flag publications with zero detected tools for manual review, especially in computational/clinical domains

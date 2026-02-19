@@ -1,0 +1,147 @@
+publicationMetadata:
+  pmid: "1519665"
+  title: "Nonradioactive in situ hybridization using digoxigenin-labeled oligonucleotides. Applications to musculoskeletal tissues."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - describes experimental technique development and application
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a methods development paper for in situ hybridization technique using digoxigenin-labeled 
+    oligonucleotide probes. Expected tools include:
+    - Genetic reagents (oligonucleotide probes, digoxigenin-11-dUTP)
+    - Potentially antibodies (for digoxigenin detection, though not explicitly mentioned)
+    - Tissue samples (though these are pathology specimens, not research models)
+    
+    The paper describes synthesis of DNA probes for specific genes and application to tissue sections,
+    indicating active tool development and usage rather than just citations.
+  overallAssessment: |
+    This is a laboratory research publication describing the development and optimization of a 
+    nonradioactive in situ hybridization technique. The authors synthesized specific oligonucleotide 
+    probes and applied them to tissue sections, indicating active tool development and experimental usage. 
+    Despite lacking a formal Methods section (common for older publications), the abstract describes 
+    clear experimental procedures and tool applications that would typically contain research tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "digoxigenin-11-dUTP"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...in situ localization of specific mRNAs using digoxigenin-11-dUTP-labeled oligonucleotide probes..."
+    whyMissed: "This is a specific chemical reagent used for labeling oligonucleotide probes - a key genetic reagent for in situ hybridization"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "oligonucleotide probes"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...using digoxigenin-11-dUTP-labeled oligonucleotide probes. DNA probes were synthesized for type I and type II collagen..."
+    whyMissed: "These are synthesized DNA probes - genetic reagents specifically designed for this study"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "type I collagen probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...DNA probes were synthesized for type I and type II collagen as well as transforming growth factor-beta 1 and 2..."
+    whyMissed: "Specific oligonucleotide probe synthesized for type I collagen mRNA detection"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "type II collagen probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...DNA probes were synthesized for type I and type II collagen as well as transforming growth factor-beta 1 and 2..."
+    whyMissed: "Specific oligonucleotide probe synthesized for type II collagen mRNA detection"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "TGF beta 1 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...DNA probes were synthesized for type I and type II collagen as well as transforming growth factor-beta 1 and 2 (TGF beta 1 and TGF beta 2)..."
+    whyMissed: "Specific oligonucleotide probe synthesized for TGF-β1 mRNA detection"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "TGF beta 2 probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...DNA probes were synthesized for type I and type II collagen as well as transforming growth factor-beta 1 and 2 (TGF beta 1 and TGF beta 2)..."
+    whyMissed: "Specific oligonucleotide probe synthesized for TGF-β2 mRNA detection"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "nonsense sequence probe"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Control experiments, such as competitive inhibition, nonsense sequence hybridization, and RNAse digestion..."
+    whyMissed: "Control probe used for specificity testing - important negative control reagent"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "digoxigenin-\\d+-dUTP"
+    toolType: "genetic_reagent"
+    examples: ["digoxigenin-11-dUTP"]
+    reasoning: "Digoxigenin-labeled nucleotides are specific reagents for nonradioactive labeling - pattern would catch various digoxigenin derivatives"
+
+  - patternType: "context_phrase"
+    pattern: "DNA probes were synthesized for"
+    toolType: "genetic_reagent"
+    examples: ["DNA probes were synthesized for type I and type II collagen"]
+    reasoning: "This phrase specifically indicates custom probe synthesis, which represents genetic reagent development"
+
+  - patternType: "context_phrase"
+    pattern: "oligonucleotide probes?"
+    toolType: "genetic_reagent"
+    examples: ["digoxigenin-11-dUTP-labeled oligonucleotide probes"]
+    reasoning: "Oligonucleotide probes are fundamental genetic reagents for hybridization studies"
+
+  - patternType: "context_phrase"
+    pattern: "nonsense sequence"
+    toolType: "genetic_reagent"
+    examples: ["nonsense sequence hybridization"]
+    reasoning: "Nonsense/scrambled sequences are important negative control reagents in hybridization studies"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+\\s+beta\\s+\\d+\\s+probe"
+    toolType: "genetic_reagent"
+    examples: ["TGF beta 1 probe", "TGF beta 2 probe"]
+    reasoning: "Pattern for growth factor probes with beta nomenclature commonly used in molecular biology"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of genetic reagent usage
+    - Multiple specific oligonucleotide probes were synthesized and used but not detected
+    - Digoxigenin-11-dUTP labeling reagent was missed
+    - Control probes (nonsense sequences) were not detected
+    - This represents a significant mining failure for genetic reagents in older publications
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication should have yielded 7 genetic reagent tools but none were detected
+    - The mining patterns need significant improvement for detecting genetic reagents, especially:
+      * Oligonucleotide probes and DNA probes
+      * Digoxigenin labeling reagents
+      * Gene-specific probe nomenclature
+      * Control reagents (nonsense sequences)
+    - Consider that older publications (1992) may use different terminology than modern papers
+    - The abstract-only format may require different parsing strategies
+    - All 7 potentially missed tools should be added to improve database completeness
+    - The suggested patterns would significantly improve genetic reagent detection
+    - No observations could be extracted due to lack of Results/Discussion sections

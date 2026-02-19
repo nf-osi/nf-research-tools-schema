@@ -1,0 +1,201 @@
+publicationMetadata:
+  pmid: "39373898"
+  title: "Identification of Pathogenic Missense Mutations of NF1 Using Computational Approaches."
+  queryType: "bench"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis), this study should contain:
+    - Computational tools (software, databases, web servers, prediction algorithms)
+    - Potentially genetic reagents (reference sequences, protein structures)
+    
+    This is a pure computational study using in silico approaches to analyze NF1 mutations.
+    The methods section describes multiple computational tools, databases, and prediction algorithms.
+    No lab-based tools (antibodies, cell lines, animal models) are expected.
+    No clinical assessment tools are expected as this is not a clinical study.
+  overallAssessment: |
+    This is a computational bioinformatics study that extensively uses multiple software tools, databases, 
+    and prediction algorithms to analyze NF1 mutations. The publication should contain numerous computational 
+    tools based on the detailed methods section describing various prediction servers, databases, and analysis 
+    pipelines. The complete absence of mined tools suggests significant mining failures for computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PredictSNP2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The effects of mutations on protein functions were analyzed using the PredictSNP2 tool (https://loschmidt.chemi.muni.cz/predictsnp/). PredictSNP functions as a consensus classifier that integrates multiple prediction algorithms"
+    whyMissed: "Tool name with version number and URL not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "iStable"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The iStable-integrated server, accessible at predictor.nchu.edu.tw/iStable, features two machine learning-based tools, iMutant and MUpro, which utilize thermodynamic parameters"
+    whyMissed: "Web server name not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "iMutant"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "iMutant, which operates on a support vector machine (SVM) algorithm, assesses changes in protein stability by calculating the difference in free energy"
+    whyMissed: "Algorithm/tool name within integrated server not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MUpro"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "MUpro combines SVM and neural network technologies to analyze the effect of mutations on protein stability and assigns a confidence score"
+    whyMissed: "Algorithm/tool name within integrated server not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Align-GVGD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Align-GVGD (http://agvgd.hci.utah.edu/agvgd_input.php) is another tool that applies the Grantham difference across multiple sequence alignments"
+    whyMissed: "Hyphenated tool name with URL not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AlphaFold3"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Furthermore, to directly visualize the impact of these mutations on protein structure, we utilized AlphaFold3 to simulate both the wild-type and mutant NF1 structures"
+    whyMissed: "Tool name with version number not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SNPeffect 4.0"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "These mutations were subjected to further phenotyping analysis using SNPeffect 4.0, which predicted disturbances in the protein's chaperone binding sites"
+    whyMissed: "Tool name with version number not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HGMD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The missense mutations were collected from UniProt (UniProt ID UP51795) as well as from the HGMD (http://www.hgmd.org/) and ClinVar databases"
+    whyMissed: "Database acronym not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ClinVar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The missense mutations were collected from UniProt (UniProt ID UP51795) as well as from the HGMD (http://www.hgmd.org/) and ClinVar databases"
+    whyMissed: "Database name not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "UniProt"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The standard protein sequence of NF1 was obtained from UniProt (UniprotKB P21359, ENSG00000196712). The missense mutations were collected from UniProt"
+    whyMissed: "Database name not captured by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "OMIM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Extensive information about the protein and its mutations was gathered through OMIM (https://omim.org/) and various academic literature reviews"
+    whyMissed: "Database acronym not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NCBI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The NF1 mRNA template (NM_000267.3) was retrieved from the National Center for Biotechnology Information (NCBI) database"
+    whyMissed: "Database acronym not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z]*SNP\\d*\\b"
+    toolType: "computational_tool"
+    examples: ["PredictSNP2", "SNPeffect 4.0"]
+    reasoning: "Pattern to catch SNP-related prediction tools with version numbers"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z]*Fold\\d*\\b"
+    toolType: "computational_tool"
+    examples: ["AlphaFold3"]
+    reasoning: "Pattern to catch protein folding prediction tools with version numbers"
+
+  - patternType: "term"
+    pattern: "\\biStable\\b|\\biMutant\\b|\\bMUpro\\b"
+    toolType: "computational_tool"
+    examples: ["iStable", "iMutant", "MUpro"]
+    reasoning: "Pattern to catch protein stability prediction tools"
+
+  - patternType: "term"
+    pattern: "\\bAlign-GVGD\\b"
+    toolType: "computational_tool"
+    examples: ["Align-GVGD"]
+    reasoning: "Pattern to catch hyphenated bioinformatics tool names"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|utilizing|employed|accessed at|retrieved from|obtained from"
+    toolType: "general"
+    examples: ["analyzed using the PredictSNP2 tool", "accessible at predictor.nchu.edu.tw/iStable"]
+    reasoning: "Context phrases that indicate tool usage in computational studies"
+
+  - patternType: "term"
+    pattern: "\\b(HGMD|ClinVar|UniProt|OMIM|NCBI)\\b"
+    toolType: "computational_tool"
+    examples: ["HGMD", "ClinVar", "UniProt", "OMIM", "NCBI"]
+    reasoning: "Common bioinformatics database acronyms and names"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[a-zA-Z]+\\s+\\d+\\.\\d+\\b"
+    toolType: "computational_tool"
+    examples: ["SNPeffect 4.0"]
+    reasoning: "Pattern to catch software names with version numbers (space separated)"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\bhttps?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}[/\\w.-]*\\b"
+    toolType: "computational_tool"
+    examples: ["https://loschmidt.chemi.muni.cz/predictsnp/", "http://agvgd.hci.utah.edu/agvgd_input.php"]
+    reasoning: "URLs often indicate web-based computational tools and databases"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete mining failure: 0 tools mined from a computational study that uses 12+ tools
+    - Missing computational tool patterns: No patterns to catch bioinformatics tools, databases, prediction servers
+    - Missing version number patterns: Tools like "PredictSNP2", "SNPeffect 4.0", "AlphaFold3" not captured
+    - Missing URL-based detection: Web servers with URLs not captured
+    - Missing database acronyms: Common databases like HGMD, ClinVar, UniProt, OMIM not captured
+    - Missing hyphenated tool names: "Align-GVGD" not captured
+    - Missing integrated tool components: iMutant and MUpro within iStable server not captured
+  recommendations: |
+    This publication demonstrates a critical gap in computational tool mining patterns. All 12 identified 
+    tools should be added to the database as they represent legitimate bioinformatics tools used for 
+    mutation analysis. The suggested patterns should be implemented to improve future mining of:
+    1. Bioinformatics databases (HGMD, ClinVar, UniProt, OMIM, NCBI)
+    2. Prediction tools with version numbers (PredictSNP2, SNPeffect 4.0, AlphaFold3)
+    3. Web-based servers and tools (iStable, Align-GVGD)
+    4. Integrated tool components (iMutant, MUpro)
+    5. URL-based tool identification for web servers
+    No observations were extracted as this is a pure computational study without experimental results 
+    on biological systems - the results focus on computational predictions rather than biological phenotypes.

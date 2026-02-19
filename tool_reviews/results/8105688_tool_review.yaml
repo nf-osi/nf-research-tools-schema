@@ -1,0 +1,80 @@
+publicationMetadata:
+  pmid: "8105688"
+  title: "Linkage disequilibrium in the neurofibromatosis 1 (NF1) region: implications for gene mapping."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a 1993 genetic linkage analysis study examining RFLP polymorphisms in the NF1 region.
+    Expected tool types:
+    - Computational tools: Statistical analysis software for linkage disequilibrium calculations
+    - Genetic reagents: RFLP markers, restriction enzymes (though these may be considered standard reagents)
+    
+    However, given the 1993 publication date and focus on statistical genetics rather than wet lab work,
+    computational tools would likely be basic statistical packages that may not be explicitly named.
+    The study uses CEPH kindreds (established genetic resource) but this represents a population/database
+    rather than a specific research tool.
+  overallAssessment: |
+    This 1993 genetic linkage study focuses on statistical analysis of RFLP polymorphisms rather than
+    experimental tool development or usage. While it involves genetic analysis, it predates the era of
+    named bioinformatics tools and likely used basic statistical software. The absence of a Methods
+    section and focus on population genetics makes research tool usage unlikely.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CEPH kindreds"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "By using Centre d'Etude du Polymorphisme Humain (CEPH) kindreds, 91-110 unrelated parents were genotyped."
+    whyMissed: "CEPH kindreds represent an established genetic resource/database rather than a specific research tool. This is a population-based resource used for genetic studies."
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "RFLPs"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "we compared physical distances and linkage disequilibrium among eight RFLPs in the neurofibromatosis 1 (NF1) region"
+    whyMissed: "RFLPs (Restriction Fragment Length Polymorphisms) are genetic markers but represent a general technique/marker type rather than specific named reagents. Without specific RFLP names or catalog numbers, these are too generic to be considered specific tools."
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "statistical analysis (performed|conducted|carried out) (using|with|in) [A-Z][a-zA-Z0-9\\s]+"
+    toolType: "computational_tool"
+    examples: ["statistical analysis performed using SAS", "analysis conducted with SPSS"]
+    reasoning: "For older genetics papers, statistical software usage might be mentioned in this format. However, this specific paper lacks such mentions."
+  - patternType: "naming_convention"
+    pattern: "CEPH (kindreds|families|pedigrees)"
+    toolType: "genetic_reagent"
+    examples: ["CEPH kindreds", "CEPH families"]
+    reasoning: "CEPH resources are standardized genetic materials, but they represent population databases rather than specific tools. Pattern could help identify but would need careful validation to avoid false positives."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is from 1993, predating most named bioinformatics tools
+    - No Methods section present, indicating lack of detailed experimental procedures
+    - Focus is on statistical genetics/linkage analysis rather than tool development or usage
+    - Abstract-only content limits ability to identify specific tools or reagents
+    - CEPH kindreds and RFLPs mentioned are general resources/techniques rather than specific tools
+  recommendations: |
+    The mining results are appropriate for this publication. No tools should be added:
+    - This is a 1993 genetic linkage study focused on statistical analysis
+    - Lacks Methods section and detailed experimental procedures
+    - CEPH kindreds represent a population database, not a specific research tool
+    - RFLPs are generic marker types without specific identifiers
+    - No computational tools are explicitly named (likely used basic statistical software)
+    - No observations can be extracted due to lack of Results/Discussion sections
+    - The "bench" query classification may be misleading - this is primarily a statistical genetics paper

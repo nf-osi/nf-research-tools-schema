@@ -1,0 +1,133 @@
+publicationMetadata:
+  pmid: "24719295"
+  title: "Maximizing bone formation in posterior spine fusion using rhBMP-2 and zoledronic acid in wild type and NF1 deficient mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving animal experimentation, bone biology, and analytical techniques.
+    Expected tools include animal models (NF1 knockout mice), genetic reagents (rhBMP-2), analytical tools (microCT),
+    and histological reagents (TRAP staining). The study design involves controlled experiments with treatment groups,
+    quantitative measurements, and histological analysis - all hallmarks of bench research requiring multiple tool types.
+  overallAssessment: |
+    This is a laboratory research study investigating bone formation in spine fusion using animal models and therapeutic interventions.
+    The experimental design clearly requires research tools including animal models, reagents, and analytical equipment.
+    Despite lacking a formal Methods section in the provided text, the abstract describes controlled experiments with quantitative outcomes typical of bench research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "In this study, 16 wild type and 16 Nf1(+/-) mice were subjected to posterolateral fusion using collagen sponges containing 5 μg rhBMP-2 introduced bilaterally."
+    whyMissed: "This is a clear animal model reference with specific genotype notation (heterozygous knockout) that should have been detected by animal model mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "wild type mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "In this study, 16 wild type and 16 Nf1(+/-) mice were subjected to posterolateral fusion using collagen sponges containing 5 μg rhBMP-2 introduced bilaterally."
+    whyMissed: "Control animal model that serves as comparison group - standard terminology in animal research that should be captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "rhBMP-2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "posterolateral fusion using collagen sponges containing 5 μg rhBMP-2 introduced bilaterally"
+    whyMissed: "Recombinant human bone morphogenetic protein-2 is a specific biological reagent with dosage information that should be detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "zoledronic acid"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Mice were dosed twice weekly with 0.02 mg/kg zoledronic acid (ZA) or sterile saline."
+    whyMissed: "Specific pharmaceutical compound used as experimental treatment with precise dosing regimen"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "microCT"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "The fusion mass was assessed for bone volume (BV) and bone mineral density (BMD) by microCT."
+    whyMissed: "Micro-computed tomography is a specialized analytical instrument/software system used for quantitative bone analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRAP staining"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "TRAP staining on histological sections indicated an increased osteoclast surface/bone surface (Oc.S/BS) in Nf1(+/-) mice"
+    whyMissed: "Tartrate-resistant acid phosphatase staining is a specific histological reagent/technique for identifying osteoclasts"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\(\\+/-\\)\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-) mice"]
+    reasoning: "Heterozygous knockout mouse notation is standard in genetics research and should be captured as animal models"
+
+  - patternType: "naming_convention"
+    pattern: "\\bwild\\s+type\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["wild type mice"]
+    reasoning: "Wild type control animals are fundamental research tools that should be systematically captured"
+
+  - patternType: "term"
+    pattern: "\\brh[A-Z][A-Za-z0-9-]+\\b"
+    toolType: "genetic_reagent"
+    examples: ["rhBMP-2"]
+    reasoning: "Recombinant human proteins (rh prefix) are common biological reagents that should be detected"
+
+  - patternType: "context_phrase"
+    pattern: "assessed.*by\\s+(\\w+CT|microCT|micro-CT)"
+    toolType: "computational_tool"
+    examples: ["assessed for bone volume (BV) and bone mineral density (BMD) by microCT"]
+    reasoning: "CT-based analytical methods with assessment context clearly indicate analytical tool usage"
+
+  - patternType: "term"
+    pattern: "\\bTRAP\\s+staining\\b"
+    toolType: "genetic_reagent"
+    examples: ["TRAP staining"]
+    reasoning: "TRAP staining is a specific histological technique that should be captured as a reagent/method"
+
+  - patternType: "context_phrase"
+    pattern: "dosed.*with\\s+[0-9.]+\\s*[μmg]+/kg\\s+([A-Za-z0-9\\s-]+)"
+    toolType: "genetic_reagent"
+    examples: ["dosed twice weekly with 0.02 mg/kg zoledronic acid"]
+    reasoning: "Pharmaceutical compounds with specific dosing regimens indicate experimental reagent usage"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear evidence of multiple research tools in the abstract
+    - Missing Methods section limits detailed tool validation, but abstract provides sufficient evidence
+    - Animal models, reagents, and analytical tools are clearly described with experimental context
+    - Mining patterns appear to have significant gaps for standard laboratory research terminology
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by initial mining.
+    All 6 identified tools should be added as they represent core experimental components:
+    - Animal models (Nf1(+/-) mice, wild type mice) are fundamental to the study design
+    - Reagents (rhBMP-2, zoledronic acid, TRAP staining) are specific experimental materials
+    - Analytical tool (microCT) is essential for quantitative bone analysis
+    The suggested patterns would significantly improve detection of similar tools in future mining.
+    No observations were extracted due to lack of detailed Results/Discussion sections in provided text.
+    This case highlights the need for more comprehensive pattern coverage for basic laboratory research tools.

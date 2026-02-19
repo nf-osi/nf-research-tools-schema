@@ -1,0 +1,267 @@
+publicationMetadata:
+  pmid: "17924978"
+  title: "Natural history of meningioma development in mice reveals: a synergy of Nf2 and p16(Ink4a) mutations."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study investigating meningioma development in genetically modified mice.
+    The publication describes extensive use of mouse models, genetic reagents (adenoviral vectors),
+    antibodies for immunohistochemistry, and computational tools for statistical analysis and imaging.
+    Multiple research tools are clearly present and actively used in experimental procedures.
+  overallAssessment: |
+    This is a comprehensive laboratory research study that extensively uses multiple categories of research tools.
+    The study involves genetically modified mouse models, adenoviral gene delivery systems, antibodies for
+    immunohistochemistry, and advanced imaging techniques. The presence of a detailed Methods section and
+    experimental results strongly indicates active tool usage rather than just citations.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf2 flox2/flox2 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "To obtain Nf2 flox2/flox2 ;p16 Ink4a*/* mice, Nf2 flox2/flox2 mice (4) on the FVB/N background were bred to p16 Ink4a*/* mice"
+    whyMissed: "Specific genetically modified mouse strain with conditional knockout alleles not detected by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "p16 Ink4a*/* mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf2 flox2/flox2 mice (4) on the FVB/N background were bred to p16 Ink4a*/* mice (11) on a FVB/N/129Ola mixed background"
+    whyMissed: "Knockout mouse strain nomenclature not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "FVB/N mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "All mice used for this analysis were predominantly FVB/N mixed strain with contemporaneous littermates serving as controls"
+    whyMissed: "Standard inbred mouse strain name not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "adCre"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cre recombinase was targeted to the mouse leptomeninges by direct injection of 3 µL (1 × 10 8 plaque-forming units) of adCre suspension"
+    whyMissed: "Adenoviral vector abbreviation not detected by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "adLacZ"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "As control groups, 10 adLacZ-injected Nf2 flox2/flox2 mice and eight adCre-injected FVB/N WT mice were used"
+    whyMissed: "Control adenoviral vector not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PGDS antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "PGDS immunohistochemistry was carried out on adjacent paraffin sections using affinity-purified rabbit polyclonal antibodies (1:500; Santa Cruz, CA, USA sc-14825)"
+    whyMissed: "Antibody mentioned with full vendor and catalog information but not detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Gd-DTPA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "all animals were intraperitoneally injected (1) a MR contrast agent, Gd-DTPA (Magnevist®, Schering, Leverkusen, Germany)"
+    whyMissed: "MRI contrast agent with vendor information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Biospec MRI system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "MR study was performed on a 4.7 Tesla microimaging system (Biospec, Bruker BioSpin MRI, Inc., Ertlingen, Germany)"
+    whyMissed: "Specialized imaging equipment/software system not detected"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Phillips 301 transmission electron microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Thin sections were cut with an LKB8801 ultramicrotome and diamond knife, stained with Sato's lead, and examined in a Phillips 301 transmission electron microscope"
+    whyMissed: "Microscopy equipment with model number not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "χ² test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Significant differences in survival and tumor development were identified using χ² test; P <0.05 was considered significant"
+    whyMissed: "Statistical test method not detected by computational tool patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+\\s*flox[0-9]*/flox[0-9]*\\s*mice"
+    toolType: "animal_model"
+    examples: ["Nf2 flox2/flox2 mice", "adCre;Nf2 flox2/flox2 mice"]
+    reasoning: "Conditional knockout mouse nomenclature with floxed alleles is standard in genetics research but not captured by current patterns"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+\\*\\/\\*\\s*mice"
+    toolType: "animal_model"
+    examples: ["p16 Ink4a*/* mice", "adCre;Nf2 flox2/flox2;Ink4a*/* mice"]
+    reasoning: "Knockout mouse strain nomenclature using asterisk notation for null alleles"
+
+  - patternType: "term"
+    pattern: "ad[A-Za-z]+"
+    toolType: "genetic_reagent"
+    examples: ["adCre", "adLacZ"]
+    reasoning: "Adenoviral vector abbreviations commonly used in gene delivery experiments"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies?\\s*\\([^)]*;\\s*[^,]+,\\s*[^,]+\\s+[a-zA-Z0-9-]+\\)"
+    toolType: "antibody"
+    examples: ["antibodies (1:500; Santa Cruz, CA, USA sc-14825)"]
+    reasoning: "Antibody mentions with dilution, vendor, and catalog number information"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+\\/[A-Z]+\\s*mice"
+    toolType: "animal_model"
+    examples: ["FVB/N mice", "FVB/N/129Ola mice"]
+    reasoning: "Standard inbred mouse strain nomenclature not currently captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([^)]*;\\s*[A-Za-z\\s]+,\\s*[A-Z]{2,},\\s*[A-Z]{2,}[^)]*\\)"
+    toolType: "general"
+    examples: ["(Magnevist®, Schering, Leverkusen, Germany)", "(Santa Cruz, CA, USA sc-14825)"]
+    reasoning: "Vendor information pattern with company, location, and catalog numbers indicates research tools"
+
+  - patternType: "term"
+    pattern: "χ²\\s*test|chi-square\\s*test|Fisher's\\s*exact\\s*test|t-test|ANOVA"
+    toolType: "computational_tool"
+    examples: ["χ² test", "chi-square test"]
+    reasoning: "Statistical analysis methods are computational tools commonly used in research"
+
+observations:
+  - resourceName: "Nf2 flox2/flox2 mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Meningioma development rate was 13% (9 of 72 histologically examined mice) in adCre;Nf2 flox2/flox2 mice.
+      All meningiomas had features of benign neoplasms (WHO grade I) similar to benign human meningiomas of 
+      meningothelial, transitional, psammomatous, or fibroblastic histological subtypes. Two patterns of growth 
+      were identified: diffuse thickening meningioma en plaque-like pattern and discrete nodular pattern.
+    foundIn: "results"
+    contextSnippet: "the rate of meningioma development was significantly higher in adCre;Nf2 flox2/flox2;Ink4a*/* (10 of 27 histologically examined mice; 37%) compared with adCre;Nf2 flox2/flox2 (9 of 72 histologically examined mice; 13%) mice"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+  - resourceName: "p16 Ink4a*/* mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Additional nullizygosity for p16 Ink4a significantly increased meningioma development rate to 37% 
+      (10 of 27 mice) compared to 13% in Nf2 single mutants (χ², P <0.01). The synergy enhanced tumor 
+      initiation but did not modify tumor grade - all remained WHO grade I benign neoplasms.
+    foundIn: "results"
+    contextSnippet: "the rate of meningioma development was significantly higher in adCre;Nf2 flox2/flox2;Ink4a*/* (10 of 27 histologically examined mice; 37%) compared with adCre;Nf2 flox2/flox2 (9 of 72 histologically examined mice; 13%)"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+  - resourceName: "p16 Ink4a*/* mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Meningothelial proliferation was observed more frequently in adCre;Nf2 flox2/flox2;Ink4a*/* mice 
+      (21/27; 77%) than in adCre;Nf2 flox2/flox2 mice (33/72; 46%) (χ², P <0.01). This increased 
+      proliferation led to more frequent hydrocephalus caused by impeded CSF flow.
+    foundIn: "results"
+    contextSnippet: "Meningothelial proliferation was observed more frequently in adCre;Nf2 flox2/flox2;Ink4a*/* (21/27; 77%) than in adCre;Nf2 flox2/flox2 (33/72; 46%) mice"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+  - resourceName: "PGDS antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      PGDS immunohistochemistry successfully performed using affinity-purified rabbit polyclonal antibodies 
+      at 1:500 dilution (Santa Cruz sc-14825). Almost all mouse meningiomas showed positive staining, though 
+      the pattern differed from normal arachnoid cells - fewer fine granules dispersed in cytoplasm rather 
+      than perinuclear distribution. Strong patchy staining seen in some tumor regions.
+    foundIn: "results"
+    contextSnippet: "Almost all mouse meningiomas showed some positive staining. In some cases strong staining was seen within some regions of the tumor (patchy distribution), and in other tumors, only few scattered positive or weakly positive cells"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+  - resourceName: "Biospec MRI system"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      4.7 Tesla microimaging system (Biospec, Bruker BioSpin MRI) successfully detected meningothelial 
+      proliferation with 70% sensitivity and 78% specificity. Pathological gadolinium enhancement observed 
+      in 75% of intracranial mouse meningiomas. Short acquisition sequences (6 minutes) provided sufficient 
+      signal-noise ratio and spatial resolution to detect most meningiomas and meningothelial proliferations.
+    foundIn: "results"
+    contextSnippet: "MRI allowed the diagnosis of meningothelial proliferation with a sensitivity of 70% and a specificity of 78%. Pathological gadolinium enhancement was observed in 75% of the intracranial mouse meningiomas"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+  - resourceName: "adCre"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Adenoviral Cre recombinase successfully targeted to mouse leptomeninges by direct injection of 3 µL 
+      (1 × 10^8 plaque-forming units) into subarachnoidal space on postnatal day 2. Trans-orbital or subdural 
+      approaches both effective. Vector diffusion through CSF circulation caused multifocal Nf2 inactivation 
+      leading to higher frequency of en plaque meningiomas compared to human patterns.
+    foundIn: "results"
+    contextSnippet: "The higher frequency of en plaque meningiomas in our mouse model is likely caused by the multifocality of Nf2 inactivation induced by diffusion in the subarachnoid space of the highly concentrated adCre vector suspension"
+    confidence: 1.0
+    doi: "10.1111/j.1750-3639.2007.00105.x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 7
+  observationsExtracted: 6
+  observationsByType:
+    Tumor Growth: 2
+    Cellular: 1
+    Usage Instructions: 3
+  majorIssuesFound: |
+    - CRITICAL: Mining completely failed to detect any tools despite this being a tool-rich laboratory research publication
+    - Multiple genetically modified mouse strains with standard nomenclature were missed
+    - Antibody with complete vendor/catalog information was not detected
+    - Adenoviral vectors (genetic reagents) were not captured
+    - Specialized research equipment and imaging systems were missed
+    - Statistical analysis methods were not recognized as computational tools
+  recommendations: |
+    This publication represents a complete mining failure - zero tools were detected in a publication that 
+    extensively uses at least 9 different research tools across multiple categories. The mining patterns 
+    urgently need improvement to capture:
+    
+    1. Mouse strain nomenclature (floxed alleles, knockout notation, inbred strains)
+    2. Adenoviral vector abbreviations (adCre, adLacZ)
+    3. Antibodies with vendor/catalog information
+    4. Research equipment with model numbers
+    5. Statistical analysis methods
+    
+    All 9 missed tools should be added to the database. The suggested patterns would significantly improve 
+    mining accuracy for genetics and neuroscience research. This case highlights the need for domain-specific 
+    pattern development to capture specialized research tool nomenclature.
+    
+    The extracted observations demonstrate the scientific value these tools provided, including quantitative 
+    tumor development rates, proliferation measurements, and technical performance metrics that would be 
+    valuable for other researchers using similar tools.

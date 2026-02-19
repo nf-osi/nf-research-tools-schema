@@ -1,0 +1,145 @@
+publicationMetadata:
+  pmid: "35511749"
+  title: "A High-Throughput Screening Platform Identifies Novel Combination Treatments for Malignant Peripheral Nerve Sheath Tumors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes high-throughput drug screening using MPNST cell lines and patient-derived 
+    orthotopic xenograft (PDOX) models. Expected tools include:
+    - Cell lines (MPNST cell lines mentioned)
+    - Patient-derived models (PDOX models explicitly mentioned)
+    - Computational tools (high-throughput screening platform, data analysis)
+    - Potentially animal models (athymic mice for xenografts)
+    - Chemical compounds/genetic reagents (screening library compounds)
+  overallAssessment: |
+    This is clearly a laboratory research study involving high-throughput drug screening, cell culture, 
+    and animal xenograft models. The publication should contain multiple research tools including cell 
+    lines, patient-derived xenograft models, and computational screening platforms. The absence of 
+    mined tools is concerning and suggests significant under-mining, especially given the explicit 
+    mentions of MPNST cell lines and PDOX models in the abstract.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "We screened a collection of compounds from the NCATS Mechanism Interrogation PlatE (MIPE) library in three MPNST cell lines, using cell viability and apoptosis assays."
+    whyMissed: "Generic term 'MPNST cell lines' may not have matched specific cell line naming patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST-SP-01"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "One of the combinations, MK-1775 with Doxorubicin, significantly reduced tumor growth in a sporadic PDOX model (MPNST-SP-01; sevenfold)"
+    whyMissed: "Specific PDOX model identifier not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST-NF1-09"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "significantly reduced tumor growth in a sporadic PDOX model (MPNST-SP-01; sevenfold) and in an NF1-PDOX model (MPNST-NF1-09; fourfold)"
+    whyMissed: "Specific PDOX model identifier not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NCATS Mechanism Interrogation PlatE (MIPE) library"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We screened a collection of compounds from the NCATS Mechanism Interrogation PlatE (MIPE) library in three MPNST cell lines"
+    whyMissed: "Chemical compound library not recognized as genetic reagent/chemical tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "athymic models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Synergistic combinations in vitro were further evaluated in patient-derived orthotopic xenograft/orthoxenograft (PDOX) athymic models"
+    whyMissed: "Athymic mouse strain mentioned but not recognized as animal model"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "high-throughput screening platform"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Our results support the utility of our screening platform of in vitro and in vivo models to explore new therapeutic approaches"
+    whyMissed: "Screening platform/system not recognized as computational tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "MPNST-[A-Z]{2,3}-[0-9]{2,3}"
+    toolType: "patient_derived_model"
+    examples: ["MPNST-SP-01", "MPNST-NF1-09"]
+    reasoning: "PDOX models appear to follow specific naming convention with MPNST prefix, tissue type abbreviation, and numerical identifier"
+
+  - patternType: "context_phrase"
+    pattern: "PDOX model|patient-derived orthotopic xenograft|orthoxenograft.*model"
+    toolType: "patient_derived_model"
+    examples: ["patient-derived orthotopic xenograft/orthoxenograft (PDOX) athymic models"]
+    reasoning: "PDOX terminology clearly indicates patient-derived xenograft models but may not be captured by current patterns"
+
+  - patternType: "term"
+    pattern: "athymic.*model|athymic.*mice"
+    toolType: "animal_model"
+    examples: ["PDOX athymic models"]
+    reasoning: "Athymic mice are commonly used immunocompromised animal models for xenograft studies"
+
+  - patternType: "context_phrase"
+    pattern: "screening.*library|compound.*library|chemical.*library"
+    toolType: "genetic_reagent"
+    examples: ["NCATS Mechanism Interrogation PlatE (MIPE) library"]
+    reasoning: "Chemical/compound libraries are important research reagents for drug screening studies"
+
+  - patternType: "context_phrase"
+    pattern: "high-throughput.*screening.*platform|screening.*platform"
+    toolType: "computational_tool"
+    examples: ["high-throughput screening platform"]
+    reasoning: "Screening platforms involve computational systems for data acquisition and analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined from this publication despite clear evidence of multiple research tools
+    - Publication describes high-throughput drug screening using cell lines and PDOX models
+    - Specific model identifiers (MPNST-SP-01, MPNST-NF1-09) were not captured
+    - MPNST cell lines mentioned but not identified as tools
+    - Chemical screening library (NCATS MIPE) not recognized
+    - Athymic mouse models not identified
+    - Only abstract available - full text would likely contain many more tools
+  recommendations: |
+    This publication represents a significant under-mining case. At minimum, 5-6 research tools should 
+    have been identified from the abstract alone:
+    - MPNST cell lines (cell_line)
+    - MPNST-SP-01 and MPNST-NF1-09 (patient_derived_model)
+    - NCATS MIPE library (genetic_reagent)
+    - Athymic models (animal_model)
+    - High-throughput screening platform (computational_tool)
+    
+    The mining patterns need significant improvement to capture:
+    1. PDOX model naming conventions
+    2. Generic cell line references ("MPNST cell lines")
+    3. Chemical/compound libraries
+    4. Immunocompromised mouse strains
+    5. Screening platform terminology
+    
+    Full text access would likely reveal many additional tools including specific cell line names,
+    detailed animal model information, and computational analysis tools. This case highlights the
+    need for more comprehensive pattern coverage for patient-derived models and screening platforms.

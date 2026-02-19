@@ -1,0 +1,112 @@
+publicationMetadata:
+  pmid: "34352618"
+  title: "Characterization of UMi031-A-2 inducible pluripotent stem cell line with a neurofibromatosis type 2-associated mutation."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - iPSC characterization is clearly lab research
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes the generation and characterization of an iPSC line (UMi031-A-2) with 
+    CRISPR-induced NF2 mutation. Expected tools include:
+    - Cell lines: The UMi031-A-2 iPSC line itself and parent unaffected iPSC line
+    - Genetic reagents: CRISPR components used for gene editing
+    - Potentially antibodies for pluripotency characterization
+    - Computational tools for karyotype analysis
+    
+    Note: Only abstract available, so full tool inventory cannot be assessed.
+  overallAssessment: |
+    This is clearly a lab research publication describing iPSC line generation and characterization.
+    Such studies typically involve multiple research tools including the cell lines themselves,
+    CRISPR reagents, characterization antibodies, and analysis software. However, only the
+    abstract is available, limiting comprehensive tool detection.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "UMi031-A-2"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "The UMi031-A-2 hiPSC line contains a CRISPR-induced homozygous, Neurofibromatosis Type 2 (NF2) mutation"
+    whyMissed: "iPSC line name not detected - may need pattern for cell line nomenclature with institution codes"
+    confidence: 0.95  # Very high confidence this is a cell line
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "This line was generated from an unaffected iPSC line using CRISPR technology"
+    whyMissed: "CRISPR mentioned as technology but not detected as genetic reagent tool"
+    confidence: 0.85  # High confidence - CRISPR is a genetic editing tool
+    shouldBeAdded: Yes
+
+  - toolName: "unaffected iPSC line"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "This line was generated from an unaffected iPSC line using CRISPR technology"
+    whyMissed: "Parent cell line mentioned but not specifically named - may be too generic to detect"
+    confidence: 0.70  # Moderate confidence - refers to a real cell line but not specifically named
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}[0-9]{3}-[A-Z]-[0-9]+"
+    toolType: "cell_line"
+    examples: ["UMi031-A-2"]
+    reasoning: "iPSC lines often follow institutional naming conventions with letters/numbers and hyphens. This pattern would catch similar cell line names."
+
+  - patternType: "term"
+    pattern: "CRISPR(?:\\s+technology|\\s+system|\\s+cas9|\\s+cas12|\\s+editing|\\s+induced|\\s+mediated)?"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR technology", "CRISPR-induced"]
+    reasoning: "CRISPR is a fundamental genetic editing tool that should be detected when mentioned in experimental context."
+
+  - patternType: "context_phrase"
+    pattern: "(?:hiPSC|iPSC|induced pluripotent stem cell)\\s+line"
+    toolType: "cell_line"
+    examples: ["hiPSC line", "iPSC line"]
+    reasoning: "iPSC/hiPSC lines are important cell line tools that should be detected when mentioned as experimental resources."
+
+  - patternType: "context_phrase"
+    pattern: "generated from.*(?:iPSC|hiPSC|cell line)"
+    toolType: "cell_line"
+    examples: ["generated from an unaffected iPSC line"]
+    reasoning: "Parent cell lines used for derivation should be detected as they are source materials/tools."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3  # UMi031-A-2, CRISPR, unaffected iPSC line
+  newPatternsCount: 4  # Cell line naming, CRISPR terms, iPSC line context, parent line context
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were mined despite clear presence of research tools in abstract
+    - Only abstract available - full Methods section would likely contain many more tools
+    - Cell line nomenclature patterns may need improvement to catch institutional naming schemes
+    - CRISPR technology not detected as genetic reagent tool
+    - iPSC characterization likely involves antibodies, karyotyping tools not mentioned in abstract
+  recommendations: |
+    This publication clearly contains research tools that were missed by the mining process:
+    1. The UMi031-A-2 iPSC line itself should be detected as a cell line tool
+    2. CRISPR technology should be recognized as a genetic reagent
+    3. The parent "unaffected iPSC line" represents another cell line resource
+    
+    The mining patterns need improvement for:
+    - iPSC/hiPSC line nomenclature (institutional naming schemes)
+    - CRISPR technology detection in experimental contexts
+    - Parent/source cell line identification
+    
+    Full text access would likely reveal additional tools including:
+    - Specific antibodies for pluripotency markers
+    - Karyotyping analysis software
+    - Cell culture reagents and media
+    - Characterization assays and equipment
+    
+    This represents a significant gap in tool detection for stem cell research publications.

@@ -1,0 +1,150 @@
+publicationMetadata:
+  pmid: "34230198"
+  title: "Current Recommendations for Patient-Reported Outcome Measures Assessing Domains of Quality of Life in Neurofibromatosis Clinical Trials."
+  queryType: "clinical"
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a systematic review/recommendation paper about patient-reported outcome measures for neurofibromatosis clinical trials.
+    Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY FOCUS
+    - Possibly computational tools for systematic review analysis
+    
+    The publication explicitly reviews and recommends PRO measures, which are validated clinical assessment tools.
+    Multiple specific questionnaires and scales are mentioned by name in the abstract.
+  overallAssessment: |
+    This publication is a systematic review that evaluates and recommends patient-reported outcome (PRO) measures for neurofibromatosis clinical trials.
+    It should contain multiple clinical assessment tools (validated questionnaires and scales) as these are the primary focus of the review.
+    The mining system completely missed these tools, likely due to inadequate patterns for clinical assessment tool names.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Pediatric Quality of Life Inventory (PedsQL) Generic Core Scales"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The highest-rated generic measures were (1) the Pediatric Quality of Life Inventory (PedsQL) Generic Core Scales for NF clinical trials for children or for children through adults"
+    whyMissed: "Clinical assessment tool pattern likely doesn't capture full instrument names with parenthetical abbreviations"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "the Pediatric Quality of Life Inventory (PedsQL) Generic Core Scales for NF clinical trials"
+    whyMissed: "Abbreviated form of clinical assessment tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Functional Assessment of Cancer Therapy-General"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "(2) the Functional Assessment of Cancer Therapy-General for adult medical trials"
+    whyMissed: "Clinical assessment tool pattern doesn't capture hyphenated instrument names"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "World Health Organization Quality of Life-BREF"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "(3) the World Health Organization Quality of Life-BREF for adult psychosocial trials"
+    whyMissed: "WHO instrument name with abbreviation not captured by patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL NF1 Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The highest-rated disease-specific measures were (1) the PedsQL NF1 Module for NF1 trials"
+    whyMissed: "Disease-specific module of clinical assessment tool not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NF2 Impact on Quality of Life Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "(2) the NF2 Impact on Quality of Life Scale for NF2 trials"
+    whyMissed: "Disease-specific quality of life scale not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Penn Acoustic Neuroma Quality of Life Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "(3) the Penn Acoustic Neuroma Quality of Life Scale for NF2 trials targeting vestibular schwannomas"
+    whyMissed: "Institution-specific clinical assessment scale not captured"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Quality of Life Inventory"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pediatric Quality of Life Inventory (PedsQL)"]
+    reasoning: "Standard naming pattern for QoL assessment instruments"
+
+  - patternType: "term"
+    pattern: "PedsQL"
+    toolType: "clinical_assessment_tool"
+    examples: ["PedsQL Generic Core Scales", "PedsQL NF1 Module"]
+    reasoning: "Common abbreviation for Pediatric Quality of Life Inventory - widely used clinical tool"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+ Assessment of [A-Z][a-zA-Z\\s]+-[A-Z][a-zA-Z]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Functional Assessment of Cancer Therapy-General"]
+    reasoning: "Pattern for 'Assessment of X-Y' clinical instruments"
+
+  - patternType: "term"
+    pattern: "World Health Organization Quality of Life-BREF"
+    toolType: "clinical_assessment_tool"
+    examples: ["World Health Organization Quality of Life-BREF"]
+    reasoning: "WHO-BREF is a standard international QoL assessment tool"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+ Quality of Life Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["NF2 Impact on Quality of Life Scale", "Penn Acoustic Neuroma Quality of Life Scale"]
+    reasoning: "Pattern for disease/condition-specific quality of life scales"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome.*measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcome (PRO) measures"]
+    reasoning: "Context phrase indicating clinical assessment tools in the vicinity"
+
+  - patternType: "context_phrase"
+    pattern: "self-report.*measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["self-report and parent-report PRO measures"]
+    reasoning: "Context indicating patient-reported assessment instruments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Mining system completely failed to identify any clinical assessment tools despite this being a systematic review of PRO measures
+    - Seven major clinical assessment tools were clearly mentioned by name in the abstract but not captured
+    - This represents a significant gap in clinical assessment tool mining patterns
+    - The publication is specifically about recommending validated questionnaires and scales for clinical trials
+  recommendations: |
+    - ALL 7 identified clinical assessment tools should be added to the mining results
+    - Implement the suggested patterns to capture clinical assessment tool names, especially:
+      * PedsQL and its variants (widely used pediatric QoL tool)
+      * WHO Quality of Life instruments
+      * Disease-specific QoL scales
+      * "Assessment of X-Y" naming patterns
+    - This publication demonstrates that clinical assessment tool mining needs significant improvement
+    - Consider adding context-based patterns that look for "measures", "scales", "questionnaires" near tool names
+    - No observations extracted as this is a review/recommendation paper without experimental results
+    - This case highlights the importance of comprehensive clinical assessment tool pattern coverage

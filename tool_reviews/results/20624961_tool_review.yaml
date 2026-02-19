@@ -1,0 +1,148 @@
+publicationMetadata:
+  pmid: "20624961"
+  title: "Neurofibromin regulates corticostriatal inhibitory networks during working memory performance."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract, this lab research publication should contain:
+    - Animal models (Nf1 heterozygous null mutants mentioned)
+    - Computational tools (biophysical modeling, fMRI analysis)
+    - Clinical assessment tools (working memory assays, behavioral probes)
+    
+    The study combines mouse behavioral/electrophysiology experiments with human fMRI studies,
+    indicating multiple tool types should be present across both preclinical and clinical domains.
+  overallAssessment: |
+    This is clearly a laboratory research publication combining mouse model studies with human neuroimaging.
+    The abstract describes specific experimental approaches (electrophysiology, behavioral assays, fMRI, biophysical modeling)
+    that would require multiple research tools. However, only abstract text is available, limiting tool detection.
+    The absence of Methods sections significantly hampers comprehensive tool identification.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 heterozygous null mutants"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...electrophysiological studies in a mouse model of NF1 (Nf1 heterozygous null mutants; Nf1(+/-)) to demonstrate..."
+    whyMissed: "This is a specific mouse model strain mentioned with genetic nomenclature (Nf1(+/-)) in experimental context"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(+/-)"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...mouse model of NF1 (Nf1 heterozygous null mutants; Nf1(+/-)) to demonstrate that (i) Neurofibromin regulates..."
+    whyMissed: "Standard genetic nomenclature for heterozygous knockout mice, used in experimental context"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "working memory assays"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Accordingly, working memory assays applied during functional MRI (fMRI) studies in human subjects..."
+    whyMissed: "Specific assessment tools used to measure cognitive function in human subjects"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "behavioral working memory probes"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Here, we use behavioral working memory probes and electrophysiological studies in a mouse model..."
+    whyMissed: "Behavioral assessment tools used for cognitive testing in mice"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+  - toolName: "functional MRI"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...working memory assays applied during functional MRI (fMRI) studies in human subjects with NF1..."
+    whyMissed: "Neuroimaging technique requiring analysis software and computational processing"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "fMRI"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...working memory assays applied during functional MRI (fMRI) studies in human subjects with NF1..."
+    whyMissed: "Abbreviation for functional MRI, neuroimaging analysis tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "biophysical model"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...sufficient to alter persistent activity in a biophysical model of an mPFC microcircuit..."
+    whyMissed: "Computational modeling approach used for circuit simulation"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+\\([\\+\\-\\/]+\\)\\b"
+    toolType: "animal_model"
+    examples: ["Nf1(+/-)", "Nf1(+/-)"]
+    reasoning: "Standard genetic nomenclature for mouse strains with heterozygous/homozygous notation should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(working memory|behavioral|cognitive)\\s+(assays?|probes?|tests?)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["working memory assays", "behavioral working memory probes"]
+    reasoning: "Behavioral and cognitive assessment tools are often described with these specific phrases"
+
+  - patternType: "term"
+    pattern: "\\b(heterozygous|homozygous)\\s+(null\\s+)?mutants?\\b"
+    toolType: "animal_model"
+    examples: ["heterozygous null mutants"]
+    reasoning: "Genetic terminology indicating engineered mouse models used in research"
+
+  - patternType: "context_phrase"
+    pattern: "\\bmouse model of\\s+[A-Z0-9]+\\b"
+    toolType: "animal_model"
+    examples: ["mouse model of NF1"]
+    reasoning: "Phrase pattern indicating animal model usage in disease research context"
+
+  - patternType: "term"
+    pattern: "\\bbiophysical model\\b"
+    toolType: "computational_tool"
+    examples: ["biophysical model"]
+    reasoning: "Computational modeling approaches used in neuroscience research"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(functional MRI|fMRI)\\s+(studies|analysis|data)\\b"
+    toolType: "computational_tool"
+    examples: ["functional MRI (fMRI) studies"]
+    reasoning: "Neuroimaging techniques that require computational analysis tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of tool usage
+    - Only abstract text available - no Methods, Results, or Discussion sections for detailed analysis
+    - Multiple research tools are clearly mentioned in the abstract but were missed by mining algorithms
+    - Publication combines mouse model research with human neuroimaging, indicating diverse tool types
+  recommendations: |
+    This publication clearly contains multiple research tools that were completely missed by the initial mining:
+    - At least 2 animal model tools (Nf1 heterozygous null mutants, genetic nomenclature)
+    - At least 2 clinical assessment tools (working memory assays, behavioral probes)
+    - At least 2-3 computational tools (fMRI analysis, biophysical modeling)
+    
+    The mining algorithms appear to have significant gaps in detecting:
+    1. Genetic nomenclature for mouse strains
+    2. Behavioral/cognitive assessment terminology
+    3. Neuroimaging and computational modeling tools
+    
+    Recommend implementing the suggested patterns to improve future mining accuracy.
+    This publication should be flagged for manual curator review to properly extract all tools.
+    The lack of full-text sections severely limits comprehensive tool identification.

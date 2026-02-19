@@ -1,0 +1,132 @@
+publicationMetadata:
+  pmid: "25549701"
+  title: "Exome sequencing on malignant meningiomas identified mutations in neurofibromatosis type 2 (NF2) and meningioma 1 (MN1) genes."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis with genomic sequencing):
+    - Computational tools (software, pipelines) - HIGH PROBABILITY
+    - Genetic reagents (sequencing kits, arrays) - HIGH PROBABILITY
+    - Lab equipment/platforms (sequencing platforms) - MODERATE PROBABILITY
+    
+    This is an exome sequencing study that performed genomic analysis on tumor samples.
+    The methods describe specific sequencing platforms, analysis software, and reagent kits.
+    Such studies typically use multiple computational tools for variant calling, annotation,
+    and prioritization, plus laboratory reagents for sample preparation and sequencing.
+  overallAssessment: |
+    This genomic sequencing study should contain multiple research tools. The methods section
+    describes exome sequencing using specific platforms (Illumina HiSeq2000), reagent kits
+    (Agilent SureSelect, NimbleGen arrays), and analysis software (wANNOVAR, Sanger sequencing).
+    The fact that no tools were mined suggests significant gaps in the mining patterns for
+    computational tools and laboratory reagents used in genomic studies.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Illumina HiSeq2000"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We performed exome sequencing on five malignant meningiomas on the Illumina HiSeq2000 platform using Agilent SureSelect Human All Exon kits."
+    whyMissed: "Sequencing platform not recognized - needs pattern for 'Platform' or 'HiSeq' with model numbers"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent SureSelect Human All Exon"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We performed exome sequencing on five malignant meningiomas on the Illumina HiSeq2000 platform using Agilent SureSelect Human All Exon kits."
+    whyMissed: "Exome capture kit not recognized - needs pattern for vendor + 'SureSelect' or 'All Exon kits'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "wANNOVAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used wANNOVAR web server to annotate and prioritize variants, identified candidate genes with recurrent mutations"
+    whyMissed: "Bioinformatics web server not recognized - needs pattern for 'wANNOVAR' or 'web server' in analysis context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Sanger sequencing"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "identified candidate genes with recurrent mutations, and validated selected mutations by Sanger sequencing."
+    whyMissed: "Sequencing method not recognized - needs pattern for 'Sanger sequencing' as validation technique"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NimbleGen targeted region arrays"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We next designed custom NimbleGen targeted region arrays on five candidate genes, and sequenced four additional malignant meningiomas."
+    whyMissed: "Custom array design not recognized - needs pattern for 'NimbleGen' + 'arrays' or 'targeted region'"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "Illumina\\s+\\w+\\d+"
+    toolType: "computational_tool"
+    examples: ["Illumina HiSeq2000", "Illumina MiSeq", "Illumina NovaSeq"]
+    reasoning: "Sequencing platforms are critical tools in genomics studies but not being captured. Pattern should match Illumina + platform name + model number."
+
+  - patternType: "term"
+    pattern: "wANNOVAR|ANNOVAR"
+    toolType: "computational_tool"
+    examples: ["wANNOVAR web server", "ANNOVAR software"]
+    reasoning: "Popular variant annotation tool frequently used in exome/genome sequencing studies but missed by current patterns."
+
+  - patternType: "context_phrase"
+    pattern: "(?:using|with)\\s+([A-Z][a-zA-Z]+\\s+[A-Z][a-zA-Z]+(?:\\s+[A-Za-z0-9]+)*?)\\s+(?:kits?|arrays?)"
+    toolType: "genetic_reagent"
+    examples: ["using Agilent SureSelect Human All Exon kits", "with NimbleGen targeted region arrays"]
+    reasoning: "Reagent kits and arrays are essential lab tools but current patterns miss vendor + product name + 'kits/arrays' combinations."
+
+  - patternType: "term"
+    pattern: "Sanger\\s+sequencing"
+    toolType: "computational_tool"
+    examples: ["validated by Sanger sequencing", "confirmed using Sanger sequencing"]
+    reasoning: "Sanger sequencing is a standard validation method in genomics but not being captured as a tool."
+
+  - patternType: "naming_convention"
+    pattern: "custom\\s+\\w+\\s+(?:arrays?|panels?)"
+    toolType: "genetic_reagent"
+    examples: ["custom NimbleGen targeted region arrays", "custom Agilent arrays"]
+    reasoning: "Custom arrays and panels are important reagents in targeted sequencing but missed when described as 'custom' designs."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: No tools were mined despite clear presence of multiple research tools
+    - Missing computational tools: Illumina HiSeq2000 platform, wANNOVAR annotation software, Sanger sequencing
+    - Missing genetic reagents: Agilent SureSelect exome capture kits, NimbleGen custom arrays
+    - Mining patterns inadequate for genomic sequencing studies
+    - Vendor + product name combinations not being captured
+    - Bioinformatics web servers and analysis tools not recognized
+  recommendations: |
+    URGENT: This publication demonstrates major gaps in tool mining for genomic studies.
+    Five clear research tools were completely missed, indicating systematic pattern deficiencies.
+    
+    Immediate actions needed:
+    1. Add patterns for sequencing platforms (Illumina, PacBio, Oxford Nanopore + model numbers)
+    2. Add patterns for popular bioinformatics tools (ANNOVAR, GATK, BWA, etc.)
+    3. Add patterns for reagent kits (vendor + product + "kits/arrays")
+    4. Add patterns for sequencing methods (Sanger, targeted, whole genome)
+    5. Add context-based patterns for "using X platform" and "with Y kits"
+    
+    All 5 missed tools should be added to the database as they represent genuine research tools
+    used in this genomic analysis study. No observations could be extracted since no tools
+    were validated, but the Results section contains mutation findings that could be linked
+    to the sequencing tools once they are properly captured.

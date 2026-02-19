@@ -1,0 +1,327 @@
+publicationMetadata:
+  pmid: "26066488"
+  title: "A Systematic Assessment of Accuracy in Detecting Somatic Mosaic Variants by Deep Amplicon Sequencing: Application to NF2 Gene."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → computational tools (bioinformatics software, analysis pipelines), genetic reagents (sequencing kits, primers, enzymes), potentially antibodies for validation
+    
+    This is a molecular diagnostics/bioinformatics study developing a deep sequencing method for mosaic variant detection.
+    Expected tools include: NGS analysis software (alignment, variant calling, annotation), laboratory reagents (sequencing kits, PCR reagents), and potentially validation tools.
+    
+    Publications can contain MULTIPLE tool types. This study combines wet lab molecular biology with computational analysis,
+    so both genetic reagents and computational tools are expected.
+  overallAssessment: |
+    This publication describes a comprehensive laboratory and bioinformatics study developing a deep amplicon sequencing method
+    for detecting somatic mosaic variants in NF2. The study includes extensive wet lab work (DNA extraction, PCR, sequencing)
+    and computational analysis (alignment, variant calling, statistical analysis). Multiple research tools are expected and
+    extensively used throughout the methodology. The complete absence of mined tools (0 total) indicates a significant
+    mining failure rather than absence of tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "BWA MEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Amplicon reads were aligned against the human reference genome hg19 with BWA MEM [22]."
+    whyMissed: "Standard bioinformatics tool name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "GATK"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GATK version 2.5.2 [23] was used to recalibrate base qualities and realign aligned reads around indels."
+    whyMissed: "Well-known bioinformatics toolkit with version number not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MuTect"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNVs were identified using MuTect version 1.1.4 [16] with standard parameters"
+    whyMissed: "Somatic variant caller with version number not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "IndelGenotyperV2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GATK IndelGenotyperV2 (with minFraction = 0.001 and minCnt = 3) was used to detect InDels."
+    whyMissed: "GATK component tool not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Annovar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Genomic and functional annotation of detected variants was made by Annovar [24]."
+    whyMissed: "Variant annotation software not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "DepthOfCoverage"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Coverage statistics was performed by DepthOfCoverage utility of GATK."
+    whyMissed: "GATK utility tool not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "BASH and R custom scripts were used to obtain the list of low coverage (≤100X) regions per sample."
+    whyMissed: "Statistical software in analysis context not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GeneMapper"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Electrophoresis data were analyzed by GeneMapper software (Life Technologies, Carlsbad, CA, USA)."
+    whyMissed: "Commercial analysis software with vendor not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PolyPhen 2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "non synonymous variants predicted to be non-deleterious by at least two out of three open access prediction software questioned (PolyPhen 2, SIFT and Mutation Taster)"
+    whyMissed: "Variant prediction software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SIFT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "non synonymous variants predicted to be non-deleterious by at least two out of three open access prediction software questioned (PolyPhen 2, SIFT and Mutation Taster)"
+    whyMissed: "Variant prediction software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Mutation Taster"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "non synonymous variants predicted to be non-deleterious by at least two out of three open access prediction software questioned (PolyPhen 2, SIFT and Mutation Taster)"
+    whyMissed: "Variant prediction software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TruSeq Custom Amplicon Library Preparation Kit v1.5"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Library preparation was performed using the TruSeq Custom Amplicon Library Preparation Kit v1.5 (Illumina, San Diego, CA, USA)."
+    whyMissed: "Commercial kit with version and vendor not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "MiSeq Reagent Kit v2"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "sequenced on the Illumina MiSeq Sequencer (Illumina, San Diego, CA, USA) with MiSeq Reagent Kit v2 (2X150 cycles)"
+    whyMissed: "Sequencing reagent kit with version not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "BigDye Terminator v1.1 Cycle Sequencing Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sequencing analysis was performed on both strands using the BigDye Terminator v1.1 Cycle Sequencing Kit (Life Technologies Applied Biosystems, Austin, Texas, USA)"
+    whyMissed: "Sequencing chemistry kit with version and vendor not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "HiYieldGel/PCR DNA Fragments Extraction Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "PCR and COLD-PCR products were purified using HiYieldGel/PCR DNA Fragments Extraction Kit (RBCBioscience, New Taipei City, Taiwan)."
+    whyMissed: "DNA purification kit with vendor not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HotStarTaq Plus"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "0.5U HotStarTaq Plus (Qiagen, Hilden, Germany) and 100 ng of genomic DNA."
+    whyMissed: "DNA polymerase enzyme with vendor not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SYTOs 9"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "SYTOs 9 (Invitrogen, Eugene, Oregon, USA) was used as the intercalating dye in HRMA."
+    whyMissed: "Fluorescent dye with vendor not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "BWA\\s+(MEM|ALN)"
+    toolType: "computational_tool"
+    examples: ["BWA MEM"]
+    reasoning: "BWA is a widely used alignment tool in bioinformatics, often with specific algorithms like MEM"
+
+  - patternType: "term"
+    pattern: "GATK\\s+(version\\s+)?[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["GATK version 2.5.2"]
+    reasoning: "GATK is a standard toolkit for variant analysis, often mentioned with version numbers"
+
+  - patternType: "term"
+    pattern: "MuTect\\s+(version\\s+)?[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["MuTect version 1.1.4"]
+    reasoning: "MuTect is a somatic variant caller commonly used in cancer genomics and mosaicism studies"
+
+  - patternType: "term"
+    pattern: "Annovar|ANNOVAR"
+    toolType: "computational_tool"
+    examples: ["Annovar"]
+    reasoning: "Annovar is a widely used variant annotation tool in genomics"
+
+  - patternType: "term"
+    pattern: "(PolyPhen\\s*2?|SIFT|Mutation\\s*Taster)"
+    toolType: "computational_tool"
+    examples: ["PolyPhen 2", "SIFT", "Mutation Taster"]
+    reasoning: "These are standard variant prediction tools used for functional annotation"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed\\s+(using|by|with)\\s+([A-Z][a-zA-Z0-9\\s]+)\\s+software"
+    toolType: "computational_tool"
+    examples: ["analyzed by GeneMapper software"]
+    reasoning: "Common phrase pattern indicating software usage in analysis context"
+
+  - patternType: "vendor_indicator"
+    pattern: "Kit\\s+v?[0-9]+\\.?[0-9]*\\s*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["TruSeq Custom Amplicon Library Preparation Kit v1.5 (Illumina, San Diego, CA, USA)"]
+    reasoning: "Commercial kits with version numbers and vendor information in parentheses"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-zA-Z]+Taq\\s+(Plus|DNA\\s+Polymerase)"
+    toolType: "genetic_reagent"
+    examples: ["HotStarTaq Plus"]
+    reasoning: "DNA polymerase enzymes often follow this naming pattern"
+
+  - patternType: "term"
+    pattern: "SYTO[s]?\\s*[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["SYTOs 9"]
+    reasoning: "SYTO dyes are commonly used fluorescent nucleic acid stains"
+
+  - patternType: "context_phrase"
+    pattern: "using\\s+the\\s+([A-Z][a-zA-Z0-9\\s]+)\\s+\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["using the HiYieldGel/PCR DNA Fragments Extraction Kit (RBCBioscience, New Taipei City, Taiwan)"]
+    reasoning: "Common phrase indicating reagent usage with vendor information"
+
+observations:
+  - resourceName: "BWA MEM"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      BWA MEM was used for aligning amplicon reads against the human reference genome hg19. 
+      The tool was part of the bioinformatics pipeline for processing deep sequencing data 
+      to detect somatic mosaic variants in NF2 gene samples.
+    foundIn: "methods"
+    contextSnippet: "Amplicon reads were aligned against the human reference genome hg19 with BWA MEM [22]."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0129099"
+
+  - resourceName: "GATK"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      GATK version 2.5.2 was used to recalibrate base qualities and realign aligned reads around indels.
+      This preprocessing step was essential for accurate variant calling in the mosaic variant detection pipeline.
+    foundIn: "methods"
+    contextSnippet: "GATK version 2.5.2 [23] was used to recalibrate base qualities and realign aligned reads around indels."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0129099"
+
+  - resourceName: "MuTect"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MuTect version 1.1.4 was used with standard parameters for SNV identification in the mosaic variant analysis.
+      The tool was specifically chosen for its ability to detect low-frequency somatic variants without matched normal samples.
+    foundIn: "methods"
+    contextSnippet: "SNVs were identified using MuTect version 1.1.4 [16] with standard parameters"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0129099"
+
+  - resourceName: "MuTect"
+    resourceType: "Computational Tool"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      MuTect showed limitations in detecting variants with very low allele fractions (~0.01) due to its downsampling strategy.
+      Undetected variants in 1% dilution samples were likely affected by this limitation, particularly for SNV events.
+    foundIn: "results"
+    contextSnippet: "Undetected variants either fall in amplicons with lower coverage or, even if they are supported by a high number of reads, their allele fraction is low (~0.01). The latter case involves only SNVs events and is likely due to the downsampling strategy of MuTect."
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0129099"
+
+  - resourceName: "IndelGenotyperV2"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      GATK IndelGenotyperV2 was used to detect InDels with specific parameters: minFraction = 0.001 and minCnt = 3.
+      These parameters were optimized for detecting low-frequency indel variants in mosaic samples.
+    foundIn: "methods"
+    contextSnippet: "GATK IndelGenotyperV2 (with minFraction = 0.001 and minCnt = 3) was used to detect InDels."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0129099"
+
+  - resourceName: "TruSeq Custom Amplicon Library Preparation Kit v1.5"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The TruSeq Custom Amplicon Library Preparation Kit v1.5 from Illumina was used for library preparation.
+      The genomic DNA input for amplicon library preparation was 250 ng for each sample according to manufacturer's instructions.
+    foundIn: "methods"
+    contextSnippet: "Library preparation was performed using the TruSeq Custom Amplicon Library Preparation Kit v1.5 (Illumina, San Diego, CA, USA). The genomic DNA input for amplicon library preparation was 250 ng for each sample according to manufacturer's instructions."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0129099"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 17
+  newPatternsCount: 10
+  observationsExtracted: 6
+  observationsByType:
+    Usage Instructions: 5
+    Issue: 1
+  majorIssuesFound: |
+    - CRITICAL: Complete mining failure - 0 tools detected despite extensive tool usage
+    - Publication contains numerous computational tools (BWA MEM, GATK, MuTect, Annovar, etc.)
+    - Multiple genetic reagents (sequencing kits, enzymes, dyes) with vendor information
+    - All tools have clear experimental usage context with version numbers and parameters
+    - Mining patterns appear to miss standard bioinformatics tools and commercial reagents
+  recommendations: |
+    URGENT: This publication represents a complete mining failure. Despite containing 17+ clear research tools
+    with experimental usage context, ZERO tools were detected. This indicates fundamental gaps in mining patterns.
+    
+    Key recommendations:
+    1. ADD all 17 identified tools - they have clear experimental usage with versions/vendors
+    2. IMPLEMENT suggested patterns to capture bioinformatics tools (BWA, GATK, MuTect, Annovar)
+    3. IMPROVE reagent detection for commercial kits with version numbers and vendor info
+    4. ENHANCE software detection patterns for analysis tools with vendor information
+    5. REVIEW mining algorithm - this level of failure suggests systematic issues
+    
+    All identified tools should be added as they represent genuine research tools with clear experimental usage.
+    The observations extracted demonstrate the tools' practical applications and limitations in the research context.

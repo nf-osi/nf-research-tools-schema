@@ -1,0 +1,115 @@
+publicationMetadata:
+  pmid: "38321701"
+  title: "Patient-reported measures of tinnitus for individuals with neurofibromatosis type 2-related schwannomatosis: Recommendations for clinical trials."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study that systematically evaluates patient-reported outcome measures (PROMs) 
+    for tinnitus assessment in NF2 patients. Expected tool types:
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY FOCUS
+    - Computational tools (possibly for analysis, though not explicitly mentioned)
+    
+    The study specifically mentions evaluating 19 patient-reported outcome measures, with 16 undergoing formal review.
+    These are legitimate clinical assessment tools that should have been captured by mining algorithms.
+  overallAssessment: |
+    This publication is highly likely to contain clinical assessment tools as it is specifically focused on evaluating 
+    and recommending patient-reported outcome measures for tinnitus in NF2 clinical trials. The study systematically 
+    reviewed 19 PROMs and formally evaluated 16 using standardized criteria. The absence of mined tools represents 
+    a significant mining failure, as multiple validated clinical assessment instruments are explicitly discussed.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Tinnitus Functional Index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The Tinnitus Functional Index was identified as the most highly rated measure for the assessment of tinnitus in populations with neurofibromatosis type 2"
+    whyMissed: "This is the primary recommended outcome measure from the study but wasn't captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Client Oriented Scale of Improvement-Tinnitus"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "One measure was excluded (i.e. the Client Oriented Scale of Improvement-Tinnitus) because while it would be very useful for clinical settings"
+    whyMissed: "Specific tinnitus assessment tool mentioned by name but not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Patient-Reported Outcomes Rating Acceptance Tool for Endpoints"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "using the Patient-Reported Outcomes Rating Acceptance Tool for Endpoints (PRO-RATE) form described and published previously"
+    whyMissed: "Evaluation tool used to assess other PROMs, has acronym PRO-RATE"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PRO-RATE"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The PRO-RATE form allowed for the numerical scoring and consequent comparison of the PROMs under evaluation"
+    whyMissed: "Acronym form of the evaluation tool, commonly used abbreviation"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Tinnitus Functional Index|TFI"
+    toolType: "clinical_assessment_tool"
+    examples: ["Tinnitus Functional Index was identified as the most highly rated measure"]
+    reasoning: "Specific validated tinnitus assessment instrument that is widely used in clinical research"
+
+  - patternType: "term"
+    pattern: "Client Oriented Scale of Improvement"
+    toolType: "clinical_assessment_tool"
+    examples: ["Client Oriented Scale of Improvement-Tinnitus"]
+    reasoning: "Patient-reported outcome measure for tinnitus assessment mentioned in exclusion criteria"
+
+  - patternType: "term"
+    pattern: "PRO-RATE|Patient-Reported Outcomes Rating Acceptance Tool for Endpoints"
+    toolType: "clinical_assessment_tool"
+    examples: ["PRO-RATE form", "Patient-Reported Outcomes Rating Acceptance Tool for Endpoints"]
+    reasoning: "Standardized evaluation tool for assessing patient-reported outcome measures"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measure[s]?|PROM[s]?"
+    toolType: "clinical_assessment_tool"
+    examples: ["19 identified patient-reported outcome measures", "16 published patient-reported outcome measures"]
+    reasoning: "Generic term that often precedes specific instrument names in clinical assessment literature"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire|scale|inventory|index|assessment tool"
+    toolType: "clinical_assessment_tool"
+    examples: ["tinnitus questionnaire", "outcome measure", "assessment of tinnitus"]
+    reasoning: "Common descriptors for clinical assessment instruments that should trigger tool detection"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL MINING FAILURE: This publication is entirely focused on clinical assessment tools (patient-reported outcome measures) 
+      but zero tools were mined, representing a complete failure of the mining algorithm for this publication type
+    - The study explicitly discusses 19 patient-reported outcome measures and formally evaluates 16 of them
+    - Primary recommendation (Tinnitus Functional Index) was completely missed
+    - Evaluation methodology tool (PRO-RATE) was missed
+    - Generic terms like "patient-reported outcome measures" and "questionnaire" should trigger clinical assessment tool detection
+  recommendations: |
+    - ALL 4 potentially missed tools should be added to the database as they represent legitimate clinical assessment instruments
+    - Mining patterns urgently need improvement for clinical assessment tools, particularly:
+      * Specific instrument names (Tinnitus Functional Index, PRO-RATE)
+      * Generic terms that indicate presence of assessment tools (PROM, questionnaire, scale)
+      * Context phrases around clinical evaluation and outcome measurement
+    - This publication demonstrates that clinical assessment tool mining is severely underdeveloped
+    - No observations were extracted as this is a methodology/recommendation paper rather than an experimental study
+    - Future mining should specifically target publications with "patient-reported outcome", "questionnaire", "assessment", and "clinical trial" terminology

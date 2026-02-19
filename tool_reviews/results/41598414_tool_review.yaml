@@ -1,0 +1,106 @@
+publicationMetadata:
+  pmid: "41598414"
+  title: "Dermoscopy-Guided High-Frequency Ultrasound Imaging of Subcentimeter Cutaneous and Subcutaneous Neurofibromas in Patients with Neurofibromatosis Type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, imaging devices, diagnostic equipment, computational tools for analysis
+    
+    This clinical imaging study would be expected to contain:
+    - Clinical assessment tools: NF1 diagnostic criteria, patient selection criteria
+    - Medical devices: Ultrasound imaging equipment, dermoscopy devices
+    - Computational tools: Image analysis software, data management systems
+    
+    Note: While this is a clinical study, it involves specialized medical imaging equipment and 
+    software that qualify as research tools. Clinical studies can contain multiple tool types
+    including computational tools for data analysis and specialized medical devices.
+  overallAssessment: |
+    This clinical imaging study would typically use research tools including specialized medical devices
+    (ultrasound equipment, dermoscopy systems) and computational tools (image analysis software).
+    The study involves systematic evaluation of neurofibromas using advanced imaging techniques,
+    which requires both hardware and software tools for data acquisition and analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Dermus SkinScanner"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...measurements were performed at the Department of Dermatology, Venereology and Dermatooncology, Semmelweis University, using a portable DG-HFUS device (Dermus SkinScanner, Dermus Ltd., Budapest, Hungary). This system combines dermoscopic and HFUS imaging..."
+    whyMissed: "Specific medical device name with manufacturer information not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SkinAid cloud software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Recorded images were analyzed in SkinAid cloud software, stored under patient ID with demographic and lesion details..."
+    whyMissed: "Software tool for image analysis not captured by computational tool mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Legius criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...confirming the diagnosis of NF1 based on the current criteria published by Legius et al. in 2021..."
+    whyMissed: "Clinical diagnostic criteria referenced as assessment tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[A-Z][a-zA-Z]+,\\s+[A-Z][a-zA-Z]+\\s+Ltd\\."
+    toolType: "clinical_assessment_tool"
+    examples: ["Dermus SkinScanner, Dermus Ltd., Budapest, Hungary"]
+    reasoning: "Medical device names with manufacturer and location information indicate specialized equipment"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed in\\s+[A-Z][a-zA-Z]+\\s+(cloud\\s+)?software"
+    toolType: "computational_tool"
+    examples: ["analyzed in SkinAid cloud software"]
+    reasoning: "Software tools used for data analysis often follow this naming pattern"
+
+  - patternType: "context_phrase"
+    pattern: "diagnosis.*based on.*criteria published by"
+    toolType: "clinical_assessment_tool"
+    examples: ["diagnosis of NF1 based on the current criteria published by Legius et al."]
+    reasoning: "References to published diagnostic criteria indicate clinical assessment tools"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z]{2,}-[A-Z]{4}\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["DG-HFUS"]
+    reasoning: "Medical imaging acronyms often represent specialized diagnostic equipment"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of research tools
+    - Mining patterns failed to capture medical devices and imaging software
+    - Clinical diagnostic criteria not recognized as assessment tools
+    - Limited text availability (only Methods section) may have affected mining
+  recommendations: |
+    This publication contains legitimate research tools that were completely missed by the mining process.
+    The Dermus SkinScanner and SkinAid software should definitely be added as they are core tools used in the study.
+    The Legius criteria reference is borderline but represents a standardized clinical assessment tool.
+    
+    Key recommendations:
+    1. Add patterns to capture medical device names with manufacturer information
+    2. Improve computational tool detection for image analysis software
+    3. Consider diagnostic criteria as clinical assessment tools when actively used
+    4. The suggested patterns would significantly improve mining accuracy for clinical imaging studies
+    
+    No observations could be extracted due to absence of Results and Discussion sections.
+    This highlights the importance of having complete publication text for comprehensive tool validation.

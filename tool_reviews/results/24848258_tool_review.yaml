@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "24848258"
+  title: "Merlin deficiency predicts FAK inhibitor sensitivity: a synthetic lethal relationship."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # High confidence - mentions cell lines, xenograft models, drug testing
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes laboratory research involving:
+    - "diverse panel of cancer cell lines" - suggests cell line tools
+    - "tumor xenograft models" - suggests animal models/PDX models
+    - "blocking antibodies" - suggests antibody tools
+    - Drug compounds (VS-4718, pemetrexed, cisplatin) - potential genetic reagents/compounds
+    - In vitro and in vivo experimental work
+    
+    Expected tool types: cell lines, animal models, antibodies, potentially patient-derived models (xenografts)
+  overallAssessment: |
+    This is clearly a laboratory research publication describing experimental work with cancer cell lines,
+    xenograft tumor models, and drug sensitivity testing. The study involves both in vitro cell culture
+    experiments and in vivo animal studies. Despite lacking a formal Methods section, the abstract describes
+    typical lab research activities that would require multiple research tools including cell lines, animal
+    models, antibodies, and potentially patient-derived xenograft models.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "cancer cell lines"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "In a diverse panel of cancer cell lines, we found that the cells most sensitive to focal adhesion kinase (FAK) inhibition lack expression"
+    whyMissed: "Generic term 'cancer cell lines' mentioned but no specific cell line names provided in abstract"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "MPM cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "Our data demonstrate that low Merlin expression predicts for increased sensitivity of MPM cells to a FAK inhibitor, VS-4718"
+    whyMissed: "MPM (malignant pleural mesothelioma) cells mentioned but no specific cell line names given"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+    
+  - toolName: "tumor xenograft models"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "Our data demonstrate that low Merlin expression predicts for increased sensitivity of MPM cells to a FAK inhibitor, VS-4718, in vitro and in tumor xenograft models"
+    whyMissed: "Xenograft models mentioned but no specific model names or details provided"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "blocking antibodies"
+    toolType: "antibody"
+    foundIn: "abstract"
+    contextSnippet: "Disruption of MPM cell-cell or cell-extracellular matrix (ECM) contacts with blocking antibodies suggests that weak cell-cell adhesions"
+    whyMissed: "Blocking antibodies mentioned but no specific antibody names or targets specified"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "VS-4718"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Our data demonstrate that low Merlin expression predicts for increased sensitivity of MPM cells to a FAK inhibitor, VS-4718"
+    whyMissed: "Specific FAK inhibitor compound mentioned - this is a research reagent/drug compound"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "pemetrexed"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Whereas pemetrexed and cisplatin, standard-of-care agents for MPM, enrich for CSCs"
+    whyMissed: "Specific chemotherapy drug mentioned as research reagent for comparison studies"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+    
+  - toolName: "cisplatin"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Whereas pemetrexed and cisplatin, standard-of-care agents for MPM, enrich for CSCs"
+    whyMissed: "Specific chemotherapy drug mentioned as research reagent for comparison studies"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "xenograft model[s]?"
+    toolType: "patient_derived_model"
+    examples: ["tumor xenograft models"]
+    reasoning: "Xenograft models are commonly used patient-derived models that should be captured"
+    
+  - patternType: "term"
+    pattern: "blocking antibod(y|ies)"
+    toolType: "antibody"
+    examples: ["blocking antibodies"]
+    reasoning: "Blocking antibodies are functional antibodies used as research tools"
+    
+  - patternType: "context_phrase"
+    pattern: "panel of .* cell lines"
+    toolType: "cell_line"
+    examples: ["diverse panel of cancer cell lines"]
+    reasoning: "Phrases describing cell line panels indicate cell line tool usage"
+    
+  - patternType: "term"
+    pattern: "VS-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["VS-4718"]
+    reasoning: "VS-series compounds are specific research reagents/inhibitors that should be captured"
+    
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}\\s+cells"
+    toolType: "cell_line"
+    examples: ["MPM cells"]
+    reasoning: "Acronym followed by 'cells' often indicates specific cell line types"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 0  # No validated tools to extract observations from
+  observationsByType: {}
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of laboratory research
+    - Abstract-only content limits detailed tool identification (no Methods section available)
+    - Multiple potential research tools mentioned but not captured by mining algorithms
+    - Specific compounds (VS-4718) and experimental models (xenografts) clearly described but missed
+    - Generic terms used (e.g., "cancer cell lines") without specific names make tool identification challenging
+  recommendations: |
+    Overall recommendations for this publication:
+    - This publication clearly describes laboratory research and should contain multiple research tools
+    - The mining algorithms appear to have missed several obvious tools mentioned in the abstract
+    - Key missed tools include: xenograft models, blocking antibodies, and specific compounds (VS-4718)
+    - The lack of Methods section limits detailed tool identification, but abstract provides sufficient evidence
+    - Suggest adding patterns for xenograft models, blocking antibodies, and VS-series compounds
+    - Consider manual curator review to identify specific cell line names from full text if available
+    - This represents a significant false negative case where legitimate research tools were not detected

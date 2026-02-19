@@ -1,0 +1,272 @@
+publicationMetadata:
+  pmid: "25851896"
+  title: "Preclinical assessment of the anticancer drug response of plexiform neurofibroma tissue using primary cultures."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a laboratory research study involving primary cell culture, drug testing, immunostaining,
+    and microscopy analysis. Expected tool types include:
+    - Antibodies (for immunostaining S100, CD90)
+    - Primary cell cultures (plexiform neurofibroma-derived)
+    - Computational tools (ImageJ for cell counting)
+    - Genetic reagents (drugs: nilotinib, imatinib)
+    - Laboratory reagents and assay kits
+  overallAssessment: |
+    This is a clear laboratory research study involving primary cell culture establishment,
+    drug testing, immunofluorescence staining, and quantitative analysis. The study describes
+    detailed experimental methods including cell culture protocols, drug treatments, antibody
+    staining, and microscopy analysis. Multiple research tools should be present including
+    antibodies, computational analysis software, and primary cell culture systems.
+
+toolValidations: []
+  # No tools were mined, so this section is empty
+
+potentiallyMissedTools:
+  - toolName: "S100 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...slides were double immunostained with antibodies against S100 (specific to Schwann cells) and CD90 (specific to fibroblasts). For Schwann cell staining, cells were incubated with 2 μg/mL rabbit anti-human S100 antibody (DAKO, Glostrup, Denmark)..."
+    whyMissed: "Clear antibody mention with vendor information (DAKO) and catalog details, used for immunostaining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD90 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...To stain fibroblasts, cells were incubated with 2 μg/mL anti-human CD90 antibody (Dianova, Hamburg, Germany), 2 μg/mL secondary FITC-conjugated goat anti-mouse IgG (DAKO)..."
+    whyMissed: "Clear antibody mention with vendor information (Dianova) used for fibroblast staining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FITC-conjugated anti-rabbit antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...10 μg/mL secondary fluorescein isothiocyanate (FITC)-conjugated anti-rabbit antibody (DAKO)..."
+    whyMissed: "Secondary antibody with vendor information (DAKO) used in immunostaining protocol"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FITC-conjugated goat anti-mouse IgG"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...2 μg/mL secondary FITC-conjugated goat anti-mouse IgG (DAKO)..."
+    whyMissed: "Secondary antibody with vendor information (DAKO) used in immunostaining protocol"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...More than 200 cells were counted for each drug concentration using ImageJ software (version 1.48; National Institutes of Health, Behesda, MD, USA)..."
+    whyMissed: "Software tool with specific version number (1.48) and source institution mentioned"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Primary plexiform neurofibroma cultures"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Primary cultures containing tumor and nontumor stromal cells were utilized in a novel strategy to test drug responses...four primary cultures derived from plexiform neurofibromas..."
+    whyMissed: "Primary cell cultures established from patient tumor tissue, used as experimental model"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "nilotinib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...cells from each culture were seeded into eight-compartment chamber slides at a density of 10,000 cells/well and treated with nilotinib (0, 5, 10, and 20 μM) or imatinib..."
+    whyMissed: "Anticancer drug used as experimental treatment with specific concentrations"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "imatinib"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...treated with nilotinib (0, 5, 10, and 20 μM) or imatinib (0, 10, 20, and 40 μM) over a 5-day period..."
+    whyMissed: "Anticancer drug used as experimental treatment with specific concentrations"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "2,3-bis (2-methoxy-4-nitro-5-sulfophenyl)-5-[(phenylamino) carbonyl]-2H-tetrazolium hydroxide assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...The viability and drug cytotoxicity for all of the cells in cultures treated as above were measured using 2,3-bis (2-methoxy-4-nitro-5-sulfophenyl)-5-[(phenylamino) carbonyl]-2H-tetrazolium hydroxide and lactate dehydrogenase assays (Roche, Penzberg, Germany)..."
+    whyMissed: "Cell viability assay kit with vendor information (Roche)"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "lactate dehydrogenase assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...measured using 2,3-bis (2-methoxy-4-nitro-5-sulfophenyl)-5-[(phenylamino) carbonyl]-2H-tetrazolium hydroxide and lactate dehydrogenase assays (Roche, Penzberg, Germany)..."
+    whyMissed: "Cytotoxicity assay kit with vendor information (Roche)"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b(DAKO|Dianova|Roche|Gibco|Biochrom)\\b.*\\b(antibody|assay|kit|reagent)"
+    toolType: "general"
+    examples: ["DAKO, Glostrup, Denmark", "Roche, Penzberg, Germany"]
+    reasoning: "Vendor names with location information often indicate commercial research tools"
+
+  - patternType: "context_phrase"
+    pattern: "immunostained with antibodies against \\w+"
+    toolType: "antibody"
+    examples: ["immunostained with antibodies against S100", "immunostained with antibodies against CD90"]
+    reasoning: "This phrase pattern reliably indicates antibody usage in immunostaining protocols"
+
+  - patternType: "context_phrase"
+    pattern: "using \\w+ software \\(version [\\d\\.]+.*\\)"
+    toolType: "computational_tool"
+    examples: ["using ImageJ software (version 1.48; National Institutes of Health, Behesda, MD, USA)"]
+    reasoning: "Software mentions with version numbers and institutional sources indicate computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "treated with \\w+ \\([\\d\\.,\\s]+[μµ]M\\)"
+    toolType: "genetic_reagent"
+    examples: ["treated with nilotinib (0, 5, 10, and 20 μM)", "treated with imatinib (0, 10, 20, and 40 μM)"]
+    reasoning: "Drug treatment mentions with specific concentrations indicate experimental reagents"
+
+  - patternType: "context_phrase"
+    pattern: "primary cultures? (derived from|containing|established from)"
+    toolType: "cell_line"
+    examples: ["primary cultures derived from plexiform neurofibromas", "Primary cultures containing tumor and nontumor stromal cells"]
+    reasoning: "Primary culture establishment phrases indicate cell culture systems as research tools"
+
+observations:
+  - resourceName: "Primary plexiform neurofibroma cultures"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Primary cultures showed highly variable drug responses between different tumor samples.
+      The proportions of Schwann cells and fibroblasts changed dose-dependently, but patterns
+      varied between tumor samples and between the two drugs tested. Culture from tumor no. 1
+      showed good response to both nilotinib and imatinib with continuous and substantial
+      decrease in tumor cell proportion. Culture from tumor no. 2 responded well to nilotinib
+      but poorly to imatinib. Culture from tumor no. 3 responded well to imatinib but less
+      well to nilotinib. Culture from tumor no. 4 responded poorly to both drugs.
+    foundIn: "results"
+    contextSnippet: "...The proportions of Schwann cells and fibroblasts changed in a dose-dependent manner, but the patterns of change varied from tumor to tumor and between the two drugs..."
+    confidence: 0.90
+    doi: "10.3988/jcn.2015.11.2.172"
+
+  - resourceName: "nilotinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Nilotinib treatment resulted in dose-dependent changes in cell proportions and decreased
+      total cell numbers. Good response observed in culture from tumor no. 1 and no. 2, with
+      continuous and substantial decrease in tumor cell proportion. Less effective in tumor
+      no. 3 culture, and poor response in tumor no. 4 culture. Treatment concentrations
+      tested were 0, 5, 10, and 20 μM over 5-day period.
+    foundIn: "results"
+    contextSnippet: "...A good drug response, defined as a continuous and substantial decrease in the proportion of tumor cells, was observed in the culture derived from tumor no. 1 for both nilotinib..."
+    confidence: 0.90
+    doi: "10.3988/jcn.2015.11.2.172"
+
+  - resourceName: "imatinib"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: ""
+    details: |
+      Imatinib treatment showed variable efficacy across different tumor cultures. Good response
+      in cultures from tumor no. 1 and no. 3 with substantial decrease in tumor cell proportion.
+      Poor response in cultures from tumor no. 2 and no. 4. Treatment concentrations tested
+      were 0, 10, 20, and 40 μM over 5-day period. Generally showed different response patterns
+      compared to nilotinib in the same cultures.
+    foundIn: "results"
+    contextSnippet: "...By contrast, the culture from tumor no. 2 responded well to nilotinib but poorly to imatinib. The culture of tumor no. 3 responded well to imatinib but less well to nilotinib..."
+    confidence: 0.90
+    doi: "10.3988/jcn.2015.11.2.172"
+
+  - resourceName: "S100 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      S100 antibody used at 2 μg/mL concentration for specific staining of Schwann cells
+      in primary plexiform neurofibroma cultures. Rabbit anti-human S100 antibody from
+      DAKO (Glostrup, Denmark) used with FITC-conjugated anti-rabbit secondary antibody
+      at 10 μg/mL. Successfully distinguished Schwann cells from fibroblasts in mixed
+      primary cultures for quantitative analysis.
+    foundIn: "methods"
+    contextSnippet: "...For Schwann cell staining, cells were incubated with 2 μg/mL rabbit anti-human S100 antibody (DAKO, Glostrup, Denmark), 10 μg/mL secondary fluorescein isothiocyanate (FITC)-conjugated anti-rabbit antibody..."
+    confidence: 0.95
+    doi: "10.3988/jcn.2015.11.2.172"
+
+  - resourceName: "CD90 antibody"
+    resourceType: "Antibody"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      CD90 antibody used at 2 μg/mL concentration for specific staining of fibroblasts
+      in primary plexiform neurofibroma cultures. Anti-human CD90 antibody from Dianova
+      (Hamburg, Germany) used with FITC-conjugated goat anti-mouse IgG secondary antibody
+      at 2 μg/mL. Successfully distinguished fibroblasts from Schwann cells in mixed
+      primary cultures for quantitative analysis.
+    foundIn: "methods"
+    contextSnippet: "...To stain fibroblasts, cells were incubated with 2 μg/mL anti-human CD90 antibody (Dianova, Hamburg, Germany), 2 μg/mL secondary FITC-conjugated goat anti-mouse IgG (DAKO)..."
+    confidence: 0.95
+    doi: "10.3988/jcn.2015.11.2.172"
+
+  - resourceName: "ImageJ"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      ImageJ software version 1.48 from National Institutes of Health used for quantitative
+      cell counting in fluorescence microscopy images. More than 200 cells were counted
+      for each drug concentration to calculate percentages of S100-positive Schwann cells
+      and CD90-positive fibroblasts. Software enabled accurate quantification of cell
+      proportions in mixed primary cultures after drug treatment.
+    foundIn: "methods"
+    contextSnippet: "...More than 200 cells were counted for each drug concentration using ImageJ software (version 1.48; National Institutes of Health, Behesda, MD, USA). The percentages of Schwann cells and fibroblasts were calculated..."
+    confidence: 0.95
+    doi: "10.3988/jcn.2015.11.2.172"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10  # Number of tools that might have been missed
+  newPatternsCount: 5  # Number of new patterns suggested
+  observationsExtracted: 6  # Number of scientific observations found
+  observationsByType:  # Breakdown by observation type
+    Cellular: 3
+    Usage Instructions: 3
+  majorIssuesFound: |
+    Critical mining failure - no tools were extracted despite this being a clear laboratory
+    research study with extensive experimental methods:
+    - Multiple antibodies with vendor information completely missed
+    - Computational tool (ImageJ) with version number missed
+    - Primary cell cultures as experimental model missed
+    - Drug treatments as genetic reagents missed
+    - Commercial assay kits missed
+    - All tools had clear experimental context and vendor/source information
+  recommendations: |
+    This represents a complete mining failure for a tool-rich laboratory study. All 10 identified
+    tools should be added to the database:
+    - 4 antibodies (S100, CD90, and 2 secondary antibodies) with clear vendor information
+    - 1 computational tool (ImageJ) with version and source details
+    - 1 primary cell culture system established from patient tissue
+    - 2 drug treatments (nilotinib, imatinib) used as experimental reagents
+    - 2 commercial assay kits for viability/cytotoxicity measurement
+    
+    The suggested patterns should be implemented to catch similar tools in future mining.
+    This publication demonstrates the need for better pattern coverage for:
+    - Vendor-based tool identification
+    - Immunostaining protocol language
+    - Software with version information
+    - Drug treatment contexts
+    - Primary culture establishment phrases
+    
+    Six high-quality scientific observations were extracted covering drug efficacy patterns,
+    antibody usage protocols, and computational analysis methods.

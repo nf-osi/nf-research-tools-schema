@@ -1,0 +1,81 @@
+publicationMetadata:
+  pmid: "2491775"
+  title: "Genetic analysis of eight loci tightly linked to neurofibromatosis 1."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a genetic linkage analysis study from 1989. Based on the abstract, this study:
+    - Used RFLP (Restriction Fragment Length Polymorphism) probes for genetic mapping
+    - Performed multipoint linkage analysis on NF1 families
+    - Conducted genotyping analysis
+    
+    Expected tool types for this publication type:
+    - Genetic reagents: RFLP probes mentioned in the study
+    - Computational tools: Linkage analysis software (though likely not specified in 1989)
+    
+    However, the abstract only mentions "eight previously identified RFLP probes" without 
+    naming specific probes, and no computational tools are explicitly named. This is typical
+    for older genetic studies where reagent details were often omitted from abstracts.
+  overallAssessment: |
+    This 1989 genetic linkage study would typically use research tools (RFLP probes, linkage analysis methods),
+    but the abstract-only format and age of the publication means specific tool names are not provided.
+    The study mentions "eight previously identified RFLP probes" but doesn't name them specifically.
+    Without full text access, it's impossible to identify specific genetic reagents or computational methods used.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "RFLP probes"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We have genotyped eight previously identified RFLP probes on 50 NF1 families to determine the placement of the NF1 locus relative to the RFLP loci."
+    whyMissed: "Generic term 'RFLP probes' mentioned but no specific probe names provided in abstract"
+    confidence: 0.3
+    shouldBeAdded: No
+  - toolName: "Multipoint linkage analysis"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Multipoint linkage analysis resulted in the unique placement of six loci at odds greater than 100:1"
+    whyMissed: "Analysis method mentioned but no specific software or computational tool named"
+    confidence: 0.2
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "genotyped.*RFLP probes"
+    toolType: "genetic_reagent"
+    examples: ["genotyped eight previously identified RFLP probes"]
+    reasoning: "Could help identify RFLP probe usage in genetic studies, though specific probe names would still be needed"
+  - patternType: "context_phrase"
+    pattern: "linkage analysis"
+    toolType: "computational_tool"
+    examples: ["Multipoint linkage analysis resulted in"]
+    reasoning: "Could identify linkage analysis methods, though specific software names would be needed for tool extraction"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 2
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is from 1989 with only abstract available - no Methods section
+    - Generic mentions of "RFLP probes" and "linkage analysis" without specific tool names
+    - Typical for older genetic studies to omit specific reagent/software details from abstracts
+    - No specific research tools are named that could be extracted
+  recommendations: |
+    This publication represents a common challenge in tool mining from older genetic studies:
+    - The study clearly used research tools (RFLP probes, linkage analysis software) but doesn't name them specifically
+    - Without full text access, specific genetic reagents cannot be identified
+    - The abstract-only format limits tool extraction capabilities
+    - No tools should be added based on generic method descriptions alone
+    - This type of publication highlights the need for full-text access for effective tool mining
+    - No observations can be extracted without Results/Discussion sections

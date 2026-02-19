@@ -1,0 +1,221 @@
+publicationMetadata:
+  pmid: "18636037"
+  title: "The ErbB inhibitors trastuzumab and erlotinib inhibit growth of vestibular schwannoma xenografts in nude mice: a preliminary study."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a xenograft study involving:
+    - Animal models (nude mice)
+    - Patient-derived models (vestibular schwannoma xenografts)
+    - Genetic reagents (BrdU, TUNEL assay components)
+    - Computational tools (MRI imaging)
+    - Drug treatments (trastuzumab, erlotinib)
+    
+    Expected multiple tool types across animal models, patient-derived models, genetic reagents, and computational tools.
+  overallAssessment: |
+    This is a clear laboratory research study involving xenograft experiments in nude mice to test ErbB inhibitors against vestibular schwannomas.
+    The study includes animal model usage, patient-derived xenograft establishment, drug treatments, imaging analysis, and cellular assays.
+    Multiple research tools should be present including animal models, patient-derived models, genetic reagents, and computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "nude mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "...vestibular schwannoma (VS) xenografts. METHODS: Vestibular schwannoma xenografts were established in the interscapular fat pad in nude mice for 4 weeks..."
+    whyMissed: "Standard animal model terminology not captured by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "vestibular schwannoma xenografts"
+    toolType: "patient_derived_model"
+    foundIn: "abstract"
+    contextSnippet: "...To analyze the ability of ErbB inhibitors to reduce the growth of vestibular schwannoma (VS) xenografts. METHODS: Vestibular schwannoma xenografts were established..."
+    whyMissed: "Patient-derived xenograft model not recognized by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "magnetic resonance imaging"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...Tumor growth was monitored by magnetic resonance imaging during the treatment period..."
+    whyMissed: "Imaging technology as computational tool not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MRI"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Tumor growth was monitored by magnetic resonance imaging (MRI) over the treatment period..."
+    whyMissed: "MRI abbreviation not recognized as computational tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "bromodeoxyuridine"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Animals also received bromodeoxyuridine injections to label proliferating cells..."
+    whyMissed: "Cell labeling reagent not captured by current patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BrdU"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Animals also received BrdU injections to label proliferating cells..."
+    whyMissed: "BrdU abbreviation for bromodeoxyuridine not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "terminal deoxynucleotidyl transferase-mediated dUTP-biotin end labeling"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Cell death was analyzed by terminal deoxynucleotidyl transferase-mediated dUTP-biotin end labeling of fragmented DNA..."
+    whyMissed: "TUNEL assay full name not captured by patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "TUNEL"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...Cell death was analyzed by terminal dUTP nick end labeling (TUNEL)..."
+    whyMissed: "TUNEL assay abbreviation not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "T2-weighted magnetic resonance imaging"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "...Tumors can be distinguished with T2-weighted magnetic resonance imaging sequences..."
+    whyMissed: "Specific MRI sequence type not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "nude mice|athymic mice|immunodeficient mice"
+    toolType: "animal_model"
+    examples: ["nude mice"]
+    reasoning: "Standard immunodeficient mouse strains used for xenograft studies"
+
+  - patternType: "naming_convention"
+    pattern: "\\w+\\s+(xenograft|xenografts|PDX)"
+    toolType: "patient_derived_model"
+    examples: ["vestibular schwannoma xenografts"]
+    reasoning: "Patient-derived xenograft models with tissue/tumor type prefix"
+
+  - patternType: "term"
+    pattern: "magnetic resonance imaging|MRI|T2-weighted|T1-weighted"
+    toolType: "computational_tool"
+    examples: ["magnetic resonance imaging", "MRI", "T2-weighted magnetic resonance imaging"]
+    reasoning: "Medical imaging technologies used as analytical tools"
+
+  - patternType: "term"
+    pattern: "bromodeoxyuridine|BrdU|5-bromo-2'-deoxyuridine"
+    toolType: "genetic_reagent"
+    examples: ["bromodeoxyuridine", "BrdU"]
+    reasoning: "Cell proliferation labeling reagent and its common abbreviation"
+
+  - patternType: "term"
+    pattern: "TUNEL|terminal deoxynucleotidyl transferase|dUTP nick end labeling"
+    toolType: "genetic_reagent"
+    examples: ["TUNEL", "terminal deoxynucleotidyl transferase-mediated dUTP-biotin end labeling"]
+    reasoning: "Cell death detection assay and its components"
+
+  - patternType: "context_phrase"
+    pattern: "established in|xenografts were established|tumor growth was monitored by"
+    toolType: "general"
+    examples: ["xenografts were established in the interscapular fat pad", "tumor growth was monitored by magnetic resonance imaging"]
+    reasoning: "Context phrases indicating experimental tool usage in xenograft studies"
+
+observations:
+  - resourceName: "nude mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Nude mice were used as hosts for vestibular schwannoma xenografts. Xenografts were established in the interscapular fat pad and maintained for 4 weeks initially, with longer-term experiments running for 12 weeks. Control tumors demonstrated slight growth during the 12-week treatment period, while both trastuzumab and erlotinib significantly reduced the growth of VS xenografts (p < 0.05).
+    foundIn: "both"
+    contextSnippet: "Control tumors demonstrated slight growth during the 12-week treatment period. Both trastuzumab and erlotinib significantly reduced the growth of VS xenografts (p < 0.05)."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31817f7398"
+
+  - resourceName: "vestibular schwannoma xenografts"
+    resourceType: "Patient-Derived Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Vestibular schwannoma xenografts showed differential response to ErbB inhibitor treatments. Control tumors demonstrated slight growth over the 12-week treatment period. Both trastuzumab and erlotinib significantly reduced xenograft growth compared to controls (p < 0.05). The xenografts could be distinguished and monitored using T2-weighted MRI sequences.
+    foundIn: "results"
+    contextSnippet: "Control tumors demonstrated slight growth over the 12 week treatment period. Both trastuzumab and erlotinib significantly reduced the growth of VS xenografts (p<0.05)."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31817f7398"
+
+  - resourceName: "bromodeoxyuridine"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      BrdU (bromodeoxyuridine) was used to label proliferating cells in vestibular schwannoma xenografts. Trastuzumab treatment significantly reduced the proliferation of VS cells compared to control (p < 0.01) as determined by BrdU uptake analysis. This demonstrates the anti-proliferative effect of the ErbB2 inhibitor.
+    foundIn: "results"
+    contextSnippet: "Trastuzumab significantly reduced the proliferation of VS cells compared to control (p<0.01) as determined by BrdU uptake."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31817f7398"
+
+  - resourceName: "TUNEL"
+    resourceType: "Genetic Reagent"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      TUNEL (terminal dUTP nick end labeling) assay was used to analyze cell death in vestibular schwannoma xenografts. Erlotinib treatment, but not trastuzumab, resulted in a significant increase in the percentage of TUNEL-positive VS cells (p < 0.01), indicating increased apoptosis with the ErbB kinase inhibitor but not the ErbB2-specific inhibitor.
+    foundIn: "results"
+    contextSnippet: "Erlotinib, but not trastuzumab, resulted in a significant increase in the percent of TUNEL-positive VS cells (p<0.01)."
+    confidence: 1.0
+    doi: "10.1097/MAO.0b013e31817f7398"
+
+  - resourceName: "magnetic resonance imaging"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MRI was successfully used to monitor tumor growth during the treatment period. T2-weighted MRI sequences were particularly effective for distinguishing tumors from surrounding tissue. This imaging approach allowed for non-invasive longitudinal monitoring of xenograft growth over the 12-week treatment period.
+    foundIn: "results"
+    contextSnippet: "Tumors could be distinguished with T2 weighted MRI sequences."
+    confidence: 0.9
+    doi: "10.1097/MAO.0b013e31817f7398"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 2
+    Cellular: 2
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools in a clear laboratory research study
+    - Multiple obvious research tools were missed including animal models, patient-derived models, genetic reagents, and computational tools
+    - Standard laboratory terminology (nude mice, BrdU, TUNEL, MRI) not captured by current patterns
+    - Xenograft models not recognized as patient-derived models
+    - Medical imaging not classified as computational tools
+  recommendations: |
+    This publication represents a significant mining failure - zero tools were detected in a clear laboratory research study that contains multiple obvious research tools.
+    All 9 potentially missed tools should be added to the database as they represent genuine research tools used experimentally.
+    The suggested patterns should be implemented to capture similar tools in future mining efforts.
+    This case highlights major gaps in current mining patterns for:
+    1. Standard animal model terminology (nude mice, immunodeficient strains)
+    2. Patient-derived xenograft models
+    3. Cell labeling and detection reagents (BrdU, TUNEL)
+    4. Medical imaging as computational tools
+    5. Context phrases indicating experimental usage
+    The 5 observations extracted provide valuable scientific findings about tool performance and usage.

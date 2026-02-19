@@ -1,0 +1,104 @@
+publicationMetadata:
+  pmid: "19333415"
+  title: "Drosophila melanogaster as a model organism of brain diseases."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very clear this is a review article
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review Article → Typically does not contain actual research tools used by the authors.
+    Instead, reviews discuss tools and models used by others in the field.
+    May mention:
+    - Animal models (Drosophila strains, genetic lines) - but as citations, not usage
+    - Genetic reagents (GAL4/UAS system, promoters) - but as general methodology, not specific tools
+    - Computational tools - unlikely in this type of review
+    - Clinical assessment tools - not relevant for this basic research review
+    
+    This review focuses on Drosophila as a model system for brain diseases, discussing
+    general methodological approaches rather than specific experimental tools.
+  overallAssessment: |
+    This is clearly a review article that discusses Drosophila melanogaster as a model organism
+    for studying brain diseases. Review articles typically cite and discuss research tools used
+    by others but do not report original experimental work using specific tools. The absence
+    of a Methods section and Results section confirms this is not an experimental study.
+    While the text mentions general genetic systems (GAL4/UAS) and promoters, these are
+    discussed as methodological concepts rather than specific research tools used in experiments.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "GAL4/UAS system"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "One of the most important genetic systems used in reverse genetic approaches is the GAL4/ UAS -system (see Figure 1 .). Human proteins or Drosophila proteins can be expressed in a tissue and time dependent manner in the fly"
+    whyMissed: "This is a general genetic system mentioned as methodology, not a specific experimental tool used by the authors"
+    confidence: 0.2  # Low confidence this should be considered a research tool
+    shouldBeAdded: No
+    
+  - toolName: "repo promoter"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "A large number of GAL4 driver lines including the glial promoter repo (reversed polarity) , the pan-neuronal promoter elav (embryonal lethal, abnormal vision) and the eye-specific promoter GMR (Glass Multimer Reporter) are available in Drosophila"
+    whyMissed: "Mentioned as an available tool in the field, not used experimentally by the authors"
+    confidence: 0.1  # Very low confidence - this is just a literature mention
+    shouldBeAdded: No
+    
+  - toolName: "elav promoter"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "A large number of GAL4 driver lines including the glial promoter repo (reversed polarity) , the pan-neuronal promoter elav (embryonal lethal, abnormal vision) and the eye-specific promoter GMR (Glass Multimer Reporter) are available in Drosophila"
+    whyMissed: "Mentioned as an available tool in the field, not used experimentally by the authors"
+    confidence: 0.1  # Very low confidence - this is just a literature mention
+    shouldBeAdded: No
+    
+  - toolName: "GMR promoter"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "A large number of GAL4 driver lines including the glial promoter repo (reversed polarity) , the pan-neuronal promoter elav (embryonal lethal, abnormal vision) and the eye-specific promoter GMR (Glass Multimer Reporter) are available in Drosophila"
+    whyMissed: "Mentioned as an available tool in the field, not used experimentally by the authors"
+    confidence: 0.1  # Very low confidence - this is just a literature mention
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "exclude review articles from tool mining"
+    toolType: "general"
+    examples: ["This review considers what has been gleaned from", "Taken together, as a wide variety of Drosophila models"]
+    reasoning: "Review articles discuss tools used by others but rarely report original tool usage. Mining should focus on experimental papers with Methods sections."
+    
+  - patternType: "context_phrase"
+    pattern: "distinguish between 'available in' vs 'we used'"
+    toolType: "genetic_reagent"
+    examples: ["are available in Drosophila", "can be used in order to find"]
+    reasoning: "Phrases like 'available in' or 'can be used' indicate general methodology discussion rather than specific tool usage by the authors."
+
+observations: []  # No validated tools, therefore no observations to extract
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4  # GAL4/UAS system and three promoters mentioned
+  newPatternsCount: 2  # Patterns to exclude review articles and distinguish availability vs usage
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}  # Empty since no observations
+  majorIssuesFound: |
+    - Publication is a review article, not an experimental study
+    - No Methods section present, indicating no original experimental work
+    - No Results section present, confirming this is not reporting new experiments
+    - All tool mentions are general methodology discussions or citations of others' work
+    - GAL4/UAS system and promoters mentioned as "available" tools, not tools used by authors
+  recommendations: |
+    This publication should not contribute any research tools to the database because:
+    1. It is a review article that discusses methodology rather than reporting experimental work
+    2. No Methods or Results sections indicate no original research was conducted
+    3. All genetic systems mentioned (GAL4/UAS, promoters) are discussed as general methodology available in the field
+    4. No specific experimental usage of any research tools by the authors
+    5. Mining algorithms should be updated to exclude review articles or weight them much lower
+    6. Context analysis should distinguish between "tools available in the field" vs "tools we used in our experiments"
+    
+    The mining correctly identified zero tools from this publication. The potentially missed tools
+    are actually false positives that should remain excluded because they represent general
+    methodology discussion rather than specific experimental tool usage.

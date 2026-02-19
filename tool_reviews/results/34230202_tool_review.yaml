@@ -1,0 +1,118 @@
+publicationMetadata:
+  pmid: "34230202"
+  title: "Perspective of Adults With Neurofibromatosis type 1 and Cutaneous Neurofibromas"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study that created and administered a custom survey instrument.
+    Expected tool types:
+    - Clinical assessment tools: The survey instrument itself is a clinical assessment tool for measuring
+      patient perspectives, treatment preferences, and quality of life impacts related to cutaneous neurofibromas.
+    - Possibly computational tools: May have used statistical software for survey data analysis, though not
+      explicitly mentioned in the provided text.
+    
+    Note: This publication type typically does not use lab research tools (antibodies, cell lines, animal models,
+    genetic reagents, organoids, PDX models) as it focuses on patient-reported outcomes rather than experimental research.
+  overallAssessment: |
+    This survey study would be expected to contain clinical assessment tools, specifically the custom survey
+    instrument developed by the REiNS cNF Working Group. The survey measures patient perspectives on cutaneous
+    neurofibroma burden, treatment preferences, and acceptable risk-benefit ratios - making it a valid clinical
+    assessment tool for patient-reported outcomes in NF1 research.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "REiNS cNF Working Group Survey"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "An online survey developed by multidisciplinary experts and patient representatives of the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) cNF Working Group was distributed to adults with NF1"
+    whyMissed: "The survey instrument itself is a clinical assessment tool but may not have been recognized due to lack of standardized naming or formal validation status"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Online Survey Platform"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "An online survey developed by multidisciplinary experts and patient representatives...was distributed to adults with NF1 (n = 3,734) in the largest international database"
+    whyMissed: "The specific online survey platform/software used for data collection and management is not explicitly named but would be a computational tool"
+    confidence: 0.60
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "survey developed by.*working group"
+    toolType: "clinical_assessment_tool"
+    examples: ["survey developed by multidisciplinary experts and patient representatives of the Response Evaluation in Neurofibromatosis and Schwannomatosis (REiNS) cNF Working Group"]
+    reasoning: "Custom survey instruments developed by research groups are valid clinical assessment tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "online survey.*distributed to"
+    toolType: "clinical_assessment_tool"
+    examples: ["online survey developed by multidisciplinary experts...was distributed to adults with NF1"]
+    reasoning: "Online survey distribution indicates use of a survey instrument as a clinical assessment tool"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-zA-Z]+ Working Group Survey"
+    toolType: "clinical_assessment_tool"
+    examples: ["REiNS cNF Working Group Survey"]
+    reasoning: "Working group surveys often represent specialized clinical assessment instruments for specific conditions"
+
+observations:
+  - resourceName: "REiNS cNF Working Group Survey"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # No MP ID for general comments
+    details: |
+      Survey successfully captured patient perspectives from 548 adults with NF1 regarding cutaneous neurofibroma burden.
+      Key findings include: 75% of respondents considered 33-66% reduction in cNF number/size as meaningful treatment response;
+      Most respondents (48-58%) willing to try available treatments but unaware of options beyond surgical removal;
+      >65% reported being "very much" or "extremely willing" to try experimental treatments;
+      Major barriers to clinical trial participation were cost and work time requirements.
+    foundIn: "results"
+    contextSnippet: "A total of 548 adults with NF1 responded to the survey. Respondents ranked appearance, number, and then location as the most bothersome features of raised cNF..."
+    confidence: 0.90
+    doi: "10.1212/WNL.0000000000012425"
+
+  - resourceName: "REiNS cNF Working Group Survey"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # No MP ID for usage instructions
+    details: |
+      Survey eligibility criteria: self-reported NF1 diagnosis, age ≥18 years, ≥1 cutaneous neurofibroma, 
+      and ability to read English. Survey was distributed through the largest international database of 
+      individuals with any form of NF (n = 3,734 contacted). Response rate was approximately 15% (548/3,734).
+    foundIn: "methods"
+    contextSnippet: "Eligibility criteria included self-reported NF1 diagnosis, age ≥18 years, ≥1 cNF, and ability to read English"
+    confidence: 0.95
+    doi: "10.1212/WNL.0000000000012425"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 2
+  observationsByType:
+    General Comment or Review: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - No tools were initially mined from this publication, which is partially correct but missed the survey instrument
+    - The custom survey developed by the REiNS cNF Working Group is itself a clinical assessment tool that should have been captured
+    - Mining patterns may need improvement to recognize custom survey instruments and questionnaires developed by research groups
+  recommendations: |
+    This publication represents a missed opportunity to capture a valid clinical assessment tool. The REiNS cNF Working Group Survey
+    should be added as it represents a specialized instrument for measuring patient perspectives on cutaneous neurofibromas in NF1.
+    
+    Key recommendations:
+    1. Add the REiNS cNF Working Group Survey as a clinical assessment tool
+    2. Improve mining patterns to capture custom survey instruments developed by research working groups
+    3. Consider adding patterns for "online survey" and "survey developed by" contexts
+    4. The survey instrument has clear clinical utility and should be included in the research tools database
+    
+    The observations extracted demonstrate the survey's effectiveness in capturing meaningful patient-reported outcomes
+    that can guide clinical trial design and treatment development for cutaneous neurofibromas in NF1.

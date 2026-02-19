@@ -1,0 +1,247 @@
+publicationMetadata:
+  pmid: "28644838"
+  title: "Characterization and utilization of an international neurofibromatosis web-based, patient-entered registry: An observational study."
+  queryType: "clinical"
+  publicationType: "Observational Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this observational study of a patient registry:
+    - Clinical assessment tools: Disease-specific questionnaires, quality of life measures, patient-reported outcomes
+    - Computational tools: Statistical software (R), database systems (MySQL), data analysis packages
+    - Web platforms: Registry systems, data management platforms
+    
+    This type of study typically uses validated questionnaires and surveys as clinical assessment tools,
+    plus computational tools for statistical analysis of registry data. The study involves development
+    and validation of patient-reported outcome measures, which are legitimate clinical assessment tools.
+  overallAssessment: |
+    This observational study describes the development and validation of a web-based patient registry for
+    neurofibromatosis. Such studies typically contain multiple tool types: clinical assessment tools
+    (questionnaires, surveys, outcome measures) and computational tools (statistical software, databases).
+    The study involves systematic data collection using structured questionnaires and statistical analysis,
+    making it highly likely to contain research tools despite the initial mining finding zero tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "R Statistical Environment V 3.2.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...The spreadsheets were converted to text files (comma-separated) and imported into the R Statistical Environment V 3.2.4 [ 17 ]. Tabulations were performed using the stat.table function..."
+    whyMissed: "Specific software version mentioned with usage context for statistical analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Epi package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...imported into the R Statistical Environment V 3.2.4 [ 17 ]. Tabulations were performed using the stat.table function of the Epi package [ 18 ]..."
+    whyMissed: "R package specifically used for statistical tabulations with clear usage context"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MySQL Server"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Invitae uses MySQL Server as the back-end relational database. All server requests are transmitted over SSL and use several layers of data and access protection..."
+    whyMissed: "Database system used as backend for registry platform"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF Registry questionnaires"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...The registry questionnaires [ S1 Text ] and consent language [ S2 Text ] were developed in collaboration with two clinicians...Disease-specific questionnaires captured features of current published diagnostic criteria..."
+    whyMissed: "Disease-specific questionnaires developed and validated for clinical assessment"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Quality of life questions"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Disease-specific questionnaires captured features of current published diagnostic criteria [ 12 , 13 , 14 ] and a variety of disease manifestations. They also posed quality of life questions..."
+    whyMissed: "Quality of life assessment component of the registry questionnaires"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Kruskal-Wallis test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical analyses were performed using the Kruskal-Wallis and Wilcoxon signed rank tests (for continuous variables) and ordered categorical variables..."
+    whyMissed: "Statistical test method used for data analysis"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Wilcoxon signed rank test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical analyses were performed using the Kruskal-Wallis and Wilcoxon signed rank tests (for continuous variables) and ordered categorical variables..."
+    whyMissed: "Statistical test method used for data analysis"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Chi-Square Test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical analyses were performed using the Kruskal-Wallis and Wilcoxon signed rank tests (for continuous variables) and ordered categorical variables and the Chi - Square Test (for unordered categorical variables)..."
+    whyMissed: "Statistical test method used for categorical variable analysis"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "R Statistical Environment V?\\d+\\.\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["R Statistical Environment V 3.2.4"]
+    reasoning: "Specific R version patterns with 'Statistical Environment' terminology commonly used in publications"
+
+  - patternType: "context_phrase"
+    pattern: "using the [\\w\\.]+ function of the [\\w\\s]+ package"
+    toolType: "computational_tool"
+    examples: ["using the stat.table function of the Epi package"]
+    reasoning: "R package usage patterns that indicate specific computational tools being used"
+
+  - patternType: "term"
+    pattern: "MySQL Server|PostgreSQL|Oracle Database|SQL Server"
+    toolType: "computational_tool"
+    examples: ["MySQL Server"]
+    reasoning: "Database systems used as backend infrastructure for research platforms"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaires?\\s+(?:were\\s+)?(?:developed|designed|created|administered)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaires were developed in collaboration"]
+    reasoning: "Indicates development or use of clinical assessment questionnaires"
+
+  - patternType: "term"
+    pattern: "quality of life (?:questions|measures|questionnaires|instruments)"
+    toolType: "clinical_assessment_tool"
+    examples: ["quality of life questions"]
+    reasoning: "Quality of life assessments are standard clinical assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyses were performed using|statistical analyses.*using|analyzed using"
+    toolType: "computational_tool"
+    examples: ["Statistical analyses were performed using the Kruskal-Wallis"]
+    reasoning: "Indicates usage of statistical methods and computational tools for analysis"
+
+observations:
+  - resourceName: "NF Registry questionnaires"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Disease-specific questionnaires were developed for NF1, NF2, and schwannomatosis (SCHW) in collaboration
+      with clinicians. The questionnaires captured features of current published diagnostic criteria and various
+      disease manifestations. They were piloted in 50 patients with minor modifications made based on feedback.
+      The questionnaires also included quality of life questions and were designed to support clinical trial
+      recruitment by identifying patients with specific characteristics.
+    foundIn: "methods"
+    contextSnippet: "The registry questionnaires [ S1 Text ] and consent language [ S2 Text ] were developed in collaboration with two clinicians who are co-authors of this paper (BK, DV). The questionnaires were piloted in 50 patients and minor modifications were made."
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0178639"
+
+  - resourceName: "R Statistical Environment V 3.2.4"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R Statistical Environment V 3.2.4 was used for comprehensive statistical analysis of registry data.
+      Data was imported from Excel spreadsheets converted to comma-separated text files. Statistical analyses
+      included Kruskal-Wallis and Wilcoxon signed rank tests for continuous variables, and Chi-Square tests
+      for categorical variables. The Epi package was specifically used for tabulations via the stat.table function.
+      A p-value threshold of <0.05 was used for statistical significance without adjustment for multiple comparisons.
+    foundIn: "methods"
+    contextSnippet: "The spreadsheets were converted to text files (comma-separated) and imported into the R Statistical Environment V 3.2.4 [ 17 ]. Tabulations were performed using the stat.table function of the Epi package [ 18 ]."
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0178639"
+
+  - resourceName: "MySQL Server"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      MySQL Server served as the back-end relational database for the NF Registry platform maintained by Invitae.
+      The system implemented multiple security layers including SSL transmission, password authentication,
+      role-based access controls, firewall protection, and redundant storage with nightly backups retained
+      for 30 days and monthly backups stored for 1 year. The database design separated participant identifying
+      information from medical information for enhanced privacy protection.
+    foundIn: "methods"
+    contextSnippet: "Invitae uses MySQL Server as the back-end relational database. All server requests are transmitted over SSL and use several layers of data and access protection, with a dedicated, managed Cisco router firewall"
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0178639"
+
+  - resourceName: "NF Registry questionnaires"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The registry successfully enrolled 4,680 participants who met diagnostic criteria, with NF1 representing 86%,
+      NF2 12%, and SCHW 2% of registrants. Patient-reported symptom incidences were found to be congruent with
+      published clinician-sourced data, validating the reliability of patient-entered data for clinical trial
+      recruitment purposes. The registry supported recruitment for 18 studies between 2013-2016, including
+      12 observational and 6 interventional studies.
+    foundIn: "results"
+    contextSnippet: "The analyses support our hypothesis that patient-reported symptom incidences in the NF Registry are congruent with published clinician-sourced data."
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0178639"
+
+  - resourceName: "Quality of life questions"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Quality of life questions were integrated into the disease-specific questionnaires and proved valuable
+      for patient-reported outcomes research. The registry was particularly useful for observational trials
+      focused on development of patient-reported outcomes measures. Multiple studies recruited through the
+      registry specifically targeted quality of life assessments and survey development for NF patients
+      and family members.
+    foundIn: "results"
+    contextSnippet: "Between April 26, 2013 and July 8, 2016, the registry has been useful to investigators in recruitment, particularly for observational trials, especially those for development of patient-reported outcomes."
+    confidence: 0.85
+    doi: "10.1371/journal.pone.0178639"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 2
+  majorIssuesFound: |
+    - Initial mining completely missed multiple legitimate research tools despite clear usage context
+    - Clinical assessment tools (questionnaires, quality of life measures) were not detected
+    - Computational tools (R, MySQL, statistical packages) with explicit version numbers were missed
+    - Statistical methods mentioned with clear usage context were not captured
+    - This represents a significant gap in mining sensitivity for observational studies
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by initial mining:
+    
+    DEFINITELY ADD:
+    - R Statistical Environment V 3.2.4 (computational tool with clear usage)
+    - Epi package (R package for statistical analysis)
+    - MySQL Server (database system for registry backend)
+    - NF Registry questionnaires (clinical assessment tool - disease-specific)
+    - Quality of life questions (clinical assessment tool component)
+    
+    CONSIDER ADDING:
+    - Statistical test methods (Kruskal-Wallis, Wilcoxon, Chi-Square) if mining includes statistical methods
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Better detection of R software with version numbers
+    - Recognition of clinical questionnaires and surveys as assessment tools
+    - Database systems used in research infrastructure
+    - Quality of life measures and patient-reported outcomes
+    - Statistical analysis methods and packages
+    
+    OBSERVATIONS:
+    - Extracted 5 high-quality observations about tool usage, validation, and performance
+    - Focus on practical implementation details and research utility
+    - Good coverage of both technical specifications and research outcomes
+    
+    This case demonstrates the need for improved mining patterns for observational studies and clinical research tools.

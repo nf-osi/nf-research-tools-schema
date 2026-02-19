@@ -1,0 +1,196 @@
+publicationMetadata:
+  pmid: "25557241"
+  title: "Outcomes of preimplantation genetic diagnosis in neurofibromatosis type 1."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95  # High confidence - clear clinical research design
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Clinical Study with extensive genetic testing methodology):
+    - Computational tools → Statistical software, bioinformatics tools for genetic analysis
+    - Genetic reagents → PCR reagents, molecular markers, sequencing techniques
+    - Clinical assessment tools → Diagnostic criteria, outcome measures for NF1
+    
+    This is a retrospective clinical study examining preimplantation genetic diagnosis (PGD) outcomes.
+    The extensive Methods section describes molecular techniques, statistical analyses, and clinical
+    assessments that would typically involve multiple research tools across categories.
+  overallAssessment: |
+    This clinical research study would typically use multiple research tools including computational
+    tools for statistical analysis and genetic data processing, genetic reagents for molecular
+    testing procedures, and clinical assessment tools for NF1 diagnosis and outcome evaluation.
+    The extensive methodology suggests significant tool usage that was not captured in mining.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "R version 4.3.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analyses were performed using R version 4.3.1. Correction for multiple testing was applied."
+    whyMissed: "Statistical software with version number not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Fisher's exact test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A Fisher's exact test was performed to assess the association between the occurrence of deletions as well as specific SNVs, and mosaicism."
+    whyMissed: "Statistical test method not recognized as computational tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "PCR (polymerase chain reaction)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The employed strategies by the centers were multiplex PCR (polymerase chain reaction)-based PGT using short tandem repeat markers"
+    whyMissed: "Common molecular technique not captured as genetic reagent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Short tandem repeat (STR) markers"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "PCR-based PGT employed multiple short tandem repeat (STR) markers in or flanking NF1"
+    whyMissed: "Molecular markers not recognized in mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SNP array (HumanKaryomap-12 Beadchips)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "SNP array analysis was carried out using HumanKaryomap-12 Beadchips according to the manufacturer's protocol (Illumina, San Diego, CA, USA)"
+    whyMissed: "Specific array platform with vendor information not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Bluefuse software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "data were analyzed with the Bluefuse software"
+    whyMissed: "Specialized analysis software not in mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "REPLI-g (Qiagen)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "After Whole Genome Amplification (WGA) of a trophectoderm biopsy (REPLI-g, Qiagen)"
+    whyMissed: "Commercial reagent kit with vendor/catalog info not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "OnePGT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "NGS-based genome-wide haplotyping (OnePGT) was applied in Maastricht University Medical Center"
+    whyMissed: "Specialized NGS analysis platform not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "National Institutes of Health diagnostic criteria for NF1"
+    toolType: "clinical_assessment_tool"
+    foundIn: "introduction"
+    contextSnippet: "Neurofibromatosis type 1 (NF1, OMIM No. 162200) is a neurocutaneous disorder characterized by café-au-lait macules, freckling, neurofibromas"
+    whyMissed: "Standardized diagnostic criteria not captured as clinical assessment tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ACMG/AMP classification system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Newly described variants (n = 76) were scored using the American College of Medical Genetics and Genomics (ACMG) and the Association for Molecular Pathology (AMP) classification system"
+    whyMissed: "Variant classification system not recognized as clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ESHRE guidelines"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "All PGT assays were designed and validated according to local protocols and ESHRE guidelines"
+    whyMissed: "Clinical practice guidelines not captured as assessment tools"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Leiden Open Variation Database (LOVD)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "submitted prior to publication in the Leiden Open Variation Database (LOVD)"
+    whyMissed: "Specialized genetic variant database not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "R version [0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["R version 4.3.1"]
+    reasoning: "Statistical software R with version numbers commonly used in clinical research"
+
+  - patternType: "term"
+    pattern: "Fisher's exact test|Chi-square test|t-test|ANOVA"
+    toolType: "computational_tool"
+    examples: ["Fisher's exact test"]
+    reasoning: "Statistical tests are computational methods that should be captured as tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed with|processed using|performed using|carried out using"
+    toolType: "general"
+    examples: ["data were analyzed with the Bluefuse software"]
+    reasoning: "Context phrases indicating tool usage that could improve capture"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+,\\s*[A-Za-z\\s,]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["(Illumina, San Diego, CA, USA)", "(Qiagen)"]
+    reasoning: "Vendor information in parentheses often indicates commercial reagents/kits"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}[0-9]+ guidelines|[A-Z]{2,}/[A-Z]{2,} classification"
+    toolType: "clinical_assessment_tool"
+    examples: ["ESHRE guidelines", "ACMG/AMP classification system"]
+    reasoning: "Professional organization guidelines and classification systems are clinical tools"
+
+  - patternType: "term"
+    pattern: "diagnostic criteria|classification system|guidelines"
+    toolType: "clinical_assessment_tool"
+    examples: ["National Institutes of Health diagnostic criteria for NF1"]
+    reasoning: "Standardized diagnostic and classification tools used in clinical practice"
+
+  - patternType: "term"
+    pattern: "PCR|polymerase chain reaction|STR markers|SNP array"
+    toolType: "genetic_reagent"
+    examples: ["short tandem repeat (STR) markers", "SNP array"]
+    reasoning: "Common molecular biology techniques and reagents"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12  # Number of tools that might have been missed
+  newPatternsCount: 7  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations since no validated tools
+  majorIssuesFound: |
+    Major issues identified during review:
+    - No tools were mined from this publication despite extensive methodology describing multiple research tools
+    - Publication contains detailed Methods section with clear tool usage across multiple categories
+    - Mining system failed to capture computational tools (R, statistical tests, specialized software)
+    - Genetic reagents and molecular techniques not recognized (PCR, STR markers, commercial kits)
+    - Clinical assessment tools missed (diagnostic criteria, classification systems, guidelines)
+    - This represents a significant failure of the mining system for clinical research publications
+  recommendations: |
+    Strong recommendations for this publication:
+    - All 12 potentially missed tools should be added to the database
+    - This publication demonstrates major gaps in mining patterns for clinical research
+    - Mining system needs enhancement for:
+      * Statistical software and methods (R, Fisher's exact test, etc.)
+      * Molecular biology reagents and techniques (PCR, STR markers, commercial kits)
+      * Clinical assessment tools (diagnostic criteria, classification systems)
+      * Specialized bioinformatics databases and software
+    - Suggested patterns should be implemented to improve future mining accuracy
+    - This publication type (clinical genetic research) requires specialized mining approaches
+    - Consider manual curation for similar high-methodology clinical publications

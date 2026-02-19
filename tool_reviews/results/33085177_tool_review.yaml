@@ -1,0 +1,216 @@
+publicationMetadata:
+  pmid: "33085177"
+  title: "The development of the PlexiQoL: A patient-reported outcome measure for adults with neurofibromatosis type 1-associated plexiform neurofibromas."
+  queryType: "clinical"  # From PubMed query (hint only)
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95  # Very clear this is questionnaire development
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire/survey development study, which typically contains:
+    - Clinical assessment tools (the PlexiQoL being developed, plus comparator measures)
+    - Computational tools (statistical software for psychometric analysis)
+    
+    The study develops the PlexiQoL questionnaire and uses established comparator measures
+    (Nottingham Health Profile, SF-36) for validation. Statistical analysis software
+    (RUMM2030 for Rasch analysis) is also used. This type of study commonly contains
+    multiple clinical assessment tools and computational analysis tools.
+  overallAssessment: |
+    This publication is a classic questionnaire development and validation study that would
+    be expected to contain multiple research tools. The primary tool being developed is the
+    PlexiQoL questionnaire itself. Additionally, established clinical assessment tools are
+    used as comparators (NHP, SF-36), and computational tools are used for statistical
+    analysis (RUMM2030, Rasch analysis). The mining appears to have missed several legitimate
+    clinical assessment tools and computational tools that are clearly described in the methods.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "PlexiQoL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The development of the PlexiQoL: A patient-reported outcome measure for adults with neurofibromatosis type 1-associated plexiform neurofibromas...The PlexiQoL is the first disease-specific PRO assessing the ability of adults with NF-1 associated pNFs to meet their basic human needs."
+    whyMissed: "This is the primary clinical assessment tool being developed in this study - a patient-reported outcome measure specifically for NF1 patients with plexiform neurofibromas"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Nottingham Health Profile"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The comparator measure used in the UK was the Nottingham Health Profile (NHP; Hunt et al., 1981)...The NHP comprises six sections; energy level, pain, physical mobility, sleep, social isolation, and emotional reactions."
+    whyMissed: "This is an established clinical assessment tool used as a comparator measure in the validation study"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Short Form-36"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "the Short Form‐36 (SF‐36; Ware & Sherbourne, 1992) was used in the US. These are generic measures of subjective health status (HRQL). The SF‐36 consists of 36 items, covering eight sections."
+    whyMissed: "This is an established clinical assessment tool (SF-36) used as a comparator measure in the US portion of the validation study"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "RUMM2030"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Rasch analysis was conducted using the RUMM2030 programme (Andrich et al., 2010)."
+    whyMissed: "This is specialized statistical software for Rasch Measurement Theory analysis, clearly identified with version and citation"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Skindex"
+    toolType: "clinical_assessment_tool"
+    foundIn: "introduction"
+    contextSnippet: "Clinical studies of NF1 have used the SF‐36 (Ware & Sherbourne, 1992) and the Skindex (Chrsen et al., 1996). As these are generic HRQL measures..."
+    whyMissed: "This is a clinical assessment tool mentioned as being used in previous NF1 studies, though not used in this particular study"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PlexiQoL"
+    toolType: "clinical_assessment_tool"
+    examples: ["PlexiQoL", "the PlexiQoL"]
+    reasoning: "The primary outcome measure being developed should be captured as a clinical assessment tool"
+
+  - patternType: "term"
+    pattern: "Nottingham Health Profile|NHP"
+    toolType: "clinical_assessment_tool"
+    examples: ["Nottingham Health Profile (NHP)", "NHP"]
+    reasoning: "Well-established health-related quality of life questionnaire used as comparator"
+
+  - patternType: "term"
+    pattern: "Short Form-36|SF-36|SF‐36"
+    toolType: "clinical_assessment_tool"
+    examples: ["Short Form‐36 (SF‐36)", "SF‐36"]
+    reasoning: "Widely used health survey instrument, should be captured when used as assessment tool"
+
+  - patternType: "term"
+    pattern: "RUMM2030"
+    toolType: "computational_tool"
+    examples: ["RUMM2030 programme"]
+    reasoning: "Specialized software for Rasch analysis, clearly identified with citation"
+
+  - patternType: "context_phrase"
+    pattern: "patient-reported outcome measure|PRO measure|questionnaire.*developed|scale.*developed"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient-reported outcome measure", "PRO measure"]
+    reasoning: "Phrases that indicate development or use of clinical assessment instruments"
+
+  - patternType: "context_phrase"
+    pattern: "comparator measure|validation.*using|assessed using.*questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["comparator measure used", "validation survey"]
+    reasoning: "Context phrases that indicate use of established assessment tools for validation"
+
+observations:
+  - resourceName: "PlexiQoL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      The PlexiQoL consists of 18 dichotomous items (True/Not True response format) and can be 
+      completed in fewer than 5 minutes. The questionnaire uses patients' own words wherever 
+      possible and asks respondents to base responses on how they feel "at the moment" (UK) or 
+      "at the present time" (US). Items are presented in pen and paper format.
+    foundIn: "results"
+    contextSnippet: "The measure consists of 18 dichotomous items and can be completed in fewer than five minutes. This allows for easy administration, completion and scoring."
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+  - resourceName: "PlexiQoL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for general comments
+    details: |
+      The PlexiQoL demonstrated excellent psychometric properties including: internal consistency 
+      (Cronbach's α = 0.90), test-retest reliability (0.90), unidimensionality (fits Rasch model), 
+      and sensitivity to differences in patient-perceived pNF severity, general health, and pain 
+      medication use. The measure showed minimal floor and ceiling effects (7.3% and 2.1% respectively).
+    foundIn: "results"
+    contextSnippet: "Cronbach's α coefficients for the PlexiQoL were 0.90 at both time points...Test‐retest reliability was 0.90, demonstrating excellent reproducibility"
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+  - resourceName: "PlexiQoL"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for general comments
+    details: |
+      The PlexiQoL successfully distinguished between groups differing in perceived general health, 
+      perceived pNF severity, and use of pain medication (all p < 0.01). No significant differences 
+      were found between groups based on age, gender, or country, indicating absence of bias and 
+      cross-cultural validity.
+    foundIn: "results"
+    contextSnippet: "Significant differences (p < 0.01) in PlexiQoL scores were observed for patients grouped by perceived general health, perceived pNF severity and use of pain medication"
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+  - resourceName: "Nottingham Health Profile"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for general comments
+    details: |
+      The NHP showed large end effects (floor and ceiling effects) in this NF1 population, 
+      indicating poor targeting to this specific patient sample. For example, 31.3% scored 
+      minimum on energy level and 25.9% scored maximum. This suggests the NHP subscales are 
+      not well-suited for measuring health status in NF1 patients with plexiform neurofibromas.
+    foundIn: "results"
+    contextSnippet: "Large end effects were observed for several NHP and SF‐36 sections. This indicates that the subscales are not well targeted to this sample."
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+  - resourceName: "Short Form-36"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""  # Not applicable for general comments
+    details: |
+      The SF-36 showed inconsistent results with some section scores appearing unexpectedly high, 
+      suggesting limited effect of pNFs on health status. For "role limitations due to emotional 
+      problems," the median score was 100 with 59% of respondents indicating no problems. Large 
+      end effects were observed, indicating poor targeting to this patient population.
+    foundIn: "results"
+    contextSnippet: "Some section scores on the SF‐36 appear high, suggesting that pNFs have a limited effect on health status...Large end effects were observed for several NHP and SF‐36 sections."
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+  - resourceName: "RUMM2030"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""  # Not applicable for usage instructions
+    details: |
+      RUMM2030 software was used to conduct Rasch Measurement Theory analysis for scale reduction 
+      and psychometric evaluation. The software assessed unidimensionality, item fit statistics, 
+      differential item functioning (DIF), and local item dependency. Analysis included evaluation 
+      of person-item distribution graphs and overall fit statistics.
+    foundIn: "methods"
+    contextSnippet: "Rasch analysis was conducted using the RUMM2030 programme (Andrich et al., 2010)."
+    confidence: 1.0
+    doi: "10.1002/mgg3.1530"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # PlexiQoL, NHP, SF-36, RUMM2030, Skindex
+  newPatternsCount: 6  # Various patterns for clinical assessment tools and computational tools
+  observationsExtracted: 6  # Multiple observations about tool performance and characteristics
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 4
+  majorIssuesFound: |
+    - Complete failure to detect any tools despite this being a clear questionnaire development study
+    - Missed the primary tool being developed (PlexiQoL)
+    - Missed established clinical assessment tools used as comparators (NHP, SF-36)
+    - Missed computational tool used for statistical analysis (RUMM2030)
+    - Mining patterns appear inadequate for clinical assessment tool detection
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by 
+    the mining process. The PlexiQoL (primary tool being developed), NHP and SF-36 (comparator 
+    clinical assessment tools), and RUMM2030 (computational analysis tool) should all be added.
+    The mining patterns need significant improvement for clinical assessment tool detection,
+    particularly for questionnaire development studies. Patterns should include terms like
+    "patient-reported outcome," "questionnaire," "scale," "measure," and software names used
+    for psychometric analysis. The observations extracted demonstrate the scientific value and
+    performance characteristics of these tools in the NF1 population.

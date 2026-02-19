@@ -1,0 +1,209 @@
+publicationMetadata:
+  pmid: "38086517"
+  title: "Noninvasive treatment of cutaneous neurofibromas (cNFs): Results of a randomized prospective, direct comparison of four methods"
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools for measuring pain, clinical responses, quality of life
+    Also computational tools for 3D photography analysis and statistical analysis
+    Medical devices/imaging tools for treatment delivery and outcome assessment
+    
+    This is a randomized prospective clinical trial comparing treatment methods, so it should contain:
+    - Clinical assessment tools for measuring outcomes (pain scales, response measures)
+    - Imaging/measurement devices (3D photography, ultrasound)
+    - Treatment devices (lasers, RF equipment)
+    - Statistical analysis software
+  overallAssessment: |
+    This is a randomized prospective clinical trial comparing four treatment methods for cutaneous neurofibromas.
+    Clinical trials typically use validated assessment tools to measure outcomes, imaging devices for monitoring,
+    and statistical software for analysis. The study mentions pain assessment, clinical response evaluation,
+    3D photography for volume measurements, and dermoscopy-guided high-frequency ultrasound imaging.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "3D photography"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Regional pain, clinical responses, tumor height and volume (by 3D photography) were assessed before, 3 and 6 months post-treatment"
+    whyMissed: "3D photography system used for objective tumor volume measurement - this is a clinical assessment/measurement tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Dermus SkinScanner"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "measurements were performed at the Department of Dermatology, Venereology and Dermatooncology, Semmelweis University, using a portable DG-HFUS device (Dermus SkinScanner, Dermus Ltd., Budapest, Hungary)"
+    whyMissed: "Specific medical device with manufacturer details used for clinical assessment and measurement"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SkinAid cloud software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Recorded images were analyzed in SkinAid cloud software, stored under patient ID with demographic and lesion details"
+    whyMissed: "Software used for image analysis and data management in the study"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "radiofrequency (RF) needle coagulation"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Safety, tolerability, and efficacy of 4 different treatments were compared in 309, 2-4 mm cNFs across 19 adults with Fitzpatrick skin types (FST) I-IV: radiofrequency (RF) needle coagulation"
+    whyMissed: "Medical treatment device used in the clinical trial - this is a therapeutic tool/device"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "755 nm alexandrite laser"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "755 nm alexandrite laser with suction, 980 nm diode laser, and intratumoral injection of 10 mg/mL deoxycholate"
+    whyMissed: "Specific laser device used as treatment modality in the clinical trial"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "980 nm diode laser"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "755 nm alexandrite laser with suction, 980 nm diode laser, and intratumoral injection of 10 mg/mL deoxycholate"
+    whyMissed: "Specific laser device used as treatment modality in the clinical trial"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "Fitzpatrick skin types (FST)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Safety, tolerability, and efficacy of 4 different treatments were compared in 309, 2-4 mm cNFs across 19 adults with Fitzpatrick skin types (FST) I-IV"
+    whyMissed: "Standardized clinical classification system used for patient assessment"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "3D photography|three-dimensional photography"
+    toolType: "clinical_assessment_tool"
+    examples: ["tumor height and volume (by 3D photography)"]
+    reasoning: "3D photography systems are used for objective clinical measurements and should be captured as assessment tools"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+, [A-Z][a-zA-Z]+ Ltd\\.|\\b[A-Z][a-zA-Z]+ [A-Z][a-zA-Z]+, [A-Z][a-zA-Z]+ Inc\\."
+    toolType: "general"
+    examples: ["Dermus SkinScanner, Dermus Ltd., Budapest, Hungary"]
+    reasoning: "Medical devices with specific manufacturer information should be captured as tools"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed in \\w+ software|processed with \\w+ software|using \\w+ software"
+    toolType: "computational_tool"
+    examples: ["analyzed in SkinAid cloud software"]
+    reasoning: "Software tools used for data analysis should be captured"
+
+  - patternType: "term"
+    pattern: "Fitzpatrick skin type|FST|skin phototype"
+    toolType: "clinical_assessment_tool"
+    examples: ["Fitzpatrick skin types (FST) I-IV"]
+    reasoning: "Standardized clinical classification systems are assessment tools"
+
+  - patternType: "term"
+    pattern: "\\d+\\s*nm\\s+(laser|diode|alexandrite)"
+    toolType: "clinical_assessment_tool"
+    examples: ["755 nm alexandrite laser", "980 nm diode laser"]
+    reasoning: "Specific laser devices with wavelengths are medical treatment tools"
+
+observations:
+  - resourceName: "3D photography"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      3D photography was used to measure tumor height and volume before treatment and at 3 and 6 months post-treatment.
+      This provided objective quantitative assessment of treatment efficacy by measuring dimensional changes in cutaneous neurofibromas.
+      The method allowed for standardized, reproducible measurements across different treatment modalities.
+    foundIn: "results"
+    contextSnippet: "Regional pain, clinical responses, tumor height and volume (by 3D photography) were assessed before, 3 and 6 months post-treatment"
+    confidence: 0.85
+    doi: "https://doi.org/10.1016/j.jaad.2023.11.058"
+
+  - resourceName: "Dermus SkinScanner"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Dermus SkinScanner (DG-HFUS device) provided eight objective imaging parameters for neurofibroma assessment:
+      size, location, shape, contours, surface, echogenicity, global echogenicity, and posterior acoustic features.
+      The device combines dermoscopic and HFUS imaging (33 MHz, range 20-40 MHz) with 2-second acquisition time.
+      It enables precise lesion localization and enhances diagnostic accuracy and reproducibility.
+    foundIn: "both"
+    contextSnippet: "DG-HFUS is a valuable, non-invasive tool for assessing cutaneous and subcutaneous neurofibromas, providing eight objective imaging parameters"
+    confidence: 0.90
+    doi: "https://doi.org/10.1016/j.jaad.2023.11.058"
+
+  - resourceName: "Dermus SkinScanner"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      Study found that 79% of lesions were cutaneous neurofibromas and 21% were subcutaneous using DG-HFUS.
+      All lesions were hypoechoic; 62% had homogeneous echotexture, 38% were heterogeneous.
+      Margins were well-defined in 57% and poorly defined in 43%. Surface elevation was present in 58% of lesions.
+      Mean maximum vertical and lateral diameters were 5.37 ± 2.66 mm and 2.28 ± 1.39 mm, respectively.
+    foundIn: "results"
+    contextSnippet: "DG-HFUS revealed that 79% of lesions were cutaneous neurofibromas and 21% were subcutaneous. All lesions were hypoechoic; 62% had a homogeneous echotexture"
+    confidence: 0.85
+    doi: "https://doi.org/10.1016/j.jaad.2023.11.058"
+
+  - resourceName: "SkinAid cloud software"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      SkinAid cloud software was used to analyze recorded dermoscopic and ultrasound images.
+      The software stored images under patient ID with demographic and lesion details.
+      It facilitated systematic analysis of DG-HFUS assessments including size, location, shape, contours,
+      surface, echogenicity, global echogenicity, and posterior acoustic features.
+    foundIn: "methods"
+    contextSnippet: "Recorded images were analyzed in SkinAid cloud software, stored under patient ID with demographic and lesion details"
+    confidence: 0.80
+    doi: "https://doi.org/10.1016/j.jaad.2023.11.058"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite it being a clinical trial with clear tool usage
+    - Multiple clinical assessment tools and computational tools were missed during initial mining
+    - The publication contains specific medical devices with manufacturer details that should have been captured
+    - Treatment devices (lasers, RF equipment) used in the clinical trial were not identified
+    - 3D photography system used for objective measurements was missed
+    - Image analysis software was not captured
+  recommendations: |
+    This publication should have had multiple tools identified during mining. The following tools should be added:
+    - 3D photography system (clinical assessment tool for objective measurements)
+    - Dermus SkinScanner (clinical assessment/imaging device with specific manufacturer)
+    - SkinAid cloud software (computational tool for image analysis)
+    
+    Consider adding treatment devices as tools:
+    - RF needle coagulation device
+    - 755 nm alexandrite laser
+    - 980 nm diode laser
+    - Fitzpatrick skin type classification system
+    
+    The mining patterns need improvement to capture:
+    - Medical devices with manufacturer information
+    - 3D imaging/photography systems
+    - Clinical measurement tools
+    - Laser treatment devices with specific wavelengths
+    - Standardized clinical classification systems
+    
+    Four scientific observations were extracted showing how these tools were used and their performance characteristics.
+    The observations provide valuable information about tool effectiveness and usage protocols.

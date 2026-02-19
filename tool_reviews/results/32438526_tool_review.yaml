@@ -1,0 +1,233 @@
+publicationMetadata:
+  pmid: "32438526"
+  title: "Effects of Neurod1 Expression on Mouse and Human Schwannoma Cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication is clearly a laboratory research study involving:
+    - Transgenic mouse lines (animal models)
+    - Primary human cell cultures (cell lines)
+    - Adenoviral vectors (genetic reagents)
+    - Gene expression studies
+    - Cell proliferation assays
+    
+    Expected tool types: animal models, cell lines, genetic reagents, and potentially antibodies for detection/analysis.
+  overallAssessment: |
+    This is a clear laboratory research publication that extensively uses research tools including transgenic mouse models, 
+    primary cell cultures, and genetic reagents. The study involves experimental manipulation of gene expression using 
+    adenoviral vectors and assessment of cellular responses. Multiple research tools should be present and the mining 
+    system appears to have missed all of them, indicating a significant gap in tool detection for this type of publication.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "transgenic mouse lines"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Using a variety of transgenic mouse lines, we investigated how expression of Neurod1 effects medulloblastoma (MB) growth, schwannoma tumor progression"
+    whyMissed: "Generic term 'transgenic mouse lines' not caught by specific strain name patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf2-null animals"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "Deletion of the neurofibromatosis type 2 (Nf2) tumor-suppressor gene via Cre expression in SCs led to increased intraganglionic SC proliferation...Nf2-null animals"
+    whyMissed: "Nf2-null mouse model not recognized as distinct from disease gene reference"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "wild-type littermates"
+    toolType: "animal_model"
+    foundIn: "results"
+    contextSnippet: "compared to age-matched wild-type littermates. The effect of Neurod1-induced expression on intraganglionic SC proliferation"
+    whyMissed: "Control animal group not recognized as research tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "primary human vestibular schwannoma (VS) cell cultures"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Primary human vestibular schwannoma (VS) cell cultures were transduced with adenoviral vectors expressing Neurod1"
+    whyMissed: "Primary cell culture not caught by standard cell line naming patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "human schwannoma cultures"
+    toolType: "cell_line"
+    foundIn: "results"
+    contextSnippet: "Gene transfer of Neurod1 in human schwannoma cultures significantly reduced cell proliferation in dose-dependent way"
+    whyMissed: "Primary culture system not recognized by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "adenoviral vectors expressing Neurod1"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Primary human vestibular schwannoma (VS) cell cultures were transduced with adenoviral vectors expressing Neurod1"
+    whyMissed: "Viral vector construct not caught by genetic reagent patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "5-ethynyl-2'-deoxyuridine (EdU)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cell proliferation was assessed by 5-ethynyl-2'-deoxyuridine (EdU) uptake"
+    whyMissed: "Chemical reagent for proliferation assay not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cre expression"
+    toolType: "genetic_reagent"
+    foundIn: "results"
+    contextSnippet: "Deletion of the neurofibromatosis type 2 (Nf2) tumor-suppressor gene via Cre expression in SCs"
+    whyMissed: "Cre recombinase system not caught by genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "transgenic mouse lines?"
+    toolType: "animal_model"
+    examples: ["transgenic mouse lines"]
+    reasoning: "Generic term for genetically modified mouse models commonly used in research"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z0-9]+-null (animals|mice)"
+    toolType: "animal_model"
+    examples: ["Nf2-null animals"]
+    reasoning: "Gene knockout mouse nomenclature pattern (Gene-null) indicating research animal models"
+
+  - patternType: "context_phrase"
+    pattern: "primary .+ cell cultures?"
+    toolType: "cell_line"
+    examples: ["primary human vestibular schwannoma (VS) cell cultures"]
+    reasoning: "Primary cell culture systems are important research tools often missed by standard cell line patterns"
+
+  - patternType: "term"
+    pattern: "adenoviral vectors?"
+    toolType: "genetic_reagent"
+    examples: ["adenoviral vectors expressing Neurod1"]
+    reasoning: "Viral vectors are common genetic reagents for gene delivery in research"
+
+  - patternType: "term"
+    pattern: "EdU|5-ethynyl-2'-deoxyuridine"
+    toolType: "genetic_reagent"
+    examples: ["5-ethynyl-2'-deoxyuridine (EdU)"]
+    reasoning: "EdU is a standard reagent for proliferation assays, should be recognized"
+
+  - patternType: "term"
+    pattern: "Cre (expression|recombinase)"
+    toolType: "genetic_reagent"
+    examples: ["Cre expression"]
+    reasoning: "Cre recombinase system is fundamental genetic tool for conditional knockouts"
+
+  - patternType: "context_phrase"
+    pattern: "wild-type littermates?"
+    toolType: "animal_model"
+    examples: ["wild-type littermates"]
+    reasoning: "Control animal groups are essential research tools that should be captured"
+
+observations:
+  - resourceName: "Nf2-null animals"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Deletion of the Nf2 tumor-suppressor gene via Cre expression in Schwann cells led to increased 
+      intraganglionic Schwann cell proliferation compared to age-matched wild-type littermates. This 
+      demonstrates the cellular phenotype of increased proliferation in Nf2-deficient Schwann cells.
+    foundIn: "results"
+    contextSnippet: "Deletion of the neurofibromatosis type 2 (Nf2) tumor-suppressor gene via Cre expression in SCs led to increased intraganglionic SC proliferation"
+    confidence: 0.95
+    doi: "10.1002/lary.28671"
+
+  - resourceName: "Nf2-null animals"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003633"
+    details: |
+      Nf2-null animals showed mildly reduced vestibular sensory-evoked potentials (VsEP) responses 
+      compared to age-matched wild-type littermates, indicating impaired vestibular function as a 
+      result of Nf2 deletion.
+    foundIn: "results"
+    contextSnippet: "mildly reduced vestibular sensory-evoked potentials (VsEP) responses compared to age-matched wild-type littermates"
+    confidence: 0.9
+    doi: "10.1002/lary.28671"
+
+  - resourceName: "primary human vestibular schwannoma (VS) cell cultures"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Gene transfer of Neurod1 in human schwannoma cultures significantly reduced cell proliferation 
+      in a dose-dependent manner, demonstrating the anti-proliferative effect of Neurod1 expression 
+      in human schwannoma cells.
+    foundIn: "results"
+    contextSnippet: "Gene transfer of Neurod1 in human schwannoma cultures significantly reduced cell proliferation in dose dependent way"
+    confidence: 0.95
+    doi: "10.1002/lary.28671"
+
+  - resourceName: "wild-type littermates"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Sciatic nerve axotomy significantly increased Schwann cell proliferation in wild-type animals, 
+      and expression of Neurod1 reduced the proliferative capacity of wild-type Schwann cells 
+      following nerve injury.
+    foundIn: "results"
+    contextSnippet: "Sciatic nerve axotomy significantly increased SC proliferation in wild-type and Nf2-null animals, and expression of Neurod1 reduced the proliferative capacity of both wild-type and Nf2-null SCs"
+    confidence: 0.9
+    doi: "10.1002/lary.28671"
+
+  - resourceName: "transgenic mouse lines"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Expression of Neurod1 reduced the growth of slow-growing but not fast-growing medulloblastoma 
+      models, indicating differential effects of Neurod1 on tumor progression depending on the 
+      growth characteristics of the tumor model.
+    foundIn: "results"
+    contextSnippet: "Expression of Neurod1 reduced the growth of slow-growing but not fast-growing MB models"
+    confidence: 0.85
+    doi: "10.1002/lary.28671"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 7
+  observationsExtracted: 5
+  observationsByType:
+    Cellular: 3
+    Nervous System: 1
+    Tumor Growth: 1
+  majorIssuesFound: |
+    - Complete failure of mining system to detect any tools in a clear lab research publication
+    - Multiple animal models (transgenic lines, Nf2-null mice, wild-type controls) completely missed
+    - Primary cell culture systems not recognized
+    - Genetic reagents (adenoviral vectors, EdU, Cre system) not detected
+    - Mining patterns appear inadequate for this type of neuroscience/cancer research publication
+  recommendations: |
+    This publication represents a complete mining failure - 8 clear research tools were missed while 0 were detected.
+    The study uses multiple transgenic mouse models, primary cell cultures, and genetic reagents that are fundamental
+    research tools. The mining system needs significant improvement in:
+    1. Recognizing generic terms like "transgenic mouse lines" as animal models
+    2. Distinguishing gene knockout models (Nf2-null) from disease gene references
+    3. Detecting primary cell culture systems as research tools
+    4. Identifying viral vectors and genetic reagents (EdU, Cre system)
+    5. Recognizing control animal groups (wild-type littermates) as research tools
+    
+    All 8 missed tools should be added to improve coverage. The suggested patterns would significantly
+    improve detection of similar tools in neuroscience and cancer research publications. Five high-quality
+    scientific observations were extracted showing cellular proliferation effects, nervous system phenotypes,
+    and tumor growth characteristics across multiple validated research tools.

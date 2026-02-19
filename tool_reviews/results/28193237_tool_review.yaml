@@ -1,0 +1,165 @@
+publicationMetadata:
+  pmid: "28193237"
+  title: "Evaluation of quality of life in adults with neurofibromatosis 1 (NF1) using the Impact of NF1 on Quality Of Life (INF1-QOL) questionnaire."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Questionnaire/Survey Development):
+    - Clinical assessment tools (questionnaires, scales, outcome measures) - PRIMARY EXPECTED
+    - Computational tools for statistical analysis - SECONDARY (analysis software)
+    
+    This study develops and validates the INF1-QOL questionnaire and uses EuroQol for validation.
+    Clinical assessment tools are the primary focus, with statistical analysis tools as secondary.
+    No lab research tools (antibodies, cell lines, animal models) are expected in this type of study.
+  overallAssessment: |
+    This is a questionnaire development and validation study that should contain clinical assessment tools.
+    The study develops the INF1-QOL questionnaire and validates it against EuroQol, representing genuine
+    clinical assessment tools. Statistical analysis methods are mentioned but represent analytical approaches
+    rather than discrete research tools. This publication type typically contains validated clinical instruments.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "INF1-QOL questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Impact of NF1 on Quality of Life (INF1-QOL) questionnaire was developed by a literature search for common terms, focus group (n = 6), semi-structured interviews (n = 21), initial drafts (n =50) and final 14 item questionnaire (n = 50)"
+    whyMissed: "Primary tool being developed in this study - should be the main focus of clinical assessment tool mining"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "EuroQol (EQ-5D)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The EuroQol questionnaires were completed by the 50 NF1 participants who did the final 14 item INF1-QOL questionnaire. The EuroQol (EQ 5D) contains a global health score and covers Mobility, Self-care, Usual Activities, Pain/Discomfort, Anxiety and Depression"
+    whyMissed: "Well-established generic quality of life questionnaire used for validation - standard clinical assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Riccardi NF severity grade classification"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Disease severity was determined using the Riccardi NF severity grade classification 1 to 4. Grades 1 and 2 were amalgamated to ensure adequate numbers in each group. Grades 1 and 2 were deemed mild, grade 3 moderate and grade 4 severe"
+    whyMissed: "Clinical severity assessment scale used to grade NF1 disease severity - validated clinical tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["INF1-QOL questionnaire", "EuroQol questionnaire"]
+    reasoning: "Many clinical assessment tools are questionnaires - this is a fundamental term that should trigger clinical tool detection"
+
+  - patternType: "context_phrase"
+    pattern: "was developed by|questionnaire was developed|scale was developed"
+    toolType: "clinical_assessment_tool"
+    examples: ["The Impact of NF1 on Quality of Life (INF1-QOL) questionnaire was developed by"]
+    reasoning: "Development context phrases strongly indicate tool creation, especially for clinical assessment instruments"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-[A-Z]{2,}|[A-Z]+[0-9]+-[A-Z]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["INF1-QOL", "EQ-5D"]
+    reasoning: "Clinical assessment tools often use abbreviated naming conventions with hyphens and alphanumeric codes"
+
+  - patternType: "context_phrase"
+    pattern: "severity grade|severity classification|severity scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Riccardi NF severity grade classification"]
+    reasoning: "Clinical severity grading systems are validated assessment tools used in clinical practice and research"
+
+  - patternType: "context_phrase"
+    pattern: "completed by|administered to|scored using"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaires were completed by the 50 NF1 participants"]
+    reasoning: "Administration context phrases indicate actual usage of clinical assessment tools"
+
+observations:
+  - resourceName: "INF1-QOL questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      INF1-QOL showed good internal reliability (Cronbach's alpha 0.87) and was easy and quick to complete within ten minutes.
+      The questionnaire comprises 14 items rated from zero to three, with maximum potential score of 42 where highest score denotes worst function.
+      Mean total INF1-QOL score was 8.64 (SD 6.3), median 7.00, range 0-30. No significant correlations with age or gender were found.
+    foundIn: "results"
+    contextSnippet: "INF1-QOL showed good internal reliability (Cronbach's alpha 0.87), mean total INF1-QOL score was 8.64 (SD 6.3), median 7.00, range 0-30 (possible range 0-42); no significant correlations with age or gender"
+    confidence: 0.95
+    doi: "10.1186/s12955-017-0607-y"
+
+  - resourceName: "INF1-QOL questionnaire"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The highest impact on quality of life was moderate or severe problems with anxiety and depression (32%) and negative effects of NF1 on role and outlook on life (42%).
+      INF1-QOL correlated highly with EuroQol (r = 0.82, p < 0.0001) and moderately with clinical severity (r = 0.34, p < 0.05).
+      The questionnaire covers a broad range of themes representative of NF1 manifestations and will be useful in clinical practice and clinical trials.
+    foundIn: "both"
+    contextSnippet: "The highest impact on QOL was moderate or severe problems with anxiety and depression (32%) and negative effects of NF1 on role and outlook on life (42%). Total INF1-QOL score correlated with total EuroQol r = 0.82, p < 0.0001"
+    confidence: 0.95
+    doi: "10.1186/s12955-017-0607-y"
+
+  - resourceName: "EuroQol (EQ-5D)"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      EuroQol was used for validation of INF1-QOL. Mean total EuroQol score was 7.38 (SD 2.87), median 6.5, with observed range of 5-18.
+      Mean global EuroQol score was 76.34 (SD 16.56), median 80, range of 25-100. EuroQol was quicker to complete than INF1-QOL but had narrower range of themes.
+      The questionnaire covers Mobility, Self-care, Usual Activities, Pain/Discomfort, and Anxiety and Depression.
+    foundIn: "both"
+    contextSnippet: "The mean total EuroQol score was 7.38 (SD 2.87), median 6.5, mean global EuroQol score was 76.34 (SD 16.56), median 80. Total INF1-QOL score correlated with total EuroQol r = 0.82, p < 0.0001"
+    confidence: 0.95
+    doi: "10.1186/s12955-017-0607-y"
+
+  - resourceName: "Riccardi NF severity grade classification"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Clinical severity was assessed using Riccardi NF severity grade classification (1-4 scale). Grades 1 and 2 were combined as mild, grade 3 as moderate, and grade 4 as severe.
+      Mean inter-rater reliability for grading clinical severity scores was 0.71 (range 0.65-0.79), with intra-class correlation of 0.92.
+      Mean clinical severity score was 1.95 (SD 0.65). Distribution: 17 (34%) mild, 16 (32%) moderate, 17 (34%) severe disease.
+    foundIn: "both"
+    contextSnippet: "Disease severity was determined using the Riccardi NF severity grade classification 1 to 4. The mean inter-relater reliability for grading of clinical severity scores was 0.71 (range 0.65-0.79), and intra-class correlation was 0.92"
+    confidence: 0.90
+    doi: "10.1186/s12955-017-0607-y"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 5
+  observationsExtracted: 4
+  observationsByType:
+    Usage Instructions: 3
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Mining completely missed all clinical assessment tools in this questionnaire development study
+    - No tools were detected despite this being a clinical study focused on tool development and validation
+    - Three major clinical assessment tools were present but not captured: INF1-QOL (primary tool), EuroQol (validation tool), and Riccardi severity classification
+    - Current mining patterns appear inadequate for detecting clinical assessment tools, particularly questionnaires and scales
+  recommendations: |
+    This publication represents a significant gap in clinical assessment tool mining. All tools should be added:
+    
+    1. INF1-QOL questionnaire - Primary tool being developed and validated
+    2. EuroQol (EQ-5D) - Standard validation tool used for comparison
+    3. Riccardi NF severity grade classification - Clinical severity assessment scale
+    
+    The mining patterns need substantial improvement for clinical assessment tools, particularly:
+    - Better detection of questionnaire development contexts
+    - Recognition of validation study designs
+    - Improved pattern matching for clinical scale nomenclature
+    - Enhanced context analysis for tool administration phrases
+    
+    This study provides excellent examples of clinical assessment tool usage and validation that should inform
+    pattern development. The observations extracted demonstrate the rich scientific content available when
+    tools are properly identified in clinical studies.

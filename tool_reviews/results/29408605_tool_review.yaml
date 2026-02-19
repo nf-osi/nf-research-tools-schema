@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "29408605"
+  title: "Nf2 Mutation in Schwann Cells Delays Functional Neural Recovery Following Injury."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is clearly a laboratory research study involving transgenic mouse models, nerve injury experiments,
+    functional assessments, and microscopy analysis. Expected tools include:
+    - Animal models (transgenic mice strains)
+    - Genetic reagents (transgenic constructs)
+    - Computational tools (for stereological analysis)
+    - Clinical assessment tools (functional outcome measures like pressure pad testing)
+    
+    Note: Publications can contain MULTIPLE tool types. This study likely uses animal models for
+    experimental work and may include assessment tools for measuring functional outcomes.
+  overallAssessment: |
+    This is a laboratory research study investigating the role of Nf2 mutations in Schwann cell function
+    using transgenic mouse models and nerve injury experiments. The study design clearly indicates use of
+    research tools including animal models, experimental techniques, and functional assessment methods.
+    Tools are highly expected based on the experimental nature of the work described in the abstract.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "P0Sch∆39-121 transgenic mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We performed sciatic nerve crush in wild-type (WT) and in P0Sch∆39-121 transgenic mice that express a dominant negative Nf2 isoform in SCs."
+    whyMissed: "Specific transgenic mouse strain name with clear nomenclature indicating engineered animal model"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "wild-type mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We performed sciatic nerve crush in wild-type (WT) and in P0Sch∆39-121 transgenic mice"
+    whyMissed: "Control animal model used in comparison with transgenic strain"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "pressure pad"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Recovery of nerve function was assessed by measuring mean contact paw area on a pressure pad 7, 21, 60, and 90 days following nerve injury"
+    whyMissed: "Functional assessment device used to measure nerve recovery outcomes"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "nerve conduction assays"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "Recovery of nerve function was assessed by measuring mean contact paw area on a pressure pad 7, 21, 60, and 90 days following nerve injury and by nerve conduction assays at 90 days following injury"
+    whyMissed: "Electrophysiological assessment method for measuring nerve function"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "electron microscopy"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Myelin ultrastructure was analyzed by electron microscopy"
+    whyMissed: "Imaging technique/instrument used for ultrastructural analysis"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "stereological quantification"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "After 90 days, the nerves were harvested and axon regeneration was quantified stereologically"
+    whyMissed: "Quantitative analysis method/software for morphometric measurements"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "P0[A-Za-z]+[∆Δ][0-9-]+ transgenic mice"
+    toolType: "animal_model"
+    examples: ["P0Sch∆39-121 transgenic mice"]
+    reasoning: "Pattern to catch transgenic mouse strains with P0 promoter constructs and deletion mutations, commonly used in Schwann cell research"
+
+  - patternType: "context_phrase"
+    pattern: "assessed by measuring .+ on a (pressure pad|force plate|gait analysis)"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed by measuring mean contact paw area on a pressure pad"]
+    reasoning: "Functional assessment devices used to measure locomotor and sensory outcomes in animal studies"
+
+  - patternType: "context_phrase"
+    pattern: "(quantified|analyzed) stereologically"
+    toolType: "computational_tool"
+    examples: ["axon regeneration was quantified stereologically"]
+    reasoning: "Stereological analysis methods are computational tools for unbiased quantitative morphometry"
+
+  - patternType: "term"
+    pattern: "nerve conduction (assays|studies|tests)"
+    toolType: "clinical_assessment_tool"
+    examples: ["nerve conduction assays"]
+    reasoning: "Electrophysiological assessment methods for measuring nerve function, commonly used in neuroscience research"
+
+  - patternType: "context_phrase"
+    pattern: "wild-type \\(WT\\) (mice|rats|animals)"
+    toolType: "animal_model"
+    examples: ["wild-type (WT) and in P0Sch∆39-121 transgenic mice"]
+    reasoning: "Control animal strains used as comparisons to genetically modified models"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available - missing Methods, Results, and Discussion sections that would contain detailed tool information
+    - Mining patterns appear to have missed several obvious research tools including transgenic mouse models and functional assessment methods
+    - The publication clearly describes laboratory research with animal models and experimental procedures
+  recommendations: |
+    This publication should have yielded multiple research tools based on the experimental design described in the abstract.
+    The following tools were clearly missed and should be added:
+    - P0Sch∆39-121 transgenic mice (animal model) - HIGH PRIORITY
+    - Wild-type control mice (animal model) - HIGH PRIORITY  
+    - Pressure pad functional assessment (clinical assessment tool) - HIGH PRIORITY
+    - Nerve conduction assays (clinical assessment tool) - HIGH PRIORITY
+    
+    The mining patterns need improvement to catch:
+    1. Transgenic mouse strain nomenclature with deletion mutations
+    2. Functional assessment devices and methods
+    3. Control animal strains (wild-type references)
+    4. Electrophysiological assessment techniques
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the abstract suggests
+    this study would contain valuable phenotypic data about nerve regeneration, functional recovery, and
+    morphometric measurements that would be captured if full text were available.
+    
+    This represents a significant gap in the mining coverage for neuroscience research tools.

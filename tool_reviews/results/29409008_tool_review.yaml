@@ -1,0 +1,158 @@
+publicationMetadata:
+  pmid: "29409008"
+  title: "Targeted next-generation sequencing for differential diagnosis of neurofibromatosis type 2, schwannomatosis, and meningiomatosis."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on publication type (Bioinformatics Analysis):
+    - Computational tools (NGS analysis software, bioinformatics pipelines, sequencing platforms)
+    - Genetic reagents (primers, amplicons, sequencing reagents)
+    
+    This is a targeted next-generation sequencing study analyzing tumor suppressor genes
+    (NF2, SMARCB1, LZTR1, SMARCE1, SUFU) using an amplicon-based approach. Such studies
+    typically use sequencing platforms, bioinformatics analysis software, primer design
+    tools, and various molecular biology reagents for DNA preparation and amplification.
+  overallAssessment: |
+    This publication describes a molecular genetics study using targeted NGS for differential
+    diagnosis of neurofibromatosis conditions. The study clearly involves computational analysis
+    of sequencing data and molecular biology techniques, which should contain multiple research
+    tools including sequencing platforms, bioinformatics software, and genetic reagents.
+    The complete absence of mined tools suggests significant gaps in the mining approach for
+    this type of publication.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "next-generation sequencing"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "We present the targeted next-generation sequencing (NGS) of NF2, SMARCB1, LZTR1, SMARCE1, and SUFU tumor suppressor genes"
+    whyMissed: "Generic term 'next-generation sequencing' not recognized as a computational tool category"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "NGS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We present the targeted next-generation sequencing (NGS) of NF2, SMARCB1, LZTR1, SMARCE1, and SUFU tumor suppressor genes"
+    whyMissed: "Abbreviation 'NGS' not recognized as sequencing technology"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "amplicon-based approach"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using an amplicon-based approach. We analyzed blood DNA from a cohort of 196 patients"
+    whyMissed: "Amplicon-based methodology not recognized as genetic reagent/technique"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "targeted NGS strategy"
+    toolType: "computational_tool"
+    foundIn: "discussion"
+    contextSnippet: "The targeted NGS strategy is suitable for the identification of NF2 mosaicism in blood and for the investigation of tumors"
+    whyMissed: "Specific NGS strategy/approach not captured as computational methodology"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "next-generation sequencing|NGS|targeted sequencing|whole exome sequencing|WES|RNA-seq|ChIP-seq"
+    toolType: "computational_tool"
+    examples: ["next-generation sequencing (NGS)", "targeted NGS strategy"]
+    reasoning: "Sequencing technologies are fundamental computational tools in genomics research but may not be captured by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "amplicon-based approach|PCR-based|primer design|sequencing platform|bioinformatics analysis"
+    toolType: "genetic_reagent"
+    examples: ["amplicon-based approach"]
+    reasoning: "Molecular biology methodologies and approaches represent genetic reagents/techniques that should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "variant calling|sequence alignment|quality control|data processing pipeline"
+    toolType: "computational_tool"
+    examples: ["NGS was an effective and sensitive method"]
+    reasoning: "Bioinformatics analysis steps are computational tools but may be described generically"
+
+  - patternType: "vendor_indicator"
+    pattern: "Illumina|Ion Torrent|PacBio|Oxford Nanopore|Thermo Fisher|Applied Biosystems"
+    toolType: "computational_tool"
+    examples: []
+    reasoning: "Sequencing platform vendors are commonly mentioned but may not be captured without specific product names"
+
+observations:
+  - resourceName: "NGS"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      NGS was demonstrated to be an effective and sensitive method to detect mutant alleles 
+      in blood or tumor DNA of mosaic NF2 patients. The targeted NGS strategy proved suitable 
+      for identification of NF2 mosaicism in blood and investigation of tumors from patients 
+      with neurofibromatosis conditions.
+    foundIn: "results"
+    contextSnippet: "NGS was an effective and sensitive method to detect mutant alleles in blood or tumor DNA of mosaic NF2 patients"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noy009"
+
+  - resourceName: "targeted NGS strategy"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The targeted NGS approach successfully enabled differential diagnosis between NF2, 
+      schwannomatosis, and meningiomatosis through simultaneous investigation of multiple 
+      tumor suppressor genes (NF2, SMARCB1, LZTR1, SMARCE1). The method identified variants 
+      in 52% of NF2 patients, 12.5% and 32% of schwannomatosis patients for SMARCB1 and 
+      LZTR1 respectively, and 8% of meningiomatosis patients for SMARCE1.
+    foundIn: "both"
+    contextSnippet: "Simultaneous investigation of NF2, SMARCB1, LZTR1, and SMARCE1 is a key element in the differential diagnosis"
+    confidence: 0.9
+    doi: "10.1093/neuonc/noy009"
+
+  - resourceName: "amplicon-based approach"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The amplicon-based approach was successfully used for targeted sequencing of tumor 
+      suppressor genes NF2, SMARCB1, LZTR1, SMARCE1, and SUFU. This method enabled analysis 
+      of both blood DNA from 196 patients and matched tumor DNA when available, proving 
+      effective for detecting variants across different patient cohorts.
+    foundIn: "methods"
+    contextSnippet: "using an amplicon-based approach. We analyzed blood DNA from a cohort of 196 patients"
+    confidence: 0.8
+    doi: "10.1093/neuonc/noy009"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 3
+  observationsByType:
+    Usage Instructions: 2
+    General Comment or Review: 1
+  majorIssuesFound: |
+    - Complete failure to identify any tools despite clear bioinformatics/molecular genetics content
+    - Missing fundamental sequencing technologies (NGS, targeted sequencing)
+    - Missing molecular biology methodologies (amplicon-based approach)
+    - No recognition of computational analysis methods in genomics context
+    - Patterns appear inadequate for bioinformatics and molecular genetics publications
+  recommendations: |
+    This publication represents a significant gap in the current mining approach. Despite being
+    a clear bioinformatics/molecular genetics study with multiple computational tools and genetic
+    reagents, zero tools were identified. Key recommendations:
+    
+    1. Add sequencing technology patterns (NGS, targeted sequencing, amplicon-based)
+    2. Include bioinformatics methodology terms (variant calling, sequence analysis)
+    3. Expand genetic reagent patterns to include molecular biology techniques
+    4. Consider context-aware mining for genomics publications
+    5. The 4 potentially missed tools should definitely be added to improve coverage
+    6. The suggested patterns would significantly improve mining for similar publications
+    7. Observations extracted show the tools were effectively used and reported on

@@ -1,0 +1,146 @@
+publicationMetadata:
+  pmid: "33279959"
+  title: "Stepwise crosstalk between aberrant Nf1, Tp53 and Rb signalling pathways induces gliomagenesis in zebrafish."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This publication describes transgenic zebrafish model development and characterization, which typically involves:
+    - Animal models (transgenic zebrafish lines)
+    - Genetic reagents (knockout constructs, transgenes)
+    - Computational tools (bioinformatics analysis, gene expression profiling)
+    
+    The study involves creating multiple transgenic lines with gene deletions, tumor analysis, and bioinformatics,
+    indicating high likelihood of research tool usage despite limited text availability.
+  overallAssessment: |
+    This is clearly a lab research publication focused on developing and characterizing transgenic zebrafish models
+    for glioma research. The study involves genetic manipulation, tumor induction, histological analysis, and
+    bioinformatics, all of which typically require research tools. However, only abstract text is available,
+    limiting detailed tool identification and validation.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "transgenic zebrafish lines with nf1 deletion"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "several transgenic zebrafish lines with single or multiple deletions of nf1, tp53 and rb1 in astrocytes, were established to genetically induce gliomagenesis"
+    whyMissed: "Specific transgenic zebrafish lines described as research models but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "transgenic zebrafish lines with tp53 deletion"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "several transgenic zebrafish lines with single or multiple deletions of nf1, tp53 and rb1 in astrocytes, were established to genetically induce gliomagenesis"
+    whyMissed: "Specific transgenic zebrafish lines described as research models but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "transgenic zebrafish lines with rb1 deletion"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "several transgenic zebrafish lines with single or multiple deletions of nf1, tp53 and rb1 in astrocytes, were established to genetically induce gliomagenesis"
+    whyMissed: "Specific transgenic zebrafish lines described as research models but not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "nf1;tp53 combined knockout fish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Combination of mutations, nf1;tp53 and rb1;tp53 combined knockout fish, showed much higher tumour incidences"
+    whyMissed: "Double knockout zebrafish model specifically mentioned but not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "rb1;tp53 combined knockout fish"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Combination of mutations, nf1;tp53 and rb1;tp53 combined knockout fish, showed much higher tumour incidences"
+    whyMissed: "Double knockout zebrafish model specifically mentioned but not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "bioinformatics analyses"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Further bioinformatics analyses demonstrated the alterations in RTK/Ras/PI3K, cell cycle, and focal adhesion pathways"
+    whyMissed: "General bioinformatics analysis mentioned but specific tools not identified due to abstract-only text"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "gene expression profiling"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Gene expression profiling and histological analyses showed the tumours derived from zebrafish have significant similarities"
+    whyMissed: "Gene expression analysis methodology mentioned but specific platforms/tools not detailed in abstract"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "transgenic zebrafish lines? with .+ deletion"
+    toolType: "animal_model"
+    examples: ["transgenic zebrafish lines with single or multiple deletions of nf1, tp53 and rb1"]
+    reasoning: "Captures transgenic zebrafish models with specific gene deletions, which are commonly used research tools"
+
+  - patternType: "naming_convention"
+    pattern: "[a-z0-9]+;[a-z0-9]+ (combined )?knockout (fish|zebrafish)"
+    toolType: "animal_model"
+    examples: ["nf1;tp53 combined knockout fish", "rb1;tp53 combined knockout fish"]
+    reasoning: "Identifies double/multiple knockout zebrafish models using standard genetic nomenclature"
+
+  - patternType: "context_phrase"
+    pattern: "(were established|generated|created) to genetically (induce|model)"
+    toolType: "animal_model"
+    examples: ["were established to genetically induce gliomagenesis in zebrafish"]
+    reasoning: "Indicates active development/creation of animal models for research purposes"
+
+  - patternType: "term"
+    pattern: "gene expression profiling"
+    toolType: "computational_tool"
+    examples: ["Gene expression profiling and histological analyses"]
+    reasoning: "Standard methodology that involves computational analysis tools, even when specific platforms aren't mentioned"
+
+  - patternType: "term"
+    pattern: "bioinformatics analyses?"
+    toolType: "computational_tool"
+    examples: ["Further bioinformatics analyses demonstrated the alterations"]
+    reasoning: "General term indicating computational analysis, though specific tools may not be detailed"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined from this publication despite clear evidence of research tool usage
+    - Only abstract text available, limiting detailed tool identification and validation
+    - Multiple transgenic zebrafish models described but not captured by mining patterns
+    - Computational analysis methods mentioned but specific tools not detailed
+  recommendations: |
+    This publication clearly describes the development and use of multiple transgenic zebrafish models for glioma research,
+    which are legitimate research tools that should have been captured. The mining patterns appear to have missed:
+    
+    1. Multiple transgenic zebrafish lines with specific gene deletions (nf1, tp53, rb1)
+    2. Double knockout models (nf1;tp53, rb1;tp53)
+    3. Computational analysis methods (bioinformatics, gene expression profiling)
+    
+    Recommendations:
+    - Add the 5 specific zebrafish models as animal_model tools with high confidence
+    - Consider adding bioinformatics and gene expression profiling as computational_tools with moderate confidence
+    - Implement suggested patterns to better capture transgenic animal models and computational methods
+    - This case highlights the need for patterns that recognize model organism nomenclature and genetic manipulation terminology
+    
+    No observations could be extracted due to lack of Results/Discussion sections, but the models described would likely
+    have phenotypic and pathological observations in the full text.

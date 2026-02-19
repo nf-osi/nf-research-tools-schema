@@ -1,0 +1,244 @@
+publicationMetadata:
+  pmid: "39665502"
+  title: "Elucidating Microstructural Alterations in Neurodevelopmental Disorders: Application of Advanced Diffusion-Weighted Imaging in Children With Rasopathies."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on this clinical neuroimaging study, expected tool types include:
+    - Clinical assessment tools: Wechsler Abbreviated Scale of Intelligence (WASI-2), Tanner staging scales
+    - Computational tools: FSL software suite, MATLAB toolboxes, R statistical software, imaging analysis pipelines
+    - Advanced imaging techniques: NODDI and DKI (though these are methodological approaches rather than discrete tools)
+    
+    This is a prospective clinical study with sophisticated neuroimaging analysis, so computational tools for 
+    image processing and statistical analysis are expected, along with standardized clinical assessment instruments.
+  overallAssessment: |
+    This is a prospective clinical neuroimaging study that would typically use multiple research tools. The study 
+    involves advanced MRI data acquisition and analysis, requiring computational tools for image processing, 
+    statistical analysis, and data visualization. Clinical assessment tools are used for participant characterization 
+    (IQ testing, pubertal staging). The sophisticated methodology suggests multiple computational tools should be present.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "FSL 6.0.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DWI data were preprocessed (author MR) using FSL 6.0.5 (FMRIB Analysis Group, Oxford, UK), with topup susceptibility-induced distortion correction and eddy for correction of eddy currents-induced distortions and subject movements"
+    whyMissed: "Specific software version with vendor information - clear computational tool usage"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NODDI Matlab Toolbox v. 1.05"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The NODDI maps were generated using the NODDI Matlab Toolbox v. 1.05 (UCL, UK) through fitting to the preprocessed diffusion data in MATLAB R2023b"
+    whyMissed: "Specific toolbox version with institutional source - specialized neuroimaging analysis tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB R2023b"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The NODDI maps were generated using the NODDI Matlab Toolbox v. 1.05 (UCL, UK) through fitting to the preprocessed diffusion data in MATLAB R2023b (Mathworks, Natick, MA)"
+    whyMissed: "Specific software version with vendor information - computational platform"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "R 4.3.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was completed by JP in R 4.3.1 (R Core Team, 2023)"
+    whyMissed: "Specific software version used for statistical analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MICE"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "missing data were imputed using a predictive mean matching algorithm performed by the Multiple Imputation by Chained Equations (MICE) package in R"
+    whyMissed: "R package for statistical analysis - specialized imputation tool"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "MASS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "linear discriminant analysis was then conducted using the lda function within the MASS package in R"
+    whyMissed: "R package for statistical analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRACULA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "TRActs Constrained by UnderLying Anatomy (TRACULA) delineated 42 major white matter tracts using probabilistic tractography"
+    whyMissed: "Specialized neuroimaging analysis tool for tractography"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ggseg3d"
+    toolType: "computational_tool"
+    foundIn: "results"
+    contextSnippet: "Visualization created using ggseg3d package in R 4.3.1 (R Core Team, 2023)"
+    whyMissed: "R package for data visualization"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler Abbreviated Scale of Intelligence 2nd Edition"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "A full-scale IQ ≥ 70, acquired using the Wechsler Abbreviated Scale of Intelligence 2nd Edition, was required to maximize study compliance (Wechsler 1999)"
+    whyMissed: "Standardized clinical assessment instrument for intelligence testing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Tanner staging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Pubertal status was determined using Tanner staging (Marshall and Tanner 1970, 1969)"
+    whyMissed: "Standardized clinical assessment tool for pubertal development"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "FSL [0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["FSL 6.0.5"]
+    reasoning: "FSL is a major neuroimaging software suite, version numbers indicate specific tool usage"
+
+  - patternType: "term"
+    pattern: "MATLAB R[0-9]{4}[a-b]?"
+    toolType: "computational_tool"
+    examples: ["MATLAB R2023b"]
+    reasoning: "MATLAB with specific release versions indicates computational tool usage"
+
+  - patternType: "term"
+    pattern: "R [0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["R 4.3.1"]
+    reasoning: "R statistical software with version numbers"
+
+  - patternType: "context_phrase"
+    pattern: "using the .+ package in R"
+    toolType: "computational_tool"
+    examples: ["using the MICE package in R", "using the ggseg3d package in R"]
+    reasoning: "R packages are computational tools for specialized analysis"
+
+  - patternType: "term"
+    pattern: "Wechsler .+ Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wechsler Abbreviated Scale of Intelligence 2nd Edition"]
+    reasoning: "Wechsler scales are standardized clinical assessment instruments"
+
+  - patternType: "term"
+    pattern: "Tanner stag(ing|e)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Tanner staging"]
+    reasoning: "Tanner staging is a standardized clinical assessment for pubertal development"
+
+  - patternType: "context_phrase"
+    pattern: "Toolbox v\\. [0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["NODDI Matlab Toolbox v. 1.05"]
+    reasoning: "Versioned toolboxes indicate specialized computational tools"
+
+  - patternType: "naming_convention"
+    pattern: "TRACULA|TRActs Constrained by UnderLying Anatomy"
+    toolType: "computational_tool"
+    examples: ["TRACULA"]
+    reasoning: "Neuroimaging analysis software with distinctive naming"
+
+observations:
+  - resourceName: "FSL 6.0.5"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      FSL 6.0.5 was used for DWI data preprocessing with specific modules: topup for susceptibility-induced 
+      distortion correction and eddy for correction of eddy currents-induced distortions and subject movements. 
+      This represents standard preprocessing pipeline for diffusion-weighted imaging data.
+    foundIn: "methods"
+    contextSnippet: "DWI data were preprocessed (author MR) using FSL 6.0.5 (FMRIB Analysis Group, Oxford, UK), with topup susceptibility-induced distortion correction and eddy for correction of eddy currents-induced distortions and subject movements"
+    confidence: 0.95
+    doi: "e70087"
+
+  - resourceName: "NODDI Matlab Toolbox v. 1.05"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The NODDI Matlab Toolbox v. 1.05 was used to generate NODDI maps through fitting to preprocessed 
+      diffusion data. NODDI is a multi-compartment biophysical model that models diffusion signal as 
+      combination of cerebrospinal fluid, extracellular, and intracellular compartments.
+    foundIn: "methods"
+    contextSnippet: "The NODDI maps were generated using the NODDI Matlab Toolbox v. 1.05 (UCL, UK) through fitting to the preprocessed diffusion data in MATLAB R2023b"
+    confidence: 0.95
+    doi: "e70087"
+
+  - resourceName: "R 4.3.1"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      R 4.3.1 was used for statistical analysis including ANOVA, post-hoc testing with Tukey-Kramer correction, 
+      Bonferroni correction for multiple comparisons, principal components analysis, and linear discriminant analysis. 
+      Multiple R packages were utilized including MICE for imputation and MASS for discriminant analysis.
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was completed by JP in R 4.3.1 (R Core Team, 2023)"
+    confidence: 0.95
+    doi: "e70087"
+
+  - resourceName: "TRACULA"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      TRACULA (TRActs Constrained by UnderLying Anatomy) was used to delineate 42 major white matter tracts 
+      using probabilistic tractography. This enabled tract-based analysis of diffusion parameters across 
+      multiple white matter pathways.
+    foundIn: "methods"
+    contextSnippet: "TRActs Constrained by UnderLying Anatomy (TRACULA) delineated 42 major white matter tracts using probabilistic tractography"
+    confidence: 0.95
+    doi: "e70087"
+
+  - resourceName: "Wechsler Abbreviated Scale of Intelligence 2nd Edition"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      The Wechsler Abbreviated Scale of Intelligence 2nd Edition was used to assess full-scale IQ, with 
+      a criterion of IQ ≥ 70 required for study inclusion to maximize compliance. Clinical groups showed 
+      significantly lower scores compared to typically developing participants on all IQ measures (p < 0.010).
+    foundIn: "methods"
+    contextSnippet: "A full-scale IQ ≥ 70, acquired using the Wechsler Abbreviated Scale of Intelligence 2nd Edition, was required to maximize study compliance"
+    confidence: 0.95
+    doi: "e70087"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 8
+  observationsExtracted: 5
+  observationsByType:
+    Usage Instructions: 5
+  majorIssuesFound: |
+    - No tools were mined from this publication despite clear evidence of multiple computational and clinical assessment tools
+    - This represents a significant mining failure for a sophisticated neuroimaging study
+    - Multiple software tools with specific version numbers were explicitly mentioned in methods
+    - Clinical assessment instruments were clearly described and used
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the mining process:
+    - 8 computational tools including FSL, MATLAB, R, and specialized neuroimaging packages
+    - 2 clinical assessment tools (WASI-2, Tanner staging)
+    - All tools have clear usage context and version information
+    - The mining patterns need significant improvement to catch neuroimaging software and clinical assessment tools
+    - This type of clinical neuroimaging study should be a high-yield target for tool mining
+    - Suggested patterns focus on version numbers, package names, and standardized assessment instruments
+    - All potentially missed tools should be added to improve database completeness

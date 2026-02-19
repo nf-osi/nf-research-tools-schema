@@ -1,0 +1,80 @@
+publicationMetadata:
+  pmid: "34395726"
+  title: "Analysis of the Effects of Hexokinase 2 Detachment From Mitochondria-Associated Membranes with the Highly Selective Peptide HK2pep."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Other"  # Protocol/methods paper in Bio-protocol journal
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a protocol/methods paper describing the use of a novel peptide (HK2pep) for biochemical analysis.
+    Expected tool types:
+    - Genetic reagents (the HK2pep peptide itself is a designed reagent)
+    - Computational tools (peptide design likely required computational modeling/design software)
+    - Cell lines (for testing peptide effects, though not mentioned in available abstract)
+    - Antibodies (for detecting HK2 and assessing detachment, though not mentioned in available abstract)
+    
+    Note: Limited to abstract only - full Methods section would likely reveal additional tools including
+    cell culture reagents, detection antibodies, imaging tools, and computational analysis software.
+  overallAssessment: |
+    This Bio-protocol paper describes a novel peptide-based approach for detaching hexokinase 2 from 
+    mitochondrial membranes. As a protocol paper, it would typically describe specific reagents, tools, 
+    and methods needed to perform the described technique. However, only the abstract is available for 
+    analysis, which limits tool identification. The mining found zero tools, which is likely an 
+    underestimate given that this is a methods paper that would normally detail specific reagents and protocols.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "HK2pep"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We designed a HK2-targeting peptide named HK2pep, corresponding to the N-terminal hydrophobic domain of HK2 and armed with a metalloprotease cleavage sequence and a polycation stretch shielded by a polyanion sequence."
+    whyMissed: "The mining patterns may not recognize custom-designed peptides as genetic reagents. HK2pep is a specifically designed therapeutic peptide that functions as a research tool."
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+pep\\b"
+    toolType: "genetic_reagent"
+    examples: ["HK2pep"]
+    reasoning: "Custom peptides often follow naming conventions ending in 'pep' and represent designed genetic reagents for research"
+  - patternType: "context_phrase"
+    pattern: "designed.*peptide.*named"
+    toolType: "genetic_reagent"
+    examples: ["We designed a HK2-targeting peptide named HK2pep"]
+    reasoning: "This phrase pattern indicates the development/design of a novel peptide tool"
+  - patternType: "context_phrase"
+    pattern: "targeting peptide"
+    toolType: "genetic_reagent"
+    examples: ["HK2-targeting peptide"]
+    reasoning: "Targeting peptides are commonly used research reagents that should be captured"
+
+observations: []  # No validated tools to extract observations from, and limited text available
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 1
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Zero tools were mined despite this being a protocol/methods paper that would typically contain multiple research tools
+    - Only abstract text is available - Methods, Results, and Discussion sections are missing, severely limiting tool identification
+    - The custom-designed peptide HK2pep was not captured, indicating gaps in genetic reagent pattern recognition
+    - Protocol papers typically describe specific reagents, cell lines, antibodies, and computational tools that are not visible in the abstract alone
+  recommendations: |
+    This publication requires full-text access to properly identify research tools. The abstract alone suggests this is a 
+    methods paper that would contain multiple tools including the HK2pep peptide, likely cell lines for testing, detection 
+    antibodies, and computational tools for peptide design. The mining should be re-run with full text when available.
+    
+    Key recommendations:
+    - Obtain full text including Methods section for comprehensive tool identification
+    - Add the identified HK2pep peptide as a genetic reagent
+    - Implement suggested patterns for better peptide/reagent recognition
+    - Consider that protocol papers may have different tool mention patterns than research articles
+    - No observations can be extracted without Results/Discussion sections

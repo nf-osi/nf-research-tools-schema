@@ -1,0 +1,128 @@
+publicationMetadata:
+  pmid: "39824854"
+  title: "Comparison of 1D and 3D volume measurement techniques in NF2-associated vestibular schwannoma monitoring."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a clinical study comparing imaging measurement techniques for NF2-associated vestibular schwannomas.
+    Expected tool types:
+    - Computational tools: iPlan Net software (Brainlab) for 3D segmentation, SPSS for statistical analysis
+    - Clinical assessment tools: Hannover and Koos classification systems for tumor grading
+    
+    The study focuses on imaging analysis methods rather than laboratory research, so lab tools
+    (antibodies, cell lines, animal models) are not expected. However, the software tools used
+    for image analysis and statistical analysis are legitimate computational research tools.
+  overallAssessment: |
+    This clinical study compares different methods for measuring vestibular schwannoma volumes in NF2 patients.
+    The study uses specialized medical imaging software (iPlan Net) and statistical software (SPSS), which are
+    legitimate computational research tools. Clinical classification systems (Hannover, Koos) are also research
+    tools used for standardized tumor assessment. Despite being found by a "bench" query, this is primarily
+    a clinical methodology study that would contain computational and clinical assessment tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "iPlan Net software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...postcontrast thin-sliced (≤ 3 mm) T1-weighted magnetic resonance (MR) sequences were uploaded into the iPlan Net software (Brainlab, Feldkirchen, Germany), and volumes were measured manually or in combination with semiautomated segmentation..."
+    whyMissed: "Specific software name with vendor information (Brainlab) used for 3D tumor segmentation and volume analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Statistical evaluation was performed using the Statistical Package for Social Studies (SPSS 10.0 for Windows, SPSS Inc.)..."
+    whyMissed: "Statistical analysis software with specific version (10.0) and vendor (SPSS Inc.) mentioned"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Hannover classification system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Tumor size was classified by the Hannover and Koos classification systems..."
+    whyMissed: "Standardized clinical classification system for tumor grading used in the study"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Koos classification system"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...Tumor size was classified by the Hannover and Koos classification systems..."
+    whyMissed: "Standardized clinical classification system for tumor grading used in the study"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "RECIST guidelines"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "...the maximum linear (tumor) diameter (MLD) in axial and coronal (medial to lateral and caudal to rostral/cranial, in total four measurements per MRI) planes were measured according to the RECIST guidelines..."
+    whyMissed: "Standardized clinical guidelines for tumor measurement used as assessment methodology"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z]+\\s+(?:software|Software))\\s*\\([A-Z][a-zA-Z]+(?:,\\s*[A-Z][a-zA-Z]+)*\\)"
+    toolType: "computational_tool"
+    examples: ["iPlan Net software (Brainlab, Feldkirchen, Germany)"]
+    reasoning: "Pattern to catch software names with vendor information in parentheses, which is a strong indicator of actual tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "Statistical evaluation was performed using"
+    toolType: "computational_tool"
+    examples: ["Statistical evaluation was performed using the Statistical Package for Social Studies (SPSS 10.0 for Windows, SPSS Inc.)"]
+    reasoning: "Phrase that reliably indicates statistical software usage in methods sections"
+
+  - patternType: "naming_convention"
+    pattern: "\\b([A-Z][a-zA-Z]+)\\s+classification\\s+system"
+    toolType: "clinical_assessment_tool"
+    examples: ["Hannover classification system", "Koos classification system"]
+    reasoning: "Pattern to identify standardized clinical classification systems used for patient/tumor assessment"
+
+  - patternType: "context_phrase"
+    pattern: "measured according to the"
+    toolType: "clinical_assessment_tool"
+    examples: ["measured according to the RECIST guidelines"]
+    reasoning: "Phrase indicating use of standardized measurement protocols or guidelines"
+
+  - patternType: "term"
+    pattern: "\\bRECIST\\s+guidelines\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["RECIST guidelines"]
+    reasoning: "Specific standardized clinical assessment methodology for tumor measurement"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Mining completely missed all research tools in this publication
+    - No tools were initially identified despite clear usage of computational and clinical assessment tools
+    - The publication contains legitimate research tools that should have been captured
+  recommendations: |
+    This publication contains several legitimate research tools that were completely missed by the initial mining:
+    
+    1. iPlan Net software (Brainlab) - Medical imaging software used for 3D tumor segmentation
+    2. SPSS 10.0 - Statistical analysis software with specific version
+    3. Hannover classification system - Clinical tumor grading tool
+    4. Koos classification system - Clinical tumor grading tool  
+    5. RECIST guidelines - Standardized tumor measurement methodology
+    
+    All five missed tools should be added to the database. The mining patterns need significant improvement
+    to catch software tools with vendor information, statistical software usage, and clinical classification
+    systems. This represents a major gap in the current mining approach for clinical methodology studies.
+    
+    No observations were extracted since the Results and Discussion sections were not available in the input data.
+    Future analysis should include these sections to capture experimental findings and tool performance data.

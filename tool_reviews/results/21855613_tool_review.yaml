@@ -1,0 +1,84 @@
+publicationMetadata:
+  pmid: "21855613"
+  title: "Genetically engineered mouse models shed new light on the pathogenesis of neurofibromatosis type I-related neoplasms of the peripheral nervous system."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.95  # Very high confidence - clearly states "In this review, we summarize"
+  hasMethodsSection: No
+  likelyContainsTools: No
+  expectedToolTypes: |
+    Review articles typically do not contain actual research tools but rather discuss/cite tools used in other studies.
+    This review focuses on genetically engineered mouse models, so it may mention:
+    - Animal models (mouse strains) - but likely as citations from other work, not actual usage
+    - Genetic reagents - but again, likely cited rather than used
+    
+    Since this is a review without Methods/Results/Discussion sections, any tool mentions would be
+    citations of other researchers' work rather than actual tool usage by the authors.
+  overallAssessment: |
+    This is clearly a review article that summarizes findings from genetically engineered mouse models
+    used by other researchers to study neurofibromatosis type 1. Review articles typically cite tools
+    from other studies but do not use tools themselves. The absence of Methods, Results, and Discussion
+    sections confirms this is not an experimental study. Any research tools mentioned would be citations
+    of other work rather than actual tool usage, making them inappropriate for tool databases that focus
+    on experimental usage.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "genetically engineered mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "In recent years, a number of genetically engineered mouse models have been created to investigate the molecular mechanisms driving the pathogenesis of these tumors."
+    whyMissed: "This is a general reference to mouse models as a category, not specific named strains or models"
+    confidence: 0.1  # Very low confidence - this is too generic
+    shouldBeAdded: No
+  - toolName: "mouse models"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Genetically engineered mouse models shed new light on the pathogenesis of neurofibromatosis type I-related neoplasms"
+    whyMissed: "Generic reference to mouse models without specific strain names or experimental details"
+    confidence: 0.1  # Very low confidence - too generic for a tool database
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "exclude review articles from tool mining"
+    toolType: "general"
+    examples: ["In this review, we summarize", "review articles typically cite but don't use tools"]
+    reasoning: "Review articles cite tools from other studies but don't use them experimentally. Mining tools from reviews creates false positives since the tools aren't actually used by the review authors. A publication type filter could exclude reviews from tool mining entirely."
+  - patternType: "term"
+    pattern: "require specific strain/model names rather than generic terms"
+    toolType: "animal_model"
+    examples: ["genetically engineered mouse models", "mouse models"]
+    reasoning: "Generic terms like 'mouse models' or 'genetically engineered mouse models' are too broad for tool databases. Only specific strain names (e.g., 'Nf1+/-', 'B6.129-Nf1tm1Tyj') should be captured as they represent actual usable research tools."
+
+observations: []  # No validated tools, therefore no observations can be extracted
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2  # Two generic references identified but not recommended for addition
+  newPatternsCount: 2  # Two pattern suggestions provided
+  observationsExtracted: 0  # No observations since no validated tools
+  observationsByType: {}  # Empty since no observations
+  majorIssuesFound: |
+    - Publication is a review article, not experimental research
+    - No Methods, Results, or Discussion sections available
+    - Only abstract text provided, which contains general references to mouse models
+    - Review articles cite tools from other studies but don't use them experimentally
+    - Generic terms like "genetically engineered mouse models" are too broad for tool databases
+  recommendations: |
+    This publication should be excluded from tool mining entirely. As a review article, it discusses
+    tools used by other researchers but does not use any tools experimentally. The mining correctly
+    identified zero tools, which is the expected result for a review article. 
+    
+    Recommendations:
+    1. Implement publication type filtering to exclude review articles from tool mining
+    2. When mining animal models, require specific strain names rather than generic terms
+    3. Consider this publication as a negative control case - correctly identified zero tools
+    4. No manual curator review needed - the empty result is correct for this publication type
+    
+    No tools were missed because review articles should not contribute tools to experimental databases.
+    The suggested patterns would help prevent similar false positives in future mining efforts.

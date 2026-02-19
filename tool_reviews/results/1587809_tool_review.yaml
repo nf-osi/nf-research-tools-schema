@@ -1,0 +1,121 @@
+publicationMetadata:
+  pmid: "1587809"
+  title: "Expression of the GTPase activating domain of the neurofibromatosis type 1 (NF1) gene in Escherichia coli and role of the conserved lysine residue."
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95  # Confidence in the classification
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    
+    This is a molecular biology study involving protein expression in E. coli, mutagenesis, and biochemical 
+    characterization. Expected tools include:
+    - Genetic reagents (expression constructs, mutant proteins)
+    - Bacterial expression systems (E. coli strains)
+    - Potentially computational tools for protein analysis
+    
+    Note: This is a 1992 paper, so advanced cellular models (organoids) and patient-derived models (PDX) 
+    would not be expected. Clinical assessment tools are not relevant for this biochemical study.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving molecular cloning, protein expression, 
+    and biochemical characterization of NF1 protein domains. The study describes expressing specific 
+    protein constructs in E. coli and performing mutagenesis studies, which would typically involve 
+    multiple research tools including genetic reagents and bacterial expression systems. However, only 
+    the abstract is available, limiting detailed tool identification.
+
+toolValidations: []  # No tools were mined, so no validations needed
+
+potentiallyMissedTools:
+  - toolName: "Escherichia coli"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...was expressed in Escherichia coli as a soluble protein..."
+    whyMissed: "E. coli mentioned as expression system but may not have been recognized as a research tool. Bacterial expression systems are standard genetic reagents in molecular biology."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1-333"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...A small catalytic domain from the neurofibromatosis type 1 gene, NF1-333, consisting of 333 amino acids between residues 1197 and 1528..."
+    whyMissed: "This is a specific protein construct/expression clone created for this study. The naming convention (NF1-333) indicates a defined genetic reagent."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "p120-GAP"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Its catalytic activity under non-saturating conditions is similar to the full-length p120-GAP..."
+    whyMissed: "This appears to be a reference protein/reagent used for comparison. p120-GAP is a well-known GTPase-activating protein used as a control."
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "GAP-334"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...but different from truncated GAP-334..."
+    whyMissed: "This is another protein construct/reagent used for comparison. The naming suggests a truncated version of GAP protein."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Lys-1422 mutant"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...Lys-1422, which is totally conserved in all GAP proteins, was mutated and the properties of the mutant protein investigated..."
+    whyMissed: "This is a site-directed mutant protein created for this study. Mutant proteins are important genetic reagents in functional studies."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "E\\.?\\s*coli|Escherichia coli"
+    toolType: "genetic_reagent"
+    examples: ["Escherichia coli"]
+    reasoning: "E. coli is a standard bacterial expression system used as a genetic reagent in molecular biology. Should be captured when mentioned as expression host."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]+[0-9]+-[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["NF1-333", "GAP-334"]
+    reasoning: "Protein constructs often follow naming conventions with gene name followed by numbers indicating amino acid positions or construct variants."
+
+  - patternType: "context_phrase"
+    pattern: "mutant protein|mutated.*protein|site-directed mutant"
+    toolType: "genetic_reagent"
+    examples: ["Lys-1422 mutant protein"]
+    reasoning: "Mutant proteins are important genetic reagents. Context phrases indicating mutagenesis should trigger tool detection."
+
+  - patternType: "context_phrase"
+    pattern: "expressed in.*as.*protein|expression.*in.*coli"
+    toolType: "genetic_reagent"
+    examples: ["expressed in Escherichia coli as a soluble protein"]
+    reasoning: "Phrases describing protein expression systems indicate both the expression host and the expressed construct as potential tools."
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5  # Number of tools that might have been missed
+  newPatternsCount: 4  # Number of new patterns suggested
+  observationsExtracted: 0  # Number of scientific observations found
+  observationsByType: {}  # No observations extracted
+  majorIssuesFound: |
+    Major issues found during review:
+    - No tools were mined from this publication despite clear evidence of research tool usage
+    - Only abstract available - Methods section would likely contain detailed tool information
+    - Multiple genetic reagents (protein constructs, expression systems, mutants) were missed
+    - This represents a significant gap in tool mining for molecular biology publications
+  recommendations: |
+    Overall recommendations for this publication:
+    - All 5 potentially missed tools should be added - they represent legitimate genetic reagents
+    - The mining patterns need improvement for bacterial expression systems and protein constructs
+    - Molecular biology terminology and naming conventions should be better captured
+    - Consider that older publications (1992) may use different terminology than modern papers
+    - The lack of Methods section limits detailed tool identification, but abstract contains sufficient evidence
+    - Future mining should better recognize E. coli as a standard expression system/genetic reagent
+    - Protein construct naming conventions (gene-number patterns) should be captured
+    - Mutant protein terminology should trigger genetic reagent detection

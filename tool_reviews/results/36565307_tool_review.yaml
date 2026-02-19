@@ -1,0 +1,174 @@
+publicationMetadata:
+  pmid: "36565307"
+  title: "COVID-19 in people with neurofibromatosis 1, neurofibromatosis 2, or schwannomatosis."
+  queryType: "unknown"  # Not specified in input
+  publicationType: "Epidemiological Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a large-scale epidemiological study analyzing electronic health records from the N3C Data Enclave.
+    Expected tool types:
+    - Computational tools: Statistical software (R), data analysis packages, SQL queries, bootstrap analysis tools
+    - Clinical assessment tools: COVID-19 severity scoring systems, diagnostic coding systems (ICD-10, SNOMED)
+    
+    The study involves extensive statistical analysis, data processing, and clinical outcome assessment, making it
+    highly likely to contain both computational tools and clinical assessment instruments.
+  overallAssessment: |
+    This epidemiological study analyzing COVID-19 outcomes in rare disease populations would typically use multiple
+    research tools. The extensive Methods section describes computational analysis using R, statistical packages,
+    and SQL queries for data processing. Clinical assessment tools include COVID-19 severity scoring and diagnostic
+    coding systems. The mining found zero tools, which appears to be a significant under-detection given the
+    computational complexity and clinical assessment components described in the methodology.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "R"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A Shapiro-Wilk test (base R v3.6.3, shapiro.test function) was used to test the normality...The age-adjusted proportions in the test and comparison vectors were compared to estimate the P value of the real observations (real P value) (using BSDA v1.2.0, z.test function)"
+    whyMissed: "R programming language with specific version (v3.6.3) mentioned with statistical functions"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BSDA"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using BSDA v1.2.0, z.test function"
+    whyMissed: "R package with version number for statistical analysis"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "gdata"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Then, the age-adjusted proportions in the test and comparison vectors were resampled 10,000 times to produce 10,000 possible combinations of age-adjusted proportions (using gdata v2.18.0, resample function)"
+    whyMissed: "R package with version number for data resampling"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ggplot2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The distributions of bootstrapped P values were visualized using R (ggplot2 v3.3.2)"
+    whyMissed: "R package with version number for data visualization"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SQL"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All cohorts were generated using custom SQL queries and subsequently analyzed in the N3C Data Enclave"
+    whyMissed: "Database query language used for data extraction"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "N3C Data Enclave"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All cohorts were generated using custom SQL queries and subsequently analyzed in the N3C Data Enclave. Some of the aggregate data were downloaded after approval by the N3C Data Access Committee and further analyzed in a private, secure cloud computing instance"
+    whyMissed: "Data analysis platform and computational environment"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ICD-10"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "a strong positive COVID-19 diagnostic code from the International Classification of Diseases, 10th Revision (ICD-10) or Systematized Nomenclature of Medicine (SNOMED) tables"
+    whyMissed: "Clinical diagnostic coding system used for patient classification"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SNOMED"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "a strong positive COVID-19 diagnostic code from the International Classification of Diseases, 10th Revision (ICD-10) or Systematized Nomenclature of Medicine (SNOMED) tables"
+    whyMissed: "Clinical terminology system used for medical coding"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "WHO COVID-19 Severity Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "results"
+    contextSnippet: "We first identified the patients in the previously examined disease cohorts with highest documented severity (N3C severity type severe, ie, World Health Organization severity 7-9 and mortality/hospice, ie, World Health Organization severity 10)"
+    whyMissed: "Clinical assessment tool for COVID-19 severity scoring"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "N3C COVID-19 Phenotype"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The N3C cohort and case definition criteria are publicly available as described in version 3.3 of the N3C COVID-19 phenotype documentation"
+    whyMissed: "Standardized clinical phenotyping tool for COVID-19 case definition"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "using [SOFTWARE_NAME] v?[0-9]+\\.[0-9]+\\.?[0-9]*"
+    toolType: "computational_tool"
+    examples: ["using BSDA v1.2.0", "using gdata v2.18.0", "using R (ggplot2 v3.3.2)"]
+    reasoning: "Software with version numbers in usage context - strong indicator of computational tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "(base R|R v[0-9]+\\.[0-9]+\\.?[0-9]*)"
+    toolType: "computational_tool"
+    examples: ["base R v3.6.3", "using R"]
+    reasoning: "R programming language with version specification commonly used in statistical analysis"
+
+  - patternType: "term"
+    pattern: "SQL queries?"
+    toolType: "computational_tool"
+    examples: ["custom SQL queries"]
+    reasoning: "Database query language usage for data extraction and analysis"
+
+  - patternType: "term"
+    pattern: "ICD-10|ICD-9|SNOMED"
+    toolType: "clinical_assessment_tool"
+    examples: ["ICD-10", "SNOMED tables"]
+    reasoning: "Standard medical coding systems used for clinical assessment and diagnosis"
+
+  - patternType: "context_phrase"
+    pattern: "World Health Organization severity [0-9]+-?[0-9]*"
+    toolType: "clinical_assessment_tool"
+    examples: ["World Health Organization severity 7-9", "World Health Organization severity 10"]
+    reasoning: "WHO severity scales for clinical assessment of disease severity"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+ Enclave|Data Enclave"
+    toolType: "computational_tool"
+    examples: ["N3C Data Enclave"]
+    reasoning: "Data analysis platforms and computational environments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Zero tools were mined from this publication despite extensive computational analysis described
+    - Publication contains detailed Methods section with multiple statistical software packages and versions
+    - Clinical assessment tools (ICD-10, SNOMED, WHO severity scales) were not detected
+    - R programming environment with multiple packages (BSDA, gdata, ggplot2) clearly described but missed
+    - SQL queries and data analysis platforms explicitly mentioned but not captured
+  recommendations: |
+    This publication should have yielded multiple computational tools and clinical assessment tools based on the
+    extensive methodology described. The mining appears to have completely failed to detect:
+    
+    1. Statistical software: R v3.6.3 with multiple packages (BSDA, gdata, ggplot2)
+    2. Database tools: SQL queries, N3C Data Enclave platform
+    3. Clinical assessment tools: ICD-10, SNOMED coding systems, WHO COVID-19 severity scales
+    
+    All 10 potentially missed tools should be added to improve mining coverage. The suggested patterns would
+    help capture software with version numbers, clinical coding systems, and data analysis platforms.
+    
+    No observations were extracted as no validated tools were available for linking. Future analysis should
+    extract observations about tool performance and usage from the Results and Discussion sections once
+    tools are properly validated.

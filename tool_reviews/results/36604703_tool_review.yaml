@@ -1,0 +1,141 @@
+publicationMetadata:
+  pmid: "36604703"
+  title: "The German version of the neurofibromatosis 2 impact on quality of life questionnaire correlates with severity of depression and physician-reported disease severity."
+  queryType: "clinical"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire validation study, which should contain clinical assessment tools:
+    - NFTI-QOL-D (German version being developed and validated)
+    - PHQ-9 (depression assessment questionnaire)
+    - Disease severity score (clinician-reported assessment tool)
+    - R Studio (computational tool for statistical analysis)
+    
+    The publication focuses on translating, validating, and correlating clinical assessment instruments,
+    which are legitimate research tools in clinical research contexts.
+  overallAssessment: |
+    This questionnaire validation study should definitely contain clinical assessment tools as its primary focus
+    is developing and validating the German version of NFTI-QOL. The study methodology involves translation,
+    validation, and correlation analysis of multiple assessment instruments, making clinical assessment tools
+    the expected tool type. The complete absence of mined tools suggests significant gaps in the mining patterns
+    for clinical assessment tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NFTI-QOL-D"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The aim of this study was to produce and validate a German version of the NFTI-QOL (NFTI-QOL-D) and to correlate QOL scores with a depression score"
+    whyMissed: "This is the primary clinical assessment tool being developed and validated in this study. Should have been detected as it's explicitly named and described as a questionnaire."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "NFTI-QOL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The NFTI-QOL questionnaire has produced useful results in English-speaking cohorts. The aim of this study was to produce and validate a German version of the NFTI-QOL"
+    whyMissed: "This is the original English version of the quality of life questionnaire that serves as the basis for the German translation. Clear questionnaire context."
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PHQ-9"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "correlate QOL scores with a depression score (PHQ-9) and clinical disease severity"
+    whyMissed: "PHQ-9 is a well-established depression assessment questionnaire used as a validation comparator. Should be detected as clinical assessment tool."
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "R Studio"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "R Studio version 2022.02.3 was utilised for descriptive statistics, Cronbach's α and Pearson's correlation analyses"
+    whyMissed: "Statistical software with specific version number used for data analysis. Clear computational tool with version specification."
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Disease severity score"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The utilised clinician-reported disease severity score is based on the presence or absence of 7 symptoms with major impact on the patient's life"
+    whyMissed: "This is a validated clinical assessment tool used to measure disease severity. Described as having been validated for internal consistency and correlation with clinical parameters."
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NFTI-QOL(-D)?"
+    toolType: "clinical_assessment_tool"
+    examples: ["NFTI-QOL", "NFTI-QOL-D"]
+    reasoning: "Disease-specific quality of life questionnaires should be detected. The NFTI-QOL is a validated NF2-specific assessment tool."
+
+  - patternType: "term"
+    pattern: "PHQ-9"
+    toolType: "clinical_assessment_tool"
+    examples: ["PHQ-9 depression questionnaire", "PHQ-9 questionnaire"]
+    reasoning: "PHQ-9 is a widely used standardized depression assessment tool that should be consistently detected."
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire.*correlat(es?|ed|ing)"
+    toolType: "clinical_assessment_tool"
+    examples: ["questionnaire correlates with severity", "questionnaire was correlated with"]
+    reasoning: "Questionnaires being correlated with other measures indicates validation studies using clinical assessment tools."
+
+  - patternType: "context_phrase"
+    pattern: "(R Studio|RStudio)\\s+version\\s+[0-9]+\\.[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["R Studio version 2022.02.3"]
+    reasoning: "Statistical software with version numbers should be detected as computational tools, especially in validation studies."
+
+  - patternType: "context_phrase"
+    pattern: "disease severity score.*validated"
+    toolType: "clinical_assessment_tool"
+    examples: ["disease severity score was validated for internal consistency"]
+    reasoning: "Validated clinical scoring systems are legitimate assessment tools used in clinical research."
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,}-[A-Z]{2,}(-[A-Z])?"
+    toolType: "clinical_assessment_tool"
+    examples: ["NFTI-QOL", "NFTI-QOL-D"]
+    reasoning: "Many clinical assessment tools follow acronym-based naming conventions with hyphens."
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Complete failure to detect any clinical assessment tools despite this being a questionnaire validation study
+    - NFTI-QOL-D (primary tool being developed) was not detected
+    - PHQ-9 (standard depression questionnaire) was not detected  
+    - R Studio (computational tool with version) was not detected
+    - Disease severity score (validated clinical tool) was not detected
+    - Mining patterns appear inadequate for clinical assessment tools
+  recommendations: |
+    This publication represents a significant failure of the mining system for clinical assessment tools.
+    Five legitimate research tools were completely missed:
+    
+    1. NFTI-QOL-D - The primary clinical assessment tool being developed and validated
+    2. NFTI-QOL - The original English questionnaire being translated
+    3. PHQ-9 - Standard depression assessment questionnaire used for validation
+    4. R Studio - Statistical software used for analysis (with version number)
+    5. Disease severity score - Validated clinical assessment tool
+    
+    All five tools should be added to the database. The mining patterns for clinical assessment tools
+    need significant improvement, particularly for:
+    - Disease-specific questionnaires (NFTI-QOL pattern)
+    - Standard clinical instruments (PHQ-9)
+    - Statistical software with versions
+    - Validated clinical scoring systems
+    
+    No observations were extracted as this is a validation study focused on psychometric properties
+    rather than reporting specific clinical findings about the tools' performance in measuring outcomes.

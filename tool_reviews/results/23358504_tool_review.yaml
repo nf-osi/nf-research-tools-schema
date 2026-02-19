@@ -1,0 +1,171 @@
+publicationMetadata:
+  pmid: "23358504"
+  title: "Integrated proteomics identified novel activation of dynein IC2-GR-COX-1 signaling in neurofibromatosis type I (NF1) disease model cells."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the abstract content describing integrated proteomics analysis, this Lab Research publication
+    should contain multiple tool types:
+    - Cell lines (PC12 cells explicitly mentioned)
+    - Genetic reagents (NF1 knockdown constructs, siRNA mentioned)
+    - Computational tools (iTRAQ, 2D-DIGE, DNA microarrays, iPEACH analysis platform)
+    - Potentially antibodies for protein validation studies
+    
+    The publication describes experimental cell culture work, genetic manipulation, proteomics analysis,
+    and molecular validation studies - all of which typically require specific research tools.
+  overallAssessment: |
+    This is clearly a laboratory research publication involving cell culture, genetic manipulation, and
+    proteomics analysis. The abstract describes creating NF1 knockdown PC12 cells, performing integrated
+    proteomics with multiple platforms, and conducting validation studies with siRNA. Such experimental
+    work would typically require numerous research tools including cell lines, genetic reagents, and
+    computational analysis tools. The absence of any mined tools suggests significant gaps in the mining patterns.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PC12 cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...we prepared NF1 gene knockdown (KD) PC12 cells, as a NF1 disease model, and analyzed their molecular..."
+    whyMissed: "Standard cell line name not captured by mining patterns"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "iTRAQ"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...integrated proteomics approach, comprising iTRAQ, 2D-DIGE, and DNA microarrays, using an integrated..."
+    whyMissed: "Proteomics analysis platform not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "2D-DIGE"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...integrated proteomics approach, comprising iTRAQ, 2D-DIGE, and DNA microarrays, using an integrated..."
+    whyMissed: "Proteomics technique/platform not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DNA microarrays"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...integrated proteomics approach, comprising iTRAQ, 2D-DIGE, and DNA microarrays, using an integrated..."
+    whyMissed: "Genomics analysis platform not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "iPEACH"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "...using an integrated protein and gene expression analysis chart (iPEACH). In NF1-KD PC12 cells..."
+    whyMissed: "Custom analysis platform/software not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "dynein IC2 siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...In addition, dynein IC2 siRNA significantly inhibited nuclear translocation and accumulation of GR..."
+    whyMissed: "Specific siRNA reagent not captured by patterns"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "NGF"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "...In NF1-KD PC12 cells showing abnormal neuronal differentiation after NGF treatment, of 3198 molecules..."
+    whyMissed: "Growth factor reagent (Nerve Growth Factor) not recognized"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "PC12 cells?"
+    toolType: "cell_line"
+    examples: ["PC12 cells"]
+    reasoning: "PC12 is a standard rat pheochromocytoma cell line widely used in neuroscience research"
+
+  - patternType: "term"
+    pattern: "iTRAQ"
+    toolType: "computational_tool"
+    examples: ["iTRAQ"]
+    reasoning: "iTRAQ (isobaric tags for relative and absolute quantitation) is a standard proteomics analysis platform"
+
+  - patternType: "term"
+    pattern: "2D-DIGE"
+    toolType: "computational_tool"
+    examples: ["2D-DIGE"]
+    reasoning: "2D-DIGE (two-dimensional difference gel electrophoresis) is a proteomics analysis technique"
+
+  - patternType: "term"
+    pattern: "DNA microarrays?"
+    toolType: "computational_tool"
+    examples: ["DNA microarrays"]
+    reasoning: "DNA microarrays are standard genomics analysis platforms for gene expression profiling"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+siRNA\\b"
+    toolType: "genetic_reagent"
+    examples: ["dynein IC2 siRNA"]
+    reasoning: "Pattern to capture specific siRNA reagents targeting particular genes/proteins"
+
+  - patternType: "term"
+    pattern: "NGF"
+    toolType: "genetic_reagent"
+    examples: ["NGF treatment"]
+    reasoning: "Nerve Growth Factor is a commonly used research reagent in neuroscience studies"
+
+  - patternType: "context_phrase"
+    pattern: "knockdown \\(KD\\)"
+    toolType: "genetic_reagent"
+    examples: ["NF1 gene knockdown (KD)"]
+    reasoning: "Pattern to identify gene knockdown constructs and cell lines"
+
+  - patternType: "naming_convention"
+    pattern: "i[A-Z]+\\b"
+    toolType: "computational_tool"
+    examples: ["iPEACH"]
+    reasoning: "Many bioinformatics tools use 'i' prefix naming convention (iPEACH, iPathway, etc.)"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 8
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - NO TOOLS WERE MINED despite clear evidence of multiple research tools in the abstract
+    - Publication describes laboratory research with cell culture, genetic manipulation, and proteomics analysis
+    - Multiple specific tools mentioned: PC12 cells, iTRAQ, 2D-DIGE, DNA microarrays, iPEACH, siRNA, NGF
+    - Mining patterns appear to have significant gaps for standard research tools
+    - Only abstract available - full Methods section would likely contain many more tools
+  recommendations: |
+    This publication represents a significant failure of the mining system - 7 clear research tools
+    were completely missed from the abstract alone. The tools identified include:
+    
+    SHOULD BE ADDED:
+    - PC12 cells (standard cell line)
+    - iTRAQ, 2D-DIGE, DNA microarrays, iPEACH (computational/analysis tools)
+    - dynein IC2 siRNA, NGF (genetic reagents)
+    
+    PATTERN IMPROVEMENTS NEEDED:
+    - Add patterns for standard cell line names (PC12, HEK293, etc.)
+    - Include proteomics platform terms (iTRAQ, 2D-DIGE, etc.)
+    - Capture siRNA reagent patterns
+    - Recognize growth factor reagents (NGF, EGF, etc.)
+    - Add bioinformatics tool naming conventions
+    
+    NO OBSERVATIONS EXTRACTED:
+    - Only abstract available, no Results/Discussion sections for phenotypic observations
+    - Full text would be needed to extract experimental findings and tool performance data
+    
+    This case highlights critical gaps in the mining patterns that need immediate attention.
