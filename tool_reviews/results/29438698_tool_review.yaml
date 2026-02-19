@@ -1,0 +1,97 @@
+publicationMetadata:
+  pmid: "29438698"
+  title: "Schwann cell programming and malignant peripheral nerve sheath tumor development"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and content about Schwann cell programming and tumor development:
+    - Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools
+    - The study focuses on Schwann cell biology and malignant peripheral nerve sheath tumors
+    - Methods section indicates experimental procedures likely involving molecular biology techniques
+    - Expected tools: antibodies for protein detection, cell lines for in vitro studies, animal models for tumor studies, genetic reagents for manipulation
+    
+    Note: This appears to be a laboratory research study that would typically use multiple research tool types including antibodies, cell culture systems, and potentially animal models for cancer research.
+  overallAssessment: |
+    This is a laboratory research publication focused on Schwann cell programming and malignant peripheral nerve sheath tumor development. 
+    Based on the title and research focus, this type of study would typically involve extensive use of research tools including antibodies for protein analysis, 
+    cell lines for in vitro experiments, and potentially animal models for tumor studies. The presence of a Methods section strongly suggests 
+    experimental work that would require various research reagents and tools.
+
+toolValidations: []  # No tools were initially mined
+
+potentiallyMissedTools:
+  - toolName: "Primary Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Based on publication focus on Schwann cell programming, likely mentions primary Schwann cell cultures"
+    whyMissed: "Primary cell cultures may not have been captured by standard cell line mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+  
+  - toolName: "Immunofluorescence antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Research on cell programming typically requires antibodies for protein localization and characterization"
+    whyMissed: "Antibodies may be mentioned without specific names or catalog numbers"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "Mouse tumor models"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Malignant peripheral nerve sheath tumor research often uses mouse xenograft or genetic models"
+    whyMissed: "Animal models may be described generically without specific strain names"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "primary.*[Ss]chwann.*cell"
+    toolType: "cell_line"
+    examples: ["primary Schwann cells", "primary rat Schwann cells"]
+    reasoning: "Primary cell cultures are important research tools but may not be captured by standard cell line patterns"
+  
+  - patternType: "context_phrase"
+    pattern: "immunofluorescence.*staining|immunostaining.*antibod"
+    toolType: "antibody"
+    examples: ["immunofluorescence staining with antibodies", "immunostaining using specific antibodies"]
+    reasoning: "Immunofluorescence studies require antibodies but may not mention specific antibody names"
+  
+  - patternType: "term"
+    pattern: "MPNST.*model|peripheral.*nerve.*sheath.*tumor.*model"
+    toolType: "animal_model"
+    examples: ["MPNST mouse model", "peripheral nerve sheath tumor model"]
+    reasoning: "Tumor models may be described by disease name rather than specific strain nomenclature"
+  
+  - patternType: "context_phrase"
+    pattern: "cell.*programming|reprogramming.*protocol"
+    toolType: "genetic_reagent"
+    examples: ["cell programming factors", "reprogramming protocol using vectors"]
+    reasoning: "Cell programming studies often use genetic reagents like vectors or transcription factors"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No research tools were identified in initial mining despite this being a laboratory research publication
+    - Publication focuses on Schwann cell programming and malignant peripheral nerve sheath tumors, which typically requires extensive use of research tools
+    - Methods section present indicates experimental procedures that would normally involve antibodies, cell cultures, and potentially animal models
+    - Significant gap between expected tool usage (high) and tools identified (zero) suggests mining patterns may need improvement
+  recommendations: |
+    - This publication should be manually reviewed by a curator as it represents a clear case where tools were likely missed
+    - The mining patterns appear insufficient for capturing tools in Schwann cell and peripheral nerve tumor research
+    - Recommend adding patterns for primary cell cultures, immunofluorescence reagents, and tumor model systems
+    - Consider expanding context-based mining to capture tools described by function rather than specific names
+    - The zero tool count is highly suspicious for a laboratory research paper with a Methods section
+    - Priority should be given to improving mining sensitivity for neurobiology and cancer research publications

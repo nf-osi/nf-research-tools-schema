@@ -1,0 +1,148 @@
+publicationMetadata:
+  pmid: "33507559"
+  title: "Purinergic signaling in peripheral nervous system glial cells."
+  queryType: "unknown"
+  publicationType: "Review Article"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: No
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a review article that includes some experimental data. Based on the content:
+    - Review articles typically cite tools from other studies but may not use them directly
+    - However, this review includes original qPCR data on cultured mouse Schwann cells
+    - Expected tools: cell lines (cultured mouse Schwann cells), computational tools (qPCR analysis)
+    - May also contain genetic reagents (primers for qPCR) and potentially animal models (source of cells)
+    
+    The publication mentions experimental procedures including cell culture, qPCR, and specific culture conditions,
+    suggesting it contains both review content and original experimental work.
+  overallAssessment: |
+    This review article combines literature review with original experimental data on purinergic receptor expression
+    in cultured mouse Schwann cells. While primarily a review, it includes qPCR experiments that would require
+    research tools including cell lines, culture reagents, and computational analysis tools. The absence of a
+    formal Methods section is typical for review articles, but experimental details are provided in figure legends.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "cultured mouse Schwann cells"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...catalog purinergic receptor mRNA expression in cultured mouse Schwann cells (SCs)..."
+    whyMissed: "Cell line mentioned in experimental context but may not have been recognized as a research tool"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "wildtype (WT) embryonic day (E12.5)-derived cultured mouse SCs"
+    toolType: "cell_line"
+    foundIn: "introduction"
+    contextSnippet: "...mRNA expression levels in wildtype (WT) embryonic day (E12.5)-derived cultured mouse SCs are expressed as ΔCT ± SD..."
+    whyMissed: "Specific cell line with developmental stage and genotype information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "qPCR"
+    toolType: "computational_tool"
+    foundIn: "introduction"
+    contextSnippet: "...To summarize purinergic receptor expression in SCs, we performed qPCR..."
+    whyMissed: "Molecular biology technique/method mentioned as being performed but not captured as tool"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+  - toolName: "DMEM"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...cultured in DMEM +10% FBS + 10 ng/ml β-heregulin +2uM forskolin..."
+    whyMissed: "Cell culture medium is a research reagent but may not be captured by current patterns"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+
+  - toolName: "β-heregulin"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...cultured in DMEM +10% FBS + 10 ng/ml β-heregulin +2uM forskolin..."
+    whyMissed: "Growth factor/protein reagent used in cell culture not captured"
+    confidence: 0.7
+    shouldBeAdded: Yes
+
+  - toolName: "forskolin"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...cultured in DMEM +10% FBS + 10 ng/ml β-heregulin +2uM forskolin..."
+    whyMissed: "Chemical reagent used in cell culture experiments not captured"
+    confidence: 0.7
+    shouldBeAdded: Yes
+
+  - toolName: "nerve growth factor"
+    toolType: "genetic_reagent"
+    foundIn: "introduction"
+    contextSnippet: "...neuron/Schwann cell co-cultures in serum-free N2 medium with nerve growth factor..."
+    whyMissed: "Growth factor reagent used in cell culture not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "cultured .+ cells"
+    toolType: "cell_line"
+    examples: ["cultured mouse Schwann cells", "cultured in DMEM"]
+    reasoning: "Pattern to capture cultured cell lines that may be described with species and cell type"
+
+  - patternType: "context_phrase"
+    pattern: "we performed (qPCR|RT-PCR|PCR)"
+    toolType: "computational_tool"
+    examples: ["we performed qPCR"]
+    reasoning: "Captures molecular biology techniques when described as experimental procedures"
+
+  - patternType: "naming_convention"
+    pattern: "(embryonic day|E)\\d+(\\.\\d+)?(-derived)?"
+    toolType: "cell_line"
+    examples: ["embryonic day (E12.5)-derived cultured mouse SCs"]
+    reasoning: "Captures developmental stage information that specifies cell line characteristics"
+
+  - patternType: "term"
+    pattern: "(β-heregulin|heregulin|forskolin|nerve growth factor|NGF)"
+    toolType: "genetic_reagent"
+    examples: ["β-heregulin", "forskolin", "nerve growth factor"]
+    reasoning: "Common growth factors and signaling molecules used in cell culture"
+
+  - patternType: "context_phrase"
+    pattern: "cultured in (DMEM|RPMI|MEM|medium)"
+    toolType: "genetic_reagent"
+    examples: ["cultured in DMEM +10% FBS"]
+    reasoning: "Captures cell culture media and conditions as research reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear experimental content
+    - Publication contains original qPCR experiments on cultured Schwann cells
+    - Multiple research reagents and cell culture components mentioned but not captured
+    - Cell lines with specific developmental stages and culture conditions described
+    - Growth factors and signaling molecules used in experiments not identified
+  recommendations: |
+    This publication was significantly under-mined for research tools. Despite being classified as a review article,
+    it contains substantial original experimental work including:
+    
+    1. SHOULD ADD: Cultured mouse Schwann cell lines (primary tools for the experiments)
+    2. SHOULD ADD: Growth factors and culture reagents (β-heregulin, forskolin, nerve growth factor)
+    3. CONSIDER ADDING: qPCR as computational tool (molecular biology technique)
+    4. CONSIDER ADDING: Culture media components (DMEM, N2 medium)
+    
+    The mining patterns need improvement to capture:
+    - Cell lines described with developmental stages and culture conditions
+    - Growth factors and signaling molecules used in cell culture
+    - Molecular biology techniques when described as experimental procedures
+    - Culture media and reagents in experimental contexts
+    
+    This case demonstrates that review articles can contain significant original experimental data and should
+    not be automatically excluded from tool mining. The experimental content in figure legends and methods
+    descriptions within the text should be thoroughly scanned for research tools.

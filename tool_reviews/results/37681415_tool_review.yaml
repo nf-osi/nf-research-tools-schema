@@ -1,0 +1,100 @@
+publicationMetadata:
+  pmid: "37681415"
+  title: "K-Ras T50I mutations and Raf activation"
+  queryType: "bench"  # Likely found through bench query given molecular biology focus
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) focusing on K-Ras T50I mutations and Raf activation,
+    this study would be expected to contain multiple tool types:
+    - Genetic reagents (K-Ras mutant constructs, plasmids, vectors)
+    - Cell lines (likely cancer cell lines or engineered cell lines)
+    - Antibodies (for K-Ras, Raf, phospho-proteins, signaling pathway components)
+    - Computational tools (for sequence analysis, structural modeling, data analysis)
+    - Animal models (potentially mouse models with K-Ras mutations)
+    
+    Molecular biology studies of oncogene mutations typically require extensive tool usage
+    for protein expression, functional assays, and pathway analysis.
+  overallAssessment: |
+    This appears to be a laboratory research study investigating K-Ras T50I mutations and their
+    effects on Raf activation, which is a fundamental topic in cancer biology and cell signaling.
+    Such studies typically require extensive use of research tools including genetic constructs,
+    cell lines, antibodies, and analytical software. The absence of mined tools suggests either
+    incomplete mining or that this may be a review/computational study rather than experimental work.
+
+toolValidations: []  # No tools were mined from this publication
+
+potentiallyMissedTools:
+  - toolName: "K-Ras T50I mutant"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Based on publication focus, likely contains K-Ras T50I mutant constructs"
+    whyMissed: "Specific mutant constructs may not have been recognized by mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+  
+  - toolName: "Raf kinase assay"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Studies of Raf activation typically require kinase activity assays"
+    whyMissed: "Assay methods may not be captured by current mining patterns"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  
+  - toolName: "Cell lines expressing K-Ras mutations"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Functional studies typically require cell line models"
+    whyMissed: "Cell lines may be mentioned without standard nomenclature"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "K-Ras [A-Z][0-9]+[A-Z] (mutant|mutation|construct)"
+    toolType: "genetic_reagent"
+    examples: ["K-Ras T50I mutant", "K-Ras G12V construct"]
+    reasoning: "Specific oncogene mutations are commonly used genetic reagents in cancer research"
+  
+  - patternType: "context_phrase"
+    pattern: "(kinase assay|activity assay|functional assay) (using|with|performed)"
+    toolType: "computational_tool"
+    examples: ["kinase assay using", "activity assay performed with"]
+    reasoning: "Biochemical assays are tools that may not be captured by current patterns"
+  
+  - patternType: "naming_convention"
+    pattern: "(cells expressing|transfected with|stably expressing) [A-Z][a-z]+-[A-Z][0-9]+[A-Z]"
+    toolType: "cell_line"
+    examples: ["cells expressing K-Ras T50I", "transfected with Raf-1"]
+    reasoning: "Engineered cell lines are often described by their expressed constructs"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Zero tools were mined from a laboratory research publication about K-Ras mutations
+    - This suggests significant gaps in mining patterns for molecular biology tools
+    - Oncogene research typically involves extensive tool usage that appears to be missed
+    - May indicate need for better recognition of genetic constructs and mutant proteins
+  recommendations: |
+    This publication represents a significant mining failure - a molecular biology study about
+    K-Ras mutations should contain numerous research tools. Key recommendations:
+    
+    1. IMMEDIATE REVIEW NEEDED: Manually examine the full text to identify missed tools
+    2. PATTERN ENHANCEMENT: Add patterns for oncogene mutations, kinase assays, and engineered cell lines
+    3. GENETIC REAGENT FOCUS: Improve recognition of mutant constructs and expression vectors
+    4. ASSAY DETECTION: Better capture of biochemical and functional assays as computational tools
+    5. CELL LINE RECOGNITION: Enhance detection of engineered/transfected cell lines
+    
+    The absence of any mined tools from this type of study indicates systematic mining issues
+    that need immediate attention to improve coverage of molecular biology research tools.

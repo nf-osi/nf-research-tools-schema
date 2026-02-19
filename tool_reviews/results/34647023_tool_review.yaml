@@ -1,0 +1,90 @@
+publicationMetadata:
+  pmid: "34647023"
+  title: "A genetic mouse model of malignant peripheral nerve sheath tumors"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and focus on genetic mouse models of malignant peripheral nerve sheath tumors:
+    - Animal models (genetic mouse strains, knockout/transgenic mice)
+    - Cell lines (potentially derived from tumors or normal tissue)
+    - Genetic reagents (constructs, vectors, primers)
+    - Antibodies (for immunohistochemistry, Western blot)
+    - Computational tools (for data analysis, statistical software)
+    
+    This is a laboratory research study developing and characterizing a genetic mouse model,
+    which typically involves multiple research tools across several categories.
+  overallAssessment: |
+    This is a laboratory research publication focused on developing and characterizing a genetic mouse model
+    for malignant peripheral nerve sheath tumors. Such studies typically use extensive research tools including
+    animal models, antibodies for tissue analysis, cell culture systems, and computational tools for data analysis.
+    The absence of any mined tools is highly suspicious and suggests significant under-mining of research tools.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Genetic mouse model"
+    toolType: "animal_model"
+    foundIn: "title"
+    contextSnippet: "A genetic mouse model of malignant peripheral nerve sheath tumors"
+    whyMissed: "Title explicitly mentions genetic mouse model but wasn't captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "Malignant peripheral nerve sheath tumor model"
+    toolType: "animal_model"
+    foundIn: "title"
+    contextSnippet: "A genetic mouse model of malignant peripheral nerve sheath tumors"
+    whyMissed: "Specific tumor model mentioned in title but not detected"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "genetic mouse model"
+    toolType: "animal_model"
+    examples: ["A genetic mouse model of malignant peripheral nerve sheath tumors"]
+    reasoning: "Publications describing genetic mouse models should be captured as animal model tools"
+    
+  - patternType: "context_phrase"
+    pattern: "mouse model of [disease/condition]"
+    toolType: "animal_model"
+    examples: ["mouse model of malignant peripheral nerve sheath tumors"]
+    reasoning: "Disease-specific mouse models are important research tools that should be captured"
+    
+  - patternType: "naming_convention"
+    pattern: "[Gene]+/- mice|[Gene]-/- mice|[Gene] knockout mice|[Gene] transgenic mice"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice", "Trp53-/- mice"]
+    reasoning: "Standard genetic mouse strain nomenclature should be captured systematically"
+
+observations: []  # Cannot extract observations without access to full text content
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 2
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Zero tools were mined from a laboratory research publication about genetic mouse models
+    - Title explicitly mentions "genetic mouse model" which should be captured as an animal model tool
+    - This appears to be a significant under-mining issue rather than a publication without tools
+    - Laboratory research on genetic mouse models typically uses multiple tool categories
+  recommendations: |
+    - URGENT: This publication requires complete re-mining with improved patterns
+    - The title alone contains at least one clear animal model tool that was missed
+    - Genetic mouse model publications typically contain multiple research tools including:
+      * Specific mouse strain names and genetic backgrounds
+      * Antibodies for immunohistochemistry and protein analysis
+      * Cell lines derived from tumors or normal tissue
+      * Molecular biology reagents (primers, constructs, vectors)
+      * Computational tools for statistical analysis
+    - Recommend manual curator review to identify all missed tools
+    - Update mining patterns to better capture genetic mouse model terminology
+    - This case highlights need for improved animal model detection patterns

@@ -1,0 +1,104 @@
+publicationMetadata:
+  pmid: "30800298"
+  title: "The impact of plexiform neurofibromas on adults with neurofibromatosis type 1: A qualitative study"
+  queryType: "clinical"
+  publicationType: "Qualitative Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: No
+  expectedToolTypes: |
+    This is a qualitative study examining patient experiences and the psychosocial impact of plexiform 
+    neurofibromas in adults with NF1. Expected tool types for this publication type:
+    
+    - Clinical assessment tools: Potentially validated questionnaires or interview guides for measuring 
+      quality of life, psychological impact, or patient-reported outcomes
+    - Computational tools: Possibly qualitative data analysis software (NVivo, ATLAS.ti, etc.)
+    
+    NOT expected:
+    - Lab research tools (antibodies, cell lines, animal models, genetic reagents, organoids, PDX)
+    - These are not relevant for qualitative interview-based studies
+    
+    Note: Qualitative studies typically use interview guides, thematic analysis frameworks, or 
+    validated psychosocial assessment instruments rather than laboratory research tools.
+  overallAssessment: |
+    This qualitative study focuses on patient experiences and psychosocial impacts, which would not 
+    typically involve laboratory research tools. The study design suggests interviews or surveys to 
+    understand patient perspectives, potentially using validated clinical assessment tools for measuring 
+    quality of life or psychological outcomes. No laboratory methods or experimental procedures would 
+    be expected in this type of research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Semi-structured interview guide"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Qualitative studies typically use structured or semi-structured interview protocols"
+    whyMissed: "Interview guides/protocols are research instruments but may not be recognized as 'tools' by mining algorithms focused on laboratory equipment"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+  - toolName: "Thematic analysis framework"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Qualitative data analysis often employs systematic frameworks like Braun & Clarke's thematic analysis"
+    whyMissed: "Qualitative analysis frameworks are methodological tools but may not match typical computational tool patterns"
+    confidence: 0.6
+    shouldBeAdded: Maybe
+  - toolName: "Qualitative data analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Software like NVivo, ATLAS.ti, or MAXQDA commonly used for coding and analyzing qualitative data"
+    whyMissed: "Specific software names may not have been mentioned or recognized by mining patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "interview guide|interview protocol|interview schedule"
+    toolType: "clinical_assessment_tool"
+    examples: ["semi-structured interview guide", "standardized interview protocol"]
+    reasoning: "Interview guides are research instruments used in qualitative studies but may be missed by patterns focused on laboratory tools"
+  - patternType: "term"
+    pattern: "thematic analysis|framework analysis|interpretative phenomenological analysis|grounded theory"
+    toolType: "computational_tool"
+    examples: ["Braun & Clarke thematic analysis", "framework analysis approach"]
+    reasoning: "Qualitative analysis frameworks are methodological tools that should be captured"
+  - patternType: "term"
+    pattern: "NVivo|ATLAS\\.ti|MAXQDA|Dedoose|QSR|qualitative data analysis software"
+    toolType: "computational_tool"
+    examples: ["NVivo 12", "ATLAS.ti version 8", "MAXQDA 2020"]
+    reasoning: "Specialized qualitative analysis software commonly used in social science research"
+  - patternType: "context_phrase"
+    pattern: "analyzed using|coded using|transcribed using|interviews were conducted using"
+    toolType: "general"
+    examples: ["interviews were conducted using a semi-structured guide", "data were analyzed using NVivo"]
+    reasoning: "Context phrases indicating tool usage in qualitative research methodology"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Publication is a qualitative study examining patient experiences, not laboratory research
+    - No research tools were mined, which is appropriate for this publication type
+    - Qualitative studies use different types of research instruments (interview guides, analysis frameworks) 
+      that may not be captured by mining patterns designed for laboratory tools
+    - The absence of mined tools is correct and expected for this study design
+  recommendations: |
+    - No tools need to be rejected since none were mined
+    - This publication correctly identified as not containing traditional research tools
+    - Consider expanding mining patterns to capture qualitative research instruments:
+      * Interview guides and protocols
+      * Qualitative analysis frameworks and software
+      * Patient-reported outcome measures specific to qualitative research
+    - The mining system performed correctly by not identifying false positive tools
+    - Future improvements could include patterns for qualitative research methodology tools
+    - No observations were extracted as this study focuses on patient experiences rather than 
+      experimental findings about research tools

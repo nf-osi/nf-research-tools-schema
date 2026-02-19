@@ -1,0 +1,142 @@
+publicationMetadata:
+  pmid: "36806881"
+  title: "Proteasomal pathway inhibition as therapy for NF2-associated tumors"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) and topic (proteasomal pathway inhibition for NF2-associated tumors):
+    - Cell lines (likely NF2-deficient cell lines, meningioma cell lines, schwannoma cell lines)
+    - Genetic reagents (NF2 constructs, siRNA, plasmids, proteasome inhibitors like bortezomib, carfilzomib, MG132)
+    - Antibodies (for Western blot, immunofluorescence against proteasome subunits, NF2/merlin, ubiquitin)
+    - Computational tools (for data analysis, statistical software, image analysis)
+    - Animal models (potentially NF2 knockout mice or tumor xenograft models)
+    - Chemical compounds/inhibitors (proteasome inhibitors are central to this research)
+    
+    This type of mechanistic study investigating therapeutic targets typically uses multiple research tools across categories.
+  overallAssessment: |
+    This is a laboratory research study investigating proteasomal pathway inhibition as a therapeutic approach for NF2-associated tumors.
+    Such mechanistic studies typically employ multiple research tools including cell lines, antibodies, genetic reagents, and computational analysis tools.
+    The fact that no tools were initially mined from a publication with this focus is highly unusual and suggests significant gaps in current mining patterns, particularly for chemical biology and therapeutic research.
+
+toolValidations: []  # No tools were mined to validate
+
+potentiallyMissedTools:
+  - toolName: "Proteasome inhibitors (bortezomib, carfilzomib, MG132, lactacystin)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Publication focuses on proteasomal pathway inhibition - these compounds would be essential experimental tools"
+    whyMissed: "Chemical inhibitors/pharmaceutical compounds may not be captured by current mining patterns focused on traditional biological tools"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NF2-deficient cell lines (meningioma, schwannoma cell lines)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Research on NF2-associated tumors requires NF2-deficient or NF2-mutant cell line models"
+    whyMissed: "Cell lines may be described functionally (NF2-deficient) rather than by standard nomenclature, or may use patient-derived lines with non-standard names"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-proteasome subunit antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Proteasomal pathway studies require antibodies against proteasome subunits (20S, 26S), ubiquitin, or pathway markers"
+    whyMissed: "Antibodies may be described by target protein rather than specific clone/catalog information, or mentioned without vendor details"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-NF2/merlin antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "NF2 research typically uses antibodies against NF2/merlin protein for Western blot or immunofluorescence"
+    whyMissed: "NF2 antibodies may be described simply as 'NF2 antibody' without specific clone information"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Statistical analysis software (GraphPad Prism, R, SPSS)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Laboratory research requires statistical analysis software for data analysis and visualization"
+    whyMissed: "Statistical software often mentioned briefly in methods without version numbers or detailed context"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+  - toolName: "Cell viability assay reagents (MTT, WST-1, CellTiter-Glo)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Therapeutic studies typically measure cell viability using colorimetric or luminescent assays"
+    whyMissed: "Assay reagents may be mentioned generically or by function rather than specific product names"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(bortezomib|carfilzomib|MG132|lactacystin|epoxomicin|PS341|MLN2238)\\b"
+    toolType: "genetic_reagent"
+    examples: ["bortezomib treatment", "MG132 inhibition", "carfilzomib-treated cells", "PS341 exposure"]
+    reasoning: "Proteasome inhibitors are key chemical tools in cancer research but may not be captured by current biological tool patterns"
+
+  - patternType: "context_phrase"
+    pattern: "(treated with|incubated with|exposed to)\\s+[A-Z0-9]+\\s*(inhibitor|compound|drug)"
+    toolType: "genetic_reagent"
+    examples: ["treated with MG132", "incubated with bortezomib", "exposed to proteasome inhibitor"]
+    reasoning: "Chemical treatment context phrases could identify missed pharmaceutical tools and compounds"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}[0-9]{2,}\\b"
+    toolType: "genetic_reagent"
+    examples: ["MG132", "PS341", "MLN2238", "WST1"]
+    reasoning: "Many chemical compounds and assay reagents use alphanumeric naming conventions that current patterns may miss"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Sigma|Calbiochem|Selleck|MedChemExpress|Cayman|Cell Signaling|Abcam)\\s+(Chemical|Chemicals|Technology)?"
+    toolType: "genetic_reagent"
+    examples: ["Sigma Chemical", "Selleck Chemicals", "Cell Signaling Technology"]
+    reasoning: "Chemical and reagent vendors are often mentioned with compounds but may not be captured by current vendor patterns"
+
+  - patternType: "context_phrase"
+    pattern: "(analyzed using|statistical analysis|data analysis|performed using)\\s+(GraphPad|Prism|SPSS|SAS|R\\s)"
+    toolType: "computational_tool"
+    examples: ["analyzed using GraphPad Prism", "statistical analysis with R", "data analysis performed using SPSS"]
+    reasoning: "Statistical analysis context often indicates computational tools that may be mentioned briefly without detailed descriptions"
+
+  - patternType: "term"
+    pattern: "\\b(NF2-deficient|NF2-null|merlin-deficient|schwannoma|meningioma)\\s+(cell|cells|line|lines)\\b"
+    toolType: "cell_line"
+    examples: ["NF2-deficient cells", "schwannoma cell line", "meningioma cells"]
+    reasoning: "Functional descriptions of cell lines may be missed by patterns looking for standard nomenclature"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Zero tools were mined from a laboratory research publication that should contain numerous research tools
+    - Publication topic (proteasomal pathway inhibition for NF2 tumors) strongly indicates use of chemical inhibitors, specialized cell lines, and antibodies
+    - Current mining patterns appear inadequate for capturing chemical compounds and pharmaceutical tools
+    - Functional cell line descriptions (NF2-deficient) may be missed by standard nomenclature patterns
+    - Statistical analysis tools are likely present but not captured
+    - This represents a systematic failure in mining chemical biology and therapeutic research publications
+  recommendations: |
+    This publication represents a critical mining failure - a laboratory mechanistic study with zero tools identified despite clear therapeutic focus.
+    URGENT RECOMMENDATIONS:
+    1. IMMEDIATE: Expand mining patterns to include proteasome inhibitors and chemical compounds
+    2. Add comprehensive patterns for pharmaceutical/chemical vendors (Sigma, Selleck, Cayman, etc.)
+    3. Include functional cell line descriptions (NF2-deficient, tumor-derived, patient-derived)
+    4. Capture statistical analysis software mentions even when brief or without versions
+    5. Add context-based mining for treatment/inhibition/exposure phrases
+    6. CRITICAL: Manual review of this publication is essential to catalog actual tools used
+    7. Use this publication as a primary test case for improved chemical biology mining patterns
+    8. The complete absence of tools indicates fundamental gaps in current mining approach for therapeutic research
+    9. Consider separate mining strategies for different research domains (chemical biology vs molecular biology)
+    10. Validate mining improvements against similar therapeutic/chemical biology publications

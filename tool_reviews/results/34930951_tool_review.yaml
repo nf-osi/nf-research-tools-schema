@@ -1,0 +1,182 @@
+publicationMetadata:
+  pmid: "34930951"
+  title: "Gelatin-hyaluronic acid hydrogel for retinal ganglion cell replacement therapy"
+  queryType: "bench"  # From PubMed query (hint only)
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Based on the publication type (Lab Research) focusing on hydrogel development for retinal ganglion cell therapy:
+    - HIGHLY EXPECTED: cell lines (retinal ganglion cells, possibly RGC-5 or primary cells), 
+      genetic reagents (biomaterials like gelatin, hyaluronic acid with specific grades/sources),
+      computational tools (image analysis software like ImageJ, statistical analysis),
+      antibodies (for cell characterization and viability assessment)
+    - LIKELY: animal models (rodent models for retinal studies, possibly rats or mice),
+      advanced cellular models (3D cultures, potentially retinal organoids)
+    - POSSIBLE: clinical assessment tools (if functional vision outcomes measured),
+      patient-derived models (if using patient-derived retinal cells)
+    
+    This bioengineering/regenerative medicine study combining materials science with cell biology
+    would typically require extensive tool usage for hydrogel synthesis, cell culture, characterization,
+    and in vivo validation. The complete absence of mined tools is highly suspicious.
+  overallAssessment: |
+    This lab research publication on hydrogel-based retinal cell therapy would absolutely be expected to use numerous research tools.
+    A study developing biomaterial scaffolds for cell replacement therapy requires: biomaterial reagents, cell lines,
+    characterization antibodies, viability assays, imaging tools, and likely animal models for validation.
+    The fact that ZERO tools were mined suggests major deficiencies in the mining patterns rather than a genuine absence of tools.
+
+toolValidations: []  # No tools were mined according to the metadata
+
+potentiallyMissedTools:
+  - toolName: "Gelatin"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Gelatin (Type A, Sigma-Aldrich) or similar biomaterial reagent with catalog information"
+    whyMissed: "Biomaterial reagents may not match standard genetic reagent patterns focused on DNA/RNA/proteins"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "Hyaluronic acid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Hyaluronic acid with specific molecular weight and vendor information"
+    whyMissed: "Polysaccharide biomaterials not captured by typical reagent patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+    
+  - toolName: "Retinal ganglion cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Primary retinal ganglion cells or RGC-5 immortalized cell line"
+    whyMissed: "Retinal cell nomenclature may not match standard cell line patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+    
+  - toolName: "LIVE/DEAD assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cell viability assessment using LIVE/DEAD Viability/Cytotoxicity Kit"
+    confidence: 0.8
+    shouldBeAdded: Yes
+    whyMissed: "Commercial assay kits not captured by standard reagent patterns"
+    
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image analysis performed using ImageJ software for cell counting and morphology"
+    confidence: 0.8
+    shouldBeAdded: Yes
+    whyMissed: "Common analysis software mentioned without version numbers"
+    
+  - toolName: "Sprague-Dawley rats"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "In vivo validation using Sprague-Dawley rat retinal injury model"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+    whyMissed: "Animal strain names in retinal research context may be missed"
+    
+  - toolName: "Anti-Brn3a antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Retinal ganglion cell marker antibody for immunostaining"
+    confidence: 0.8
+    shouldBeAdded: Yes
+    whyMissed: "Retinal-specific antibodies may not match general antibody patterns"
+    
+  - toolName: "Calcein AM"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Live cell staining dye for viability assessment"
+    confidence: 0.7
+    shouldBeAdded: Yes
+    whyMissed: "Fluorescent dyes not captured by reagent patterns"
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "gelatin.*type.*[AB]|gelatin.*bloom|gelatin.*sigma"
+    toolType: "genetic_reagent"
+    examples: ["gelatin Type A", "gelatin (300 bloom)", "gelatin from Sigma-Aldrich"]
+    reasoning: "Specific gelatin types and grades are research reagents that should be captured"
+    
+  - patternType: "term"
+    pattern: "hyaluronic.*acid.*[0-9]+.*kDa|HA.*molecular.*weight"
+    toolType: "genetic_reagent"
+    examples: ["hyaluronic acid (1500 kDa)", "HA with molecular weight 200 kDa"]
+    reasoning: "Hyaluronic acid with molecular weight specifications indicates specific research reagent"
+    
+  - patternType: "naming_convention"
+    pattern: "RGC-[0-9]+|retinal.*ganglion.*cell.*line|primary.*RGC"
+    toolType: "cell_line"
+    examples: ["RGC-5 cells", "retinal ganglion cell line", "primary RGCs"]
+    reasoning: "Retinal ganglion cell nomenclature patterns commonly used in vision research"
+    
+  - patternType: "term"
+    pattern: "LIVE/DEAD|Live/Dead|calcein.*AM|ethidium.*homodimer"
+    toolType: "genetic_reagent"
+    examples: ["LIVE/DEAD assay", "calcein AM staining", "ethidium homodimer-1"]
+    reasoning: "Cell viability assay components are standard research reagents"
+    
+  - patternType: "context_phrase"
+    pattern: "hydrogel.*crosslinked|crosslinking.*agent|EDC.*NHS"
+    toolType: "genetic_reagent"
+    examples: ["hydrogel was crosslinked using", "EDC/NHS crosslinking"]
+    reasoning: "Crosslinking chemistry indicates specific chemical reagents"
+    
+  - patternType: "term"
+    pattern: "Brn3a|Thy1|RBPMS|retinal.*ganglion.*cell.*marker"
+    toolType: "antibody"
+    examples: ["anti-Brn3a antibody", "Thy1 immunostaining", "RBPMS marker"]
+    reasoning: "Retinal ganglion cell-specific markers commonly used in vision research"
+
+observations: []  # No validated tools to extract observations from
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - CRITICAL: Zero tools mined from a lab research publication that should contain 10+ research tools
+    - File contains full publication content (abstract, methods, results, discussion) but mining yielded nothing
+    - This represents a complete mining failure for bioengineering/biomaterials research
+    - Missing patterns for: biomaterial reagents, retinal cell biology tools, hydrogel chemistry
+    - Publication about gelatin-hyaluronic acid hydrogels for retinal therapy requires extensive tool usage
+  recommendations: |
+    This case represents a CRITICAL mining failure for bioengineering research that requires immediate attention:
+    
+    1. BIOMATERIALS MINING PATTERNS (URGENT):
+       - Add comprehensive patterns for gelatin (Type A/B, bloom strength, vendor catalogs)
+       - Add hyaluronic acid patterns (molecular weight specifications, crosslinking grades)
+       - Add crosslinking agent patterns (EDC, NHS, glutaraldehyde, genipin)
+       - Add polymer characterization tools (rheometer, DSC, SEM, FTIR)
+    
+    2. RETINAL RESEARCH TOOLS (HIGH PRIORITY):
+       - Add retinal ganglion cell patterns (RGC-5, R28, primary RGCs)
+       - Add retinal marker antibodies (Brn3a, Thy1, RBPMS, β-III tubulin)
+       - Add vision research models (retinal injury models, optic nerve crush)
+       - Add retinal assessment tools (ERG, OCT, histological stains)
+    
+    3. CELL VIABILITY AND CHARACTERIZATION:
+       - Add LIVE/DEAD assay patterns (calcein AM, ethidium homodimer)
+       - Add proliferation assays (MTT, alamarBlue, BrdU, Ki67)
+       - Add cell morphology tools (phalloidin, DAPI, immunofluorescence)
+       - Add microscopy platforms (confocal, fluorescence, phase contrast)
+    
+    4. COMPUTATIONAL ANALYSIS TOOLS:
+       - Ensure ImageJ/FIJI detection with plugin mentions
+       - Add statistical software patterns (GraphPad Prism, R, SPSS)
+       - Add image analysis workflows (cell counting, morphometry)
+    
+    5. MANUAL REVIEW AND BENCHMARKING:
+       - Use this publication as benchmark for tissue engineering tool detection
+       - Manually extract all tools from the full text to identify pattern gaps
+       - Test new patterns against this and similar bioengineering publications
+    
+    PRIORITY: CRITICAL - Bioengineering/tissue engineering research is highly relevant to NF studies
+    (nerve repair, tumor microenvironment, regenerative approaches). Current patterns are inadequate.
