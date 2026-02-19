@@ -251,10 +251,22 @@ def prepare_goose_input(pub_row, inputs_dir):
             results_text = extract_results_section(fulltext_xml)
             discussion_text = extract_discussion_section(fulltext_xml)
 
-    # Parse mined tools from JSON columns
-    novel_tools = json.loads(pub_row.get('novel_tools', '{}'))
-    tool_metadata = json.loads(pub_row.get('tool_metadata', '{}'))
-    tool_sources = json.loads(pub_row.get('tool_sources', '{}'))
+    # Parse mined tools from JSON columns (handle NaN values)
+    novel_tools_raw = pub_row.get('novel_tools', '{}')
+    tool_metadata_raw = pub_row.get('tool_metadata', '{}')
+    tool_sources_raw = pub_row.get('tool_sources', '{}')
+
+    # Convert NaN to empty dict string
+    if pd.isna(novel_tools_raw):
+        novel_tools_raw = '{}'
+    if pd.isna(tool_metadata_raw):
+        tool_metadata_raw = '{}'
+    if pd.isna(tool_sources_raw):
+        tool_sources_raw = '{}'
+
+    novel_tools = json.loads(novel_tools_raw)
+    tool_metadata = json.loads(tool_metadata_raw)
+    tool_sources = json.loads(tool_sources_raw)
 
     # Prepare tool list with context - include ALL 9 tool types
     tools_list = []
@@ -406,8 +418,8 @@ def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
             safe_print(f"❌ Timeout after 10 minutes")
             return None
         except Exception as e:
-        safe_print(f"❌ Error: {e}")
-        return None
+            safe_print(f"❌ Error: {e}")
+            return None
 
 def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, force_rereviews):
     """
@@ -497,7 +509,8 @@ def compile_validation_results(mining_df, results_dir):
         rejected_tools = []
         uncertain_tools = []
 
-        for tool_val in tool_validations:
+        if tool_validations:
+            for tool_val in tool_validations:
             tool_info = {
                 'pmid': pmid,
                 'toolName': tool_val.get('toolName'),
