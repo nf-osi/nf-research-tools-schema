@@ -213,9 +213,9 @@ def prepare_goose_input(pub_row, inputs_dir):
 
     if cached:
         print(f"  ✅ Using cached text (skipping API calls)")
-        abstract_text = cached['abstract']
-        methods_text = cached['methods']
-        intro_text = cached['introduction']
+        abstract_text = cached.get('abstract', '')
+        methods_text = cached.get('methods', '')
+        intro_text = cached.get('introduction', '')
         # Load Results and Discussion sections (with backwards compatibility)
         results_text = cached.get('results', '')
         discussion_text = cached.get('discussion', '')
@@ -442,6 +442,12 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
         return (pmid, 'skipped', None)
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
+
+    # Skip abstract_only publications - no methods section means tool mining will fail
+    cached = load_cached_text(pmid)
+    if cached and cached.get('cache_level') == 'abstract_only' and not force_rereviews:
+        safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
+        return (pmid, 'skipped_abstract_only', None)
 
     # Prepare input file
     input_file = prepare_goose_input(row, inputs_dir)
@@ -704,6 +710,11 @@ def main():
         help='Comma-separated PMIDs to review (e.g., PMID:28078640,PMID:29415745)'
     )
     parser.add_argument(
+        '--pmids-file',
+        type=str,
+        help='File with one PMID per line to review (e.g., phase2_upgraded_pmids.txt)'
+    )
+    parser.add_argument(
         '--compile-only',
         action='store_true',
         help='Compile results from existing YAML files only'
@@ -785,6 +796,12 @@ def main():
         mining_df = mining_df[mining_df['pmid'].isin(pmid_list)]
         print(f"\nFiltered to {len(mining_df)} publications: {', '.join(pmid_list)}")
 
+    if args.pmids_file:
+        with open(args.pmids_file, 'r') as f:
+            pmid_file_list = [line.strip() for line in f if line.strip()]
+        mining_df = mining_df[mining_df['pmid'].isin(pmid_file_list)]
+        print(f"\nFiltered to {len(mining_df)} publications from {args.pmids_file}")
+
     # Run goose reviews (unless skip or compile-only)
     if not args.skip_goose and not args.compile_only:
         print(f"\n{'='*80}")
@@ -796,6 +813,7 @@ def main():
         total_pubs = len(mining_df)
         reviewed_count = 0
         skipped_count = 0
+        skipped_abstract_only_count = 0
         failed_count = 0
 
         # Use parallel processing if requested
@@ -817,6 +835,8 @@ def main():
                         reviewed_count += 1
                     elif status == 'skipped':
                         skipped_count += 1
+                    elif status == 'skipped_abstract_only':
+                        skipped_abstract_only_count += 1
                     elif status == 'failed':
                         failed_count += 1
         else:
@@ -829,6 +849,8 @@ def main():
                     reviewed_count += 1
                 elif status == 'skipped':
                     skipped_count += 1
+                elif status == 'skipped_abstract_only':
+                    skipped_abstract_only_count += 1
                 elif status == 'failed':
                     failed_count += 1
 
@@ -837,6 +859,8 @@ def main():
         print(f"Review Summary:")
         print(f"  ✅ Reviewed: {reviewed_count}")
         print(f"  ⏭️  Skipped (cached): {skipped_count}")
+        if skipped_abstract_only_count > 0:
+            print(f"  ⏭️  Skipped (abstract_only, no methods): {skipped_abstract_only_count}")
         if failed_count > 0:
             print(f"  ❌ Failed: {failed_count}")
         print(f"  📊 Total processed: {total_pubs}")

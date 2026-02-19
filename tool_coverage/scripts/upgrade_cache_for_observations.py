@@ -340,6 +340,7 @@ def main():
         'failed': 0,
         'skipped': 0
     }
+    upgraded_pmids = []
 
     for i, candidate in enumerate(upgrade_candidates, 1):
         pmid = candidate['pmid']
@@ -349,12 +350,20 @@ def main():
 
         if result:
             stats['upgraded'] += 1
+            upgraded_pmids.append(f"PMID:{pmid}")
         else:
             stats['failed'] += 1
 
         # Rate limiting
         time.sleep(0.34)
         logger.info("")
+
+    # Write list of upgraded PMIDs for phase 2 re-review step
+    upgraded_pmids_file = Path('tool_coverage/outputs/phase2_upgraded_pmids.txt')
+    upgraded_pmids_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(upgraded_pmids_file, 'w') as f:
+        f.write('\n'.join(upgraded_pmids))
+    logger.info(f"Wrote {len(upgraded_pmids)} upgraded PMIDs to {upgraded_pmids_file}")
 
     # Print summary
     logger.info("="*80)
@@ -368,7 +377,7 @@ def main():
     if stats['upgraded'] > 0:
         logger.info(f"✓ Upgraded {stats['upgraded']} caches to full level")
         logger.info(f"  These caches now have Results + Discussion sections")
-        logger.info(f"  Ready for observation extraction")
+        logger.info(f"  Ready for observation extraction via phase 2 re-review")
 
 
 if __name__ == '__main__':

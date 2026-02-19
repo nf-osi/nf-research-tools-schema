@@ -86,6 +86,11 @@ prompt: |
      - Ways to distinguish real tools from false positives
      - Tool types that need better pattern coverage
 
+     **DO NOT suggest patterns for:**
+     - Generic statistical software or programming languages (R, Python, SAS, MATLAB, Excel, SPSS, Stata, GraphPad Prism, JMP) — these match nearly every biomedical publication and add no specificity
+     - Generic bioinformatics tools already standard across all fields (bedtools, SAMtools, FastQC) unless in a specifically NF-focused pipeline context
+     - Tools that are not specific to NF or rare disease research
+
   5. CRITICAL FALSE POSITIVE PATTERNS TO REJECT:
      **For Lab Research Tools (antibodies, cell lines, animal models, genetic reagents):**
      - Gene/disease names (NF1, NF2) mentioned without tool keywords
@@ -96,6 +101,7 @@ prompt: |
      - Common words that happen to match software names (e.g., "Table 1", "Figure 3A", "using the")
      - Programming languages mentioned without actual usage context
      - Software cited in references but not used in analysis
+     - Generic statistical software and languages (R, Python, SAS, MATLAB, Excel, SPSS, Stata, GraphPad Prism, JMP) — these are ubiquitous across all biomedical research and are NOT NF-specific. Only flag if the tool implements a custom NF-focused algorithm or pipeline
 
      **For Advanced Cellular Models (organoids, assembloids):**
      - 2D cell culture mentioned as "culture" without 3D context
@@ -214,8 +220,9 @@ prompt: |
      - Other - Any other relevant observations
 
      EXTRACTION GUIDELINES:
+     - **HARD REQUIREMENT: only extract observations for tools with verdict: Accept in toolValidations** — if toolValidations is empty or a tool has verdict: Reject/Uncertain, the observations list MUST be empty (`observations: []`). Do NOT extract observations for tools in potentiallyMissedTools.
      - **Focus on Results and Discussion sections** - these report experimental findings
-     - **Link to specific tools** - each observation must reference a validated tool
+     - **Link to specific tools** - each observation must reference a tool whose resourceName exactly matches a toolValidations entry with verdict: Accept
      - **Include quantitative data** when available (e.g., "15% weight reduction at 8 weeks")
      - **Capture sufficient context** - enough detail to understand the observation
      - **Be precise about the finding** - quote or paraphrase accurately from the text
@@ -358,9 +365,11 @@ prompt: |
   - Look for tools mentioned with vendor/catalog info, RRIDs, or specific experimental context
   - Suggest concrete, actionable patterns that would catch tools missed in this paper
   - If no tools were missed and no patterns are needed, set potentiallyMissedTools: [] and suggestedPatterns: []
+  - **NF-SPECIFIC ONLY**: Only report tools and patterns relevant to NF/rare disease research. Do NOT report generic statistical software (R, Python, SAS, MATLAB, GraphPad Prism, Excel, SPSS), standard bioinformatics tools ubiquitous across all fields, or general lab equipment. The goal is to catalog tools uniquely useful for understanding or treating neurofibromatosis.
 
   **Observation Extraction:**
-  - ONLY extract observations for VALIDATED (accepted) tools
+  - ONLY extract observations for tools with verdict: Accept in toolValidations. If toolValidations is empty or has no Accept verdicts, set observations: [] — no exceptions
+  - Do NOT extract observations for tools listed only in potentiallyMissedTools — those have not been validated
   - Focus on Results and Discussion sections - these contain experimental findings
   - Include quantitative data whenever possible (numbers, percentages, p-values)
   - Be precise and faithful to the original text - do not embellish or infer
