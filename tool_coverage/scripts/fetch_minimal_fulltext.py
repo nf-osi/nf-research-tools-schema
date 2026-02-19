@@ -27,6 +27,122 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def batch_fetch_pubmed_metadata(pmids: List[str]) -> Dict[str, Optional[Dict]]:
+    """
+    Fetch complete publication metadata for multiple PMIDs in a single API call.
+    PubMed E-utilities supports batch requests up to 200 IDs.
+
+    Returns dict mapping PMID -> metadata
+    """
+    if not pmids:
+        return {}
+
+    try:
+        url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+        params = {
+            'db': 'pubmed',
+            'id': ','.join(pmids),  # Comma-separated list
+            'retmode': 'xml'
+        }
+
+        response = requests.get(url, params=params, timeout=30)
+        if response.status_code != 200:
+            logger.warning(f"PubMed batch API error: {response.status_code}")
+            return {pmid: None for pmid in pmids}
+
+        root = ET.fromstring(response.content)
+
+        # Parse each PubmedArticle
+        results = {}
+        for article in root.findall('.//PubmedArticle'):
+            # Extract PMID
+            pmid_elem = article.find('.//PMID')
+            if pmid_elem is None or not pmid_elem.text:
+                continue
+            pmid = pmid_elem.text
+
+            # Extract title
+            title_elem = article.find('.//ArticleTitle')
+            title = title_elem.text if title_elem is not None else ''
+
+            # Extract abstract
+            abstract_texts = article.findall('.//AbstractText')
+            abstract_parts = []
+            for text_elem in abstract_texts:
+                label = text_elem.get('Label', '')
+                text = text_elem.text if text_elem.text else ''
+                if label:
+                    abstract_parts.append(f"{label}: {text}")
+                else:
+                    abstract_parts.append(text)
+            abstract = ' '.join(abstract_parts)
+
+            # Extract authors
+            authors = []
+            for author in article.findall('.//Author'):
+                lastname = author.find('LastName')
+                forename = author.find('ForeName')
+                if lastname is not None and lastname.text:
+                    author_name = lastname.text
+                    if forename is not None and forename.text:
+                        author_name = f"{forename.text} {author_name}"
+                    authors.append(author_name)
+            authors_str = '; '.join(authors) if authors else ''
+
+            # Extract journal
+            journal_elem = article.find('.//Journal/Title')
+            journal = journal_elem.text if journal_elem is not None else ''
+
+            # Extract publication date
+            pub_date = None
+            pubdate_elem = article.find('.//PubDate')
+            if pubdate_elem is not None:
+                year = pubdate_elem.find('Year')
+                month = pubdate_elem.find('Month')
+                day = pubdate_elem.find('Day')
+
+                if year is not None and year.text:
+                    pub_date = year.text
+                    if month is not None and month.text:
+                        # Convert month name to number
+                        month_map = {
+                            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+                            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+                            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                        }
+                        month_num = month_map.get(month.text, month.text)
+                        pub_date = f"{year.text}-{month_num}"
+                        if day is not None and day.text:
+                            pub_date = f"{year.text}-{month_num}-{day.text.zfill(2)}"
+
+            # Extract DOI
+            doi = ''
+            for article_id in article.findall('.//ArticleId'):
+                if article_id.get('IdType') == 'doi':
+                    doi = article_id.text if article_id.text else ''
+                    break
+
+            results[pmid] = {
+                'title': title,
+                'abstract': abstract,
+                'authors': authors_str,
+                'journal': journal,
+                'publicationDate': pub_date if pub_date else '',
+                'doi': doi
+            }
+
+        # Fill in None for any PMIDs that weren't found
+        for pmid in pmids:
+            if pmid not in results:
+                results[pmid] = None
+
+        return results
+
+    except Exception as e:
+        logger.error(f"Error in batch fetch for {len(pmids)} PMIDs: {e}")
+        return {pmid: None for pmid in pmids}
+
+
 def fetch_pubmed_metadata(pmid: str) -> Optional[Dict]:
     """
     Fetch complete publication metadata from PubMed E-utilities API.
@@ -291,6 +407,8 @@ def main():
                        help='Output directory for cache files')
     parser.add_argument('--force', action='store_true',
                        help='Re-fetch even if cache file exists')
+    parser.add_argument('--batch-size', type=int, default=10,
+                       help='Number of PMIDs to fetch in each batch (default: 10, max: 200)')
 
     args = parser.parse_args()
 
@@ -315,9 +433,10 @@ def main():
 
     logger.info(f"Fetching minimal cache for {len(pmids)} PMIDs...")
     logger.info(f"Output directory: {output_dir}")
+    logger.info(f"Batch size: {args.batch_size} PMIDs per batch")
     logger.info("")
 
-    # Process each PMID
+    # Process PMIDs
     stats = {
         'total': len(pmids),
         'minimal': 0,
@@ -326,30 +445,87 @@ def main():
         'skipped': 0
     }
 
-    for i, pmid in enumerate(pmids, 1):
+    # Filter out already cached PMIDs
+    pmids_to_fetch = []
+    for pmid in pmids:
         pmid_clean = pmid.replace('PMID:', '').strip()
         cache_file = output_dir / f"{pmid_clean}_text.json"
-
-        # Check if already cached
         if cache_file.exists() and not args.force:
-            logger.info(f"[{i}/{len(pmids)}] PMID:{pmid_clean} - Already cached (use --force to re-fetch)")
+            logger.info(f"PMID:{pmid_clean} - Already cached (use --force to re-fetch)")
             stats['skipped'] += 1
-            continue
+        else:
+            pmids_to_fetch.append(pmid_clean)
 
-        logger.info(f"[{i}/{len(pmids)}] PMID:{pmid_clean}")
-
-        # Fetch and cache
-        cache_data = create_minimal_cache(pmid_clean, output_dir)
-
-        # Update stats
-        cache_level = cache_data.get('cache_level', 'failed')
-        if cache_level in stats:
-            stats[cache_level] += 1
-
-        # Rate limiting
-        time.sleep(0.34)  # ~3 requests/second to be nice to NCBI
-
+    if not pmids_to_fetch:
+        logger.info("No PMIDs to fetch (all already cached)")
+    else:
+        logger.info(f"Processing {len(pmids_to_fetch)} PMIDs in batches of {args.batch_size}...")
         logger.info("")
+
+        # Process in batches
+        for batch_start in range(0, len(pmids_to_fetch), args.batch_size):
+            batch_end = min(batch_start + args.batch_size, len(pmids_to_fetch))
+            batch_pmids = pmids_to_fetch[batch_start:batch_end]
+
+            logger.info(f"Batch {batch_start//args.batch_size + 1}/{(len(pmids_to_fetch)-1)//args.batch_size + 1}: Fetching metadata for {len(batch_pmids)} PMIDs...")
+
+            # Batch fetch metadata from PubMed
+            metadata_results = batch_fetch_pubmed_metadata(batch_pmids)
+
+            # Process each PMID in batch
+            for i, pmid_clean in enumerate(batch_pmids):
+                global_idx = batch_start + i + 1
+                logger.info(f"  [{global_idx}/{len(pmids_to_fetch)}] PMID:{pmid_clean}")
+
+                metadata = metadata_results.get(pmid_clean)
+                if not metadata:
+                    logger.error(f"    Failed to fetch PubMed metadata")
+                    cache_data = {
+                        'pmid': f"PMID:{pmid_clean}",
+                        'error': 'PubMed fetch failed',
+                        'cache_level': 'failed'
+                    }
+                    stats['failed'] += 1
+                else:
+                    # Fetch methods from PMC (individual requests)
+                    logger.info(f"    Attempting PMC methods fetch...")
+                    methods = fetch_pmc_methods_section(pmid_clean)
+
+                    has_fulltext = bool(methods)
+                    cache_level = 'minimal' if has_fulltext else 'abstract_only'
+
+                    cache_data = {
+                        'pmid': f"PMID:{pmid_clean}",
+                        'title': metadata['title'],
+                        'abstract': metadata['abstract'],
+                        'authors': metadata['authors'],
+                        'journal': metadata['journal'],
+                        'publicationDate': metadata['publicationDate'],
+                        'doi': metadata['doi'],
+                        'methods': methods if methods else '',
+                        'cache_level': cache_level,
+                        'has_fulltext': has_fulltext,
+                        'fetch_date': time.strftime('%Y-%m-%d %H:%M:%S')
+                    }
+
+                    # Update stats
+                    if cache_level in stats:
+                        stats[cache_level] += 1
+
+                    author_count = len(metadata['authors'].split('; ')) if metadata['authors'] else 0
+                    logger.info(f"    ✓ Cached as '{cache_level}' ({len(metadata['abstract'])} chars abstract, "
+                                f"{len(methods) if methods else 0} chars methods, {author_count} authors)")
+
+                # Save to cache
+                cache_file = output_dir / f"{pmid_clean}_text.json"
+                with open(cache_file, 'w') as f:
+                    json.dump(cache_data, f, indent=2)
+
+            # Rate limiting between batches
+            if batch_end < len(pmids_to_fetch):
+                time.sleep(0.34)  # Be nice to NCBI
+
+            logger.info("")
 
     # Print summary
     logger.info("="*80)
