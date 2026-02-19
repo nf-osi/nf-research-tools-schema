@@ -105,7 +105,8 @@ def batch_fetch_abstracts_from_pubmed(pmids: List[str], batch_size: int = 200) -
 def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient.Synapse = None) -> pd.DataFrame:
     """
     Ensure all publications have abstracts available.
-    Uses batched PubMed XML API (200 PMIDs/request) instead of one-at-a-time fetching.
+    First checks local publication_cache JSON files (disk I/O, instant), then falls back
+    to batched PubMed XML API (200 PMIDs/request) for any still missing.
 
     Args:
         publications_df: DataFrame with publication info
@@ -126,18 +127,45 @@ def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient
         print(f"   ✅ All {len(publications_df)} publications already have abstracts")
         return publications_df
 
-    print(f"   📥 Need to fetch {num_missing} abstracts from PubMed (batch mode)...")
+    # --- Pass 1: load from local publication_cache JSON files (fast, no network) ---
+    cache_dir = Path('tool_reviews/publication_cache')
+    cache_hits = 0
+    if cache_dir.exists():
+        for idx, row in publications_df[missing_mask].iterrows():
+            clean_pmid = str(row['pmid']).replace('PMID:', '').strip()
+            cache_file = cache_dir / f"{clean_pmid}_text.json"
+            if cache_file.exists():
+                try:
+                    with open(cache_file) as f:
+                        cached = json.load(f)
+                    abstract = cached.get('abstract', '')
+                    if abstract:
+                        publications_df.at[idx, 'abstract'] = abstract
+                        cache_hits += 1
+                except Exception:
+                    pass
 
-    # Extract clean PMIDs for the missing rows
+    if cache_hits:
+        print(f"   💾 Loaded {cache_hits} abstracts from local publication_cache (no network needed)")
+
+    # Re-evaluate what's still missing after cache pass
+    missing_mask = publications_df['abstract'].isna() | (publications_df['abstract'] == '')
+    num_missing = missing_mask.sum()
+
+    if num_missing == 0:
+        print(f"   ✅ All {len(publications_df)} publications have abstracts")
+        return publications_df
+
+    # --- Pass 2: batch-fetch remaining from PubMed XML API ---
+    print(f"   📥 Fetching {num_missing} remaining abstracts from PubMed (batch mode)...")
+
     missing_pmids = [
         str(row['pmid']).replace('PMID:', '').strip()
         for _, row in publications_df[missing_mask].iterrows()
     ]
 
-    # Batch fetch all at once
     fetched = batch_fetch_abstracts_from_pubmed(missing_pmids)
 
-    # Write back into DataFrame
     fetched_count = 0
     for idx, row in publications_df[missing_mask].iterrows():
         clean_pmid = str(row['pmid']).replace('PMID:', '').strip()
@@ -147,7 +175,7 @@ def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient
             fetched_count += 1
 
     has_abstract = ~(publications_df['abstract'].isna() | (publications_df['abstract'] == ''))
-    print(f"\n   ✅ {has_abstract.sum()} publications have abstracts ({fetched_count} newly fetched)")
+    print(f"\n   ✅ {has_abstract.sum()} publications have abstracts ({fetched_count} fetched from PubMed)")
     print(f"   ⚠️  {(~has_abstract).sum()} publications missing abstracts (will be excluded)")
 
     return publications_df
