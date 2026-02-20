@@ -1,0 +1,152 @@
+publicationMetadata:
+  pmid: "PMID:21072183"
+  title: "p21-Activated kinases are required for transformation in a cell-based model of neurofibromatosis type 2."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study using cell culture, xenograft models, and biochemical assays.
+    Expected tools include cell lines (NIH-3T3), antibodies for Western blot, plasmids/vectors,
+    mouse models for xenografts, and potentially computational tools for data analysis.
+  overallAssessment: |
+    This is a laboratory research study investigating p21-activated kinases in NF2 using cell-based models.
+    The study includes cell culture, molecular biology techniques, xenograft experiments, and biochemical assays,
+    indicating high likelihood of research tool usage. The comprehensive Methods section describes experimental
+    procedures that would require multiple research tools including cell lines, antibodies, plasmids, and animal models.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NIH-3T3"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "NIH-3T3 (obtained from American Type Culture Collection) cells were cultured in high-glucose DMEM"
+    whyMissed: "Standard cell line name with ATCC source - should be caught by cell line patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "φNX packaging cell line"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The φNX packaging cell line (Orbigen) was transfected using Lipofectamine 2000"
+    whyMissed: "Specialized packaging cell line with vendor - cell line pattern should catch this"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pBMN-I-GFP"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "was subcloned as a Bgl II/Xho I fragment into the retroviral expression vector pBMN-I-GFP"
+    whyMissed: "Retroviral expression vector with standard plasmid naming - should be caught by plasmid patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BALB/c nu/nu"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "2×10^6 cells were injected subcutaneously into flanks of 5-week old nude mice (BALB/c nu/nu)"
+    whyMissed: "Standard mouse strain nomenclature - should be caught by animal model patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pak1 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The antibodies used in this study include Pak1; Pak2; Mek1/2; phospho-MEK1 (Ser298)"
+    whyMissed: "Listed in antibody section with Cell Signaling Technology vendor - antibody patterns should catch this"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Pak2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The antibodies used in this study include Pak1; Pak2; Mek1/2; phospho-MEK1 (Ser298)"
+    whyMissed: "Listed in antibody section with Cell Signaling Technology vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "phospho-Pak1-3 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "phospho-Pak1–3 (Ser141; Invitrogen); GST (Santa Cruz Biotechnology); and β-actin (Sigma)"
+    whyMissed: "Phospho-specific antibody with epitope and vendor information"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Merlin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Akt; phospho-Akt (Thr308); Merlin (Cell Signaling Technology); phospho-Pak1–3"
+    whyMissed: "NF2 protein antibody with vendor - should be caught by antibody patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "GST-PID construct"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "A GST-PID (Pak1 amino acids 83–149) or Gst-PID L107F cDNA was subcloned"
+    whyMissed: "Recombinant protein expression construct - genetic reagent pattern should catch this"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Matrigel invasion chamber"
+    toolType: "advanced_cellular_model"
+    foundIn: "methods"
+    contextSnippet: "Matrigel invasion chamber (BD Biosciences) were rehydrated in serum-free DMEM medium"
+    whyMissed: "3D culture system for invasion assays - should be caught by advanced cellular model patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "antibodies used in this study include"
+    toolType: "antibody"
+    examples: ["The antibodies used in this study include Pak1; Pak2; Mek1/2"]
+    reasoning: "This phrase reliably indicates a list of antibodies used experimentally"
+
+  - patternType: "naming_convention"
+    pattern: "φ[A-Z]+.*cell line"
+    toolType: "cell_line"
+    examples: ["φNX packaging cell line"]
+    reasoning: "Greek letter phi (φ) is commonly used in specialized cell line names"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\(obtained from American Type Culture Collection\\)"
+    toolType: "cell_line"
+    examples: ["NIH-3T3 (obtained from American Type Culture Collection)"]
+    reasoning: "ATCC is the primary cell line repository - this phrase indicates validated cell line usage"
+
+  - patternType: "term"
+    pattern: "invasion chamber"
+    toolType: "advanced_cellular_model"
+    examples: ["Matrigel invasion chamber"]
+    reasoning: "Invasion chambers are 3D culture systems for studying cell migration and invasion"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple clear research tools present in Methods section were completely missed
+    - Cell lines, antibodies, plasmids, and mouse models all present but not detected
+    - Mining patterns appear to be failing to capture standard research tools
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    The Methods section clearly describes experimental procedures using cell lines (NIH-3T3, φNX),
+    antibodies (Pak1, Pak2, Merlin, phospho-Pak1-3), genetic reagents (pBMN-I-GFP, GST-PID),
+    animal models (BALB/c nu/nu mice), and advanced cellular models (Matrigel invasion chambers).
+    All 10 potentially missed tools should be added as they represent genuine research tools
+    used experimentally in this study. The mining patterns need significant improvement to
+    capture standard laboratory tools, especially in the antibody and cell line categories.
+    No observations were extracted since no tools were initially validated.

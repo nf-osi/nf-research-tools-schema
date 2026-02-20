@@ -1,0 +1,131 @@
+publicationMetadata:
+  pmid: "PMID:24595234"
+  title: "In vivo functional analysis of the human NF2 tumor suppressor gene in Drosophila."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study using Drosophila as a model system to test human NF2 gene function.
+    Expected tools include: genetic reagents (transgenes, constructs), animal models (Drosophila strains),
+    antibodies (for immunofluorescence), and potentially computational tools for analysis.
+  overallAssessment: |
+    This is a laboratory research study using Drosophila genetics to functionally analyze human NF2 gene variants.
+    The study involves creating transgenic flies, genetic rescue experiments, and immunofluorescence analysis.
+    Multiple research tools are expected including genetic constructs, fly strains, antibodies, and microscopy equipment.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "pUASt transformation vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Transgenes expressing the indicated NF2 proteins were cloned with N-terminal Flag epitope tags in the pUASt transformation vector."
+    whyMissed: "Specific plasmid vector name with clear cloning context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "y w Mer4/FM7; T80-Gal4 y w Mer4"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "For genetic rescue tests, at least three independent autosomal insertion lines for each allele were crossed to female flies of the following genotype, y w Mer4/FM7; T80-Gal4 y w Mer4"
+    whyMissed: "Specific Drosophila strain genotype used in genetic crosses"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Mouse anti-Flag antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Mouse anti-Flag (Sigma-Aldrich) was used at 1:20,000"
+    whyMissed: "Specific antibody with vendor and dilution information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "guinea-pig anti-Merlin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "guinea-pig anti-Merlin [8] was used at 1:5000"
+    whyMissed: "Specific antibody with species and dilution information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "apterous-Gal4 driver"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The effect of ectopic expression of the NF2 isoforms under the control of the apterous-Gal4 driver was examined"
+    whyMissed: "Specific Gal4 driver line used for tissue-specific expression"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Zeiss LSM 410 microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Confocal images were taken on either a Zeiss LSM 410 or LSM 510 microscope using Zeiss acquisition software"
+    whyMissed: "Specific microscope model used for imaging"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Zeiss LSM 510 microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Confocal images were taken on either a Zeiss LSM 410 or LSM 510 microscope using Zeiss acquisition software"
+    whyMissed: "Specific microscope model used for imaging"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "LightCycler FastStart SYBR green system"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "quantitative PCR performed using the LightCycler FastStart SYBR green system (Roche)"
+    whyMissed: "Specific qPCR system with vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "pUASt|pUAS[A-Z]+"
+    toolType: "genetic_reagent"
+    examples: ["pUASt transformation vector"]
+    reasoning: "Drosophila UAS vectors are commonly used genetic tools with specific naming conventions"
+
+  - patternType: "context_phrase"
+    pattern: "Gal4 driver|GAL4 driver"
+    toolType: "genetic_reagent"
+    examples: ["apterous-Gal4 driver", "T80-Gal4"]
+    reasoning: "Gal4 drivers are essential genetic tools in Drosophila research for tissue-specific expression"
+
+  - patternType: "naming_convention"
+    pattern: "[a-z]+ w [A-Za-z0-9]+/[A-Za-z0-9]+"
+    toolType: "animal_model"
+    examples: ["y w Mer4/FM7"]
+    reasoning: "Drosophila strain genotype notation follows specific conventions with markers and balancers"
+
+  - patternType: "vendor_indicator"
+    pattern: "anti-[A-Za-z0-9]+ \\([A-Za-z\\-]+\\)"
+    toolType: "antibody"
+    examples: ["Mouse anti-Flag (Sigma-Aldrich)", "guinea-pig anti-Merlin"]
+    reasoning: "Antibodies often mentioned with species prefix and vendor in parentheses"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple genetic reagents, antibodies, and equipment were missed in the initial mining
+    - Drosophila-specific nomenclature and tools may not be well covered by current patterns
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    The study uses standard molecular biology and Drosophila genetics approaches with clear tool usage.
+    All 8 potentially missed tools should be added as they represent genuine research reagents.
+    New patterns should be implemented to better capture Drosophila genetic tools and standard lab equipment.
+    The mining system needs improvement for model organism-specific nomenclature and genetic reagents.

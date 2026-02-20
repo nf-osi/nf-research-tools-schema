@@ -1,0 +1,137 @@
+publicationMetadata:
+  pmid: "PMID:31053133"
+  title: "Burden of adult neurofibromatosis 1: development and validation of a burden assessment tool."
+  queryType: "unknown"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire development and validation study, which would typically contain:
+    - Clinical assessment tools (the primary BoN questionnaire being developed)
+    - Existing validated questionnaires used for external validity (DLQI, PSS, SF12)
+    - Computational tools for statistical analysis (SAS 9.4, PROC CALIS)
+    
+    This type of study focuses on developing patient-reported outcome measures rather than
+    laboratory research tools. The tools are clinical assessment instruments for measuring
+    disease burden and quality of life in NF1 patients.
+  overallAssessment: |
+    This questionnaire development study is highly likely to contain clinical assessment tools
+    as the primary research output. The study develops the BoN questionnaire and validates it
+    against existing instruments. Statistical software for psychometric analysis is also expected.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "BoN questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "This study sought to develop a self-administered questionnaire in French to assess the burden of NF1 (BoN)"
+    whyMissed: "Primary research output - the newly developed Burden of Neurofibromatosis (BoN) questionnaire"
+    confidence: 0.95
+    shouldBeAdded: Yes
+    
+  - toolName: "Dermatology Life Quality Index"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "all participants were asked to complete three previously validated self-administered questionnaires: the Dermatology Life Quality Index [DLQI] questionnaire"
+    whyMissed: "Validated clinical assessment tool used for external validity testing"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "DLQI"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The DLQI questionnaire is the first dermatology-specific instrument designed to assess the impact of skin diseases on patient QoL"
+    whyMissed: "Abbreviated form of Dermatology Life Quality Index"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "Perceived Stress Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The BoN was likewise shown to significantly correlate with other validated questionnaires, such as Dermatology Life Quality Index, Perceived Stress Scale, and SF12 mental score"
+    whyMissed: "Validated psychological assessment tool used for external validity"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "PSS"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The PSS is the most widely used psychological instrument for measuring the perception of stress"
+    whyMissed: "Abbreviated form of Perceived Stress Scale"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "SF12"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The BoN was likewise shown to significantly correlate with other validated questionnaires, such as Dermatology Life Quality Index, Perceived Stress Scale, and SF12 mental score"
+    whyMissed: "Validated quality of life assessment instrument"
+    confidence: 0.90
+    shouldBeAdded: Yes
+    
+  - toolName: "SAS 9.4"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were analyzed using SAS software Version 9.4 (SAS Institute, Cary, NC, USA)"
+    whyMissed: "Statistical analysis software with specific version number"
+    confidence: 0.85
+    shouldBeAdded: Yes
+    
+  - toolName: "PROC CALIS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "PROC CALIS procedure, SAS 9.4, was employed"
+    whyMissed: "Specific statistical procedure within SAS for confirmatory factor analysis"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "\\b(BoN|Burden of .*) questionnaire\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["BoN questionnaire", "Burden of Neurofibromatosis questionnaire"]
+    reasoning: "Pattern to capture disease-specific burden assessment tools being developed"
+    
+  - patternType: "context_phrase"
+    pattern: "self-administered questionnaire.*to assess"
+    toolType: "clinical_assessment_tool"
+    examples: ["self-administered questionnaire in French to assess the burden of NF1"]
+    reasoning: "Context phrase indicating questionnaire development for clinical assessment"
+    
+  - patternType: "term"
+    pattern: "\\bPROC [A-Z]+\\b"
+    toolType: "computational_tool"
+    examples: ["PROC CALIS"]
+    reasoning: "SAS procedure names are specific computational tools for statistical analysis"
+    
+  - patternType: "context_phrase"
+    pattern: "validated.*questionnaire|questionnaire.*validated"
+    toolType: "clinical_assessment_tool"
+    examples: ["validated self-administered questionnaires", "previously validated questionnaire"]
+    reasoning: "Context indicating established clinical assessment instruments"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a questionnaire development study
+    - Multiple clinical assessment tools are clearly present but were missed
+    - The primary research output (BoN questionnaire) was not detected
+    - Statistical software tools used for validation were not captured
+  recommendations: |
+    This publication contains multiple valid research tools that were completely missed:
+    - The newly developed BoN questionnaire is the primary research output
+    - Three validated clinical assessment tools (DLQI, PSS, SF12) used for external validity
+    - Statistical software (SAS 9.4, PROC CALIS) used for psychometric analysis
+    All missed tools should be added as they represent legitimate research instruments.
+    The mining patterns need improvement for clinical assessment tool detection.

@@ -1,0 +1,89 @@
+publicationMetadata:
+  pmid: "PMID:26822862"
+  title: "Capturing the wide variety of impaired fracture healing phenotypes in Neurofibromatosis Type 1 with eight key factors: a computational study."
+  queryType: "unknown"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Bioinformatics Analysis → computational tools (software, pipelines, statistical analysis tools)
+    This is a computational modeling study using mathematical simulations to study NF1-related fracture healing.
+    Expected tools include computational modeling software, statistical analysis packages, and high-performance computing resources.
+  overallAssessment: |
+    This is a computational modeling study that uses mathematical simulations and statistical analysis to examine NF1 mutation effects on bone healing.
+    The study would typically use computational tools, statistical software, and modeling platforms.
+    While no traditional lab tools are expected, computational tools for modeling, simulation, and statistical analysis are highly likely.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "JMP"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The uniform designs were generated and analysed with JMP (SAS Institute Inc., Cary, North Carolina, USA) using a Gaussian process with a Gaussian covariance function."
+    whyMissed: "Statistical software package used for design of experiments and Gaussian process analysis"
+    confidence: 0.85
+    shouldBeAdded: No
+  - toolName: "VSC (Flemish Supercomputer Center)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Next, the computer simulations were performed with these parameter combinations, utilizing high-performance computational resources provided by the VSC (Flemish Supercomputer Center)."
+    whyMissed: "High-performance computing infrastructure used for computational simulations"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+  - toolName: "Computational model of bone regeneration"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The multiscale computational model of bone regeneration was established previously and has been described in detail elsewhere. In brief, at the tissue level the various key processes of bone regeneration are captured with 10 partial differential equations"
+    whyMissed: "Custom computational model/simulation platform for bone regeneration modeling"
+    confidence: 0.90
+    shouldBeAdded: Yes
+  - toolName: "Design of Experiments (DOE)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "In order to determine the (relative) importance of the eight factors listed in Table 1, a large sensitivity analysis using 'Design of Experiments' (DOE) was conducted. DOE (or experimental design) is a statistical tool that generates an array of combinations"
+    whyMissed: "Statistical methodology/approach for experimental design and sensitivity analysis"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "computational model.*established.*described"
+    toolType: "computational_tool"
+    examples: ["The multiscale computational model of bone regeneration was established previously"]
+    reasoning: "Identifies custom computational models developed for specific research applications"
+  - patternType: "vendor_indicator"
+    pattern: "high-performance computational resources provided by"
+    toolType: "computational_tool"
+    examples: ["utilizing high-performance computational resources provided by the VSC"]
+    reasoning: "Identifies HPC infrastructure and supercomputing resources used in computational studies"
+  - patternType: "context_phrase"
+    pattern: "sensitivity analysis using.*DOE|Design of Experiments"
+    toolType: "computational_tool"
+    examples: ["sensitivity analysis using 'Design of Experiments' (DOE) was conducted"]
+    reasoning: "Identifies statistical design methodologies used in computational analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a computational study
+    - Several computational tools and platforms were used but not captured by mining patterns
+    - JMP statistical software was excluded as generic statistical software
+    - Custom computational models and HPC resources were not detected
+  recommendations: |
+    This publication contains legitimate computational tools that were missed by initial mining.
+    The custom bone regeneration computational model should be added as it's a specialized research tool.
+    VSC supercomputer infrastructure could be considered for inclusion as HPC resources are important for computational studies.
+    JMP was correctly excluded as generic statistical software.
+    DOE methodology is borderline - more of a statistical approach than a specific tool.
+    Future mining should better capture custom computational models and simulation platforms.

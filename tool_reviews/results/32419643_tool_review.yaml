@@ -1,0 +1,172 @@
+publicationMetadata:
+  pmid: "PMID:32419643"
+  title: "Long Noncoding RNA WT1-AS Inhibit Cell Malignancy via miR-494-3p in Glioma."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study investigating lncRNA mechanisms in glioma using cell culture,
+    transfections, and molecular assays. Expected tools include cell lines, antibodies, plasmids,
+    reagents, and potentially computational tools for analysis.
+  overallAssessment: |
+    This is a laboratory research study with extensive Methods section describing cell culture,
+    transfections, molecular assays, and protein analysis. The study uses multiple glioma cell lines,
+    antibodies, plasmids, and commercial reagents, making it highly likely to contain genuine research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "M059J"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Primary normal human astrocytes (M059J) and 4 glioma cell lines (U87, U118, U251, and A172) were commercially procured from Shanghai Cell Bank"
+    whyMissed: "Cell line name not caught by initial mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "U87"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "4 glioma cell lines (U87, U118, U251, and A172) were commercially procured from Shanghai Cell Bank of the Chinese Academy of Sciences"
+    whyMissed: "Standard glioma cell line name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "U118"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "4 glioma cell lines (U87, U118, U251, and A172) were commercially procured from Shanghai Cell Bank of the Chinese Academy of Sciences"
+    whyMissed: "Standard glioma cell line name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "U251"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "4 glioma cell lines (U87, U118, U251, and A172) were commercially procured from Shanghai Cell Bank of the Chinese Academy of Sciences"
+    whyMissed: "Standard glioma cell line name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "A172"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "4 glioma cell lines (U87, U118, U251, and A172) were commercially procured from Shanghai Cell Bank of the Chinese Academy of Sciences"
+    whyMissed: "Standard glioma cell line name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pcDNA vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The human lncRNA WT1-AS were cloned into plasmid cloning DNA (pcDNA) vector"
+    whyMissed: "Common cloning vector not caught by patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "pmirGLO vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The WT1-AS sequence including the putative binding sites of miR-494-3p was subcloned and then inserted into the pmirGLO vector (Promega, Madison, Wisconsin)"
+    whyMissed: "Luciferase reporter vector not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-p-AKT antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The membranes were incubated with antibodies against p-AKT, total AKT, and β-Actin (SantaCruz Biotechnology, Santa Cruz, USA)"
+    whyMissed: "Antibody target not caught by patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "anti-AKT antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The membranes were incubated with antibodies against p-AKT, total AKT, and β-Actin (SantaCruz Biotechnology, Santa Cruz, USA)"
+    whyMissed: "Antibody target not caught by patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "anti-β-Actin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The membranes were incubated with antibodies against p-AKT, total AKT, and β-Actin (SantaCruz Biotechnology, Santa Cruz, USA)"
+    whyMissed: "Antibody target not caught by patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Ago2 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Bound RNA and protein of interest is immunoprecipitated using the Ago2 antibody (Cell Signaling Technology, Beverly, MA, USA) at a dilution of 1:50"
+    whyMissed: "Antibody for RIP assay not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CCK-8 kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Commercial kits were procured from Dojindo Molecular Technologies (CCK-8 kit, Shanghai, China)"
+    whyMissed: "Cell proliferation assay kit not caught"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "EdU assay kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Commercial kits were procured from Dojindo Molecular Technologies (CCK-8 kit, Shanghai, China) and Ribobio (EdU assay kit, Guangzhou, China)"
+    whyMissed: "Cell proliferation assay kit not caught"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][0-9]{2,4}[A-Z]?\\b"
+    toolType: "cell_line"
+    examples: ["U87", "U118", "U251", "A172", "M059J"]
+    reasoning: "Standard cell line naming convention with letter followed by numbers, commonly used for cancer cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies against [A-Za-z0-9-]+|anti-[A-Za-z0-9-]+ antibody"
+    toolType: "antibody"
+    examples: ["antibodies against p-AKT", "Ago2 antibody"]
+    reasoning: "Common phrases indicating antibody usage with target specification"
+
+  - patternType: "term"
+    pattern: "pcDNA|pmirGLO|pCMV|pGL[0-9]"
+    toolType: "genetic_reagent"
+    examples: ["pcDNA vector", "pmirGLO vector"]
+    reasoning: "Common commercial cloning and reporter vectors used in molecular biology"
+
+  - patternType: "context_phrase"
+    pattern: "kit.*\\([^)]+\\)|assay kit"
+    toolType: "genetic_reagent"
+    examples: ["CCK-8 kit", "EdU assay kit"]
+    reasoning: "Commercial assay kits with vendor information in parentheses"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a lab research study with extensive Methods
+    - Multiple standard cell lines (U87, U118, U251, A172, M059J) were not detected
+    - Common antibodies and vectors were missed by current patterns
+    - Commercial assay kits not captured by existing patterns
+  recommendations: |
+    This publication contains numerous genuine research tools that were completely missed by initial mining.
+    The suggested patterns should be implemented to capture standard cell line nomenclature, antibody
+    mentions, and commercial vectors/kits. All 13 potentially missed tools should be added as they
+    represent legitimate research reagents used in the experimental procedures. The mining patterns
+    need significant improvement for molecular biology publications.

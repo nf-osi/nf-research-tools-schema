@@ -1,0 +1,140 @@
+publicationMetadata:
+  pmid: "PMID:29402968"
+  title: "Integrating Functional Analysis in the Next-Generation Sequencing Diagnostic Pipeline of RASopathies."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This publication involves molecular genetics, functional assays, cell culture, and animal models (zebrafish).
+    Expected tools include: cell lines (HEK-293T), genetic reagents (plasmids, expression vectors), 
+    animal models (zebrafish), computational tools (sequencing analysis software), and antibodies.
+  overallAssessment: |
+    This is a laboratory research study combining next-generation sequencing with functional validation
+    of genetic variants in RASopathies. The comprehensive Methods section describes cell culture,
+    transfection, luciferase assays, zebrafish experiments, and molecular cloning, indicating extensive
+    use of research tools across multiple categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "HEK-293T cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "mutant transcripts were expressed in HEK-293T cells. The phosphorylation level of ELK1...HEK-293T cells were cultured in DMEM and transfected"
+    whyMissed: "Standard cell line naming convention not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NextGENe software v.2.3.4.1"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The data were analysed using NextGENe software v.2.3.4.1 (Softgenetics, PA, USA) with the default settings"
+    whyMissed: "Software with version number and vendor information not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "zebrafish embryos"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "To assess the effect of the VUSs on organismal phenotypes, zebrafish were used...RNA transcripts were injected into zebrafish embryos at the single-cell stage"
+    whyMissed: "Animal model in functional validation context not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "pCMV6-AC-GFP vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "the in-frame coding sequence of RAF1, A2ML1 and RIT1 were subcloned into the pCMV6-AC-GFP vector such that the GFP coding sequence was fused"
+    whyMissed: "Specific vector/plasmid naming convention not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Q5® Site-Directed Mutagenesis Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We introduced a single-base substitution into the corresponding expression vector using Q5® Site-Directed Mutagenesis Kit (NEB, UK)"
+    whyMissed: "Commercial kit with vendor information not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "anti-DDK antibodies"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The expression of the DDK-tagged transcript was validated by Western blot using anti-DDK antibodies"
+    whyMissed: "Antibody naming pattern not captured by initial mining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The width and length of the cranio-cartilage were measured using ImageJ software"
+    whyMissed: "Common image analysis software not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Dual-Luciferase® Reporter assay system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The luciferase activity was measured using a Dual-Luciferase® Reporter assay system (Promega, WI, USA)"
+    whyMissed: "Commercial assay system with vendor not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "HEK-?293T?\\b"
+    toolType: "cell_line"
+    examples: ["HEK-293T cells", "HEK293T"]
+    reasoning: "Standard cell line nomenclature for human embryonic kidney cells commonly used in functional assays"
+
+  - patternType: "context_phrase"
+    pattern: "\\b\\w+\\s+software\\s+v?\\.?\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["NextGENe software v.2.3.4.1"]
+    reasoning: "Software names with version numbers indicate specific computational tools being used"
+
+  - patternType: "naming_convention"
+    pattern: "p[A-Z][A-Za-z0-9\\-_]+\\s+vector"
+    toolType: "genetic_reagent"
+    examples: ["pCMV6-AC-GFP vector"]
+    reasoning: "Standard plasmid/vector naming convention starting with 'p' followed by descriptive name"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z0-9]+\\s+antibod"
+    toolType: "antibody"
+    examples: ["anti-DDK antibodies"]
+    reasoning: "Standard antibody naming pattern with 'anti-' prefix and target protein"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][A-Za-z0-9\\-_®]+\\s+(Kit|System|Reagent)\\s+\\([A-Za-z]+,"
+    toolType: "genetic_reagent"
+    examples: ["Q5® Site-Directed Mutagenesis Kit (NEB", "Dual-Luciferase® Reporter assay system (Promega"]
+    reasoning: "Commercial kits and systems with vendor information in parentheses"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a comprehensive lab research study
+    - Multiple categories of research tools are extensively used but not detected
+    - Standard naming conventions for cell lines, software, vectors, and antibodies were missed
+    - Commercial kits and reagents with vendor information not captured
+  recommendations: |
+    This publication contains extensive use of research tools across multiple categories that were
+    completely missed by initial mining. The suggested patterns should significantly improve
+    detection of cell lines, computational tools, genetic reagents, antibodies, and animal models.
+    All 8 potentially missed tools should be added as they represent genuine research tools used
+    in the experimental procedures. The mining patterns need substantial improvement to capture
+    standard laboratory nomenclature and commercial reagent naming conventions.

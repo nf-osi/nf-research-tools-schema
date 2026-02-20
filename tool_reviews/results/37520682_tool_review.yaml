@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "PMID:37520682"
+  title: "Combining nonsense mutation suppression therapy with nonsense-mediated decay inhibition in neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive laboratory study involving:
+    - Animal model generation (NF1 minipigs)
+    - Cell culture (Schwann cells, fibroblasts)
+    - Molecular biology techniques (Western blot, qPCR, RNA-seq)
+    - Drug testing and pharmacokinetics
+    - Genetic constructs and transfection
+    Expected tools: animal models, antibodies, cell lines, genetic reagents, computational tools
+  overallAssessment: |
+    This is a comprehensive laboratory research study involving animal model generation, cell culture, molecular biology, and drug testing. The extensive Methods section describes multiple experimental approaches including minipig generation, cell isolation and culture, molecular assays, and pharmacokinetic studies. This type of publication would typically use numerous research tools including animal models, antibodies, cell lines, genetic reagents, and computational analysis tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NF1 R1947/+ minipigs"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Generation of NF1 NS/+ minipigs Generation of a swine nonsense mutation model of NF1 followed a similar strategy as previously described. Recurrent nonsense mutation R1947∗ NF1 is located within exon 41"
+    whyMissed: "Custom-generated animal model with specific mutation nomenclature not caught by standard patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Ossabaw minipig fetal fibroblasts"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Ossabaw minipig fetal fibroblasts isolated from day 38 embryos were transfected with TALENs and a 90-mer homology-directed repair (HDR) template"
+    whyMissed: "Primary cell line from specific pig breed not recognized by standard cell line patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "anti-p75 NGFR antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Schwann cells were isolated from contaminating fibroblasts via p75 NGFR antibody-mediated magnetic cell selection, according to the manufacturer's protocol (MACS, Miltenyi Biotec)"
+    whyMissed: "Antibody mentioned with target protein but without explicit 'antibody' keyword in immediate context"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 DLR plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The NF1 DLR plasmid was kindly provided by David Bedwell at University of Alabama. The R1497X Renilla-NF1-R1947X-Firefly insert contains 30 nucleotides surrounding the premature termination codon"
+    whyMissed: "Plasmid with specific NF1 designation not caught by standard genetic reagent patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HISAT2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The RNA sequencing data were mapped to the Ensembl Sus Scrofa genome 11.1, release 103 using HISAT2 and quantified with StringTie"
+    whyMissed: "Bioinformatics alignment tool not caught by computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "StringTie"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The RNA sequencing data were mapped to the Ensembl Sus Scrofa genome 11.1, release 103 using HISAT2 and quantified with StringTie"
+    whyMissed: "RNA-seq quantification tool not caught by computational tool patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "FlowJo software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Cells were run through a CytoFLEX flow cytometer (Beckman Coulter) using the Cytexpert software according to the manufacturer's protocol. FlowJo software was used to determine cell purity"
+    whyMissed: "Flow cytometry analysis software not caught by standard patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PKNCA package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gentamicin plasma concentration-time data from subcutaneous administration were analyzed with noncompartmental methods as implemented in R (version 4.0.1) and R Studio PKNCA package (version 0.9.4)"
+    whyMissed: "R package for pharmacokinetic analysis not caught by standard patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z0-9]+\\s+[A-Z][0-9]+[*/+-]+\\s+(minipigs?|mice|rats?)\\b"
+    toolType: "animal_model"
+    examples: ["NF1 R1947/+ minipigs", "NF1 NS/+ minipigs"]
+    reasoning: "Captures animal models with specific mutation nomenclature including nonsense mutations and allele designations"
+
+  - patternType: "context_phrase"
+    pattern: "\\b(anti-|antibody against)\\s*([A-Z0-9]+\\s*[A-Z0-9]*)"
+    toolType: "antibody"
+    examples: ["anti-p75 NGFR antibody"]
+    reasoning: "Captures antibodies mentioned with 'anti-' prefix followed by target protein names"
+
+  - patternType: "term"
+    pattern: "\\b(HISAT2|StringTie|PKNCA|FlowJo)\\b"
+    toolType: "computational_tool"
+    examples: ["HISAT2", "StringTie", "PKNCA package", "FlowJo software"]
+    reasoning: "Specific bioinformatics and analysis software commonly used in genomics and flow cytometry research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+\\s+(minipig|pig)\\s+(fetal\\s+)?(fibroblasts?|cells?)\\b"
+    toolType: "cell_line"
+    examples: ["Ossabaw minipig fetal fibroblasts"]
+    reasoning: "Captures primary cell lines derived from specific pig breeds or strains"
+
+  - patternType: "context_phrase"
+    pattern: "\\b[A-Z0-9]+\\s+DLR\\s+(plasmid|construct|vector)\\b"
+    toolType: "genetic_reagent"
+    examples: ["NF1 DLR plasmid"]
+    reasoning: "Captures dual luciferase reporter (DLR) constructs with gene-specific prefixes"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple research tools are clearly present in the Methods section but were missed
+    - Animal models, antibodies, cell lines, genetic reagents, and computational tools are all used
+    - The mining patterns appear insufficient for capturing NF-specific nomenclature and specialized tools
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining:
+    - Custom NF1 minipig models with specific mutation nomenclature should be captured
+    - Primary cell lines from specific pig breeds need better pattern coverage
+    - Antibodies mentioned with target proteins but without explicit "antibody" keywords
+    - Genetic constructs like DLR plasmids require specialized patterns
+    - Bioinformatics tools (HISAT2, StringTie, FlowJo, PKNCA) need better coverage
+    - The suggested patterns would significantly improve tool detection for NF research
+    - Manual curator review recommended to validate the 8 potentially missed tools
+    - No observations extracted since no tools were initially validated

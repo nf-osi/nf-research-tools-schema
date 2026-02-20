@@ -1,0 +1,128 @@
+publicationMetadata:
+  pmid: "PMID:39373898"
+  title: "Identification of Pathogenic Missense Mutations of NF1 Using Computational Approaches."
+  queryType: "unknown"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Bioinformatics Analysis → computational tools (software, pipelines, databases)
+    This publication focuses on computational prediction of NF1 mutation pathogenicity using multiple
+    bioinformatics tools and databases. Expected tools include prediction software, structural modeling
+    tools, and mutation databases. No lab research tools expected as this is purely computational.
+  overallAssessment: |
+    This is a computational bioinformatics study using multiple prediction tools and databases to analyze
+    NF1 mutations. The study employs sophisticated computational pipelines including PredictSNP, iStable,
+    Align-GVGD, and AlphaFold3 for mutation impact prediction and structural modeling. Clinical assessment
+    tools are not expected as this focuses on computational prediction rather than patient evaluation.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "PredictSNP2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The effects of mutations on protein functions were analyzed using the PredictSNP2 tool (https://loschmidt.chemi.muni.cz/predictsnp/). PredictSNP functions as a consensus classifier that integrates multiple prediction algorithms"
+    whyMissed: "Specific bioinformatics tool with URL and detailed methodology description"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "iStable"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The iStable-integrated server, accessible at predictor.nchu.edu.tw/iStable, features two machine learning-based tools, iMutant and MUpro, which utilize thermodynamic parameters to forecast changes in protein stability"
+    whyMissed: "Protein stability prediction server with specific URL and methodology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Align-GVGD"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Align-GVGD (http://agvgd.hci.utah.edu/agvgd_input.php) is another tool that applies the Grantham difference across multiple sequence alignments (MSA) for broad comparisons"
+    whyMissed: "Mutation classification tool with specific URL and classification system"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AlphaFold3"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "Furthermore, to directly visualize the impact of these mutations on protein structure, we utilized AlphaFold3 to simulate both the wild-type and mutant NF1 structures"
+    whyMissed: "Protein structure prediction tool used for structural modeling"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SNPeffect 4.0"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "These mutations were subjected to further phenotyping analysis using SNPeffect 4.0, which predicted disturbances in the protein's chaperone binding sites"
+    whyMissed: "Mutation effect prediction tool with version number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Human Gene Mutation Database (HGMD)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Our approach involved an exhaustive search of databases such as the Human Gene Mutation Database (HGMD), UniProt, and ClinVar for information on missense mutations"
+    whyMissed: "Specialized mutation database used as data source"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ClinVar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We systematically searched the HGMD, UniProt, and ClinVar databases using the keyword 'NF1' to identify missense mutations with clinical significance"
+    whyMissed: "Clinical variant database used for mutation data retrieval"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "UniProt"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The standard protein sequence of NF1 was obtained from UniProt (UniprotKB P21359, ENSG00000196712). The missense mutations were collected from UniProt"
+    whyMissed: "Protein sequence database used for data retrieval"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "analyzed using|utilized|employed|accessible at|obtained from|collected from|searched.*databases"
+    toolType: "computational_tool"
+    examples: ["analyzed using the PredictSNP2 tool", "we utilized AlphaFold3 to simulate", "obtained from UniProt"]
+    reasoning: "These phrases consistently indicate active usage of computational tools in bioinformatics workflows"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s*\\d+(\\.\\d+)?\\b.*tool|server|database"
+    toolType: "computational_tool"
+    examples: ["PredictSNP2 tool", "SNPeffect 4.0", "iStable-integrated server"]
+    reasoning: "Bioinformatics tools often follow naming patterns with versions and are explicitly labeled as tools/servers/databases"
+
+  - patternType: "vendor_indicator"
+    pattern: "https?://[\\w\\.-]+\\.[a-z]{2,}/[\\w\\./\\-_]*"
+    toolType: "computational_tool"
+    examples: ["https://loschmidt.chemi.muni.cz/predictsnp/", "http://agvgd.hci.utah.edu/agvgd_input.php"]
+    reasoning: "URLs often indicate web-based computational tools and databases in bioinformatics studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any computational tools despite this being a bioinformatics study
+    - Multiple well-defined computational tools with URLs and version numbers were missed
+    - Pattern matching appears insufficient for bioinformatics tool detection
+    - Database resources (HGMD, ClinVar, UniProt) were not recognized as computational tools
+  recommendations: |
+    All 8 potentially missed tools should be added as they represent legitimate computational resources
+    used in this bioinformatics analysis. The tools include prediction algorithms (PredictSNP2, iStable,
+    Align-GVGD), structural modeling (AlphaFold3), mutation analysis (SNPeffect 4.0), and databases
+    (HGMD, ClinVar, UniProt). Mining patterns need improvement for bioinformatics tool detection,
+    particularly for web-based tools with URLs and version numbers. No observations extracted as
+    Results/Discussion sections were not available.

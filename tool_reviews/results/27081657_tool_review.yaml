@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "PMID:27081657"
+  title: "A randomized placebo-controlled lovastatin trial for neurobehavioral function in neurofibromatosis I."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (neuropsychological tests, behavioral scales, questionnaires), 
+    computational tools for statistical analysis and neuroimaging processing, potentially imaging tools.
+    This is a randomized controlled trial testing lovastatin effects on cognition in NF1 patients, so clinical 
+    assessment tools are highly expected for measuring cognitive and behavioral outcomes.
+  overallAssessment: |
+    This is a randomized placebo-controlled clinical trial examining lovastatin effects on neurobehavioral 
+    function in NF1 patients. Clinical trials typically use validated assessment tools to measure outcomes, 
+    and this study extensively uses neuropsychological tests and behavioral scales. The presence of 
+    neuroimaging (fMRI) also suggests computational tools for image analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Brief Visuospatial Memory Test – Revised (BVMT)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Primary outcomes were two neuropsychological measures that were most analogous to statin‐responsive tests in Nf1 mice, specifically: the Brief Visuospatial Memory Test – Revised (BVMT, Immediate and Delayed"
+    whyMissed: "Specific validated neuropsychological assessment tool with clear administration context"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Letter-Number Sequencing task (LNS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "the Brief Visuospatial Memory Test – Revised (BVMT, Immediate and Delayed 19 ; nonverbal declarative memory) and the Letter‐Number Sequencing task (LNS 20 ; working memory)"
+    whyMissed: "Validated working memory assessment tool used as primary outcome measure"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Wechsler Abbreviated Scale of Intelligence (WASI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Full‐Scale IQ of at least 70, as determined by the Wechsler Abbreviated Scale of Intelligence (WASI 15 )"
+    whyMissed: "Standardized intelligence assessment tool used for participant screening"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Hopkins Verbal Learning Test (HVLT)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Hopkins Verbal Learning Test (HVLT; verbal declarative memory 22 ), WISC‐III Object Assembly (visuoconstructive ability) 23"
+    whyMissed: "Validated verbal memory assessment tool used as secondary outcome"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Achenbach Child Behavior Checklist (CBCL)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Internalizing and Externalizing symptoms, as well as the Attention, Thought and Social Problems subscales from either the Achenbach Child Behavior Checklist (CBCL; self‐ and parent‐report)"
+    whyMissed: "Standardized behavioral assessment checklist for children"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Young Adult Self Report (YASR)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "from either the Achenbach Child Behavior Checklist (CBCL; self‐ and parent‐report) or Young Adult Self Report (YASR) 24 , 25"
+    whyMissed: "Standardized behavioral self-report tool for young adults"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Behavior Rating Inventory of Executive Function (BRIEF)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "and the Behavior Rating Inventory of Executive Function (BRIEF; General Executive Composite (GEC) score) 28"
+    whyMissed: "Validated executive function assessment tool used as tertiary measure"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Delis–Kaplan Executive Function Scale (D-KEFS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Delis–Kaplan Executive Function Scale (D‐KEFS) verbal fluency (category and letter fluency) 27"
+    whyMissed: "Standardized executive function assessment scale"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FMRIB Software Library (FSL)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "fMRI data analyses were performed using tools from the FMRIB software library ( www.fmrib.ox.ac.uk/fsl ), version 5.0"
+    whyMissed: "Neuroimaging analysis software package with specific version and URL"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Spatial Capacity Working Memory (SCAP) task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "A spatial working memory functional MRI paradigm, designed to be analogous to the behavioral tasks used in the mouse model, was also administered"
+    whyMissed: "Functional MRI paradigm used for cognitive assessment"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+(?:Test|Scale|Inventory|Checklist|Assessment)\\s*\\([A-Z]{2,6}\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Brief Visuospatial Memory Test – Revised (BVMT)", "Wechsler Abbreviated Scale of Intelligence (WASI)", "Hopkins Verbal Learning Test (HVLT)"]
+    reasoning: "Clinical assessment tools often follow pattern of full name followed by abbreviated acronym in parentheses"
+
+  - patternType: "context_phrase"
+    pattern: "(?:administered|assessed using|measured with|completed|scores on)\\s+(?:the\\s+)?[A-Z][a-zA-Z\\s]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed using", "administered", "scores on"]
+    reasoning: "These phrases commonly precede clinical assessment tool usage in methods sections"
+
+  - patternType: "vendor_indicator"
+    pattern: "(?:www\\.|http://|https://)[a-zA-Z0-9.-]+/[a-zA-Z0-9.-]+(?:\\s*,\\s*version\\s+[0-9.]+)?"
+    toolType: "computational_tool"
+    examples: ["www.fmrib.ox.ac.uk/fsl ), version 5.0"]
+    reasoning: "Software tools often include URLs and version numbers for reproducibility"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clinical trial with extensive use of validated assessment tools
+    - Multiple standardized neuropsychological tests and behavioral scales were used but not detected
+    - Neuroimaging analysis software (FSL) was used but not captured
+    - Clinical assessment tools are legitimate research tools but may be under-represented in current mining patterns
+  recommendations: |
+    This publication contains numerous validated clinical assessment tools that should be captured.
+    The neuropsychological tests (BVMT, LNS, WASI, HVLT) and behavioral scales (CBCL, YASR, BRIEF, D-KEFS) 
+    are all standardized research instruments used to measure cognitive and behavioral outcomes in clinical trials.
+    The FSL neuroimaging software is also a legitimate computational tool. All 10 potentially missed tools 
+    should be added as they represent genuine research tools used in this study. The suggested patterns 
+    would help capture similar clinical assessment tools in future mining efforts.

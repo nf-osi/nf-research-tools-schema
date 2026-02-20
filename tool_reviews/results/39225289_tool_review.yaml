@@ -1,0 +1,116 @@
+publicationMetadata:
+  pmid: "PMID:39225289"
+  title: "Comparing 3D imaging devices for the measurement of cutaneous neurofibromas in patients with Neurofibromatosis Type 1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    This study compares 3D imaging devices for measuring cutaneous neurofibromas, which are medical devices/clinical assessment tools used for objective measurement of tumor characteristics in NF1 patients. The study also uses statistical software for data analysis.
+  overallAssessment: |
+    This is a clinical study comparing three 3D imaging systems for measuring cutaneous neurofibromas in NF1 patients. The study would be expected to contain clinical assessment tools (the imaging devices themselves) and computational tools for statistical analysis. The focus is on developing standardized outcome measures for clinical trials, making this a tool validation study rather than basic research.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Vectra-H1"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "We compared the Vectra-H1, LifeViz-Micro and Cherry-Imaging systems. A total of 58 cNFs from 13 participants with NF1 were selected for imaging and analysis."
+    whyMissed: "3D imaging device used as clinical assessment tool for measuring tumor characteristics - not caught by initial mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "LifeViz-Micro"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "We compared the Vectra-H1, LifeViz-Micro and Cherry-Imaging systems. A total of 58 cNFs from 13 participants with NF1 were selected for imaging and analysis."
+    whyMissed: "3D imaging device used as clinical assessment tool for measuring tumor characteristics - not caught by initial mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Cherry-Imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "We compared the Vectra-H1, LifeViz-Micro and Cherry-Imaging systems. A total of 58 cNFs from 13 participants with NF1 were selected for imaging and analysis."
+    whyMissed: "3D imaging device used as clinical assessment tool for measuring tumor characteristics - not caught by initial mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Vectra H1"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images of up to eight cNFs from each participant were captured and analysed using each 3D imaging system: Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA)"
+    whyMissed: "Same device as Vectra-H1 but with different formatting - includes vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "LifeViz Micro"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Images of up to eight cNFs from each participant were captured and analysed using each 3D imaging system: Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA), LifeViz Micro (QuantifiCare, Biot, France)"
+    whyMissed: "Same device as LifeViz-Micro but with different formatting - includes vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cherry Imaging"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "LifeViz Micro (QuantifiCare, Biot, France) and Cherry Imaging (Yokneam, Israel). The Vectra H1 and LifeViz Micro were chosen due to their previous use in past NF1 studies"
+    whyMissed: "Same device as Cherry-Imaging but with different formatting - includes vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "IBM SPSS Statistics"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analyses were conducted using IBM SPSS Statistics (version 27.01). Friedman tests and Dunn–Bonferroni post hoc tests were performed"
+    whyMissed: "Statistical software with version number - commonly missed pattern for clinical studies"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-zA-Z]+-[A-Z][0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Vectra-H1", "LifeViz-Micro"]
+    reasoning: "Medical device naming convention with brand-model format commonly used for imaging systems"
+
+  - patternType: "context_phrase"
+    pattern: "imaging system[s]?.*\\(.*Inc\\.|Ltd\\.|France\\.|Israel\\.|USA\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA)", "LifeViz Micro (QuantifiCare, Biot, France)"]
+    reasoning: "Medical devices often mentioned with manufacturer and location information in clinical studies"
+
+  - patternType: "context_phrase"
+    pattern: "3D imaging.*system[s]?|imaging.*device[s]?.*measuring|measurement.*device[s]?"
+    toolType: "clinical_assessment_tool"
+    examples: ["3D imaging systems", "imaging devices for the measurement"]
+    reasoning: "Clinical assessment tools in NF research often involve imaging devices for tumor measurement"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[A-Z][a-zA-Z0-9]*\\s*\\([^)]*(?:Inc|Ltd|Corp|GmbH|France|Israel|USA|Germany|Japan)[^)]*\\)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Vectra H1 (Canfield Scientific Inc, Fairfield, NJ, USA)", "Cherry Imaging (Yokneam, Israel)"]
+    reasoning: "Medical devices and clinical tools often include manufacturer information in parentheses"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining completely missed the primary research tools in this clinical study
+    - All three 3D imaging devices (Vectra-H1/H1, LifeViz-Micro/Micro, Cherry-Imaging/Imaging) are clinical assessment tools used for objective measurement of cutaneous neurofibromas
+    - Statistical software (IBM SPSS Statistics v27.01) was also missed
+    - Mining patterns appear inadequate for clinical assessment tools, especially medical devices
+  recommendations: |
+    All potentially missed tools should be added as they represent the core research tools of this clinical validation study. The three imaging devices are clinical assessment tools used for tumor measurement, which is a valid research application in NF1 studies. The study specifically aims to validate these devices as standardized outcome measures for clinical trials. Mining patterns need significant improvement for clinical assessment tools, particularly medical devices with manufacturer information. No observations were extracted since no tools were initially validated, but the study contains valuable performance data for each imaging system that could be captured once tools are properly identified.
