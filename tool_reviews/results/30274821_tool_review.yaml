@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "PMID:30274821"
+  title: "Synergistic effect of Nutlin-3 combined with MG-132 on schwannoma cells through restoration of merlin and p53 tumour suppressors."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive lab research study with in vitro and in vivo experiments, so we expect:
+    - Cell lines (schwannoma cell lines mentioned)
+    - Antibodies (immunoblotting and immunofluorescence described)
+    - Animal models (xenograft studies in nude mice)
+    - Genetic reagents (shRNA vectors, plasmids mentioned)
+    - Computational tools (for analysis and imaging)
+  overallAssessment: |
+    This is a comprehensive laboratory research study investigating schwannoma biology using both in vitro and in vivo approaches. The study includes cell culture experiments, genetic manipulations, drug treatments, immunological assays, and xenograft models. This type of research heavily relies on research tools including cell lines, antibodies, genetic reagents, and animal models. The detailed Methods section confirms extensive tool usage across multiple experimental approaches.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Human Schwann cells (HSCs)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human Schwann cells (HSCs) were purchased from ScienCell Research Laboratories (catalog no., 1700)."
+    whyMissed: "Cell line with vendor and catalog number not caught by initial mining"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "RT4-D6P2T"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The rat RT4-D6P2T schwannoma cells was obtained from the Global Bioresource Center."
+    whyMissed: "Schwannoma cell line with specific nomenclature not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HEI-193"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The HEI-193, an HPV E6-E7 immortalized schwannoma cell line, was a kind gift from Dr. Weg M. Ongkeko"
+    whyMissed: "Immortalized schwannoma cell line not caught by initial mining"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BALB/c nude mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "RT4-D6P2T or HEI-193 cells (2 × 10 6 in 0.1 mL phosphatebuffered saline) were subcutaneously inoculated into the back of 4-week-old BALB/c nude mice (male)"
+    whyMissed: "Mouse strain used for xenograft studies not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-merlin antibody (HPA003097)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunoblotting analysis was performed with antibodies specific for merlin (# HPA003097, Sigma-Aldrich"
+    whyMissed: "Antibody with catalog number not caught by initial mining"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-p53 antibody (P6874)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "p53 (# P6874, Sigma-Aldrich; # 2524, Cell Signaling)"
+    whyMissed: "p53 antibody with catalog number not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-MDM2 antibody (M43084)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "MDM2 (# M43084 and # SAB4300601, Sigma-Aldrich)"
+    whyMissed: "MDM2 antibody with catalog number not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NF2 shRNA vectors"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Lentiviral shRNA vectors were constructed using target sequences against the expression of NF2 (sh1, 5′- ACTTCAAAGATA CTG ACAT-3′"
+    whyMissed: "shRNA constructs targeting NF2 not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HA-tagged NF2 plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The plasmids HA-tagged NF2 (a gift from Dr. Y. J. LU, Tongji University, China)"
+    whyMissed: "Expression plasmid for NF2 not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Flag-tagged P53 plasmid"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Flag-tagged P53 (Addgene; #10838)"
+    whyMissed: "Expression plasmid from Addgene not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "LSM 880 confocal microscope"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images (no z-stack) were acquired using a confocal microscope (LSM 880; Carl Zeiss GmbH, Germany)"
+    whyMissed: "Imaging system not caught by initial mining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Imaris software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were generated using Imaris software (Bitplane AG)"
+    whyMissed: "Image analysis software not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "catalog no\\.|catalog number|cat\\. no\\.|#\\s*[A-Z0-9]+"
+    toolType: "general"
+    examples: ["catalog no., 1700", "# HPA003097", "# P6874"]
+    reasoning: "Catalog numbers are strong indicators of commercial research tools and should be captured"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}-[0-9]{2,4}[A-Z0-9]*"
+    toolType: "cell_line"
+    examples: ["RT4-D6P2T", "HEI-193"]
+    reasoning: "Cell line naming conventions with alphanumeric codes are commonly used"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized.*cell line|cell line.*immortalized"
+    toolType: "cell_line"
+    examples: ["HPV E6-E7 immortalized schwannoma cell line"]
+    reasoning: "Immortalized cell lines are important research tools that should be captured"
+
+  - patternType: "term"
+    pattern: "shRNA vectors?|shRNA constructs?"
+    toolType: "genetic_reagent"
+    examples: ["Lentiviral shRNA vectors were constructed"]
+    reasoning: "shRNA vectors are common genetic reagents that should be captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "Addgene;?\\s*#[0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["Addgene; #10838"]
+    reasoning: "Addgene is a major plasmid repository and should be recognized"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a comprehensive lab research study
+    - Multiple cell lines, antibodies, genetic reagents, and animal models are clearly present
+    - Vendor information and catalog numbers are provided but not captured
+    - Standard research tool nomenclature not recognized by current patterns
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining:
+    - 3 cell lines (HSCs, RT4-D6P2T, HEI-193) with vendor/source information
+    - Multiple antibodies with catalog numbers from major vendors
+    - Several genetic reagents including shRNA vectors and expression plasmids
+    - Animal model (BALB/c nude mice) for xenograft studies
+    - Imaging and analysis software tools
+    All of these should be added to improve mining coverage. The suggested patterns would help capture similar tools in future publications. No observations were extracted since no tools were initially validated, but this publication would likely contain valuable phenotypic and experimental observations once tools are properly captured.

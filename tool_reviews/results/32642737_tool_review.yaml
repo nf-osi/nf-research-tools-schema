@@ -1,0 +1,103 @@
+publicationMetadata:
+  pmid: "PMID:32642737"
+  title: "Assessing interobserver variability and accuracy in the histological diagnosis and classification of cutaneous neurofibromass."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, computational tools for analysis
+    This is a pathology study evaluating diagnostic agreement, which may use:
+    - Digital pathology tools/software for image analysis
+    - Database systems for data collection (REDCap mentioned)
+    - Statistical analysis software
+    - Imaging/scanning equipment
+    - Clinical assessment frameworks for diagnostic concordance
+  overallAssessment: |
+    This is a clinical pathology study focused on diagnostic agreement among pathologists reviewing neurofibroma histology. While it lacks traditional lab research tools, it uses digital pathology infrastructure, data management systems, and statistical analysis tools. The study develops diagnostic criteria which could be considered a clinical assessment framework.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Aperio XT scanner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The hematoxylin and eosin (H&E)-stained slides were scanned using an Aperio XT scanner. Digital slides were downloaded using the native image format"
+    whyMissed: "Digital pathology scanner - specialized imaging equipment for histopathology digitization"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "CaloPix viewer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed using the CaloPix viewer (TRIBVN-HEALTHCARE, Chatillon, France), and digital images were shared with the reviewers through the internet"
+    whyMissed: "Digital pathology viewing software with vendor information"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "REDCap database"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "who entered free text of up to a 200 word description for each case into a REDcap database"
+    whyMissed: "Research data capture platform - widely used clinical research tool"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Aperio SVS files"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Digital slides were downloaded using the native image format, Aperio SVS files"
+    whyMissed: "Proprietary digital pathology file format - part of digital pathology workflow"
+    confidence: 0.7
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b\\w+\\s+scanner\\b"
+    toolType: "computational_tool"
+    examples: ["Aperio XT scanner"]
+    reasoning: "Digital pathology scanners are specialized research equipment commonly used in histopathology studies"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b\\w+\\s+viewer\\s*\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["CaloPix viewer (TRIBVN-HEALTHCARE, Chatillon, France)"]
+    reasoning: "Software viewers with vendor information in parentheses indicate specialized analysis tools"
+
+  - patternType: "term"
+    pattern: "REDCap\\s+database"
+    toolType: "computational_tool"
+    examples: ["REDCap database"]
+    reasoning: "REDCap is a widely used clinical research data capture platform that should be recognized as a computational tool"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]+\\s+[A-Z]+\\s+files?\\b"
+    toolType: "computational_tool"
+    examples: ["Aperio SVS files"]
+    reasoning: "Proprietary file formats (especially with vendor names) often indicate specialized software tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining found no tools despite clear tool usage in methods
+    - Digital pathology infrastructure (scanners, viewers, databases) not captured
+    - Clinical research data management tools (REDCap) missed
+    - Specialized imaging equipment and software overlooked
+  recommendations: |
+    This publication demonstrates significant gaps in computational tool mining for clinical/pathology studies. The study uses several important research tools:
+    1. Aperio XT scanner - should definitely be added as digital pathology equipment
+    2. CaloPix viewer - specialized pathology software with vendor info
+    3. REDCap database - standard clinical research data platform
+    4. Aperio SVS format - proprietary digital pathology format
+    
+    Mining patterns need expansion to capture digital pathology workflows and clinical research infrastructure. These tools are essential for modern pathology research but currently missed by existing patterns.

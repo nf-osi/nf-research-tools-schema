@@ -1,0 +1,154 @@
+publicationMetadata:
+  pmid: "PMID:37446790"
+  title: "Icariin Promotes Osteogenic Differentiation in a Cell Model with NF1 Gene Knockout by Activating the cAMP/PKA/CREB Pathway."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular/cell biology study involving gene knockout, cell culture, protein analysis, and transcriptomics.
+    Expected tools include: cell lines (C2C12), antibodies (for Western blot), genetic reagents (CRISPR/Cas9),
+    and computational tools (for RNA-seq analysis).
+  overallAssessment: |
+    This is a laboratory research study involving cell culture, genetic manipulation, and molecular analysis.
+    The study uses multiple research tools including cell lines, antibodies, genetic reagents, and computational
+    analysis tools. Clinical assessment tools are not expected in this basic research context.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "C2C12"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The C2C12 line is a subclone of a mouse myoblast cell line. These cells were purchased from the American Type Culture Collection (ATCC)"
+    whyMissed: "Standard cell line name with ATCC source - should have been detected"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CRISPR/Cas9 single-vector lentivirus"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "CRISPR/Cas9 single-vector lentivirus was purchased from GeneChem (Shanghai, China)"
+    whyMissed: "Genetic reagent with vendor information - clear tool usage"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-GAPDH antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Antibodies against GAPDH (cat. no. 5174S)...were obtained from Cell Signaling Technology"
+    whyMissed: "Antibody with catalog number and vendor - clear tool"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-phosphorylated PKA antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "phosphorylated PKA (cat. no. 5661S)...were obtained from Cell Signaling Technology"
+    whyMissed: "Antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-PKA antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "PKA (cat. no. 4782S)...were obtained from Cell Signaling Technology"
+    whyMissed: "Antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-phosphorylated CREB antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "phosphorylated CREB (cat. no. 9198S)...were obtained from Cell Signaling Technology"
+    whyMissed: "Antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-CREB antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CREB (cat. no. 9197T) were obtained from Cell Signaling Technology"
+    whyMissed: "Antibody with catalog number and vendor"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-neurofibromin antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Antibody against neurofibromin (cat. no. ab17963) was purchased from Abcam"
+    whyMissed: "Antibody with catalog number and vendor - this is the NF1 protein antibody"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DESeq2 (version 1.12.4) was used to determine differentially expressed genes (DEGs)"
+    whyMissed: "Bioinformatics software with version number for RNA-seq analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HiSeq XTen"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "paired-end sequencing of the library was performed on HiSeq XTen sequencers (Illumina, San Diego, CA, USA)"
+    whyMissed: "Sequencing platform/instrument used for RNA-seq"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "purchased from.*ATCC"
+    toolType: "cell_line"
+    examples: ["C2C12 line...purchased from the American Type Culture Collection (ATCC)"]
+    reasoning: "ATCC is a major cell line repository - this phrase reliably indicates cell line tools"
+
+  - patternType: "context_phrase"
+    pattern: "Antibodies against.*\\(cat\\. no\\."
+    toolType: "antibody"
+    examples: ["Antibodies against GAPDH (cat. no. 5174S)"]
+    reasoning: "Catalog numbers with 'Antibodies against' clearly indicate antibody tools"
+
+  - patternType: "naming_convention"
+    pattern: "CRISPR/Cas9.*lentivirus"
+    toolType: "genetic_reagent"
+    examples: ["CRISPR/Cas9 single-vector lentivirus"]
+    reasoning: "CRISPR delivery systems are common genetic reagents in NF research"
+
+  - patternType: "context_phrase"
+    pattern: "version \\d+\\.\\d+.*was used"
+    toolType: "computational_tool"
+    examples: ["DESeq2 (version 1.12.4) was used"]
+    reasoning: "Version numbers with usage context indicate computational tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear lab research study with extensive tool usage
+    - Multiple antibodies with catalog numbers and vendors were missed
+    - Standard cell line (C2C12) from ATCC was not detected
+    - CRISPR/Cas9 genetic reagent was missed
+    - Computational tools (DESeq2, HiSeq XTen) for RNA-seq analysis were not captured
+  recommendations: |
+    This publication contains numerous legitimate research tools that were completely missed by initial mining.
+    All 10 potentially missed tools should be added as they have clear tool-specific context, vendor information,
+    and catalog numbers. The mining patterns need significant improvement to capture:
+    1. Cell lines from standard repositories (ATCC)
+    2. Antibodies with catalog numbers and vendors
+    3. CRISPR/Cas9 genetic reagents
+    4. Bioinformatics software with version numbers
+    5. Laboratory instruments and sequencing platforms
+    No observations were extracted since no tools were initially validated, but this study would likely
+    contain valuable phenotypic observations about NF1 knockout effects on osteogenic differentiation.

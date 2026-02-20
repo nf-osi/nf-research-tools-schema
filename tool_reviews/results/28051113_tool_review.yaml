@@ -1,0 +1,143 @@
+publicationMetadata:
+  pmid: "PMID:28051113"
+  title: "A comprehensive custom panel design for routine hereditary cancer testing: preserving control, improving diagnostics and revealing a complex variation landscape."
+  queryType: "unknown"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a bioinformatics analysis study focused on NGS panel development and validation for hereditary cancer diagnostics. Expected tool types include:
+    - Computational tools (software, pipelines, analysis tools) - primary focus
+    - Potentially some genetic reagents (custom bait libraries, panels)
+    - Clinical assessment tools may be present for patient evaluation
+    
+    The study involves custom NGS panel design, bioinformatics pipeline development, and data analysis, making computational tools the most likely category.
+  overallAssessment: |
+    This publication describes the development and validation of a custom NGS panel (I2HCP) for hereditary cancer diagnostics, including neurofibromatosis. The study involves extensive bioinformatics analysis with custom pipelines and multiple software tools. Given the computational nature of NGS analysis and the detailed Methods section describing bioinformatics workflows, this publication should contain numerous computational tools and potentially some genetic reagents (custom panels).
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "I2HCP panel"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "To do this, we developed the I2HCP panel, a custom bait library covering 122 hereditary cancer genes."
+    whyMissed: "Custom genetic reagent/panel not caught by standard mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "SureSelect bait library"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "We used Agilent eArray to design our SureSelect bait library V1 (Agilent, California, USA), covering 106 genes"
+    whyMissed: "Commercial genetic reagent with specific product name not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "BWA mem"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "fastq files were mapped against the GRCh37 human genome assembly corresponding to Ensembl release 67 using BWA mem"
+    whyMissed: "Standard bioinformatics tool not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VarScan2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants, including substitutions and small insertions and deletions, were called using VarScan2 with the following parameters"
+    whyMissed: "Variant calling software not recognized by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "annovar"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Finally, variants were annotated with a combination of annovar and custom scripts"
+    whyMissed: "Annotation software not caught by standard patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "samtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using BWA mem and a sorted bam file was created with samtools"
+    whyMissed: "Standard bioinformatics tool not recognized"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "bedtools"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Exhaustive coverage metrics were produced using a combination of bedtools and custom R and Bioconductor scripts"
+    whyMissed: "Genomics analysis tool not caught by mining"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "regioneR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Variants were filtered using the regioneR bioconductor package according to the clinical indication"
+    whyMissed: "R/Bioconductor package not recognized by patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "CLC Genomics Workbench"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "CLC Genomics Workbench v6 (Qiagen) was used to analyze data from I2HCP V1"
+    whyMissed: "Commercial genomics software with version not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z0-9]*\\s+v?[0-9]+(?:\\.[0-9]+)*\\b"
+    toolType: "computational_tool"
+    examples: ["CLC Genomics Workbench v6", "BWA mem", "VarScan2"]
+    reasoning: "Software names with version numbers are strong indicators of computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "custom bait library|SureSelect.*library|capture.*library"
+    toolType: "genetic_reagent"
+    examples: ["custom bait library covering 122 hereditary cancer genes", "SureSelect bait library V1"]
+    reasoning: "NGS capture libraries and custom panels are important genetic reagents in genomics studies"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed using|processed with|called using|annotated with|filtered using"
+    toolType: "computational_tool"
+    examples: ["variants were called using VarScan2", "annotated with a combination of annovar"]
+    reasoning: "These phrases strongly indicate active use of computational tools in analysis workflows"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[a-z]+tools?\\b|\\b[A-Z][a-z]+[0-9]+\\b"
+    toolType: "computational_tool"
+    examples: ["samtools", "bedtools", "VarScan2"]
+    reasoning: "Many bioinformatics tools follow naming patterns with 'tools' suffix or CamelCase with numbers"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a computational genomics study with extensive Methods section
+    - Multiple computational tools and genetic reagents are clearly described in Methods but were missed
+    - The study focuses on NGS panel development and bioinformatics analysis, which should yield many tools
+    - Custom panels and commercial reagents are described but not captured
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining:
+    - 9 computational tools and genetic reagents should be added
+    - The I2HCP panel is a custom genetic reagent developed by the authors
+    - Multiple standard bioinformatics tools (BWA, samtools, VarScan2, etc.) are used
+    - Commercial products (SureSelect, CLC Genomics Workbench) are employed
+    - New patterns should be implemented to catch NGS-related tools and software with versions
+    - This represents a significant gap in the current mining approach for bioinformatics publications
+    - No observations were extracted since no tools were initially validated, but the Results section likely contains performance metrics for the developed panel

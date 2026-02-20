@@ -1,0 +1,155 @@
+publicationMetadata:
+  pmid: "PMID:25377441"
+  title: "Development and validation of the English Pain Interference Index and Pain Interference Index-Parent report."
+  queryType: "unknown"
+  publicationType: "Questionnaire/Survey Development"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    This is a questionnaire development and validation study, which would typically contain:
+    - Clinical assessment tools (questionnaires, scales, patient-reported outcome measures)
+    - Possibly computational tools for statistical analysis
+    
+    The study develops and validates the Pain Interference Index (PII) and creates a parent proxy version,
+    while also using existing validated measures like Modified Brief Pain Inventory (MBPI), visual analogue
+    scales (VAS), and other pain assessment instruments. These are legitimate clinical research tools.
+  overallAssessment: |
+    This publication focuses on developing and validating clinical assessment tools for measuring pain
+    interference in pediatric populations with chronic conditions. Clinical assessment tools (questionnaires,
+    scales, patient-reported outcome measures) are valid research tools even without traditional lab methods.
+    The study uses multiple validated instruments and develops new ones, making it highly likely to contain
+    legitimate clinical research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Pain Interference Index (PII)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "This study investigated the psychometric properties of the Pain Interference Index (PII), a six-item questionnaire originally developed in Swedish, in chronically ill youth."
+    whyMissed: "This is the primary clinical assessment tool being developed and validated in the study - a six-item questionnaire measuring pain interference"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Pain Interference Index-Parent report (PII-Parent)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "We adapted the PII for English-speaking participants and created a parallel parent proxy measure."
+    whyMissed: "This is the parent proxy version of the PII questionnaire developed in this study"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Modified Brief Pain Inventory (MBPI)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "validity was examined by correlating PII scores with existing measures of pain interference (Modified Brief Pain Inventory [MBPI])"
+    whyMissed: "This is a validated 12-item questionnaire used as a comparison measure for validation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "visual analogue scale (VAS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "and pain intensity (visual analogue scale [VAS])"
+    whyMissed: "VAS is a standard clinical assessment tool for measuring pain intensity"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Faces Pain Scale-Revised (FPS-R)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "patients completed previously validated measures of pain interference (Modified Brief Pain Inventory [MBPI] [ 23 ]) and pain intensity (Faces Pain Scale-Revised [FPS-R] [ 24 ]"
+    whyMissed: "This is a validated one-item tool for measuring pain intensity in children using facial expressions"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Pain Rating Scale (PRS)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Pain Rating Scale [PRS] [ 25 ]). Parents completed the PII-P and the parent version of the PRS"
+    whyMissed: "This is a two-item visual analogue scale developed by the authors for assessing pain intensity"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "NF Disease Severity Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "First, the NF Disease Severity Scale, adapted by our group from Ablon [ 31 ], asks the medical professional to rate the patient's symptoms as mild, moderate, or severe."
+    whyMissed: "This is a clinical assessment scale for rating NF1 disease severity used for validation purposes"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 Disease Complications Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The second indicator of disease severity, the NF1 Disease Complications Scale, is a checklist designed by a multi-disciplinary team of medical experts in NF1 at the National Institutes of Health."
+    whyMissed: "This is an 18-item checklist for assessing NF1-related complications and disease severity"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Pain Interference Index|PII(?!-Parent)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Interference Index (PII)", "PII scores"]
+    reasoning: "The primary questionnaire being developed in this study - should be captured as a clinical assessment tool"
+
+  - patternType: "term"
+    pattern: "Pain Interference Index-Parent|PII-Parent|PII-P"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Interference Index-Parent report", "PII-Parent", "PII-P"]
+    reasoning: "The parent proxy version of the PII questionnaire developed in this study"
+
+  - patternType: "term"
+    pattern: "Modified Brief Pain Inventory|MBPI"
+    toolType: "clinical_assessment_tool"
+    examples: ["Modified Brief Pain Inventory [MBPI]", "MBPI scores"]
+    reasoning: "Validated pain interference questionnaire commonly used in pediatric pain research"
+
+  - patternType: "term"
+    pattern: "Faces Pain Scale-Revised|FPS-R"
+    toolType: "clinical_assessment_tool"
+    examples: ["Faces Pain Scale-Revised [FPS-R]"]
+    reasoning: "Validated pediatric pain intensity assessment tool using facial expressions"
+
+  - patternType: "term"
+    pattern: "Pain Rating Scale|PRS(?!-Parent)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pain Rating Scale [PRS]"]
+    reasoning: "Visual analogue scale for pain intensity assessment"
+
+  - patternType: "term"
+    pattern: "NF Disease Severity Scale|NF1 Disease Complications Scale"
+    toolType: "clinical_assessment_tool"
+    examples: ["NF Disease Severity Scale", "NF1 Disease Complications Scale"]
+    reasoning: "Disease-specific assessment scales for neurofibromatosis severity and complications"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire|scale|inventory|assessment tool|patient-reported outcome|clinical measure"
+    toolType: "clinical_assessment_tool"
+    examples: ["six-item questionnaire", "assessment tool", "clinical measure"]
+    reasoning: "Context phrases that commonly indicate clinical assessment tools in validation studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a questionnaire development study with multiple clinical assessment tools
+    - The mining system appears to have missed all clinical assessment tools (questionnaires, scales, inventories)
+    - This represents a significant gap in clinical tool detection patterns
+    - All 8 potentially missed tools are legitimate clinical research instruments used in pain and disease severity assessment
+  recommendations: |
+    - All 8 potentially missed tools should be added as they are legitimate clinical assessment instruments
+    - The mining patterns need significant enhancement for clinical assessment tools, particularly questionnaires and scales
+    - Clinical studies like this contain valid research tools even without traditional lab methods
+    - The suggested patterns should be implemented to improve detection of pain assessment instruments and disease severity scales
+    - No observations were extracted as no tools were initially validated, but the clinical assessment tools would likely have usage instructions and validation data in a complete analysis

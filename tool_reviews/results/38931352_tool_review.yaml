@@ -1,0 +1,126 @@
+publicationMetadata:
+  pmid: "PMID:38931352"
+  title: "PET Imaging of Neurofibromatosis Type 1 with a Fluorine-18 Labeled Tryptophan Radiotracer."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a preclinical imaging study involving radiotracer development, animal models, PET imaging, and immunohistochemistry.
+    Expected tools include: animal models (NF1 mice), computational tools (imaging software), antibodies (for IHC), 
+    and potentially genetic reagents (genotyping primers).
+  overallAssessment: |
+    This is a laboratory research study involving radiotracer development and preclinical PET imaging in NF1 mouse models.
+    The study includes radiosynthesis, biodistribution studies, PET imaging, and immunohistochemistry, indicating high likelihood
+    of research tool usage including animal models, imaging software, antibodies, and laboratory reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Trp53, Nf1, Suz12 triple mutant mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The triple mutant line from the vendor carries Trp53, Nf1, Suz12 mutations on chromosome 11 and develops tumors at approximately four months, which is similar to conditions found in human NF1 patients"
+    whyMissed: "Specific genetically modified mouse strain with detailed mutation description"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "VivoQuant software version 4.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ROIs were manually drawn with VivoQuant software version 4.0 (Invicro, Needham, MA, USA) following image normalization based on weight and injected dose, and PET imaging data analysis was performed using VivoQuant"
+    whyMissed: "Specific imaging analysis software with version number and vendor information"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Agilent ChemStation software (version C.01.07)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quality control of L-[18F]FETrp was performed in an Agilent Infinity 1260 HPLC system. An Agilent ChemStation software (version C.01.07) was used for data analysis"
+    whyMissed: "HPLC data analysis software with specific version number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "indoleamine 2,3-dioxygenase rabbit monoclonal antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "indoleamine 2,3-dioxygenase rabbit monoclonal (1:100, Abcam, Cambridge, UK)"
+    whyMissed: "Specific antibody with dilution, vendor, and location information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AHR antibody mouse monoclonal"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "AHR antibody mouse monoclonal (1:50, Santa Cruz, Dallas, TX, USA)"
+    whyMissed: "Specific antibody with dilution, vendor, and location information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "TDO2 rabbit polyclonal antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "antibody-TDO2, rabbit/IgG polyclonal (1:100, Proteintech, Rosemont, IL, USA)"
+    whyMissed: "Specific antibody with dilution, vendor, and location information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PCR primers for genotyping"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "The following polymerase chain reaction (PCR) primers were used for the genotyping: Trp53, TGGATGGTGGTATACTCAGAGC (common), CAGCCTCTGTTCCACATACACT (mutant forward), AGGCTTAGAGGTGCAAGCTG (wild-type forward)"
+    whyMissed: "Specific primer sequences for genotyping multiple genes"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "triple mutant.*mice|.*triple mutant line"
+    toolType: "animal_model"
+    examples: ["Trp53, Nf1, Suz12 triple mutant mice"]
+    reasoning: "Captures genetically modified mouse strains with multiple mutations commonly used in NF research"
+
+  - patternType: "context_phrase"
+    pattern: "software version \\d+\\.\\d+.*\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["VivoQuant software version 4.0 (Invicro, Needham, MA, USA)", "Agilent ChemStation software (version C.01.07)"]
+    reasoning: "Identifies software tools with version numbers and vendor information"
+
+  - patternType: "context_phrase"
+    pattern: "antibody.*\\(1:\\d+,.*\\)"
+    toolType: "antibody"
+    examples: ["indoleamine 2,3-dioxygenase rabbit monoclonal (1:100, Abcam, Cambridge, UK)"]
+    reasoning: "Captures antibodies with dilution ratios and vendor information commonly found in IHC protocols"
+
+  - patternType: "term"
+    pattern: "PCR primers.*genotyping"
+    toolType: "genetic_reagent"
+    examples: ["PCR primers were used for the genotyping"]
+    reasoning: "Identifies primer sets used for genotyping, which are important genetic reagents in animal model studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple research tools are clearly present in the methods section including animal models, software, antibodies, and genetic reagents
+    - The mining system appears to have missed standard research tools that should have been detected
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the initial mining:
+    - A genetically modified mouse model (Trp53, Nf1, Suz12 triple mutant) should definitely be added
+    - Two imaging/analysis software tools with version numbers should be added
+    - Three specific antibodies with vendor information should be added
+    - PCR primers for genotyping should be added as genetic reagents
+    The suggested patterns would help capture similar tools in future NF research publications.
+    No observations were extracted since no tools were initially validated, but this publication likely contains
+    valuable phenotypic and methodological observations that could be extracted after tool validation.

@@ -1,0 +1,144 @@
+publicationMetadata:
+  pmid: "PMID:41444363"
+  title: "Focused ultrasound-mediated drug delivery of bevacizumab in treating NF2-related schwannomatosis in an animal model."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a preclinical animal study using transgenic mouse models to test focused ultrasound drug delivery.
+    Expected tools include animal models (transgenic mice), antibodies (for immunohistology), computational tools
+    (for image analysis), and potentially genetic reagents (transgenic constructs).
+  overallAssessment: |
+    This is a preclinical laboratory research study using transgenic mouse models to investigate focused ultrasound-mediated
+    drug delivery for NF2-related schwannomatosis. The publication has a comprehensive Methods section describing animal
+    procedures, imaging protocols, and histological analysis, indicating active use of research tools. Clinical assessment
+    tools are unlikely given the animal model focus, but lab tools including animal models, antibodies, and computational
+    analysis software are expected and present.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Postn-Cre; Nf2flox/flox mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The Postn-Cre transgenic and conditional Nf2flox/flox knocking alleles were obtained from the Conway and Clapp labs at Indiana University School of Medicine...Postn-Cre; Nf2flox/flox mice and Cre-negative controls possessed the same mixed genetic background"
+    whyMissed: "Specific transgenic mouse strain with standard nomenclature indicating Cre recombinase system and conditional knockout alleles"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-CD31 (Abcam, ab7388)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Immunohistology analysis of 10 micron dorsal root ganglia cryosections was performed using Anti-CD31 (Abcam, ab7388) for vasculature"
+    whyMissed: "Commercial antibody with vendor name and catalog number for immunohistochemistry"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-S100B (Atlas Antibodies, HPA015768-100UL)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-S100B (Atlas Antibodies, HPA015768-100UL) antibodies for S100B protein and DAPI for nuclei"
+    whyMissed: "Commercial antibody with vendor name and catalog number for immunohistochemistry"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "BioSpec 70/30 USR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "magnetic resonance imaging (MRI) of the spine with gadolinium contrast using a 7 T scanner (BioSpec 70/30 USR; Bruker, USA)"
+    whyMissed: "MRI scanner system with specific model number used for imaging analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "MATLAB with Aedes software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "MRI images were transferred into MATLAB with Aedes software for manual segmentation of DRG schwannomas"
+    whyMissed: "Image analysis software combination used for tumor segmentation and quantification"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "LP-100 FUS system (FUS Instruments, Canada)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Following co-registration of a preclinical LP-100 FUS system (FUS Instruments, Canada) with the MRI scanner"
+    whyMissed: "Focused ultrasound system with model number and vendor for therapeutic intervention"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+-Cre;?\\s*[A-Z][a-z0-9]+[fl/ox]+[/+\\-]+"
+    toolType: "animal_model"
+    examples: ["Postn-Cre; Nf2flox/flox"]
+    reasoning: "Captures Cre-lox transgenic mouse nomenclature with promoter-Cre and conditional allele notation"
+
+  - patternType: "vendor_indicator"
+    pattern: "Anti-[A-Z0-9]+\\s*\\([A-Za-z\\s]+,\\s*[A-Z0-9\\-]+\\)"
+    toolType: "antibody"
+    examples: ["Anti-CD31 (Abcam, ab7388)", "Anti-S100B (Atlas Antibodies, HPA015768-100UL)"]
+    reasoning: "Captures antibody names with vendor and catalog number in parentheses"
+
+  - patternType: "term"
+    pattern: "BioSpec\\s+[0-9]+/[0-9]+\\s+[A-Z]+"
+    toolType: "computational_tool"
+    examples: ["BioSpec 70/30 USR"]
+    reasoning: "Bruker MRI scanner model naming convention for imaging systems"
+
+  - patternType: "vendor_indicator"
+    pattern: "LP-[0-9]+\\s+FUS\\s+system"
+    toolType: "computational_tool"
+    examples: ["LP-100 FUS system"]
+    reasoning: "FUS Instruments focused ultrasound system model naming"
+
+observations:
+  - resourceName: "Postn-Cre; Nf2flox/flox mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Transgenic mice developed dorsal root ganglia (DRG) schwannomas that could be visualized and quantified
+      using MRI with gadolinium contrast. Tumors were present at bilateral lumbar levels L1-L6 and were
+      suitable for focused ultrasound targeting and drug delivery studies.
+    foundIn: "methods"
+    contextSnippet: "The primary outcome was DRG schwannoma tumor size, assessed via voxel counts from magnetic resonance imaging (MRI) of the spine with gadolinium contrast"
+    confidence: 0.90
+    doi: "10.1038/s41598-025-32031-9"
+
+  - resourceName: "Postn-Cre; Nf2flox/flox mice"
+    resourceType: "Animal Model"
+    observationType: "Issue"
+    observationTypeOntologyId: ""
+    details: |
+      Colony maintenance was compromised by high death rate due to inbreeding issues, which prevented
+      randomized and blinded allocation of animals to treatment groups. This represents a significant
+      limitation for experimental design and statistical analysis.
+    foundIn: "methods"
+    contextSnippet: "Allocation of animals to the treatment arm was neither randomized nor blinded, since maintaining the colony was compromised by a high death rate due to inbreeding issues"
+    confidence: 0.95
+    doi: "10.1038/s41598-025-32031-9"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 2
+  observationsByType:
+    Tumor Growth: 1
+    Issue: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study with extensive Methods section
+    - Multiple research tools are clearly present including transgenic mouse models, commercial antibodies, and imaging systems
+    - Mining patterns appear to have missed standard laboratory tool nomenclature and vendor/catalog number formats
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by initial mining.
+    The suggested patterns should be implemented to capture transgenic mouse nomenclature, antibody vendor formats,
+    and imaging system models. All 6 potentially missed tools should be added as they represent genuine research
+    tools with proper experimental context. The observations extracted highlight both the utility and limitations
+    of the animal model system. Future mining should include better coverage of preclinical research tool categories.

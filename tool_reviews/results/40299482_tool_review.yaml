@@ -1,0 +1,109 @@
+publicationMetadata:
+  pmid: "PMID:40299482"
+  title: "Sleep Disorders in Pediatric Patients Affected by Neurofibromatosis Type 1: Reports of a Questionnaire and an Apple Watch Sleep Assessment."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales), possibly computational tools for analysis
+    This study specifically mentions questionnaire development and Apple Watch assessment, indicating clinical assessment tools.
+    Statistical analysis methods may involve computational tools for data processing.
+  overallAssessment: |
+    This is a clinical observational case-control study comparing sleep disorders in NF1 patients versus controls.
+    The study develops and uses clinical assessment tools (questionnaire, Apple Watch sleep monitoring) which are valid research tools.
+    Clinical studies routinely use validated instruments and devices for patient assessment, making tool usage highly expected.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "anonymous questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "For data collection, an anonymous questionnaire consisting of multiple-choice and open-ended questions was designed and administered to all patients recruited in the survey."
+    whyMissed: "Clinical assessment tool not captured by initial mining patterns - questionnaire development and administration"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Apple Watch Ultra model 2"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "An assessment of sleep parameters (including the total sleep duration; time in bed vs. time asleep; napping frequency and napping duration; sleep stages; heart rate and respiratory metrics; sleep onset and sleep efficiency; and sleep breathing disorders) with an Apple Watch Ultra model 2 (application: Sleep++) was performed"
+    whyMissed: "Wearable device used for clinical sleep assessment not captured by initial patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Sleep++"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "with an Apple Watch Ultra model 2 (application: Sleep++) was performed in all the patients"
+    whyMissed: "Mobile application for sleep monitoring not captured by initial patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "chi-square tests"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical comparisons between the two groups were performed using chi-square tests for categorical data"
+    whyMissed: "Statistical test method not captured - though this is generic statistical analysis"
+    confidence: 0.3
+    shouldBeAdded: No
+
+  - toolName: "independent t-tests"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "chi-square tests for categorical data and independent t-tests for continuous variables to assess significance"
+    whyMissed: "Statistical test method not captured - though this is generic statistical analysis"
+    confidence: 0.3
+    shouldBeAdded: No
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["anonymous questionnaire consisting of multiple-choice and open-ended questions"]
+    reasoning: "Questionnaires are fundamental clinical assessment tools that should be captured, especially when developed or administered in studies"
+
+  - patternType: "naming_convention"
+    pattern: "Apple Watch.*model.*[0-9]+"
+    toolType: "clinical_assessment_tool"
+    examples: ["Apple Watch Ultra model 2"]
+    reasoning: "Wearable devices with specific model numbers used for clinical monitoring represent valid assessment tools"
+
+  - patternType: "context_phrase"
+    pattern: "assessment.*with.*[device/application]"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessment of sleep parameters with an Apple Watch Ultra model 2"]
+    reasoning: "Context phrase indicating clinical assessment using specific devices or applications"
+
+  - patternType: "term"
+    pattern: "Sleep\\+\\+"
+    toolType: "clinical_assessment_tool"
+    examples: ["application: Sleep++"]
+    reasoning: "Mobile applications used for clinical data collection and monitoring are valid assessment tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture clinical assessment tools despite clear usage in methods
+    - Questionnaire development and administration not detected by current patterns
+    - Wearable device (Apple Watch) used for clinical monitoring missed
+    - Mobile application (Sleep++) for data collection not captured
+    - Generic statistical tests identified but these are not NF-specific tools
+  recommendations: |
+    This publication contains legitimate clinical assessment tools that were completely missed by initial mining.
+    The questionnaire, Apple Watch, and Sleep++ application are all valid research tools used for patient assessment.
+    Current mining patterns need enhancement for clinical assessment tools, particularly questionnaires and wearable devices.
+    Statistical tests (chi-square, t-tests) should not be added as they are generic across all research.
+    No observations can be extracted since Results/Discussion sections are not available.
+    Manual curator should review to confirm these clinical tools warrant inclusion in the database.

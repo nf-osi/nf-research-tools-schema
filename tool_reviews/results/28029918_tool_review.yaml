@@ -1,0 +1,142 @@
+publicationMetadata:
+  pmid: "PMID:28029918"
+  title: "Activity of Selumetinib in Neurofibromatosis Type 1-Related Plexiform Neurofibromas."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, scales), computational tools for analysis, animal models for preclinical validation
+    This is a phase 1 clinical trial with both human subjects and mouse model components, so multiple tool types are expected:
+    - Clinical assessment tools for patient outcomes and adverse events
+    - Animal models for preclinical validation
+    - Computational tools for pharmacokinetic analysis and imaging analysis
+    - Potentially genetic reagents for the mouse model generation
+  overallAssessment: |
+    This is a phase 1 clinical trial testing selumetinib in pediatric NF1 patients with plexiform neurofibromas. The study includes both clinical components (human subjects) and preclinical validation (mouse models), making it likely to contain multiple research tool types. Clinical assessment tools for measuring adverse events, patient-reported outcomes, and functional assessments are expected. The mouse model component suggests animal models and potentially genetic reagents were used.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "DhhCre;Nf1fl/fl mouse model"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Selumetinib was evaluated in the DhhCre;Nf1fl/fl genetically engineered mouse model of neurofibroma with the use of an intermittent dosing schedule."
+    whyMissed: "Specific genetically engineered mouse strain with standard nomenclature not caught by initial mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Responsibility for Medication Questionnaire"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Adherence to the dosing schedule was assessed by administration of the Responsibility for Medication Questionnaire, by review of a patient diary, and by capsule counts."
+    whyMissed: "Clinical assessment tool for medication adherence not identified in initial mining"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "National Cancer Institute Common Terminology Criteria for Adverse Events, version 4.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Adverse events were graded according to National Cancer Institute Common Terminology Criteria for Adverse Events, version 4.0."
+    whyMissed: "Standardized clinical assessment tool for adverse event grading not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "volumetric magnetic resonance imaging analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Response to treatment was monitored by using volumetric magnetic resonance imaging analysis to measure the change in size of the plexiform neurofibroma."
+    whyMissed: "Computational analysis method for tumor volume measurement not identified"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "noncompartmental methods"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Pharmacokinetic variables were calculated by means of noncompartmental methods."
+    whyMissed: "Pharmacokinetic analysis computational method not captured"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+Cre;[A-Z][a-z0-9]+fl/fl"
+    toolType: "animal_model"
+    examples: ["DhhCre;Nf1fl/fl"]
+    reasoning: "Standard Cre-lox mouse strain nomenclature pattern for conditional knockout models commonly used in NF research"
+
+  - patternType: "context_phrase"
+    pattern: "graded according to.*Criteria.*version"
+    toolType: "clinical_assessment_tool"
+    examples: ["graded according to National Cancer Institute Common Terminology Criteria for Adverse Events, version 4.0"]
+    reasoning: "Clinical assessment tools often described with version-specific grading criteria"
+
+  - patternType: "term"
+    pattern: "volumetric.*imaging analysis"
+    toolType: "computational_tool"
+    examples: ["volumetric magnetic resonance imaging analysis"]
+    reasoning: "Volumetric analysis methods are computational tools commonly used in NF tumor measurement"
+
+  - patternType: "context_phrase"
+    pattern: "assessed by administration of.*Questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["assessed by administration of the Responsibility for Medication Questionnaire"]
+    reasoning: "Clinical questionnaires often described with this administration context"
+
+observations:
+  - resourceName: "DhhCre;Nf1fl/fl mouse model"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Treatment with selumetinib resulted in decreases from baseline in neurofibroma volume in 12 of 18 mice (67%). This demonstrates the efficacy of selumetinib in reducing tumor burden in the genetically engineered mouse model of NF1-related neurofibroma.
+    foundIn: "results"
+    contextSnippet: "Treatment with selumetinib resulted in confirmed partial responses (tumor volume decreases from baseline of ≥20%) in 17 of the 24 children (71%) and decreases from baseline in neurofibroma volume in 12 of 18 mice (67%)."
+    confidence: 0.95
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "National Cancer Institute Common Terminology Criteria for Adverse Events, version 4.0"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used to grade adverse events in pediatric patients receiving selumetinib. The most common toxic effects included acneiform rash, gastrointestinal effects, and asymptomatic creatine kinase elevation. Maximum tolerated dose was established at 25 mg per square meter.
+    foundIn: "results"
+    contextSnippet: "The maximum tolerated dose was 25 mg per square meter (approximately 60% of the recommended adult dose). The most common toxic effects associated with selumetinib included acneiform rash, gastrointestinal effects, and asymptomatic creatine kinase elevation."
+    confidence: 0.90
+    doi: "10.1056/NEJMoa1605943"
+
+  - resourceName: "volumetric magnetic resonance imaging analysis"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used as the definitive assessment method for measuring plexiform neurofibroma response to treatment. More sensitive and reproducible than standard response criteria (RECIST and WHO) due to complex shapes and slow growth rates of plexiform neurofibromas. Evaluations performed centrally at NCI after cycles 5 and 10, then every 6 cycles.
+    foundIn: "both"
+    contextSnippet: "Therefore, a more sensitive and reproducible volumetric MRI analysis, which has been established as the definitive assessment method, was used in this trial. Evaluations of response to treatment were performed centrally at the NCI by review of magnetic resonance imaging (MRI) studies obtained after cycles 5 and 10 and thereafter after every 6 cycles."
+    confidence: 0.85
+    doi: "10.1056/NEJMoa1605943"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 5
+  newPatternsCount: 4
+  observationsExtracted: 3
+  observationsByType:
+    Tumor Growth: 1
+    Usage Instructions: 2
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clinical trial with both human and mouse model components
+    - Multiple research tools were missed including a genetically engineered mouse model, clinical assessment tools, and computational analysis methods
+    - The mining system appears to have missed standard clinical trial tools and mouse model nomenclature
+  recommendations: |
+    This publication contains several important research tools that were completely missed by the initial mining:
+    - The DhhCre;Nf1fl/fl mouse model should definitely be added as it's a specific genetically engineered model
+    - Clinical assessment tools (CTCAE v4.0, Responsibility for Medication Questionnaire) are valid research tools used in clinical trials
+    - Computational tools for volumetric imaging analysis and pharmacokinetic analysis should be considered
+    - The mining patterns need improvement for clinical trial contexts and mouse strain nomenclature
+    - All potentially missed tools should be manually reviewed for inclusion

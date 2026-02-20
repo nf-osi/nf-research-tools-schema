@@ -1,0 +1,174 @@
+publicationMetadata:
+  pmid: "PMID:33078583"
+  title: "Cell autonomous requirement of neurofibromin (Nf1) for postnatal muscle hypertrophic growth and metabolic homeostasis."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive molecular biology study using mouse models, immunostaining, RNA-seq, proteomics,
+    and metabolic assays. Expected tools include mouse strains, antibodies, computational analysis software,
+    and genetic reagents.
+  overallAssessment: |
+    This is a laboratory research study investigating Nf1 function in muscle using genetically modified mouse models.
+    The extensive Methods section describes multiple experimental approaches including immunostaining, RNA sequencing,
+    proteomics, and metabolic assays, indicating high likelihood of containing multiple research tool types.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Myf5-Cre"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Mouse lines used in this study were described before: Myf5 Cre, Lbx1 Cre, Nf1 flox, and Rosa26 mTmG"
+    whyMissed: "Cre recombinase mouse lines are genetic reagents but may not have been captured by initial patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Lbx1-Cre"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Mouse lines used in this study were described before: Myf5 Cre, Lbx1 Cre, Nf1 flox, and Rosa26 mTmG"
+    whyMissed: "Cre recombinase mouse lines are genetic reagents but may not have been captured by initial patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1-flox"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Mouse lines used in this study were described before: Myf5 Cre, Lbx1 Cre, Nf1 flox, and Rosa26 mTmG"
+    whyMissed: "Floxed alleles are genetic reagents but may not have been captured by initial patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Rosa26-mTmG"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Mouse lines used in this study were described before: Myf5 Cre, Lbx1 Cre, Nf1 flox, and Rosa26 mTmG"
+    whyMissed: "Reporter mouse lines are genetic reagents but may not have been captured by initial patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-collagen IV"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "The primary antibodies and dilutions used were goat anti-collagen IV (Millipore AB769; 1:500)"
+    whyMissed: "Antibody with catalog number should have been captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "anti-MyHC type 1"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse anti-MyHC type 1 (DSHB BA-D5; 1:500)"
+    whyMissed: "Antibody with catalog number should have been captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "anti-laminin"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "rabbit anti-laminin (Sigma-Aldrich L9393; 1:500)"
+    whyMissed: "Antibody with catalog number should have been captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Pax7"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse anti-Pax7 (DSHB Pax7; 1:10)"
+    whyMissed: "Antibody with catalog number should have been captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "STAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Mapping was performed using STAR 2.4.2a software with mouse genome (mm9)"
+    whyMissed: "Bioinformatics software with version number should have been captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DESeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differential expression analysis was performed with DESeq2 using default settings"
+    whyMissed: "Standard bioinformatics package should have been captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MaxQuant"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw MS data were processed with MaxQuant software (v1.5.3.30)"
+    whyMissed: "Proteomics analysis software with version should have been captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Blots images were analysed with ImageJ grey value analysis tool"
+    whyMissed: "Common image analysis software should have been captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[-_]?[Cc]re\\b"
+    toolType: "genetic_reagent"
+    examples: ["Myf5-Cre", "Lbx1-Cre"]
+    reasoning: "Cre recombinase mouse lines follow standard naming convention and are essential genetic reagents"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[-_]?flox\\b"
+    toolType: "genetic_reagent"
+    examples: ["Nf1-flox"]
+    reasoning: "Floxed alleles are conditional knockout genetic reagents with standard naming"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Za-z0-9\\s]+ \\([A-Z][a-z]+ [A-Z0-9-]+; 1:[0-9]+\\)"
+    toolType: "antibody"
+    examples: ["anti-collagen IV (Millipore AB769; 1:500)", "anti-laminin (Sigma-Aldrich L9393; 1:500)"]
+    reasoning: "Antibodies with vendor and catalog numbers in parentheses with dilution ratios"
+
+  - patternType: "term"
+    pattern: "STAR\\s+[0-9]+\\.[0-9]+\\.[0-9]+[a-z]?"
+    toolType: "computational_tool"
+    examples: ["STAR 2.4.2a"]
+    reasoning: "STAR aligner with version numbers is a standard bioinformatics tool"
+
+  - patternType: "term"
+    pattern: "MaxQuant\\s+\\(v[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\)"
+    toolType: "computational_tool"
+    examples: ["MaxQuant (v1.5.3.30)"]
+    reasoning: "MaxQuant proteomics software with version in parentheses"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple mouse genetic reagents (Cre lines, floxed alleles) were missed
+    - Numerous antibodies with catalog numbers were not captured
+    - Standard bioinformatics tools (STAR, DESeq2, MaxQuant, ImageJ) were missed
+    - Mining patterns appear insufficient for capturing standard molecular biology tools
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    The study uses multiple mouse genetic reagents, antibodies, and computational tools that should
+    have been captured. Patterns need significant improvement to capture:
+    1. Cre recombinase lines and floxed alleles (genetic reagents)
+    2. Antibodies with vendor/catalog information
+    3. Standard bioinformatics software with versions
+    All 12 potentially missed tools should be added as they represent genuine research tools
+    used in experimental procedures described in the Methods section.

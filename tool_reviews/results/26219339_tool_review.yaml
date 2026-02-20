@@ -1,0 +1,155 @@
+publicationMetadata:
+  pmid: "PMID:26219339"
+  title: "A high-throughput kinome screen reveals serum/glucocorticoid-regulated kinase 1 as a therapeutic target for NF2-deficient meningiomas."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive laboratory study involving high-throughput screening, cell culture, genetic engineering,
+    and molecular biology techniques. Expected tools include cell lines, antibodies, genetic reagents (shRNAs, CRISPR),
+    computational tools for analysis, and various chemical inhibitors.
+  overallAssessment: |
+    This is a high-quality laboratory research publication with extensive experimental methods including high-throughput
+    kinome screening, CRISPR gene editing, cell culture, and molecular biology techniques. The comprehensive Methods
+    section indicates active use of multiple research tools including cell lines, antibodies, genetic reagents, and
+    computational analysis tools. This publication type would definitely contain and utilize numerous research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Ben-Men-1"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Cell lines included immortalized NF2-deficient meningioma Ben-Men-1"
+    whyMissed: "Standard cell line naming convention not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AC007-hTERT"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "immortalized arachnoid AC007-hTERT derived from an NF2 patient expressing heterozygous level of NF2"
+    whyMissed: "Cell line with hTERT immortalization suffix not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "293T cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Low passage 293T cells for large-scale lentiviral packaging were obtained from TRC"
+    whyMissed: "Common cell line name without specific vendor/catalog information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "pLKO-puromycin system"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "6,091 shRNAs, cloned into the pLKO-puromycin system, targeting 747 distinct kinases"
+    whyMissed: "Vector system name not captured by plasmid patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "lenti-CRISPR-NF2_sg1"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "transfected using program U-023 with lenti-CRISPR-NF2_sg1 expressing a single guide RNA targeting human NF2 exon 8"
+    whyMissed: "CRISPR construct with specific target naming not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "TRCN0000194957"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "pLKO-puro-based shRNAs targeting human SGK1 (TRCN0000194957)"
+    whyMissed: "TRC catalog numbers for shRNAs not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AlexaFlour488 conjugated-pS6 (Ser240/244) antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "co-incubation with AlexaFlour488 conjugated-pS6 (Ser240/244) antibody (Cell Signaling Technology"
+    whyMissed: "Fluorophore-conjugated antibody with phospho-site specificity not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Acumen eX3 laser-scanning fluorescence microplate cytometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analysis for pS6 staining intensity was performed using the Acumen eX3 laser-scanning fluorescence microplate cytometer"
+    whyMissed: "Specialized imaging/analysis instrument not recognized as computational tool"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism 6.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Growth curves were plotted using GraphPad Prism 6.0 software (San Diego, CA)"
+    whyMissed: "Statistical software with version number - should be captured despite being common"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "CellTiter-Glo Luminescent Cell Viability Assay"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Cell viability was assessed in 384-well plates using CellTiter-Glo Luminescent Cell Viability Assay (Promega"
+    whyMissed: "Commercial assay kit not captured by reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,3}[0-9]{3,4}(-[a-zA-Z]+)?"
+    toolType: "cell_line"
+    examples: ["AC007-hTERT", "Ben-Men-1", "293T"]
+    reasoning: "Captures cell line naming conventions with alphanumeric codes and optional suffixes like hTERT"
+
+  - patternType: "term"
+    pattern: "TRCN[0-9]{10}"
+    toolType: "genetic_reagent"
+    examples: ["TRCN0000194957", "TRCN0000197238", "TRCN0000010424"]
+    reasoning: "TRC (The RNAi Consortium) catalog numbers for shRNAs are standardized identifiers"
+
+  - patternType: "context_phrase"
+    pattern: "lenti-CRISPR-[A-Z0-9_]+"
+    toolType: "genetic_reagent"
+    examples: ["lenti-CRISPR-NF2_sg1"]
+    reasoning: "CRISPR lentiviral constructs with target-specific naming conventions"
+
+  - patternType: "vendor_indicator"
+    pattern: "AlexaFlour[0-9]+ conjugated-[a-zA-Z0-9\\-\\(\\)]+ antibody"
+    toolType: "antibody"
+    examples: ["AlexaFlour488 conjugated-pS6 (Ser240/244) antibody"]
+    reasoning: "Fluorophore-conjugated antibodies with specific target and modification site information"
+
+  - patternType: "term"
+    pattern: "pLKO[\\.-][a-zA-Z0-9\\-]+"
+    toolType: "genetic_reagent"
+    examples: ["pLKO-puromycin system", "pLKO.1-emptyT"]
+    reasoning: "pLKO vector system variants commonly used for shRNA delivery"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple high-confidence research tools were missed including cell lines, genetic reagents, and antibodies
+    - The publication contains extensive experimental methods with clear tool usage
+    - Mining patterns appear insufficient for capturing specialized research tools in this domain
+  recommendations: |
+    This publication contains numerous legitimate research tools that were completely missed by initial mining.
+    The suggested patterns should be implemented to capture cell lines with alphanumeric naming, TRC catalog numbers,
+    CRISPR constructs, and fluorophore-conjugated antibodies. All 10 potentially missed tools should be added as they
+    represent genuine research tools with clear experimental usage context. The mining system needs improvement for
+    capturing specialized molecular biology tools and reagents commonly used in NF research.

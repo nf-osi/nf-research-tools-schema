@@ -1,0 +1,164 @@
+publicationMetadata:
+  pmid: "PMID:32781282"
+  title: "Nf1 heterozygous mice recapitulate the anthropometric and metabolic features of human neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory animal study using mouse models to investigate metabolic phenotypes in NF1.
+    Expected tools include animal models (Nf1+/- mice), computational tools for data analysis,
+    and potentially genetic reagents for genotyping.
+  overallAssessment: |
+    This is a laboratory research study using mouse models to investigate metabolic phenotypes
+    associated with NF1. The publication has a comprehensive Methods section describing experimental
+    procedures including animal husbandry, metabolic testing, and tissue analysis. Research tools
+    are highly expected, particularly animal models and computational analysis tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "Nf1 heterozygous (Nf1+/-) mice accurately reflect the dominant inheritance of NF1 and are regularly employed as a model of NF1"
+    whyMissed: "Standard mouse strain nomenclature for heterozygous knockout mice not captured by initial mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6J strain"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 +/− mice were obtained from Tyler Jacks, Ph.D., (Massachusetts Institute of Technology, Cambridge, MA) and backcrossed 13 generations into the C57BL/6J strain"
+    whyMissed: "Inbred mouse strain designation not captured by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Bruker minispec LF90 TD‐NMR analyzer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Total body fat and lean tissue were assessed using a Bruker minispec LF90 TD‐NMR analyzer, which was calibrated prior to each use"
+    whyMissed: "Specific instrument model with vendor name not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CLAMS (Comprehensive Lab Animal Monitoring System)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Indirect calorimetry was assessed using the Comprehensive Lab Animal Monitoring System (CLAMS)"
+    whyMissed: "Specialized metabolic monitoring system acronym not in patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AlphaTrak 2 glucometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Serial blood glucose measurements were made every 10 minutes for 120 minutes using a glucometer (AlphaTrak 2, Zoetis, Parsippany, NJ)"
+    whyMissed: "Specific medical device model with vendor not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "GraphPad Prism version 6.0h"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Analysis was performed using GraphPad Prism version 6.0h (La Jolla, CA, USA)"
+    whyMissed: "Statistical software with specific version number - should be excluded as generic statistical software"
+    confidence: 0.3
+    shouldBeAdded: No
+
+  - toolName: "Image Pro Plus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image Pro Plus was used to quantify the area of lipid accumulation (Oil Red-O stained) in each section from the liver and skeletal muscle"
+    whyMissed: "Image analysis software not captured by patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\+/\\-\\s+mice\\b"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mice"]
+    reasoning: "Captures heterozygous knockout mouse nomenclature which is standard in genetics research"
+
+  - patternType: "naming_convention"
+    pattern: "\\bC57BL/6[A-Z]*\\b"
+    toolType: "animal_model"
+    examples: ["C57BL/6J strain"]
+    reasoning: "Captures C57BL/6 inbred mouse strain designations commonly used in research"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-z]+\\s+[A-Za-z0-9\\-]+\\s+[A-Z]{2,}[\\-\\s]*[A-Z0-9]+\\b"
+    toolType: "computational_tool"
+    examples: ["Bruker minispec LF90 TD‐NMR analyzer"]
+    reasoning: "Captures vendor name followed by specific instrument model numbers"
+
+  - patternType: "context_phrase"
+    pattern: "assessed using|analyzed using|measured using|quantified using"
+    toolType: "general"
+    examples: ["assessed using a Bruker minispec", "analyzed using GraphPad Prism"]
+    reasoning: "These phrases reliably indicate tool usage in experimental contexts"
+
+observations:
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Body Weight"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      Nf1+/- mice are leaner with significantly reduced visceral and subcutaneous fat mass compared to wild-type littermates.
+      This corresponds with reduced leptin levels and increased density of small adipocytes.
+    foundIn: "both"
+    contextSnippet: "Nf1+/- mice are leaner with significantly reduced visceral and subcutaneous fat mass, which corresponds with an increased density of small adipocytes and reduced leptin levels"
+    confidence: 1.0
+    doi: "10.1016/j.trsl.2020.08.001"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Metabolism"
+    observationTypeOntologyId: "MP:0005266"
+    details: |
+      Nf1+/- mice are highly reliant on carbohydrates as an energy substrate and display increased glucose clearance
+      and insulin sensitivity, but normal response to pyruvate suggesting enhanced glucose utilization and preserved gluconeogenesis.
+    foundIn: "both"
+    contextSnippet: "Nf1+/- mice are highly reliant on carbohydrates as an energy substrate and display increased glucose clearance and insulin sensitivity, but normal response to pyruvate"
+    confidence: 1.0
+    doi: "10.1016/j.trsl.2020.08.001"
+
+  - resourceName: "Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Disease Susceptibility"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      WT and Nf1+/- mice subjected to high glucose diet were protected from diet-induced obesity and hyperglycemia,
+      suggesting metabolic protection in the NF1 heterozygous state.
+    foundIn: "both"
+    contextSnippet: "WT and Nf1+/- mice subjected to high glucose diet were protected from diet-induced obesity and hyperglycemia"
+    confidence: 1.0
+    doi: "10.1016/j.trsl.2020.08.001"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 3
+  observationsByType:
+    Body Weight: 1
+    Metabolism: 1
+    Disease Susceptibility: 1
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a clear laboratory research study
+    - Mouse model nomenclature (Nf1+/-, C57BL/6J) not recognized by current patterns
+    - Specialized research instruments with vendor names missed
+    - Standard heterozygous knockout notation not captured
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by initial mining.
+    The Nf1+/- mouse model is the primary research tool and should definitely be added.
+    Patterns for mouse strain nomenclature need significant improvement to capture heterozygous knockouts and inbred strains.
+    Specialized research instruments should be captured when they have vendor names and model numbers.
+    GraphPad Prism should be excluded as generic statistical software.
+    The observations extracted show clear phenotypic characterization of the mouse model.

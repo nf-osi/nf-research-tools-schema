@@ -1,0 +1,218 @@
+publicationMetadata:
+  pmid: "PMID:31545171"
+  title: "Optical dopamine monitoring with dLight1 reveals mesolimbic phenotypes in a mouse model of neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive neuroscience study using mouse models, viral vectors, antibodies, 
+    electrophysiology, and computational analysis tools.
+  overallAssessment: |
+    This is a sophisticated lab research study combining multiple experimental approaches including 
+    animal models, viral vectors, antibodies, and computational tools. The extensive Methods section 
+    details experimental procedures using research tools across multiple categories. Clinical assessment 
+    tools are not expected in this basic neuroscience research context.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "129T2/SvEmsJ::C57Bl/6NTac Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Experimental subjects were 8–12 week old 129T2/SvEmsJ::C57Bl/6NTac Nf1+/+ and Nf1+/- male and female mice that were generated via the F1 cross"
+    whyMissed: "Specific mouse strain nomenclature with genetic modification not caught by initial patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "dLight1.2"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "We employed the genetically encoded optical dopamine sensor dLight1 to monitor dopaminergic neurotransmission in the ventral striatum of NF1 mice"
+    whyMissed: "Genetically encoded sensor/biosensor not recognized as genetic reagent"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-tyrosine hydroxylase antibody (EMD Millipore AB152)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-tyrosine hydroxylase (Rabbit polyclonal) EMD Millipore Cat#: AB152 RRID: AB_390204 IHC (1:1000)"
+    whyMissed: "Antibody with catalog number and RRID not caught by patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-tyrosine hydroxylase antibody (ImmunoStar 22941)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-tyrosine hydroxylase (mouse monoclonal) ImmunoStar Cat#: 22941 RRID: AB_572268 IHC (1:1000)"
+    whyMissed: "Second antibody with catalog number and RRID not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Anti-GFP antibody (Aves GFP-1020)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Anti-GFP (mouse polyclonal) Aves Cat#: GFP-1020 RRID: AB_10000240 IHC (1:1000)"
+    whyMissed: "GFP antibody with catalog number not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pAAV-hSyn-dLight1.2"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "pAAV-hSyn-dLight1.2 Addgene Plasmid#: 111068 RRID: Addgene_111068 Gift on Lin Tian; produced by UC Davis Vector Core"
+    whyMissed: "Viral vector plasmid with Addgene number not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "pAAV-hSyn-hChR2(H134R)-EYFP"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "pAAV-hSyn-hChR2(H134R)-EYFP Addgene Plasmid#: 26973 RRID: Addgene_26973 Gift of Karl Deisseroth"
+    whyMissed: "Optogenetic vector plasmid not recognized"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AAV9-Th-PI-Cre-SV40"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "AAV9-Th-PI-Cre-SV40 Addgene Plasmid#: 107788 RRID: Addgene_107788 Addgene viral prep#: 107788-AAV9"
+    whyMissed: "Cre recombinase viral vector not caught"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Matlab"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Matlab Mathworks, Inc RRID: SCR_001622"
+    whyMissed: "Standard analysis software with RRID identifier"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "GraphPad Prism 7"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "GraphPad Prism 7 GraphPad Software, Inc RRID: SCR_002798"
+    whyMissed: "Statistical software with version and RRID"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "ABET II Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "ABET II Software for Operant Control Lafayette Instrument Company Model 89501"
+    whyMissed: "Specialized behavioral control software"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "HEK293T cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "HEK293T cells were triple transfected using polyethylenimine (PEI) to deliver viral"
+    whyMissed: "Standard cell line used for viral production"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+::[A-Z0-9]+ Nf1\\+/\\-"
+    toolType: "animal_model"
+    examples: ["129T2/SvEmsJ::C57Bl/6NTac Nf1+/-"]
+    reasoning: "Mouse strain nomenclature with genetic modification notation specific to NF research"
+
+  - patternType: "term"
+    pattern: "dLight\\d+(\\.\\d+)?"
+    toolType: "genetic_reagent"
+    examples: ["dLight1.2", "dLight1"]
+    reasoning: "Genetically encoded dopamine sensors commonly used in neuroscience research"
+
+  - patternType: "context_phrase"
+    pattern: "Anti-[A-Za-z0-9\\s]+ \\([A-Za-z\\s]+\\) [A-Za-z\\s]+ Cat#: [A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["Anti-tyrosine hydroxylase (Rabbit polyclonal) EMD Millipore Cat#: AB152"]
+    reasoning: "Standard antibody description format with catalog numbers"
+
+  - patternType: "term"
+    pattern: "pAAV-[A-Za-z0-9\\-\\(\\)]+"
+    toolType: "genetic_reagent"
+    examples: ["pAAV-hSyn-dLight1.2", "pAAV-hSyn-hChR2(H134R)-EYFP"]
+    reasoning: "AAV plasmid vectors commonly used in neuroscience research"
+
+  - patternType: "vendor_indicator"
+    pattern: "Addgene Plasmid#: \\d+"
+    toolType: "genetic_reagent"
+    examples: ["Addgene Plasmid#: 111068", "Addgene Plasmid#: 26973"]
+    reasoning: "Addgene repository identifiers for plasmids and viral vectors"
+
+  - patternType: "term"
+    pattern: "HEK293T"
+    toolType: "cell_line"
+    examples: ["HEK293T cells"]
+    reasoning: "Standard cell line used for viral production and transfection studies"
+
+observations:
+  - resourceName: "129T2/SvEmsJ::C57Bl/6NTac Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      NF1 mice exhibit reduced spontaneous dopaminergic neurotransmission that was associated with 
+      excitation/inhibition imbalance in the ventral tegmental area and abnormal neuronal morphology. 
+      NF1 mice also had more robust dopaminergic and behavioral responses to salient visual stimuli, 
+      which were independent of learning.
+    foundIn: "both"
+    contextSnippet: "We found that NF1 mice exhibit reduced spontaneous dopaminergic neurotransmission that was associated with excitation/inhibition imbalance in the ventral tegmental area and abnormal neuronal morphology"
+    confidence: 1.0
+    doi: "10.7554/eLife.48983"
+
+  - resourceName: "129T2/SvEmsJ::C57Bl/6NTac Nf1+/- mice"
+    resourceType: "Animal Model"
+    observationType: "Behavior"
+    observationTypeOntologyId: "MP:0001262"
+    details: |
+      NF1 mice had more robust dopaminergic and behavioral responses to salient visual stimuli, 
+      which were independent of learning, and rescued by optogenetic inhibition of non-dopaminergic 
+      neurons in the VTA. These behavioral phenotypes relate to impaired executive function, 
+      attention, and spatial learning.
+    foundIn: "both"
+    contextSnippet: "NF1 mice also had more robust dopaminergic and behavioral responses to salient visual stimuli, which were independent of learning, and rescued by optogenetic inhibition"
+    confidence: 1.0
+    doi: "10.7554/eLife.48983"
+
+  - resourceName: "dLight1.2"
+    resourceType: "Genetic Reagent"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      dLight1.2 successfully monitors dopaminergic neurotransmission in the ventral striatum during 
+      motivated behavior in vivo. The sensor allows for real-time optical monitoring of dopamine 
+      release with high temporal resolution during behavioral tasks.
+    foundIn: "both"
+    contextSnippet: "We employed the genetically encoded optical dopamine sensor dLight1 to monitor dopaminergic neurotransmission in the ventral striatum of NF1 mice during motivated behavior"
+    confidence: 1.0
+    doi: "10.7554/eLife.48983"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 3
+  observationsByType:
+    Nervous System: 1
+    Behavior: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a comprehensive lab research study
+    - Multiple categories of research tools were completely missed including animal models, antibodies, genetic reagents, cell lines, and computational tools
+    - The Methods section contains extensive tool information with catalog numbers, RRIDs, and vendor details that should have been captured
+  recommendations: |
+    This publication contains numerous high-quality research tools that were completely missed by initial mining. 
+    The animal model (NF1 knockout mice), genetic reagents (viral vectors, biosensors), antibodies with catalog numbers, 
+    and cell lines should all be added to the database. The mining patterns need significant improvement to capture 
+    standard neuroscience research tools. Manual curator review is recommended to validate all potentially missed tools. 
+    The observations extracted provide valuable phenotypic data for the NF1 mouse model that would benefit the research community.
