@@ -46,6 +46,68 @@ prompt: |
 
      usageType values: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
 
+  3. TYPE-SPECIFIC FIELDS — for every ACCEPTED tool, add the fields below as additional YAML keys
+     on the same entry. Extract only what the text explicitly states; omit fields not found.
+     Fields marked (*) are critical — make every effort to populate them from the text.
+
+     animal_model:
+       strainNomenclature*  (full strain name/ID as written, e.g. "B6.129-Nf1tm1Fcr/J")
+       backgroundStrain     (e.g. "C57BL/6")
+       backgroundSubstrain  (e.g. "C57BL/6J")
+       animalModelGeneticDisorder*  [Neurofibromatosis type 1 | Neurofibromatosis type 2 | Schwannomatosis | No known disease]
+       animalModelOfManifestation   (e.g. "Plexiform Neurofibroma", "Optic Nerve Glioma")
+
+     antibody:
+       targetAntigen*  (what the antibody recognises, e.g. "NF1", "Ki67", "p-ERK")
+       hostOrganism    [Mouse | Rabbit | Unknown]
+       clonality       [Monoclonal | Polyclonal | Secondary | Recombinant | Control | Unknown]
+       reactiveSpecies (e.g. "Human, Mouse")
+       conjugate       (e.g. "HRP", "Alexa Fluor 488", or "Non-conjugated")
+
+     cell_line:
+       organ*          (tissue/organ of origin — required for Synapse, e.g. "Nerve", "Brain", "Blood")
+       tissue          (e.g. "Peripheral nerve sheath", "Optic nerve")
+       cellLineGeneticDisorder*  [Neurofibromatosis Type 1 | Neurofibromatosis Type 2 | Schwannamatosis | None]
+       cellLineManifestation     (tumour or phenotype, e.g. "Malignant Peripheral Nerve Sheath Tumor")
+       cellLineCategory [Cancer cell line | Embryonic stem cell | Finite cell line | Hybrid cell line | Hybridoma]
+
+     genetic_reagent:
+       insertName*     (gene/construct name, e.g. "Nf1", "Cre", "shNF1")
+       vectorType      [Plasmid | Viral | Transposon | Other]
+       vectorBackbone  (e.g. "pLenti", "AAV2", "pX330")
+       promoter        (e.g. "CMV", "EF1α", "U6")
+       insertSpecies   (e.g. "Mouse", "Human")
+       selectableMarker (e.g. "Puromycin", "GFP")
+       gRNAshRNASequence (if applicable)
+
+     computational_tool:
+       softwareType*   [Analysis Software | Pipeline | Package/Library | Workflow | Database | Web Application | Command-line Tool | Plugin | Other]
+       softwareVersion (e.g. "v1.4.2", "2023")
+       programmingLanguage (e.g. "Python", "R", "Java")
+       sourceRepository (full URL to GitHub/GitLab/Bitbucket repo)
+
+     advanced_cellular_model:
+       modelType*       [organoid | spheroid | tumoroid | assembloid | other]
+       derivationSource* [patient tissue | iPSC | primary cell | cell line | other]
+       cellTypes        (e.g. "Schwann cells, fibroblasts")
+       organoidType     (e.g. "brain organoid", "nerve organoid")
+       matrixType       (e.g. "Matrigel", "collagen")
+       cultureSystem    (e.g. "suspension", "embedded")
+
+     patient_derived_model:
+       modelSystemType* [PDX | PDO | cell line | organoid | other]
+       patientDiagnosis* (e.g. "NF1-associated MPNST", "plexiform neurofibroma")
+       hostStrain       (e.g. "NSG", "nude mouse") — for PDX
+       tumorType        (e.g. "MPNST", "neurofibroma")
+       engraftmentSite  (e.g. "subcutaneous", "orthotopic")
+
+     clinical_assessment_tool:
+       assessmentType*   [scale | questionnaire | structured interview | performance test | biomarker assay | other]
+       targetPopulation* [pediatric | adult | caregiver | all ages | clinician-rated | other]
+       diseaseSpecific   [Yes | No]
+       numberOfItems     (integer, e.g. 36)
+       scoringMethod     (e.g. "0–100 scale", "Likert 1–5", "sum score")
+
 activities:
   - Evaluate each mined tool (or discover tools in discovery mode)
   - Assign verdict and recommendation per accept/reject criteria
