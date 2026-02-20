@@ -698,6 +698,96 @@ def process_single_publication(row, idx, total_pubs, results_dir, client, force_
 
     return (pmid, 'reviewed', result) if result else (pmid, 'failed', None)
 
+def process_single_observation(row, idx, total_pubs, results_dir, client, force_rereviews):
+    """
+    Process a single publication for Phase 2 observation extraction (parallel-safe).
+
+    Returns:
+        tuple: (pmid, status, obs_rows) where status is one of:
+               'skipped', 'extracted', 'failed'
+               obs_rows is a list of observation dicts (may be empty)
+    """
+    pmid = row['pmid']
+    safe_print(f"\n🔬 Progress: {idx+1}/{total_pubs} — {pmid}")
+
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+
+    # Need Phase 1 YAML with accepted tools
+    yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
+    if not yaml_path.exists():
+        safe_print(f"  ⏭️  No Phase 1 YAML — skipping")
+        return (pmid, 'skipped', [])
+
+    phase1_data = parse_review_yaml(yaml_path)
+    if not phase1_data:
+        return (pmid, 'skipped', [])
+
+    # Only extract observations for tools that were experimentally used (not merely cited)
+    accepted_names = [
+        t.get('toolName', '') for t in (phase1_data.get('toolValidations') or [])
+        if (
+            t.get('recommendation') == 'Keep'
+            and t.get('confidence', 0) >= 0.8
+            and t.get('usageType', '') != 'Citation Only'
+        )
+    ]
+    accepted_names = [n for n in accepted_names if n]
+
+    if not accepted_names:
+        safe_print(f"  ⏭️  No accepted experimentally-used tools — skipping")
+        return (pmid, 'skipped', [])
+
+    # Skip if observations already extracted (unless force)
+    obs_yaml_path = Path(results_dir) / f'{clean_pmid}_observations.yaml'
+    if obs_yaml_path.exists() and not force_rereviews:
+        safe_print(f"  ⏭️  Observations already extracted")
+        try:
+            existing = yaml.safe_load(obs_yaml_path.read_text())
+            obs_rows = _build_obs_rows(pmid, row, existing.get('observations') or [])
+            return (pmid, 'skipped', obs_rows)
+        except Exception:
+            return (pmid, 'skipped', [])
+
+    # Load cache — need Results/Discussion sections (full cache level)
+    cached = load_cached_text(pmid)
+    if not cached:
+        safe_print(f"  ⏭️  No cache — skipping")
+        return (pmid, 'skipped', [])
+
+    input_data = prepare_input_data(row, cached)
+    result_path = run_observation_extraction(pmid, input_data, accepted_names, results_dir, client)
+
+    if result_path:
+        try:
+            obs_data = yaml.safe_load(result_path.read_text())
+            obs_rows = _build_obs_rows(pmid, row, obs_data.get('observations') or [])
+            return (pmid, 'extracted', obs_rows)
+        except Exception as e:
+            safe_print(f"  ⚠️  Could not parse observations YAML: {e}")
+            return (pmid, 'failed', [])
+    else:
+        return (pmid, 'failed', [])
+
+
+def _build_obs_rows(pmid, row, observations):
+    """Convert raw observation dicts to flat CSV rows."""
+    return [
+        {
+            '_pmid': pmid,
+            '_doi': row.get('doi', ''),
+            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
+            'resourceName': obs.get('resourceName', ''),
+            'resourceType': obs.get('resourceType', ''),
+            'observationType': obs.get('observationType', ''),
+            'details': obs.get('details', ''),
+            'foundIn': obs.get('foundIn', ''),
+            'contextSnippet': obs.get('contextSnippet', ''),
+            'confidence': obs.get('confidence', ''),
+        }
+        for obs in observations
+    ]
+
+
 def parse_review_yaml(yaml_path):
     """Parse goose review YAML file."""
     try:
@@ -1240,101 +1330,53 @@ def main():
     if args.extract_observations:
         print("\n" + "=" * 80)
         print("Phase 2: Extracting Observations from Results + Discussion")
+        if args.parallel_workers > 1:
+            print(f"Using {args.parallel_workers} parallel workers")
         print("=" * 80)
 
         obs_extracted = 0
         obs_skipped = 0
+        obs_failed = 0
         all_obs_rows = []
+        total_pubs = len(mining_df)
+        rows_list = [(idx, row) for idx, row in enumerate(mining_df.itertuples(index=False))]
 
-        for _, row in mining_df.iterrows():
-            pmid = row['pmid']
-            clean_pmid = sanitize_pmid_for_filename(pmid)
-
-            # Need Phase 1 YAML with accepted tools
-            yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
-            if not yaml_path.exists():
-                obs_skipped += 1
-                continue
-
-            phase1_data = parse_review_yaml(yaml_path)
-            if not phase1_data:
-                obs_skipped += 1
-                continue
-
-            accepted_names = [
-                t.get('toolName', '') for t in (phase1_data.get('toolValidations') or [])
-                if t.get('recommendation') == 'Keep' and t.get('confidence', 0) >= 0.8
-            ]
-            accepted_names = [n for n in accepted_names if n]
-
-            if not accepted_names:
-                obs_skipped += 1
-                continue
-
-            # Skip if observations already extracted (unless force)
-            obs_yaml_path = Path(results_dir) / f'{clean_pmid}_observations.yaml'
-            if obs_yaml_path.exists() and not args.force_rereviews:
-                safe_print(f"⏭️  {pmid}: observations already extracted")
-                obs_skipped += 1
-                # Still collect existing observations
-                try:
-                    existing = yaml.safe_load(obs_yaml_path.read_text())
-                    for obs in (existing.get('observations') or []):
-                        all_obs_rows.append({
-                            '_pmid': pmid,
-                            '_doi': row.get('doi', ''),
-                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
-                            'resourceName': obs.get('resourceName', ''),
-                            'resourceType': obs.get('resourceType', ''),
-                            'observationType': obs.get('observationType', ''),
-                            'details': obs.get('details', ''),
-                            'foundIn': obs.get('foundIn', ''),
-                            'contextSnippet': obs.get('contextSnippet', ''),
-                            'confidence': obs.get('confidence', ''),
-                        })
-                except Exception:
-                    pass
-                continue
-
-            # Load cache
-            cached = load_cached_text(pmid)
-            if not cached:
-                obs_skipped += 1
-                continue
-
-            input_data = prepare_input_data(row, cached)
-            result_path = run_observation_extraction(
-                pmid, input_data, accepted_names, results_dir, anthropic_client
+        def _obs_task(args_tuple):
+            idx, row = args_tuple
+            return process_single_observation(
+                row._asdict(), idx, total_pubs, results_dir, anthropic_client, args.force_rereviews
             )
 
-            if result_path:
-                obs_extracted += 1
-                try:
-                    obs_data = yaml.safe_load(result_path.read_text())
-                    for obs in (obs_data.get('observations') or []):
-                        all_obs_rows.append({
-                            '_pmid': pmid,
-                            '_doi': row.get('doi', ''),
-                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
-                            'resourceName': obs.get('resourceName', ''),
-                            'resourceType': obs.get('resourceType', ''),
-                            'observationType': obs.get('observationType', ''),
-                            'details': obs.get('details', ''),
-                            'foundIn': obs.get('foundIn', ''),
-                            'contextSnippet': obs.get('contextSnippet', ''),
-                            'confidence': obs.get('confidence', ''),
-                        })
-                except Exception as e:
-                    print(f"  ⚠️  Could not parse observations YAML: {e}")
-            else:
-                obs_skipped += 1
-
-            time.sleep(0.5)  # Light rate-limiting between API calls
+        if args.parallel_workers > 1:
+            with ThreadPoolExecutor(max_workers=args.parallel_workers) as executor:
+                futures = {executor.submit(_obs_task, item): item for item in rows_list}
+                for future in as_completed(futures):
+                    pmid, status, obs_rows = future.result()
+                    all_obs_rows.extend(obs_rows)
+                    if status == 'extracted':
+                        obs_extracted += 1
+                    elif status == 'failed':
+                        obs_failed += 1
+                    else:
+                        obs_skipped += 1
+        else:
+            for idx, row in enumerate(mining_df.itertuples(index=False)):
+                pmid, status, obs_rows = process_single_observation(
+                    row._asdict(), idx, total_pubs, results_dir, anthropic_client, args.force_rereviews
+                )
+                all_obs_rows.extend(obs_rows)
+                if status == 'extracted':
+                    obs_extracted += 1
+                elif status == 'failed':
+                    obs_failed += 1
+                else:
+                    obs_skipped += 1
 
         print(f"\n{'='*80}")
         print(f"Observation Extraction Summary:")
         print(f"  ✅ Extracted: {obs_extracted} publications")
         print(f"  ⏭️  Skipped: {obs_skipped} publications")
+        print(f"  ❌ Failed: {obs_failed} publications")
         print(f"  📊 Total observations collected: {len(all_obs_rows)}")
         print(f"{'='*80}")
 

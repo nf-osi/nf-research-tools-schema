@@ -36,6 +36,10 @@ def should_upgrade_cache(review_file: Path) -> tuple[bool, str, int]:
     """
     Determine if cache should be upgraded based on validation results.
 
+    Only upgrades for publications with at least one Accepted tool that was
+    experimentally used (usageType != "Citation Only"). Citation-only tools
+    have no Results/Discussion observations worth extracting.
+
     Returns:
         (should_upgrade, reason, num_tools)
     """
@@ -43,34 +47,27 @@ def should_upgrade_cache(review_file: Path) -> tuple[bool, str, int]:
         with open(review_file) as f:
             review = yaml.safe_load(f)
 
-        # Check for accepted tools with high confidence
+        # Check for accepted tools with high confidence that were actually used
+        # (not merely cited from other work — those have no observations to extract)
         accepted_tools = [
             t for t in review.get('toolValidations', []) or []
-            if t.get('verdict') == 'Accept' and t.get('confidence', 0) >= 0.8
+            if (
+                t.get('verdict') == 'Accept'
+                and t.get('confidence', 0) >= 0.8
+                and t.get('usageType', '') != 'Citation Only'
+            )
         ]
 
         if len(accepted_tools) == 0:
-            return False, "No high-confidence validated tools", 0
+            return False, "No high-confidence experimentally-used tools", 0
 
-        # Check publication type if available (optional field in new YAML format)
+        # Skip review articles / editorials — no Results section to mine
         pub_type = review.get('publicationMetadata', {}).get('publicationType', '')
         skip_types = ['Review Article', 'Editorial', 'Letter', 'Comment', 'News']
         if pub_type in skip_types:
             return False, f"Publication type: {pub_type}", len(accepted_tools)
 
-        # Check metadata completeness (if available)
-        completeness_scores = [
-            t.get('metadata', {}).get('_completenessScore', 0)
-            for t in accepted_tools
-            if '_completenessScore' in t.get('metadata', {})
-        ]
-
-        if completeness_scores:
-            avg_completeness = sum(completeness_scores) / len(completeness_scores)
-            if avg_completeness < 0.6:
-                return False, f"Low completeness: {avg_completeness:.2f}", len(accepted_tools)
-
-        return True, f"{len(accepted_tools)} high-quality tools validated", len(accepted_tools)
+        return True, f"{len(accepted_tools)} accepted tools ready for observation extraction", len(accepted_tools)
 
     except Exception as e:
         logger.error(f"Error analyzing {review_file.name}: {e}")
@@ -280,7 +277,7 @@ def main():
     upgrade_candidates = []
     skip_reasons = {
         'no_tools': [],
-        'low_completeness': [],
+        'citation_only': [],
         'review_article': [],
         'already_full': [],
         'abstract_only': []
@@ -300,18 +297,18 @@ def main():
             })
         else:
             # Categorize skip reason
-            if 'No high-confidence' in reason:
+            if 'experimentally-used' in reason:
                 skip_reasons['no_tools'].append(pmid)
-            elif 'Low completeness' in reason:
-                skip_reasons['low_completeness'].append(pmid)
+            elif 'Citation Only' in reason:
+                skip_reasons['citation_only'].append(pmid)
             elif 'Publication type' in reason:
                 skip_reasons['review_article'].append(pmid)
 
     logger.info(f"Upgrade candidates: {len(upgrade_candidates)} publications")
-    logger.info(f"  - High-quality tools: {len(upgrade_candidates)}")
-    logger.info(f"  - Low completeness: {len(skip_reasons['low_completeness'])} (skipped)")
+    logger.info(f"  - With used tools: {len(upgrade_candidates)}")
+    logger.info(f"  - Citation-only tools: {len(skip_reasons['citation_only'])} (skipped — no observations to extract)")
     logger.info(f"  - Review articles: {len(skip_reasons['review_article'])} (skipped)")
-    logger.info(f"  - No tools: {len(skip_reasons['no_tools'])} (skipped)")
+    logger.info(f"  - No accepted tools: {len(skip_reasons['no_tools'])} (skipped)")
     logger.info("")
 
     if args.dry_run:
