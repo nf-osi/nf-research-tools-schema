@@ -7,6 +7,8 @@ on:
     paths:
       - 'VALIDATED_*.csv'
       - 'SUBMIT_*.csv'
+      - 'tool_coverage/outputs/VALIDATED_*.csv'
+      - 'tool_coverage/outputs/SUBMIT_*.csv'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -39,10 +41,11 @@ jobs:
       - name: Check for validated or submit files
         id: check_files
         run: |
-          if ls VALIDATED_*.csv 1> /dev/null 2>&1; then
+          # Check both repo root and tool_coverage/outputs/
+          if ls VALIDATED_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/VALIDATED_*.csv 1> /dev/null 2>&1; then
             echo "has_validated=true" >> $GITHUB_OUTPUT
             echo "✅ Found VALIDATED_*.csv files (AI-validated)"
-          elif ls SUBMIT_*.csv 1> /dev/null 2>&1; then
+          elif ls SUBMIT_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/SUBMIT_*.csv 1> /dev/null 2>&1; then
             echo "has_validated=false" >> $GITHUB_OUTPUT
             echo "⚠️  Found SUBMIT_*.csv files (not AI-validated)"
           else
@@ -168,5 +171,6 @@ jobs:
           name: synapse-upload-logs
           path: |
             CLEAN_*.csv
+            tool_coverage/outputs/CLEAN_*.csv
             GFF_Tool_Coverage_Report.pdf
           retention-days: 30

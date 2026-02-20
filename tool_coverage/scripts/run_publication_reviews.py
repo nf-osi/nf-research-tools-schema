@@ -21,6 +21,7 @@ import time
 
 # Configuration
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
+OBS_RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_observation_extraction.yaml'
 REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
@@ -37,9 +38,23 @@ toolValidations:
     usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
   # Repeat for each tool. Use [] if no tools found."""
 
+# Observation extraction YAML output template
+OBSERVATION_YAML_TEMPLATE = """\
+observations:
+  - resourceName: "Exact tool name from validated tools list"
+    resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+    observationType: "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
+    details: "Specific finding, including quantitative values where available (e.g., 50% tumor reduction)"
+    foundIn: "Results" | "Discussion" | "Both"
+    contextSnippet: "...up to 300 chars of verbatim text supporting this observation..."
+    confidence: 0.0-1.0
+  # Repeat for each observation. Use [] if no qualifying observations found."""
+
 # Module-level cache for recipe content (loaded once)
 _recipe_system_prompt = None
 _recipe_task_instructions = None
+_obs_recipe_system_prompt = None
+_obs_recipe_task_instructions = None
 
 def setup_directories():
     """Create output directories."""
@@ -55,7 +70,7 @@ def setup_directories():
     return str(review_dir), str(results_dir), str(inputs_dir)
 
 def _load_recipe():
-    """Load recipe YAML once and cache system prompt + task instructions."""
+    """Load Phase 1 tool-validation recipe YAML once and cache prompts."""
     global _recipe_system_prompt, _recipe_task_instructions
     if _recipe_system_prompt is not None:
         return
@@ -65,9 +80,151 @@ def _load_recipe():
         recipe = yaml.safe_load(f)
 
     _recipe_system_prompt = recipe.get('instructions', '').strip()
-    # Use the full prompt as task instructions — publication content is embedded directly
-    # in the user message so there is no file-reading step to skip.
     _recipe_task_instructions = recipe.get('prompt', '').strip()
+
+
+def _load_obs_recipe():
+    """Load Phase 2 observation-extraction recipe YAML once and cache prompts."""
+    global _obs_recipe_system_prompt, _obs_recipe_task_instructions
+    if _obs_recipe_system_prompt is not None:
+        return
+
+    recipe_path = Path(OBS_RECIPE_PATH)
+    with open(recipe_path) as f:
+        recipe = yaml.safe_load(f)
+
+    _obs_recipe_system_prompt = recipe.get('instructions', '').strip()
+    _obs_recipe_task_instructions = recipe.get('prompt', '').strip()
+
+
+def build_observation_prompt(input_data, accepted_tool_names):
+    """Return (system_prompt, user_message) for Phase 2 observation extraction.
+
+    Args:
+        input_data: Dict with publication text (must have resultsText and/or discussionText)
+        accepted_tool_names: List of validated tool name strings from Phase 1
+    """
+    _load_obs_recipe()
+
+    meta = input_data['publicationMetadata']
+    pmid = meta['pmid']
+
+    def section(label, text):
+        return f"**{label}:**\n{text.strip() if text and text.strip() else '(not available)'}"
+
+    tools_text = '\n'.join(f'  - {name}' for name in accepted_tool_names) or '  (none)'
+
+    user_message = f"""Extract observations for publication {pmid}.
+
+**PUBLICATION METADATA:**
+- PMID: {pmid}
+- Title: {meta.get('title', '')}
+- Year: {meta.get('year', '')}
+
+{section('RESULTS', input_data.get('resultsText', ''))}
+
+{section('DISCUSSION', input_data.get('discussionText', ''))}
+
+**VALIDATED TOOLS IN THIS PUBLICATION:**
+{tools_text}
+
+---
+{_obs_recipe_task_instructions}
+
+Output ONLY the YAML below — no explanation before or after:
+
+```yaml
+{OBSERVATION_YAML_TEMPLATE}
+```
+"""
+    return _obs_recipe_system_prompt, user_message
+
+
+def run_observation_extraction(pmid, input_data, accepted_tool_names, results_dir, client, max_retries=3):
+    """Run Phase 2 observation extraction for a single publication.
+
+    Reads Results + Discussion (requires full cache level) and extracts
+    scientific observations about the validated tools.
+
+    Returns path to YAML file, or None on failure.
+    """
+    safe_print(f"\n{'='*80}")
+    safe_print(f"Extracting observations for {pmid}")
+    safe_print(f"{'='*80}")
+
+    if not input_data.get('resultsText') and not input_data.get('discussionText'):
+        safe_print(f"  ⏭️  Skipping — no Results or Discussion text in cache (need full cache level)")
+        return None
+
+    if not accepted_tool_names:
+        safe_print(f"  ⏭️  Skipping — no accepted tools from Phase 1 review")
+        return None
+
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    yaml_file = Path(results_dir).resolve() / f'{clean_pmid}_observations.yaml'
+
+    system_prompt, user_message = build_observation_prompt(input_data, accepted_tool_names)
+
+    for attempt in range(max_retries):
+        try:
+            if attempt > 0:
+                safe_print(f"  Retry attempt {attempt + 1}/{max_retries}...")
+
+            message = client.messages.create(
+                model=ANTHROPIC_MODEL,
+                max_tokens=4096,
+                temperature=0.0,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_message}]
+            )
+
+            response_text = message.content[0].text
+            safe_print(f"  Response: {len(response_text)} chars, "
+                       f"~{message.usage.input_tokens}in/{message.usage.output_tokens}out tokens")
+
+            # Extract YAML
+            yaml_text = None
+            match = re.search(r'```yaml\s*\n(.*?)\n```', response_text, re.DOTALL)
+            if match:
+                yaml_text = match.group(1).strip()
+            else:
+                match = re.search(r'(observations:.*)', response_text, re.DOTALL)
+                if match:
+                    yaml_text = match.group(1).strip()
+
+            if not yaml_text:
+                safe_print(f"  ⚠️  No YAML found in response")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                return None
+
+            data = yaml.safe_load(yaml_text)
+            if not isinstance(data, dict) or 'observations' not in data:
+                safe_print(f"  ⚠️  Invalid YAML structure (missing observations)")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                return None
+
+            yaml_file.write_text(yaml_text, encoding='utf-8')
+            obs_count = len(data.get('observations') or [])
+            safe_print(f"  ✅ Extracted {obs_count} observations → {yaml_file.name}")
+            return yaml_file
+
+        except anthropic.RateLimitError:
+            wait = 60 * (attempt + 1)
+            safe_print(f"  ⚠️  Rate limit — waiting {wait}s before retry...")
+            time.sleep(wait)
+        except anthropic.APIError as e:
+            safe_print(f"  ❌ API error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+        except Exception as e:
+            safe_print(f"  ❌ Error: {e}")
+            return None
+
+    return None
 
 
 def _format_mined_tools(tools_list):
@@ -649,25 +806,25 @@ def filter_submission_csvs(validation_results, output_dir='.'):
             # Need to match on PMID + tool name from tracking columns
             if '_pmid' in df.columns:
                 # Create keep mask
+                # Map file stem → (tool_type, name_column) matching write_validated_tools_submit_csv
+                name_col_by_stem = {
+                    'animal_models':          ('animal_model',          'strainNomenclature'),
+                    'antibodies':             ('antibody',              'targetAntigen'),
+                    'cell_lines':             ('cell_line',             '_toolName'),
+                    'genetic_reagents':       ('genetic_reagent',       'insertName'),
+                    'computational_tools':    ('computational_tool',    'softwareName'),
+                    'advanced_cellular_models': ('advanced_cellular_model', '_toolName'),
+                    'patient_derived_models': ('patient_derived_model', '_toolName'),
+                    'clinical_assessment_tools': ('clinical_assessment_tool', 'assessmentName'),
+                    'resources':              (None,                    'resourceName'),
+                }
+                stem = submit_file.stem.replace('SUBMIT_', '')
+                file_tool_type, file_name_col = name_col_by_stem.get(stem, (None, None))
+
                 def should_keep_row(row):
                     pmid = row.get('_pmid', '')
-                    # Try to extract tool name from different possible columns
-                    tool_name = None
-                    tool_type = None
-
-                    # Determine tool type from file name
-                    if 'antibodies' in submit_file.name:
-                        tool_type = 'antibody'
-                        tool_name = row.get('targetAntigen', '')
-                    elif 'cell_lines' in submit_file.name:
-                        tool_type = 'cell_line'
-                        tool_name = row.get('_cellLineName', '')
-                    elif 'animal_models' in submit_file.name:
-                        tool_type = 'animal_model'
-                        tool_name = row.get('name', '')
-                    elif 'genetic_reagents' in submit_file.name:
-                        tool_type = 'genetic_reagent'
-                        tool_name = row.get('insertName', '')
+                    tool_type = file_tool_type
+                    tool_name = row.get(file_name_col, '') if file_name_col else ''
 
                     if not tool_name or not pmid:
                         return True  # Keep if we can't determine (conservative)
@@ -681,8 +838,8 @@ def filter_submission_csvs(validation_results, output_dir='.'):
                 df_filtered = df[df.apply(should_keep_row, axis=1)]
                 removed_count = original_count - len(df_filtered)
 
-                # Save filtered version
-                output_file = Path(output_dir) / f"VALIDATED_{submit_file.name}"
+                # Save filtered version (VALIDATED_animal_models.csv, not VALIDATED_SUBMIT_animal_models.csv)
+                output_file = Path(output_dir) / submit_file.name.replace('SUBMIT_', 'VALIDATED_')
                 df_filtered.to_csv(output_file, index=False)
 
                 print(f"  ✅ Removed {removed_count} rows → {output_file.name}")
@@ -699,27 +856,18 @@ def filter_submission_csvs(validation_results, output_dir='.'):
 def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     """Write SUBMIT_*.csv files from accepted toolValidations for direct submission.
 
-    In discovery mode (no pre-mined tools), Claude records found tools directly in
-    toolValidations. This function converts those validated tool entries into the
-    same SUBMIT_*.csv format expected by filter_submission_csvs.
+    Column names match the actual Synapse table schemas (verified from live tables).
+    Tracking columns prefixed with '_' are stripped by clean_submission_csvs.py before upload.
+
+    For types with no name column in the detail table (cell_line, advanced_cellular_model,
+    patient_derived_model), the tool name is recorded in SUBMIT_resources.csv under resourceName.
+    All other types also get a resources row so the Resources table stays in sync.
     """
     print("\n" + "=" * 80)
     print("Writing SUBMIT_*.csv from Validated Tools")
     print("=" * 80)
 
-    # Type-specific primary name column (matches filter_submission_csvs expectations)
-    name_column_map = {
-        'animal_model': 'name',
-        'antibody': 'targetAntigen',
-        'cell_line': '_cellLineName',
-        'genetic_reagent': 'insertName',
-        'computational_tool': 'softwareName',
-        'advanced_cellular_model': '_modelName',
-        'patient_derived_model': '_modelName',
-        'clinical_assessment_tool': 'assessmentName',
-    }
-
-    # Plural filename stem — matches what filter_submission_csvs looks for in filenames
+    # Plural filename stem
     type_to_stem = {
         'animal_model': 'animal_models',
         'antibody': 'antibodies',
@@ -731,19 +879,153 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         'clinical_assessment_tool': 'clinical_assessment_tools',
     }
 
-    # Group accepted tools by normalized type
+    # Synapse resourceType strings for the Resources table
+    resource_type_map = {
+        'animal_model': 'Animal Model',
+        'antibody': 'Antibody',
+        'cell_line': 'Cell Line',
+        'genetic_reagent': 'Genetic Reagent',
+        'computational_tool': 'Computational Tool',
+        'advanced_cellular_model': 'Advanced Cellular Model',
+        'patient_derived_model': 'Patient-Derived Model',
+        'clinical_assessment_tool': 'Clinical Assessment Tool',
+    }
+
+    # Synapse column templates per type (verified against live Synapse tables).
+    # Only columns that can be pre-populated from AI mining are filled;
+    # the rest are left blank for curators. ID columns are omitted (Synapse generates them).
+    # Types with no name in the detail table (cell_line, advanced_cellular_model,
+    # patient_derived_model) carry the tool name as '_toolName' (tracking only).
+    def make_detail_row(tool_type, tool_name):
+        """Return a dict of Synapse detail-table columns for one tool."""
+        if tool_type == 'animal_model':
+            return {
+                'strainNomenclature': tool_name,
+                'backgroundStrain': '',
+                'backgroundSubstrain': '',
+                'animalModelGeneticDisorder': '',
+                'animalModelOfManifestation': '',
+                'transplantationType': '',
+                'animalState': '',
+                'generation': '',
+                'donorId': '',
+                'transplantationDonorId': '',
+            }
+        elif tool_type == 'antibody':
+            return {
+                'targetAntigen': tool_name,
+                'hostOrganism': '',
+                'clonality': '',
+                'cloneId': '',
+                'uniprotId': '',
+                'reactiveSpecies': '',
+                'conjugate': '',
+            }
+        elif tool_type == 'cell_line':
+            return {
+                '_toolName': tool_name,      # tracking only — name goes in resources
+                'organ': '',                  # required; curator must fill in
+                'tissue': '',
+                'cellLineManifestation': '',
+                'cellLineGeneticDisorder': '',
+                'cellLineCategory': '',
+                'donorId': '',
+                'originYear': '',
+                'strProfile': '',
+                'resistance': '',
+                'contaminatedMisidentified': '',
+                'populationDoublingTime': '',
+            }
+        elif tool_type == 'genetic_reagent':
+            return {
+                'insertName': tool_name,
+                'vectorType': '',
+                'vectorBackbone': '',
+                'promoter': '',
+                'insertSpecies': '',
+                'insertEntrezId': '',
+                'selectableMarker': '',
+                'copyNumber': '',
+                'gRNAshRNASequence': '',
+            }
+        elif tool_type == 'computational_tool':
+            return {
+                'softwareName': tool_name,
+                'softwareType': '',
+                'softwareVersion': '',
+                'programmingLanguage': '',
+                'sourceRepository': '',
+                'documentation': '',
+                'licenseType': '',
+                'containerized': '',
+                'maintainer': '',
+            }
+        elif tool_type == 'advanced_cellular_model':
+            return {
+                '_toolName': tool_name,      # tracking only — name goes in resources
+                'modelType': '',              # required; curator must fill in
+                'derivationSource': '',       # required; curator must fill in
+                'cellTypes': '',
+                'organoidType': '',
+                'matrixType': '',
+                'cultureSystem': '',
+                'maturationTime': '',
+                'characterizationMethods': '',
+                'passageNumber': '',
+                'cryopreservationProtocol': '',
+                'qualityControlMetrics': '',
+            }
+        elif tool_type == 'patient_derived_model':
+            return {
+                '_toolName': tool_name,      # tracking only — name goes in resources
+                'modelSystemType': '',        # required; curator must fill in
+                'patientDiagnosis': '',       # required; curator must fill in
+                'hostStrain': '',
+                'tumorType': '',
+                'engraftmentSite': '',
+                'passageNumber': '',
+                'establishmentRate': '',
+                'molecularCharacterization': '',
+                'clinicalData': '',
+                'humanizationMethod': '',
+                'immuneSystemComponents': '',
+                'validationMethods': '',
+            }
+        elif tool_type == 'clinical_assessment_tool':
+            return {
+                'assessmentName': tool_name,
+                'assessmentType': '',
+                'targetPopulation': '',
+                'diseaseSpecific': '',
+                'numberOfItems': '',
+                'scoringMethod': '',
+                'validatedLanguages': '',
+                'psychometricProperties': '',
+                'administrationTime': '',
+                'availabilityStatus': '',
+                'licensingRequirements': '',
+                'digitalVersion': '',
+            }
+        else:
+            return {'_toolName': tool_name}
+
+    # Collect tools grouped by type, plus a flat list for resources
     tools_by_type = {}
+    resource_rows = []
+
     for result in validation_results:
+        pub_pmid = result.get('pmid', '')
         pub_doi = result.get('doi', '')
         pub_title = result.get('title', '')
         pub_year = result.get('year', '')
+
         for tool in result.get('acceptedTools', []):
             raw_type = tool.get('toolType', '')
             tool_type = normalize_tool_type(raw_type)
-            if tool_type not in tools_by_type:
-                tools_by_type[tool_type] = []
-            tools_by_type[tool_type].append({
-                '_pmid': tool.get('pmid', result.get('pmid', '')),
+            tool_name = tool.get('toolName', '')
+
+            tracking = {
+                '_pmid': tool.get('pmid', pub_pmid),
                 '_doi': pub_doi,
                 '_publicationTitle': pub_title,
                 '_year': pub_year,
@@ -751,7 +1033,30 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 '_confidence': tool.get('confidence', ''),
                 '_verdict': tool.get('verdict', ''),
                 '_usageType': tool.get('usageType', ''),
-                'toolName': tool.get('toolName', ''),
+            }
+
+            detail = make_detail_row(tool_type, tool_name)
+            row = {**tracking, **detail}
+
+            if tool_type not in tools_by_type:
+                tools_by_type[tool_type] = []
+            tools_by_type[tool_type].append(row)
+
+            # Resources row for every accepted tool
+            resource_rows.append({
+                '_pmid': tracking['_pmid'],
+                '_doi': pub_doi,
+                '_publicationTitle': pub_title,
+                '_year': pub_year,
+                '_confidence': tracking['_confidence'],
+                '_toolType': tool_type,
+                'resourceName': tool_name,
+                'resourceType': resource_type_map.get(tool_type, tool_type),
+                'rrid': '',
+                'synonyms': '',
+                'description': '',
+                'aiSummary': '',
+                'howToAcquire': '',
             })
 
     if not tools_by_type:
@@ -761,27 +1066,19 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    for tool_type, tools in tools_by_type.items():
-        name_col = name_column_map.get(tool_type, 'name')
+    for tool_type, rows in tools_by_type.items():
         stem = type_to_stem.get(tool_type, tool_type)
-        rows = []
-        for t in tools:
-            row = {
-                '_pmid': t['_pmid'],
-                '_doi': t['_doi'],
-                '_publicationTitle': t['_publicationTitle'],
-                '_year': t['_year'],
-                '_context': t['_context'],
-                '_confidence': t['_confidence'],
-                '_verdict': t['_verdict'],
-                '_usageType': t['_usageType'],
-                name_col: t['toolName'],
-            }
-            rows.append(row)
         df = pd.DataFrame(rows)
         out_file = output_path / f'SUBMIT_{stem}.csv'
         df.to_csv(out_file, index=False)
         print(f"  Created SUBMIT_{stem}.csv: {len(df)} rows")
+
+    # Write resources CSV (one row per accepted tool, all types)
+    if resource_rows:
+        res_df = pd.DataFrame(resource_rows)
+        res_file = output_path / 'SUBMIT_resources.csv'
+        res_df.to_csv(res_file, index=False)
+        print(f"  Created SUBMIT_resources.csv: {len(res_df)} rows")
 
 
 def main():
@@ -830,7 +1127,17 @@ def main():
         '--max-reviews',
         type=int,
         default=None,
-        help='Maximum number of Goose reviews to run in this invocation (caps queue after skips)'
+        help='Maximum number of AI reviews to run in this invocation (caps queue after skips)'
+    )
+    parser.add_argument(
+        '--extract-observations',
+        action='store_true',
+        help=(
+            'Phase 2 mode: extract scientific observations from Results+Discussion sections '
+            'for publications with high-confidence validated tools. Reads existing Phase 1 '
+            'YAML files for accepted tool names; writes *_observations.yaml files alongside them. '
+            'Skips publications without Results/Discussion in cache (need full cache level).'
+        )
     )
 
     args = parser.parse_args()
@@ -844,7 +1151,8 @@ def main():
 
     # Create shared Anthropic client (thread-safe, uses connection pooling)
     api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key and not args.skip_goose and not args.compile_only:
+    needs_api = not args.skip_goose and not args.compile_only
+    if not api_key and needs_api:
         print("❌ ANTHROPIC_API_KEY not set — cannot run reviews")
         sys.exit(1)
     anthropic_client = anthropic.Anthropic(api_key=api_key) if api_key else None
@@ -855,44 +1163,9 @@ def main():
         print("\n❌ Failed to load mining results")
         sys.exit(1)
 
-    # Add candidate publications from Synapse (always enabled)
-    print("\nFetching candidate publications from Synapse...")
-
-    # Initialize Synapse client (no auth needed for open access tables)
-    try:
-        syn = synapseclient.Synapse()
-        print("✅ Synapse client initialized (no auth needed - tables are open access)")
-    except Exception as e:
-        print(f"⚠️  Synapse client initialization failed: {e}")
-        print("   Continuing with only mined publications...")
-        syn = None
-
-    if syn:
-        candidate_df = fetch_unlinked_publications(syn)
-
-        if len(candidate_df) > 0:
-            # Add empty tool columns to match mining_df structure
-            candidate_df['novel_tools'] = '{}'
-            candidate_df['tool_metadata'] = '{}'
-            candidate_df['tool_sources'] = '{}'
-            candidate_df['fulltext_available'] = False
-
-            # Append to mining_df
-            original_count = len(mining_df)
-            mining_df = pd.concat([mining_df, candidate_df], ignore_index=True)
-
-            # Remove duplicates by pmid (keep first occurrence - mined takes precedence)
-            before_dedup = len(mining_df)
-            mining_df = mining_df.drop_duplicates(subset=['pmid'], keep='first').reset_index(drop=True)
-            duplicates_removed = before_dedup - len(mining_df)
-
-            added_count = len(mining_df) - original_count
-            print(f"\n✅ Added {added_count} unique candidate publications to review queue")
-            if duplicates_removed > 0:
-                print(f"   ({duplicates_removed} duplicates removed)")
-            print(f"   Total publications to review: {len(mining_df)}")
-        else:
-            print("\n✅ No additional candidate publications found")
+    # Note: Synapse candidate publications are now added to screened_publications.csv
+    # BEFORE Phase 1 cache fetch (in the workflow's "Append Synapse candidates" step),
+    # so they already appear in mining_df via processed_publications.csv.
 
     # Filter by specific PMIDs if requested
     if args.pmids:
@@ -906,6 +1179,121 @@ def main():
         mining_df = mining_df[mining_df['pmid'].isin(pmid_file_list)]
         print(f"\nFiltered to {len(mining_df)} publications from {args.pmids_file}")
 
+    # ── Phase 2: Observation Extraction ─────────────────────────────────────────
+    # When --extract-observations is set, skip Phase 1 tool validation entirely.
+    # Instead, read existing Phase 1 YAMLs for accepted tool names, then call
+    # run_observation_extraction() for each publication that has Results/Discussion.
+    if args.extract_observations:
+        print("\n" + "=" * 80)
+        print("Phase 2: Extracting Observations from Results + Discussion")
+        print("=" * 80)
+
+        obs_extracted = 0
+        obs_skipped = 0
+        all_obs_rows = []
+
+        for _, row in mining_df.iterrows():
+            pmid = row['pmid']
+            clean_pmid = sanitize_pmid_for_filename(pmid)
+
+            # Need Phase 1 YAML with accepted tools
+            yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
+            if not yaml_path.exists():
+                obs_skipped += 1
+                continue
+
+            phase1_data = parse_review_yaml(yaml_path)
+            if not phase1_data:
+                obs_skipped += 1
+                continue
+
+            accepted_names = [
+                t.get('toolName', '') for t in (phase1_data.get('toolValidations') or [])
+                if t.get('recommendation') == 'Keep' and t.get('confidence', 0) >= 0.8
+            ]
+            accepted_names = [n for n in accepted_names if n]
+
+            if not accepted_names:
+                obs_skipped += 1
+                continue
+
+            # Skip if observations already extracted (unless force)
+            obs_yaml_path = Path(results_dir) / f'{clean_pmid}_observations.yaml'
+            if obs_yaml_path.exists() and not args.force_rereviews:
+                safe_print(f"⏭️  {pmid}: observations already extracted")
+                obs_skipped += 1
+                # Still collect existing observations
+                try:
+                    existing = yaml.safe_load(obs_yaml_path.read_text())
+                    for obs in (existing.get('observations') or []):
+                        all_obs_rows.append({
+                            '_pmid': pmid,
+                            '_doi': row.get('doi', ''),
+                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
+                            'resourceName': obs.get('resourceName', ''),
+                            'resourceType': obs.get('resourceType', ''),
+                            'observationType': obs.get('observationType', ''),
+                            'details': obs.get('details', ''),
+                            'foundIn': obs.get('foundIn', ''),
+                            'contextSnippet': obs.get('contextSnippet', ''),
+                            'confidence': obs.get('confidence', ''),
+                        })
+                except Exception:
+                    pass
+                continue
+
+            # Load cache
+            cached = load_cached_text(pmid)
+            if not cached:
+                obs_skipped += 1
+                continue
+
+            input_data = prepare_input_data(row, cached)
+            result_path = run_observation_extraction(
+                pmid, input_data, accepted_names, results_dir, anthropic_client
+            )
+
+            if result_path:
+                obs_extracted += 1
+                try:
+                    obs_data = yaml.safe_load(result_path.read_text())
+                    for obs in (obs_data.get('observations') or []):
+                        all_obs_rows.append({
+                            '_pmid': pmid,
+                            '_doi': row.get('doi', ''),
+                            '_publicationTitle': row.get('title', row.get('publicationTitle', '')),
+                            'resourceName': obs.get('resourceName', ''),
+                            'resourceType': obs.get('resourceType', ''),
+                            'observationType': obs.get('observationType', ''),
+                            'details': obs.get('details', ''),
+                            'foundIn': obs.get('foundIn', ''),
+                            'contextSnippet': obs.get('contextSnippet', ''),
+                            'confidence': obs.get('confidence', ''),
+                        })
+                except Exception as e:
+                    print(f"  ⚠️  Could not parse observations YAML: {e}")
+            else:
+                obs_skipped += 1
+
+            time.sleep(0.5)  # Light rate-limiting between API calls
+
+        print(f"\n{'='*80}")
+        print(f"Observation Extraction Summary:")
+        print(f"  ✅ Extracted: {obs_extracted} publications")
+        print(f"  ⏭️  Skipped: {obs_skipped} publications")
+        print(f"  📊 Total observations collected: {len(all_obs_rows)}")
+        print(f"{'='*80}")
+
+        if all_obs_rows:
+            Path('tool_coverage/outputs').mkdir(parents=True, exist_ok=True)
+            obs_df = pd.DataFrame(all_obs_rows)
+            obs_file = Path('tool_coverage/outputs') / 'observations.csv'
+            obs_df.to_csv(obs_file, index=False)
+            print(f"\n✅ Observations saved: {obs_file} ({len(obs_df)} rows)")
+
+        return  # Phase 2 complete — do not run Phase 1 tool validation
+
+    # ── Phase 1: Tool Validation ─────────────────────────────────────────────
     # Run goose reviews (unless skip or compile-only)
     if not args.skip_goose and not args.compile_only:
         # Apply --max-reviews cap: pre-filter out already-reviewed and no-cache publications,

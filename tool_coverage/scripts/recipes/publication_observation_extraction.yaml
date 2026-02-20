@@ -1,0 +1,64 @@
+version: 1.0.0
+title: Publication Observation Extractor
+description: Extract scientific observations about validated NF research tools from publication Results and Discussion sections.
+instructions: |
+  You are a biomedical research expert specializing in Neurofibromatosis (NF) research. Your task is to extract
+  concrete, quantitative or qualitative scientific observations about specific research tools from publication
+  results and discussion sections. You are given a list of tools that have already been validated as genuine
+  NF research tools used in this study. Focus only on observations directly about those tools' performance,
+  efficacy, safety, or biological effects — not the disease background or unrelated findings.
+
+prompt: |
+  Extract scientific observations about the validated NF research tools used in publication {{ pmid }}.
+
+  VALIDATED TOOLS IN THIS PUBLICATION:
+  {{ acceptedTools }}
+
+  WORKFLOW:
+  1. Read the Results and Discussion sections carefully.
+  2. For each validated tool listed above, find observations that describe:
+     - Efficacy or treatment effects (tumor reduction, growth inhibition, %)
+     - Safety or tolerability findings (adverse events, survival, weight change)
+     - Biological measurements (IC50, EC50, Ki, tumor volume, body weight, biomarkers)
+     - Behavioral or functional outcomes (pain scores, cognitive measures, QoL)
+     - Mechanistic findings directly about the tool (target engagement, pathway effects)
+
+  EXTRACTION RULES:
+  - Only extract observations that are DIRECTLY about the listed validated tools
+  - Include quantitative values where stated (e.g., "50% tumor reduction at 10 mg/kg")
+  - Record the exact section where the observation was found (Results, Discussion)
+  - Do NOT extract background disease information unrelated to the tool's performance
+  - Do NOT extract observations about tools NOT in the validated tools list
+  - Confidence: 0.9+ = explicit quantitative result; 0.7-0.89 = qualitative finding with evidence;
+    below 0.7 = omit
+
+  observationType values:
+    "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
+
+activities:
+  - Read Results and Discussion sections for observations about validated tools
+  - Record quantitative and qualitative findings with confidence scores
+
+extensions:
+  - type: builtin
+    name: developer
+    available_tools:
+      - text_editor
+
+settings:
+  goose_provider: anthropic
+  goose_model: claude-sonnet-4-20250514
+  temperature: 0.0
+
+parameters:
+  - key: pmid
+    input_type: string
+    requirement: required
+    description: PubMed ID of the publication
+  - key: acceptedTools
+    input_type: string
+    requirement: required
+    description: Newline-separated list of validated tool names from Phase 1 review
+
+author:
+  contact: nf-research-tools-team

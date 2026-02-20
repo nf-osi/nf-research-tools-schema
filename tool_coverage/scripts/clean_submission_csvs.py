@@ -55,15 +55,15 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
     """
     errors = []
 
-    # Define required columns for each type
+    # Define required columns for each type (verified against live Synapse tables)
     required_columns = {
-        # Existing tool types (v1.0)
-        'animal_models': ['name', 'species'],
+        # Existing tool types (v1.0) — syn26486808, syn26486811, syn26486823, syn26486832
+        'animal_models': ['strainNomenclature'],
         'antibodies': ['targetAntigen'],
         'cell_lines': ['organ'],
         'genetic_reagents': ['insertName'],
 
-        # New tool types (v2.0)
+        # New tool types (v2.0) — syn73709226-syn73709229
         'computational_tools': ['softwareName', 'softwareType'],
         'advanced_cellular_models': ['modelType', 'derivationSource'],
         'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
@@ -229,11 +229,12 @@ Examples:
         else:
             print("⚠️  UPSERT MODE - Data will be uploaded to Synapse!\n")
 
-    # Find all SUBMIT_*.csv files
-    submit_files = glob.glob('SUBMIT_*.csv')
+    # Find all SUBMIT_*.csv files — check both repo root and tool_coverage/outputs/
+    submit_files = glob.glob('SUBMIT_*.csv') + glob.glob('tool_coverage/outputs/SUBMIT_*.csv')
+    submit_files = sorted(set(submit_files))
 
     if not submit_files:
-        print("❌ No SUBMIT_*.csv files found!")
+        print("❌ No SUBMIT_*.csv files found (checked . and tool_coverage/outputs/)!")
         return
 
     print(f"Found {len(submit_files)} files to clean:\n")
