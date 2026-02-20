@@ -710,54 +710,55 @@ def run_direct_review(pmid, input_data, results_dir, client, max_retries=3):
             if attempt > 0:
                 safe_print(f"Retry attempt {attempt + 1}/{max_retries}...")
 
-            message = client.messages.create(
-                model=ANTHROPIC_MODEL,
-                max_tokens=8192,
-                temperature=0.0,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}]
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                cwd=str(results_path),
+                start_new_session=True  # own process group so kill() reaches all children
             )
 
-            response_text = message.content[0].text
-            safe_print(f"  Response: {len(response_text)} chars, "
-                       f"~{message.usage.input_tokens}in/{message.usage.output_tokens}out tokens")
-
-            yaml_text = extract_yaml_from_response(response_text)
-            if not yaml_text:
-                safe_print(f"⚠️  No YAML found in response")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return None
-
-            # Validate structure
             try:
-                data = yaml.safe_load(yaml_text)
-                if not isinstance(data, dict) or 'toolValidations' not in data:
-                    safe_print(f"⚠️  Invalid YAML structure (missing toolValidations)")
-                    if attempt < max_retries - 1:
-                        time.sleep(2 ** attempt)
-                        continue
-                    return None
-            except yaml.YAMLError as e:
-                safe_print(f"⚠️  YAML parse error: {e}")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
+                stdout, stderr = process.communicate(timeout=360)  # 6 minute timeout
+            except subprocess.TimeoutExpired:
+                # Kill the entire process group (Goose may have spawned children)
+                import signal
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                except ProcessLookupError:
+                    process.kill()
+                process.communicate()
+                safe_print(f"❌ Timeout after 6 minutes")
                 return None
 
-            yaml_file.write_text(yaml_text, encoding='utf-8')
-            safe_print(f"✅ Review completed: {yaml_file}")
-            return yaml_file
+            safe_print(stdout)
 
-        except anthropic.RateLimitError:
-            wait = 60 * (attempt + 1)
-            safe_print(f"⚠️  Rate limit — waiting {wait}s before retry...")
-            time.sleep(wait)
-        except anthropic.APIError as e:
-            safe_print(f"❌ API error: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
+            if process.returncode != 0:
+                # Check if this is a database conflict error (exit code 101)
+                is_db_conflict = (
+                    process.returncode == 101 and
+                    'table schema_version already exists' in stderr
+                )
+
+                if is_db_conflict and attempt < max_retries - 1:
+                    safe_print(f"⚠️  Database conflict (exit code {process.returncode}), retrying...")
+                    time.sleep(1 + attempt)  # Exponential backoff
+                    continue
+                else:
+                    safe_print(f"❌ Error (exit code {process.returncode}):")
+                    safe_print(stderr)
+                    return None
+
+            # Look for generated YAML file (clean_pmid already set above)
+            yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
+            if yaml_file.exists():
+                safe_print(f"✅ Review completed: {yaml_file}")
+                return yaml_file
+            else:
+                safe_print(f"⚠️  No YAML file generated")
+                return None
+
         except Exception as e:
             safe_print(f"❌ Error: {e}")
             return None
@@ -786,9 +787,14 @@ def process_single_publication(row, idx, total_pubs, results_dir, client, force_
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
-    # Skip abstract_only publications - no methods section means tool mining will fail
+    # Skip publications with no cache file at all — Goose will waste its timeout searching
     cached = load_cached_text(pmid)
-    if cached and cached.get('cache_level') == 'abstract_only' and not force_rereviews:
+    if cached is None:
+        safe_print(f"⏭️  Skipping {pmid} (no cache file - run Phase 1 first)")
+        return (pmid, 'skipped_no_cache', None)
+
+    # Skip abstract_only publications - no methods section means tool mining will fail
+    if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
         safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
         return (pmid, 'skipped_abstract_only', None)
 
@@ -1291,17 +1297,7 @@ def main():
         '--max-reviews',
         type=int,
         default=None,
-        help='Maximum number of AI reviews to run in this invocation (caps queue after skips)'
-    )
-    parser.add_argument(
-        '--extract-observations',
-        action='store_true',
-        help=(
-            'Phase 2 mode: extract scientific observations from Results+Discussion sections '
-            'for publications with high-confidence validated tools. Reads existing Phase 1 '
-            'YAML files for accepted tool names; writes *_observations.yaml files alongside them. '
-            'Skips publications without Results/Discussion in cache (need full cache level).'
-        )
+        help='Maximum number of Goose reviews to run in this invocation (caps queue after skips)'
     )
 
     args = parser.parse_args()
@@ -1360,14 +1356,6 @@ def main():
                 cache_file = cache_dir / f"{clean_pmid.replace('PMID:', '')}_text.json"
                 if not cache_file.exists():
                     continue  # no cache - will be skipped anyway
-                # Skip abstract_only caches (no methods section — would be skipped during processing anyway)
-                try:
-                    with open(cache_file) as _cf:
-                        _cache_meta = json.load(_cf)
-                    if _cache_meta.get('cache_level') == 'abstract_only' or not _cache_meta.get('methods'):
-                        continue
-                except Exception:
-                    pass
                 eligible.append(pmid)
             if len(eligible) > args.max_reviews:
                 cap_pmids = set(eligible[:args.max_reviews])
@@ -1378,10 +1366,10 @@ def main():
                     yaml_path = results_path / f'{clean_pmid}_tool_review.yaml'
                     return yaml_path.exists() or pmid in cap_pmids
                 mining_df = mining_df[mining_df.apply(keep_row, axis=1)]
-                print(f"\n⚠️  Capped to {args.max_reviews} AI reviews this run "
+                print(f"\n⚠️  Capped to {args.max_reviews} Goose reviews this run "
                       f"({len(eligible) - args.max_reviews} deferred to next run)")
             else:
-                print(f"\n✅ {len(eligible)} publications eligible for AI review (within --max-reviews {args.max_reviews})")
+                print(f"\n✅ {len(eligible)} publications need Goose review (within --max-reviews {args.max_reviews})")
 
         print(f"\n{'='*80}")
         print(f"Running Goose Reviews for {len(mining_df)} publications")
@@ -1393,6 +1381,7 @@ def main():
         reviewed_count = 0
         skipped_count = 0
         skipped_abstract_only_count = 0
+        skipped_no_cache_count = 0
         failed_count = 0
 
         # Use parallel processing if requested
@@ -1414,6 +1403,8 @@ def main():
                         skipped_count += 1
                     elif status == 'skipped_abstract_only':
                         skipped_abstract_only_count += 1
+                    elif status == 'skipped_no_cache':
+                        skipped_no_cache_count += 1
                     elif status == 'failed':
                         failed_count += 1
         else:
@@ -1427,6 +1418,8 @@ def main():
                     skipped_count += 1
                 elif status == 'skipped_abstract_only':
                     skipped_abstract_only_count += 1
+                elif status == 'skipped_no_cache':
+                    skipped_no_cache_count += 1
                 elif status == 'failed':
                     failed_count += 1
 
@@ -1437,6 +1430,8 @@ def main():
         print(f"  ⏭️  Skipped (cached): {skipped_count}")
         if skipped_abstract_only_count > 0:
             print(f"  ⏭️  Skipped (abstract_only, no methods): {skipped_abstract_only_count}")
+        if skipped_no_cache_count > 0:
+            print(f"  ⏭️  Skipped (no cache file): {skipped_no_cache_count}")
         if failed_count > 0:
             print(f"  ❌ Failed: {failed_count}")
         print(f"  📊 Total processed: {total_pubs}")
