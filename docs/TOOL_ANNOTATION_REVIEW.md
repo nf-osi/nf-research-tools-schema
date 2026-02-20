@@ -2,25 +2,32 @@
 
 ## Overview
 
-The tool annotation review system analyzes `individualID` annotations from Synapse and suggests new cell lines and synonyms to add to the tools database.
+The tool annotation review system analyzes `individualID` and `modelSystemName` annotations from Synapse to:
+1. **Suggest new cell lines** — `individualID` values not yet in the tools database
+2. **Enrich existing tool records** — fill blank fields in cell lines, animal models, patient-derived models, and donors using consensus annotation values
 
 **Workflow**: `review-tool-annotations.yml`
-**Script**: `scripts/review_tool_annotations.py`
+**Scripts**: `scripts/review_tool_annotations.py`, `scripts/enrich_existing_tools.py`
 **Trigger**: Scheduled weekly (Monday 9 AM UTC) OR manual workflow_dispatch
 **Schedule Position**: Step 1 in workflow sequence (entry point)
 
 ## Purpose
 
-Ensures that individualID values used in file annotations are properly represented in the tools database as cell lines, preventing orphaned or unrecognized tool references.
+- Ensures that `individualID` values used in file annotations are properly represented in the tools database as cell lines, preventing orphaned or unrecognized tool references.
+- Backfills blank fields (`tissue`, `cellLineManifestation`, `cellLineGeneticDisorder`, `animalModelGeneticDisorder`, `animalModelOfManifestation`, `sex`, `age`, `species`) using consensus values derived from NF Portal file annotations matched by `modelSystemName`.
 
 ## How It Works
 
 ### 1. Data Collection
 
-**Annotations Source** (`syn52702673`):
+**Annotations Source for new cell line suggestions** (`syn52702673`):
 - Queries all `individualID` values from file annotations
 - Counts frequency of each unique value
 - Filters to values with ≥2 occurrences (configurable)
+
+**Annotations Source for field enrichment** (`syn16858331`):
+- Queries `modelSystemName`, `tissue`, `tumorType`, `diagnosis`, `sex`, `age`, `species` from the full NF Portal file annotations view
+- `modelSystemName` matches `resourceName` in the tools database — used as the join key
 
 **Tools Source** (`syn51730943`):
 - Fetches all tools with resourceName and synonyms
@@ -55,7 +62,7 @@ Analyzes all columns in syn51730943:
 - **Suggested new facets**: Columns with 5-100 unique values
 - **Low diversity facets**: Flags facets with very few values (may not be useful)
 
-### 4. Output Generation
+### 4. Output Generation — New Cell Lines
 
 Creates multiple files:
 
@@ -85,6 +92,32 @@ Creates multiple files:
 - `SUBMIT_cell_lines.csv` - New cell lines
 - `SUBMIT_resources.csv` - Corresponding resource entries
 
+### 5. Field Enrichment — Existing Tool Records
+
+`scripts/enrich_existing_tools.py` backfills blank fields in existing tool records using consensus annotation values. A value is only proposed when **all** non-blank annotation values for a given `modelSystemName` agree on the same canonical form (case-normalized, validated against schema valid values).
+
+**Fields enriched per table**:
+
+| Table (Synapse ID) | Target fields | Annotation source |
+|---|---|---|
+| CellLineDetails (syn26486823) | `tissue`, `cellLineManifestation`, `cellLineGeneticDisorder` | `tissue`, `tumorType`, `diagnosis` |
+| AnimalModelDetails (syn26486808) | `animalModelGeneticDisorder`, `animalModelOfManifestation` | `diagnosis`, `tumorType` |
+| PatientDerivedModelDetails (syn73709228) | `patientDiagnosis`, `tumorType` | `diagnosis`, `tumorType` |
+| Donor (syn26486829) | `sex`, `age`, `species` | `sex`, `age`, `species` (via cell line → donorId chain) |
+
+**Rules**:
+- Only fills currently-blank fields — existing values are never overwritten
+- Values must match schema valid values (or a synonym map) — free-form text is rejected
+- For `age`: all annotation values must be the same numeric value
+
+**Output files**:
+- `SUBMIT_cell_line_updates.csv` - Cell line rows with proposed field updates
+- `SUBMIT_animal_model_updates.csv` - Animal model rows with proposed field updates
+- `SUBMIT_patient_derived_model_updates.csv` - PDX rows with proposed field updates
+- `SUBMIT_donor_updates.csv` - Donor rows with proposed field updates
+- `tool_field_enrichment.json` - Machine-readable enrichment summary (counts by table and field)
+- `tool_field_enrichment.md` - Human-readable enrichment summary
+
 ## Assumptions
 
 ### All individualIDs are Cell Lines
@@ -112,9 +145,9 @@ The system assumes all `individualID` values refer to cell lines. This is becaus
 
 ### PR Creation
 
-When new resources are found, creates a PR with:
+A PR is created when either new cell lines are found **or** existing tool fields can be enriched.
 
-**Title**: `🔍 Annotation Review - New Cell Lines (N suggested)`
+**Title**: `🔍 Annotation Review (N new, M enriched)`
 
 **Labels**:
 - `automated-annotation-review`
@@ -124,20 +157,28 @@ When new resources are found, creates a PR with:
 **Assignee**: BelindaBGarana
 
 **Files Included**:
-- `SUBMIT_cell_lines.csv`
-- `SUBMIT_resources.csv`
+- `SUBMIT_cell_lines.csv` *(if new cell lines found)*
+- `SUBMIT_resources.csv` *(if new cell lines found)*
+- `SUBMIT_cell_line_updates.csv` *(if enrichment proposed)*
+- `SUBMIT_animal_model_updates.csv` *(if enrichment proposed)*
+- `SUBMIT_patient_derived_model_updates.csv` *(if enrichment proposed)*
+- `SUBMIT_donor_updates.csv` *(if enrichment proposed)*
 - `tool_annotation_suggestions.json`
 - `tool_annotation_suggestions.md`
+- `tool_field_enrichment.json` *(always written)*
+- `tool_field_enrichment.md` *(always written)*
 
 ### Manual Review Checklist
 
 Before merging the PR:
 
 - [ ] Verify suggested cell lines are legitimate (not typos or errors)
-- [ ] Fill in `organ` field for each cell line (REQUIRED)
+- [ ] Fill in `organ` field for each new cell line (REQUIRED)
 - [ ] Check suggested synonyms make sense
 - [ ] Review facet suggestions (informational only)
 - [ ] Ensure no duplicate entries
+- [ ] Review proposed field updates in `SUBMIT_*_updates.csv` (check `_match_key` column to confirm annotation match)
+- [ ] Check `tool_field_enrichment.json` for per-field update counts
 
 ### What Happens After Merge
 
@@ -146,9 +187,14 @@ When the PR is merged:
 1. **Immediate**: `upsert-tools.yml` triggers automatically
    - Validates CSV schemas
    - Cleans tracking columns (prefixed with `_`)
-   - Uploads to Synapse:
+   - Inserts new rows to Synapse (new cell lines / resources):
      - syn26486823 (cell lines table)
      - syn26450069 (resources table)
+   - Updates existing rows in Synapse (enrichment, update-mode — only fills blank fields):
+     - syn26486823 (cell line field updates)
+     - syn26486808 (animal model field updates)
+     - syn73709228 (patient-derived model field updates)
+     - syn26486829 (donor field updates)
 
 2. **Next Step**: `check-tool-coverage.yml` triggers
    - Continues the workflow chain
@@ -168,14 +214,26 @@ When the PR is merged:
 
 ### Data Sources
 
-**Annotations**: `syn52702673`
-- File annotations view
-- Contains individualID field
+**Annotations (new cell line suggestions)**: `syn52702673`
+- Narrow annotations view (individualID, resourceType, studyId, etc.)
+- Contains `individualID` field
+- Public access
+
+**Annotations (field enrichment)**: `syn16858331`
+- Full NF Portal file annotations view
+- Contains `modelSystemName`, `tissue`, `tumorType`, `diagnosis`, `sex`, `age`, `species`
+- Join key: `modelSystemName` matches `resourceName` in the tool database
+- Public access
+
+**Tools resource table**: `syn26450069`
+- Base Resource table with `cellLineId`, `animalModelId` foreign keys
+- Used to map `resourceName` → detail-table primary key
 - Public access
 
 **Tools**: `syn51730943`
-- Tools materialized view
+- Tools materialized view (denormalized)
 - Contains resourceName, synonyms, all tool fields
+- Used for new cell line comparison and facet analysis
 - Public access
 
 ## Example Output

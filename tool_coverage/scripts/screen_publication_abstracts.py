@@ -11,12 +11,10 @@ from pathlib import Path
 import anthropic
 import time
 import json
+import requests
+import xml.etree.ElementTree as ET
 from typing import Set, List, Dict
-from Bio import Entrez
 import synapseclient
-
-# Set email for PubMed API
-Entrez.email = "neurofibromatosis.tools@sagebionetworks.org"
 
 
 def load_screening_knowledge() -> Dict:
@@ -42,90 +40,142 @@ def load_existing_cache() -> Set[str]:
         return set()
 
 
-def fetch_abstract_from_pubmed(pmid: str) -> str:
+def batch_fetch_abstracts_from_pubmed(pmids: List[str], batch_size: int = 200) -> Dict[str, str]:
     """
-    Fetch abstract from PubMed API.
+    Fetch abstracts for multiple PMIDs in batched PubMed XML API calls.
+    Up to 200 PMIDs per request — ~60x faster than one-at-a-time Entrez fetching.
 
     Args:
-        pmid: PubMed ID
+        pmids: List of numeric PMID strings (no 'PMID:' prefix)
+        batch_size: PMIDs per request (max 200 for PubMed efetch)
 
     Returns:
-        Abstract text or empty string if not found
+        Dict mapping PMID -> abstract text
     """
-    try:
-        handle = Entrez.efetch(db="pubmed", id=pmid, rettype="abstract", retmode="text")
-        abstract_text = handle.read()
-        handle.close()
+    results = {}
+    total_batches = (len(pmids) + batch_size - 1) // batch_size
 
-        # Clean up the abstract text
-        if abstract_text:
-            # Remove PMID header line
-            lines = abstract_text.split('\n')
-            # Find where abstract actually starts (after blank line)
-            abstract_lines = []
-            found_start = False
-            for line in lines:
-                if not found_start and line.strip() == '':
-                    found_start = True
+    for batch_num, batch_start in enumerate(range(0, len(pmids), batch_size), 1):
+        batch = pmids[batch_start:batch_start + batch_size]
+        print(f"     Fetching batch {batch_num}/{total_batches} ({len(batch)} PMIDs)...")
+
+        try:
+            url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+            params = {
+                'db': 'pubmed',
+                'id': ','.join(batch),
+                'retmode': 'xml',
+                'email': 'neurofibromatosis.tools@sagebionetworks.org',
+                'tool': 'nf-research-tools-miner'
+            }
+            response = requests.get(url, params=params, timeout=30)
+            if response.status_code != 200:
+                print(f"     ⚠️  PubMed API error: {response.status_code}")
+                continue
+
+            root = ET.fromstring(response.content)
+            for article in root.findall('.//PubmedArticle'):
+                pmid_elem = article.find('.//PMID')
+                if pmid_elem is None or not pmid_elem.text:
                     continue
-                if found_start:
-                    abstract_lines.append(line)
+                pmid = pmid_elem.text
 
-            abstract = ' '.join(abstract_lines).strip()
-            return abstract
+                abstract_texts = article.findall('.//AbstractText')
+                abstract_parts = []
+                for text_elem in abstract_texts:
+                    label = text_elem.get('Label', '')
+                    text = text_elem.text if text_elem.text else ''
+                    if label:
+                        abstract_parts.append(f"{label}: {text}")
+                    else:
+                        abstract_parts.append(text)
+                if abstract_parts:
+                    results[pmid] = ' '.join(abstract_parts)
 
-        return ""
-    except Exception as e:
-        print(f"  ⚠️  Error fetching abstract for PMID {pmid}: {e}")
-        return ""
+        except Exception as e:
+            print(f"     ⚠️  Batch fetch error: {e}")
+
+        # Rate limiting: 3 req/sec without API key
+        if batch_start + batch_size < len(pmids):
+            time.sleep(0.34)
+
+    return results
 
 
 def ensure_abstracts_available(publications_df: pd.DataFrame, syn: synapseclient.Synapse = None) -> pd.DataFrame:
     """
     Ensure all publications have abstracts available.
-    First check if abstract is in DataFrame (from Synapse table).
-    If missing, fetch from PubMed API.
+    First checks local publication_cache JSON files (disk I/O, instant), then falls back
+    to batched PubMed XML API (200 PMIDs/request) for any still missing.
 
     Args:
         publications_df: DataFrame with publication info
-        syn: Synapse client (optional, for fetching from Synapse table)
+        syn: Synapse client (unused, kept for API compatibility)
 
     Returns:
         DataFrame with 'abstract' column populated
     """
     print("\n📄 Ensuring abstracts are available...")
 
-    # Check if abstract column exists
     if 'abstract' not in publications_df.columns:
         publications_df['abstract'] = ''
 
-    # Count how many abstracts we need to fetch
-    missing_abstracts = publications_df['abstract'].isna() | (publications_df['abstract'] == '')
-    num_missing = missing_abstracts.sum()
+    missing_mask = publications_df['abstract'].isna() | (publications_df['abstract'] == '')
+    num_missing = missing_mask.sum()
 
     if num_missing == 0:
         print(f"   ✅ All {len(publications_df)} publications already have abstracts")
         return publications_df
 
-    print(f"   📥 Need to fetch {num_missing} abstracts from PubMed...")
+    # --- Pass 1: load from local publication_cache JSON files (fast, no network) ---
+    cache_dir = Path('tool_reviews/publication_cache')
+    cache_hits = 0
+    if cache_dir.exists():
+        for idx, row in publications_df[missing_mask].iterrows():
+            clean_pmid = str(row['pmid']).replace('PMID:', '').strip()
+            cache_file = cache_dir / f"{clean_pmid}_text.json"
+            if cache_file.exists():
+                try:
+                    with open(cache_file) as f:
+                        cached = json.load(f)
+                    abstract = cached.get('abstract', '')
+                    if abstract:
+                        publications_df.at[idx, 'abstract'] = abstract
+                        cache_hits += 1
+                except Exception:
+                    pass
 
-    # Fetch missing abstracts from PubMed
-    for idx, row in publications_df[missing_abstracts].iterrows():
-        pmid = str(row['pmid'])
-        abstract = fetch_abstract_from_pubmed(pmid)
+    if cache_hits:
+        print(f"   💾 Loaded {cache_hits} abstracts from local publication_cache (no network needed)")
 
+    # Re-evaluate what's still missing after cache pass
+    missing_mask = publications_df['abstract'].isna() | (publications_df['abstract'] == '')
+    num_missing = missing_mask.sum()
+
+    if num_missing == 0:
+        print(f"   ✅ All {len(publications_df)} publications have abstracts")
+        return publications_df
+
+    # --- Pass 2: batch-fetch remaining from PubMed XML API ---
+    print(f"   📥 Fetching {num_missing} remaining abstracts from PubMed (batch mode)...")
+
+    missing_pmids = [
+        str(row['pmid']).replace('PMID:', '').strip()
+        for _, row in publications_df[missing_mask].iterrows()
+    ]
+
+    fetched = batch_fetch_abstracts_from_pubmed(missing_pmids)
+
+    fetched_count = 0
+    for idx, row in publications_df[missing_mask].iterrows():
+        clean_pmid = str(row['pmid']).replace('PMID:', '').strip()
+        abstract = fetched.get(clean_pmid, '')
         if abstract:
             publications_df.at[idx, 'abstract'] = abstract
-            print(f"     ✅ PMID {pmid}: Fetched abstract ({len(abstract)} chars)")
-        else:
-            print(f"     ⚠️  PMID {pmid}: No abstract available")
+            fetched_count += 1
 
-        # Rate limiting for PubMed API (max 3 requests/second)
-        time.sleep(0.35)
-
-    # Final count
     has_abstract = ~(publications_df['abstract'].isna() | (publications_df['abstract'] == ''))
-    print(f"\n   ✅ {has_abstract.sum()} publications have abstracts")
+    print(f"\n   ✅ {has_abstract.sum()} publications have abstracts ({fetched_count} fetched from PubMed)")
     print(f"   ⚠️  {(~has_abstract).sum()} publications missing abstracts (will be excluded)")
 
     return publications_df

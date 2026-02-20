@@ -36,6 +36,29 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_development.csv': 'syn26486807',  # Publications where tools were DEVELOPED
     'CLEAN_observations.csv': 'syn26486836',  # Scientific observations about tools
     # Note: syn51735450 is a materialized view that auto-updates from usage + resources
+
+    # Enrichment updates (update-mode: fill blank fields in existing rows)
+    'CLEAN_cell_line_updates.csv': 'syn26486823',
+    'CLEAN_animal_model_updates.csv': 'syn26486808',
+    'CLEAN_patient_derived_model_updates.csv': 'syn73709228',
+    'CLEAN_donor_updates.csv': 'syn26486829',
+}
+
+# Files that should be processed in update-mode (fill blank fields only,
+# never append new rows, never overwrite existing values).
+UPDATE_MODE_FILES = {
+    'CLEAN_cell_line_updates.csv',
+    'CLEAN_animal_model_updates.csv',
+    'CLEAN_patient_derived_model_updates.csv',
+    'CLEAN_donor_updates.csv',
+}
+
+# Primary key column for each update-mode file (used to match rows)
+UPDATE_MODE_MATCH_COL = {
+    'CLEAN_cell_line_updates.csv': 'cellLineId',
+    'CLEAN_animal_model_updates.csv': 'animalModelId',
+    'CLEAN_patient_derived_model_updates.csv': 'patientDerivedModelId',
+    'CLEAN_donor_updates.csv': 'donorId',
 }
 
 def get_synapse_table_id(filename):
@@ -136,12 +159,122 @@ def clean_csv(input_file):
 
     return output_file, df_clean
 
-def upsert_to_synapse(syn, clean_file, df_clean):
-    """Upsert cleaned data to Synapse table.
+def update_existing_rows(syn, table_id: str, df_updates: pd.DataFrame, match_col: str) -> bool:
+    """Update blank fields in existing Synapse table rows.
 
-    This function appends new rows to the Synapse table. Since we're working with
-    new tool discoveries and publication links, we're always adding new rows rather
-    than updating existing ones.
+    Safe, idempotent update that only fills currently-blank/null fields.
+    Never overwrites a field that already has a value.
+
+    Workflow:
+    1. Query the full current table (all rows and columns) to get ROW_ID, ROW_VERSION.
+    2. Merge with df_updates on match_col.
+    3. For each update field: set value only when the current cell is blank/null.
+    4. Store only the rows that were actually changed (with ROW_ID + ROW_VERSION,
+       which triggers an in-place Synapse update rather than an append).
+
+    Args:
+        syn:        Authenticated Synapse client.
+        table_id:   Synapse table ID (e.g. 'syn26486823').
+        df_updates: DataFrame with proposed new values.  Must contain match_col.
+                    Tracking columns (starting with '_') have already been removed.
+        match_col:  Column name used to join df_updates with the live table
+                    (e.g. 'cellLineId').
+
+    Returns:
+        True if at least one row was successfully updated, False otherwise.
+    """
+    if df_updates.empty:
+        print(f"      ⚠️  Empty update DataFrame, skipping {table_id}")
+        return False
+
+    if match_col not in df_updates.columns:
+        print(f"      ⚠️  match_col '{match_col}' not in update DataFrame; skipping {table_id}")
+        return False
+
+    # Columns in df_updates that carry actual values to write (exclude match col)
+    update_cols = [c for c in df_updates.columns if c != match_col]
+    if not update_cols:
+        print(f"      ⚠️  No update columns found (beyond match_col); skipping {table_id}")
+        return False
+
+    try:
+        # ── Step 1: Read current table state ─────────────────────────────────
+        print(f"      Reading current state of {table_id}…")
+        results = syn.tableQuery(f"SELECT * FROM {table_id}")
+        current_df = results.asDataFrame()
+
+        if current_df.empty:
+            print(f"      ⚠️  Table {table_id} is empty; skipping update")
+            return False
+
+        if match_col not in current_df.columns:
+            print(f"      ⚠️  match_col '{match_col}' not found in {table_id}; skipping")
+            return False
+
+        # Ensure match key is string for reliable joins
+        current_df[match_col] = current_df[match_col].astype(str)
+        df_updates[match_col] = df_updates[match_col].astype(str)
+
+        # ── Step 2: Merge proposed updates with current table ─────────────────
+        merged = current_df.merge(
+            df_updates[[match_col] + update_cols].rename(
+                columns={c: f"__new_{c}" for c in update_cols}
+            ),
+            on=match_col,
+            how='inner',
+        )
+
+        if merged.empty:
+            print(f"      ⚠️  No matching rows found in {table_id} for proposed updates")
+            return False
+
+        # ── Step 3: Apply updates — only fill blank/null cells ────────────────
+        changed_indices = set()
+        for col in update_cols:
+            if col not in current_df.columns:
+                print(f"         Skipping unknown column '{col}' (not in table)")
+                continue
+            new_col = f"__new_{col}"
+            # Identify rows where current value is blank AND new value is not blank
+            current_blank = merged[col].isna() | (merged[col].astype(str).str.strip() == '')
+            new_not_blank = merged[new_col].notna() & (merged[new_col].astype(str).str.strip() != '')
+            to_fill = current_blank & new_not_blank
+            if to_fill.any():
+                merged.loc[to_fill, col] = merged.loc[to_fill, new_col]
+                changed_indices.update(merged.index[to_fill].tolist())
+                print(f"         '{col}': {to_fill.sum()} cells to fill")
+
+        # Drop the temporary __new_* columns
+        new_cols_to_drop = [f"__new_{c}" for c in update_cols]
+        merged = merged.drop(columns=[c for c in new_cols_to_drop if c in merged.columns])
+
+        if not changed_indices:
+            print(f"      ℹ️  All target fields already populated in {table_id}; no changes needed")
+            return True
+
+        # ── Step 4: Store only modified rows back to Synapse ─────────────────
+        rows_to_store = merged.loc[list(changed_indices)]
+        print(f"      Storing {len(rows_to_store)} modified rows to {table_id}…")
+        table = Table(table_id, rows_to_store)
+        syn.store(table)
+
+        print(f"      ✅ Updated {len(rows_to_store)} rows in {table_id}")
+        print(f"         Creating snapshot version…")
+        syn.create_snapshot_version(table_id)
+        print(f"         ✅ Snapshot version created")
+        return True
+
+    except Exception as exc:
+        print(f"      ❌ Error updating {table_id}: {exc}")
+        return False
+
+
+def upsert_to_synapse(syn, clean_file, df_clean):
+    """Dispatch to the correct upload handler for a cleaned CSV file.
+
+    • Update-mode files (CLEAN_*_updates.csv): call update_existing_rows() to
+      fill only currently-blank fields in existing rows.
+    • All other files: append new rows to the Synapse table.
 
     After uploading, creates a snapshot version of the table to track this update.
 
@@ -164,6 +297,18 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         print(f"      ⚠️  Empty DataFrame, skipping upload")
         return False
 
+    basename = os.path.basename(clean_file)
+
+    # ── Update-mode: fill blank fields in existing rows ───────────────────────
+    if basename in UPDATE_MODE_FILES:
+        match_col = UPDATE_MODE_MATCH_COL.get(basename)
+        if not match_col:
+            print(f"      ⚠️  No match column configured for {basename}; skipping")
+            return False
+        print(f"      🔄 Update-mode: filling blank fields in {table_id} (match on '{match_col}')")
+        return update_existing_rows(syn, table_id, df_clean, match_col)
+
+    # ── Standard mode: append new rows ───────────────────────────────────────
     try:
         # Store the DataFrame to Synapse table
         # This appends new rows to the existing table
@@ -278,7 +423,12 @@ Examples:
         elif args.dry_run:
             table_id = get_synapse_table_id(clean_file)
             if table_id:
-                print(f"      🔍 Would upload {len(df_clean)} rows to {table_id}")
+                basename = os.path.basename(clean_file)
+                if basename in UPDATE_MODE_FILES:
+                    match_col = UPDATE_MODE_MATCH_COL.get(basename, '?')
+                    print(f"      🔍 Would update {len(df_clean)} rows in {table_id} (update-mode, match on '{match_col}')")
+                else:
+                    print(f"      🔍 Would upload {len(df_clean)} rows to {table_id}")
                 upload_summary.append((clean_file, len(df_clean), None))
 
     # Print summary
