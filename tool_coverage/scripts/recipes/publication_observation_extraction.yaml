@@ -9,9 +9,14 @@ instructions: |
   efficacy, safety, or biological effects — not the disease background or unrelated findings.
 
 prompt: |
+  Extract scientific observations about the validated NF research tools used in publication {{ pmid }}.
+
+  VALIDATED TOOLS IN THIS PUBLICATION:
+  {{ acceptedTools }}
+
   WORKFLOW:
-  1. The publication's Results and Discussion sections and the validated tools list are provided above.
-  2. For each validated tool in the list, scan Results then Discussion for observations that describe:
+  1. Read the Results and Discussion sections carefully.
+  2. For each validated tool listed above, find observations that describe:
      - Efficacy or treatment effects (tumor reduction, growth inhibition, %)
      - Safety or tolerability findings (adverse events, survival, weight change)
      - Biological measurements (IC50, EC50, Ki, tumor volume, body weight, biomarkers)
@@ -19,24 +24,16 @@ prompt: |
      - Mechanistic findings directly about the tool (target engagement, pathway effects)
 
   EXTRACTION RULES:
-  - Only extract observations DIRECTLY about the validated tools listed above
+  - Only extract observations that are DIRECTLY about the listed validated tools
   - Include quantitative values where stated (e.g., "50% tumor reduction at 10 mg/kg")
-  - Record the exact section where the observation was found (Results, Discussion, Both)
+  - Record the exact section where the observation was found (Results, Discussion)
   - Do NOT extract background disease information unrelated to the tool's performance
   - Do NOT extract observations about tools NOT in the validated tools list
   - Confidence: 0.9+ = explicit quantitative result; 0.7-0.89 = qualitative finding with evidence;
-    below 0.7 = omit the observation entirely
+    below 0.7 = omit
 
-  observationType values depend on resourceType:
-    animal_model:             "Tumor Growth/Burden" | "Survival/Lifespan" | "Body Weight/Growth" | "Behavioral" | "Nervous System" | "Cardiovascular System" | "Immune Response" | "Metabolic" | "Developmental" | "Cellular/Molecular" | "Coat Color" | "Drug Efficacy" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    cell_line:                "Drug Response/Efficacy" | "Viability/Proliferation" | "Migration/Invasion" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    advanced_cellular_model:  "Drug Response/Efficacy" | "Viability/Proliferation" | "Migration/Invasion" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    patient_derived_model:    "Drug Response/Efficacy" | "Tumor Growth/Burden" | "Viability/Proliferation" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    antibody:                 "Specificity" | "Sensitivity" | "Application Performance" | "Cross-reactivity" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    genetic_reagent:          "Editing/Knockdown Efficiency" | "Off-target Effects" | "Expression Level" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    computational_tool:       "Accuracy/Performance" | "Usability" | "Scalability/Compatibility" | "Reproducibility" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    clinical_assessment_tool: "Reliability" | "Validity" | "Clinical Utility" | "Sensitivity/Specificity" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
-    biobank:                  "Sample Quality" | "Availability" | "Collection Completeness" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+  observationType values:
+    "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
 
 activities:
   - Read Results and Discussion sections for observations about validated tools

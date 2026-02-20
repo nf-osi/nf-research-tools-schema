@@ -5,7 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'submissions/*/accepted/**/*.json'
+      - 'VALIDATED_*.csv'
+      - 'SUBMIT_*.csv'
+      - 'tool_coverage/outputs/VALIDATED_*.csv'
+      - 'tool_coverage/outputs/SUBMIT_*.csv'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -101,9 +104,13 @@ jobs:
       - name: Check for validated files
         id: check_files
         run: |
-          if ls tool_coverage/outputs/ACCEPTED_*.csv 1> /dev/null 2>&1; then
-            echo "has_files=true" >> $GITHUB_OUTPUT
-            echo "✅ Found ACCEPTED_*.csv files"
+          # Check both repo root and tool_coverage/outputs/
+          if ls VALIDATED_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/VALIDATED_*.csv 1> /dev/null 2>&1; then
+            echo "has_validated=true" >> $GITHUB_OUTPUT
+            echo "✅ Found VALIDATED_*.csv files (AI-validated)"
+          elif ls SUBMIT_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/SUBMIT_*.csv 1> /dev/null 2>&1; then
+            echo "has_validated=false" >> $GITHUB_OUTPUT
+            echo "⚠️  Found SUBMIT_*.csv files (not AI-validated)"
           else
             echo "has_files=false" >> $GITHUB_OUTPUT
             echo "❌ No ACCEPTED_*.csv files found in tool_coverage/outputs/"

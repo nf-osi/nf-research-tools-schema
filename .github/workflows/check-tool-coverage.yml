@@ -282,6 +282,71 @@ jobs:
           echo "max_reviews=${MAX_REVIEWS}" >> $GITHUB_OUTPUT
           echo "  Sonnet review cap: ${MAX_REVIEWS} publications per run"
 
+      - name: Append Synapse candidate publications to screened list
+        id: append_synapse
+        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true' || steps.abstract_screening_skipped.outputs.abstract_screening_complete == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Fetching NF portal + unlinked-tools publications from Synapse..."
+          echo "These are added to screened_publications.csv BEFORE Phase 1 cache fetch"
+          echo "so they go through the same cache fetch and eligibility filter as mined pubs."
+
+          python3 <<'EOF'
+          import sys
+          sys.path.insert(0, 'tool_coverage/scripts')
+          from run_publication_reviews import fetch_unlinked_publications
+          import synapseclient
+          import pandas as pd
+
+          screened_file = 'tool_coverage/outputs/screened_publications.csv'
+
+          try:
+              syn = synapseclient.Synapse()
+              candidate_df = fetch_unlinked_publications(syn)
+          except Exception as e:
+              print(f"⚠️  Synapse fetch failed: {e}")
+              print("   Continuing without Synapse candidates")
+              sys.exit(0)
+
+          if candidate_df.empty:
+              print("ℹ️  No new Synapse candidates to add")
+              sys.exit(0)
+
+          # Load existing screened list
+          try:
+              screened_df = pd.read_csv(screened_file)
+          except Exception:
+              screened_df = pd.DataFrame(columns=['pmid'])
+
+          existing_pmids = set(screened_df['pmid'].dropna().astype(str).tolist())
+
+          # Filter to only truly new PMIDs not already in the screened list
+          new_candidates = candidate_df[~candidate_df['pmid'].astype(str).isin(existing_pmids)].copy()
+
+          if new_candidates.empty:
+              print("ℹ️  All Synapse candidates already in screened list")
+              sys.exit(0)
+
+          # Align columns (screened_publications.csv has pmid, title, doi, journal, year, query_type, source)
+          new_candidates['journal'] = ''
+          new_candidates['year'] = ''
+          new_candidates['query_type'] = 'synapse_candidate'
+          # source column is already set by fetch_unlinked_publications
+
+          # Keep only columns present in screened_df (plus pmid minimum)
+          keep_cols = ['pmid', 'title', 'doi', 'journal', 'year', 'query_type', 'source']
+          new_candidates = new_candidates[[c for c in keep_cols if c in new_candidates.columns]]
+
+          # Append
+          combined = pd.concat([screened_df, new_candidates], ignore_index=True)
+          combined.to_csv(screened_file, index=False)
+          print(f"✅ Added {len(new_candidates)} Synapse candidate publications to screened list")
+          print(f"   Total screened publications: {len(combined)}")
+          EOF
+
+          echo "append_synapse_complete=true" >> $GITHUB_OUTPUT
+
       - name: Phase 1 - Fetch minimal cache (title + abstract + methods + metadata)
         id: phase1_cache
         if: steps.prep_list.outputs.prep_complete == 'true'
@@ -399,27 +464,29 @@ jobs:
 
           echo "phase2_complete=true" >> $GITHUB_OUTPUT
 
-      - name: Phase 2 - Re-review upgraded publications for observations
+      - name: Phase 2 - Extract observations for high-confidence tool publications
         id: phase2_review
         if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.phase2_cache.outputs.phase2_complete == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          echo "Step 4c: Phase 2 - Re-reviewing publications with upgraded caches..."
-          echo "  Now that Results + Discussion are cached, Sonnet can extract observations"
+          echo "Step 4c: Phase 2 - Extracting observations from Results + Discussion..."
+          echo "  Runs for publications with high-confidence validated tools (confidence ≥0.8)"
+          echo "  Reads existing Phase 1 YAMLs for accepted tool names"
+          echo "  Writes *_observations.yaml alongside tool review YAMLs"
 
           if [ -f "tool_coverage/outputs/phase2_upgraded_pmids.txt" ] && [ -s "tool_coverage/outputs/phase2_upgraded_pmids.txt" ]; then
             UPGRADED_COUNT=$(wc -l < tool_coverage/outputs/phase2_upgraded_pmids.txt)
-            echo "  Re-reviewing $UPGRADED_COUNT publications with upgraded caches..."
+            echo "  Processing $UPGRADED_COUNT publications with upgraded caches..."
 
             python tool_coverage/scripts/run_publication_reviews.py \
               --mining-file tool_coverage/outputs/processed_publications.csv \
               --pmids-file tool_coverage/outputs/phase2_upgraded_pmids.txt \
-              --force-rereviews \
+              --extract-observations \
               --parallel-workers 4 \
               2>&1 | tee tool_coverage/outputs/phase2_review_output.log
           else
-            echo "  No publications were upgraded in phase 2 - skipping re-review"
+            echo "  No publications were upgraded in phase 2 - skipping observation extraction"
           fi
 
           echo "phase2_review_complete=true" >> $GITHUB_OUTPUT

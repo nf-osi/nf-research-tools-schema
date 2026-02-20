@@ -232,12 +232,12 @@ Examples:
         else:
             print("⚠️  UPSERT MODE - Data will be uploaded to Synapse!\n")
 
-    # Find all ACCEPTED_*.csv files — check both repo root and tool_coverage/outputs/
-    submit_files = glob.glob('ACCEPTED_*.csv') + glob.glob('tool_coverage/outputs/ACCEPTED_*.csv')
+    # Find all SUBMIT_*.csv files — check both repo root and tool_coverage/outputs/
+    submit_files = glob.glob('SUBMIT_*.csv') + glob.glob('tool_coverage/outputs/SUBMIT_*.csv')
     submit_files = sorted(set(submit_files))
 
     if not submit_files:
-        print("❌ No ACCEPTED_*.csv files found (checked . and tool_coverage/outputs/)!")
+        print("❌ No SUBMIT_*.csv files found (checked . and tool_coverage/outputs/)!")
         return
 
     print(f"Found {len(submit_files)} files to clean:\n")
