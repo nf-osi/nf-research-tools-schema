@@ -83,32 +83,6 @@ jobs:
             echo "⚠️  ANTHROPIC_API_KEY not found - AI validation will be skipped"
           fi
 
-      - name: Cache Goose CLI
-        if: steps.check_api_key.outputs.api_key_exists == 'true'
-        id: cache-goose
-        uses: actions/cache@v4
-        with:
-          path: ~/goose-bin
-          key: goose-1.23.2-linux-x86_64
-
-      - name: Install Goose CLI
-        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.cache-goose.outputs.cache-hit != 'true'
-        run: |
-          echo "Installing Goose CLI for AI validation..."
-          # Download pre-built binary from GitHub releases
-          GOOSE_VERSION="1.23.2"
-          mkdir -p ~/goose-bin
-          wget -q https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2
-          tar -xjf goose-x86_64-unknown-linux-gnu.tar.bz2 -C ~/goose-bin
-          chmod +x ~/goose-bin/goose
-          rm goose-x86_64-unknown-linux-gnu.tar.bz2
-
-      - name: Add Goose to PATH
-        if: steps.check_api_key.outputs.api_key_exists == 'true'
-        run: |
-          echo "$HOME/goose-bin" >> $GITHUB_PATH
-          ~/goose-bin/goose --version
-
       - name: Download artifacts from previous run (if skipping steps)
         if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true'
         uses: dawidd6/action-download-artifact@v3
@@ -296,12 +270,11 @@ jobs:
           fi
 
           # Calculate --max-reviews for the Sonnet step.
-          # Budget: 6h total - 30min overhead - time already spent on screening/cache.
-          # Goose timeout is now 6 min/pub; with 4 workers effective rate = 6/4 = 1.5 min/pub.
-          # Conservative: assume 8 min/pub effective (some pubs hit the 6-min timeout).
-          # Available for Sonnet: 300 min (5h). Max reviews = floor(300 / 8) = 37.
+          # Direct API call: ~30-60s per publication (vs 3-8 min with Goose).
+          # With 4 parallel workers: effective ~15-20s per publication.
+          # Budget: 300 min (5h). Conservative: 60s/pub effective = 300 pubs max.
           # Override with workflow input if provided.
-          MAX_REVIEWS=37
+          MAX_REVIEWS=300
           if [ -n "${{ github.event.inputs.max_reviews }}" ]; then
             MAX_REVIEWS="${{ github.event.inputs.max_reviews }}"
           fi

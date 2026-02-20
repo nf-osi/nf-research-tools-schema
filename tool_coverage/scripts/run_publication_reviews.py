@@ -26,135 +26,9 @@ REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 
-# Fields excluded from the mining template — either submission-form metadata
-# (not Synapse columns) or curator-only data not found in publication text.
-_TEMPLATE_SKIP_FIELDS = {
-    # Submission form / acquisition metadata
-    'resourceType', 'contactEmail', 'developerContactEmail',
-    'requestFormURL', 'toolURL', 'downloadURL', 'catalogURL',
-    'itemAcquisition', 'additionalDetails', 'vendor', 'catalogNumber',
-    'developerName', 'developerAffiliation', 'synonyms', 'description',
-    'developmentPublicationDOI', 'usagePublicationDOIs',
-    # Internal Synapse IDs (auto-generated)
-    'donorId', 'transplantationDonorId',
-    # Curator-only — not extractable from publication text
-    'strProfile', 'contaminatedMisidentified', 'rrid',
-    # Captured as toolName at the top level, not a separate field
-    'resourceName',
-}
-
-# Maps internal type key → form schema path (relative to repo root)
-_TYPE_SCHEMA_PATHS = {
-    'animal_model':             'NF-Tools-Schemas/animal-model/submitAnimalModel.json',
-    'antibody':                 'NF-Tools-Schemas/antibody/submitAntibody.json',
-    'cell_line':                'NF-Tools-Schemas/cell-line/submitCellLine.json',
-    'genetic_reagent':          'NF-Tools-Schemas/genetic-reagent/submitGeneticReagent.json',
-    'computational_tool':       'NF-Tools-Schemas/computational-tool/submitComputationalTool.json',
-    'advanced_cellular_model':  'NF-Tools-Schemas/advanced-cellular-model/submitAdvancedCellularModel.json',
-    'patient_derived_model':    'NF-Tools-Schemas/patient-derived-model/submitPatientDerivedModel.json',
-    'clinical_assessment_tool': 'NF-Tools-Schemas/clinical-assessment-tool/submitClinicalAssessmentTool.json',
-}
-
-
-def _build_tool_validation_template() -> str:
-    """Build TOOL_VALIDATION_YAML_TEMPLATE dynamically from form JSON schemas.
-
-    Reads each type's submission form to determine which fields to request from
-    Claude. Adding a field to a form schema automatically propagates to the
-    mining prompt — no manual sync needed.
-
-    Falls back to an empty field list per type if a schema file cannot be read,
-    so the script stays runnable even outside the repo root.
-    """
-    type_lines = []
-    for ttype, schema_rel in _TYPE_SCHEMA_PATHS.items():
-        # Support both repo-root and script-relative invocation
-        candidates = [Path(schema_rel), Path(__file__).parents[2] / schema_rel]
-        schema_path = next((p for p in candidates if p.exists()), None)
-        if schema_path is None:
-            type_lines.append(f'    # {ttype}: (schema not found at {schema_rel})')
-            continue
-
-        try:
-            with open(schema_path) as fh:
-                schema = json.load(fh)
-        except Exception:
-            type_lines.append(f'    # {ttype}: (schema unreadable)')
-            continue
-
-        props = schema.get('properties', {})
-        bi = props.get('basicInfo', {})
-        bi_props = bi.get('properties', {})
-        bi_required = set(bi.get('required', []))
-
-        # basicInfo fields first, then remaining top-level properties
-        all_fields: dict[str, tuple] = {}
-        for k, v in bi_props.items():
-            all_fields[k] = (v, k in bi_required)
-        for k, v in props.items():
-            if k != 'basicInfo' and k not in all_fields:
-                all_fields[k] = (v, False)
-
-        hints = []
-        for fname, (fschema, is_req) in all_fields.items():
-            if fname in _TEMPLATE_SKIP_FIELDS:
-                continue
-            hint = fname + ('*' if is_req else '')
-            enum_vals = fschema.get('enum')
-            if not enum_vals and fschema.get('type') == 'array':
-                enum_vals = fschema.get('items', {}).get('enum')
-            if enum_vals:
-                hint += ' [' + ' | '.join(str(v) for v in enum_vals if v) + ']'
-            hints.append(hint)
-
-        type_lines.append(f'    # {ttype}: {", ".join(hints)}')
-
-    header = (
-        'toolValidations:\n'
-        '  - toolName: "Exact tool name as it appears in text"\n'
-        '    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent"'
-        ' | "computational_tool" | "advanced_cellular_model"'
-        ' | "patient_derived_model" | "clinical_assessment_tool"\n'
-        '    verdict: "Accept" | "Reject" | "Uncertain"\n'
-        '    confidence: 0.0-1.0\n'
-        '    recommendation: "Keep" | "Remove" | "Manual Review Required"\n'
-        '    contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."\n'
-        '    usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"\n'
-        '    # Add ALL type-specific fields you can extract from the text (omit fields not found):\n'
-        '    # (* = critical field, fill if at all possible)\n'
-    )
-    return header + '\n'.join(type_lines) + '\n  # Repeat for each tool. Use [] if no tools found.'
-
-
-# Built once at import time from the form schemas — stays in sync automatically.
-TOOL_VALIDATION_YAML_TEMPLATE = _build_tool_validation_template()
-
-# Observation extraction YAML output template
-OBSERVATION_YAML_TEMPLATE = """\
-observations:
-  - resourceName: "Exact tool name from validated tools list"
-    resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
-    observationType: choose from the list below based on resourceType:
-      animal_model:             Tumor Growth/Burden | Survival/Lifespan | Body Weight/Growth | Behavioral | Nervous System | Cardiovascular System | Immune Response | Metabolic | Developmental | Cellular/Molecular | Coat Color | Drug Efficacy | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      cell_line:                Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      advanced_cellular_model:  Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      patient_derived_model:    Drug Response/Efficacy | Tumor Growth/Burden | Viability/Proliferation | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      antibody:                 Specificity | Sensitivity | Application Performance | Cross-reactivity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      genetic_reagent:          Editing/Knockdown Efficiency | Off-target Effects | Expression Level | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      computational_tool:       Accuracy/Performance | Usability | Scalability/Compatibility | Reproducibility | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      clinical_assessment_tool: Reliability | Validity | Clinical Utility | Sensitivity/Specificity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      biobank:                  Sample Quality | Availability | Collection Completeness | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-    details: "Specific finding, including quantitative values where available (e.g., 50% tumor reduction)"
-    foundIn: "Results" | "Discussion" | "Both"
-    contextSnippet: "...up to 300 chars of verbatim text supporting this observation..."
-    confidence: 0.0-1.0
-  # Repeat for each observation. Use [] if no qualifying observations found."""
-
 # Module-level cache for recipe content (loaded once)
 _recipe_system_prompt = None
 _recipe_task_instructions = None
-_obs_recipe_system_prompt = None
-_obs_recipe_task_instructions = None
 
 def setup_directories():
     """Create output directories."""
@@ -170,7 +44,7 @@ def setup_directories():
     return str(review_dir), str(results_dir), str(inputs_dir)
 
 def _load_recipe():
-    """Load Phase 1 tool-validation recipe YAML once and cache prompts."""
+    """Load recipe YAML once and cache system prompt + task instructions."""
     global _recipe_system_prompt, _recipe_task_instructions
     if _recipe_system_prompt is not None:
         return
@@ -180,151 +54,21 @@ def _load_recipe():
         recipe = yaml.safe_load(f)
 
     _recipe_system_prompt = recipe.get('instructions', '').strip()
-    _recipe_task_instructions = recipe.get('prompt', '').strip()
 
-
-def _load_obs_recipe():
-    """Load Phase 2 observation-extraction recipe YAML once and cache prompts."""
-    global _obs_recipe_system_prompt, _obs_recipe_task_instructions
-    if _obs_recipe_system_prompt is not None:
-        return
-
-    recipe_path = Path(OBS_RECIPE_PATH)
-    with open(recipe_path) as f:
-        recipe = yaml.safe_load(f)
-
-    _obs_recipe_system_prompt = recipe.get('instructions', '').strip()
-    _obs_recipe_task_instructions = recipe.get('prompt', '').strip()
-
-
-def build_observation_prompt(input_data, accepted_tool_names):
-    """Return (system_prompt, user_message) for Phase 2 observation extraction.
-
-    Args:
-        input_data: Dict with publication text (must have resultsText and/or discussionText)
-        accepted_tool_names: List of validated tool name strings from Phase 1
-    """
-    _load_obs_recipe()
-
-    meta = input_data['publicationMetadata']
-    pmid = meta['pmid']
-
-    def section(label, text):
-        return f"**{label}:**\n{text.strip() if text and text.strip() else '(not available)'}"
-
-    tools_text = '\n'.join(f'  - {name}' for name in accepted_tool_names) or '  (none)'
-
-    user_message = f"""Extract observations for publication {pmid}.
-
-**PUBLICATION METADATA:**
-- PMID: {pmid}
-- Title: {meta.get('title', '')}
-- Year: {meta.get('year', '')}
-
-{section('RESULTS', input_data.get('resultsText', ''))}
-
-{section('DISCUSSION', input_data.get('discussionText', ''))}
-
-**VALIDATED TOOLS IN THIS PUBLICATION:**
-{tools_text}
-
----
-{_obs_recipe_task_instructions}
-
-Output ONLY the YAML below — no explanation before or after:
-
-```yaml
-{OBSERVATION_YAML_TEMPLATE}
-```
-"""
-    return _obs_recipe_system_prompt, user_message
-
-
-def run_observation_extraction(pmid, input_data, accepted_tool_names, results_dir, client, max_retries=3):
-    """Run Phase 2 observation extraction for a single publication.
-
-    Reads Results + Discussion (requires full cache level) and extracts
-    scientific observations about the validated tools.
-
-    Returns path to YAML file, or None on failure.
-    """
-    safe_print(f"\n{'='*80}")
-    safe_print(f"Extracting observations for {pmid}")
-    safe_print(f"{'='*80}")
-
-    if not input_data.get('resultsText') and not input_data.get('discussionText'):
-        safe_print(f"  ⏭️  Skipping — no Results or Discussion text in cache (need full cache level)")
-        return None
-
-    if not accepted_tool_names:
-        safe_print(f"  ⏭️  Skipping — no accepted tools from Phase 1 review")
-        return None
-
-    clean_pmid = sanitize_pmid_for_filename(pmid)
-    yaml_file = Path(results_dir).resolve() / f'{clean_pmid}_observations.yaml'
-
-    system_prompt, user_message = build_observation_prompt(input_data, accepted_tool_names)
-
-    for attempt in range(max_retries):
-        try:
-            if attempt > 0:
-                safe_print(f"  Retry attempt {attempt + 1}/{max_retries}...")
-
-            message = client.messages.create(
-                model=ANTHROPIC_MODEL,
-                max_tokens=4096,
-                temperature=0.0,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}]
-            )
-
-            response_text = message.content[0].text
-            safe_print(f"  Response: {len(response_text)} chars, "
-                       f"~{message.usage.input_tokens}in/{message.usage.output_tokens}out tokens")
-
-            # Extract YAML
-            yaml_text = None
-            match = re.search(r'```yaml\s*\n(.*?)\n```', response_text, re.DOTALL)
-            if match:
-                yaml_text = match.group(1).strip()
-            else:
-                match = re.search(r'(observations:.*)', response_text, re.DOTALL)
-                if match:
-                    yaml_text = match.group(1).strip()
-
-            if not yaml_text:
-                safe_print(f"  ⚠️  No YAML found in response")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return None
-
-            data = yaml.safe_load(yaml_text)
-            if not isinstance(data, dict) or 'observations' not in data:
-                safe_print(f"  ⚠️  Invalid YAML structure (missing observations)")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return None
-
-            yaml_file.write_text(yaml_text, encoding='utf-8')
-            obs_count = len(data.get('observations') or [])
-            safe_print(f"  ✅ Extracted {obs_count} observations → {yaml_file.name}")
-            return yaml_file
-
-        except anthropic.RateLimitError:
-            wait = 60 * (attempt + 1)
-            safe_print(f"  ⚠️  Rate limit — waiting {wait}s before retry...")
-            time.sleep(wait)
-        except anthropic.APIError as e:
-            safe_print(f"  ❌ API error: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
-        except Exception as e:
-            safe_print(f"  ❌ Error: {e}")
-            return None
-
-    return None
+    full_prompt = recipe.get('prompt', '')
+    # Drop step 1 (file reading) — we embed content directly in the message.
+    # Task instructions start at "2. For each mined tool".
+    lines = full_prompt.split('\n')
+    start = next(
+        (i for i, l in enumerate(lines) if l.strip().startswith('2. For each mined tool')),
+        0
+    )
+    # Also drop the final "9. Create a YAML file..." step — we handle file writing in Python.
+    end = next(
+        (i for i, l in enumerate(lines) if l.strip().startswith('9. Create a YAML file')),
+        len(lines)
+    )
+    _recipe_task_instructions = '\n'.join(lines[start:end]).strip()
 
 
 def _format_mined_tools(tools_list):
@@ -347,13 +91,21 @@ def build_review_prompt(input_data):
 
     meta = input_data['publicationMetadata']
     pmid = meta['pmid']
-    doi_raw = meta.get('doi', '')
-    doi = str(doi_raw) if doi_raw and not pd.isna(doi_raw) else ''
+    doi = meta.get('doi', '') or ''
 
     def section(label, text):
         return f"**{label}:**\n{text.strip() if text and text.strip() else '(not available)'}"
 
     tools_text = _format_mined_tools(input_data.get('minedTools', []))
+
+    # Extract the YAML output template from the recipe (between the ``` fences)
+    recipe_path = Path(RECIPE_PATH)
+    with open(recipe_path) as f:
+        raw = f.read()
+    yaml_template_match = re.search(r'(```yaml.*?```)', raw, re.DOTALL)
+    yaml_template = yaml_template_match.group(1) if yaml_template_match else ''
+    # Substitute template variables
+    yaml_template = yaml_template.replace('{{ pmid }}', pmid).replace('{{ doi }}', doi)
 
     user_message = f"""Review publication {pmid} for NF research tool validation.
 
@@ -384,13 +136,13 @@ def build_review_prompt(input_data):
 {tools_text}
 
 ---
+Using the publication data above, perform the following:
+
 {_recipe_task_instructions}
 
-Output ONLY the YAML below — no explanation before or after:
+9. Output ONLY the YAML content below (no explanation before or after). Use this exact structure:
 
-```yaml
-{TOOL_VALIDATION_YAML_TEMPLATE}
-```
+{yaml_template}
 """
     return _recipe_system_prompt, user_message
 
@@ -401,12 +153,12 @@ def extract_yaml_from_response(text):
     match = re.search(r'```yaml\s*\n(.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Try plain ``` ... ``` block whose content starts with toolValidations:
-    match = re.search(r'```\s*\n(toolValidations:.*?)\n```', text, re.DOTALL)
+    # Try plain ``` ... ``` block whose content starts with publicationMetadata:
+    match = re.search(r'```\s*\n(publicationMetadata:.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Bare YAML starting at toolValidations:
-    match = re.search(r'(toolValidations:.*)', text, re.DOTALL)
+    # Bare YAML starting at publicationMetadata:
+    match = re.search(r'(publicationMetadata:.*)', text, re.DOTALL)
     if match:
         return match.group(1).strip()
     return None
@@ -584,48 +336,11 @@ def prepare_input_data(pub_row, cached):
     """
     pmid = pub_row['pmid']
 
-    # Try to load from cache first
-    cached = load_cached_text(pmid)
-
-    if cached:
-        print(f"  ✅ Using cached text (skipping API calls)")
-        abstract_text = cached.get('abstract', '')
-        methods_text = cached.get('methods', '')
-        intro_text = cached.get('introduction', '')
-        # Load Results and Discussion sections (with backwards compatibility)
-        results_text = cached.get('results', '')
-        discussion_text = cached.get('discussion', '')
-    else:
-        # Fall back to fetching (backwards compatibility)
-        # Import mining functions to fetch text
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from fetch_fulltext_and_mine import (
-            fetch_pubmed_abstract,
-            fetch_pmc_fulltext,
-            extract_methods_section,
-            extract_introduction_section,
-            extract_results_section,
-            extract_discussion_section
-        )
-
-        # Fetch abstract from PubMed
-        print(f"  Fetching abstract from PubMed...")
-        abstract_text = fetch_pubmed_abstract(pmid)
-
-        # Fetch full text from PMC
-        print(f"  Fetching full text from PMC...")
-        fulltext_xml = fetch_pmc_fulltext(pmid)
-        methods_text = ""
-        intro_text = ""
-        results_text = ""
-        discussion_text = ""
-
-        if fulltext_xml:
-            print(f"  Extracting sections from full text...")
-            methods_text = extract_methods_section(fulltext_xml)
-            intro_text = extract_introduction_section(fulltext_xml)
-            results_text = extract_results_section(fulltext_xml)
-            discussion_text = extract_discussion_section(fulltext_xml)
+    abstract_text = cached.get('abstract', '')
+    methods_text = cached.get('methods', '')
+    intro_text = cached.get('introduction', '')
+    results_text = cached.get('results', '')
+    discussion_text = cached.get('discussion', '')
 
     # Parse mined tools from JSON columns (handle NaN values)
     novel_tools_raw = pub_row.get('novel_tools', '{}')
@@ -710,55 +425,54 @@ def run_direct_review(pmid, input_data, results_dir, client, max_retries=3):
             if attempt > 0:
                 safe_print(f"Retry attempt {attempt + 1}/{max_retries}...")
 
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                cwd=str(results_path),
-                start_new_session=True  # own process group so kill() reaches all children
+            message = client.messages.create(
+                model=ANTHROPIC_MODEL,
+                max_tokens=8192,
+                temperature=0.0,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_message}]
             )
 
-            try:
-                stdout, stderr = process.communicate(timeout=360)  # 6 minute timeout
-            except subprocess.TimeoutExpired:
-                # Kill the entire process group (Goose may have spawned children)
-                import signal
-                try:
-                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-                except ProcessLookupError:
-                    process.kill()
-                process.communicate()
-                safe_print(f"❌ Timeout after 6 minutes")
-                return None
+            response_text = message.content[0].text
+            safe_print(f"  Response: {len(response_text)} chars, "
+                       f"~{message.usage.input_tokens}in/{message.usage.output_tokens}out tokens")
 
-            safe_print(stdout)
-
-            if process.returncode != 0:
-                # Check if this is a database conflict error (exit code 101)
-                is_db_conflict = (
-                    process.returncode == 101 and
-                    'table schema_version already exists' in stderr
-                )
-
-                if is_db_conflict and attempt < max_retries - 1:
-                    safe_print(f"⚠️  Database conflict (exit code {process.returncode}), retrying...")
-                    time.sleep(1 + attempt)  # Exponential backoff
+            yaml_text = extract_yaml_from_response(response_text)
+            if not yaml_text:
+                safe_print(f"⚠️  No YAML found in response")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
                     continue
-                else:
-                    safe_print(f"❌ Error (exit code {process.returncode}):")
-                    safe_print(stderr)
-                    return None
-
-            # Look for generated YAML file (clean_pmid already set above)
-            yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
-            if yaml_file.exists():
-                safe_print(f"✅ Review completed: {yaml_file}")
-                return yaml_file
-            else:
-                safe_print(f"⚠️  No YAML file generated")
                 return None
 
+            # Validate structure
+            try:
+                data = yaml.safe_load(yaml_text)
+                if not isinstance(data, dict) or 'publicationMetadata' not in data:
+                    safe_print(f"⚠️  Invalid YAML structure (missing publicationMetadata)")
+                    if attempt < max_retries - 1:
+                        time.sleep(2 ** attempt)
+                        continue
+                    return None
+            except yaml.YAMLError as e:
+                safe_print(f"⚠️  YAML parse error: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                return None
+
+            yaml_file.write_text(yaml_text, encoding='utf-8')
+            safe_print(f"✅ Review completed: {yaml_file}")
+            return yaml_file
+
+        except anthropic.RateLimitError:
+            wait = 60 * (attempt + 1)
+            safe_print(f"⚠️  Rate limit — waiting {wait}s before retry...")
+            time.sleep(wait)
+        except anthropic.APIError as e:
+            safe_print(f"❌ API error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
         except Exception as e:
             safe_print(f"❌ Error: {e}")
             return None
@@ -787,19 +501,11 @@ def process_single_publication(row, idx, total_pubs, results_dir, client, force_
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
-    # Skip publications with no cache file at all — Goose will waste its timeout searching
+    # Load cache — skip immediately if absent (no file → no review possible)
     cached = load_cached_text(pmid)
     if cached is None:
         safe_print(f"⏭️  Skipping {pmid} (no cache file - run Phase 1 first)")
         return (pmid, 'skipped_no_cache', None)
-
-    # Skip abstract_only publications - no methods section means tool mining will fail
-    if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
-        safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
-        return (pmid, 'skipped_abstract_only', None)
-
-    # Prepare input file
-    input_file = prepare_goose_input(row, inputs_dir)
 
     # Skip abstract_only — no methods section means tool mining will find nothing
     if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
@@ -1311,8 +1017,7 @@ def main():
 
     # Create shared Anthropic client (thread-safe, uses connection pooling)
     api_key = os.environ.get('ANTHROPIC_API_KEY')
-    needs_api = not args.skip_goose and not args.compile_only
-    if not api_key and needs_api:
+    if not api_key and not args.skip_goose and not args.compile_only:
         print("❌ ANTHROPIC_API_KEY not set — cannot run reviews")
         sys.exit(1)
     anthropic_client = anthropic.Anthropic(api_key=api_key) if api_key else None
