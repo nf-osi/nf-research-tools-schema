@@ -25,6 +25,18 @@ REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 
+# Minimal YAML output template — only fields needed for VALIDATED_*.csv submission files
+TOOL_VALIDATION_YAML_TEMPLATE = """\
+toolValidations:
+  - toolName: "Exact tool name as it appears in text"
+    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+    verdict: "Accept" | "Reject" | "Uncertain"
+    confidence: 0.0-1.0
+    recommendation: "Keep" | "Remove" | "Manual Review Required"
+    contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."
+    usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
+  # Repeat for each tool. Use [] if no tools found."""
+
 # Module-level cache for recipe content (loaded once)
 _recipe_system_prompt = None
 _recipe_task_instructions = None
@@ -53,21 +65,9 @@ def _load_recipe():
         recipe = yaml.safe_load(f)
 
     _recipe_system_prompt = recipe.get('instructions', '').strip()
-
-    full_prompt = recipe.get('prompt', '')
-    # Drop step 1 (file reading) — we embed content directly in the message.
-    # Task instructions start at "2. For each mined tool".
-    lines = full_prompt.split('\n')
-    start = next(
-        (i for i, l in enumerate(lines) if l.strip().startswith('2. For each mined tool')),
-        0
-    )
-    # Also drop the final "9. Create a YAML file..." step — we handle file writing in Python.
-    end = next(
-        (i for i, l in enumerate(lines) if l.strip().startswith('9. Create a YAML file')),
-        len(lines)
-    )
-    _recipe_task_instructions = '\n'.join(lines[start:end]).strip()
+    # Use the full prompt as task instructions — publication content is embedded directly
+    # in the user message so there is no file-reading step to skip.
+    _recipe_task_instructions = recipe.get('prompt', '').strip()
 
 
 def _format_mined_tools(tools_list):
@@ -98,15 +98,6 @@ def build_review_prompt(input_data):
 
     tools_text = _format_mined_tools(input_data.get('minedTools', []))
 
-    # Extract the YAML output template from the recipe (between the ``` fences)
-    recipe_path = Path(RECIPE_PATH)
-    with open(recipe_path) as f:
-        raw = f.read()
-    yaml_template_match = re.search(r'(```yaml.*?```)', raw, re.DOTALL)
-    yaml_template = yaml_template_match.group(1) if yaml_template_match else ''
-    # Substitute template variables
-    yaml_template = yaml_template.replace('{{ pmid }}', pmid).replace('{{ doi }}', doi)
-
     user_message = f"""Review publication {pmid} for NF research tool validation.
 
 **PUBLICATION METADATA:**
@@ -136,13 +127,13 @@ def build_review_prompt(input_data):
 {tools_text}
 
 ---
-Using the publication data above, perform the following:
-
 {_recipe_task_instructions}
 
-9. Output ONLY the YAML content below (no explanation before or after). Use this exact structure:
+Output ONLY the YAML below — no explanation before or after:
 
-{yaml_template}
+```yaml
+{TOOL_VALIDATION_YAML_TEMPLATE}
+```
 """
     return _recipe_system_prompt, user_message
 
@@ -153,12 +144,12 @@ def extract_yaml_from_response(text):
     match = re.search(r'```yaml\s*\n(.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Try plain ``` ... ``` block whose content starts with publicationMetadata:
-    match = re.search(r'```\s*\n(publicationMetadata:.*?)\n```', text, re.DOTALL)
+    # Try plain ``` ... ``` block whose content starts with toolValidations:
+    match = re.search(r'```\s*\n(toolValidations:.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Bare YAML starting at publicationMetadata:
-    match = re.search(r'(publicationMetadata:.*)', text, re.DOTALL)
+    # Bare YAML starting at toolValidations:
+    match = re.search(r'(toolValidations:.*)', text, re.DOTALL)
     if match:
         return match.group(1).strip()
     return None
@@ -448,8 +439,8 @@ def run_direct_review(pmid, input_data, results_dir, client, max_retries=3):
             # Validate structure
             try:
                 data = yaml.safe_load(yaml_text)
-                if not isinstance(data, dict) or 'publicationMetadata' not in data:
-                    safe_print(f"⚠️  Invalid YAML structure (missing publicationMetadata)")
+                if not isinstance(data, dict) or 'toolValidations' not in data:
+                    safe_print(f"⚠️  Invalid YAML structure (missing toolValidations)")
                     if attempt < max_retries - 1:
                         time.sleep(2 ** attempt)
                         continue
@@ -535,15 +526,12 @@ def compile_validation_results(mining_df, results_dir):
     print("=" * 80)
 
     validation_results = []
-    all_missed_tools = []
-    all_suggested_patterns = []
-    all_observations = []
 
     for _, row in mining_df.iterrows():
         pmid = row['pmid']
-        doi = row.get('doi', '')
+        doi_raw = row.get('doi', '')
+        doi = str(doi_raw) if doi_raw and not pd.isna(doi_raw) else ''
 
-        # Check if YAML file exists
         clean_pmid = sanitize_pmid_for_filename(pmid)
         yaml_path = Path(results_dir) / f'{clean_pmid}_tool_review.yaml'
         if not yaml_path.exists():
@@ -552,95 +540,55 @@ def compile_validation_results(mining_df, results_dir):
 
         print(f"\nProcessing {pmid}...")
 
-        # Load review data
         review_data = parse_review_yaml(yaml_path)
         if not review_data:
             continue
 
-        # Extract validation results
-        pub_meta = review_data.get('publicationMetadata', {})
-        tool_validations = review_data.get('toolValidations', [])
-        summary = review_data.get('summary', {})
-        missed_tools = review_data.get('potentiallyMissedTools', [])
-        suggested_patterns = review_data.get('suggestedPatterns', [])
-        observations = review_data.get('observations', [])
+        tool_validations = review_data.get('toolValidations', []) or []
 
-        # Categorize tools by recommendation
         accepted_tools = []
         rejected_tools = []
         uncertain_tools = []
 
-        if tool_validations:
-            for tool_val in tool_validations:
-                tool_info = {
-                    'pmid': pmid,
-                    'toolName': tool_val.get('toolName'),
-                    'toolType': tool_val.get('toolType'),
-                    'verdict': tool_val.get('verdict'),
-                    'confidence': tool_val.get('confidence'),
-                    'recommendation': tool_val.get('recommendation'),
-                    'reasoning': tool_val.get('reasoning', '')
-                }
-
-                if tool_val.get('recommendation') == 'Keep':
-                    accepted_tools.append(tool_info)
-                elif tool_val.get('recommendation') == 'Remove':
-                    rejected_tools.append(tool_info)
-                else:  # Manual Review Required
-                    uncertain_tools.append(tool_info)
-
-        # Collect missed tools
-        for missed_tool in missed_tools:
-            missed_tool['pmid'] = pmid
-            all_missed_tools.append(missed_tool)
-
-        # Collect suggested patterns
-        for pattern in suggested_patterns:
-            pattern['pmid'] = pmid
-            all_suggested_patterns.append(pattern)
-
-        # Collect observations
-        for obs in observations:
-            obs_info = {
+        for tool_val in tool_validations:
+            tool_info = {
                 'pmid': pmid,
-                'doi': doi if doi else obs.get('doi', ''),
-                'resourceName': obs.get('resourceName'),
-                'resourceType': obs.get('resourceType'),
-                'observationType': obs.get('observationType'),
-                'details': obs.get('details', ''),
-                'foundIn': obs.get('foundIn', ''),
-                'confidence': obs.get('confidence', 1.0)
+                'toolName': tool_val.get('toolName'),
+                'toolType': tool_val.get('toolType'),
+                'verdict': tool_val.get('verdict'),
+                'confidence': tool_val.get('confidence'),
+                'recommendation': tool_val.get('recommendation'),
+                'contextSnippet': tool_val.get('contextSnippet', ''),
+                'usageType': tool_val.get('usageType', ''),
             }
-            all_observations.append(obs_info)
+            rec = tool_val.get('recommendation', '')
+            if rec == 'Keep':
+                accepted_tools.append(tool_info)
+            elif rec == 'Remove':
+                rejected_tools.append(tool_info)
+            else:
+                uncertain_tools.append(tool_info)
 
         validation_results.append({
             'pmid': pmid,
-            'title': pub_meta.get('title', ''),
-            'publicationType': pub_meta.get('publicationType', ''),
-            'likelyContainsTools': pub_meta.get('likelyContainsTools', ''),
-            'totalToolsMined': summary.get('totalToolsMined', 0),
-            'toolsAccepted': summary.get('toolsAccepted', 0),
-            'toolsRejected': summary.get('toolsRejected', 0),
-            'toolsUncertain': summary.get('toolsUncertain', 0),
-            'potentiallyMissedCount': summary.get('potentiallyMissedCount', 0),
-            'newPatternsCount': summary.get('newPatternsCount', 0),
-            'observationsExtracted': summary.get('observationsExtracted', 0),
+            'doi': doi,
+            'year': row.get('year', ''),
+            'title': row.get('title', row.get('publicationTitle', '')),
+            'toolsAccepted': len(accepted_tools),
+            'toolsRejected': len(rejected_tools),
+            'toolsUncertain': len(uncertain_tools),
             'acceptedTools': accepted_tools,
             'rejectedTools': rejected_tools,
             'uncertainTools': uncertain_tools,
-            'missedTools': missed_tools,
-            'suggestedPatterns': suggested_patterns,
-            'overallAssessment': pub_meta.get('overallAssessment', ''),
-            'majorIssues': summary.get('majorIssuesFound', ''),
-            'recommendations': summary.get('recommendations', '')
         })
 
+    total_accepted = sum(r['toolsAccepted'] for r in validation_results)
+    total_rejected = sum(r['toolsRejected'] for r in validation_results)
     print(f"\n✅ Compiled {len(validation_results)} publication reviews")
-    print(f"   - Total potentially missed tools: {len(all_missed_tools)}")
-    print(f"   - Total suggested patterns: {len(all_suggested_patterns)}")
-    print(f"   - Total observations extracted: {len(all_observations)}")
+    print(f"   - Total accepted tools: {total_accepted}")
+    print(f"   - Total rejected/uncertain tools: {total_rejected}")
 
-    return validation_results, all_missed_tools, all_suggested_patterns, all_observations
+    return validation_results
 
 def normalize_tool_type(tool_type):
     """Normalize tool type to match CSV file naming convention."""
@@ -747,6 +695,94 @@ def filter_submission_csvs(validation_results, output_dir='.'):
     print("\n" + "=" * 80)
     print("Filtering complete. Review VALIDATED_*.csv files.")
     print("=" * 80)
+
+def write_validated_tools_submit_csv(validation_results, output_dir='.'):
+    """Write SUBMIT_*.csv files from accepted toolValidations for direct submission.
+
+    In discovery mode (no pre-mined tools), Claude records found tools directly in
+    toolValidations. This function converts those validated tool entries into the
+    same SUBMIT_*.csv format expected by filter_submission_csvs.
+    """
+    print("\n" + "=" * 80)
+    print("Writing SUBMIT_*.csv from Validated Tools")
+    print("=" * 80)
+
+    # Type-specific primary name column (matches filter_submission_csvs expectations)
+    name_column_map = {
+        'animal_model': 'name',
+        'antibody': 'targetAntigen',
+        'cell_line': '_cellLineName',
+        'genetic_reagent': 'insertName',
+        'computational_tool': 'softwareName',
+        'advanced_cellular_model': '_modelName',
+        'patient_derived_model': '_modelName',
+        'clinical_assessment_tool': 'assessmentName',
+    }
+
+    # Plural filename stem — matches what filter_submission_csvs looks for in filenames
+    type_to_stem = {
+        'animal_model': 'animal_models',
+        'antibody': 'antibodies',
+        'cell_line': 'cell_lines',
+        'genetic_reagent': 'genetic_reagents',
+        'computational_tool': 'computational_tools',
+        'advanced_cellular_model': 'advanced_cellular_models',
+        'patient_derived_model': 'patient_derived_models',
+        'clinical_assessment_tool': 'clinical_assessment_tools',
+    }
+
+    # Group accepted tools by normalized type
+    tools_by_type = {}
+    for result in validation_results:
+        pub_doi = result.get('doi', '')
+        pub_title = result.get('title', '')
+        pub_year = result.get('year', '')
+        for tool in result.get('acceptedTools', []):
+            raw_type = tool.get('toolType', '')
+            tool_type = normalize_tool_type(raw_type)
+            if tool_type not in tools_by_type:
+                tools_by_type[tool_type] = []
+            tools_by_type[tool_type].append({
+                '_pmid': tool.get('pmid', result.get('pmid', '')),
+                '_doi': pub_doi,
+                '_publicationTitle': pub_title,
+                '_year': pub_year,
+                '_context': tool.get('contextSnippet', ''),
+                '_confidence': tool.get('confidence', ''),
+                '_verdict': tool.get('verdict', ''),
+                '_usageType': tool.get('usageType', ''),
+                'toolName': tool.get('toolName', ''),
+            })
+
+    if not tools_by_type:
+        print("⚠️  No accepted tools found — no SUBMIT_*.csv files created")
+        return
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    for tool_type, tools in tools_by_type.items():
+        name_col = name_column_map.get(tool_type, 'name')
+        stem = type_to_stem.get(tool_type, tool_type)
+        rows = []
+        for t in tools:
+            row = {
+                '_pmid': t['_pmid'],
+                '_doi': t['_doi'],
+                '_publicationTitle': t['_publicationTitle'],
+                '_year': t['_year'],
+                '_context': t['_context'],
+                '_confidence': t['_confidence'],
+                '_verdict': t['_verdict'],
+                '_usageType': t['_usageType'],
+                name_col: t['toolName'],
+            }
+            rows.append(row)
+        df = pd.DataFrame(rows)
+        out_file = output_path / f'SUBMIT_{stem}.csv'
+        df.to_csv(out_file, index=False)
+        print(f"  Created SUBMIT_{stem}.csv: {len(df)} rows")
+
 
 def main():
     """Main execution."""
@@ -887,6 +923,14 @@ def main():
                 cache_file = cache_dir / f"{clean_pmid.replace('PMID:', '')}_text.json"
                 if not cache_file.exists():
                     continue  # no cache - will be skipped anyway
+                # Skip abstract_only caches (no methods section — would be skipped during processing anyway)
+                try:
+                    with open(cache_file) as _cf:
+                        _cache_meta = json.load(_cf)
+                    if _cache_meta.get('cache_level') == 'abstract_only' or not _cache_meta.get('methods'):
+                        continue
+                except Exception:
+                    pass
                 eligible.append(pmid)
             if len(eligible) > args.max_reviews:
                 cap_pmids = set(eligible[:args.max_reviews])
@@ -897,10 +941,10 @@ def main():
                     yaml_path = results_path / f'{clean_pmid}_tool_review.yaml'
                     return yaml_path.exists() or pmid in cap_pmids
                 mining_df = mining_df[mining_df.apply(keep_row, axis=1)]
-                print(f"\n⚠️  Capped to {args.max_reviews} Goose reviews this run "
+                print(f"\n⚠️  Capped to {args.max_reviews} AI reviews this run "
                       f"({len(eligible) - args.max_reviews} deferred to next run)")
             else:
-                print(f"\n✅ {len(eligible)} publications need Goose review (within --max-reviews {args.max_reviews})")
+                print(f"\n✅ {len(eligible)} publications eligible for AI review (within --max-reviews {args.max_reviews})")
 
         print(f"\n{'='*80}")
         print(f"Running Goose Reviews for {len(mining_df)} publications")
@@ -969,7 +1013,11 @@ def main():
         print(f"{'='*80}")
 
     # Compile validation results
-    validation_results, all_missed_tools, all_suggested_patterns, all_observations = compile_validation_results(mining_df, results_dir)
+    validation_results = compile_validation_results(mining_df, results_dir)
+
+    # Write SUBMIT_*.csv from validated tools (discovery mode: toolValidations → submission)
+    if not args.compile_only:
+        write_validated_tools_submit_csv(validation_results, output_dir='tool_coverage/outputs')
 
     # Save validation summary
     summary_file = Path(review_dir) / 'validation_summary.json'
@@ -977,23 +1025,18 @@ def main():
         json.dump(validation_results, f, indent=2)
     print(f"\n✅ Validation summary saved: {summary_file}")
 
-    # Create detailed report CSV
+    # Create report
     report_rows = []
     for result in validation_results:
         report_rows.append({
             'pmid': result['pmid'],
             'title': result['title'],
-            'publicationType': result['publicationType'],
-            'likelyContainsTools': result['likelyContainsTools'],
-            'totalMined': result['totalToolsMined'],
             'accepted': result['toolsAccepted'],
             'rejected': result['toolsRejected'],
             'uncertain': result['toolsUncertain'],
-            'potentiallyMissed': result['potentiallyMissedCount'],
-            'suggestedPatterns': result['newPatternsCount'],
-            'observationsExtracted': result.get('observationsExtracted', 0),
-            'majorIssues': result['majorIssues'],
-            'recommendations': result['recommendations']
+            'acceptedToolNames': ', '.join(
+                t.get('toolName', '') for t in result['acceptedTools']
+            ),
         })
 
     report_df = pd.DataFrame(report_rows)
@@ -1001,55 +1044,18 @@ def main():
     report_df.to_excel(report_file, index=False)
     print(f"✅ Validation report saved: {report_file}")
 
-    # Save missed tools report
-    if all_missed_tools:
-        missed_tools_df = pd.DataFrame(all_missed_tools)
-        missed_tools_file = Path(review_dir) / 'potentially_missed_tools.csv'
-        missed_tools_df.to_csv(missed_tools_file, index=False)
-        print(f"✅ Potentially missed tools saved: {missed_tools_file}")
-        print(f"   - {len(all_missed_tools)} tools that may have been missed")
-
-    # Save suggested patterns report
-    if all_suggested_patterns:
-        patterns_df = pd.DataFrame(all_suggested_patterns)
-        patterns_file = Path(review_dir) / 'suggested_patterns.csv'
-        patterns_df.to_csv(patterns_file, index=False)
-        print(f"✅ Suggested patterns saved: {patterns_file}")
-        print(f"   - {len(all_suggested_patterns)} patterns to improve mining")
-
-    # Save observations report
-    if all_observations:
-        observations_df = pd.DataFrame(all_observations)
-        observations_file = Path(review_dir) / 'observations.csv'
-        observations_df.to_csv(observations_file, index=False)
-        print(f"✅ Observations saved: {observations_file}")
-        print(f"   - {len(all_observations)} scientific observations extracted")
-
-        # Print observation breakdown by type
-        if 'observationType' in observations_df.columns:
-            obs_counts = observations_df['observationType'].value_counts()
-            print(f"   - Breakdown by type:")
-            for obs_type, count in obs_counts.head(5).items():
-                print(f"     • {obs_type}: {count}")
-            if len(obs_counts) > 5:
-                print(f"     • ... and {len(obs_counts) - 5} more types")
-
     # Filter SUBMIT_*.csv files
     if not args.compile_only:
-        filter_submission_csvs(validation_results)
+        filter_submission_csvs(validation_results, output_dir='tool_coverage/outputs')
 
     print("\n" + "=" * 80)
     print("Validation Complete!")
     print("=" * 80)
     print("\nNext steps:")
     print("  1. Review validation_report.xlsx for summary")
-    print("  2. Check VALIDATED_*.csv files (rejected tools removed)")
+    print("  2. Check tool_coverage/outputs/VALIDATED_*.csv files (rejected tools removed)")
     print("  3. Manually review 'uncertain' tools if any")
-    print("  4. Review potentially_missed_tools.csv for tools that may need manual addition")
-    print("  5. Review suggested_patterns.csv to improve future mining accuracy")
-    print("  6. Review observations.csv for scientific observations extracted")
-    print("  7. Run format_mining_for_submission.py to create SUBMIT files (includes observations)")
-    print("  8. Manually verify SUBMIT_*.csv files before uploading to Synapse")
+    print("  4. Manually verify VALIDATED_*.csv files before uploading to Synapse")
     print("=" * 80)
 
 if __name__ == '__main__':
