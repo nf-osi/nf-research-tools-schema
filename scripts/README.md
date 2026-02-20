@@ -7,11 +7,20 @@ This directory contains scripts for workflow automation and data management.
 ### Tool Annotation Review
 
 **`review_tool_annotations.py`**
-- Analyzes individualID annotations from Synapse syn52702673
+- Analyzes `individualID` annotations from Synapse syn52702673
 - Compares against tools in syn51730943
 - Suggests new cell lines and synonyms using fuzzy matching
 - Analyzes facet configuration for search improvements
-- Outputs JSON suggestions and markdown reports
+- Outputs `tool_annotation_suggestions.json` / `.md` and `SUBMIT_cell_lines.csv` / `SUBMIT_resources.csv`
+
+**`enrich_existing_tools.py`**
+- Queries `modelSystemName`, `tissue`, `tumorType`, `diagnosis`, `sex`, `age`, `species` from syn16858331
+- Matches annotation data to existing tool records via `modelSystemName` = `resourceName`
+- Computes consensus values (all annotations for a given model must agree after case normalization + schema valid-value lookup)
+- Fills blank fields only — never overwrites existing values
+- Enriches: CellLineDetails (syn26486823), AnimalModelDetails (syn26486808), PatientDerivedModelDetails (syn73709228), Donor (syn26486829)
+- Outputs `SUBMIT_*_updates.csv` files + `tool_field_enrichment.json` / `.md`
+- Supports `--dry-run` (prints proposed updates without writing files) and `--output-dir`
 
 **Used by**: `review-tool-annotations.yml` workflow
 
@@ -69,6 +78,19 @@ python scripts/review_tool_annotations.py --limit 1000
 
 # Dry run (no files saved)
 python scripts/review_tool_annotations.py --dry-run
+```
+
+### Enrich Existing Tool Records
+```bash
+# Dry run — print proposed updates without writing files
+# Works with anonymous Synapse login (read-only public tables)
+python scripts/enrich_existing_tools.py --dry-run
+
+# Full run — write SUBMIT_*_updates.csv to current directory
+SYNAPSE_AUTH_TOKEN=<token> python scripts/enrich_existing_tools.py
+
+# Write output files to a specific directory
+SYNAPSE_AUTH_TOKEN=<token> python scripts/enrich_existing_tools.py --output-dir /tmp/enrichment
 ```
 
 ### Link Tool Datasets

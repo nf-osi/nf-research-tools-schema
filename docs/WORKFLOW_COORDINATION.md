@@ -32,9 +32,13 @@ graph TD
 **Trigger**: Schedule (Monday 9 AM UTC)
 **Creates PR**: Yes (label: `automated-annotation-review`)
 
-Analyzes individualID annotations from Synapse, suggests new cell lines and synonyms.
+Two tasks in one workflow:
+1. **New cell lines**: Analyzes `individualID` annotations from syn52702673, suggests new cell lines and synonyms.
+2. **Field enrichment**: Queries `modelSystemName`-matched annotation data from syn16858331, fills blank fields in existing cell line, animal model, patient-derived model, and donor records using consensus values.
 
-**Manual Action Required**: Fill in `organ` field for cell lines
+**Manual Action Required**:
+- Fill in `organ` field for any new cell lines
+- Review `SUBMIT_*_updates.csv` files (check `_match_key` column to confirm annotation match is correct)
 
 **Next Step**: When PR is merged → triggers `check-tool-coverage`
 

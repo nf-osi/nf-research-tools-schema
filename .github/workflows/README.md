@@ -8,8 +8,9 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ```
 1. review-tool-annotations.yml (Monday 9 AM UTC)
-   ├─ Analyzes individualID annotations vs tools
-   ├─ Suggests new cell lines and synonyms
+   ├─ Analyzes individualID annotations → suggests new cell lines and synonyms
+   ├─ Enriches existing tool records (cell lines, animal models, PDX, donors)
+   │   via consensus values from modelSystemName-matched file annotations
    └─ Creates PR with label: automated-annotation-review
          ↓ (when PR merged)
 
@@ -49,31 +50,39 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 ### 1. Review Tool Annotations (review-tool-annotations.yml)
 
-**Purpose**: Analyze individualID annotations and suggest new tools (ENTRY POINT)
+**Purpose**: Analyze annotations to suggest new tools and enrich existing tool records (ENTRY POINT)
 
 **Trigger**:
 - Schedule: Monday 9 AM UTC
 - Manual: workflow_dispatch
 
 **What it does**:
-1. Queries `individualID` from syn52702673 (annotations)
-2. Compares against tools in syn51730943
-3. Suggests new cell lines (assumes all individualIDs are cell lines)
-4. Uses fuzzy matching (0.85 threshold) to suggest synonyms
-5. Analyzes facet configuration
-6. Creates SUBMIT_*.csv files ready for Synapse upload
+1. Queries `individualID` from syn52702673 — suggests new cell lines not yet in the database
+2. Compares against tools in syn51730943 using fuzzy matching (0.85 threshold) to suggest synonyms
+3. Analyzes facet configuration
+4. Creates `SUBMIT_cell_lines.csv` / `SUBMIT_resources.csv` for new cell lines
+5. Queries `modelSystemName`, `tissue`, `tumorType`, `diagnosis`, `sex`, `age`, `species` from syn16858331
+6. Matches annotation data to existing tool records via `modelSystemName` = `resourceName`
+7. Computes consensus values (all annotations for a given model must agree after case normalization)
+8. Generates `SUBMIT_*_updates.csv` files to backfill blank fields in existing records
 
 **Outputs**:
-- `SUBMIT_cell_lines.csv`
-- `SUBMIT_resources.csv`
-- `tool_annotation_suggestions.json`
-- `tool_annotation_suggestions.md`
+- `SUBMIT_cell_lines.csv` — new cell lines *(if new individualIDs found)*
+- `SUBMIT_resources.csv` — corresponding resource entries *(if new cell lines)*
+- `SUBMIT_cell_line_updates.csv` — existing cell line rows with proposed field updates
+- `SUBMIT_animal_model_updates.csv` — existing animal model rows with proposed updates
+- `SUBMIT_patient_derived_model_updates.csv` — existing PDX rows with proposed updates
+- `SUBMIT_donor_updates.csv` — existing donor rows with proposed updates
+- `tool_annotation_suggestions.json` / `.md`
+- `tool_field_enrichment.json` / `.md` — enrichment counts by table and field
 
 **PR Labels**: `automated-annotation-review`, `cell-lines`, `needs-manual-review`
 
 **Assignee**: BelindaBGarana
 
-**Manual Review Required**: Fill in `organ` field for cell lines before merging
+**Manual Review Required**:
+- Fill in `organ` field for new cell lines before merging
+- Verify proposed field updates via `_match_key` column in `SUBMIT_*_updates.csv`
 
 **Documentation**: See [`docs/TOOL_ANNOTATION_REVIEW.md`](../../docs/TOOL_ANNOTATION_REVIEW.md)
 
@@ -213,13 +222,18 @@ These workflows support the main sequence but run independently:
 1. Detects VALIDATED_*.csv (AI-validated) or SUBMIT_*.csv files
 2. Validates CSV schemas
 3. Cleans tracking columns (prefixed with `_`)
-4. Uploads to corresponding Synapse tables:
+4. Uploads to corresponding Synapse tables (insert mode for new rows):
    - syn26486808 (animal models)
    - syn26486811 (antibodies)
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
    - syn26450069 (resources)
-5. Regenerates coverage report
+5. Updates existing rows in Synapse (update mode — only fills blank fields):
+   - `CLEAN_cell_line_updates.csv` → syn26486823
+   - `CLEAN_animal_model_updates.csv` → syn26486808
+   - `CLEAN_patient_derived_model_updates.csv` → syn73709228
+   - `CLEAN_donor_updates.csv` → syn26486829
+6. Regenerates coverage report
 
 **No PR Created**: Uploads directly, creates summary in Actions
 
