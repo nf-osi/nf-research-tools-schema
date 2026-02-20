@@ -1040,8 +1040,8 @@ def main():
         })
 
     report_df = pd.DataFrame(report_rows)
-    report_file = Path(review_dir) / 'validation_report.xlsx'
-    report_df.to_excel(report_file, index=False)
+    report_file = Path('tool_coverage/outputs') / 'validation_report.csv'
+    report_df.to_csv(report_file, index=False)
     print(f"✅ Validation report saved: {report_file}")
 
     # Filter SUBMIT_*.csv files
