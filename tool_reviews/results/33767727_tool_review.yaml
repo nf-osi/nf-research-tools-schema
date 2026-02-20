@@ -1,0 +1,168 @@
+publicationMetadata:
+  pmid: "PMID:33767727"
+  title: "Molecular Diagnosis of Neurofibromatosis by Multigene Panel Testing."
+  queryType: "unknown"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, possibly computational tools for analysis
+    This publication focuses on molecular diagnosis using genetic testing methods, so computational tools
+    for sequencing analysis and genetic reagents (DNA extraction kits, sequencing platforms) are expected.
+    Clinical assessment tools may be present for phenotype evaluation. Lab research tools like antibodies
+    and cell lines are less likely but possible for tissue analysis.
+  overallAssessment: |
+    This clinical study involves molecular genetic testing of NF patients using multigene panel sequencing,
+    Sanger sequencing, and ultradeep sequencing. The study would typically use computational tools for
+    sequence analysis, genetic reagents for DNA extraction and library preparation, and potentially clinical
+    assessment tools for phenotype evaluation. The presence of a detailed Methods section indicates actual
+    experimental work rather than just observational data collection.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "AxyPrep Blood Genomic DNA Miniprep Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Genomic DNA was extracted from the peripheral blood, skin lesions, hair, oral mucosa, and tumor tissues separately using the AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China)"
+    whyMissed: "Commercial DNA extraction kit with vendor information - specific genetic reagent for genomic DNA isolation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DNeasy Blood & Tissue Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "using the AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China) and DNeasy Blood & Tissue Kit (Qiagen, Germany)"
+    whyMissed: "Commercial DNA extraction kit from Qiagen - specific genetic reagent for tissue DNA isolation"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NanoDrop one spectrophotometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The DNA purity was determined using a NanoDrop one spectrophotometer and quantified with a Qubit 2.0 Fluorometer"
+    whyMissed: "Specific instrument model for DNA quantification and purity assessment"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit 2.0 Fluorometer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "determined using a NanoDrop one spectrophotometer and quantified with a Qubit 2.0 Fluorometer using the Qubit dsDNA HS Assay Kit"
+    whyMissed: "Specific instrument model for DNA quantification"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Qubit dsDNA HS Assay Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "quantified with a Qubit 2.0 Fluorometer using the Qubit dsDNA HS Assay Kit (Life Technologies, Thermo Fisher Scientific, Inc.)"
+    whyMissed: "Commercial assay kit with vendor information for DNA quantification"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Roche NimbleGen Sequence Capture SeqCap EZ Library"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "the capture probe from the Roche NimbleGen Sequence Capture SeqCap EZ Library was used to capture a total of 569 genes associated with hereditary dermatosis"
+    whyMissed: "Specific capture probe library system for targeted sequencing"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Covaris M220"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "DNA was cropped into approximately 300-bp fragments using focused ultrasonicators (Covaris M220, United States)"
+    whyMissed: "Specific instrument model for DNA fragmentation"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina HiSeq X Ten System"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequencing was carried out on an Illumina HiSeq X Ten System (Illumina, San Diego, CA, United States)"
+    whyMissed: "Specific sequencing platform with vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ABI PRISM 3730XL analyzer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "An ABI PRISM 3730XL analyzer (Applied Biosystems, Foster City, CA, United States) was used for Sanger sequencing"
+    whyMissed: "Specific Sanger sequencing instrument with vendor information"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Primer 3.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Primers were designed based on the mutation sites found using Primer 3.0"
+    whyMissed: "Specific software tool for primer design with version number"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Reflectance confocal microscopy"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reflectance confocal microscopy (RCM) (Supplementary Figure 2A) and dermoscopy (Supplementary Figure 2B) of the probands"
+    whyMissed: "Specific imaging technique/instrument for skin lesion analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "dermoscopy"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Reflectance confocal microscopy (RCM) (Supplementary Figure 2A) and dermoscopy (Supplementary Figure 2B) of the probands"
+    whyMissed: "Clinical imaging technique for skin lesion evaluation"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z]+ Kit \\([A-Z][a-zA-Z]+[,\\s]+[A-Za-z\\s,]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["AxyPrep Blood Genomic DNA Miniprep Kit (Axygen, Corning, Jiangsu, China)", "DNeasy Blood & Tissue Kit (Qiagen, Germany)"]
+    reasoning: "Commercial kits with vendor information in parentheses are reliable indicators of genetic reagents"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+ [A-Z0-9]+ [A-Za-z]+ ?[Ss]ystem|[Aa]nalyzer|[Ss]pectrophotometer|[Ff]luorometer"
+    toolType: "computational_tool"
+    examples: ["Illumina HiSeq X Ten System", "ABI PRISM 3730XL analyzer", "NanoDrop one spectrophotometer"]
+    reasoning: "Instrument names with model numbers and system/analyzer/spectrophotometer suffixes indicate computational tools"
+
+  - patternType: "context_phrase"
+    pattern: "was used for|were used for|using the|carried out on|performed using"
+    toolType: "general"
+    examples: ["was used for Sanger sequencing", "carried out on an Illumina HiSeq X Ten System"]
+    reasoning: "These phrases reliably indicate actual tool usage rather than citations"
+
+  - patternType: "term"
+    pattern: "\\b[Pp]rimer [0-9]+\\.[0-9]+|[Pp]rimer[0-9]+\\.[0-9]+"
+    toolType: "computational_tool"
+    examples: ["Primer 3.0"]
+    reasoning: "Software tools for primer design with version numbers"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a methods-heavy clinical study
+    - Multiple genetic reagents (DNA extraction kits, assay kits) were missed
+    - Several computational tools (sequencing platforms, analysis instruments) were not detected
+    - The mining appears to have missed tools with vendor information and model numbers
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining.
+    The study uses multiple genetic reagents (DNA extraction kits, capture probes, assay kits) and
+    computational tools (sequencing platforms, analysis instruments, software). All 12 potentially
+    missed tools should be added as they represent genuine research tools with clear experimental usage.
+    The suggested patterns would significantly improve detection of commercial kits and instruments
+    with vendor information. No observations were extracted since no tools were initially validated.

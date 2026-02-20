@@ -1,0 +1,146 @@
+publicationMetadata:
+  pmid: "PMID:29408605"
+  title: "Nf2 Mutation in Schwann Cells Delays Functional Neural Recovery Following Injury."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory research study using transgenic mouse models to investigate nerve injury and regeneration.
+    Expected tools include animal models (transgenic mice), computational tools for analysis, and potentially
+    genetic reagents. The study involves functional testing, histology, and electrophysiology.
+  overallAssessment: |
+    This is a laboratory research study investigating the role of merlin/NF2 in Schwann cell responses to nerve injury
+    using transgenic mouse models. The publication has a detailed Methods section describing experimental procedures
+    including animal models, surgical techniques, functional testing, and analytical software. This type of study
+    would typically use multiple research tools including animal models, computational analysis tools, and potentially
+    genetic reagents.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "P0SchΔ39-121 transgenic mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "We performed sciatic nerve crush in wild-type (WT) and in P0SchΔ39-121 transgenic mice that express a dominant negative Nf2 isoform in SCs."
+    whyMissed: "Specific transgenic mouse strain name with clear nomenclature indicating a research tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FVB mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "WT FVB mice were obtained from Jackson Labs (Bar Harbor, ME)."
+    whyMissed: "Standard mouse strain obtained from commercial vendor (Jackson Labs)"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CatWalk XT"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used the CatWalk XT (ver. 8, Noldus Information Technology, Wageningen, The Netherlands) system to study the functional recovery of the nerve."
+    whyMissed: "Specific software system with version number and vendor information for gait analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Metamorph software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "images captured with a Leica DMR III microscope and CCD camera running Metamorph software (Molecular Devices, Inc., Sunnyvale, CA)"
+    whyMissed: "Specific imaging analysis software with vendor information"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Using ImageJ software (NIH, Bethesda, MD), g-ratios were calculated on the EM micrographs"
+    whyMissed: "Widely used image analysis software with specific usage context for morphometric analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SigmaPlot software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differences among means for each group were analyzed by using t-tests and one way ANOVA using SigmaPlot software (Systat, San Jose, CA)"
+    whyMissed: "Statistical analysis software with vendor information"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "P0[A-Za-z0-9Δ\\-]+ transgenic mice"
+    toolType: "animal_model"
+    examples: ["P0SchΔ39-121 transgenic mice"]
+    reasoning: "Pattern to capture transgenic mouse lines with P0 promoter-driven expression, common in Schwann cell research"
+
+  - patternType: "context_phrase"
+    pattern: "obtained from [A-Za-z\\s]+ Labs"
+    toolType: "animal_model"
+    examples: ["obtained from Jackson Labs", "obtained from Riken Bioresource Center"]
+    reasoning: "Phrase indicating commercial or institutional source of animal models"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Za-z]+\\s+software\\s+\\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["Metamorph software (Molecular Devices, Inc., Sunnyvale, CA)", "SigmaPlot software (Systat, San Jose, CA)"]
+    reasoning: "Pattern to capture software tools with vendor information in parentheses"
+
+  - patternType: "term"
+    pattern: "CatWalk\\s+XT"
+    toolType: "computational_tool"
+    examples: ["CatWalk XT (ver. 8, Noldus Information Technology)"]
+    reasoning: "Specific gait analysis system commonly used in neuroscience research"
+
+observations:
+  - resourceName: "P0SchΔ39-121 transgenic mice"
+    resourceType: "Animal Model"
+    observationType: "Motor Activity"
+    observationTypeOntologyId: "MP:0001405"
+    details: |
+      Functional studies showed delayed nerve regeneration in Nf2 mutant mice compared to the WT mice.
+      Recovery of nerve function was assessed by measuring mean contact paw area on a pressure pad at
+      7, 21, 60, and 90 days following nerve injury. Delayed neural recovery correlated with a reduced
+      density of regenerated axons and increased endoneurial space in mutants compared to WT mice.
+    foundIn: "both"
+    contextSnippet: "Functional studies showed delayed nerve regeneration in Nf2 mutant mice compared to the WT mice. Delayed neural recovery correlated with a reduced density of regenerated axons and increased endoneurial space in mutants compared to WT mice."
+    confidence: 0.9
+    doi: "10.1016/j.neuroscience.2018.01.054"
+
+  - resourceName: "P0SchΔ39-121 transgenic mice"
+    resourceType: "Animal Model"
+    observationType: "Nervous System"
+    observationTypeOntologyId: "MP:0003631"
+    details: |
+      There was a small (~17%) reduction in the percent of regenerated axons in the Nf2 mutant mice
+      compared to wild-type controls. Nevertheless, functional and nerve conduction measures ultimately
+      recovered to similar levels in WT and Nf2 mutant mice by 90 days post-injury.
+    foundIn: "both"
+    contextSnippet: "Nevertheless, functional and nerve conduction measures ultimately recovered to similar levels in WT and Nf2 mutant mice, while there was a small (∼17%) reduction in the percent of regenerated axons in the Nf2 mutant mice."
+    confidence: 0.9
+    doi: "10.1016/j.neuroscience.2018.01.054"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 2
+  observationsByType:
+    Motor Activity: 1
+    Nervous System: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study with multiple research tools
+    - The mining system missed several important categories: transgenic mouse models, commercial mouse strains, 
+      and multiple computational analysis tools with specific vendor information
+    - This represents a significant gap in tool detection for neuroscience research publications
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the initial mining.
+    The transgenic mouse model (P0SchΔ39-121) is a key research tool for NF2/neurofibromatosis research.
+    Commercial mouse strains and analysis software with vendor information should be captured.
+    The suggested patterns would help identify similar tools in future neuroscience publications.
+    All six potentially missed tools should be added to improve mining coverage for this type of research.

@@ -1,0 +1,153 @@
+publicationMetadata:
+  pmid: "PMID:30571760"
+  title: "Neurofibromin haploinsufficiency results in altered spermatogenesis in a mouse model of neurofibromatosis type 1."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory research study examining testicular function in an NF1 mouse model. Expected tools include:
+    - Animal models (Nf1+/- mice)
+    - Antibodies (for Western blotting)
+    - Computational tools (for image analysis and statistics)
+    - Potentially genetic reagents or cell lines if used in experiments
+  overallAssessment: |
+    This is a laboratory research study using mouse models to investigate reproductive phenotypes in NF1. The publication has a detailed Methods section describing animal procedures, histology, Western blotting, and morphometric analysis. Research tools are highly expected including the NF1 mouse model, antibodies for protein detection, and computational tools for image analysis and statistical analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mouse model (Nf1Dsk9/+)"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "The NF1 mouse model used in this study has been described elsewhere [29]. Dsk9 is a missense mutation in the GTPase-activating protein related domain of neurofibromin. Nf1Dsk9/+ (subsequently referred to as \"Nf1+/-\") mice were maintained on a mixed (C3HeB/FeJ x C57bl/6) background."
+    whyMissed: "This is a specific NF1 mouse strain with detailed genetic background information and mutation description, not just a disease reference"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "p44/42 MAPK (ERK1/2) antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K), along with anti-rabbit conjugated secondary antibody, all purchased from New England Biolabs"
+    whyMissed: "Specific antibody with vendor information and catalog details for Western blotting experiments"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "p-ERK1/2 antibody (phospho-Thr202/Tyr204)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K), along with anti-rabbit conjugated secondary antibody, all purchased from New England Biolabs"
+    whyMissed: "Specific phospho-specific antibody with epitope information and vendor details"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "PI3K antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Western blotting was performed with rabbit primary antibodies for p44/42 MAPK (ERK1/2), p44/42 MAPK phosphorylated at threonine 202 and tyrosine 204 (p-ERK1/2), or phosphatidylinositol 3-kinase (PI3K), along with anti-rabbit conjugated secondary antibody, all purchased from New England Biolabs"
+    whyMissed: "Specific antibody with vendor information for Western blotting experiments"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "Image-Pro Plus software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Computerized quantitative morphometric analysis was performed using Image-Pro Plus software (Media Cybernetics). Testicular morphometric analysis...Seminiferous tubule size was measured at a final magnification of 200X using Image-Pro Plus software (Media Cybernetics, Inc., Rockville, MD)."
+    whyMissed: "Specific image analysis software with vendor information used for quantitative morphometric analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The width and equatorial length of the testes were measured on testicular histological images using Image J1.45s, version 1.44p (NIH, Bethesda, MD)."
+    whyMissed: "Specific software with version number used for image measurements"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "InVivo 3.2.0 software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sections were viewed and imaged using an Olympus BX61 upright light microscope and Q imaging Retiga Exi camera with InVivo 3.2.0 software (Media Cybernetics)."
+    whyMissed: "Specific imaging software with version number and vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1[+/-]+.*mouse|mouse.*Nf1[+/-]+"
+    toolType: "animal_model"
+    examples: ["Nf1+/- mouse model", "Nf1Dsk9/+ mice"]
+    reasoning: "NF1 mouse models use specific genetic nomenclature that should be captured as research tools rather than disease references"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies.*purchased from|primary antibodies for.*from"
+    toolType: "antibody"
+    examples: ["antibodies...purchased from New England Biolabs", "primary antibodies for p44/42 MAPK"]
+    reasoning: "Vendor information strongly indicates actual antibody reagents being used in experiments"
+
+  - patternType: "term"
+    pattern: "Image-Pro Plus|ImageJ.*version|InVivo.*software"
+    toolType: "computational_tool"
+    examples: ["Image-Pro Plus software", "ImageJ1.45s, version 1.44p", "InVivo 3.2.0 software"]
+    reasoning: "Specific image analysis software with version numbers are clear computational tools"
+
+observations:
+  - resourceName: "Nf1+/- mouse model (Nf1Dsk9/+)"
+    resourceType: "Animal Model"
+    observationType: "Reproductive Behavior"
+    observationTypeOntologyId: "MP:0001919"
+    details: |
+      Nf1+/- male mice showed significantly reduced fertility with fewer pups per litter compared to Nf1+/+ control males. The reduced fertility was associated with disorganization of the seminiferous epithelium, with exfoliation of germ cells and immature spermatids into the tubule lumen.
+    foundIn: "both"
+    contextSnippet: "We found that although Nf1+/- male mice are able to reproduce, they have significantly fewer pups per litter than Nf1+/+ control males. Reduced fertility in Nf1+/- male mice is associated with disorganization of the seminiferous epithelium"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1+/- mouse model (Nf1Dsk9/+)"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Morphometric analysis showed that alterations in spermatogenesis were associated with decreased Leydig cell numbers and increased spermatid cell numbers in Nf1+/- males compared to controls.
+    foundIn: "both"
+    contextSnippet: "Morphometric analysis shows that these alterations are associated with decreased Leydig cell numbers and increased spermatid cell numbers"
+    confidence: 0.90
+    doi: "10.1371/journal.pone.0208835"
+
+  - resourceName: "Nf1+/- mouse model (Nf1Dsk9/+)"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Nf1+/- males showed increased expression of phosphorylated ERK, a downstream effector of Ras, compared to control Nf1+/+ littermates. This finding is consistent with hyper-activation of Ras signaling affecting ectoplasmic specialization and spermiation.
+    foundIn: "both"
+    contextSnippet: "we found increased expression of phosphorylated ERK, a downstream effector of Ras that has been shown to alter ectoplasmic specialization, in Nf1+/- males in comparison to control Nf1+/+ littermates"
+    confidence: 0.95
+    doi: "10.1371/journal.pone.0208835"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 3
+  observationsExtracted: 3
+  observationsByType:
+    Reproductive Behavior: 1
+    Cellular: 1
+    Molecular: 1
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study with extensive Methods section
+    - Multiple research tools are clearly present including NF1 mouse model, antibodies, and computational tools
+    - The mining system appears to have missed obvious tool mentions with vendor information and version numbers
+  recommendations: |
+    All 7 potentially missed tools should be added to the database:
+    - The Nf1+/- mouse model is a well-characterized research tool, not just a disease reference
+    - Multiple antibodies with vendor information (New England Biolabs) are clear research reagents
+    - Image analysis software with version numbers are legitimate computational tools
+    - The observations extracted show meaningful phenotypic data from the mouse model
+    - Mining patterns should be updated to better capture NF mouse model nomenclature and antibody vendor contexts

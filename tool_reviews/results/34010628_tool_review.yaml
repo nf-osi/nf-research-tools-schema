@@ -1,0 +1,159 @@
+publicationMetadata:
+  pmid: "PMID:34010628"
+  title: "Stem-like cells drive NF1-associated MPNST functional heterogeneity and tumor progression."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive lab research study involving mouse models, cell culture, molecular biology,
+    bioinformatics analysis, and drug testing. Expected tools include genetically engineered mouse models,
+    cell lines, antibodies for immunostaining, computational tools for RNA-seq analysis, and potentially
+    organoid-like cultures (SKPs, spheres).
+  overallAssessment: |
+    This is a comprehensive laboratory research study investigating cancer stem cells in NF1-associated
+    tumors using multiple experimental approaches. The extensive Methods section describes mouse models,
+    cell culture, molecular biology techniques, bioinformatics analysis, and drug treatments, indicating
+    heavy use of research tools. Tools are expected across multiple categories including animal models,
+    cell lines, antibodies, and computational software.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 f/f ;Trp53 f/f ;Nes-TK mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "SKPs were isolated as previously reported from neonatal Nf1 f/f ; Trp53 f/f ;Nes-TK mice within 2 weeks of age"
+    whyMissed: "Complex genetically engineered mouse model with multiple alleles not captured by simple gene name patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1 f/f ;Trp53 f/f ;CGD mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "BC and DRG were harvested from the E13.5 embryos as described from Nf1 f/f ;Trp53 f/f ;CGD mice"
+    whyMissed: "Complex genetically engineered mouse model with reporter transgene not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "cisNP mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "A spontaneous MPNST GEMM, cisNP , was previously described ( Vogel et al., 1999 )"
+    whyMissed: "Specific mouse strain name not following standard nomenclature patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SKPs (Skin-derived Precursors)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "SKPs were isolated as previously reported ( Le et al., 2009 ) from neonatal Nf1 f/f ; Trp53 f/f ;Nes-TK mice"
+    whyMissed: "Primary cell culture system with specific isolation protocol, not standard cell line naming"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "STAR aligner"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The raw transcript counts were aligned to Refseq related to the build GRCh38-mm10 using STAR 2.4.2.8"
+    whyMissed: "Bioinformatics tool with version number not captured by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DeSeq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Differentially expressed genes between GFP+ and GFP- tumor populations were analyzed by paired experiment design in the DeSeq2 package"
+    whyMissed: "R package for differential expression analysis not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Seurat V3.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Data were analyzed by the Seurat V3.0 package in the R programming environment"
+    whyMissed: "Single-cell RNA-seq analysis package with version not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GSVA package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The ssgesa was calculated by the GSVA package with default settings"
+    whyMissed: "R package for gene set variation analysis not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "gentleMACS Octo Dissociator"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "dissociated by gentleMACS Octo Dissociator (Miltenyi Biotec) with 1 g/ml collagenase"
+    whyMissed: "Specialized laboratory equipment with vendor name not captured"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+  - toolName: "S3e sorter"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "GFP+ and GFP- cells from the same tumor were analyzed and sorted by the S3e sorter (BioRad)"
+    whyMissed: "Flow cytometry equipment with vendor name not captured"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+\\s*[f/f|+/-|tm\\d+].*mice"
+    toolType: "animal_model"
+    examples: ["Nf1 f/f ;Trp53 f/f ;Nes-TK mice", "Nf1 f/f ;Trp53 f/f ;CGD mice"]
+    reasoning: "Captures complex genetically engineered mouse models with multiple alleles and transgenes"
+
+  - patternType: "context_phrase"
+    pattern: "analyzed by.*package|using.*package|with.*package"
+    toolType: "computational_tool"
+    examples: ["analyzed by paired experiment design in the DeSeq2 package", "calculated by the GSVA package"]
+    reasoning: "Identifies R/Python packages used for data analysis in bioinformatics workflows"
+
+  - patternType: "term"
+    pattern: "STAR\\s+\\d+\\.\\d+\\.\\d+|DeSeq2|Seurat\\s+V?\\d+\\.\\d+|GSVA"
+    toolType: "computational_tool"
+    examples: ["STAR 2.4.2.8", "DeSeq2 package", "Seurat V3.0", "GSVA package"]
+    reasoning: "Captures specific bioinformatics tools commonly used in RNA-seq and single-cell analysis"
+
+  - patternType: "context_phrase"
+    pattern: "isolated as previously reported|cultured in.*medium|embedded into.*mice"
+    toolType: "cell_line"
+    examples: ["SKPs were isolated as previously reported", "cultured in serum-free media"]
+    reasoning: "Identifies primary cell cultures and specialized cell isolation procedures"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\([A-Za-z]+\\s+Biotec\\)|\\(BioRad\\)|\\(Miltenyi\\s+Biotec\\)"
+    toolType: "genetic_reagent"
+    examples: ["gentleMACS Octo Dissociator (Miltenyi Biotec)", "S3e sorter (BioRad)"]
+    reasoning: "Captures specialized laboratory equipment with vendor information"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple genetically engineered mouse models with complex nomenclature were missed
+    - Several important bioinformatics tools (STAR, DeSeq2, Seurat, GSVA) were not captured
+    - Primary cell culture systems (SKPs) were not identified
+    - Laboratory equipment with vendor names was not recognized
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining.
+    The study uses multiple genetically engineered mouse models, primary cell cultures, and computational
+    tools that are highly relevant to NF research. The mining patterns need significant improvement to
+    capture complex mouse model nomenclature and bioinformatics workflows. All potentially missed tools
+    should be added to improve coverage of similar publications. The lack of any mined tools from such
+    a tool-rich publication indicates major gaps in the current mining approach.

@@ -1,0 +1,102 @@
+publicationMetadata:
+  pmid: "PMID:38173515"
+  title: "Development of a semi-automatic segmentation technique based on mean magnetic resonance imaging intensity thresholding for volumetric quantification of plexiform neurofibromas."
+  queryType: "clinical"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Bioinformatics Analysis → computational tools (software, pipelines, image analysis tools)
+    This publication develops a computational method for medical image analysis, specifically for
+    volumetric quantification of plexiform neurofibromas using MRI data. Expected tools include:
+    - Image analysis software (MATLAB, FSLeyes)
+    - Statistical analysis tools
+    - Custom algorithms/scripts for segmentation
+    - MRI analysis pipelines
+  overallAssessment: |
+    This is a methods development paper focused on creating a semi-automatic segmentation algorithm
+    for MRI-based tumor volume quantification. The publication develops computational tools and
+    compares different image analysis approaches, making it highly likely to contain research tools.
+    The Methods section describes detailed computational procedures and software usage.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MATLAB"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The SSTMean method consisted of 4 main steps that were implemented in a Matlab script (Version 9.9.0, Natick, MA)."
+    whyMissed: "MATLAB with specific version number (9.9.0) used for implementing the segmentation algorithm"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FSLeyes"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "For each MRI slice, the tumor was identified by drawing its contour(s) using the pencil tool from FSLeyes [25]."
+    whyMissed: "FSLeyes is a specialized neuroimaging visualization tool used for manual tumor tracing"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SSTMean"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A semi-automatic segmentation technique based on mean magnetic resonance imaging (MRI) intensity thresholding (SSTMean) was developed"
+    whyMissed: "Custom algorithm/method developed by the authors for tumor segmentation"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SSTMini"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "compared to a similar and previously published technique based on minimum image intensity thresholding (SSTMini)"
+    whyMissed: "Previously published segmentation algorithm used for comparison"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}[A-Za-z]*\\b.*\\(Version\\s+[0-9\\.]+.*\\)"
+    toolType: "computational_tool"
+    examples: ["Matlab script (Version 9.9.0, Natick, MA)"]
+    reasoning: "Software names with version numbers in parentheses indicate specific tool usage"
+
+  - patternType: "context_phrase"
+    pattern: "implemented in.*script|developed.*algorithm|technique.*based on"
+    toolType: "computational_tool"
+    examples: ["implemented in a Matlab script", "technique based on mean magnetic resonance imaging"]
+    reasoning: "Phrases indicating custom algorithm or method development"
+
+  - patternType: "term"
+    pattern: "FSLeyes|ImageJ|ITK-SNAP|3D Slicer|FreeSurfer"
+    toolType: "computational_tool"
+    examples: ["FSLeyes"]
+    reasoning: "Specialized neuroimaging and medical image analysis software commonly used in research"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a computational methods paper
+    - Multiple computational tools are clearly present in the Methods section
+    - MATLAB with specific version number used for algorithm implementation
+    - FSLeyes neuroimaging software used for manual segmentation validation
+    - Custom algorithms (SSTMean, SSTMini) developed/used for tumor segmentation
+  recommendations: |
+    All four potentially missed tools should be added to the mining results:
+    - MATLAB (v9.9.0) is clearly used for algorithm implementation
+    - FSLeyes is used for manual tumor tracing and validation
+    - SSTMean is the novel algorithm developed by the authors
+    - SSTMini is a comparison algorithm from previous work
+    The mining patterns need improvement to capture computational tools in medical imaging contexts.
+    No observations were extracted as no tools were initially validated, but the Results section
+    likely contains performance metrics for these computational tools.

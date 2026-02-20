@@ -1,0 +1,173 @@
+publicationMetadata:
+  pmid: "PMID:25329635"
+  title: "Genetic modifiers of neurofibromatosis type 1-associated café-au-lait macule count identified using multi-platform analysis."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This publication involves molecular biology techniques including:
+    - Lymphoblastoid cell lines (LCLs) for gene expression analysis
+    - Microarray analysis and qPCR validation
+    - DNA sequencing and SNP genotyping
+    - Computational analysis tools for statistical analysis
+    - Clinical assessment tools for phenotype quantification
+  overallAssessment: |
+    This is a comprehensive genetic association study combining laboratory molecular biology techniques with clinical phenotyping. The study uses lymphoblastoid cell lines, gene expression profiling, DNA sequencing, and statistical analysis tools. Clinical assessment tools are used for quantifying NF1 phenotypes including café-au-lait macule counts. Multiple tool types are expected across laboratory reagents, computational analysis, and clinical assessment categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Lymphoblastoid cell lines (LCLs)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Lymphoblastoid cell lines (LCLs) from the first 79 participants (\"EXPR\") were used in the gene expression screen to identify putative modifiers."
+    whyMissed: "Cell line terminology not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HumanRef-8_v2 Sentrix BeadChips"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Amplified biotinylated cRNA (1.5 µg) was hybridized to HumanRef-8_v2 Sentrix BeadChips."
+    whyMissed: "Specific microarray chip model not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Illumina Human OmniQuad-1M SNP-arrays"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "For genotyping DPH2 SNPs rs4660761 and rs7161, we used genotyping calls obtained from Illumina Human OmniQuad-1M SNP-arrays."
+    whyMissed: "SNP array platform not captured by initial patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Ion Torrent PGM Sequencer"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Individual samples were barcoded, pooled, templated, and sequenced on the Ion Torrent PGM Sequencer using the Ion PGM Template OT2 200"
+    whyMissed: "Sequencing platform not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "TRAP (Tiled Regression Analysis Package)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "\"Tiled Regression\" as implemented in TRAP (Tiled Regression Analysis Package) was used to identify the set of independent significant variants"
+    whyMissed: "Specialized statistical software not captured"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "GenomeStudio (v. 2010.2)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "SNP-array analysis was done according to the manufacturer's protocol using GenomeStudio (v. 2010.2) software (Illumina)."
+    whyMissed: "Illumina analysis software not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Ion Ampliseq Designer v3.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A targeted, multiplex PCR primer panel was designed using the custom Ion Ampliseq Designer v3.0 (Thermo Fisher Scientific"
+    whyMissed: "Primer design software not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "PedCheck"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "In those cases in which family data were available, SNVs were checked for Mendelian segregation with PedCheck"
+    whyMissed: "Genetics analysis software not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "PEDSTATS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Hardy-Weinberg equilibrium (HWE) proportions were tested with PEDSTATS on 70 unrelated individuals."
+    whyMissed: "Statistical genetics software not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "Wood's lamp examination"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The number, size and distribution of CALM and other dermatologic abnormalities were counted, measured and mapped with a Wood's lamp and ruler in a darkened room."
+    whyMissed: "Clinical examination tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Slit-lamp examination"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "A slit-lamp exam was used to enumerate and photograph Lisch nodules in the eye, as previously described"
+    whyMissed: "Ophthalmologic examination tool not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "NF1 consensus criteria"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The DISC and REP1 cohorts were comprised of adults meeting the consensus criteria for the diagnosis of NF1"
+    whyMissed: "Clinical diagnostic criteria not captured"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "lymphoblastoid cell line[s]?"
+    toolType: "cell_line"
+    examples: ["Lymphoblastoid cell lines (LCLs)"]
+    reasoning: "LCLs are commonly used research tools in genetic studies but may not be captured by standard cell line patterns"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+-[0-9]+_v[0-9]+ [A-Za-z]+ BeadChips?"
+    toolType: "genetic_reagent"
+    examples: ["HumanRef-8_v2 Sentrix BeadChips"]
+    reasoning: "Illumina microarray chip naming convention not captured by current patterns"
+
+  - patternType: "naming_convention"
+    pattern: "Ion [A-Za-z0-9]+ [A-Za-z0-9]+ Sequencer"
+    toolType: "genetic_reagent"
+    examples: ["Ion Torrent PGM Sequencer"]
+    reasoning: "Ion Torrent sequencing platform naming convention"
+
+  - patternType: "context_phrase"
+    pattern: "Wood's lamp (examination|exam)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Wood's lamp exam"]
+    reasoning: "Dermatological examination tool commonly used in NF1 research"
+
+  - patternType: "context_phrase"
+    pattern: "slit-lamp (examination|exam)"
+    toolType: "clinical_assessment_tool"
+    examples: ["slit-lamp exam"]
+    reasoning: "Ophthalmologic examination tool for Lisch nodules in NF1"
+
+  - patternType: "context_phrase"
+    pattern: "consensus criteria for.*diagnosis"
+    toolType: "clinical_assessment_tool"
+    examples: ["consensus criteria for the diagnosis of NF1"]
+    reasoning: "Clinical diagnostic criteria are assessment tools"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive laboratory study
+    - Multiple categories of research tools are present but were missed by initial mining
+    - Cell lines, genetic reagents, computational tools, and clinical assessment tools all present
+    - Specialized equipment and software tools not captured by current patterns
+  recommendations: |
+    This publication contains numerous research tools across multiple categories that were completely missed by initial mining. The study uses lymphoblastoid cell lines, specialized microarray and sequencing platforms, statistical genetics software, and clinical assessment tools. All 12 potentially missed tools should be added as they represent genuine research tools used in the study. The suggested patterns would significantly improve capture of similar tools in genetic association studies. No observations were extracted since no tools were initially validated, but this publication would likely contain valuable observations about tool performance and usage once tools are properly identified.

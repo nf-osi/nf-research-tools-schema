@@ -1,0 +1,126 @@
+publicationMetadata:
+  pmid: "PMID:18670322"
+  title: "Vestibular schwannoma quantitative polymerase chain reaction expression of estrogen and progesterone receptors."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study using qRT-PCR to analyze gene expression in tumor samples.
+    Expected tools include: PCR reagents, primers/probes, thermal cyclers, detection systems,
+    RNA extraction kits, reverse transcription kits, and analysis software.
+  overallAssessment: |
+    This is a laboratory research study using quantitative RT-PCR to analyze estrogen and progesterone
+    receptor expression in vestibular schwannoma tissues. The detailed Methods section describes
+    extensive molecular biology procedures including RNA extraction, reverse transcription, and
+    qRT-PCR analysis, indicating high likelihood of research tool usage.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Trizol reagent"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Subsequently, total RNA was extracted from VS and control nerve samples using the Trizol reagent (Gibco Invitrogen, Carlsbad, CA) per the manufacturer's instructions."
+    whyMissed: "RNA extraction reagent with vendor information - specific molecular biology tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Gene AMP kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "mRNA (5 μg per 50 μL sample) was reverse transcribed using the Gene AMP kit (Perkin-Elmer; Waltham, MA) in a DNA Engine Peltier Thermal cycler"
+    whyMissed: "Reverse transcription kit with vendor information - specific molecular biology reagent"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "DNA Engine Peltier Thermal cycler (PTC-200)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "reverse transcribed using the Gene AMP kit (Perkin-Elmer; Waltham, MA) in a DNA Engine Peltier Thermal cycler (PTC-200; MJ Research, Watertown, MA)"
+    whyMissed: "Thermal cycler equipment with model number and vendor - laboratory instrument"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Taqman Universal PCR Master Mix"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "In each Q-PCR reaction, Taqman Universal PCR Master Mix (2× buffer containing polymerase; Applied Biosystems, Foster City, CA) was used"
+    whyMissed: "PCR master mix reagent with vendor information - specific molecular biology reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Taqman Gene Expression Assays"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "20× solution of primers and fluorophor-labeled probe (Taqman Gene Expression Assays; Applied Biosystems, Foster City, CA) for both the transcript encoding the receptor"
+    whyMissed: "Pre-designed primer/probe assays with vendor information - specific molecular biology reagents"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ABI Prism 7,000 Sequence Detection System"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "An ABI Prism 7,000 Sequence Detection System was used for all reactions with the following cycling parameters"
+    whyMissed: "qPCR detection system with specific model - laboratory instrument"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Microsoft Excel program"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Results were analyzed using a Microsoft Excel program designed for Q-PCR quantitation based on internal control mRNA levels"
+    whyMissed: "Custom Excel program for qPCR analysis - computational analysis tool"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+\\s+\\([^)]*(?:Invitrogen|Applied Biosystems|Perkin-Elmer|MJ Research|Gibco)[^)]*\\)"
+    toolType: "genetic_reagent"
+    examples: ["Trizol reagent (Gibco Invitrogen, Carlsbad, CA)", "Gene AMP kit (Perkin-Elmer; Waltham, MA)"]
+    reasoning: "Captures molecular biology reagents and equipment with vendor information in parentheses"
+
+  - patternType: "term"
+    pattern: "\\b(?:Taqman|TaqMan)\\s+[A-Z][a-zA-Z\\s]+(?:Master Mix|Gene Expression Assays|Assays)"
+    toolType: "genetic_reagent"
+    examples: ["Taqman Universal PCR Master Mix", "Taqman Gene Expression Assays"]
+    reasoning: "Captures TaqMan-branded molecular biology reagents commonly used in qPCR"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z]{2,}\\s+[A-Z][a-z]+\\s+\\d+[,\\d]*\\s+Sequence Detection System"
+    toolType: "genetic_reagent"
+    examples: ["ABI Prism 7,000 Sequence Detection System"]
+    reasoning: "Captures qPCR detection systems with standard naming convention"
+
+  - patternType: "context_phrase"
+    pattern: "(?:extracted|isolated)\\s+(?:using|with)\\s+(?:the\\s+)?([A-Z][a-zA-Z\\s]+(?:reagent|kit))"
+    toolType: "genetic_reagent"
+    examples: ["extracted from VS and control nerve samples using the Trizol reagent"]
+    reasoning: "Captures extraction reagents and kits used in molecular biology procedures"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple molecular biology reagents, kits, and equipment mentioned with vendor information
+    - Methods section contains detailed protocols indicating extensive tool usage
+    - Mining patterns appear to miss standard molecular biology reagents and equipment
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    The study uses standard molecular biology techniques with specific reagents, kits, and equipment
+    that should be captured. All 7 potentially missed tools should be added as they represent
+    legitimate research tools with vendor information and clear experimental usage context.
+    The suggested patterns would help capture similar molecular biology tools in future mining.
+    No observations were extracted since no tools were initially validated.

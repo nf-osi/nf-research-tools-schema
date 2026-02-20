@@ -1,0 +1,193 @@
+publicationMetadata:
+  pmid: "PMID:28256556"
+  title: "An inflammatory gene signature distinguishes neurofibroma Schwann cells and macrophages from cells in the normal peripheral nervous system."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a comprehensive molecular biology study involving:
+    - Animal models (Nf1 knockout mice)
+    - Cell sorting and analysis (antibodies for FACS)
+    - Gene expression profiling (microarrays)
+    - Computational analysis (multiple software tools)
+    - Cell culture and functional assays
+    All major tool categories except clinical assessment tools are expected.
+  overallAssessment: |
+    This is a sophisticated lab research study combining mouse genetics, cell biology, and bioinformatics to study neurofibroma pathogenesis. The comprehensive Methods section describes extensive experimental procedures including animal models, cell sorting, gene expression analysis, and computational tools. Multiple research tool categories are expected and likely present throughout the study.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1fl/fl;DhhCre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "All mice were maintained on the C57Bl/6 background from Harlan laboratories (Indianapolis, IN), by in-house breeding to Nf1 and fl/ + DhhCre to obtain Nf1 fl/fl ;DhhCre or Nf1 mice"
+    whyMissed: "Specific mouse strain nomenclature with conditional knockout alleles not captured by initial mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "anti-CD11b antibody (8G12/HPCA-2)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "We incubated the dissociated mouse DRG/neurofibroma cell suspensions with anti-mouse monoclonal antibodies against CD11b (8G12/HPCA-2, Becton–Dickinson; San Jose, CA) bound to allophycocyanin (APC)"
+    whyMissed: "Specific antibody clone designation and vendor information not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "anti-p75/NGFR antibody (C40-1457)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "anti-p75/NGFR (C40-1457, Becton–Dickinson) bound to phycoerythrin (PE), anti-F4/80 bound to Cy5.5 on ice in a solution containing phosphate-buffered saline"
+    whyMissed: "Specific antibody clone with catalog number not captured"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "FACSCanto"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We acquired cell suspensions in a dual-laser (Argon 488 and dye laser 630 or HeNe 633) FACSCanto (Becton–Dickinson) and analyzed on an 'alive' gate"
+    whyMissed: "Flow cytometry instrument name not captured by software patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Affymetrix Mouse Gene 2.0 ST array"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "All the probe sets on Affymetrix Mouse Gene 2.0 ST array (Mogene-2_0-st-v1.na33.2.mm10) were summarized by the Affymetrix Expression Console program"
+    whyMissed: "Microarray platform name not captured by genetic reagent patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "limma package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Bioconductor/R limma package was used to define DEGs between two groups. Genes were considered differentially expressed when they passed two cutoff criteria"
+    whyMissed: "R/Bioconductor package name not captured by computational tool patterns"
+    confidence: 0.92
+    shouldBeAdded: Yes
+
+  - toolName: "WebGestalt"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Gene set enrichment analysis was performed using the WebGestalt webserver (http://bioinfo.vanderbilt.edu/webgestalt/). DEG sets were queried against the KEGG database"
+    whyMissed: "Web-based analysis tool with URL not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ComBat method"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "After preprocessing steps, data from two batches were combined and their batch effects were corrected using ComBat method implemented in Bioconductor's sva package"
+    whyMissed: "Specific computational method within R package not captured"
+    confidence: 0.88
+    shouldBeAdded: Yes
+
+  - toolName: "GraphViz"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The final interaction map was automatically generated using in-house Perl script and the GraphViz graph package (http://www.graphviz.org)"
+    whyMissed: "Graph visualization software with URL not captured"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The intensities of the white dots that were converted from the original black dots were measured using ImageJ software"
+    whyMissed: "Common image analysis software not captured"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+fl/fl;[A-Za-z0-9]+Cre\\b"
+    toolType: "animal_model"
+    examples: ["Nf1fl/fl;DhhCre"]
+    reasoning: "Captures conditional knockout mouse strain nomenclature with floxed alleles and Cre recombinase"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Za-z0-9/]+ \\([A-Za-z0-9-]+\\)"
+    toolType: "antibody"
+    examples: ["anti-CD11b (8G12/HPCA-2)", "anti-p75/NGFR (C40-1457)"]
+    reasoning: "Captures antibody names with clone designations in parentheses"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Za-z]+ package\\b"
+    toolType: "computational_tool"
+    examples: ["limma package", "sva package"]
+    reasoning: "Identifies R/Bioconductor packages commonly used in genomics analysis"
+
+  - patternType: "term"
+    pattern: "\\bAffymetrix [A-Za-z0-9 ]+array\\b"
+    toolType: "genetic_reagent"
+    examples: ["Affymetrix Mouse Gene 2.0 ST array"]
+    reasoning: "Captures specific microarray platform names from Affymetrix"
+
+  - patternType: "context_phrase"
+    pattern: "using [A-Za-z]+ software"
+    toolType: "computational_tool"
+    examples: ["using ImageJ software"]
+    reasoning: "Common phrase pattern for software usage in methods sections"
+
+observations:
+  - resourceName: "Nf1fl/fl;DhhCre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Neurofibroma formation observed in 7-month-old Nf1fl/fl;DhhCre mice. Both Schwann cells and macrophages showed significantly altered cytokine gene expression in neurofibromas compared to normal nerve tissue. Network analysis revealed inflammation-associated pathways were enriched in neurofibroma tissue.
+    foundIn: "both"
+    contextSnippet: "both macrophages and SCs showed significantly altered cytokine gene expression in neurofibromas. Computationally reconstructed SC-macrophage molecular networks were enriched for inflammation-associated pathways"
+    confidence: 0.95
+    doi: "10.1038/srep43315"
+
+  - resourceName: "Nf1fl/fl;DhhCre mice"
+    resourceType: "Animal Model"
+    observationType: "Molecular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Treatment with PEGylated interferon-α2b reduced expression of many cytokines overexpressed in neurofibroma. Type-I interferon signaling was decreased in neurofibromas, and interferon treatment partially restored normal cytokine expression patterns.
+    foundIn: "both"
+    contextSnippet: "treatment of neurofibroma-bearing mice with polyethylene glycolyated (PEGylated) type-I interferon-α2b reduces the expression of many cytokines overexpressed in neurofibroma"
+    confidence: 0.92
+    doi: "10.1038/srep43315"
+
+  - resourceName: "limma package"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Used for differential gene expression analysis with specific cutoff criteria: FDR q < 0.05 and fold change >2x. Successfully identified differentially expressed genes between neurofibroma and normal tissue samples.
+    foundIn: "results"
+    contextSnippet: "The Bioconductor/R limma package was used to define DEGs between two groups. Genes were considered differentially expressed when they passed two cutoff criteria (FDR q < 0.05 and fold change >2x)"
+    confidence: 0.88
+    doi: "10.1038/srep43315"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 3
+  observationsByType:
+    Tumor Growth: 1
+    Molecular: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Initial mining completely missed this tool-rich publication
+    - Multiple categories of tools present: animal models, antibodies, computational tools, genetic reagents
+    - Sophisticated experimental design with extensive tool usage not captured
+    - Methods section contains detailed protocols with specific tool names, vendors, and catalog numbers
+  recommendations: |
+    This publication represents a significant mining failure - it contains numerous high-quality research tools across multiple categories that were completely missed. The suggested patterns should be implemented to capture:
+    1. Mouse strain nomenclature with conditional alleles
+    2. Antibody clone designations with vendors
+    3. R/Bioconductor package names
+    4. Microarray platform names
+    5. Common software usage phrases
+    All potentially missed tools should be added as they represent genuine research tools with clear experimental usage context.

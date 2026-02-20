@@ -1,0 +1,166 @@
+publicationMetadata:
+  pmid: "PMID:8582272"
+  title: "Neurofibromin-deficient fibroblasts fail to form perineurium in vitro."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory research study using transgenic mouse models, cell culture systems, and molecular biology techniques. Expected tools include animal models (Nf1 knockout mice), cell lines (primary fibroblasts, Schwann cells), and potentially genetic reagents. The study involves complex co-culture systems and microscopy analysis.
+  overallAssessment: |
+    This is a laboratory research study investigating neurofibromatosis using transgenic mouse models and cell culture systems. The publication describes experimental procedures including animal model generation, cell isolation, co-culture systems, and microscopy analysis. Multiple research tools are expected including animal models, cell lines, and reagents for cell culture and analysis.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1 knockout mice"
+    toolType: "animal_model"
+    foundIn: "abstract"
+    contextSnippet: "cell cultures containing neurons. Schwann cells and fibroblasts from transgenic mouse embryos in which the type 1 neurofibromatosis gene was disrupted by homologous recombination"
+    whyMissed: "Described as 'transgenic mouse embryos' with gene disruption rather than standard knockout nomenclature"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6J mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "C57BL/6J mice in which one allele of the NF1 gene has been targeted were generated as described elsewhere"
+    whyMissed: "Standard mouse strain name not caught by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(+/-) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "In order to obtain Nf1 (−/−) embryos, male and female Nf1 (+/−) mice were mated"
+    whyMissed: "Genetic nomenclature with parentheses and symbols not recognized"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1(-/-) embryos"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "In order to obtain Nf1 (−/−) embryos, male and female Nf1 (+/−) mice were mated"
+    whyMissed: "Knockout embryo designation not caught by patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Primary Schwann cells"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Primary Schwann cells were purified from sciatic nerve from postnatal day 1 rats as described previously"
+    whyMissed: "Primary cell type not recognized as cell line tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Mouse embryonic fibroblasts"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Fibroblasts from E12.5 mouse embryos were obtained when embryos were dissected for DRG preparation"
+    whyMissed: "Primary fibroblast cultures not caught by cell line patterns"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "DRG cultures"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The spinal cord with dorsal root ganglia (DRG) attached was removed and DRG enzymatically dissociated"
+    whyMissed: "Primary neuronal cultures from dorsal root ganglia not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Taq polymerase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "0.25 units of Taq polymerase (Perkin-Elmer Cetus) and a mixture of dATP, dCTP, dGTP and dTTP"
+    whyMissed: "PCR reagent with vendor information not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "PCR primers (NeoTkp, NF31a, NF31b)"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "200 ng of each oligonucleotide primer (NeoTkp, NF31a, NF31b) ( Brannan et al., 1994 )"
+    whyMissed: "Specific primer names not recognized by patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "Nf1\\s*\\([+\\-/]+\\)\\s*(mice|embryos|fibroblasts)"
+    toolType: "animal_model"
+    examples: ["Nf1 (+/−) mice", "Nf1 (−/−) embryos"]
+    reasoning: "Genetic nomenclature with parentheses and +/- symbols is standard for knockout mouse strains but not caught by current patterns"
+
+  - patternType: "context_phrase"
+    pattern: "primary\\s+(\\w+\\s+)?cells?\\s+(were\\s+)?(purified|isolated|obtained)\\s+from"
+    toolType: "cell_line"
+    examples: ["Primary Schwann cells were purified from", "primary fibroblasts obtained from"]
+    reasoning: "Primary cell cultures are important research tools but may not be caught by standard cell line patterns"
+
+  - patternType: "term"
+    pattern: "DRG\\s+(cultures?|neurons?)"
+    toolType: "cell_line"
+    examples: ["DRG cultures", "DRG neurons"]
+    reasoning: "Dorsal root ganglia cultures are specialized neuronal culture systems commonly used in NF research"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(Taq|DNA)\\s+polymerase\\s*\\([^)]*\\)"
+    toolType: "genetic_reagent"
+    examples: ["Taq polymerase (Perkin-Elmer Cetus)"]
+    reasoning: "PCR reagents with vendor information should be captured as genetic reagents"
+
+  - patternType: "term"
+    pattern: "oligonucleotide\\s+primer[s]?\\s*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["oligonucleotide primer (NeoTkp, NF31a, NF31b)"]
+    reasoning: "Specific primer names in parentheses indicate custom genetic reagents"
+
+observations:
+  - resourceName: "Nf1 knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Normal fascicle formation by perineurial cells failed to occur in the absence of neurofibromin. Fascicles were reduced in number and showed abnormal morphology when normal neurons and Schwann cells were cultured with fibroblasts lacking neurofibromin for up to 37 days.
+    foundIn: "both"
+    contextSnippet: "Normal fascicle formation by perineurial cells failed to occur in the absence of neurofibromin. Fascicles were reduced in number and showed abnormal morphology"
+    confidence: 0.95
+    doi: "10.1242/dev.121.11.3583"
+
+  - resourceName: "Nf1 knockout mice"
+    resourceType: "Animal Model"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Proliferation was increased in a majority of fibroblast cell strains analyzed from embryos lacking neurofibromin. This suggests that mutations in the neurofibromatosis type I gene affect fibroblast behavior that might contribute to neurofibroma formation.
+    foundIn: "both"
+    contextSnippet: "Proliferation was increased in a majority of fibroblast cell strains analyzed from embryos lacking neurofibromin"
+    confidence: 0.9
+    doi: "10.1242/dev.121.11.3583"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 9
+  newPatternsCount: 5
+  observationsExtracted: 2
+  observationsByType:
+    Cellular: 2
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study with extensive use of research tools
+    - Multiple animal models (knockout mice strains) were missed due to genetic nomenclature not being recognized
+    - Primary cell culture systems were not captured by current cell line patterns
+    - PCR reagents and primers with specific names and vendors were not identified
+    - The mining patterns appear to miss standard laboratory research tools used in NF research
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining. The suggested patterns should be implemented to capture:
+    1. Genetic nomenclature for knockout mouse strains (Nf1+/-, Nf1-/-)
+    2. Primary cell culture systems (Schwann cells, fibroblasts, DRG cultures)
+    3. PCR reagents and custom primers with vendor information
+    4. Standard mouse strain names (C57BL/6J)
+    All potentially missed tools should be added as they represent legitimate research tools used in this study. The observations extracted show clear phenotypic differences in the knockout model system.

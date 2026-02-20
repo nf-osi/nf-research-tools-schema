@@ -1,0 +1,114 @@
+publicationMetadata:
+  pmid: "PMID:33507822"
+  title: "NF106: A Neurofibromatosis Clinical Trials Consortium Phase II Trial of the MEK Inhibitor Mirdametinib (PD-0325901) in Adolescents and Adults With NF1-Related Plexiform Neurofibromas."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (patient-reported outcome measures, pain scales, quality of life instruments), computational tools for pharmacokinetic analysis and statistical modeling
+    
+    This phase II clinical trial would be expected to use validated clinical assessment instruments to measure patient outcomes, pain, and quality of life. Additionally, computational tools for pharmacokinetic modeling and statistical analysis would be standard.
+  overallAssessment: |
+    This is a phase II clinical trial testing mirdametinib in NF1 patients with plexiform neurofibromas. Clinical trials routinely use validated assessment tools to measure patient outcomes, including pain scales and quality of life instruments. The study also involves pharmacokinetic analysis which requires computational modeling tools. While no traditional lab research tools are expected, clinical assessment tools are legitimate research instruments in this context.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Numerical Rating Scale-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Numerical Rating Scale-11 is a self-report measure of pain intensity that was adapted to assess PN-related pain for NF1 clinical trials. Patients were asked to choose their most important tumor pain and rate it from 0 (no pain) to 10 (worst pain) in the past week."
+    whyMissed: "Specific validated pain assessment scale with clear administration protocol"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Brief Pain Inventory Pain Interference subscale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Brief Pain Inventory Pain Interference subscale assesses the impact of pain on daily functioning in seven areas from 0 (does not interfere) to 10 (completely interfered) in the past week; it yields a mean total score."
+    whyMissed: "Validated pain interference assessment instrument with specific scoring methodology"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Pediatric Quality of Life Inventory NF1 module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The Pediatric Quality of Life Inventory NF1 module is a disease-specific health-related quality-of-life (QOL) measure assessing 16 domains. Responses on a five-point Likert scale are transformed to a scale of 0-100 (higher scores = better QOL); it produces mean domain and total scores."
+    whyMissed: "Disease-specific validated quality of life assessment tool with detailed scoring system"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Phoenix WinNonlin"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A noncompartmental analysis was performed to estimate area under the concentration-time curve from time 0 to 12 hours (AUC 0-12h) after a single dose of mirdametinib using Phoenix WinNonlin (Version 8.1; Certara, Princeton, NJ)."
+    whyMissed: "Specific pharmacokinetic analysis software with version number and vendor"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NONMEM"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "A population pharmacokinetics (PK) analysis was also performed using nonlinear mixed effect modeling with NONMEM (version 7.2; ICON, Ellicott City, MD) with Perl speaks NONMEM version 3.6.2 and Pirana version 2.7.1 (Certara)."
+    whyMissed: "Specialized pharmacokinetic modeling software with version and vendor information"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "National Cancer Institute Common Terminology Criteria for Adverse Events v4.0"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Adverse events (AEs) were graded according to National Cancer Institute Common Terminology Criteria for Adverse Events v4.0."
+    whyMissed: "Standardized clinical assessment tool for adverse event grading with version specification"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+Scale[-\\s]?\\d*\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Numerical Rating Scale-11"]
+    reasoning: "Pattern to capture numbered rating scales commonly used in clinical assessments"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+Inventory\\b.*\\bmodule\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["Pediatric Quality of Life Inventory NF1 module"]
+    reasoning: "Pattern to capture disease-specific modules of validated assessment inventories"
+
+  - patternType: "context_phrase"
+    pattern: "graded according to.*Criteria.*v\\d+\\.\\d+"
+    toolType: "clinical_assessment_tool"
+    examples: ["graded according to National Cancer Institute Common Terminology Criteria for Adverse Events v4.0"]
+    reasoning: "Context phrase indicating use of standardized clinical grading criteria"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\busing\\s+([A-Z][a-zA-Z]+\\s*[A-Z][a-zA-Z]+)\\s*\\(Version\\s+[\\d\\.]+;\\s*[^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["using Phoenix WinNonlin (Version 8.1; Certara, Princeton, NJ)"]
+    reasoning: "Pattern to capture software tools with version numbers and vendor information in pharmacokinetic analysis context"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 6
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a clinical trial with clear tool usage
+    - Multiple validated clinical assessment instruments were used but not detected
+    - Pharmacokinetic analysis software tools were missed despite detailed methodology
+    - Clinical assessment tools are legitimate research instruments but may be under-represented in current mining patterns
+  recommendations: |
+    All six potentially missed tools should be added as they represent legitimate research instruments:
+    - Three clinical assessment tools (NRS-11, Brief Pain Inventory, PedsQL NF1 module) are validated instruments
+    - Two computational tools (Phoenix WinNonlin, NONMEM) are specialized pharmacokinetic analysis software
+    - One clinical grading system (CTCAE v4.0) is a standardized assessment tool
+    Mining patterns should be enhanced to better capture clinical assessment instruments and pharmacokinetic analysis software.
+    No observations were extracted as no tools were initially validated, but the clinical outcomes data could provide valuable observations once tools are properly validated.

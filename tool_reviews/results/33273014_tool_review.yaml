@@ -1,0 +1,153 @@
+publicationMetadata:
+  pmid: "PMID:33273014"
+  title: "mTOR kinase inhibition disrupts neuregulin 1-ERBB3 autocrine signaling and sensitizes NF2-deficient meningioma cellular models to IGF1R inhibition."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study using cell lines, drug treatments, and molecular assays.
+    Expected tools include cell lines, antibodies, genetic reagents, and computational analysis tools.
+  overallAssessment: |
+    This is a laboratory research study investigating molecular mechanisms in NF2-deficient meningioma cells.
+    The study uses multiple cell lines, drug treatments, molecular biology techniques, and computational analysis.
+    High likelihood of containing genuine research tools including cell lines, antibodies, and analysis software.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Ben-Men-1"
+    toolType: "cell_line"
+    foundIn: "abstract"
+    contextSnippet: "...NF2-null human arachnoidal cells (ACs) and the MN cell line Ben-Men-1, particularly neuregulin-1/heregulin..."
+    whyMissed: "Cell line name not caught by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AC-CRISPR"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...Human cell lines included an NF2-null immortalized MN line Ben-Men-1, NF2 AC-CRISPR, and two independent human primary MN..."
+    whyMissed: "CRISPR-modified cell line not caught by patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MN1-LF"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "...we generated an immortalized human MN line, MN1-LF from an independent NF2-null human primary MN cell line..."
+    whyMissed: "Custom cell line name not in standard patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CSCW2"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...NF2 (isoform 1, NCBI accession # NM_000268) cloned into the lentiviral vector CSCW2 followed by packaging..."
+    whyMissed: "Lentiviral vector name not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "TRIzol reagent"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "...RNA was isolated from all MN-relevant lines using TRIzol reagent (15596026, ThermoFisher Scientific)..."
+    whyMissed: "Commercial reagent with catalog number not caught"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+  - toolName: "STAR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Sequence reads were aligned to human reference genome Ensembl GRCh37 (v.75), using STAR (v. 2.5.2a)..."
+    whyMissed: "Bioinformatics alignment tool with version not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "edgeR"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Differentially expressed genes in pair-wise comparisons were identified by edgeR's quasi-likelihood F test (v. 3.18.1)..."
+    whyMissed: "R package for differential expression analysis not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SynergyFinder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "...Synergy scores were generated using the web-based SynergyFinder application (https://synergyfinder.fimm.fi/)..."
+    whyMissed: "Web-based analysis tool with URL not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "anti-ERBB3 Y1197"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Antibodies recognizing ERRB3 Y1197, ERBB3, EPHA2 S897, NDRG1 T346, Akt S473, Akt T308..."
+    whyMissed: "Phospho-specific antibody not caught by patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "anti-NF2/merlin polyclonal antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "...Anti-NF2/merlin polyclonal antibody has been previously described..."
+    whyMissed: "Custom antibody description not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,4}-[A-Z][a-z]+-[0-9]+"
+    toolType: "cell_line"
+    examples: ["Ben-Men-1", "MN1-LF"]
+    reasoning: "Captures cell line naming convention with tissue/disease prefix and numerical suffix"
+
+  - patternType: "context_phrase"
+    pattern: "lentiviral vector [A-Z0-9]+"
+    toolType: "genetic_reagent"
+    examples: ["lentiviral vector CSCW2"]
+    reasoning: "Identifies viral vectors used for genetic manipulation"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Za-z]+ reagent \\([0-9]+, [A-Za-z ]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["TRIzol reagent (15596026, ThermoFisher Scientific)"]
+    reasoning: "Captures commercial reagents with catalog numbers and vendor information"
+
+  - patternType: "term"
+    pattern: "anti-[A-Z0-9/]+ (Y|S|T)[0-9]+"
+    toolType: "antibody"
+    examples: ["anti-ERBB3 Y1197", "anti-EPHA2 S897"]
+    reasoning: "Identifies phospho-specific antibodies with target and phosphorylation site"
+
+  - patternType: "context_phrase"
+    pattern: "using [A-Z]+ \\(v\\. [0-9\\.]+[a-z]*\\)"
+    toolType: "computational_tool"
+    examples: ["using STAR (v. 2.5.2a)", "using edgeR (v. 3.18.1)"]
+    reasoning: "Captures software tools with version numbers in analysis context"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple cell lines, antibodies, reagents, and computational tools are clearly present
+    - Mining patterns appear to have significant gaps for this type of molecular biology research
+  recommendations: |
+    This publication contains numerous genuine research tools that were completely missed by initial mining.
+    The study uses multiple cell lines (Ben-Men-1, AC-CRISPR, MN1-LF), commercial reagents with catalog numbers,
+    computational analysis tools with versions, and specific antibodies. All potentially missed tools should be added.
+    The suggested patterns would significantly improve mining coverage for similar molecular biology studies.
+    No observations were extracted since no tools were initially validated, but this study likely contains
+    valuable phenotypic and molecular observations that could be captured once tools are properly identified.

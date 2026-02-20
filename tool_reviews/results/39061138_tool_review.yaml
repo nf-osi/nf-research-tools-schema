@@ -1,0 +1,176 @@
+publicationMetadata:
+  pmid: "PMID:39061138"
+  title: "A Fibroblast-Derived Secretome Stimulates the Growth and Invasiveness of 3D Plexiform Neurofibroma Spheroids."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory research study using 3D cell culture models, so we expect:
+    - Cell lines (plexiform neurofibroma cell lines mentioned)
+    - Advanced cellular models (3D spheroids, organoids)
+    - Computational tools (imaging software, analysis tools)
+    - Genetic reagents (fluorescent proteins, vectors)
+    - Potentially antibodies for detection/analysis
+  overallAssessment: |
+    This is a laboratory research study investigating plexiform neurofibroma biology using 3D cell culture models.
+    The study involves cell lines, 3D culture systems, imaging, and molecular analysis, indicating high likelihood of research tools.
+    The comprehensive Methods section describes experimental procedures using various reagents, cell lines, and analytical tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ipNF95.11b C"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "The following immortalized human plexiform neurofibroma cell lines (hereafter called pNF1 cells) described in [ 36 ] were used: ipNF95.11b C, ipNF95.11b C-RFP, and ipNF 05.5."
+    whyMissed: "Specific cell line name following standard nomenclature not caught by initial mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ipNF95.11b C-RFP"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "ipNF95.11b C gifted from Dr. Margaret Wallace (University of Florida, USA) was lentivirally transduced with red fluorescent protein (RFP)"
+    whyMissed: "Modified cell line with fluorescent protein not caught by initial mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ipNF 05.5"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "ipNF95.11b C, ipNF95.11b C-RFP, and ipNF 05.5. ipNF95.11b C gifted from Dr. Margaret Wallace (University of Florida, USA)"
+    whyMissed: "Cell line name with space in nomenclature not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Cultrex TM"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Reduced growth factor reconstituted basement membrane (rBM; Cultrex TM ) and Collagen I (high concentration; rat tail) were purchased from Bio-Techne"
+    whyMissed: "Commercial basement membrane matrix product not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "CellTracker TM Orange"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "CellTracker TM  Orange, CellTrace TM  Far red, Hoechst33342, LookOut RT-PCR kits for mycoplasma detection"
+    whyMissed: "Cell tracking dye reagent not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "CellTrace TM Far red"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "CellTracker TM  Orange, CellTrace TM  Far red, Hoechst33342, LookOut RT-PCR kits for mycoplasma detection"
+    whyMissed: "Cell tracking dye reagent not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Zeiss LSM 780"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Optical sections of 9 or 16 contiguous fields, unless otherwise indicated, through the entire depth of the 3D structures were acquired using Zeiss LSM 780 (Carl Zeiss Microscopy, Jena, Germany)"
+    whyMissed: "Confocal microscope system not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Stellaris 5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "acquired using Zeiss LSM 780 (Carl Zeiss Microscopy, Jena, Germany) or Stellaris 5 (Leica Microsystems, Deerfield, IL, USA) confocal microscopes"
+    whyMissed: "Confocal microscope system not caught"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Volocity software 7.0.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were reconstructed in 3D using Volocity software 7.0.0 (PerkinElmer, Waltham, MA, USA). The number of total cells was quantified using Volocity."
+    whyMissed: "Image analysis software with version number not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "invaded cells were visualized using a Nikon Eclipse Ti-S microscope (Tokyo, Japan) and quantified using ImageJ software (NIH, Bethesda, MD, USA)"
+    whyMissed: "Standard image analysis software not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NanoSight NS300"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "sEV depletion was determined by version 3.3 Dev Build 3.3.104 Nanoparticle Tracking Analysis software (Malvern Panalytical Ltd., Malvern, UK) installed in NanoSight NS300"
+    whyMissed: "Nanoparticle tracking analysis instrument not caught"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "3D spheroid culture system"
+    toolType: "advanced_cellular_model"
+    foundIn: "methods"
+    contextSnippet: "We used a 3D rBM overlay model according to previous publications for live-cell imaging by confocal microscopy. Briefly, in 3D monocultures of pNF1 cells"
+    whyMissed: "3D culture system methodology not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "ipNF[0-9]{2}\\.[0-9]+[a-zA-Z]*"
+    toolType: "cell_line"
+    examples: ["ipNF95.11b C", "ipNF 05.5"]
+    reasoning: "Immortalized plexiform neurofibroma cell line naming convention commonly used in NF research"
+
+  - patternType: "term"
+    pattern: "CellTracker.*|CellTrace.*"
+    toolType: "genetic_reagent"
+    examples: ["CellTracker TM Orange", "CellTrace TM Far red"]
+    reasoning: "Commercial cell tracking dyes commonly used in cell biology research"
+
+  - patternType: "context_phrase"
+    pattern: "3D.*overlay model|3D.*culture.*system|spheroid.*culture"
+    toolType: "advanced_cellular_model"
+    examples: ["3D rBM overlay model", "3D spheroid culture system"]
+    reasoning: "3D culture methodologies are advanced cellular models that should be captured"
+
+  - patternType: "vendor_indicator"
+    pattern: "Cultrex.*|Matrigel.*basement membrane"
+    toolType: "genetic_reagent"
+    examples: ["Cultrex TM"]
+    reasoning: "Commercial basement membrane matrices are key reagents for 3D culture systems"
+
+  - patternType: "term"
+    pattern: "Volocity.*software|NanoSight.*|Stellaris.*microscope|LSM.*microscope"
+    toolType: "computational_tool"
+    examples: ["Volocity software 7.0.0", "NanoSight NS300", "Stellaris 5", "Zeiss LSM 780"]
+    reasoning: "Specialized imaging and analysis equipment commonly used in cell biology research"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a comprehensive lab research study
+    - Multiple cell lines with standard nomenclature were missed
+    - Commercial reagents and specialized equipment not detected
+    - 3D culture systems (advanced cellular models) not identified
+    - Image analysis software tools not captured
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    All 12 potentially missed tools should be added as they represent genuine research tools used in experiments.
+    The cell lines (ipNF95.11b C, ipNF95.11b C-RFP, ipNF 05.5) are well-characterized NF research tools.
+    The 3D culture system represents an advanced cellular model that should be captured.
+    Software tools like Volocity and ImageJ are computational tools used for analysis.
+    The suggested patterns would significantly improve mining accuracy for similar NF research publications.
+    No observations were extracted since no tools were initially validated, but this study likely contains valuable phenotypic data.

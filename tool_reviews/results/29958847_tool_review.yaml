@@ -1,0 +1,136 @@
+publicationMetadata:
+  pmid: "PMID:29958847"
+  title: "Radiomic biomarkers informative of cancerous transformation in neurofibromatosis-1 plexiform tumors."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → computational tools for image analysis, clinical assessment tools for patient evaluation
+    This study focuses on radiomic analysis of medical imaging data (MR, PET, CT) to distinguish malignant 
+    from benign tumors in NF1 patients. Expected tools include:
+    - Computational tools: image processing software, statistical analysis tools, registration pipelines
+    - Clinical assessment tools: imaging protocols, diagnostic criteria
+    - No lab research tools expected (no wet lab methods described)
+  overallAssessment: |
+    This is a clinical imaging study that develops computational methods for tumor classification in NF1 patients.
+    The study uses medical imaging data and computational analysis pipelines, making computational tools highly likely.
+    Clinical assessment tools may be present for patient evaluation and outcome measures.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Insight Toolkit (ITK)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The pipeline for PN identification was developed in-house using the Insight Toolkit ( www.itk.org/ ) interfacing with the medical imaging visualization suite"
+    whyMissed: "Specific software toolkit with URL mentioned in methods section for image processing pipeline development"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "3D Slicer"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "using the Insight Toolkit ( www.itk.org/ ) interfacing with the medical imaging visualization suite, Slicer ( www.slicer.org/ )"
+    whyMissed: "Medical imaging visualization software with URL, used for image processing and analysis"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Law's texture energy measures (LTEM)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image texture was quantified using Law's texture energy measures (LTEM), grey-level run length (GLRL), and neighborhood grey-tone difference matrices (NGTM)"
+    whyMissed: "Specific computational method for texture analysis in medical imaging"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "grey-level run length (GLRL)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image texture was quantified using Law's texture energy measures (LTEM), grey-level run length (GLRL), and neighborhood grey-tone difference matrices (NGTM)"
+    whyMissed: "Computational method for texture analysis in image processing"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "neighborhood grey-tone difference matrices (NGTM)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Image texture was quantified using Law's texture energy measures (LTEM), grey-level run length (GLRL), and neighborhood grey-tone difference matrices (NGTM)"
+    whyMissed: "Computational method for texture analysis in medical imaging"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "k-medoid clustering"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "feature reduction was performed using k-medoid clustering to remove statistically significant features were highly inter-correlated"
+    whyMissed: "Specific clustering algorithm used for feature reduction in data analysis"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "Jarque-Bera normality test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Normality of the feature was tested using the Jarque-Bera normality test and the Levene's test was used to test for equal variances"
+    whyMissed: "Specific statistical test method used in data analysis"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+  - toolName: "Levene's test"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Normality of the feature was tested using the Jarque-Bera normality test and the Levene's test was used to test for equal variances"
+    whyMissed: "Specific statistical test for variance equality"
+    confidence: 0.75
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "developed in-house using"
+    toolType: "computational_tool"
+    examples: ["developed in-house using the Insight Toolkit"]
+    reasoning: "Indicates custom development using specific software tools"
+
+  - patternType: "context_phrase"
+    pattern: "quantified using"
+    toolType: "computational_tool"
+    examples: ["Image texture was quantified using Law's texture energy measures"]
+    reasoning: "Common phrase indicating use of computational methods for quantitative analysis"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+'s [a-z]+ [a-z]+ [a-z]+\\b"
+    toolType: "computational_tool"
+    examples: ["Law's texture energy measures", "Levene's test"]
+    reasoning: "Pattern for named computational methods/algorithms in scientific literature"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\( www\\.[a-zA-Z0-9.-]+\\.[a-z]{2,} \\)"
+    toolType: "computational_tool"
+    examples: ["( www.itk.org/ )", "( www.slicer.org/ )"]
+    reasoning: "URLs in parentheses often indicate software tools with official websites"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 8
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a computational imaging study
+    - Multiple computational tools clearly present in methods section were missed
+    - Mining patterns appear insufficient for medical imaging and computational analysis tools
+    - Statistical analysis methods and image processing algorithms not captured
+  recommendations: |
+    This publication contains multiple computational tools that should be added:
+    - ITK and 3D Slicer are major medical imaging software platforms
+    - Texture analysis methods (LTEM, GLRL, NGTM) are specialized computational tools
+    - Statistical methods may be borderline but k-medoid clustering is specific enough to include
+    - Mining patterns need improvement for computational tools in medical imaging context
+    - No observations extracted as no tools were initially validated, but this study could provide
+      usage insights for medical imaging tools in NF1 research

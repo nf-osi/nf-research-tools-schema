@@ -1,0 +1,103 @@
+publicationMetadata:
+  pmid: "PMID:24980480"
+  title: "Novel age-dependent targets in vestibular schwannomas."
+  queryType: "unknown"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Bioinformatics Analysis → computational tools (software, pipelines, microarray analysis tools)
+    This study performs gene expression analysis using microarrays and RT-PCR, requiring:
+    - Microarray platforms (Affymetrix arrays)
+    - Data analysis software (R/Bioconductor packages)
+    - Statistical analysis tools
+    - PCR equipment and reagents
+    - RNA extraction and processing tools
+  overallAssessment: |
+    This is a bioinformatics analysis study comparing gene expression between early-onset and late-onset vestibular schwannoma patients. The study uses microarray technology and computational analysis tools, making it highly likely to contain research tools including microarray platforms, analysis software, and molecular biology reagents. Clinical assessment tools are unlikely given the focus on molecular analysis rather than patient outcomes.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Human Genome U133 Plus 2.0 Array"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RNA was extracted and cRNA were hybridized to Human Genome U133 Plus 2.0 Array (Affymetrix) for analysis of over 47,000 transcripts"
+    whyMissed: "Specific microarray platform with vendor name - this is a commercial genetic analysis reagent"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Bioconductor limma package"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The Bioconductor limma package [20] was used to preprocess the expression data from Human Genome U133 Plus 2.0 Affymetrix Array"
+    whyMissed: "Specific R/Bioconductor package for microarray analysis - computational tool with version reference"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "DNA Engine Opticon 2 Continuous Fluorescence Detection System"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "RT-qPCR was performed in the DNA Engine Opticon 2 Continuous Fluorescence Detection System (Bio-Rad, Hercules, CA, USA)"
+    whyMissed: "Specific PCR instrument with vendor and location - laboratory equipment for genetic analysis"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Human Universal Reference RNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sample RNA was processed in triplicate with serial dilutions of Human Universal Reference RNA (Stratagene, La Jolla, CA, USA)"
+    whyMissed: "Commercial RNA standard with vendor information - genetic reagent for RT-PCR normalization"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+ Genome U\\d+ Plus [\\d\\.]+\\s+Array\\b"
+    toolType: "genetic_reagent"
+    examples: ["Human Genome U133 Plus 2.0 Array"]
+    reasoning: "Captures Affymetrix microarray naming convention with genome type, chip version, and 'Array' designation"
+
+  - patternType: "context_phrase"
+    pattern: "\\bBioconductor\\s+\\w+\\s+package\\b"
+    toolType: "computational_tool"
+    examples: ["Bioconductor limma package"]
+    reasoning: "Identifies R/Bioconductor packages which are standard computational tools in genomics research"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b(DNA Engine|Opticon)\\s+\\w+.*Detection System\\b.*\\([^)]+Bio-Rad[^)]*\\)"
+    toolType: "genetic_reagent"
+    examples: ["DNA Engine Opticon 2 Continuous Fluorescence Detection System (Bio-Rad, Hercules, CA, USA)"]
+    reasoning: "Captures Bio-Rad PCR instruments with specific model names and vendor attribution"
+
+  - patternType: "term"
+    pattern: "\\bUniversal Reference RNA\\b.*\\([^)]+Stratagene[^)]*\\)"
+    toolType: "genetic_reagent"
+    examples: ["Human Universal Reference RNA (Stratagene, La Jolla, CA, USA)"]
+    reasoning: "Identifies commercial RNA standards used for normalization in expression studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a methods-heavy bioinformatics study
+    - Multiple clear research tools present in Methods section were missed
+    - Microarray platform, computational analysis packages, and laboratory instruments all overlooked
+    - Current mining patterns appear insufficient for capturing genomics/bioinformatics tools
+  recommendations: |
+    All four potentially missed tools should be added as they represent genuine research tools:
+    - Human Genome U133 Plus 2.0 Array: Commercial microarray platform for gene expression analysis
+    - Bioconductor limma package: Established computational tool for microarray data analysis
+    - DNA Engine Opticon 2: Laboratory instrument for RT-PCR analysis
+    - Human Universal Reference RNA: Commercial standard for RNA normalization
+    The suggested patterns would improve mining of genomics tools, Bioconductor packages, and laboratory instruments.
+    No observations were extracted as no tools were initially validated, but the study likely contains gene expression findings that could be captured once tools are properly identified.

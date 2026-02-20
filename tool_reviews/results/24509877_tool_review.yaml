@@ -1,0 +1,165 @@
+publicationMetadata:
+  pmid: "PMID:24509877"
+  title: "MAF mediates crosstalk between Ras-MAPK and mTOR signaling in NF1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular biology study investigating MAF transcription factor regulation in NF1-deficient MPNST cells.
+    Expected tools include cell lines (MPNST, NHSC), antibodies (MAF, pS6, etc.), genetic reagents (viral vectors, 
+    plasmids), and potentially computational tools for microarray analysis.
+  overallAssessment: |
+    This is a comprehensive lab research study with extensive Methods section describing cell culture, viral transduction,
+    immunoblotting, ChIP, xenograft experiments, and microarray analysis. The study clearly uses multiple research tools
+    including cell lines, antibodies, viral vectors, and animal models. Tools are expected and extensively documented.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "MPNST cell lines"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Normal human Schwann cells (NHSC) from trauma victims and MPNST cell lines were cultured as described"
+    whyMissed: "Generic reference to MPNST cell lines without specific names"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MPNST 88-14"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Chromatin immunoprecipitation (ChIP) MPNST 88-14 cells were cross-linked with 1% formaldehyde"
+    whyMissed: "Specific MPNST cell line name not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "S462-TY"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "1.5 ×10^6 MPNST S462-TY cells suspended in Matrigel (BD) and expressing pLVX control"
+    whyMissed: "Specific MPNST cell line name not caught by mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Normal human Schwann cells (NHSC)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Normal human Schwann cells (NHSC) from trauma victims and MPNST cell lines were cultured"
+    whyMissed: "Primary cell type not caught by standard cell line patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "athymic nude (nu/nu) mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "injected subcutaneously into the right flanks of 6 to 8-week-old female athymic nude (nu/nu) mice (Harlan)"
+    whyMissed: "Mouse strain nomenclature not caught by mining patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Ad-NF1-GRD"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "MPNST cells were infected with purified Ad-NF1-GRD or control Ad-GFP, in triplicate"
+    whyMissed: "Adenoviral vector construct not caught by genetic reagent patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "pLVX-Tight-Puro vector"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Inducible expression used lentiviral vectors containing the MAF ORF or empty pLVX-Tight-Puro vector (GeneCopoeia)"
+    whyMissed: "Lentiviral vector plasmid not caught by genetic reagent patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "MAF antibody (Imgenex)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Membranes were probed with antibodies for MAF (Imgenex), SOX9 (Santa Cruz)"
+    whyMissed: "Antibody with vendor specification not caught by antibody patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "S100β antibody (Dako)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Primary antibodies used were S100β (Dako), MBP (Chemicon), and BLBP (Millipore)"
+    whyMissed: "Antibody with vendor specification not caught by antibody patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "microscopic images acquired with ImageJ software (NIH) on a Zeiss Axiovert 200M"
+    whyMissed: "Common imaging software not caught by computational tool patterns"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "FlowJo software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Flow cytometry was performed on a FACSCanto (Becton Dickinson) and analyzed using FlowJo software"
+    whyMissed: "Flow cytometry analysis software not caught by computational tool patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "MPNST [A-Z0-9-]+"
+    toolType: "cell_line"
+    examples: ["MPNST 88-14", "MPNST S462-TY"]
+    reasoning: "MPNST cell lines follow specific naming conventions that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "antibodies? (?:for|against) [A-Z0-9β-]+ \\([^)]+\\)"
+    toolType: "antibody"
+    examples: ["antibodies for MAF (Imgenex)", "S100β (Dako)"]
+    reasoning: "Antibodies with vendor information in parentheses are commonly used format"
+
+  - patternType: "naming_convention"
+    pattern: "Ad-[A-Z0-9-]+"
+    toolType: "genetic_reagent"
+    examples: ["Ad-NF1-GRD", "Ad-GFP"]
+    reasoning: "Adenoviral vectors follow Ad- prefix naming convention"
+
+  - patternType: "naming_convention"
+    pattern: "pLVX-[A-Za-z0-9-]+"
+    toolType: "genetic_reagent"
+    examples: ["pLVX-Tight-Puro", "pLVX-Tet-On"]
+    reasoning: "Lentiviral expression vectors often use pLVX prefix"
+
+  - patternType: "naming_convention"
+    pattern: "athymic nude \\(nu/nu\\) mice"
+    toolType: "animal_model"
+    examples: ["athymic nude (nu/nu) mice"]
+    reasoning: "Specific immunodeficient mouse strain nomenclature for xenograft studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Mining patterns appear to miss many standard research tools including cell lines, antibodies, and genetic reagents
+    - Cell line naming conventions (MPNST 88-14, S462-TY) not captured
+    - Antibody mentions with vendor information not detected
+    - Viral vector constructs (Ad-NF1-GRD, pLVX vectors) not identified
+    - Mouse strain nomenclature not recognized
+  recommendations: |
+    This publication contains extensive research tools that were completely missed by initial mining.
+    The study uses multiple MPNST cell lines, primary Schwann cells, numerous antibodies with vendor information,
+    viral vectors for gene delivery, mouse xenograft models, and analysis software. All potentially missed tools
+    should be added to improve mining coverage. The suggested patterns would significantly improve detection of
+    similar tools in future NF research publications. Manual curator review is recommended to validate the
+    extensive tool usage documented in the Methods section.

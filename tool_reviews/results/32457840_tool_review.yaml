@@ -1,0 +1,165 @@
+publicationMetadata:
+  pmid: "PMID:32457840"
+  title: "TGFβ Signaling Increases Net Acid Extrusion, Proliferation and Invasion in Panc-1 Pancreatic Cancer Cells: SMAD4 Dependence and Link to Merlin/NF2 Signaling."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This publication involves extensive molecular biology and cell biology experiments including western blotting,
+    immunofluorescence, siRNA knockdown, cell culture, and functional assays. Expected tools include antibodies
+    for western blot and immunofluorescence, multiple cancer cell lines, siRNA reagents, and potentially
+    computational tools for data analysis.
+  overallAssessment: |
+    This is a comprehensive laboratory research study investigating TGFβ signaling in pancreatic cancer cells.
+    The extensive Methods section describes multiple experimental techniques requiring numerous research tools
+    including antibodies, cell lines, siRNA reagents, and specialized equipment. The study would be expected
+    to contain many validated research tools across multiple categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Panc-1"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human PDAC cell lines MIAPaCa-2, Panc-1, BxPC-3, and AsPC-1 were acquired from American Type Culture Collection (ATCC, Rockville, MD, USA)"
+    whyMissed: "Standard pancreatic cancer cell line name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "MIAPaCa-2"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human PDAC cell lines MIAPaCa-2, Panc-1, BxPC-3, and AsPC-1 were acquired from American Type Culture Collection (ATCC, Rockville, MD, USA)"
+    whyMissed: "Standard pancreatic cancer cell line name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "BxPC-3"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human PDAC cell lines MIAPaCa-2, Panc-1, BxPC-3, and AsPC-1 were acquired from American Type Culture Collection (ATCC, Rockville, MD, USA)"
+    whyMissed: "Standard pancreatic cancer cell line name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "AsPC-1"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human PDAC cell lines MIAPaCa-2, Panc-1, BxPC-3, and AsPC-1 were acquired from American Type Culture Collection (ATCC, Rockville, MD, USA)"
+    whyMissed: "Standard pancreatic cancer cell line name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "HPDE H6c7"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Immortalized human pancreatic ductal epithelial (HPDE H6c7) cells were a kind gift from Dr. Ming-Sound Tsao at Ontario Cancer Institute"
+    whyMissed: "Immortalized pancreatic epithelial cell line name not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-β-actin"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Primary antibodies used in western blot analysis were: mouse anti-β-actin, mouse anti-α-tubulin, and mouse anti-α-smooth muscle actin"
+    whyMissed: "Antibody with anti- prefix not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Merlin"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "rabbit anti-GAPDH, rabbit anti-Histone 3, rabbit anti-Merlin, mouse anti-p53, mouse anti-Ki67, and rabbit anti-β-catenin, all from Cell Signaling"
+    whyMissed: "NF2/Merlin antibody not caught - this is directly relevant to NF research"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-NHE1"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse anti-NHE1 (clone 54), anti-Poly-ADP Ribose Polymerase (PARP), anti-cleaved PARP (Asp214) and anti-pSer807/811-Rb, all from Santa Cruz Biotechnology"
+    whyMissed: "Antibody with clone information not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "NHE1 siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NHE1 siRNA: ON-TARGET SMART pool (Thermo Scientific); NBCn1 siRNA (SASI_Hs01_00030755, Sigma-Aldrich)"
+    whyMissed: "siRNA reagent with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "Merlin siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Merlin siRNA (SASI_Hs_01_00188862, Sigma) sense sequence 5′-CCUCAAAGCUUCGUGUUAA-3"
+    whyMissed: "NF2/Merlin siRNA reagent not caught - directly relevant to NF research"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SMAD4 siRNA"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "SMAD4 (EHU018671 esiRNA siRNA mixture, Sigma). A 19-bp scrambled oligomer"
+    whyMissed: "siRNA reagent with catalog number not caught by mining patterns"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Z][a-z]+[A-Z]?-[0-9]+"
+    toolType: "cell_line"
+    examples: ["Panc-1", "BxPC-3", "AsPC-1", "MIAPaCa-2"]
+    reasoning: "Standard cancer cell line naming convention with letters, numbers, and hyphens commonly used in ATCC collections"
+
+  - patternType: "context_phrase"
+    pattern: "anti-[A-Z][a-zA-Z0-9]+"
+    toolType: "antibody"
+    examples: ["anti-β-actin", "anti-Merlin", "anti-NHE1"]
+    reasoning: "Antibodies commonly named with anti- prefix followed by target protein name"
+
+  - patternType: "context_phrase"
+    pattern: "[A-Z][a-zA-Z0-9]+ siRNA"
+    toolType: "genetic_reagent"
+    examples: ["NHE1 siRNA", "Merlin siRNA", "SMAD4 siRNA"]
+    reasoning: "siRNA reagents commonly named as target gene followed by siRNA"
+
+  - patternType: "vendor_indicator"
+    pattern: "acquired from American Type Culture Collection \\(ATCC"
+    toolType: "cell_line"
+    examples: ["Human PDAC cell lines MIAPaCa-2, Panc-1, BxPC-3, and AsPC-1 were acquired from American Type Culture Collection"]
+    reasoning: "ATCC is a major cell line repository, mentions indicate validated cell lines"
+
+  - patternType: "context_phrase"
+    pattern: "immortalized.*cells"
+    toolType: "cell_line"
+    examples: ["Immortalized human pancreatic ductal epithelial (HPDE H6c7) cells"]
+    reasoning: "Immortalized cell lines are important research tools often missed by standard patterns"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple standard research tools were missed including cell lines, antibodies, and siRNA reagents
+    - The mining patterns appear to be missing common naming conventions for cancer cell lines
+    - NF2/Merlin-related tools were missed despite being directly relevant to NF research
+    - Antibody naming patterns with anti- prefix were not captured
+  recommendations: |
+    This publication contains numerous legitimate research tools that were completely missed by the initial mining.
+    The 11 potentially missed tools should all be added as they represent standard laboratory reagents with
+    clear experimental usage context. The suggested patterns would significantly improve mining accuracy for
+    similar publications. No observations were extracted since no tools were initially validated, but this
+    study likely contains valuable phenotypic and functional data that could be captured once tools are properly identified.

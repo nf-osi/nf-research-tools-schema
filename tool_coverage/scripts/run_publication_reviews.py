@@ -90,7 +90,8 @@ def build_review_prompt(input_data):
 
     meta = input_data['publicationMetadata']
     pmid = meta['pmid']
-    doi = meta.get('doi', '') or ''
+    doi_raw = meta.get('doi', '')
+    doi = str(doi_raw) if doi_raw and not pd.isna(doi_raw) else ''
 
     def section(label, text):
         return f"**{label}:**\n{text.strip() if text and text.strip() else '(not available)'}"

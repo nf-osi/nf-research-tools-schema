@@ -1,0 +1,98 @@
+publicationMetadata:
+  pmid: "PMID:24619350"
+  title: "Longitudinal evaluation of quality of life in 288 patients with neurofibromatosis 2."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (questionnaires, scales, patient-reported outcome measures), 
+    possibly computational tools for statistical analysis. This is a longitudinal observational study 
+    evaluating quality of life outcomes in NF2 patients using validated questionnaires. The study 
+    specifically uses the NFTI-QOL (NF2 impact on quality of life) patient questionnaire as the 
+    primary outcome measure, along with clinician-rated and genetic severity assessments.
+  overallAssessment: |
+    This clinical study evaluates quality of life in NF2 patients using validated assessment tools, 
+    specifically the NFTI-QOL questionnaire. Clinical studies routinely use assessment tools 
+    (questionnaires, scales) as research instruments to measure patient outcomes. The study also 
+    uses statistical analysis software (SPSS) for data analysis, representing computational tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "NFTI-QOL"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "The disease-focused NF2 impact on quality of life (NFTI-QOL) patient questionnaire was assessed as an outcome measure for treatment in a multi-centre study."
+    whyMissed: "This is a validated clinical assessment questionnaire specifically designed for NF2 patients to measure quality of life impact"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ClinSev"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "NFTI-QOL was related to clinician-rated severity (ClinSev) and genetic severity (GenSev) over repeated visits."
+    whyMissed: "This is a clinician-rated severity assessment scale used to grade NF2 disease severity as mild, moderate, or severe"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "GenSev"
+    toolType: "clinical_assessment_tool"
+    foundIn: "abstract"
+    contextSnippet: "NFTI-QOL was related to clinician-rated severity (ClinSev) and genetic severity (GenSev) over repeated visits."
+    whyMissed: "This is a genetic severity rating system that ranks NF2 mutations by severity (mild, moderate, severe)"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The NFTI-QOL, clinical, and genetic data were analysed with SPSS using correlation, linear regression, and analysis of variance (ANOVA) tools as required."
+    whyMissed: "Statistical analysis software used for data analysis in this study"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "NFTI-QOL|NF2 impact on quality of life"
+    toolType: "clinical_assessment_tool"
+    examples: ["NFTI-QOL", "NF2 impact on quality of life (NFTI-QOL) patient questionnaire"]
+    reasoning: "Disease-specific quality of life questionnaires are validated clinical assessment tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "questionnaire was assessed as an outcome measure|patient questionnaire|eight-item questionnaire"
+    toolType: "clinical_assessment_tool"
+    examples: ["patient questionnaire was assessed as an outcome measure", "eight-item questionnaire"]
+    reasoning: "These phrases indicate validated clinical assessment instruments used in patient studies"
+
+  - patternType: "term"
+    pattern: "clinician-rated severity|genetic severity"
+    toolType: "clinical_assessment_tool"
+    examples: ["clinician-rated severity (ClinSev)", "genetic severity (GenSev)"]
+    reasoning: "Severity rating scales and assessment systems are clinical tools used to evaluate disease progression"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 4
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clinical study that clearly uses validated assessment tools
+    - The NFTI-QOL questionnaire is a validated clinical assessment tool specifically designed for NF2 patients
+    - Clinical severity rating systems (ClinSev, GenSev) are assessment tools used to evaluate disease progression
+    - Mining patterns appear to miss clinical assessment tools in favor of lab-based tools
+  recommendations: |
+    All four potentially missed tools should be added to the database:
+    - NFTI-QOL is a validated NF2-specific quality of life questionnaire (high priority)
+    - ClinSev and GenSev are clinical assessment scales for disease severity rating
+    - SPSS is the statistical software used for analysis (lower priority as it's generic)
+    The mining patterns need improvement to capture clinical assessment tools, particularly 
+    disease-specific questionnaires and severity rating scales used in clinical studies.
+    No observations were extracted as no tools were initially validated.

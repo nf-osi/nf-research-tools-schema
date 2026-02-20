@@ -1,0 +1,119 @@
+publicationMetadata:
+  pmid: "PMID:15255999"
+  title: "Molecular profiling of malignant peripheral nerve sheath tumors associated with neurofibromatosis type 1, based on large-scale real-time RT-PCR."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular profiling study using real-time RT-PCR to analyze gene expression in tumor samples.
+    Expected tools include: computational tools (RT-PCR analysis software, statistical software), 
+    genetic reagents (primers, probes), and potentially antibodies (S100 immunostaining mentioned).
+    Clinical assessment tools unlikely given the molecular focus.
+  overallAssessment: |
+    This is a laboratory-based molecular profiling study using real-time quantitative RT-PCR to analyze 489 genes
+    in tumor samples. The comprehensive Methods section describes RNA extraction, primer design, PCR protocols,
+    and statistical analysis, indicating active use of research tools rather than just citations.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "ABI Prism 7700 Sequence Detection System"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The increase in fluorescent signal associated with exponential growth of PCR products is detected by the laser detector of the ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems, Foster City, CA)"
+    whyMissed: "Specific PCR instrument with vendor and location information, clearly used in experiments"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "PE Biosystems analysis software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "detected by the laser detector of the ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems, Foster City, CA), using PE Biosystems analysis software according to the manufacturer's manuals"
+    whyMissed: "Analysis software specifically used for PCR data processing"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Oligo 5.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Primers for TBP, RPLP0 and the 489 target genes (List in annex; supplementary information) were chosen with the assistance of the Oligo 5.0 computer program (National Biosciences, Plymouth, MN)"
+    whyMissed: "Primer design software with version number and vendor information"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "TaqMan PCR Core REAGENTS Kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed using an ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems) and either the TaqMan® PCR Core REAGENTS Kit or the SYBR® Green PCR Core Reagents kit"
+    whyMissed: "Commercial PCR reagent kit with trademark symbol and vendor"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "SYBR Green PCR Core Reagents kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "All PCR reactions were performed using an ABI Prism 7700 Sequence Detection System (Perkin-Elmer Applied Biosystems) and either the TaqMan® PCR Core REAGENTS Kit or the SYBR® Green PCR Core Reagents kit"
+    whyMissed: "Commercial PCR reagent kit with trademark symbol and vendor"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "Superscript II RNase H-reverse transcriptase"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "100 units of Superscript II RNase H-reverse transcriptase (Invitrogen, Cergy Pontoise, France), 3 μM random hexamers (Pharmacia, Uppsala, Sweden) and 100 ng of total RNA"
+    whyMissed: "Specific enzyme with vendor information used in cDNA synthesis"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "RNasin RNase inhibitor"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "20 units of RNasin RNase inhibitor (Promega, Madison, WI), 10 mM DDT, 100 units of Superscript II RNase H-reverse transcriptase"
+    whyMissed: "Specific enzyme inhibitor with vendor information"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][a-zA-Z\\s]+\\s+\\([A-Za-z\\s]+,\\s+[A-Z]{2,}\\)\\b"
+    toolType: "general"
+    examples: ["(Perkin-Elmer Applied Biosystems, Foster City, CA)", "(Invitrogen, Cergy Pontoise, France)", "(Promega, Madison, WI)"]
+    reasoning: "Pattern to catch reagents and instruments with vendor and location information in parentheses"
+
+  - patternType: "term"
+    pattern: "\\b[A-Z][a-zA-Z0-9\\s]+\\s+(Kit|System|Program|Software)\\b"
+    toolType: "computational_tool"
+    examples: ["TaqMan PCR Core REAGENTS Kit", "ABI Prism 7700 Sequence Detection System", "Oligo 5.0 computer program"]
+    reasoning: "Pattern to catch commercial kits, systems, and software with proper capitalization"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-zA-Z]+\\s+[IVX]+\\s+[A-Za-z\\-]+\\s+(transcriptase|polymerase|inhibitor|enzyme)\\b"
+    toolType: "genetic_reagent"
+    examples: ["Superscript II RNase H-reverse transcriptase", "RNasin RNase inhibitor"]
+    reasoning: "Pattern for enzyme names with Roman numerals and descriptive suffixes"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study
+    - Multiple research tools are explicitly mentioned in the Methods section with vendor information
+    - The mining system missed standard molecular biology reagents and instruments
+    - PCR-related tools (instruments, software, reagents) were not captured
+  recommendations: |
+    This publication contains multiple legitimate research tools that were completely missed by the initial mining.
+    The tools found include PCR instruments, analysis software, primer design software, and molecular biology reagents.
+    All have clear vendor information and are described in experimental context in the Methods section.
+    The suggested patterns should help capture similar tools in future molecular biology publications.
+    No observations were extracted since no tools were initially validated as accepted.

@@ -1,0 +1,90 @@
+publicationMetadata:
+  pmid: "PMID:23225063"
+  title: "Dopamine deficiency underlies learning deficits in neurofibromatosis-1 mice."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a laboratory research study using mouse models, behavioral testing, electrophysiology, and primary cell culture.
+    Expected tools include animal models (genetically modified mice), potentially antibodies for protein analysis,
+    cell culture reagents, and computational tools for data analysis. The study involves multiple experimental approaches
+    typical of neuroscience research.
+  overallAssessment: |
+    This is a laboratory research study investigating dopamine signaling defects in NF1 mouse models using behavioral,
+    electrophysiological, and cell culture approaches. The publication should contain multiple research tools including
+    genetically modified mouse strains, cell culture systems, and analytical tools. The presence of a Methods section
+    and experimental design strongly indicates tool usage for hypothesis testing and mechanistic studies.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- GFAP CKO mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 +/− GFAP CKO (CKO) with one non-functional Nf1 allele in all somatic cells and complete Nf1 loss in GFAP+ (glial) cells"
+    whyMissed: "Specific genetically modified mouse strain with conditional knockout design not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Nf1flox/flox control mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "littermate control Nf1 flox/flox (CTL) mice were maintained on an inbred C57BL/6 background"
+    whyMissed: "Control mouse strain with floxed alleles not detected by standard animal model patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6 background strain"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "mice were maintained on an inbred C57BL/6 background with ad libitum access to food and water"
+    whyMissed: "Standard inbred mouse strain background not captured by mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\+?/?-?\\s+[A-Z]{2,}\\s+CKO\\b"
+    toolType: "animal_model"
+    examples: ["Nf1+/- GFAP CKO"]
+    reasoning: "Conditional knockout mouse nomenclature with tissue-specific promoters commonly used in NF research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z0-9]+\\s*flox/flox\\b"
+    toolType: "animal_model"
+    examples: ["Nf1 flox/flox"]
+    reasoning: "Floxed allele nomenclature indicating Cre-lox recombination system usage"
+
+  - patternType: "naming_convention"
+    pattern: "\\bC57BL/6\\s+background\\b"
+    toolType: "animal_model"
+    examples: ["C57BL/6 background"]
+    reasoning: "Standard inbred mouse strain backgrounds are important tools for genetic studies"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a clear laboratory research study with mouse models
+    - Mining patterns failed to capture genetically modified mouse strains with complex nomenclature
+    - Conditional knockout and floxed allele naming conventions not recognized
+    - Standard inbred strain backgrounds not detected
+  recommendations: |
+    All three potentially missed tools should be added as they represent legitimate research tools:
+    genetically modified mouse models essential for NF1 research. The mining patterns need enhancement
+    for complex mouse strain nomenclature including conditional knockouts, floxed alleles, and strain
+    backgrounds. No observations were extracted since no tools were initially validated, but the Results
+    and Discussion sections (not provided) would likely contain behavioral and molecular phenotype data
+    for these mouse models. Manual curator review recommended to extract full tool list and associated
+    phenotypic observations.

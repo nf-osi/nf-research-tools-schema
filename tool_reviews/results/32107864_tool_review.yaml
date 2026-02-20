@@ -1,0 +1,124 @@
+publicationMetadata:
+  pmid: "PMID:32107864"
+  title: "Expanding the Noonan spectrum/RASopathy NGS panel: Benefits of adding NF1 and SPRED1."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools, computational tools for analysis
+    This study involves genetic testing and sequencing analysis, so computational tools for NGS analysis are expected.
+    While primarily clinical, the genetic testing methodology may involve laboratory reagents and computational pipelines.
+    Clinical assessment tools may be used for phenotype evaluation, though this appears more focused on genetic diagnosis.
+  overallAssessment: |
+    This is a clinical genetic study evaluating the utility of adding NF1 and SPRED1 genes to RASopathy diagnostic panels.
+    The study involves next-generation sequencing, variant calling, and copy number analysis, indicating computational tools are likely used.
+    While primarily diagnostic rather than experimental research, the molecular methods suggest laboratory reagents and bioinformatics tools would be employed.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "bwa-mem v0.7.10"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Sequence reads were aligned to the reference sequence (GRCh37) using bwa-mem v0.7.10, followed by variant calling using GATK"
+    whyMissed: "Specific bioinformatics tool with version number for sequence alignment"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "GATK, version 1.0.4705"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "followed by variant calling using GATK, version 1.0.4705 (McKenna et al., 2010)"
+    whyMissed: "Specific bioinformatics tool with version number for variant calling"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MiSeq-M01450 instrument"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "followed by sequencing using the MiSeq-M01450 instrument (150-base paired end mode; Illumina)"
+    whyMissed: "Specific sequencing instrument with model number"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "SureSelect"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NGS was performed by oligonucleotide hybridization-based DNA capture (SureSelect; Agilent)"
+    whyMissed: "DNA capture/enrichment kit from Agilent"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "PureGene Blood Core Kit B"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "DNA was extracted from peripheral blood samples using PureGene Blood Core Kit B (Qiagen)"
+    whyMissed: "DNA extraction kit with specific product name and vendor"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "VisCap"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Copy number variants (CNVs) were identified via an NGS-based detection tool (VisCap) (Pugh et al., 2016)"
+    whyMissed: "Specialized NGS-based CNV detection software tool"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ddPCR"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Confirmation of CNVs was done using ddPCR as previously described (Ceyhan-Birsoy et al., 2015)"
+    whyMissed: "Droplet digital PCR technique/platform for CNV confirmation"
+    confidence: 0.80
+    shouldBeAdded: Maybe
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Za-z]+-[A-Za-z]+\\s+v?\\d+\\.\\d+(\\.\\d+)?"
+    toolType: "computational_tool"
+    examples: ["bwa-mem v0.7.10", "GATK, version 1.0.4705"]
+    reasoning: "Bioinformatics tools often follow hyphenated naming with version numbers"
+
+  - patternType: "vendor_indicator"
+    pattern: "\\b[A-Z][A-Za-z]+\\s+[A-Za-z]+\\s+[A-Za-z]+\\s+Kit\\s+[A-Z]\\s+\\([A-Za-z]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["PureGene Blood Core Kit B (Qiagen)"]
+    reasoning: "Commercial kits often follow this naming pattern with vendor in parentheses"
+
+  - patternType: "term"
+    pattern: "\\b[A-Za-z]+-[A-Z]\\d+\\s+instrument"
+    toolType: "genetic_reagent"
+    examples: ["MiSeq-M01450 instrument"]
+    reasoning: "Sequencing instruments often have alphanumeric model numbers followed by 'instrument'"
+
+  - patternType: "context_phrase"
+    pattern: "identified via an? [A-Z]+-based [a-z]+ tool \\([A-Za-z]+\\)"
+    toolType: "computational_tool"
+    examples: ["identified via an NGS-based detection tool (VisCap)"]
+    reasoning: "Specialized analysis tools often described with this pattern"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite clear presence of computational and laboratory tools in methods
+    - Multiple bioinformatics tools with version numbers were missed (bwa-mem, GATK, VisCap)
+    - Laboratory reagents and kits were not detected (DNA extraction kits, capture kits, sequencing instruments)
+    - The mining patterns appear insufficient for clinical genetic studies that use NGS workflows
+  recommendations: |
+    All 7 potentially missed tools should be added to the database as they represent legitimate research tools used in this study.
+    The bioinformatics tools (bwa-mem, GATK, VisCap) are essential for NGS data analysis and should definitely be included.
+    Laboratory reagents (PureGene kit, SureSelect, MiSeq instrument) are standard molecular biology tools.
+    The suggested patterns would help capture similar tools in future clinical genetic studies.
+    No observations were extracted since no tools were initially validated, but the study contains methodological details that could inform tool usage.

@@ -1,0 +1,168 @@
+publicationMetadata:
+  pmid: "PMID:25917366"
+  title: "HCN channels are a novel therapeutic target for cognitive dysfunction in Neurofibromatosis type 1."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a molecular neuroscience study investigating HCN channels in NF1 using mouse models, 
+    electrophysiology, and behavioral testing. Expected tools include animal models (Nf1 mutant mice), 
+    computational tools for data analysis, and potentially genetic reagents.
+  overallAssessment: |
+    This is a laboratory research study with extensive Methods section describing animal models, 
+    electrophysiology, and behavioral experiments. The study uses multiple Nf1 mouse models and 
+    performs detailed molecular and behavioral analyses, making it highly likely to contain research tools.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1+/- mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Experimental mice were obtained by crossing Nf1 mice (in C57BL/6JOlaHsd background) with 129T2/SvEmsJ (Jackson Laboratories, Bar Harbor, ME, USA)"
+    whyMissed: "Standard mouse strain nomenclature for heterozygous Nf1 knockout mice not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "9a−/9a− Nf1 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Homozygous 9a−/9a− Nf1 mice were born at the expected Mendelian frequency, and were indistinguishable from WT mice upon examination"
+    whyMissed: "Specific exon deletion nomenclature (9a−/9a−) not recognized by mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "G12V H-Ras mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "+/− H-Ras mice in C57BL/6JOlaHsd background were obtained by crossing heterozygous G12V H-Ras mice to yield homozygous G12V H-Ras mice"
+    whyMissed: "Specific mutation nomenclature (G12V) combined with gene name not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "C57BL/6JOlaHsd"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Nf1 mice (in C57BL/6JOlaHsd background) with 129T2/SvEmsJ (Jackson Laboratories, Bar Harbor, ME, USA)"
+    whyMissed: "Mouse strain background nomenclature not recognized"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "129T2/SvEmsJ"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "crossing Nf1 mice (in C57BL/6JOlaHsd background) with 129T2/SvEmsJ (Jackson Laboratories, Bar Harbor, ME, USA)"
+    whyMissed: "Mouse strain nomenclature with vendor information not captured"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+  - toolName: "Morris water maze"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "The water maze task was performed as previously described. Before performing the water maze task, the mice were handled for a week."
+    whyMissed: "Behavioral assessment tool for cognitive function not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Rotarod"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Motor learning was assessed with the accelerating rotarod (Ugo Basile, Comerio Varese, Italy) as previously described."
+    whyMissed: "Motor function assessment tool with vendor information not captured"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "Mini Analysis"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Cumulative miniature and spontaneous synaptic currents amplitude and inter-event interval distributions were analyzed for statistical significance using the Kolmogorov–Smirnov test (Mini Analysis)"
+    whyMissed: "Electrophysiology analysis software not recognized"
+    confidence: 0.75
+    shouldBeAdded: Yes
+
+  - toolName: "Prism"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "All other statistical tests, including t-tests and one- or two-way analysis of variance, were performed using a critical probability of P < 0.05 and two-sided testing (Prism, GraphPad Software, Inc., La Jolla, CA, USA and SPSS"
+    whyMissed: "Statistical analysis software with vendor information not captured"
+    confidence: 0.70
+    shouldBeAdded: Maybe
+
+  - toolName: "lamotrigine"
+    toolType: "genetic_reagent"
+    foundIn: "abstract"
+    contextSnippet: "Furthermore, the HCN channel agonist lamotrigine rescued the electrophysiological and cognitive deficits in two independent Nf1 mouse models"
+    whyMissed: "Pharmacological compound used as experimental reagent not recognized"
+    confidence: 0.80
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "[A-Za-z0-9]+[−+]/[−+]\\s+[A-Za-z0-9]+\\s+mice"
+    toolType: "animal_model"
+    examples: ["9a−/9a− Nf1 mice", "Nf1+/- mice"]
+    reasoning: "Captures mouse genotype nomenclature with +/- or −/+ notation for heterozygous and homozygous mutations"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z][0-9]+[A-Z]\\s+[A-Za-z-]+\\s+mice"
+    toolType: "animal_model"
+    examples: ["G12V H-Ras mice"]
+    reasoning: "Captures specific mutation nomenclature (amino acid change) combined with gene names in mouse models"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z0-9]+[A-Za-z]*[0-9]*[/][A-Za-z0-9]+"
+    toolType: "animal_model"
+    examples: ["C57BL/6JOlaHsd", "129T2/SvEmsJ"]
+    reasoning: "Captures standard mouse strain nomenclature with forward slash notation"
+
+  - patternType: "context_phrase"
+    pattern: "(Morris water maze|water maze task)"
+    toolType: "clinical_assessment_tool"
+    examples: ["Morris water maze", "water maze task"]
+    reasoning: "Standard behavioral assessment for spatial learning and memory in rodents"
+
+  - patternType: "context_phrase"
+    pattern: "(accelerating rotarod|rotarod)"
+    toolType: "clinical_assessment_tool"
+    examples: ["accelerating rotarod", "rotarod"]
+    reasoning: "Standard motor function assessment tool in rodent behavioral studies"
+
+  - patternType: "term"
+    pattern: "Mini Analysis"
+    toolType: "computational_tool"
+    examples: ["Mini Analysis"]
+    reasoning: "Specific electrophysiology analysis software commonly used for synaptic current analysis"
+
+  - patternType: "context_phrase"
+    pattern: "([A-Za-z]+)\\s+(agonist|antagonist|inhibitor)\\s+([A-Za-z]+)"
+    toolType: "genetic_reagent"
+    examples: ["HCN channel agonist lamotrigine"]
+    reasoning: "Captures pharmacological compounds described by their mechanism of action and target"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 10
+  newPatternsCount: 7
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple mouse models with specific genetic modifications were not captured
+    - Behavioral assessment tools (Morris water maze, rotarod) were missed
+    - Pharmacological reagents and analysis software were not recognized
+    - Mining patterns appear insufficient for neuroscience research tools
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by initial mining.
+    The study uses multiple Nf1 mouse models, behavioral assessment tools, electrophysiology analysis software,
+    and pharmacological compounds. All potentially missed tools should be added as they represent genuine
+    research tools used in the experimental procedures. The suggested patterns would significantly improve
+    mining accuracy for neuroscience and mouse genetics studies. Manual curator review is recommended
+    to validate the specific mouse strain nomenclature and ensure proper categorization.

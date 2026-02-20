@@ -1,0 +1,249 @@
+publicationMetadata:
+  pmid: "PMID:33442015"
+  title: "Cabozantinib for neurofibromatosis type 1-related plexiform neurofibromas: a phase 2 trial."
+  queryType: "clinical"
+  publicationType: "Clinical Trial"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Trial → clinical assessment tools (questionnaires, scales), computational tools for analysis, 
+    animal models for preclinical studies, cell lines for mechanistic studies, antibodies for biomarker analysis.
+    This publication combines clinical trial data with extensive preclinical research, so multiple tool types
+    are expected including clinical assessment tools, animal models, cell lines, antibodies, and computational tools.
+  overallAssessment: |
+    This is a phase 2 clinical trial with extensive preclinical components, making it highly likely to contain
+    multiple research tool types. The clinical component uses validated assessment tools (NRS-11, BPI-PI, PedsQL),
+    while preclinical studies use mouse models, cell lines, and antibodies. Computational tools are used for
+    statistical analysis and biomarker assessment.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Nf1flox/flox;PostnCre mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Genetically engineered Nf1flox/flox;PostnCre mice on a mixed C57BL/6 × 129/SV background were utilized for in vivo studies"
+    whyMissed: "Specific genetically engineered mouse strain with conditional knockout alleles"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "iPNF95.6"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "Human immortalized NF1−/− Schwann cells (iPNF95.6) were plated in triplicate at a density of 5,000 cells/well"
+    whyMissed: "Specific immortalized human Schwann cell line with NF1 knockout"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NRS-11"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Numerical Rating Scale-11 (NRS-11): The NRS-11 is a self-report 11-point numeric scale that assesses pain intensity"
+    whyMissed: "Validated clinical pain assessment scale"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "BPI-PI Scale"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Brief Pain Inventory (BPI)-Pain Interference (PI) Scale: The BPI-PI Scale is a 7-item self-report questionnaire that measures the extent to which pain interferes with daily functioning"
+    whyMissed: "Validated clinical pain interference assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "PedsQL NF1 Module"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "PedsQL™ NF1 Module: This scale is a self-report measure assessing NF1 disease-specific QOL"
+    whyMissed: "Disease-specific quality of life assessment tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD31 antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD31 (ab28364, 1:50, Abcam) and AXL (ab227871, 1:500, Abcam)"
+    whyMissed: "Specific antibody with catalog number and vendor"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "AXL antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD31 (ab28364, 1:50, Abcam) and AXL (ab227871, 1:500, Abcam)"
+    whyMissed: "Specific antibody with catalog number and vendor"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "pAXL antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "antibodies specific to pAXL (Cat#5724, 1:1000, Cell Signaling Technology)"
+    whyMissed: "Phospho-specific antibody with catalog number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FlowJo Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "exported as FCS 3.0 files for analysis using FlowJo Software (version 9.9.6,Tree Star Inc)"
+    whyMissed: "Flow cytometry analysis software with version number"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MaxQuant"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Raw files were processed for label-free quantification by MaxQuant (version 1.6.10.43)"
+    whyMissed: "Mass spectrometry analysis software with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "Perseus"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "LFQ intensities for kinases with at least two peptides were imported into Perseus (version 1.6.10.50)"
+    whyMissed: "Proteomics analysis software with version"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "AXL immunohistochemistry was analyzed using the IHC Profiler plugin for ImageJ (version 1.47)"
+    whyMissed: "Image analysis software with version and specific plugin"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HALO Image Analysis Software"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "representative image were generated using HALO Image Analysis Software (version 2.3, Indica Labs)"
+    whyMissed: "Image analysis software with version and vendor"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z0-9]+[A-Z][a-z0-9]*\\s*\\([A-Za-z0-9\\.\\-]+\\)"
+    toolType: "cell_line"
+    examples: ["iPNF95.6", "HEK293T"]
+    reasoning: "Cell line names often follow CamelCase or mixed case patterns with parenthetical identifiers"
+
+  - patternType: "context_phrase"
+    pattern: "(?:antibodies?\\s+specific\\s+to|primary\\s+antibod(?:y|ies)|incubated.*antibod(?:y|ies))\\s+([A-Z][A-Za-z0-9\\-]+)\\s*\\([^)]*Cat#[^)]*\\)"
+    toolType: "antibody"
+    examples: ["antibodies specific to pAXL (Cat#5724, 1:1000, Cell Signaling Technology)"]
+    reasoning: "Antibodies are often described with target protein and catalog numbers in parentheses"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+[0-9]*[a-z]*[0-9]*(?:flox|Cre|tm[0-9]+|\\+/\\-|\\-/\\-)\\b"
+    toolType: "animal_model"
+    examples: ["Nf1flox/flox", "PostnCre"]
+    reasoning: "Mouse genetic nomenclature includes allele descriptors like flox, Cre, tm numbers, and +/- notation"
+
+  - patternType: "context_phrase"
+    pattern: "(?:analyzed?|processed|quantified)\\s+using\\s+([A-Z][A-Za-z]+(?:\\s+[A-Z][A-Za-z]+)*)\\s*\\(version\\s+[0-9\\.]+[^)]*\\)"
+    toolType: "computational_tool"
+    examples: ["analyzed using FlowJo Software (version 9.9.6,Tree Star Inc)", "processed by MaxQuant (version 1.6.10.43)"]
+    reasoning: "Software tools are often mentioned with version numbers in analysis contexts"
+
+  - patternType: "term"
+    pattern: "\\b(?:NRS-11|BPI-PI|PedsQL|PROMIS|SF-36|EQ-5D|VAS|Wong-Baker)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["NRS-11", "BPI-PI Scale", "PedsQL NF1 Module"]
+    reasoning: "Clinical assessment tools have standardized abbreviations and names"
+
+observations:
+  - resourceName: "Nf1flox/flox;PostnCre mice"
+    resourceType: "Animal Model"
+    observationType: "Tumor Growth"
+    observationTypeOntologyId: "MP:0002006"
+    details: |
+      Cabozantinib treatment (15mg/kg daily for 12 weeks) significantly reduced tumor burden in 
+      Nf1flox/flox;PostnCre mice compared to vehicle controls. Tumor volume was measured using 
+      calipers and calculated as 0.52 × (width)² × length for spheroid approximation.
+    foundIn: "results"
+    contextSnippet: "Cohorts of 4–5 month old, male and female (age and sex matched) Nf1flox/flox;PostnCre mice were treated with either 15mg/kg cabozantinib daily or the vehicle"
+    confidence: 0.9
+    doi: "10.1038/s41591-020-01193-6"
+
+  - resourceName: "iPNF95.6"
+    resourceType: "Cell Line"
+    observationType: "Cellular"
+    observationTypeOntologyId: "MP:0005384"
+    details: |
+      Human immortalized NF1−/− Schwann cells (iPNF95.6) showed dose-dependent response to 
+      cabozantinib treatment (39 nM to 5 μM) as measured by Caspase 3/7 Glo activity after 
+      24 hours of treatment, indicating apoptosis induction.
+    foundIn: "results"
+    contextSnippet: "Human immortalized NF1−/− Schwann cells (iPNF95.6) were plated in triplicate at a density of 5,000 cells/well in 96 well plates"
+    confidence: 0.9
+    doi: "10.1038/s41591-020-01193-6"
+
+  - resourceName: "NRS-11"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The NRS-11 pain intensity scale was used to assess "most important tumor pain" at its worst 
+      during the past week in clinical trial participants. Participants circled numbers from 0 
+      (no pain) to 10 (worst pain imaginable) on an 11-point numeric scale.
+    foundIn: "results"
+    contextSnippet: "Participants were asked to circle the one number from 0 to 10 that best described their 'most important tumor pain' at its worst during the past week"
+    confidence: 0.95
+    doi: "10.1038/s41591-020-01193-6"
+
+  - resourceName: "BPI-PI Scale"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The Brief Pain Inventory-Pain Interference Scale measured how pain interfered with daily 
+      activities (general activity, mood, walking, normal work, relations with other people, 
+      sleep, and enjoyment of life) on a 0-10 scale, with total score as mean of all 7 items.
+    foundIn: "results"
+    contextSnippet: "measures the extent to which pain interferes with daily functioning. Participants were asked to indicate how much pain interfered with various activities"
+    confidence: 0.95
+    doi: "10.1038/s41591-020-01193-6"
+
+  - resourceName: "PedsQL NF1 Module"
+    resourceType: "Clinical Assessment Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      The PedsQL NF1 Module assessed disease-specific quality of life across 16 scales including 
+      physical functioning, emotional functioning, social functioning, cognitive functioning, 
+      communication, worry, perceived physical appearance, pain and hurt, and other domains. 
+      Items rated on 5-point Likert scale (0-4) and transformed to 0-100 scale.
+    foundIn: "results"
+    contextSnippet: "This scale is a self-report measure assessing NF1 disease-specific QOL. Participants who were ages 21 years and older completed the 74-item self-report adult questionnaire"
+    confidence: 0.95
+    doi: "10.1038/s41591-020-01193-6"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 5
+  observationsExtracted: 5
+  observationsByType:
+    Tumor Growth: 1
+    Cellular: 1
+    General Comment or Review: 3
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive clinical trial with extensive preclinical components
+    - Multiple validated research tools are clearly present including animal models, cell lines, antibodies, clinical assessment tools, and computational software
+    - The mining system appears to have missed standard tool naming patterns and clinical assessment instruments
+  recommendations: |
+    All 13 potentially missed tools should be added as they represent genuine research tools with clear experimental usage:
+    - Animal model (Nf1flox/flox;PostnCre mice) used in preclinical studies
+    - Cell line (iPNF95.6) used for apoptosis assays
+    - Clinical assessment tools (NRS-11, BPI-PI, PedsQL) used for patient outcomes
+    - Antibodies with catalog numbers used for immunohistochemistry and Western blots
+    - Computational tools with versions used for data analysis
+    The suggested patterns should be implemented to improve detection of similar tools in future mining.
+    Five scientific observations were extracted covering tumor growth, cellular responses, and clinical assessment tool usage.

@@ -1,0 +1,130 @@
+publicationMetadata:
+  pmid: "PMID:28725547"
+  title: "Spatial working memory in neurofibromatosis 1: Altered neural activity and functional connectivity."
+  queryType: "clinical"
+  publicationType: "Clinical Study"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Clinical Study → clinical assessment tools (neuropsychological measures, cognitive assessments), 
+    computational tools for neuroimaging analysis (FSL, statistical software). This fMRI study of 
+    NF1 patients uses validated cognitive assessments and neuroimaging analysis software.
+  overallAssessment: |
+    This is a clinical neuroimaging study comparing NF1 patients to healthy controls using fMRI 
+    during spatial working memory tasks. The study uses validated neuropsychological assessments 
+    and sophisticated neuroimaging analysis software. Clinical assessment tools and computational 
+    tools are expected and present.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "WASI (Wechsler Abbreviated Scale of Intelligence)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Full-Scale IQ ≥ 70 (as determined by the Wechsler Abbreviated Scale of Intelligence [WASI]; Wechsler, 2011)"
+    whyMissed: "Clinical assessment tool not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "WAIS-IV (Wechsler Adult Intelligence Scale, Version 4)"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "the same measures from the Wechsler Adult Intelligence Scale, Version 4 (WAIS-IV; Wechsler, 2014) for the healthy controls"
+    whyMissed: "Clinical assessment tool not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "University of Maryland Letter–Number Sequencing (LNS) task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Working memory capacity was measured behaviorally using the University of Maryland Letter–Number Sequencing (LNS) task (Gold et al., 1997)"
+    whyMissed: "Specific cognitive assessment task not captured by initial mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "Spatial capacity working memory (SCAP) task"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Participants viewed a visual array presenting 1, 3, 5, or 7 circles on the screen followed by a probe circle"
+    whyMissed: "Custom cognitive assessment task not captured by initial mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "FSL (FMRIB Software Library)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "FMRI data analyses were performed using the FMRIB software library (www.fmrib.ox.ac.uk/fsl), version 5.0"
+    whyMissed: "Neuroimaging analysis software not captured by initial mining patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "FLAME (FMRIB's Local Analysis of Mixed Effects)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The output from the subject-specific analyses was analyzed using a mixed-effects model with FMRIB's Local Analysis of Mixed Effects (FLAME)"
+    whyMissed: "Specific FSL module not captured by initial mining patterns"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "gPPI (generalized psychophysiological interaction)"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We used the generalized psychophysiological interaction (gPPI) method described in McLaren et al. (2012)"
+    whyMissed: "Neuroimaging analysis method not captured by initial mining patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "term"
+    pattern: "Wechsler.*Scale|WASI|WAIS-IV|WISC"
+    toolType: "clinical_assessment_tool"
+    examples: ["WASI (Wechsler Abbreviated Scale of Intelligence)", "WAIS-IV (Wechsler Adult Intelligence Scale, Version 4)"]
+    reasoning: "Wechsler intelligence scales are widely used standardized cognitive assessments in NF research"
+
+  - patternType: "term"
+    pattern: "Letter.*Number.*Sequencing|LNS.*task"
+    toolType: "clinical_assessment_tool"
+    examples: ["University of Maryland Letter–Number Sequencing (LNS) task"]
+    reasoning: "Working memory assessment tasks are commonly used in NF cognitive studies"
+
+  - patternType: "term"
+    pattern: "FSL|FMRIB.*Software.*Library|FLAME.*Analysis"
+    toolType: "computational_tool"
+    examples: ["FMRIB software library (www.fmrib.ox.ac.uk/fsl)", "FMRIB's Local Analysis of Mixed Effects (FLAME)"]
+    reasoning: "FSL is a major neuroimaging analysis package commonly used in NF neuroimaging studies"
+
+  - patternType: "context_phrase"
+    pattern: "measured.*using|assessed.*via|administered.*by|completed.*behavioral.*measures"
+    toolType: "clinical_assessment_tool"
+    examples: ["Working memory capacity was measured behaviorally using", "Cognitive functioning was assessed via"]
+    reasoning: "These phrases reliably indicate administration of clinical assessment tools"
+
+  - patternType: "term"
+    pattern: "psychophysiological.*interaction|gPPI|PPI.*analysis"
+    toolType: "computational_tool"
+    examples: ["generalized psychophysiological interaction (gPPI) method"]
+    reasoning: "PPI analysis methods are specialized neuroimaging tools for connectivity analysis"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 7
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a clinical study with clear tool usage
+    - Multiple validated clinical assessment tools (WASI, WAIS-IV, LNS task, SCAP task) were missed
+    - Neuroimaging analysis software (FSL, FLAME, gPPI) was not detected
+    - Mining patterns appear inadequate for clinical assessment tools and neuroimaging software
+  recommendations: |
+    All 7 potentially missed tools should be added - they represent legitimate research tools used in this study.
+    The WASI, WAIS-IV, and LNS are standardized clinical assessment instruments widely used in NF research.
+    The SCAP task is a validated spatial working memory assessment. FSL, FLAME, and gPPI are established
+    neuroimaging analysis tools. Mining patterns need significant improvement for clinical assessment tools
+    and neuroimaging software to capture tools in similar clinical neuroimaging studies.

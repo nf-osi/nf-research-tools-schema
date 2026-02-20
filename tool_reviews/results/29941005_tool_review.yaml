@@ -1,0 +1,159 @@
+publicationMetadata:
+  pmid: "PMID:29941005"
+  title: "Increased extracellular matrix deposition during chondrogenic differentiation of dental pulp stem cells from individuals with neurofibromatosis type 1: an in vitro 2D and 3D study."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a clear laboratory research study involving cell culture, stem cell characterization, differentiation protocols, 
+    and microscopy analysis. Expected tools include antibodies for flow cytometry, cell culture reagents, computational 
+    tools for image analysis, and potentially 3D culture systems.
+  overallAssessment: |
+    This is a laboratory research study investigating dental pulp stem cells from NF1 patients using 2D and 3D culture 
+    systems. The comprehensive Methods section describes cell isolation, characterization, differentiation protocols, 
+    and multiple analytical techniques. This type of study typically uses numerous research tools including antibodies, 
+    reagents, software, and specialized culture systems.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "CD13/FITC (22A5, Caltag Medsystems)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse anti-human monoclonal antibodies directly conjugated with fluorochromes: CD13/FITC (22A5, Caltag Medsystems, UK)"
+    whyMissed: "Specific antibody with clone number and vendor information for flow cytometry characterization"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CD14/PE (M5E2, BD Biosciences)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD14/PE (M5E2, BD Biosciences, CA, USA)"
+    whyMissed: "Specific antibody with clone number and vendor for stem cell characterization"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CD90/PECy5 (5E10, BioLegend)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD90/PECy5 (5E10, BioLegend, CA, USA)"
+    whyMissed: "Specific antibody with clone number and vendor for mesenchymal stem cell marker"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CD105/APC (45A5A3, BioLegend)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD105/APC (45A5A3, BioLegend)"
+    whyMissed: "Specific antibody with clone number for stem cell characterization"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "CD146/PE (P1H12, BD Biosciences)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD146/PE (P1H12, BD Biosciences)"
+    whyMissed: "Specific antibody with clone number for stem cell marker analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "anti-Ki-67 (M7240, Dako Corporation)"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "mouse monoclonal antibody anti-Ki-67 (1:80; M7240; Dako Corporation, CA, USA)"
+    whyMissed: "Specific antibody with catalog number and dilution for immunohistochemistry"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "ImageJ v.1.49"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Images were analyzed using ImageJ software v.1.49 (NIH, USA)"
+    whyMissed: "Specific software version used for quantitative image analysis"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "FlowJo 7.6.5"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "analyzed with FACSDiva (BD Biosciences) or FlowJo 7.6.5 (FlowJo.com; Tree Star, OR, USA) software"
+    whyMissed: "Specific flow cytometry analysis software with version number"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "SPSS v. 20.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Statistical analysis was performed using Statistical Package for Social Sciences software (SPSS v. 20.0; Chicago, IL, USA)"
+    whyMissed: "Statistical analysis software with specific version"
+    confidence: 0.7
+    shouldBeAdded: No
+
+  - toolName: "Dental pulp stem cells (DPSCs)"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "DPSCs were obtained from human third molars...Two primary cell cultures were obtained from individuals with NF1 (NF1 group; NF37 and NF87) and three from individuals without NF1 (control group; CT10, CT11 and CT12)"
+    whyMissed: "Primary cell cultures with specific identifiers (NF37, NF87, CT10, CT11, CT12)"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+  - toolName: "3D pellet culture system"
+    toolType: "advanced_cellular_model"
+    foundIn: "methods"
+    contextSnippet: "For the 3Dcell culture, 5 × 10^5 cells (at passage 3; in duplicate) were centrifuged in 15 mL polypropylene conical tubes...The resulting pellets were maintained"
+    whyMissed: "3D culture system for chondrogenic differentiation studies"
+    confidence: 1.0
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "CD\\d+/[A-Z]+ \\([A-Z0-9]+, [^)]+\\)"
+    toolType: "antibody"
+    examples: ["CD13/FITC (22A5, Caltag Medsystems)", "CD90/PECy5 (5E10, BioLegend)"]
+    reasoning: "Pattern captures flow cytometry antibodies with fluorochrome conjugation, clone numbers, and vendor information"
+
+  - patternType: "naming_convention"
+    pattern: "anti-[A-Za-z0-9-]+ \\([A-Z0-9]+[,;] [^)]+\\)"
+    toolType: "antibody"
+    examples: ["anti-Ki-67 (M7240; Dako Corporation)"]
+    reasoning: "Pattern captures immunohistochemistry antibodies with catalog numbers and vendor information"
+
+  - patternType: "naming_convention"
+    pattern: "[A-Z]{2,3}\\d+[A-Z]?"
+    toolType: "cell_line"
+    examples: ["NF37", "NF87", "CT10", "CT11", "CT12"]
+    reasoning: "Pattern captures primary cell culture identifiers used in NF research"
+
+  - patternType: "context_phrase"
+    pattern: "3D.*culture|pellet.*culture|spheroid.*culture"
+    toolType: "advanced_cellular_model"
+    examples: ["3D pellet culture", "pellet culture system"]
+    reasoning: "Identifies 3D culture systems that represent advanced cellular models beyond standard 2D culture"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 11
+  newPatternsCount: 4
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive laboratory research study
+    - Multiple specific antibodies with clone numbers and vendors were missed
+    - Computational tools with version numbers were not captured
+    - Primary cell cultures with specific identifiers were overlooked
+    - 3D culture systems representing advanced cellular models were not detected
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining.
+    The study uses multiple flow cytometry antibodies, computational analysis software, primary cell cultures,
+    and 3D culture systems. All 11 potentially missed tools should be added to improve mining coverage.
+    The suggested patterns would help capture similar tools in future NF research publications.
+    No observations were extracted since no tools were initially validated, but this study likely contains
+    valuable phenotypic observations about NF1 patient-derived cells that could be captured once tools are validated.

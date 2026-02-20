@@ -1,0 +1,185 @@
+publicationMetadata:
+  pmid: "PMID:30617350"
+  title: "A cerebellopontine angle mouse model for the investigation of tumor biology, hearing, and neurological function in NF2-related vestibular schwannoma."
+  queryType: "bench"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 1.0
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a detailed protocol paper describing development of a mouse model for NF2 research, including:
+    - Animal models (mouse strains)
+    - Cell lines (NF2-/- Schwann cells, HEI-193)
+    - Genetic reagents (GLuc reporter)
+    - Computational tools (imaging software, analysis tools)
+    - Clinical assessment tools (hearing tests, behavioral assays)
+  overallAssessment: |
+    This is a comprehensive protocol paper for developing and using a cerebellopontine angle mouse model for NF2 research. It describes detailed experimental procedures including surgical techniques, tumor monitoring, and functional assessments. The publication extensively uses multiple research tools including cell lines, animal models, genetic reagents, and specialized equipment. This type of protocol paper is expected to contain numerous validated research tools across multiple categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "FVB/C57BL/6 mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "Syngeneic immune-competent FVB/C57BL/6 mice, both male and female, 10–12 weeks old, are used for implantation of the mouse NF2−/− Schwann cell line"
+    whyMissed: "Specific mouse strain name with standard nomenclature not caught by initial mining"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "NF2−/− Schwann cell line"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "We used a murine NF2−/− Schwann cell line (we obtained this as a gift from X. Breakefield, Massachusetts General Hospital) in our study"
+    whyMissed: "Cell line with genetic modification notation not recognized"
+    confidence: 0.98
+    shouldBeAdded: Yes
+
+  - toolName: "HEI-193"
+    toolType: "cell_line"
+    foundIn: "methods"
+    contextSnippet: "When using human VS cell lines, such as the established human HEI-193 cell line or other immortalized human VS cell lines, immune-deficient mice"
+    whyMissed: "Standard human schwannoma cell line name not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "nude mice (nu/nu)"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "immune-deficient mice (e.g., nude mice (nu/nu) or NOD SCID mice) should be used"
+    whyMissed: "Immunodeficient mouse strain with genetic notation"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "NOD SCID mice"
+    toolType: "animal_model"
+    foundIn: "methods"
+    contextSnippet: "immune-deficient mice (e.g., nude mice (nu/nu) or NOD SCID mice) should be used"
+    whyMissed: "Immunodeficient mouse strain name not recognized"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "GLuc reporter gene"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "NF2−/− cells should be transduced before use so they express the GLuc reporter gene, which is a secreted reporter that can be detected in the blood"
+    whyMissed: "Reporter gene construct not caught by initial patterns"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "DPOAE"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "We measure hearing function by DPOAE and ABR tests"
+    whyMissed: "Distortion Product Otoacoustic Emissions hearing test abbreviation"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "ABR"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "We measure hearing function by DPOAE and ABR tests"
+    whyMissed: "Auditory Brainstem Response hearing test abbreviation"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "hind-limb clasping test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "cerebellar ataxia using behavior tests, including hind-limb clasping, and ledge and gait tests"
+    whyMissed: "Behavioral assessment test for neurological function"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "ledge test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "cerebellar ataxia using behavior tests, including hind-limb clasping, and ledge and gait tests"
+    whyMissed: "Coordination assessment test not recognized"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "gait test"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "cerebellar ataxia using behavior tests, including hind-limb clasping, and ledge and gait tests"
+    whyMissed: "Motor function assessment test"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+  - toolName: "rotarod assay"
+    toolType: "clinical_assessment_tool"
+    foundIn: "methods"
+    contextSnippet: "Balance, motor strength, and coordination can be assayed by rotarod assay"
+    whyMissed: "Standard behavioral test for motor coordination"
+    confidence: 0.90
+    shouldBeAdded: Yes
+
+  - toolName: "LabVIEW"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "LabVIEW (National Instruments, cat. no. 784503–35)"
+    whyMissed: "Data acquisition and analysis software with catalog number"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z0-9]+/[A-Z0-9]+ mice\\b"
+    toolType: "animal_model"
+    examples: ["FVB/C57BL/6 mice", "nude mice (nu/nu)"]
+    reasoning: "Mouse strain nomenclature with forward slash notation commonly used in research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z0-9]+-?/?-? (Schwann )?cell line\\b"
+    toolType: "cell_line"
+    examples: ["NF2−/− Schwann cell line", "HEI-193 cell line"]
+    reasoning: "Cell line names with genetic modifications and standard naming conventions"
+
+  - patternType: "term"
+    pattern: "\\b(DPOAE|ABR|rotarod|ledge test|gait test|hind-limb clasping)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["DPOAE", "ABR", "rotarod assay", "ledge test"]
+    reasoning: "Standard behavioral and physiological assessment tests used in neuroscience research"
+
+  - patternType: "naming_convention"
+    pattern: "\\b[A-Z][a-z]+ reporter gene\\b"
+    toolType: "genetic_reagent"
+    examples: ["GLuc reporter gene"]
+    reasoning: "Reporter gene constructs commonly used for tracking in biological systems"
+
+  - patternType: "context_phrase"
+    pattern: "\\bassayed? by\\s+([A-Za-z0-9\\s-]+)\\b"
+    toolType: "clinical_assessment_tool"
+    examples: ["assayed by rotarod assay"]
+    reasoning: "Context phrase indicating use of assessment tools or assays"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 13
+  newPatternsCount: 5
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a comprehensive protocol paper
+    - Multiple categories of research tools are extensively described but not detected
+    - Standard mouse strain nomenclature not recognized
+    - Clinical assessment tools (hearing tests, behavioral assays) missed
+    - Cell line names with genetic modifications not caught
+    - Reporter gene constructs not identified
+  recommendations: |
+    This publication contains numerous legitimate research tools that were completely missed by initial mining:
+    - 5 animal models (mouse strains) with standard nomenclature
+    - 2 cell lines including genetically modified variants
+    - 1 genetic reagent (reporter gene)
+    - 5 clinical assessment tools (hearing and behavioral tests)
+    - 1 computational tool (LabVIEW)
+    All 13 potentially missed tools should be added as they represent genuine research tools with clear experimental usage context.
+    The suggested patterns would significantly improve detection of similar tools in future NF research publications.
+    This represents a major gap in current mining capabilities for protocol and methods papers.

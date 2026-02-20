@@ -1,0 +1,110 @@
+publicationMetadata:
+  pmid: "PMID:39966622"
+  title: "The development of an artificial intelligence auto-segmentation tool for 3D volumetric analysis of vestibular schwannomas."
+  queryType: "unknown"
+  publicationType: "Bioinformatics Analysis"
+  publicationTypeConfidence: 0.9
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Bioinformatics Analysis → computational tools (software, pipelines, AI/ML models)
+    This study develops an AI tool for medical image segmentation, so computational tools are expected.
+    Clinical assessment tools are unlikely as this is a technical development study.
+    Lab research tools are not expected as this is image analysis, not wet lab work.
+  overallAssessment: |
+    This is a bioinformatics/AI development study focused on creating an automated segmentation tool for vestibular schwannomas in MRI images. The study involves computational tool development, image processing software usage, and AI/ML model training. Computational tools are highly expected, while traditional lab research tools (antibodies, cell lines) are not relevant to this image analysis work.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Simpleware ScanIP"
+    toolType: "computational_tool"
+    foundIn: "abstract"
+    contextSnippet: "To create the tumor models for the ground truth dataset, an image processing software (Simpleware ScanIP, Synopsys) was used."
+    whyMissed: "Commercial image processing software with vendor name - clear computational tool"
+    confidence: 0.95
+    shouldBeAdded: Yes
+  
+  - toolName: "DPP V1.0"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "The helper (DPP V1.0) was trained using proprietary AI- and ML-based algorithms and information."
+    whyMissed: "AI model/tool with version number - this is the main tool being developed"
+    confidence: 0.9
+    shouldBeAdded: Yes
+  
+  - toolName: "DICE score"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "To compare the accuracy of the AI generated 3D models to the radiologist validated manual segmentation models, a DICE score was calculated."
+    whyMissed: "Standard computational metric/algorithm used for image segmentation evaluation"
+    confidence: 0.8
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "vendor_indicator"
+    pattern: "\\b([A-Z][a-zA-Z]+(?:\\s+[A-Z][a-zA-Z]+)*),\\s+([A-Z][a-zA-Z]+(?:\\s+[A-Z][a-zA-Z]+)*)"
+    toolType: "computational_tool"
+    examples: ["Simpleware ScanIP, Synopsys", "ImageJ, NIH"]
+    reasoning: "Pattern to capture software names followed by vendor/company names in parentheses or after comma"
+  
+  - patternType: "term"
+    pattern: "\\b[A-Z]{2,}\\s+V?\\d+\\.\\d+"
+    toolType: "computational_tool"
+    examples: ["DPP V1.0"]
+    reasoning: "Pattern for software/model names with version numbers, common in AI/ML tools"
+  
+  - patternType: "context_phrase"
+    pattern: "image processing software \\([^)]+\\)"
+    toolType: "computational_tool"
+    examples: ["image processing software (Simpleware ScanIP, Synopsys)"]
+    reasoning: "Context phrase that reliably indicates computational image analysis tools"
+
+observations:
+  - resourceName: "DPP V1.0"
+    resourceType: "Computational Tool"
+    observationType: "General Comment or Review"
+    observationTypeOntologyId: ""
+    details: |
+      AI model achieved mean DICE score of 0.76 (standard deviation 0.21) in proof-of-concept stage, 
+      improving to final mean DICE score of 0.88 (range 0.74-0.93, standard deviation 0.04) after 
+      final testing stage. No tumors identified within ground truth segmentation were missed by the helper.
+    foundIn: "both"
+    contextSnippet: "A proof-of-concept AI model achieved a mean DICE score of 0.76 (standard deviation 0.21). After the final testing stage, the model improved to a final mean DICE score of 0.88"
+    confidence: 0.95
+    doi: "10.1038/s41598-025-88589-x"
+  
+  - resourceName: "Simpleware ScanIP"
+    resourceType: "Computational Tool"
+    observationType: "Usage Instructions"
+    observationTypeOntologyId: ""
+    details: |
+      Software used for manual segmentation of vestibular schwannomas from MRI images using thresholding 
+      algorithms, split regions algorithm, and paint function for border adjustment. All models were 
+      reviewed by a neuroradiologist. Platform integrates proprietary AI-powered auto-segmentation tools 
+      with machine learning algorithms.
+    foundIn: "both"
+    contextSnippet: "To create the tumor models an image processing software (Simpleware, Synopsys, Mountain View, CA) was used... Our segmentation process utilized the Simpleware platform by Synopsys, which integrates proprietary AI-powered auto-segmentation tools"
+    confidence: 0.9
+    doi: "10.1038/s41598-025-88589-x"
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 3
+  newPatternsCount: 3
+  observationsExtracted: 2
+  observationsByType:
+    General Comment or Review: 1
+    Usage Instructions: 1
+  majorIssuesFound: |
+    - Initial mining failed to capture any tools despite this being a computational tool development study
+    - Three clear computational tools were missed: Simpleware ScanIP (commercial software), DPP V1.0 (the main AI tool being developed), and DICE score (evaluation metric)
+    - Mining patterns need improvement for image processing software and AI/ML tools with version numbers
+  recommendations: |
+    All three potentially missed tools should be added as they are legitimate computational tools used in this bioinformatics study.
+    Simpleware ScanIP is commercial image processing software, DPP V1.0 is the main AI tool being developed, and DICE score is a standard evaluation metric.
+    The suggested patterns would help capture similar tools in future mining.
+    The observations extracted provide valuable performance metrics and usage information for these computational tools.

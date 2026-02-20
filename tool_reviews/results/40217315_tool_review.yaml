@@ -1,0 +1,181 @@
+publicationMetadata:
+  pmid: "PMID:40217315"
+  title: "A single-cell atlas of Schwannoma across genetic backgrounds and anatomic locations."
+  queryType: "unknown"
+  publicationType: "Lab Research"
+  publicationTypeConfidence: 0.95
+  hasMethodsSection: Yes
+  likelyContainsTools: Yes
+  expectedToolTypes: |
+    Lab Research → antibodies, cell lines, animal models, genetic reagents, computational tools, organoids, PDX
+    This is a single-cell RNA sequencing study with extensive computational analysis, flow cytometry,
+    and immunohistochemistry. Expected tools include: computational tools (R packages, analysis software),
+    antibodies (for flow cytometry and IHC), potentially cell lines or primary cells, and various
+    laboratory reagents for sample processing.
+  overallAssessment: |
+    This is a comprehensive laboratory research study involving single-cell RNA sequencing, flow cytometry,
+    and immunohistochemistry on human schwannoma samples. The publication contains extensive methods describing
+    computational analysis pipelines, antibody usage, and sample processing protocols. Multiple research tools
+    are expected across computational, antibody, and reagent categories.
+
+toolValidations: []
+
+potentiallyMissedTools:
+  - toolName: "Smart-seq2"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Smart-seq2 whole transcriptome amplification, library construction, and sequencing were performed as previously published"
+    whyMissed: "Specific single-cell RNA-seq protocol/pipeline not caught by general computational tool patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "CD45-Vioblue"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "Tumors were stained first with CD45-Vioblue direct antibody conjugate (clone REA747, Miltenyi Biotec)"
+    whyMissed: "Specific antibody with clone number and vendor information not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD24-APC"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD24-APC (human antibody, clone REA832, Miltenyi Biotec)"
+    whyMissed: "Specific antibody with clone number and vendor information not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "CD44-VioBlue"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "CD44-VioBlue (human antibody, clone REA690, Miltenyi Biotec)"
+    whyMissed: "Specific antibody with clone number and vendor information not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "HLA Class I ABC antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "HLA-B (anti-HLA Class I ABC antibody, ab225636, Abcam, Cambridge, UK)"
+    whyMissed: "Specific antibody with catalog number and vendor not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "MHC Class II antibody"
+    toolType: "antibody"
+    foundIn: "methods"
+    contextSnippet: "DPB1 (anti-MHC Class II antibody, ab55152, Abcam, Cambridge, UK)"
+    whyMissed: "Specific antibody with catalog number and vendor not caught"
+    confidence: 0.95
+    shouldBeAdded: Yes
+
+  - toolName: "igraph"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "We performed Louvain clustering on the centered matrix with the top 7000 genes using the 'igraph' package"
+    whyMissed: "R package for network analysis not caught by computational tool patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "scdDblFinder"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Doublets were identified by combining the results of two methods that were published recently and implemented in R packages—scdDblFinder"
+    whyMissed: "Specific R package for doublet detection not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "scran"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "and the doubletCells algorithm from scran"
+    whyMissed: "R package for single-cell analysis not caught"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "QuPath"
+    toolType: "computational_tool"
+    foundIn: "methods"
+    contextSnippet: "Quantification of staining intensity was performed in QuPath"
+    whyMissed: "Image analysis software not caught by computational tool patterns"
+    confidence: 0.9
+    shouldBeAdded: Yes
+
+  - toolName: "FACS Aria Fusion Special Order System"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Sorting was performed with the FACS Aria Fusion Special Order System (Becton Dickinson)"
+    whyMissed: "Flow cytometry instrument not caught - could be classified as laboratory equipment/reagent"
+    confidence: 0.8
+    shouldBeAdded: Maybe
+
+  - toolName: "papain-based tumor dissociation kit"
+    toolType: "genetic_reagent"
+    foundIn: "methods"
+    contextSnippet: "Tumors were mechanically and enzymatically dissociated using a papain-based tumor dissociation kit (Miltenyi Biotec)"
+    whyMissed: "Commercial reagent kit not caught by genetic reagent patterns"
+    confidence: 0.85
+    shouldBeAdded: Yes
+
+suggestedPatterns:
+  - patternType: "context_phrase"
+    pattern: "antibody.*clone.*[A-Z0-9]+"
+    toolType: "antibody"
+    examples: ["CD45-Vioblue direct antibody conjugate (clone REA747", "CD24-APC (human antibody, clone REA832"]
+    reasoning: "Antibodies with clone numbers are specific research tools that should be captured"
+
+  - patternType: "context_phrase"
+    pattern: "ab[0-9]{5,6}.*Abcam"
+    toolType: "antibody"
+    examples: ["ab225636, Abcam", "ab55152, Abcam"]
+    reasoning: "Abcam catalog numbers are specific identifiers for antibodies"
+
+  - patternType: "naming_convention"
+    pattern: "Smart-seq[0-9]?"
+    toolType: "computational_tool"
+    examples: ["Smart-seq2"]
+    reasoning: "Smart-seq is a widely used single-cell RNA-seq protocol/pipeline"
+
+  - patternType: "context_phrase"
+    pattern: "R packages?.*[a-zA-Z][a-zA-Z0-9]+"
+    toolType: "computational_tool"
+    examples: ["R packages—scdDblFinder", "igraph package"]
+    reasoning: "R packages mentioned in methods are computational tools for analysis"
+
+  - patternType: "term"
+    pattern: "QuPath"
+    toolType: "computational_tool"
+    examples: ["QuPath"]
+    reasoning: "QuPath is a specific image analysis software commonly used in pathology research"
+
+  - patternType: "context_phrase"
+    pattern: "dissociation kit.*\\([^)]+\\)"
+    toolType: "genetic_reagent"
+    examples: ["papain-based tumor dissociation kit (Miltenyi Biotec)"]
+    reasoning: "Commercial kits with vendor information are specific research reagents"
+
+observations: []
+
+summary:
+  totalToolsMined: 0
+  toolsAccepted: 0
+  toolsRejected: 0
+  toolsUncertain: 0
+  potentiallyMissedCount: 12
+  newPatternsCount: 6
+  observationsExtracted: 0
+  observationsByType: {}
+  majorIssuesFound: |
+    - No tools were initially mined despite this being a comprehensive lab research study
+    - Multiple specific antibodies with clone numbers and catalog numbers were missed
+    - Several R packages for single-cell analysis were not captured
+    - Commercial reagent kits and laboratory equipment were not detected
+    - The mining patterns appear to be missing key computational tools and antibody identifiers
+  recommendations: |
+    This publication contains numerous research tools that were completely missed by the initial mining.
+    The study uses multiple specific antibodies with clone numbers and catalog numbers, several R packages
+    for computational analysis, and commercial reagent kits. The mining patterns need significant improvement
+    to capture: 1) Antibodies with clone numbers and vendor information, 2) R packages mentioned in methods,
+    3) Single-cell analysis protocols like Smart-seq2, 4) Image analysis software like QuPath, and
+    5) Commercial reagent kits. All 12 potentially missed tools should be added as they represent genuine
+    research tools used in this study. No observations were extracted since no tools were initially validated.
