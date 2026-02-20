@@ -43,19 +43,17 @@ def should_upgrade_cache(review_file: Path) -> tuple[bool, str, int]:
         with open(review_file) as f:
             review = yaml.safe_load(f)
 
-        pmid = review.get('publicationMetadata', {}).get('pmid', 'Unknown')
-
         # Check for accepted tools with high confidence
         accepted_tools = [
-            t for t in review.get('toolValidations', [])
+            t for t in review.get('toolValidations', []) or []
             if t.get('verdict') == 'Accept' and t.get('confidence', 0) >= 0.8
         ]
 
         if len(accepted_tools) == 0:
             return False, "No high-confidence validated tools", 0
 
-        # Check publication type
-        pub_type = review['publicationMetadata'].get('publicationType', '')
+        # Check publication type if available (optional field in new YAML format)
+        pub_type = review.get('publicationMetadata', {}).get('publicationType', '')
         skip_types = ['Review Article', 'Editorial', 'Letter', 'Comment', 'News']
         if pub_type in skip_types:
             return False, f"Publication type: {pub_type}", len(accepted_tools)

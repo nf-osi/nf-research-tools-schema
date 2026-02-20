@@ -1,237 +1,156 @@
 #!/usr/bin/env python3
 """
-Generate a summary report for GitHub Pull Request based on coverage analysis and mining results.
+Generate a summary report for GitHub Pull Request based on Sonnet validation results.
+Reads from tool_coverage/outputs/ which is committed into the PR branch.
 """
 
 import os
+import json
+import glob
 import pandas as pd
-import synapseclient
-from datetime import datetime
+from pathlib import Path
+
+
+OUTPUTS_DIR = Path('tool_coverage/outputs')
+VALIDATION_SUMMARY = Path('tool_reviews/validation_summary.json')
+
+TOOL_TYPE_LABELS = {
+    'animal_models':           ('🐭', 'Animal Models'),
+    'antibodies':              ('🔬', 'Antibodies'),
+    'cell_lines':              ('🧫', 'Cell Lines'),
+    'genetic_reagents':        ('🧬', 'Genetic Reagents'),
+    'computational_tools':     ('💻', 'Computational Tools'),
+    'clinical_assessment_tools': ('📋', 'Clinical Assessment Tools'),
+    'advanced_cellular_models':  ('🫧', 'Advanced Cellular Models'),
+    'patient_derived_models':    ('🧪', 'Patient-Derived Models'),
+}
+
+
+def load_validation_report():
+    report_file = OUTPUTS_DIR / 'validation_report.csv'
+    if report_file.exists():
+        return pd.read_csv(report_file)
+    return pd.DataFrame()
+
+
+def load_validated_counts():
+    """Return {stem: row_count} for each VALIDATED_*.csv in outputs dir."""
+    counts = {}
+    for path in sorted(OUTPUTS_DIR.glob('VALIDATED_*.csv')):
+        stem = path.stem.replace('VALIDATED_', '')  # e.g. 'animal_models'
+        try:
+            df = pd.read_csv(path)
+            counts[stem] = len(df)
+        except Exception:
+            counts[stem] = 0
+    return counts
+
+
+def load_submit_counts():
+    """Fallback: SUBMIT_*.csv counts if VALIDATED not present."""
+    counts = {}
+    for path in sorted(OUTPUTS_DIR.glob('SUBMIT_*.csv')):
+        stem = path.stem.replace('SUBMIT_', '')
+        try:
+            df = pd.read_csv(path)
+            counts[stem] = len(df)
+        except Exception:
+            counts[stem] = 0
+    return counts
+
 
 def main():
-    """Generate markdown summary for GitHub Pull Request."""
+    report_df = load_validation_report()
+    validated_counts = load_validated_counts()
+    # Fall back to SUBMIT counts if VALIDATED files aren't present yet
+    tool_counts = validated_counts if validated_counts else load_submit_counts()
+    using_validated = bool(validated_counts)
 
-    # Login to Synapse
-    syn = synapseclient.Synapse()
-    auth_token = os.getenv('SYNAPSE_AUTH_TOKEN')
-    if auth_token:
-        syn.login(authToken=auth_token)
+    total_pubs_reviewed = len(report_df)
+    total_accepted = int(report_df['accepted'].sum()) if not report_df.empty else 0
+    total_rejected = int(report_df['rejected'].sum()) if not report_df.empty else 0
+    total_uncertain = int(report_df['uncertain'].sum()) if not report_df.empty else 0
+    total_tools = total_accepted + total_rejected + total_uncertain
+    pubs_with_accepted = int((report_df['accepted'] > 0).sum()) if not report_df.empty else 0
+    pubs_needing_review = int((report_df['uncertain'] > 0).sum()) if not report_df.empty else 0
+
+    print("# 🔍 Tool Coverage Update — Automated Mining Results")
+    print()
+    print("This PR contains NF research tools discovered by Sonnet reviewing full publication text.")
+    print("**Review and merge to automatically upload to Synapse.**")
+
+    # ── Summary counts ──────────────────────────────────────────────────────
+    print()
+    print("## 📊 Review Summary")
+    print()
+    print(f"| Metric | Count |")
+    print(f"|--------|-------|")
+    print(f"| Publications reviewed | {total_pubs_reviewed} |")
+    print(f"| Publications with accepted tools | {pubs_with_accepted} |")
+    print(f"| Total tools evaluated | {total_tools} |")
+    print(f"| ✅ Accepted (Keep) | {total_accepted} |")
+    print(f"| ❌ Rejected (Remove) | {total_rejected} |")
+    print(f"| ⚠️ Uncertain (Manual Review) | {total_uncertain} |")
+    if pubs_needing_review:
+        print(f"| 📝 Publications needing manual review | {pubs_needing_review} |")
+
+    # ── Tool type breakdown ─────────────────────────────────────────────────
+    if tool_counts:
+        csv_label = "VALIDATED_*.csv" if using_validated else "SUBMIT_*.csv (VALIDATED not yet created)"
+        total_rows = sum(tool_counts.values())
+        print()
+        print(f"## 🎯 Novel Tool Suggestions by Type")
+        print(f"*From `{csv_label}` — {total_rows} total rows*")
+        print()
+        print(f"| Type | Count |")
+        print(f"|------|-------|")
+        for stem, count in sorted(tool_counts.items(), key=lambda x: -x[1]):
+            emoji, label = TOOL_TYPE_LABELS.get(stem, ('🔧', stem.replace('_', ' ').title()))
+            print(f"| {emoji} {label} | {count} |")
+
+    # ── Publications needing manual review ──────────────────────────────────
+    if pubs_needing_review and not report_df.empty:
+        uncertain_pubs = report_df[report_df['uncertain'] > 0][['pmid', 'title', 'uncertain']].head(10)
+        print()
+        print("## 📝 Publications Needing Manual Review")
+        print(f"*{pubs_needing_review} publication(s) have uncertain tools requiring human judgment:*")
+        print()
+        for _, row in uncertain_pubs.iterrows():
+            pmid_num = str(row['pmid']).replace('PMID:', '')
+            print(f"- **{row['pmid']}** ({int(row['uncertain'])} uncertain) — {str(row['title'])[:80]}")
+        if pubs_needing_review > 10:
+            print(f"- *… and {pubs_needing_review - 10} more — see `validation_report.csv`*")
+
+    # ── Files in this PR ────────────────────────────────────────────────────
+    print()
+    print("## 📁 Files in This PR")
+    print()
+    if using_validated:
+        print("- `tool_coverage/outputs/VALIDATED_*.csv` — ⭐ **use these for Synapse upload** (false positives filtered)")
+        print("- `tool_coverage/outputs/SUBMIT_*.csv` — intermediate files (pre-filter)")
     else:
-        syn.login()  # Interactive login if no token
+        print("- `tool_coverage/outputs/SUBMIT_*.csv` — tool suggestions (validation filter did not run)")
+    print("- `tool_coverage/outputs/validation_report.csv` — per-publication review summary")
 
-    print(f"# 🔍 Tool Coverage Update - Automated Mining Results")
-    print(f"\nThis PR contains automated mining results from GFF-funded publications. **Review and merge to automatically upload to Synapse.**")
-    print(f"\n## What's in This PR")
-    print(f"\n📊 **Mining Results:**")
+    # ── Review workflow ─────────────────────────────────────────────────────
+    print()
+    print("## ✅ Review Checklist")
+    print()
+    print("1. **Check `validation_report.csv`** — review accepted tool names per publication")
+    if pubs_needing_review:
+        print(f"2. **Manually review {pubs_needing_review} uncertain publication(s)** listed above")
+    print("2. **Spot-check `VALIDATED_*.csv`** — remove any remaining false positives")
+    print("3. **Fill in missing fields** (vendor info, RRIDs, catalog numbers where blank)")
+    print("4. **Merge PR** → triggers Synapse upsert workflow automatically")
+    print()
+    print("**On merge, the upsert-tools workflow will:**")
+    print("- Clean tracking columns from CSV files")
+    print("- Upload to Synapse tables (animal models, antibodies, cell lines, etc.)")
+    print("- Create snapshot versions for audit trail")
 
-    # Check which files exist
-    has_validated = os.path.exists('VALIDATED_animal_models.csv') or os.path.exists('VALIDATED_antibodies.csv') or os.path.exists('VALIDATED_cell_lines.csv') or os.path.exists('VALIDATED_genetic_reagents.csv') or os.path.exists('VALIDATED_resources.csv')
-    has_submit = os.path.exists('SUBMIT_animal_models.csv') or os.path.exists('SUBMIT_antibodies.csv') or os.path.exists('SUBMIT_cell_lines.csv') or os.path.exists('SUBMIT_genetic_reagents.csv') or os.path.exists('SUBMIT_resources.csv')
-
-    if has_validated:
-        print(f"- `VALIDATED_*.csv` - AI-validated submissions (false positives removed) ⭐ **USE THESE**")
-    if has_submit:
-        print(f"- `SUBMIT_*.csv` - Unvalidated submissions (fallback if validation failed)")
-    if os.path.exists('GFF_Tool_Coverage_Report.pdf'):
-        print(f"- `GFF_Tool_Coverage_Report.pdf` - Coverage analysis")
-    if os.path.exists('processed_publications.csv'):
-        print(f"- `processed_publications.csv` - Full mining results")
-    if os.path.exists('tool_reviews/validation_report.xlsx'):
-        print(f"- `tool_reviews/` - AI validation reports")
-
-    print(f"\n## Review Workflow")
-    print(f"\n1. **Review the files** in this PR")
-    print(f"2. **Validate findings** against publication full text")
-    print(f"3. **Remove any false positives** that AI missed")
-    print(f"4. **Complete missing fields** (vendor info, RRIDs, etc.)")
-    print(f"5. **Merge PR** → Automatically triggers Synapse upsert workflow")
-
-    print(f"\n## What Happens on Merge")
-    print(f"\nWhen you merge this PR, the **upsert-tools workflow** automatically:")
-    print(f"- ✅ Cleans submission files (removes tracking columns)")
-    print(f"- ✅ Runs dry-run preview (safety check)")
-    print(f"- ✅ Uploads to Synapse tables (appends new rows)")
-    print(f"- ✅ Creates snapshot versions for audit trail")
-    print(f"- ✅ Generates upload summary")
-
-    print(f"\n**Synapse Tables Updated:**")
-    print(f"- Animal Models: syn26486808")
-    print(f"- Antibodies: syn26486811")
-    print(f"- Cell Lines: syn26486823")
-    print(f"- Genetic Reagents: syn26486832")
-    print(f"- Resources: syn26450069")
-    print(f"- Publication Links: syn51735450")
-
-    # ========================================================================
-    # Section 1: Coverage Analysis (Before/After Comparison)
-    # ========================================================================
-    print(f"\n## 📊 Coverage Impact")
-
-    try:
-        import ast
-        import glob
-
-        # Load publications
-        pub_query = syn.tableQuery("SELECT * FROM syn16857542")
-        pub_df = pub_query.asDataFrame()
-
-        # Load links
-        link_query = syn.tableQuery("SELECT * FROM syn51735450")
-        link_df = link_query.asDataFrame()
-
-        # Parse funding agencies
-        def parse_funding_agencies(funding_str):
-            if pd.isna(funding_str):
-                return []
-            try:
-                agencies = ast.literal_eval(str(funding_str))
-                if isinstance(agencies, list):
-                    return [str(a).strip() for a in agencies if a]
-                return [str(agencies).strip()]
-            except:
-                return [str(funding_str).strip()] if funding_str else []
-
-        pub_df['funding_agencies'] = pub_df['fundingAgency'].apply(parse_funding_agencies)
-
-        # Get all unique agencies
-        all_agencies = set()
-        for agencies in pub_df['funding_agencies']:
-            all_agencies.update(agencies)
-
-        # Create indicator columns for each agency
-        for agency in all_agencies:
-            pub_df[f'is_{agency}'] = pub_df['funding_agencies'].apply(lambda x: agency in x)
-
-        # Determine link key
-        link_key = 'pmid' if 'pmid' in link_df.columns and 'pmid' in pub_df.columns else None
-
-        if link_key:
-            # Current coverage (before PR)
-            linked_pmids = set(link_df[link_key].dropna().unique())
-
-            # Load submission files to see what publications are getting tools in this PR
-            new_tool_pmids = set()
-            for csv_file in glob.glob('VALIDATED_*.csv') + glob.glob('SUBMIT_*.csv'):
-                try:
-                    submission_df = pd.read_csv(csv_file)
-                    if 'pmid' in submission_df.columns:
-                        new_tool_pmids.update(submission_df['pmid'].dropna().unique())
-                except:
-                    pass
-
-            # Calculate coverage before and after for each agency
-            print(f"\n**Before vs. After This PR:**\n")
-            print(f"| Agency | Current | After Merge | Change | Target (80%) |")
-            print(f"|--------|---------|-------------|--------|--------------|")
-
-            for agency in sorted(all_agencies):
-                agency_pubs = pub_df[pub_df[f'is_{agency}']]
-                if len(agency_pubs) > 0:
-                    agency_pmids = set(agency_pubs[link_key].dropna().unique())
-                    total = len(agency_pmids)
-
-                    # Current coverage
-                    current_with_tools = len(agency_pmids & linked_pmids)
-                    current_pct = (current_with_tools / total * 100) if total > 0 else 0
-
-                    # After PR coverage (current + new from this PR)
-                    new_from_pr = len(agency_pmids & new_tool_pmids)
-                    after_with_tools = current_with_tools + new_from_pr
-                    after_pct = (after_with_tools / total * 100) if total > 0 else 0
-
-                    # Change
-                    change = f"+{new_from_pr}" if new_from_pr > 0 else "—"
-                    change_pct = f"(+{after_pct - current_pct:.1f}%)" if new_from_pr > 0 else ""
-
-                    # Target
-                    target = int(total * 0.8)
-                    target_status = "✅" if after_pct >= 80 else f"{target - after_with_tools} needed"
-
-                    print(f"| {agency} | {current_with_tools}/{total} ({current_pct:.1f}%) | "
-                          f"{after_with_tools}/{total} ({after_pct:.1f}%) | "
-                          f"{change} {change_pct} | {target_status} |")
-
-            print(f"\n*Note: 'After Merge' shows projected coverage if all tools in this PR are validated and merged.*")
-
-        else:
-            print(f"\n⚠️ Could not determine link key for coverage calculation")
-
-    except Exception as e:
-        print(f"\n⚠️ Error loading coverage data: {e}")
-
-    # ========================================================================
-    # Section 2: Key Capabilities
-    # ========================================================================
-    print(f"\n## Key Capabilities")
-    print(f"\n🤖 **Automated Mining:** Weekly PMC mining with fuzzy matching (88% threshold)")
-    print(f"🧠 **Metadata Extraction:** 20+ fields pre-filled (~70-80% less manual entry)")
-    print(f"🤖 **AI Validation:** Goose + Claude Sonnet 4 (100% false positive detection)")
-    print(f"💾 **Smart Caching:** 50% fewer API calls, 80-85% cost reduction")
-    print(f"📤 **Production-Ready:** VALIDATED_*.csv files with false positives removed")
-
-    # ========================================================================
-    # Section 3: Novel Tools Found
-    # ========================================================================
-    print(f"\n## 🎯 Mining Results Summary")
-
-    # Check if full text mining results exist
-    fulltext_file = 'priority_publications_FULLTEXT.csv'
-    if os.path.exists(fulltext_file):
-        try:
-            fulltext_df = pd.read_csv(fulltext_file)
-
-            print(f"\n- **Publications Analyzed:** {len(fulltext_df)}")
-
-            # Tool type breakdown
-            if 'cell_lines' in fulltext_df.columns:
-                cell_lines_count = fulltext_df['cell_lines'].str.len().gt(0).sum()
-                if cell_lines_count > 0:
-                    print(f"- 🧫 **Cell Lines:** {cell_lines_count} publications")
-            if 'antibodies' in fulltext_df.columns:
-                antibodies_count = fulltext_df['antibodies'].str.len().gt(0).sum()
-                if antibodies_count > 0:
-                    print(f"- 🔬 **Antibodies:** {antibodies_count} publications")
-            if 'animal_models' in fulltext_df.columns:
-                animal_models_count = fulltext_df['animal_models'].str.len().gt(0).sum()
-                if animal_models_count > 0:
-                    print(f"- 🐭 **Animal Models:** {animal_models_count} publications")
-            if 'genetic_reagents' in fulltext_df.columns:
-                genetic_reagents_count = fulltext_df['genetic_reagents'].str.len().gt(0).sum()
-                if genetic_reagents_count > 0:
-                    print(f"- 🧬 **Genetic Reagents:** {genetic_reagents_count} publications")
-
-            # Check for GFF publications
-            gff_file = 'GFF_publications_with_tools_FULLTEXT.csv'
-            if os.path.exists(gff_file):
-                gff_mining_df = pd.read_csv(gff_file)
-                if not gff_mining_df.empty:
-                    print(f"\n### 🎓 GFF Publications")
-                    print(f"\nFound **{len(gff_mining_df)} GFF-funded publications** with potential tools")
-
-        except Exception as e:
-            print(f"\n⚠️ Error reading mining results: {e}")
-    else:
-        print(f"\n⚠️ Full text mining results not found.")
-
-    # ========================================================================
-    # Section 4: AI Validation Example (if validation reports exist)
-    # ========================================================================
-    validation_summary = 'tool_reviews/validation_summary.json'
-    if os.path.exists(validation_summary):
-        print(f"\n## AI Validation Example")
-        print(f"\n**Sample Publication Review:**")
-        print(f"- **PMID:** [Example from validation reports]")
-        print(f"- **Mining found:** Tools identified in text")
-        print(f"- **AI verdict:** Accept/Reject with confidence score")
-        print(f"- **Reasoning:** Context-based analysis")
-        print(f"- **Result:** False positive detection ✅")
-        print(f"\nSee `tool_reviews/validation_report.xlsx` for full validation results.")
-
-    # ========================================================================
-    # Footer
-    # ========================================================================
-    print(f"\n---")
-    print(f"\n*Created with AI assistance from [Claude Code](https://claude.com/claude-code)*")
+    print()
+    print("---")
+    print("*Automated via `.github/workflows/check-tool-coverage.yml`*")
 
 
 if __name__ == "__main__":
