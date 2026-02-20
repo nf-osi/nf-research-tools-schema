@@ -34,10 +34,10 @@ def load_validation_report():
 
 
 def load_validated_counts():
-    """Return {stem: row_count} for each ACCEPTED_*.csv in outputs dir."""
+    """Return {stem: row_count} for each VALIDATED_*.csv in outputs dir."""
     counts = {}
-    for path in sorted(OUTPUTS_DIR.glob('ACCEPTED_*.csv')):
-        stem = path.stem.replace('ACCEPTED_', '')  # e.g. 'animal_models'
+    for path in sorted(OUTPUTS_DIR.glob('VALIDATED_*.csv')):
+        stem = path.stem.replace('VALIDATED_', '')  # e.g. 'animal_models'
         try:
             df = pd.read_csv(path)
             counts[stem] = len(df)
@@ -96,7 +96,7 @@ def main():
 
     # ── Tool type breakdown ─────────────────────────────────────────────────
     if tool_counts:
-        csv_label = "ACCEPTED_*.csv" if using_validated else "SUBMIT_*.csv (VALIDATED not yet created)"
+        csv_label = "VALIDATED_*.csv" if using_validated else "SUBMIT_*.csv (VALIDATED not yet created)"
         total_rows = sum(tool_counts.values())
         print()
         print(f"## 🎯 Novel Tool Suggestions by Type")
@@ -126,7 +126,7 @@ def main():
     print("## 📁 Files in This PR")
     print()
     if using_validated:
-        print("- `tool_coverage/outputs/ACCEPTED_*.csv` — ⭐ **use these for Synapse upload** (false positives filtered)")
+        print("- `tool_coverage/outputs/VALIDATED_*.csv` — ⭐ **use these for Synapse upload** (false positives filtered)")
         print("- `tool_coverage/outputs/SUBMIT_*.csv` — intermediate files (pre-filter)")
     else:
         print("- `tool_coverage/outputs/SUBMIT_*.csv` — tool suggestions (validation filter did not run)")
@@ -139,7 +139,7 @@ def main():
     print("1. **Check `validation_report.csv`** — review accepted tool names per publication")
     if pubs_needing_review:
         print(f"2. **Manually review {pubs_needing_review} uncertain publication(s)** listed above")
-    print("2. **Spot-check `ACCEPTED_*.csv`** — remove any remaining false positives")
+    print("2. **Spot-check `VALIDATED_*.csv`** — remove any remaining false positives")
     print("3. **Fill in missing fields** (vendor info, RRIDs, catalog numbers where blank)")
     print("4. **Merge PR** → triggers Synapse upsert workflow automatically")
     print()
@@ -150,7 +150,7 @@ def main():
 
     print()
     print("---")
-    print("*Automated via `.github/workflows/publication-mining.yml`*")
+    print("*Automated via `.github/workflows/check-tool-coverage.yml`*")
 
 
 if __name__ == "__main__":
