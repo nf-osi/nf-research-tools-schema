@@ -26,6 +26,18 @@ REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 
+# Minimal YAML output template — only fields needed for VALIDATED_*.csv submission files
+TOOL_VALIDATION_YAML_TEMPLATE = """\
+toolValidations:
+  - toolName: "Exact tool name as it appears in text"
+    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+    verdict: "Accept" | "Reject" | "Uncertain"
+    confidence: 0.0-1.0
+    recommendation: "Keep" | "Remove" | "Manual Review Required"
+    contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."
+    usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
+  # Repeat for each tool. Use [] if no tools found."""
+
 # Module-level cache for recipe content (loaded once)
 _recipe_system_prompt = None
 _recipe_task_instructions = None
@@ -54,21 +66,9 @@ def _load_recipe():
         recipe = yaml.safe_load(f)
 
     _recipe_system_prompt = recipe.get('instructions', '').strip()
-
-    full_prompt = recipe.get('prompt', '')
-    # Drop step 1 (file reading) — we embed content directly in the message.
-    # Task instructions start at "2. For each mined tool".
-    lines = full_prompt.split('\n')
-    start = next(
-        (i for i, l in enumerate(lines) if l.strip().startswith('2. For each mined tool')),
-        0
-    )
-    # Also drop the final "9. Create a YAML file..." step — we handle file writing in Python.
-    end = next(
-        (i for i, l in enumerate(lines) if l.strip().startswith('9. Create a YAML file')),
-        len(lines)
-    )
-    _recipe_task_instructions = '\n'.join(lines[start:end]).strip()
+    # Use the full prompt as task instructions — publication content is embedded directly
+    # in the user message so there is no file-reading step to skip.
+    _recipe_task_instructions = recipe.get('prompt', '').strip()
 
 
 def _format_mined_tools(tools_list):
@@ -99,15 +99,6 @@ def build_review_prompt(input_data):
 
     tools_text = _format_mined_tools(input_data.get('minedTools', []))
 
-    # Extract the YAML output template from the recipe (between the ``` fences)
-    recipe_path = Path(RECIPE_PATH)
-    with open(recipe_path) as f:
-        raw = f.read()
-    yaml_template_match = re.search(r'(```yaml.*?```)', raw, re.DOTALL)
-    yaml_template = yaml_template_match.group(1) if yaml_template_match else ''
-    # Substitute template variables
-    yaml_template = yaml_template.replace('{{ pmid }}', pmid).replace('{{ doi }}', doi)
-
     user_message = f"""Review publication {pmid} for NF research tool validation.
 
 **PUBLICATION METADATA:**
@@ -137,13 +128,13 @@ def build_review_prompt(input_data):
 {tools_text}
 
 ---
-Using the publication data above, perform the following:
-
 {_recipe_task_instructions}
 
-9. Output ONLY the YAML content below (no explanation before or after). Use this exact structure:
+Output ONLY the YAML below — no explanation before or after:
 
-{yaml_template}
+```yaml
+{TOOL_VALIDATION_YAML_TEMPLATE}
+```
 """
     return _recipe_system_prompt, user_message
 
@@ -154,12 +145,12 @@ def extract_yaml_from_response(text):
     match = re.search(r'```yaml\s*\n(.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Try plain ``` ... ``` block whose content starts with publicationMetadata:
-    match = re.search(r'```\s*\n(publicationMetadata:.*?)\n```', text, re.DOTALL)
+    # Try plain ``` ... ``` block whose content starts with toolValidations:
+    match = re.search(r'```\s*\n(toolValidations:.*?)\n```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # Bare YAML starting at publicationMetadata:
-    match = re.search(r'(publicationMetadata:.*)', text, re.DOTALL)
+    # Bare YAML starting at toolValidations:
+    match = re.search(r'(toolValidations:.*)', text, re.DOTALL)
     if match:
         return match.group(1).strip()
     return None
@@ -449,8 +440,8 @@ def run_direct_review(pmid, input_data, results_dir, client, max_retries=3):
             # Validate structure
             try:
                 data = yaml.safe_load(yaml_text)
-                if not isinstance(data, dict) or 'publicationMetadata' not in data:
-                    safe_print(f"⚠️  Invalid YAML structure (missing publicationMetadata)")
+                if not isinstance(data, dict) or 'toolValidations' not in data:
+                    safe_print(f"⚠️  Invalid YAML structure (missing toolValidations)")
                     if attempt < max_retries - 1:
                         time.sleep(2 ** attempt)
                         continue
@@ -560,19 +551,7 @@ def compile_validation_results(mining_df, results_dir):
         rejected_tools = []
         uncertain_tools = []
 
-        # Common fields present in every tool entry
-        _common_keys = {
-            'toolName', 'toolType', 'verdict', 'confidence',
-            'recommendation', 'contextSnippet', 'usageType',
-        }
-
         for tool_val in tool_validations:
-            # Capture all type-specific fields Claude extracted (anything beyond common keys)
-            extracted_fields = {
-                k: v for k, v in tool_val.items()
-                if k not in _common_keys and not k.startswith('#') and v not in (None, '', [])
-            }
-
             tool_info = {
                 'pmid': pmid,
                 'toolName': tool_val.get('toolName'),
@@ -582,7 +561,6 @@ def compile_validation_results(mining_df, results_dir):
                 'recommendation': tool_val.get('recommendation'),
                 'contextSnippet': tool_val.get('contextSnippet', ''),
                 'usageType': tool_val.get('usageType', ''),
-                'extractedFields': extracted_fields,
             }
             rec = tool_val.get('recommendation', '')
             if rec == 'Keep':
@@ -722,18 +700,27 @@ def filter_submission_csvs(validation_results, output_dir='.'):
 def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     """Write SUBMIT_*.csv files from accepted toolValidations for direct submission.
 
-    Column names match the actual Synapse table schemas (verified from live tables).
-    Tracking columns prefixed with '_' are stripped by clean_submission_csvs.py before upload.
-
-    For types with no name column in the detail table (cell_line, advanced_cellular_model,
-    patient_derived_model), the tool name is recorded in SUBMIT_resources.csv under resourceName.
-    All other types also get a resources row so the Resources table stays in sync.
+    In discovery mode (no pre-mined tools), Claude records found tools directly in
+    toolValidations. This function converts those validated tool entries into the
+    same SUBMIT_*.csv format expected by filter_submission_csvs.
     """
     print("\n" + "=" * 80)
     print("Writing SUBMIT_*.csv from Validated Tools")
     print("=" * 80)
 
-    # Plural filename stem
+    # Type-specific primary name column (matches filter_submission_csvs expectations)
+    name_column_map = {
+        'animal_model': 'name',
+        'antibody': 'targetAntigen',
+        'cell_line': '_cellLineName',
+        'genetic_reagent': 'insertName',
+        'computational_tool': 'softwareName',
+        'advanced_cellular_model': '_modelName',
+        'patient_derived_model': '_modelName',
+        'clinical_assessment_tool': 'assessmentName',
+    }
+
+    # Plural filename stem — matches what filter_submission_csvs looks for in filenames
     type_to_stem = {
         'animal_model': 'animal_models',
         'antibody': 'antibodies',
@@ -745,164 +732,19 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         'clinical_assessment_tool': 'clinical_assessment_tools',
     }
 
-    # Synapse resourceType strings for the Resources table
-    resource_type_map = {
-        'animal_model': 'Animal Model',
-        'antibody': 'Antibody',
-        'cell_line': 'Cell Line',
-        'genetic_reagent': 'Genetic Reagent',
-        'computational_tool': 'Computational Tool',
-        'advanced_cellular_model': 'Advanced Cellular Model',
-        'patient_derived_model': 'Patient-Derived Model',
-        'clinical_assessment_tool': 'Clinical Assessment Tool',
-    }
-
-    # Synapse column templates per type (verified against live Synapse tables).
-    # Only columns that can be pre-populated from AI mining are filled;
-    # the rest are left blank for curators. ID columns are omitted (Synapse generates them).
-    # Types with no name in the detail table (cell_line, advanced_cellular_model,
-    # patient_derived_model) carry the tool name as '_toolName' (tracking only).
-    def _f(fields, key, fallback=''):
-        """Get a field from Claude's extracted fields, falling back to fallback."""
-        return fields.get(key, fallback) or fallback
-
-    def make_detail_row(tool_type, tool_name, extracted_fields=None):
-        """Return a dict of Synapse detail-table columns for one tool.
-
-        Populated from Claude's extracted type-specific fields where available,
-        with blanks for fields Claude could not find in the text.
-        """
-        f = extracted_fields or {}
-        if tool_type == 'animal_model':
-            return {
-                'strainNomenclature': _f(f, 'strainNomenclature', tool_name),
-                'backgroundStrain': _f(f, 'backgroundStrain'),
-                'backgroundSubstrain': _f(f, 'backgroundSubstrain'),
-                'animalModelGeneticDisorder': _f(f, 'animalModelGeneticDisorder'),
-                'animalModelOfManifestation': _f(f, 'animalModelOfManifestation'),
-                'transplantationType': _f(f, 'transplantationType'),
-                'animalState': _f(f, 'animalState'),
-                'generation': _f(f, 'generation'),
-                'donorId': '',
-                'transplantationDonorId': '',
-            }
-        elif tool_type == 'antibody':
-            return {
-                'targetAntigen': _f(f, 'targetAntigen', tool_name),
-                'hostOrganism': _f(f, 'hostOrganism'),
-                'clonality': _f(f, 'clonality'),
-                'cloneId': _f(f, 'cloneId'),
-                'uniprotId': _f(f, 'uniprotId'),
-                'reactiveSpecies': _f(f, 'reactiveSpecies'),
-                'conjugate': _f(f, 'conjugate'),
-            }
-        elif tool_type == 'cell_line':
-            return {
-                '_toolName': tool_name,      # tracking only — name goes in resources
-                'organ': _f(f, 'organ'),     # required; curator fills if Claude couldn't
-                'tissue': _f(f, 'tissue'),
-                'cellLineManifestation': _f(f, 'cellLineManifestation'),
-                'cellLineGeneticDisorder': _f(f, 'cellLineGeneticDisorder'),
-                'cellLineCategory': _f(f, 'cellLineCategory'),
-                'cultureMedia': _f(f, 'cultureMedia'),
-                'donorId': '',
-                'originYear': _f(f, 'originYear'),
-                'strProfile': '',
-                'resistance': _f(f, 'resistance'),
-                'contaminatedMisidentified': '',
-                'populationDoublingTime': '',
-            }
-        elif tool_type == 'genetic_reagent':
-            return {
-                'insertName': _f(f, 'insertName', tool_name),
-                'vectorType': _f(f, 'vectorType'),
-                'vectorBackbone': _f(f, 'vectorBackbone'),
-                'promoter': _f(f, 'promoter'),
-                'insertSpecies': _f(f, 'insertSpecies'),
-                'insertEntrezId': _f(f, 'insertEntrezId'),
-                'selectableMarker': _f(f, 'selectableMarker'),
-                'copyNumber': _f(f, 'copyNumber'),
-                'gRNAshRNASequence': _f(f, 'gRNAshRNASequence'),
-            }
-        elif tool_type == 'computational_tool':
-            return {
-                'softwareName': tool_name,
-                'softwareType': _f(f, 'softwareType'),
-                'softwareVersion': _f(f, 'softwareVersion'),
-                'programmingLanguage': _f(f, 'programmingLanguage'),
-                'sourceRepository': _f(f, 'sourceRepository'),
-                'documentation': _f(f, 'documentation'),
-                'licenseType': _f(f, 'licenseType'),
-                'containerized': _f(f, 'containerized'),
-                'maintainer': _f(f, 'maintainer'),
-            }
-        elif tool_type == 'advanced_cellular_model':
-            return {
-                '_toolName': tool_name,      # tracking only — name goes in resources
-                'modelType': _f(f, 'modelType'),
-                'derivationSource': _f(f, 'derivationSource'),
-                'cellTypes': _f(f, 'cellTypes'),
-                'organoidType': _f(f, 'organoidType'),
-                'matrixType': _f(f, 'matrixType'),
-                'cultureSystem': _f(f, 'cultureSystem'),
-                'cultureMedia': _f(f, 'cultureMedia'),
-                'maturationTime': _f(f, 'maturationTime'),
-                'characterizationMethods': _f(f, 'characterizationMethods'),
-                'passageNumber': _f(f, 'passageNumber'),
-                'cryopreservationProtocol': _f(f, 'cryopreservationProtocol'),
-                'qualityControlMetrics': _f(f, 'qualityControlMetrics'),
-            }
-        elif tool_type == 'patient_derived_model':
-            return {
-                '_toolName': tool_name,      # tracking only — name goes in resources
-                'modelSystemType': _f(f, 'modelSystemType'),
-                'patientDiagnosis': _f(f, 'patientDiagnosis'),
-                'hostStrain': _f(f, 'hostStrain'),
-                'tumorType': _f(f, 'tumorType'),
-                'engraftmentSite': _f(f, 'engraftmentSite'),
-                'passageNumber': _f(f, 'passageNumber'),
-                'establishmentRate': _f(f, 'establishmentRate'),
-                'molecularCharacterization': _f(f, 'molecularCharacterization'),
-                'clinicalData': _f(f, 'clinicalData'),
-                'humanizationMethod': _f(f, 'humanizationMethod'),
-                'immuneSystemComponents': _f(f, 'immuneSystemComponents'),
-                'validationMethods': _f(f, 'validationMethods'),
-            }
-        elif tool_type == 'clinical_assessment_tool':
-            return {
-                'assessmentName': tool_name,
-                'assessmentType': _f(f, 'assessmentType'),
-                'targetPopulation': _f(f, 'targetPopulation'),
-                'diseaseSpecific': _f(f, 'diseaseSpecific'),
-                'numberOfItems': _f(f, 'numberOfItems'),
-                'scoringMethod': _f(f, 'scoringMethod'),
-                'validatedLanguages': _f(f, 'validatedLanguages'),
-                'psychometricProperties': _f(f, 'psychometricProperties'),
-                'administrationTime': _f(f, 'administrationTime'),
-                'availabilityStatus': _f(f, 'availabilityStatus'),
-                'licensingRequirements': _f(f, 'licensingRequirements'),
-                'digitalVersion': _f(f, 'digitalVersion'),
-            }
-        else:
-            return {'_toolName': tool_name}
-
-    # Collect tools grouped by type, plus a flat list for resources
+    # Group accepted tools by normalized type
     tools_by_type = {}
-    resource_rows = []
-
     for result in validation_results:
-        pub_pmid = result.get('pmid', '')
         pub_doi = result.get('doi', '')
         pub_title = result.get('title', '')
         pub_year = result.get('year', '')
-
         for tool in result.get('acceptedTools', []):
             raw_type = tool.get('toolType', '')
             tool_type = normalize_tool_type(raw_type)
-            tool_name = tool.get('toolName', '')
-
-            tracking = {
-                '_pmid': tool.get('pmid', pub_pmid),
+            if tool_type not in tools_by_type:
+                tools_by_type[tool_type] = []
+            tools_by_type[tool_type].append({
+                '_pmid': tool.get('pmid', result.get('pmid', '')),
                 '_doi': pub_doi,
                 '_publicationTitle': pub_title,
                 '_year': pub_year,
@@ -910,30 +752,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 '_confidence': tool.get('confidence', ''),
                 '_verdict': tool.get('verdict', ''),
                 '_usageType': tool.get('usageType', ''),
-            }
-
-            detail = make_detail_row(tool_type, tool_name, tool.get('extractedFields', {}))
-            row = {**tracking, **detail}
-
-            if tool_type not in tools_by_type:
-                tools_by_type[tool_type] = []
-            tools_by_type[tool_type].append(row)
-
-            # Resources row for every accepted tool
-            resource_rows.append({
-                '_pmid': tracking['_pmid'],
-                '_doi': pub_doi,
-                '_publicationTitle': pub_title,
-                '_year': pub_year,
-                '_confidence': tracking['_confidence'],
-                '_toolType': tool_type,
-                'resourceName': tool_name,
-                'resourceType': resource_type_map.get(tool_type, tool_type),
-                'rrid': '',
-                'synonyms': '',
-                'description': '',
-                'aiSummary': '',
-                'howToAcquire': '',
+                'toolName': tool.get('toolName', ''),
             })
 
     if not tools_by_type:
@@ -943,19 +762,27 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    for tool_type, rows in tools_by_type.items():
+    for tool_type, tools in tools_by_type.items():
+        name_col = name_column_map.get(tool_type, 'name')
         stem = type_to_stem.get(tool_type, tool_type)
+        rows = []
+        for t in tools:
+            row = {
+                '_pmid': t['_pmid'],
+                '_doi': t['_doi'],
+                '_publicationTitle': t['_publicationTitle'],
+                '_year': t['_year'],
+                '_context': t['_context'],
+                '_confidence': t['_confidence'],
+                '_verdict': t['_verdict'],
+                '_usageType': t['_usageType'],
+                name_col: t['toolName'],
+            }
+            rows.append(row)
         df = pd.DataFrame(rows)
         out_file = output_path / f'SUBMIT_{stem}.csv'
         df.to_csv(out_file, index=False)
         print(f"  Created SUBMIT_{stem}.csv: {len(df)} rows")
-
-    # Write resources CSV (one row per accepted tool, all types)
-    if resource_rows:
-        res_df = pd.DataFrame(resource_rows)
-        res_file = output_path / 'SUBMIT_resources.csv'
-        res_df.to_csv(res_file, index=False)
-        print(f"  Created SUBMIT_resources.csv: {len(res_df)} rows")
 
 
 def main():
@@ -1062,6 +889,14 @@ def main():
                 cache_file = cache_dir / f"{clean_pmid.replace('PMID:', '')}_text.json"
                 if not cache_file.exists():
                     continue  # no cache - will be skipped anyway
+                # Skip abstract_only caches (no methods section — would be skipped during processing anyway)
+                try:
+                    with open(cache_file) as _cf:
+                        _cache_meta = json.load(_cf)
+                    if _cache_meta.get('cache_level') == 'abstract_only' or not _cache_meta.get('methods'):
+                        continue
+                except Exception:
+                    pass
                 eligible.append(pmid)
             if len(eligible) > args.max_reviews:
                 cap_pmids = set(eligible[:args.max_reviews])
@@ -1072,10 +907,10 @@ def main():
                     yaml_path = results_path / f'{clean_pmid}_tool_review.yaml'
                     return yaml_path.exists() or pmid in cap_pmids
                 mining_df = mining_df[mining_df.apply(keep_row, axis=1)]
-                print(f"\n⚠️  Capped to {args.max_reviews} Goose reviews this run "
+                print(f"\n⚠️  Capped to {args.max_reviews} AI reviews this run "
                       f"({len(eligible) - args.max_reviews} deferred to next run)")
             else:
-                print(f"\n✅ {len(eligible)} publications need Goose review (within --max-reviews {args.max_reviews})")
+                print(f"\n✅ {len(eligible)} publications eligible for AI review (within --max-reviews {args.max_reviews})")
 
         print(f"\n{'='*80}")
         print(f"Running Goose Reviews for {len(mining_df)} publications")
@@ -1184,9 +1019,9 @@ def main():
     print("=" * 80)
     print("\nNext steps:")
     print("  1. Review validation_report.xlsx for summary")
-    print("  2. Check tool_coverage/outputs/ACCEPTED_*.csv files (rejected tools removed)")
+    print("  2. Check tool_coverage/outputs/VALIDATED_*.csv files (rejected tools removed)")
     print("  3. Manually review 'uncertain' tools if any")
-    print("  4. Manually verify ACCEPTED_*.csv files before uploading to Synapse")
+    print("  4. Manually verify VALIDATED_*.csv files before uploading to Synapse")
     print("=" * 80)
 
 if __name__ == '__main__':
