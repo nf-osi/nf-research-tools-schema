@@ -47,7 +47,7 @@ toolValidations:
     # patient_derived_model:  modelSystemType* [PDX|PDO|other], patientDiagnosis*, hostStrain, tumorType, engraftmentSite
     # clinical_assessment_tool: assessmentType* [scale|questionnaire|interview|performance test|biomarker|other], targetPopulation* [pediatric|adult|caregiver|all ages|other], diseaseSpecific [Yes|No], numberOfItems, scoringMethod
     # (* = critical field, fill if at all possible)
-  # Repeat for each tool. Use [] if no tools found."""
+  # Repeat for each tool. If no tools found, output: toolValidations: []"""
 
 # Observation extraction YAML output template
 OBSERVATION_YAML_TEMPLATE = """\
@@ -59,7 +59,7 @@ observations:
     foundIn: "Results" | "Discussion" | "Both"
     contextSnippet: "...up to 300 chars of verbatim text supporting this observation..."
     confidence: 0.0-1.0
-  # Repeat for each observation. Use [] if no qualifying observations found."""
+  # Repeat for each observation. If no qualifying observations found, output: observations: []"""
 
 # Module-level cache for recipe content (loaded once)
 _recipe_system_prompt = None
@@ -197,11 +197,11 @@ def run_observation_extraction(pmid, input_data, accepted_tool_names, results_di
             yaml_text = None
             match = re.search(r'```yaml\s*\n(.*?)\n```', response_text, re.DOTALL)
             if match:
-                yaml_text = match.group(1).strip()
+                yaml_text = _clean_yaml_text(match.group(1).strip())
             else:
                 match = re.search(r'(observations:.*)', response_text, re.DOTALL)
                 if match:
-                    yaml_text = match.group(1).strip()
+                    yaml_text = _clean_yaml_text(match.group(1).strip())
 
             if not yaml_text:
                 safe_print(f"  ⚠️  No YAML found in response")
@@ -306,20 +306,41 @@ Output ONLY the YAML below — no explanation before or after:
     return _recipe_system_prompt, user_message
 
 
+def _clean_yaml_text(yaml_text):
+    """Clean common Claude YAML output artifacts before parsing.
+
+    Claude sometimes appends [] at column 1 after a populated list (treating it
+    as a "terminator" or "empty list" sentinel), which is invalid in a block
+    mapping context and causes yaml.safe_load to raise a ScannerError.
+    Also strips trailing YAML comment lines that can confuse the parser.
+    """
+    if not yaml_text:
+        return yaml_text
+    lines = yaml_text.splitlines()
+    cleaned = []
+    for line in lines:
+        stripped = line.strip()
+        # Drop bare [] at the start of a line (root-level, not indented inside a value)
+        if stripped == '[]' and not line.startswith(' ') and not line.startswith('\t'):
+            continue
+        cleaned.append(line)
+    return '\n'.join(cleaned).strip()
+
+
 def extract_yaml_from_response(text):
-    """Extract YAML content from Claude's response text."""
+    """Extract and clean YAML content from Claude's response text."""
     # Try ```yaml ... ``` block
     match = re.search(r'```yaml\s*\n(.*?)\n```', text, re.DOTALL)
     if match:
-        return match.group(1).strip()
+        return _clean_yaml_text(match.group(1).strip())
     # Try plain ``` ... ``` block whose content starts with toolValidations:
     match = re.search(r'```\s*\n(toolValidations:.*?)\n```', text, re.DOTALL)
     if match:
-        return match.group(1).strip()
+        return _clean_yaml_text(match.group(1).strip())
     # Bare YAML starting at toolValidations:
     match = re.search(r'(toolValidations:.*)', text, re.DOTALL)
     if match:
-        return match.group(1).strip()
+        return _clean_yaml_text(match.group(1).strip())
     return None
 
 
