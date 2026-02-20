@@ -3,6 +3,8 @@
 Post-process VALIDATED_*.csv outputs to apply quality filters and generate outputs.
 
 Filters applied (beyond AI verdict):
+  All tool types:
+    - Publications whose title lacks NF-specific terms (NF1/NF2/MPNST/etc.)
   Computational tools:
     - Generic stats/analysis environments (MATLAB, R, ImageJ, etc.)
     - Generic bioinformatics tools (STAR, DESeq2, Cytoscape, MaxQuant, etc.)
@@ -10,22 +12,35 @@ Filters applied (beyond AI verdict):
     - Unnamed tools with no version AND no repo at confidence < 0.9
   Antibodies:
     - Secondary antibodies (clonality = Secondary)
+    - Generic loading control antibodies (Beta-actin, GAPDH, alpha-tubulin, etc.)
+    - _resourceName prefixed with 'anti-' for clarity
   Animal models:
     - Wildtype controls / Cre drivers with no known disease
-      (animalModelGeneticDisorder is empty or "No known disease")
+    - fl/flox synonym consolidation (NF1 fl/fl ≡ NF1 flox/flox)
   Genetic reagents:
     - Lab consumables, kits, and chemical probes misclassified as genetic reagents
+    - Generic names without specific identifiers (Gateway entry vector, etc.)
   Patient-derived models:
     - Vague generic PDX descriptors with no specific model ID or NF context
+    - Trailing ' PDX' suffix stripped (kept if followed by number, e.g. PDX-1)
   Clinical assessment tools:
     - Hardware devices (microscopes, scanners, EEG systems, etc.)
     - Lab assays/kits misclassified as clinical tools (ELISA, caspase kits, etc.)
     - Generic physical performance tests (gait test, treadmill, BBB locomotor, etc.)
     - Generic psychological scales not specific to NF (Perceived Stress Scale, etc.)
+    - Tools whose name is not in the publication title AND 'tool' not in title
+  Advanced cellular models:
+    - Publications whose title lacks 3D/organoid/spheroid/sphere terms
+  Cell lines:
+    - Generic names (Primary Schwannoma Cells, etc.)
+    - Trailing ' cells' / ' cell line' stripped from _resourceName
 
 Outputs:
   - Updated VALIDATED_*.csv: deduplicated (1 row per unique tool, synonyms merged),
     blank resourceId column added (populated at Synapse upsert time)
+  - VALIDATED_donor.csv: species-level donor info for animal models (→ syn26486829)
+  - VALIDATED_vendor.csv: vendor names extracted from antibody contexts (→ syn26486850)
+  - VALIDATED_vendorItem.csv: catalog numbers per vendor-resource (→ syn26486843)
   - review.csv: 1 row per PMID, novel tools listed by category (pub-centric)
   - review_filtered.csv: tools removed by post-filter, tool-centric (audit trail)
 
@@ -34,6 +49,7 @@ Usage:
 """
 
 import csv
+import hashlib
 import re
 import sys
 import argparse
@@ -77,6 +93,24 @@ NF_PATHWAY_GENES = frozenset({
     'cd3', 'cd8', 'cd4', 'cd68', 'cd163', 'foxp3', 'pd-l1', 'pdl1', 'pd-1',
     'csf1r', 'iba1',
 })
+
+# ── NF-specific publication title filter ─────────────────────────────────────
+# Publications must mention at least one of these terms (case-insensitive) to
+# contribute tools of any category.  Prevents off-topic papers from diluting the
+# registry.  Mesothelioma and meningioma are included as NF2-associated cancers.
+_NF_TITLE_RE = re.compile(
+    r'\b(nf[\-\s]?1|nf[\-\s]?2|swn|schwannomatosis|neurofibromatosis|neurofibroma'
+    r'|schwannoma|mpnst|malignant\s+peripheral\s+nerve\s+sheath'
+    r'|mesothelioma|meningioma'
+    r'|lztr1|smarcb1|ini1|spred1)',
+    re.IGNORECASE,
+)
+
+
+def _has_nf_title(pub_title: str) -> bool:
+    """Return True if the publication title mentions NF-relevant terminology."""
+    return bool(_NF_TITLE_RE.search(pub_title))
+
 
 # ── Computational tools blocklist ─────────────────────────────────────────────
 
@@ -133,6 +167,23 @@ GENERIC_COMPUTATIONAL_PATTERNS = (
     'whole exome sequencing', 'whole genome sequencing',
     'bulk rna sequencing', 'single-cell rna sequencing',
     'chip-seq', 'atac-seq', 'hi-c', 'clip-seq',
+)
+
+# Prefix-based blocking: any tool whose lowercased name *starts with* one of
+# these strings is generic, regardless of version suffix appended.
+GENERIC_COMPUTATIONAL_PREFIXES = (
+    'imagej',            # ImageJ 1.53a, ImageJ (NIH), etc.
+    'image j',           # Image J variants with space
+    'graphpad prism',    # GraphPad Prism 8, Prism version 9, etc.
+    'prism version',     # "Prism version 9" (bare prism without GraphPad)
+    'upsetr',            # UpSetR version 1.4.0
+    'upset ',            # UpSet (other capitalizations)
+    'sas, version',      # "SAS, version 9.4"
+    'sas version',       # "SAS version 9.4"
+    'r version',         # "R version 3.5.0" (generic R)
+    'python version',    # "Python version 3.9"
+    'string version',    # "STRING version 11.5"
+    'string v',          # "STRING v11"
 )
 
 # ── Clinical assessment tools filters ─────────────────────────────────────────
@@ -276,6 +327,35 @@ GENETIC_NON_REAGENT_PATTERNS = (
     'vectastain', 'vecta stain',  # Vectastain Elite ABC — IHC detection kit
 )
 
+# Exact-match names for genetic reagents that are too generic for the registry
+GENERIC_GENETIC_REAGENT_NAMES = frozenset({
+    'gateway entry vector',      # Generic cloning system, not a specific construct
+    'baculovirus expression vector',  # Generic vector class
+    'e. coli expression vector',      # Generic bacterial expression class
+    'luciferase reporter',            # Too vague without specific promoter details
+    'dual luciferase reporter',       # Ditto
+    'pan-t-cell isolation',           # Cell isolation kit, not a genetic construct
+})
+
+# ── Generic loading-control antibodies (should not appear in tool registry) ───
+GENERIC_CONTROL_ANTIBODIES = frozenset({
+    'beta-actin', 'β-actin', 'b-actin', 'beta actin',
+    'alpha-tubulin', 'α-tubulin', 'alpha tubulin',
+    'gapdh',
+    'lamin b', 'lamin b1', 'lamin a/c',
+    'histone h3', 'total histone h3',
+    'vinculin',
+})
+
+# ── Generic cell line names (too vague for NF tool registry) ─────────────────
+GENERIC_CELL_LINE_NAMES = frozenset({
+    'primary schwannoma cells',
+    'primary neurofibroma cells',
+    'primary schwann cells',
+    'normal schwann cells',
+    'normal human schwann cells',
+})
+
 # ── Critical fields per type (for completeness scoring) ──────────────────────
 
 CRITICAL_FIELDS: dict[str, list[str]] = {
@@ -409,6 +489,11 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     """Return (remove, reason) — additional quality gate beyond AI verdict."""
     confidence = float(row.get('_confidence', 0) or 0)
 
+    # ── Global: publication title must mention NF-related terms ──────────────
+    pub_title = row.get('_publicationTitle', '').strip()
+    if pub_title and not _has_nf_title(pub_title):
+        return True, f"Publication title lacks NF-specific terms: {pub_title[:80]}"
+
     if tool_type == 'computational_tools':
         name = row.get('softwareName', '').strip()
         name_lc = name.lower()
@@ -416,6 +501,9 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             return True, f"Generic bioinformatics/stats tool: {name}"
         if any(p in name_lc for p in GENERIC_COMPUTATIONAL_PATTERNS):
             return True, f"Sequencing hardware or generic assay protocol: {name}"
+        # Block versioned generics by prefix (e.g. "ImageJ 1.53a", "GraphPad Prism 9")
+        if any(name_lc.startswith(p) for p in GENERIC_COMPUTATIONAL_PREFIXES):
+            return True, f"Generic tool (versioned): {name}"
         has_version = bool(row.get('softwareVersion', '').strip())
         has_repo = bool(row.get('sourceRepository', '').strip())
         if not has_version and not has_repo and confidence < 0.9:
@@ -424,6 +512,16 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     elif tool_type == 'antibodies':
         if row.get('clonality', '').strip() == 'Secondary':
             return True, "Secondary antibody (not an NF-specific research tool)"
+        # Generic loading-control antibodies used as internal standards
+        antigen_lc = row.get('targetAntigen', '').lower().strip()
+        if antigen_lc in GENERIC_CONTROL_ANTIBODIES:
+            return True, f"Generic loading-control antibody: {antigen_lc}"
+
+    elif tool_type == 'cell_lines':
+        cell_name = (row.get('_toolName', '') or '').strip()
+        cell_name_lc = cell_name.lower()
+        if cell_name_lc in GENERIC_CELL_LINE_NAMES:
+            return True, f"Generic cell line name: {cell_name}"
 
     elif tool_type == 'animal_models':
         disorder = row.get('animalModelGeneticDisorder', '').strip()
@@ -439,6 +537,9 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             return True, f"Drug compound (class suffix): {insert}"
         if insert_lc in DRUG_COMPOUND_NAMES:
             return True, f"Drug compound: {insert}"
+        # Exact-match generic reagent class names
+        if insert_lc in GENERIC_GENETIC_REAGENT_NAMES:
+            return True, f"Generic reagent name (no specific identifier): {insert}"
         # Non-genetic lab consumables, assay kits, media, reagents
         if any(p in insert_lc for p in GENETIC_NON_REAGENT_PATTERNS):
             return True, f"Non-genetic lab reagent/kit/consumable: {insert}"
@@ -452,9 +553,16 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
                         'xenograft models', 'tumor xenograft')
         is_generic = any(p in name_lc for p in _GENERIC_PDX)
         has_nf = any(t in name_lc for t in _NF_TERMS)
-        has_id  = bool(re.search(r'[A-Z]{2,4}[-–]\d{1,4}|(?:pdox|pdx)-?\d', name, re.IGNORECASE))
+        has_id = bool(re.search(r'[A-Z]{2,4}[-–]\d{1,4}|(?:pdox|pdx)-?\d', name, re.IGNORECASE))
         if is_generic and not has_nf and not has_id:
             return True, f"Vague PDX descriptor — no specific model ID or NF context: {name}"
+        # Vague PDX names: end in bare '-PDX' or '-pdx' with no following number
+        # (e.g. 'NF1-associated MPNST-PDX', 'NF1-MPNST patient-derived xenografts')
+        if not has_id:
+            if re.search(r'[-\s]pdx$', name_lc):
+                return True, f"Vague PDX name — no specific model ID (e.g. PDX-1): {name}"
+            if name_lc.endswith('patient-derived xenografts'):
+                return True, f"Plural/generic PDX description — re-mine for specific model IDs: {name}"
 
     elif tool_type == 'clinical_assessment_tools':
         name = row.get('assessmentName', '').strip()
@@ -467,6 +575,26 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             return True, "Generic physical performance test, not a validated clinical instrument"
         if name_lc in GENERIC_STRESS_SCALE_NAMES:
             return True, "Generic psychological scale (not NF-specific)"
+        # Only keep tools that appear in the publication title or that the paper developed:
+        # Criterion: tool name (or bracketed abbreviation) in title, OR 'tool' in title.
+        title_lc = pub_title.lower()
+        # Extract abbreviation from parenthetical: e.g. "(INF1-QOL)" → "inf1-qol"
+        abbrev_m = re.search(r'\(([A-Z0-9\-]{3,15})\)', name)
+        abbrev = abbrev_m.group(1).lower() if abbrev_m else ''
+        name_in_title   = name_lc in title_lc
+        abbrev_in_title = bool(abbrev and abbrev in title_lc)
+        tool_in_title   = 'tool' in title_lc
+        if not name_in_title and not abbrev_in_title and not tool_in_title:
+            return True, (f"Assessment name not in title and 'tool' not in title — "
+                          f"likely generic usage, not development: {name}")
+
+    elif tool_type == 'advanced_cellular_models':
+        # The publication title should mention 3D/organoid/spheroid terminology
+        title_lc = pub_title.lower()
+        _3D_TERMS = ('3d', '3-d', 'organoid', 'spheroid', 'sphere', 'tumoroid',
+                     'assembloid', 'microtissue', 'organ-on')
+        if not any(t in title_lc for t in _3D_TERMS):
+            return True, "Publication title lacks 3D/organoid/spheroid terminology"
 
     return False, ''
 
@@ -486,13 +614,18 @@ def _normalize_tool_name(name: str, tool_type: str) -> str:
             r'[\s,]+(?:cell(?:s)?(?:[\s-]?line(?:s)?)?|cell[\s-]?line(?:s)?)$',
             '', name, flags=re.IGNORECASE
         )
-    # Strip trailing animal suffixes
+    # Strip trailing animal suffixes; normalize fl ↔ flox synonym
     if tool_type == 'animal_models':
         name = re.sub(r'[\s,]+(?:mice?|rats?|animals?|mouse)$', '', name, flags=re.IGNORECASE)
+        # 'fl' is the official abbreviation for 'flox' (loxP-flanked allele).
+        # Normalise so that 'Nf1 fl/fl' and 'Nf1 flox/flox' collapse to one key.
+        name = re.sub(r'\bfl\b', 'flox', name, flags=re.IGNORECASE)
     # Strip leading/trailing PDX / PDOX labels for patient-derived models
-    # so "PDX JH-2-002", "JH-2-002 PDX", "JH-2-002" all normalize to the same key
+    # so "PDX JH-2-002", "JH-2-002 PDX", "JH-2-002" all normalize to the same key.
+    # But keep "MPNST PDX-1" style names (PDX followed by hyphen + number).
     if tool_type == 'patient_derived_models':
         name = re.sub(r'^(?:PDX|PDOX)\s+', '', name, flags=re.IGNORECASE)
+        # Only strip trailing ' PDX' if NOT followed by a dash+number (PDX-1, PDX-01…)
         name = re.sub(r'\s+(?:PDX|PDOX)$', '', name, flags=re.IGNORECASE)
     # Normalize all hyphens, spaces, slashes, punctuation → empty
     name = re.sub(r'[-\s/.,;:+‐–—]+', '', name.lower())
@@ -751,9 +884,35 @@ def process(output_dir: str, dry_run: bool = False) -> None:
             # Populate _resourceName from the primary name column (consistent cross-type field)
             name_col = NAME_COLUMN.get(tool_type)
             for row in kept_out:
-                row['_resourceName'] = (
-                    row.get(name_col, '') if name_col else ''
-                ) or row.get('_toolName', '')
+                raw_name = (row.get(name_col, '') if name_col else '') or row.get('_toolName', '')
+                # Save original (pre-transformation) name for resourceId computation so that
+                # the ID matches what _write_publication_link_csvs computes from the same
+                # raw NAME_COLUMN value (toolName comes from _get_tool_name which uses NAME_COLUMN).
+                _raw_for_id = raw_name
+
+                if tool_type == 'antibodies':
+                    # Prefix with 'anti-' so the registry name matches literature usage
+                    # (e.g. 'anti-collagen IV', not just 'collagen IV')
+                    if raw_name and not raw_name.lower().startswith('anti-'):
+                        raw_name = 'anti-' + raw_name
+
+                elif tool_type == 'cell_lines':
+                    # Strip trailing ' cells' / ' cell line' from output name
+                    raw_name = re.sub(
+                        r'[\s,]+(?:cell(?:s)?(?:[\s-]?line(?:s)?)?|cell[\s-]?line(?:s)?)$',
+                        '', raw_name, flags=re.IGNORECASE
+                    ).strip()
+
+                elif tool_type == 'patient_derived_models':
+                    # Strip trailing bare ' PDX' / ' PDOX' unless followed by hyphen+number
+                    # e.g. 'JH-2-079c PDX' → 'JH-2-079c'; 'MPNST PDX-1' unchanged
+                    raw_name = re.sub(r'\s+(?:PDX|PDOX)$', '', raw_name, flags=re.IGNORECASE).strip()
+
+                row['_resourceName'] = raw_name
+                # resourceId uses the pre-transformation name so it stays consistent with
+                # the IDs computed in _write_publication_link_csvs (which sees the same raw value)
+                _norm_key = _normalize_tool_name(_raw_for_id or row.get('_toolName', ''), tool_type)
+                row['resourceId'] = _make_resource_id(_norm_key, tool_type) if _norm_key else ''
 
             # Build output column order: resourceId + name + domain cols + tracking cols
             tracking_prefix = ['_pmid', '_doi', '_publicationTitle', '_year', '_context',
@@ -855,6 +1014,13 @@ def process(output_dir: str, dry_run: bool = False) -> None:
     # ── Publication link CSVs ─────────────────────────────────────────────────
     _write_publication_link_csvs(all_tool_rows, output_path, pub_meta)
 
+    # ── Donor / vendor CSVs ───────────────────────────────────────────────────
+    print(f"\n{'='*60}")
+    print("Generating donor / vendor CSVs")
+    print(f"{'='*60}")
+    _write_donor_csv(output_path)
+    _write_vendor_csvs(output_path)
+
     # ── Remove superseded SUBMIT_*.csv intermediates ──────────────────────────
     # run_publication_reviews.py writes SUBMIT_*.csv as intermediates.
     # generate_review_csv.py produces VALIDATED_*.csv for everything.
@@ -940,6 +1106,230 @@ def _filter_submit_resources(output_path: Path, kept_norm_names: dict) -> None:
         print(f"  ✅ {fname}: {len(kept)} kept, {removed} removed")
 
 
+# ── ID generation ─────────────────────────────────────────────────────────────
+
+def _make_resource_id(normalized_name: str, tool_type: str) -> str:
+    """Generate a stable 8-char hex resource ID from normalized name + type.
+
+    IDs are deterministic so resourceId is consistent across VALIDATED_*.csv
+    files and the link tables (usage, development).  These are temporary
+    placeholders replaced by real Synapse IDs at upsert time.
+    """
+    key = f"{tool_type}:{normalized_name.strip()}"
+    return 'RES' + hashlib.sha1(key.encode()).hexdigest()[:8]
+
+
+def _make_pub_id(pmid: str) -> str:
+    """Generate a stable publication ID from PMID.
+
+    Numeric PMIDs become 'PUBnnnnnnn'; non-numeric get a short hash suffix.
+    """
+    pmid = pmid.strip()
+    numeric = pmid.lstrip('PMID:').strip()
+    if numeric.isdigit():
+        return f'PUB{numeric}'
+    return 'PUB' + hashlib.sha1(pmid.encode()).hexdigest()[:8]
+
+
+# ── Species inference for donor CSV ───────────────────────────────────────────
+
+# (compiled pattern, latin_name) — ordered most-specific first
+_SPECIES_PATTERNS: list = [
+    (re.compile(r'\b(?:mouse|mice|murine|mus\s+musculus)\b', re.IGNORECASE),   'Mus musculus'),
+    (re.compile(r'\b(?:rat|rats|rattus|sprague[- ]dawley|wistar)\b', re.IGNORECASE), 'Rattus norvegicus'),
+    (re.compile(r'\b(?:zebrafish|danio\s+rerio)\b', re.IGNORECASE),            'Danio rerio'),
+    (re.compile(r'\b(?:drosophila|fruit\s+fly|melanogaster)\b', re.IGNORECASE),'Drosophila melanogaster'),
+    (re.compile(r'\b(?:pig|swine|sus\s+scrofa|porcine)\b', re.IGNORECASE),     'Sus scrofa'),
+    (re.compile(r'\b(?:rabbit|oryctolagus|cuniculus)\b', re.IGNORECASE),       'Oryctolagus cuniculus'),
+    (re.compile(r'\b(?:\bdog\b|canine|canis\b|familiaris)\b', re.IGNORECASE),  'Canis lupus familiaris'),
+    (re.compile(r'\b(?:frog|xenopus)\b', re.IGNORECASE),                       'Xenopus laevis'),
+    (re.compile(r'\b(?:yeast|saccharomyces|cerevisiae)\b', re.IGNORECASE),     'Saccharomyces cerevisiae'),
+    (re.compile(r'\b(?:human|homo\s+sapiens|patient)\b', re.IGNORECASE),       'Homo sapiens'),
+]
+
+# Common inbred/outbred mouse strain patterns that don't contain 'mouse'/'mice'
+_MOUSE_STRAIN_RE = re.compile(
+    r'\b(?:C57BL|BALB|FVB|NOD|NRG|NSG|SCID|athymic|nu/nu|nude'
+    r'|CB-17|CBA|DBA|SJL|A/J|AKR|129[/S]?v?|B6|C3H|transgenic'
+    r'|Nf[12][+\-]|p53[+\-])\b',
+    re.IGNORECASE,
+)
+
+
+def _infer_species(strain: str, context: str = '') -> str:
+    """Return the Latin species name inferred from strain + context text.
+
+    Returns '' if species cannot be determined.
+    """
+    text = f'{strain} {context}'
+    for pattern, latin in _SPECIES_PATTERNS:
+        if pattern.search(text):
+            return latin
+    # Fallback: common mouse strain nomenclature lacking explicit 'mouse'/'mice'
+    if _MOUSE_STRAIN_RE.search(strain):
+        return 'Mus musculus'
+    return ''
+
+
+def _write_donor_csv(output_path: Path) -> None:
+    """Generate VALIDATED_donor.csv (→ syn26486829) from animal model strain data.
+
+    One row per unique species found across all kept animal model rows.
+    Schema: donorId, parentDonorId, transplantationDonorId, species, sex, age, race
+    """
+    animal_file = output_path / 'VALIDATED_animal_models.csv'
+    if not animal_file.exists():
+        print('  ⏭  VALIDATED_animal_models.csv not found — skipping donor CSV')
+        return
+    try:
+        with open(animal_file, newline='', encoding='utf-8') as f:
+            rows = list(csv.DictReader(f))
+    except Exception as e:
+        print(f'  ❌ Error reading animal models: {e}')
+        return
+
+    species_seen: set = set()
+    donor_rows: list = []
+    for row in rows:
+        strain  = row.get('strainNomenclature', '').strip()
+        context = row.get('_context', '').strip()
+        species = _infer_species(strain, context)
+        if species and species not in species_seen:
+            species_seen.add(species)
+            donor_id = 'DON' + hashlib.sha1(species.encode()).hexdigest()[:8]
+            donor_rows.append({
+                'donorId':                donor_id,
+                'parentDonorId':          '',
+                'transplantationDonorId': '',
+                'species':                species,
+                'sex':                    '',
+                'age':                    '',
+                'race':                   '',
+            })
+
+    if not donor_rows:
+        print('  ⚠️  No species inferred from animal model strains — VALIDATED_donor.csv not written')
+        return
+
+    donor_rows.sort(key=lambda r: r['species'])
+    donor_file   = output_path / 'VALIDATED_donor.csv'
+    donor_fields = ['donorId', 'parentDonorId', 'transplantationDonorId',
+                    'species', 'sex', 'age', 'race']
+    with open(donor_file, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=donor_fields)
+        writer.writeheader()
+        writer.writerows(donor_rows)
+    print(f'  ✅ VALIDATED_donor.csv: {len(donor_rows)} unique species → {donor_file}')
+
+
+# ── Vendor / catalog extraction for antibody rows ─────────────────────────────
+
+# Parenthetical form: "(Cell Signaling Technology, Cat# 4370)"
+_VENDOR_PAREN_RE = re.compile(
+    r'\(([A-Za-z][^()\n]{3,50}?),?\s*[Cc]at\.?(?:\s*[Nn]o\.?|#|:)?\s*'
+    r'([A-Za-z0-9][A-Za-z0-9\-._]{2,20})\)',
+    re.IGNORECASE,
+)
+# Inline form: "Cell Signaling Technology Cat. No. 4370"
+_VENDOR_INLINE_RE = re.compile(
+    r'([A-Za-z][^\n(]{3,50}?)\s+[Cc]at\.?\s*(?:[Nn]o\.?|#|:)?\s*'
+    r'([A-Za-z0-9][A-Za-z0-9\-._]{2,20})',
+    re.IGNORECASE,
+)
+
+
+def _extract_vendor_from_context(context: str) -> tuple[str, str]:
+    """Extract (vendor_name, catalog_number) from an antibody context string.
+
+    Tries parenthetical form first: "(Vendor Name, Cat# ABC123)"
+    Falls back to inline form:     "Vendor Name Cat# ABC123"
+    Returns ('', '') when no vendor/catalog info is found.
+    """
+    for m in _VENDOR_PAREN_RE.finditer(context):
+        vendor_raw = m.group(1).strip().rstrip(',').strip()
+        cat        = m.group(2).strip()
+        if len(vendor_raw) >= 3 and len(cat) >= 2:
+            return vendor_raw, cat
+    for m in _VENDOR_INLINE_RE.finditer(context):
+        vendor_raw = m.group(1).strip().rstrip(',').strip()
+        cat        = m.group(2).strip()
+        if len(vendor_raw) >= 3 and len(cat) >= 2:
+            return vendor_raw, cat
+    return '', ''
+
+
+def _write_vendor_csvs(output_path: Path) -> None:
+    """Generate VALIDATED_vendor.csv (→ syn26486850) and VALIDATED_vendorItem.csv (→ syn26486843).
+
+    Parses antibody context strings for vendor names and catalog numbers.
+    vendor schema:     vendorId, vendorName, vendorUrl
+    vendorItem schema: vendorItemId, vendorId, resourceId, catalogNumber, catalogNumberURL
+    """
+    antibody_file = output_path / 'VALIDATED_antibodies.csv'
+    if not antibody_file.exists():
+        print('  ⏭  VALIDATED_antibodies.csv not found — skipping vendor CSVs')
+        return
+    try:
+        with open(antibody_file, newline='', encoding='utf-8') as f:
+            rows = list(csv.DictReader(f))
+    except Exception as e:
+        print(f'  ❌ Error reading antibodies: {e}')
+        return
+
+    vendor_map: dict[str, dict] = {}   # norm_name → vendor row
+    vendor_items: list[dict]    = []
+
+    for row in rows:
+        context     = row.get('_context', '').strip()
+        resource_id = row.get('resourceId', '').strip()
+        vendor_name, cat_num = _extract_vendor_from_context(context)
+        if not vendor_name or not cat_num:
+            continue
+
+        vendor_norm = re.sub(r'\s+', ' ', vendor_name.lower().strip())
+        if vendor_norm not in vendor_map:
+            vendor_id = 'VEN' + hashlib.sha1(vendor_norm.encode()).hexdigest()[:8]
+            vendor_map[vendor_norm] = {
+                'vendorId':   vendor_id,
+                'vendorName': vendor_name,
+                'vendorUrl':  '',
+            }
+
+        vendor_id = vendor_map[vendor_norm]['vendorId']
+        item_key  = f'{vendor_norm}:{cat_num.lower()}'
+        item_id   = 'VIT' + hashlib.sha1(item_key.encode()).hexdigest()[:8]
+        vendor_items.append({
+            'vendorItemId':     item_id,
+            'vendorId':         vendor_id,
+            'resourceId':       resource_id,
+            'catalogNumber':    cat_num,
+            'catalogNumberURL': '',
+        })
+
+    if vendor_map:
+        vendor_rows = sorted(vendor_map.values(), key=lambda r: r['vendorName'])
+        vendor_file = output_path / 'VALIDATED_vendor.csv'
+        with open(vendor_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=['vendorId', 'vendorName', 'vendorUrl'])
+            writer.writeheader()
+            writer.writerows(vendor_rows)
+        print(f'  ✅ VALIDATED_vendor.csv: {len(vendor_rows)} unique vendors → {vendor_file}')
+
+    if vendor_items:
+        item_file = output_path / 'VALIDATED_vendorItem.csv'
+        with open(item_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(
+                f, fieldnames=['vendorItemId', 'vendorId', 'resourceId',
+                               'catalogNumber', 'catalogNumberURL'],
+            )
+            writer.writeheader()
+            writer.writerows(vendor_items)
+        print(f'  ✅ VALIDATED_vendorItem.csv: {len(vendor_items)} vendor-resource items → {item_file}')
+
+    if not vendor_map:
+        print('  ⚠️  No vendor/catalog info found in antibody contexts')
+
+
 def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
                                   pub_meta: dict | None = None) -> None:
     """Generate SUBMIT_publications.csv, SUBMIT_usage.csv, SUBMIT_development.csv."""
@@ -971,16 +1361,21 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         if not tool_name:
             continue
 
+        pub_id = _make_pub_id(pmid)
+        res_id = _make_resource_id(_normalize_tool_name(tool_name, tool_type), tool_type)
         link_row = {
             '_pmid': pmid, '_doi': doi, '_publicationTitle': title, '_year': year,
             '_toolName': tool_name, '_toolType': tool_type, '_usageType': usage_type,
-            'publicationId': '', 'resourceId': '',
+            'publicationId': pub_id, 'resourceId': res_id,
         }
         if usage_type == 'Development':
-            dev_rows.append({**link_row, 'developmentId': ''})
-            usage_rows.append({**link_row, 'usageId': ''})
+            dev_id = 'DEV' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}'.encode()).hexdigest()[:8]
+            dev_rows.append({**link_row, 'developmentId': dev_id})
+            use_id = 'USE' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}:dev'.encode()).hexdigest()[:8]
+            usage_rows.append({**link_row, 'usageId': use_id})
         elif usage_type == 'Experimental Usage':
-            usage_rows.append({**link_row, 'usageId': ''})
+            use_id = 'USE' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}'.encode()).hexdigest()[:8]
+            usage_rows.append({**link_row, 'usageId': use_id})
 
     # Second pass: build pub_rows only for PMIDs with at least one link
     linked_pmids  = {r['_pmid'] for r in usage_rows} | {r['_pmid'] for r in dev_rows}
@@ -998,6 +1393,7 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         if isinstance(authors_raw, list):
             authors_raw = ', '.join(authors_raw)
         pub_rows.append({
+            'publicationId':   _make_pub_id(pmid),
             'doi':             info.get('doi', '') or meta.get('doi', ''),
             'pmid':            pmid,
             'publicationTitle': info.get('title', '') or meta.get('title', ''),
@@ -1007,7 +1403,7 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
             'authors':         authors_raw,
         })
 
-    pub_fields = ['doi', 'pmid', 'publicationTitle', 'abstract',
+    pub_fields = ['publicationId', 'doi', 'pmid', 'publicationTitle', 'abstract',
                   'journal', 'publicationDate', 'authors']
     if pub_rows:
         with open(output_path / 'VALIDATED_publications.csv', 'w', newline='', encoding='utf-8') as f:
@@ -1044,7 +1440,7 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         print(f"    Development (tool created here):  {len(dev_pmids)}")
         print(f"    Usage only (tool used here):      {len(usage_only_pmids)}")
         print(f"    Mixed (both usage + development): {len(mixed_pmids)}")
-        print(f"    ⚠️  publicationId/resourceId are blank — resolved at Synapse upsert time")
+        print(f"    ℹ️  publicationId/resourceId are stable hashes — replace with Synapse IDs at upsert time")
 
 
 def main():
