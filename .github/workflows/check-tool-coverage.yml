@@ -491,6 +491,17 @@ jobs:
 
           echo "phase2_review_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Post-filter and consolidate validated outputs
+        id: post_filter
+        if: steps.validation.outputs.validation_complete == 'true'
+        run: |
+          echo "Post-filtering VALIDATED_*.csv: removing generic tools, deduplicating synonyms..."
+          echo "Generates VALIDATED_publications/usage/development/resources.csv (single prefix)."
+          python tool_coverage/scripts/generate_review_csv.py \
+            --output-dir tool_coverage/outputs \
+            2>&1 | tee tool_coverage/outputs/post_filter_output.log
+          echo "post_filter_complete=true" >> $GITHUB_OUTPUT
+
       - name: Apply pattern improvements
         id: pattern_improvements
         if: steps.validation.outputs.validation_complete == 'true'
