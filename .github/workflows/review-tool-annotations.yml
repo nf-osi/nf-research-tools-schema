@@ -182,42 +182,70 @@ jobs:
             echo "format_complete=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Enrich existing tool fields from annotations
+        id: enrich
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "🔬 Enriching existing tool records with consensus annotation values..."
+          python scripts/enrich_existing_tools.py --output-dir .
+
+          if ls SUBMIT_*_updates.csv 1>/dev/null 2>&1; then
+            echo "has_enrichment=true" >> $GITHUB_OUTPUT
+            COUNT=$(python -c "import json; d=json.load(open('tool_field_enrichment.json')); print(d['total_updates'])")
+            echo "update_count=$COUNT" >> $GITHUB_OUTPUT
+
+            CL=$(python -c "import json; d=json.load(open('tool_field_enrichment.json')); print(d['tables'].get('cell_line', {}).get('row_count', 0))")
+            AM=$(python -c "import json; d=json.load(open('tool_field_enrichment.json')); print(d['tables'].get('animal_model', {}).get('row_count', 0))")
+            PDX=$(python -c "import json; d=json.load(open('tool_field_enrichment.json')); print(d['tables'].get('patient_derived_model', {}).get('row_count', 0))")
+            DONOR=$(python -c "import json; d=json.load(open('tool_field_enrichment.json')); print(d['tables'].get('donor', {}).get('row_count', 0))")
+            echo "cl_updates=$CL" >> $GITHUB_OUTPUT
+            echo "am_updates=$AM" >> $GITHUB_OUTPUT
+            echo "pdx_updates=$PDX" >> $GITHUB_OUTPUT
+            echo "donor_updates=$DONOR" >> $GITHUB_OUTPUT
+            echo "✅ Found $COUNT existing rows to enrich"
+          else
+            echo "has_enrichment=false" >> $GITHUB_OUTPUT
+            echo "update_count=0" >> $GITHUB_OUTPUT
+            echo "ℹ️  No existing tool fields to enrich"
+          fi
+
       - name: Create Pull Request
-        if: steps.format.outputs.format_complete == 'true'
+        if: steps.format.outputs.format_complete == 'true' || steps.enrich.outputs.has_enrichment == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
-            Add new cell lines from individualID annotations
+            Tool annotation review: new cell lines + field enrichment
 
-            - Review of individualID annotations from syn52702673
-            - Compared against tools in syn51730943
-            - Found ${{ steps.format.outputs.cell_lines_count }} new cell lines
+            - ${{ steps.format.outputs.cell_lines_count || '0' }} new cell lines from individualID annotations (syn52702673)
+            - ${{ steps.enrich.outputs.update_count || '0' }} existing tool records enriched from file annotations
             - Ready for manual review and Synapse upload
 
             Co-Authored-By: GitHub Actions <noreply@github.com>
-          title: "🔍 Annotation Review - New Cell Lines (${{ steps.format.outputs.cell_lines_count }} suggested)"
+          title: "🔍 Annotation Review (${{ steps.format.outputs.cell_lines_count || '0' }} new, ${{ steps.enrich.outputs.update_count || '0' }} enriched)"
           body: |
-            # Tool Annotation Review - New Cell Lines
+            # Tool Annotation Review
 
-            This PR contains new cell line suggestions based on `individualID` annotations from Synapse.
+            This PR contains new cell line suggestions and field enrichment updates based on
+            `individualID` annotations from Synapse.
 
             **Review Date:** ${{ steps.date.outputs.date }}
 
             ---
 
-            ## Summary
+            ## New Cell Lines
 
-            - **New cell lines**: ${{ steps.format.outputs.cell_lines_count }}
+            - **New cell lines**: ${{ steps.format.outputs.cell_lines_count || '0' }}
             - **Source**: individualID annotations from syn52702673
             - **Compared against**: Tools in syn51730943
 
-            ## Files Ready for Submission
+            ### Files Ready for Submission
 
-            - `SUBMIT_cell_lines.csv`: ${{ steps.format.outputs.cell_lines_count }} new cell lines
-            - `SUBMIT_resources.csv`: ${{ steps.format.outputs.resources_count }} new resources
+            - `SUBMIT_cell_lines.csv`: ${{ steps.format.outputs.cell_lines_count || '0' }} new cell lines
+            - `SUBMIT_resources.csv`: ${{ steps.format.outputs.resources_count || '0' }} new resources
 
-            ## What Happens Next
+            ### What Happens Next
 
             1. **Review the suggestions**: Check that cell line names are valid
             2. **Fill in required fields**: Cell lines need `organ` field populated
@@ -226,7 +254,7 @@ jobs:
                - Clean tracking columns
                - Upload to Synapse tables (syn26486823 for cell lines, syn26450069 for resources)
 
-            ## Manual Actions Required
+            ### Manual Actions Required
 
             - [ ] Review cell line names in SUBMIT_cell_lines.csv
             - [ ] Fill in `organ` field for all cell lines (required)
@@ -234,7 +262,32 @@ jobs:
 
             ---
 
-            See `tool_annotation_suggestions.md` for full analysis including facet suggestions.
+            ## Tool Field Enrichment
+
+            Existing tool records with blank fields have been enriched with consensus values
+            from NF Portal file annotations (matched by `individualID`).
+            Only blank fields are updated — existing values are never overwritten.
+
+            | Table | Rows to update |
+            |---|---|
+            | Cell lines (syn26486823) | ${{ steps.enrich.outputs.cl_updates || '0' }} |
+            | Animal models (syn26486808) | ${{ steps.enrich.outputs.am_updates || '0' }} |
+            | Patient-derived models (syn73709228) | ${{ steps.enrich.outputs.pdx_updates || '0' }} |
+            | Donors (syn26486829) | ${{ steps.enrich.outputs.donor_updates || '0' }} |
+            | **Total** | **${{ steps.enrich.outputs.update_count || '0' }}** |
+
+            ### Enrichment Update Files
+
+            - `SUBMIT_cell_line_updates.csv` → update-mode upsert to syn26486823
+            - `SUBMIT_animal_model_updates.csv` → update-mode upsert to syn26486808
+            - `SUBMIT_patient_derived_model_updates.csv` → update-mode upsert to syn73709228
+            - `SUBMIT_donor_updates.csv` → update-mode upsert to syn26486829
+
+            See `tool_field_enrichment.json` for machine-readable enrichment detail.
+
+            ---
+
+            See `tool_annotation_suggestions.md` for full annotation analysis including facet suggestions.
 
             **Automated via:** `.github/workflows/review-tool-annotations.yml`
           branch: annotation-review-${{ steps.date.outputs.date-short }}
@@ -248,6 +301,8 @@ jobs:
             SUBMIT_*.csv
             tool_annotation_suggestions.json
             tool_annotation_suggestions.md
+            tool_field_enrichment.json
+            tool_field_enrichment.md
 
       - name: Workflow summary
         if: always()
