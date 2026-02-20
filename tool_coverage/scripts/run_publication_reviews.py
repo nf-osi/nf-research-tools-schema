@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Run goose AI validation reviews for mined tools from publications.
+Run Anthropic API validation reviews for mined tools from publications.
 Filters false positives and generates validated submission CSVs.
 """
 
 import pandas as pd
 import json
 import yaml
-import subprocess
+import re
 import sys
 from pathlib import Path
 from datetime import datetime
 import os
 import argparse
+import anthropic
 import synapseclient
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
@@ -22,6 +23,11 @@ import time
 RECIPE_PATH = 'tool_coverage/scripts/recipes/publication_tool_review.yaml'
 REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
+ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
+
+# Module-level cache for recipe content (loaded once)
+_recipe_system_prompt = None
+_recipe_task_instructions = None
 
 def setup_directories():
     """Create output directories."""
@@ -35,6 +41,127 @@ def setup_directories():
 
     print(f"Created directories: {review_dir}, {results_dir}, {inputs_dir}")
     return str(review_dir), str(results_dir), str(inputs_dir)
+
+def _load_recipe():
+    """Load recipe YAML once and cache system prompt + task instructions."""
+    global _recipe_system_prompt, _recipe_task_instructions
+    if _recipe_system_prompt is not None:
+        return
+
+    recipe_path = Path(RECIPE_PATH)
+    with open(recipe_path) as f:
+        recipe = yaml.safe_load(f)
+
+    _recipe_system_prompt = recipe.get('instructions', '').strip()
+
+    full_prompt = recipe.get('prompt', '')
+    # Drop step 1 (file reading) — we embed content directly in the message.
+    # Task instructions start at "2. For each mined tool".
+    lines = full_prompt.split('\n')
+    start = next(
+        (i for i, l in enumerate(lines) if l.strip().startswith('2. For each mined tool')),
+        0
+    )
+    # Also drop the final "9. Create a YAML file..." step — we handle file writing in Python.
+    end = next(
+        (i for i, l in enumerate(lines) if l.strip().startswith('9. Create a YAML file')),
+        len(lines)
+    )
+    _recipe_task_instructions = '\n'.join(lines[start:end]).strip()
+
+
+def _format_mined_tools(tools_list):
+    """Format mined tools list for embedding in the prompt."""
+    if not tools_list:
+        return '(none — scan the full text for potentially missed tools)'
+    lines = []
+    for i, t in enumerate(tools_list, 1):
+        lines.append(f"  {i}. {t['toolName']} (type: {t['toolType']})")
+        if t.get('contextSnippet'):
+            lines.append(f"     Context: ...{t['contextSnippet'][:200]}...")
+        if t.get('minedFrom'):
+            lines.append(f"     Found in: {t['minedFrom']}")
+    return '\n'.join(lines)
+
+
+def build_review_prompt(input_data):
+    """Return (system_prompt, user_message) for the Anthropic API call."""
+    _load_recipe()
+
+    meta = input_data['publicationMetadata']
+    pmid = meta['pmid']
+    doi = meta.get('doi', '') or ''
+
+    def section(label, text):
+        return f"**{label}:**\n{text.strip() if text and text.strip() else '(not available)'}"
+
+    tools_text = _format_mined_tools(input_data.get('minedTools', []))
+
+    # Extract the YAML output template from the recipe (between the ``` fences)
+    recipe_path = Path(RECIPE_PATH)
+    with open(recipe_path) as f:
+        raw = f.read()
+    yaml_template_match = re.search(r'(```yaml.*?```)', raw, re.DOTALL)
+    yaml_template = yaml_template_match.group(1) if yaml_template_match else ''
+    # Substitute template variables
+    yaml_template = yaml_template.replace('{{ pmid }}', pmid).replace('{{ doi }}', doi)
+
+    user_message = f"""Review publication {pmid} for NF research tool validation.
+
+**PUBLICATION METADATA:**
+- PMID: {pmid}
+- Title: {meta.get('title', '')}
+- DOI: {doi}
+- Journal: {meta.get('journal', '')}
+- Year: {meta.get('year', '')}
+- Query Type: {meta.get('queryType', 'unknown')}
+- Has Abstract: {input_data.get('hasAbstract', False)}
+- Has Methods Section: {input_data.get('hasMethodsSection', False)}
+- Has Introduction: {input_data.get('hasIntroduction', False)}
+- Has Results: {input_data.get('hasResults', False)}
+- Has Discussion: {input_data.get('hasDiscussion', False)}
+
+{section('ABSTRACT', input_data.get('abstractText', ''))}
+
+{section('METHODS', input_data.get('methodsText', ''))}
+
+{section('INTRODUCTION', input_data.get('introductionText', ''))}
+
+{section('RESULTS', input_data.get('resultsText', ''))}
+
+{section('DISCUSSION', input_data.get('discussionText', ''))}
+
+**MINED TOOLS ({len(input_data.get('minedTools', []))} total):**
+{tools_text}
+
+---
+Using the publication data above, perform the following:
+
+{_recipe_task_instructions}
+
+9. Output ONLY the YAML content below (no explanation before or after). Use this exact structure:
+
+{yaml_template}
+"""
+    return _recipe_system_prompt, user_message
+
+
+def extract_yaml_from_response(text):
+    """Extract YAML content from Claude's response text."""
+    # Try ```yaml ... ``` block
+    match = re.search(r'```yaml\s*\n(.*?)\n```', text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    # Try plain ``` ... ``` block whose content starts with publicationMetadata:
+    match = re.search(r'```\s*\n(publicationMetadata:.*?)\n```', text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    # Bare YAML starting at publicationMetadata:
+    match = re.search(r'(publicationMetadata:.*)', text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return None
+
 
 def load_mining_results(mining_file):
     """Load mining results CSV."""
@@ -196,67 +323,29 @@ def load_cached_text(pmid, cache_dir='tool_reviews/publication_cache'):
     return None
 
 
-def prepare_goose_input(pub_row, inputs_dir):
-    """Prepare input JSON file for goose review.
+def prepare_input_data(pub_row, cached):
+    """Build input data dict for the API review from a DataFrame row and cached text.
 
     Args:
         pub_row: DataFrame row with publication and mining data
-        inputs_dir: Directory to save input files
+        cached: Dict from load_cached_text() — must not be None
 
     Returns:
-        Path to input JSON file
+        Dict with all publication text and mined tools
     """
     pmid = pub_row['pmid']
 
-    # Try to load from cache first
-    cached = load_cached_text(pmid)
-
-    if cached:
-        print(f"  ✅ Using cached text (skipping API calls)")
-        abstract_text = cached.get('abstract', '')
-        methods_text = cached.get('methods', '')
-        intro_text = cached.get('introduction', '')
-        # Load Results and Discussion sections (with backwards compatibility)
-        results_text = cached.get('results', '')
-        discussion_text = cached.get('discussion', '')
-    else:
-        # Fall back to fetching (backwards compatibility)
-        # Import mining functions to fetch text
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from fetch_fulltext_and_mine import (
-            fetch_pubmed_abstract,
-            fetch_pmc_fulltext,
-            extract_methods_section,
-            extract_introduction_section,
-            extract_results_section,
-            extract_discussion_section
-        )
-
-        # Fetch abstract from PubMed
-        print(f"  Fetching abstract from PubMed...")
-        abstract_text = fetch_pubmed_abstract(pmid)
-
-        # Fetch full text from PMC
-        print(f"  Fetching full text from PMC...")
-        fulltext_xml = fetch_pmc_fulltext(pmid)
-        methods_text = ""
-        intro_text = ""
-        results_text = ""
-        discussion_text = ""
-
-        if fulltext_xml:
-            print(f"  Extracting sections from full text...")
-            methods_text = extract_methods_section(fulltext_xml)
-            intro_text = extract_introduction_section(fulltext_xml)
-            results_text = extract_results_section(fulltext_xml)
-            discussion_text = extract_discussion_section(fulltext_xml)
+    abstract_text = cached.get('abstract', '')
+    methods_text = cached.get('methods', '')
+    intro_text = cached.get('introduction', '')
+    results_text = cached.get('results', '')
+    discussion_text = cached.get('discussion', '')
 
     # Parse mined tools from JSON columns (handle NaN values)
     novel_tools_raw = pub_row.get('novel_tools', '{}')
     tool_metadata_raw = pub_row.get('tool_metadata', '{}')
     tool_sources_raw = pub_row.get('tool_sources', '{}')
 
-    # Convert NaN to empty dict string
     if pd.isna(novel_tools_raw):
         novel_tools_raw = '{}'
     if pd.isna(tool_metadata_raw):
@@ -268,39 +357,30 @@ def prepare_goose_input(pub_row, inputs_dir):
     tool_metadata = json.loads(tool_metadata_raw)
     tool_sources = json.loads(tool_sources_raw)
 
-    # Prepare tool list with context - include ALL 9 tool types
     tools_list = []
-    all_tool_types = [
+    for tool_type in [
         'antibodies', 'cell_lines', 'animal_models', 'genetic_reagents',
         'computational_tools', 'advanced_cellular_models',
         'patient_derived_models', 'clinical_assessment_tools'
-    ]
-
-    for tool_type in all_tool_types:
-        tool_names = novel_tools.get(tool_type, [])
-        for tool_name in tool_names:
+    ]:
+        for tool_name in novel_tools.get(tool_type, []):
             tool_key = f"{tool_type}:{tool_name}"
             metadata = tool_metadata.get(tool_key, {})
-            sources = tool_sources.get(tool_key, [])
-
             tools_list.append({
                 'toolName': tool_name,
-                'toolType': tool_type.rstrip('s'),  # Remove plural
-                'minedFrom': sources,
-                'metadata': metadata,
+                'toolType': tool_type.rstrip('s'),
+                'minedFrom': tool_sources.get(tool_key, []),
                 'contextSnippet': metadata.get('context_snippet', '')
             })
 
-    # Prepare input data (handle both mined and unlinked publications)
-    input_data = {
+    return {
         'publicationMetadata': {
             'pmid': pmid,
             'doi': pub_row.get('doi', ''),
             'title': pub_row.get('title', pub_row.get('publicationTitle', '')),
             'journal': pub_row.get('journal', ''),
             'year': pub_row.get('year', ''),
-            'fundingAgency': pub_row.get('fundingAgency', ''),
-            'queryType': pub_row.get('query_type', 'unknown')  # Hint for expected tool types
+            'queryType': pub_row.get('query_type', 'unknown'),
         },
         'abstractText': abstract_text,
         'methodsText': methods_text,
@@ -313,29 +393,7 @@ def prepare_goose_input(pub_row, inputs_dir):
         'hasResults': bool(results_text),
         'hasDiscussion': bool(discussion_text),
         'minedTools': tools_list,
-        'miningMetrics': {
-            'totalTools': len(tools_list),
-            'toolsByType': {
-                'antibodies': len(novel_tools.get('antibodies', [])),
-                'cellLines': len(novel_tools.get('cell_lines', [])),
-                'animalModels': len(novel_tools.get('animal_models', [])),
-                'geneticReagents': len(novel_tools.get('genetic_reagents', [])),
-                'computationalTools': len(novel_tools.get('computational_tools', [])),
-                'advancedCellularModels': len(novel_tools.get('advanced_cellular_models', [])),
-                'patientDerivedModels': len(novel_tools.get('patient_derived_models', [])),
-                'clinicalAssessmentTools': len(novel_tools.get('clinical_assessment_tools', []))
-            }
-        }
     }
-
-    # Save to JSON file (sanitize pmid for filename)
-    clean_pmid = sanitize_pmid_for_filename(pmid)
-    input_file = Path(inputs_dir) / f"{clean_pmid}_input.json"
-    with open(input_file, 'w') as f:
-        json.dump(input_data, f, indent=2)
-
-    print(f"  Created input file: {input_file}")
-    return str(input_file.resolve())
 
 # Thread-safe print lock
 print_lock = threading.Lock()
@@ -345,104 +403,92 @@ def safe_print(*args, **kwargs):
     with print_lock:
         print(*args, **kwargs)
 
-def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
-    """Run goose tool validation for a single publication."""
+
+def run_direct_review(pmid, input_data, results_dir, client, max_retries=3):
+    """Run a single publication review via direct Anthropic API call.
+
+    Replaces Goose: one API call instead of a multi-turn agent session.
+    Typical latency: 20-60s vs 3-8 minutes with Goose.
+    """
     safe_print(f"\n{'='*80}")
     safe_print(f"Reviewing {pmid}")
-    safe_print(f"Input: {input_file}")
     safe_print(f"{'='*80}")
 
-    # Change to results directory (thread-safe since each uses different files)
-    original_dir = os.getcwd()
-    # Don't change directory - use absolute paths instead
-    results_path = Path(results_dir).resolve()
+    clean_pmid = sanitize_pmid_for_filename(pmid)
+    yaml_file = Path(results_dir).resolve() / f'{clean_pmid}_tool_review.yaml'
 
-    # Retry loop for database conflicts
+    system_prompt, user_message = build_review_prompt(input_data)
+
     for attempt in range(max_retries):
         try:
-            # Build goose command
-            recipe_path = Path(RECIPE_PATH).resolve()
-
-            # Sanitize PMID for filename (remove colons and invalid chars)
-            clean_pmid = sanitize_pmid_for_filename(pmid)
-
-            cmd = [
-                'goose', 'run',
-                '--recipe', str(recipe_path),
-                '--params', f'pmid={clean_pmid}',
-                '--params', f'inputFile={input_file}',
-                '--params', f'doi={doi}',  # Add DOI parameter for observation attribution
-                '--no-session'  # Don't create session files for automated runs
-            ]
-
             if attempt > 0:
                 safe_print(f"Retry attempt {attempt + 1}/{max_retries}...")
-            safe_print(f"Running: {' '.join(cmd)}")
 
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                cwd=str(results_path),
-                start_new_session=True  # own process group so kill() reaches all children
+            message = client.messages.create(
+                model=ANTHROPIC_MODEL,
+                max_tokens=8192,
+                temperature=0.0,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_message}]
             )
 
-            try:
-                stdout, stderr = process.communicate(timeout=360)  # 6 minute timeout
-            except subprocess.TimeoutExpired:
-                # Kill the entire process group (Goose may have spawned children)
-                import signal
-                try:
-                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-                except ProcessLookupError:
-                    process.kill()
-                process.communicate()
-                safe_print(f"❌ Timeout after 6 minutes")
-                return None
+            response_text = message.content[0].text
+            safe_print(f"  Response: {len(response_text)} chars, "
+                       f"~{message.usage.input_tokens}in/{message.usage.output_tokens}out tokens")
 
-            safe_print(stdout)
-
-            if process.returncode != 0:
-                # Check if this is a database conflict error (exit code 101)
-                is_db_conflict = (
-                    process.returncode == 101 and
-                    'table schema_version already exists' in stderr
-                )
-
-                if is_db_conflict and attempt < max_retries - 1:
-                    safe_print(f"⚠️  Database conflict (exit code {process.returncode}), retrying...")
-                    time.sleep(1 + attempt)  # Exponential backoff
+            yaml_text = extract_yaml_from_response(response_text)
+            if not yaml_text:
+                safe_print(f"⚠️  No YAML found in response")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
                     continue
-                else:
-                    safe_print(f"❌ Error (exit code {process.returncode}):")
-                    safe_print(stderr)
-                    return None
-
-            # Look for generated YAML file (clean_pmid already set above)
-            yaml_file = results_path / f'{clean_pmid}_tool_review.yaml'
-            if yaml_file.exists():
-                safe_print(f"✅ Review completed: {yaml_file}")
-                return yaml_file
-            else:
-                safe_print(f"⚠️  No YAML file generated")
                 return None
 
+            # Validate structure
+            try:
+                data = yaml.safe_load(yaml_text)
+                if not isinstance(data, dict) or 'publicationMetadata' not in data:
+                    safe_print(f"⚠️  Invalid YAML structure (missing publicationMetadata)")
+                    if attempt < max_retries - 1:
+                        time.sleep(2 ** attempt)
+                        continue
+                    return None
+            except yaml.YAMLError as e:
+                safe_print(f"⚠️  YAML parse error: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                return None
+
+            yaml_file.write_text(yaml_text, encoding='utf-8')
+            safe_print(f"✅ Review completed: {yaml_file}")
+            return yaml_file
+
+        except anthropic.RateLimitError:
+            wait = 60 * (attempt + 1)
+            safe_print(f"⚠️  Rate limit — waiting {wait}s before retry...")
+            time.sleep(wait)
+        except anthropic.APIError as e:
+            safe_print(f"❌ API error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
         except Exception as e:
             safe_print(f"❌ Error: {e}")
             return None
 
-def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, force_rereviews):
+    return None
+
+def process_single_publication(row, idx, total_pubs, results_dir, client, force_rereviews):
     """
-    Process a single publication (for parallel execution).
+    Process a single publication via direct Anthropic API call (for parallel execution).
 
     Returns:
-        tuple: (pmid, status, result) where status is 'skipped', 'reviewed', or 'failed'
+        tuple: (pmid, status, result) where status is one of:
+               'skipped', 'skipped_abstract_only', 'skipped_no_cache', 'reviewed', 'failed'
     """
     pmid = row['pmid']
     current_num = idx + 1
 
-    # Show progress
     safe_print(f"\n📊 Progress: {current_num}/{total_pubs} ({current_num/total_pubs*100:.1f}%)")
 
     # Check if already reviewed
@@ -454,30 +500,22 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
-    # Skip publications with no cache file at all — Goose will waste its timeout searching
+    # Load cache — skip immediately if absent (no file → no review possible)
     cached = load_cached_text(pmid)
     if cached is None:
         safe_print(f"⏭️  Skipping {pmid} (no cache file - run Phase 1 first)")
         return (pmid, 'skipped_no_cache', None)
 
-    # Skip abstract_only publications - no methods section means tool mining will fail
+    # Skip abstract_only — no methods section means tool mining will find nothing
     if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
-        safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
+        safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods for tool mining)")
         return (pmid, 'skipped_abstract_only', None)
 
-    # Prepare input file
-    input_file = prepare_goose_input(row, inputs_dir)
+    # Build input data and run direct API review
+    input_data = prepare_input_data(row, cached)
+    result = run_direct_review(pmid, input_data, results_dir, client)
 
-    # Get DOI for observation attribution
-    doi = row.get('doi', '')
-
-    # Run goose review
-    result = run_goose_review(pmid, input_file, results_dir, doi)
-
-    if result:
-        return (pmid, 'reviewed', result)
-    else:
-        return (pmid, 'failed', None)
+    return (pmid, 'reviewed', result) if result else (pmid, 'failed', None)
 
 def parse_review_yaml(yaml_path):
     """Parse goose review YAML file."""
@@ -738,7 +776,7 @@ def main():
     parser.add_argument(
         '--skip-goose',
         action='store_true',
-        help='Skip goose reviews, only filter CSVs from existing YAMLs'
+        help='Skip API reviews, only compile results from existing YAML files'
     )
     parser.add_argument(
         '--force-rereviews',
@@ -761,11 +799,18 @@ def main():
     args = parser.parse_args()
 
     print("=" * 80)
-    print("Publication Tool Validation with Goose AI")
+    print("Publication Tool Validation with Anthropic API")
     print("=" * 80)
 
     # Setup directories
     review_dir, results_dir, inputs_dir = setup_directories()
+
+    # Create shared Anthropic client (thread-safe, uses connection pooling)
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key and not args.skip_goose and not args.compile_only:
+        print("❌ ANTHROPIC_API_KEY not set — cannot run reviews")
+        sys.exit(1)
+    anthropic_client = anthropic.Anthropic(api_key=api_key) if api_key else None
 
     # Load mining results
     mining_df = load_mining_results(args.mining_file)
@@ -872,16 +917,14 @@ def main():
         # Use parallel processing if requested
         if args.parallel_workers > 1:
             with ThreadPoolExecutor(max_workers=args.parallel_workers) as executor:
-                # Submit all tasks
                 futures = {}
                 for idx, row in mining_df.iterrows():
                     future = executor.submit(
                         process_single_publication,
-                        row, idx, total_pubs, results_dir, inputs_dir, args.force_rereviews
+                        row, idx, total_pubs, results_dir, anthropic_client, args.force_rereviews
                     )
                     futures[future] = row['pmid']
 
-                # Process results as they complete
                 for future in as_completed(futures):
                     pmid, status, result = future.result()
                     if status == 'reviewed':
@@ -895,10 +938,9 @@ def main():
                     elif status == 'failed':
                         failed_count += 1
         else:
-            # Sequential processing (original behavior)
             for idx, row in mining_df.iterrows():
                 pmid, status, result = process_single_publication(
-                    row, idx, total_pubs, results_dir, inputs_dir, args.force_rereviews
+                    row, idx, total_pubs, results_dir, anthropic_client, args.force_rereviews
                 )
                 if status == 'reviewed':
                     reviewed_count += 1
