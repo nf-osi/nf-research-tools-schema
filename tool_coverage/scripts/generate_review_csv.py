@@ -396,11 +396,12 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path) -> 
             print("  ⚠️  No processed_publications.csv or publication cache found; "
                   "publication metadata will be minimal")
 
-    # Collect unique publications and per-tool links
-    seen_pmids: set = set()
-    pub_rows: list = []
+    # First pass: collect all link rows and minimal pub metadata
+    # We do NOT build pub_rows yet — a publication only gets a row if it has
+    # at least one usage or development link (prevents orphan publications).
     usage_rows: list = []
     dev_rows: list = []
+    all_pmid_info: dict = {}  # pmid → {doi, title, year}
 
     for r in review_rows:
         pmid = r.get('_pmid', '').strip()
@@ -414,23 +415,9 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path) -> 
         if not pmid:
             continue
 
-        # One publication row per unique PMID
-        if pmid not in seen_pmids:
-            seen_pmids.add(pmid)
-            meta = pub_meta.get(pmid, {})
-            authors_raw = meta.get('authors', '')
-            if isinstance(authors_raw, list):
-                authors_raw = ', '.join(authors_raw)
-            pub_rows.append({
-                # Synapse Publication table (syn26486839) columns
-                'doi':              doi or meta.get('doi', ''),
-                'pmid':             pmid,
-                'publicationTitle': title or meta.get('title', ''),
-                'abstract':         meta.get('abstract', ''),
-                'journal':          meta.get('journal', ''),
-                'publicationDate':  meta.get('publicationDate', ''),
-                'authors':          authors_raw,
-            })
+        # Cache the first-seen metadata for this PMID (used later for pub_rows)
+        if pmid not in all_pmid_info:
+            all_pmid_info[pmid] = {'doi': doi, 'title': title, 'year': year}
 
         if not tool_name:
             continue
@@ -453,6 +440,33 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path) -> 
             usage_rows.append({**link_row, 'usageId': ''})
         elif usage_type == 'Experimental Usage':
             usage_rows.append({**link_row, 'usageId': ''})
+        # Citation Only / empty usageType → no link rows → publication excluded
+
+    # Second pass: build pub_rows only for PMIDs that appear in at least one link table
+    linked_pmids = {r['_pmid'] for r in usage_rows} | {r['_pmid'] for r in dev_rows}
+    orphan_pmids = set(all_pmid_info.keys()) - linked_pmids
+    if orphan_pmids:
+        print(f"  ℹ️  {len(orphan_pmids)} publications excluded (no usage/development links): "
+              f"{', '.join(sorted(orphan_pmids)[:5])}"
+              + (' ...' if len(orphan_pmids) > 5 else ''))
+
+    pub_rows: list = []
+    for pmid in sorted(linked_pmids):
+        meta = pub_meta.get(pmid, {})
+        info = all_pmid_info.get(pmid, {})
+        authors_raw = meta.get('authors', '')
+        if isinstance(authors_raw, list):
+            authors_raw = ', '.join(authors_raw)
+        pub_rows.append({
+            # Synapse Publication table (syn26486839) columns
+            'doi':              info.get('doi', '') or meta.get('doi', ''),
+            'pmid':             pmid,
+            'publicationTitle': info.get('title', '') or meta.get('title', ''),
+            'abstract':         meta.get('abstract', ''),
+            'journal':          meta.get('journal', ''),
+            'publicationDate':  meta.get('publicationDate', ''),
+            'authors':          authors_raw,
+        })
         # Citation Only and Not Found are not linked
 
     # Write files
@@ -491,11 +505,12 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path) -> 
     # Summarise publication roles
     if pub_rows:
         dev_pmids = {r['_pmid'] for r in dev_rows}
-        usage_pmids = {r['_pmid'] for r in usage_rows} - dev_pmids
-        mixed_pmids = {r['_pmid'] for r in dev_rows} & {r['_pmid'] for r in usage_rows} - dev_pmids
+        usage_only_pmids = {r['_pmid'] for r in usage_rows} - dev_pmids
+        mixed_pmids = dev_pmids & {r['_pmid'] for r in usage_rows}
         print(f"\n  Publication roles:")
         print(f"    Development (tool created here): {len(dev_pmids)}")
-        print(f"    Usage only (tool used here):     {len(usage_pmids)}")
+        print(f"    Usage only (tool used here):     {len(usage_only_pmids)}")
+        print(f"    Mixed (both usage + development): {len(mixed_pmids)}")
         print(f"    ⚠️  publicationId/resourceId columns are blank — resolve at upsert time")
 
 

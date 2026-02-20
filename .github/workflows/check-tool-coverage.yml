@@ -513,18 +513,6 @@ jobs:
             echo "  ⚠️  review.csv not generated"
           fi
 
-      - name: Apply pattern improvements
-        id: pattern_improvements
-        if: steps.validation.outputs.validation_complete == 'true'
-        run: |
-          echo "Applying AI-suggested pattern improvements..."
-          python tool_coverage/scripts/apply_pattern_suggestions.py 2>&1 | tee pattern_improvements_output.log
-
-          # Check if any files were modified
-          if [ -f "tool_coverage/config/mining_patterns.json" ] || [ -f "PATTERN_IMPROVEMENTS.md" ]; then
-            echo "pattern_improvements_applied=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Analyze tool coverage
         id: coverage
         if: steps.prep_list.outputs.prep_complete == 'true'

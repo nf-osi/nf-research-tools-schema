@@ -136,6 +136,84 @@ def clean_csv(input_file):
 
     return output_file, df_clean
 
+def build_publication_id_map(syn) -> dict:
+    """Query Synapse Publication table; return pmid → publicationId dict."""
+    pub_table_id = SYNAPSE_TABLE_MAP.get('CLEAN_publications.csv', 'syn26486839')
+    try:
+        results = syn.tableQuery(f'SELECT publicationId, pmid FROM {pub_table_id}')
+        df = results.asDataFrame()
+        return {str(row['pmid']): str(row['publicationId']) for _, row in df.iterrows()}
+    except Exception as e:
+        print(f"      ⚠️  Could not query Publication table ({pub_table_id}): {e}")
+        return {}
+
+
+def build_resource_id_map(syn) -> dict:
+    """Query Synapse Resource table; return (resourceName, resourceType) → resourceId dict."""
+    resource_table_id = SYNAPSE_TABLE_MAP.get('CLEAN_resources.csv', 'syn26450069')
+    try:
+        results = syn.tableQuery(
+            f'SELECT resourceId, resourceName, resourceType FROM {resource_table_id}'
+        )
+        df = results.asDataFrame()
+        return {
+            (str(row['resourceName']), str(row['resourceType'])): str(row['resourceId'])
+            for _, row in df.iterrows()
+        }
+    except Exception as e:
+        print(f"      ⚠️  Could not query Resource table ({resource_table_id}): {e}")
+        return {}
+
+
+def resolve_link_ids(
+    df: pd.DataFrame,
+    pub_id_map: dict,
+    resource_id_map: dict,
+) -> Tuple[pd.DataFrame, int, int]:
+    """Populate publicationId and resourceId in a usage/development DataFrame.
+
+    Looks up publicationId using the '_pmid' (or 'pmid') column and
+    resourceId using '_toolName'+'_toolType' (or 'resourceName'+'resourceType').
+
+    Returns:
+        (resolved_df, resolved_count, unresolved_count)
+        Rows where either ID cannot be resolved are dropped and counted.
+    """
+    df = df.copy()
+
+    # Resolve publicationId from PMID
+    pmid_col = '_pmid' if '_pmid' in df.columns else ('pmid' if 'pmid' in df.columns else None)
+    if pmid_col:
+        df['publicationId'] = df[pmid_col].astype(str).map(pub_id_map).fillna('')
+    else:
+        df['publicationId'] = ''
+
+    # Resolve resourceId from (toolName, toolType) or (resourceName, resourceType)
+    name_col = '_toolName' if '_toolName' in df.columns else (
+        'resourceName' if 'resourceName' in df.columns else None
+    )
+    type_col = '_toolType' if '_toolType' in df.columns else (
+        'resourceType' if 'resourceType' in df.columns else None
+    )
+    if name_col and type_col:
+        df['resourceId'] = df.apply(
+            lambda row: resource_id_map.get(
+                (str(row.get(name_col, '')), str(row.get(type_col, ''))), ''
+            ),
+            axis=1,
+        )
+    else:
+        df['resourceId'] = ''
+
+    resolved_mask = (
+        df['publicationId'].notna() & (df['publicationId'] != '') & (df['publicationId'] != 'nan') &
+        df['resourceId'].notna() & (df['resourceId'] != '') & (df['resourceId'] != 'nan')
+    )
+    resolved = int(resolved_mask.sum())
+    unresolved = len(df) - resolved
+    return df[resolved_mask].copy(), resolved, unresolved
+
+
 def upsert_to_synapse(syn, clean_file, df_clean):
     """Upsert cleaned data to Synapse table.
 
@@ -163,6 +241,19 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     if df_clean.empty:
         print(f"      ⚠️  Empty DataFrame, skipping upload")
         return False
+
+    # For publication-link tables, resolve publicationId and resourceId from Synapse
+    # before uploading (these IDs are left blank in SUBMIT files and must be resolved here).
+    base = os.path.basename(clean_file)
+    if base in ('CLEAN_usage.csv', 'CLEAN_development.csv'):
+        print(f"      Resolving publicationId/resourceId from Synapse...")
+        pub_id_map = build_publication_id_map(syn)
+        resource_id_map = build_resource_id_map(syn)
+        df_clean, resolved, unresolved = resolve_link_ids(df_clean, pub_id_map, resource_id_map)
+        print(f"      Resolved: {resolved} rows  |  Unresolved (skipped): {unresolved} rows")
+        if df_clean.empty:
+            print(f"      ⚠️  No rows could be resolved — skipping upload")
+            return False
 
     try:
         # Store the DataFrame to Synapse table
