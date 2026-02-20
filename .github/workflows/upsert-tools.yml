@@ -5,10 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'VALIDATED_*.csv'
-      - 'SUBMIT_*.csv'
       - 'tool_coverage/outputs/VALIDATED_*.csv'
-      - 'tool_coverage/outputs/SUBMIT_*.csv'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -40,80 +37,15 @@ jobs:
         run: |
           pip install -r tool_coverage/requirements.txt
 
-      - name: Identify changed JSON files
-        id: changed_files
-        run: |
-          echo "=========================================="
-          echo "IDENTIFYING changed submissions/*/accepted/**/*.json"
-          echo "=========================================="
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "workflow_dispatch — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            echo "Initial push to main — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          else
-            git diff --name-only --diff-filter=AM \
-              "${{ github.event.before }}" "${{ github.sha }}" \
-              -- 'submissions/' \
-              | grep '/accepted/' \
-              | grep '\.json$' > changed_json_files.txt || true
-
-            COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
-            echo "Found ${COUNT} changed JSON file(s):"
-            cat changed_json_files.txt
-            echo "changed_count=${COUNT}" >> $GITHUB_OUTPUT
-            echo "use_all=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Compile changed JSON submissions into ACCEPTED_*.csv
-        id: compile_json
-        run: |
-          echo "=========================================="
-          echo "COMPILING changed JSON → ACCEPTED_*.csv"
-          echo "=========================================="
-
-          if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
-            # workflow_dispatch or initial push — process all accepted files
-            if find submissions -path "*/accepted/*.json" | grep -q .; then
-              python tool_coverage/scripts/compile_accepted_submissions.py \
-                --accepted-dir submissions \
-                --csv-dir tool_coverage/outputs
-              echo "compile_ran=true" >> $GITHUB_OUTPUT
-              echo "✅ Compilation complete (all files)"
-            else
-              echo "No JSON files found in submissions/*/accepted/ — skipping"
-              echo "compile_ran=false" >> $GITHUB_OUTPUT
-            fi
-
-          elif [ -s changed_json_files.txt ]; then
-            python tool_coverage/scripts/compile_accepted_submissions.py \
-              --files-list changed_json_files.txt \
-              --csv-dir tool_coverage/outputs
-            echo "compile_ran=true" >> $GITHUB_OUTPUT
-            echo "✅ Compilation complete (${{ steps.changed_files.outputs.changed_count }} changed file(s))"
-
-          else
-            echo "No changed JSON files detected — skipping compilation"
-            echo "compile_ran=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Check for validated files
         id: check_files
         run: |
-          # Check both repo root and tool_coverage/outputs/
-          if ls VALIDATED_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/VALIDATED_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=true" >> $GITHUB_OUTPUT
-            echo "✅ Found VALIDATED_*.csv files (AI-validated)"
-          elif ls SUBMIT_*.csv 1> /dev/null 2>&1 || ls tool_coverage/outputs/SUBMIT_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=false" >> $GITHUB_OUTPUT
-            echo "⚠️  Found SUBMIT_*.csv files (not AI-validated)"
+          if ls tool_coverage/outputs/VALIDATED_*.csv 1> /dev/null 2>&1; then
+            echo "has_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found VALIDATED_*.csv files"
           else
             echo "has_files=false" >> $GITHUB_OUTPUT
-            echo "❌ No ACCEPTED_*.csv files found in tool_coverage/outputs/"
+            echo "❌ No VALIDATED_*.csv files found in tool_coverage/outputs/"
             exit 0
           fi
 
@@ -208,7 +140,7 @@ jobs:
 
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "- Using ACCEPTED_*.csv (AI-validated, post-filtered)" >> $GITHUB_STEP_SUMMARY
+          echo "- Using VALIDATED_*.csv (AI-validated, post-filtered)" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY

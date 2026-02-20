@@ -168,6 +168,53 @@ GENERIC_STRESS_SCALE_NAMES = frozenset({
 
 # ── Genetic reagents filter ───────────────────────────────────────────────────
 
+# Drug class suffixes — if insertName ends with any of these it is a drug compound,
+# not a genetic insert.  All major kinase inhibitor (-nib), therapeutic antibody
+# (-mab), HDAC/proteasome inhibitor (-ostat), and antibiotic (-mycin) classes.
+DRUG_COMPOUND_SUFFIXES = (
+    'nib',    # kinase inhibitors: lapatinib, erlotinib, trametinib, ruxolitinib, sorafenib…
+    'mab',    # therapeutic mAbs: trastuzumab, bevacizumab, cetuximab…
+    'ostat',  # epigenetic/proteasome inhibitors: panobinostat, vorinostat…
+    'mycin',  # antibiotics / natural products: puromycin, gentamicin, rapamycin…
+)
+
+# Explicit drug names that don't match a suffix pattern above.
+# Checked as exact match on lowercased insertName.
+DRUG_COMPOUND_NAMES = frozenset({
+    # Hormones / retinoids
+    'tamoxifen', 'progesterone', 'atra',
+    # mTOR inhibitors
+    'everolimus', 'nvp-bez235', 'azd2014', 'tak-228',
+    # MEK / RAS inhibitors
+    'pd0325901',
+    # Dual-class inhibitors
+    'cudc-907',
+    # IGF1R / receptor inhibitors
+    'bms-754807',
+    # Cell death / MDM2
+    'nutlin-3', 'nutlin3', 'at101',
+    # Miscellaneous pathway inhibitors
+    'nsc23766', 'frax597', 'lgk-974', 'gsk2126458',
+    'ink128', 'mln8237', 'ly294002', 'mg-132',
+    'arry-520', 'vx680', 'su-11274', 'sgx2943',
+    'apx2009', 'apx2014', 'apx3330', 'c1368',
+    'gant61', 'napabucasin',
+    # NMD suppressor
+    'ataluren',
+    # YAP inhibitor
+    'verteporfin',
+    # Anticonvulsants / other CNS drugs
+    'lamotrigine', 'ketotifen fumarate',
+    # Adenylyl cyclase activator
+    'forskolin',
+    # Neuroimaging / PET tracers
+    'ogerin', 'raclopride', 'dtbz', 'sch23390', 'win 35428',
+    # Selection antibiotic
+    'g418',
+    # Drug screening library
+    'mipe 4.0',
+})
+
 # Substring patterns identifying non-genetic lab consumables/kits/chemicals
 # that were misclassified as genetic reagents
 GENETIC_NON_REAGENT_PATTERNS = (
@@ -190,6 +237,43 @@ GENETIC_NON_REAGENT_PATTERNS = (
     'sureselect', 'nextera', 'truseq',
     # General lab assay kits (should be in clinical/other categories)
     'brdu staining', 'annexin v',
+    # Drug salt forms (sorafenib p-Toluenesulfonate salt, imatinib mesylate, etc.)
+    'mesylate', 'toluenesulfonate', ' salt',
+    # Cell viability / proliferation / apoptosis detection kits
+    'assay',        # gene expression assay, cell migration assay, p21 ras activation assay…
+    'celltiter', 'cytotox', 'cck8', 'alamarblue', 'realtime-glo',
+    # PCR / RT reagents
+    'polymerase', ' ligase', 'sybr', 'taqman mirna', 'reverse transcriptase',
+    'superscript', 'taq ', 'pcr enzyme', 't7 transcription',
+    # Cell culture media
+    'dmem', 'rpmi', 'l15 medium', 'mem alpha',
+    # Sample processing / dissociation enzymes
+    'collagenase', 'papain', 'dispase',
+    # Staining dyes / viability indicators (not labeled antibodies or genetic labels)
+    'dapi', 'calcein am', 'to-pro', 'mitosox', 'hematoxylin',
+    # RNA / DNA extraction and cleanup
+    'trizol', 'paxgene', 'ampure', 'rneasy',
+    # Density gradient / buffer reagents
+    'ficoll', 'gadolinium', 'microbubble',
+    # RNA / DNA processing steps (not constructs)
+    'cdna synthesis', 'bisulfite', 'rna extraction', 'dna extraction',
+    'rna library prep', 'dna library prep', 'library preparation', 'sequencing library',
+    'sequencing reagent', 'dna quantification', 'methylation conversion',
+    'rna depletion', 'rna isolation', 'reverse transcription reagent',
+    'target enrichment', 'mutagenesis reagent', 'str analysis',
+    'ffpe extraction', 'edu detection', 'click-it edu',
+    # Additional sequencing / library chemistry reagents
+    'bigdye', 'sequenase',      # Sanger sequencing reagents
+    'riboerase',                # rRNA depletion kit
+    'exome capture',            # target enrichment
+    'probe library',            # capture probe library
+    # Extraction / purification reagents
+    'extraction reagent',       # NE-PER, nuclear/cytoplasmic extraction kits
+    'purification reagent',     # PCR purification
+    'rnase inhibitor',          # RNasin and similar RNA protection reagents
+    # Other misclassified lab reagents
+    'enzyme mix',               # End Repair Enzyme Mix, ligation enzyme mixes
+    'vectastain', 'vecta stain',  # Vectastain Elite ABC — IHC detection kit
 )
 
 # ── Critical fields per type (for completeness scoring) ──────────────────────
@@ -350,6 +434,12 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     elif tool_type == 'genetic_reagents':
         insert = row.get('insertName', '').strip()
         insert_lc = insert.lower()
+        # Drug compounds: kinase inhibitors, mAbs, HDAC inhibitors, antibiotics, etc.
+        if any(insert_lc.endswith(suffix) for suffix in DRUG_COMPOUND_SUFFIXES):
+            return True, f"Drug compound (class suffix): {insert}"
+        if insert_lc in DRUG_COMPOUND_NAMES:
+            return True, f"Drug compound: {insert}"
+        # Non-genetic lab consumables, assay kits, media, reagents
         if any(p in insert_lc for p in GENETIC_NON_REAGENT_PATTERNS):
             return True, f"Non-genetic lab reagent/kit/consumable: {insert}"
 
@@ -598,10 +688,15 @@ def process(output_dir: str, dry_run: bool = False) -> None:
     all_tool_rows: list[dict] = []
     all_filtered_rows: list[dict] = []
     stats: dict = {}
+    # Normalized kept names per type — used to filter SUBMIT_resources.csv
+    kept_norm_names: dict[str, set] = {}
+
+    # Link tables are regenerated by _write_publication_link_csvs(); skip here
+    _LINK_TABLE_TYPES = frozenset({'resources', 'publications', 'usage', 'development'})
 
     for validated_file in validated_files:
         tool_type = validated_file.stem.replace('VALIDATED_', '')
-        if tool_type == 'resources':
+        if tool_type in _LINK_TABLE_TYPES:
             continue
 
         print(f"\n{'='*60}")
@@ -653,8 +748,14 @@ def process(output_dir: str, dry_run: bool = False) -> None:
             kept_out  = _deduplicate_validated_rows(kept, tool_type)
             n_deduped = len(kept) - len(kept_out)
 
-            # Build output column order: resourceId + name + domain cols + tracking cols
+            # Populate _resourceName from the primary name column (consistent cross-type field)
             name_col = NAME_COLUMN.get(tool_type)
+            for row in kept_out:
+                row['_resourceName'] = (
+                    row.get(name_col, '') if name_col else ''
+                ) or row.get('_toolName', '')
+
+            # Build output column order: resourceId + name + domain cols + tracking cols
             tracking_prefix = ['_pmid', '_doi', '_publicationTitle', '_year', '_context',
                                 '_confidence', '_verdict', '_usageType']
             out_fieldnames = ['resourceId']
@@ -663,7 +764,8 @@ def process(output_dir: str, dry_run: bool = False) -> None:
             # Remaining domain columns (non-tracking, non-name)
             out_fieldnames += [f for f in fieldnames
                                if f not in out_fieldnames and not f.startswith('_')]
-            # Tracking columns last
+            # Tracking columns last (_resourceName first among tracking, then ordered prefix)
+            out_fieldnames.append('_resourceName')
             out_fieldnames += [f for f in tracking_prefix if f in fieldnames]
             out_fieldnames += [f for f in fieldnames
                                if f not in out_fieldnames and f.startswith('_')]
@@ -672,6 +774,13 @@ def process(output_dir: str, dry_run: bool = False) -> None:
                 writer = csv.DictWriter(f, fieldnames=out_fieldnames, extrasaction='ignore')
                 writer.writeheader()
                 writer.writerows(kept_out)
+
+            # Track normalized kept names to filter VALIDATED_resources.csv
+            name_col_key = NAME_COLUMN.get(tool_type, '_toolName')
+            kept_norm_names[tool_type] = {
+                _normalize_tool_name(r.get(name_col_key, '') or r.get('_toolName', ''), tool_type)
+                for r in kept_out
+            }
 
             dedup_msg = f", {n_deduped} synonyms merged" if n_deduped else ""
             print(f"  ✅ {len(kept_out)} kept{dedup_msg}, {len(filtered)} removed "
@@ -740,8 +849,95 @@ def process(output_dir: str, dry_run: bool = False) -> None:
         pct = 100 * c['nf'] / c['total'] if c['total'] else 0
         print(f"  {tt:<30} {c['nf']:>4}/{c['total']:<4} NF-specific ({pct:.0f}%)")
 
+    # ── Sync SUBMIT_resources.csv ─────────────────────────────────────────────
+    _filter_submit_resources(output_path, kept_norm_names)
+
     # ── Publication link CSVs ─────────────────────────────────────────────────
     _write_publication_link_csvs(all_tool_rows, output_path, pub_meta)
+
+    # ── Remove superseded SUBMIT_*.csv intermediates ──────────────────────────
+    # run_publication_reviews.py writes SUBMIT_*.csv as intermediates.
+    # generate_review_csv.py produces VALIDATED_*.csv for everything.
+    # Any SUBMIT_*.csv that has a VALIDATED equivalent is now redundant.
+    removed_submits: list[str] = []
+    for submit_file in sorted(output_path.glob('SUBMIT_*.csv')):
+        validated_equiv = output_path / submit_file.name.replace('SUBMIT_', 'VALIDATED_')
+        if validated_equiv.exists():
+            submit_file.unlink()
+            removed_submits.append(submit_file.name)
+    if removed_submits:
+        print(f"\n🗑  Removed {len(removed_submits)} superseded SUBMIT_*.csv files "
+              f"(VALIDATED_*.csv are canonical):")
+        for name in removed_submits:
+            print(f"    {name}")
+
+
+def _filter_submit_resources(output_path: Path, kept_norm_names: dict) -> None:
+    """Filter SUBMIT_resources.csv and VALIDATED_resources.csv to keep only rows
+    for tools that passed post-filtering in their respective type-specific files.
+
+    kept_norm_names maps plural tool type (e.g. 'animal_models') → set of normalized names.
+    The resources CSV uses singular _toolType values (e.g. 'animal_model'), so we map them.
+    """
+    SINGULAR_TO_PLURAL = {
+        'animal_model':             'animal_models',
+        'antibody':                 'antibodies',
+        'cell_line':                'cell_lines',
+        'genetic_reagent':          'genetic_reagents',
+        'computational_tool':       'computational_tools',
+        'advanced_cellular_model':  'advanced_cellular_models',
+        'patient_derived_model':    'patient_derived_models',
+        'clinical_assessment_tool': 'clinical_assessment_tools',
+    }
+
+    print(f"\n{'='*60}")
+    print("Filtering VALIDATED_resources.csv")
+    print(f"{'='*60}")
+
+    for fname in ('VALIDATED_resources.csv',):
+        resources_file = output_path / fname
+        if not resources_file.exists():
+            print(f"  ⏭  {fname} not found — skipping")
+            continue
+
+        try:
+            with open(resources_file, newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                fieldnames = list(reader.fieldnames or [])
+                rows = list(reader)
+        except Exception as e:
+            print(f"  ❌ Error reading {fname}: {e}")
+            continue
+
+        kept: list = []
+        removed = 0
+        for row in rows:
+            tool_type_singular = row.get('_toolType', '').strip()
+            tool_type_plural   = SINGULAR_TO_PLURAL.get(tool_type_singular)
+
+            if tool_type_plural not in kept_norm_names:
+                # Type not processed this run (or unknown) — keep row unchanged
+                kept.append(row)
+                continue
+
+            resource_name = row.get('resourceName', '').strip()
+            norm = _normalize_tool_name(resource_name, tool_type_plural)
+            if norm in kept_norm_names[tool_type_plural]:
+                row['_resourceName'] = resource_name
+                kept.append(row)
+            else:
+                removed += 1
+
+        # Ensure _resourceName is in fieldnames
+        if '_resourceName' not in fieldnames:
+            fieldnames.append('_resourceName')
+
+        with open(resources_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+            writer.writeheader()
+            writer.writerows(kept)
+
+        print(f"  ✅ {fname}: {len(kept)} kept, {removed} removed")
 
 
 def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
@@ -814,31 +1010,31 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
     pub_fields = ['doi', 'pmid', 'publicationTitle', 'abstract',
                   'journal', 'publicationDate', 'authors']
     if pub_rows:
-        with open(output_path / 'SUBMIT_publications.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'VALIDATED_publications.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=pub_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(pub_rows)
-        print(f"  ✅ SUBMIT_publications.csv: {len(pub_rows)} unique publications")
+        print(f"  ✅ VALIDATED_publications.csv: {len(pub_rows)} unique publications")
 
     usage_fields = ['_pmid', '_doi', '_publicationTitle', '_year',
                     '_toolName', '_toolType', '_usageType',
                     'publicationId', 'resourceId', 'usageId']
     if usage_rows:
-        with open(output_path / 'SUBMIT_usage.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'VALIDATED_usage.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=usage_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(usage_rows)
-        print(f"  ✅ SUBMIT_usage.csv: {len(usage_rows)} publication-tool usage links")
+        print(f"  ✅ VALIDATED_usage.csv: {len(usage_rows)} publication-tool usage links")
 
     dev_fields = ['_pmid', '_doi', '_publicationTitle', '_year',
                   '_toolName', '_toolType', '_usageType',
                   'publicationId', 'resourceId', 'developmentId']
     if dev_rows:
-        with open(output_path / 'SUBMIT_development.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'VALIDATED_development.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=dev_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(dev_rows)
-        print(f"  ✅ SUBMIT_development.csv: {len(dev_rows)} publication-tool development links")
+        print(f"  ✅ VALIDATED_development.csv: {len(dev_rows)} publication-tool development links")
 
     if pub_rows:
         dev_pmids        = {r['_pmid'] for r in dev_rows}
