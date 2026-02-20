@@ -379,30 +379,44 @@ def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
                 safe_print(f"Retry attempt {attempt + 1}/{max_retries}...")
             safe_print(f"Running: {' '.join(cmd)}")
 
-            result = subprocess.run(
+            process = subprocess.Popen(
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=600,  # 10 minute timeout
-                cwd=str(results_path)  # Run in results directory
+                cwd=str(results_path),
+                start_new_session=True  # own process group so kill() reaches all children
             )
 
-            safe_print(result.stdout)
+            try:
+                stdout, stderr = process.communicate(timeout=360)  # 6 minute timeout
+            except subprocess.TimeoutExpired:
+                # Kill the entire process group (Goose may have spawned children)
+                import signal
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                except ProcessLookupError:
+                    process.kill()
+                process.communicate()
+                safe_print(f"❌ Timeout after 6 minutes")
+                return None
 
-            if result.returncode != 0:
+            safe_print(stdout)
+
+            if process.returncode != 0:
                 # Check if this is a database conflict error (exit code 101)
                 is_db_conflict = (
-                    result.returncode == 101 and
-                    'table schema_version already exists' in result.stderr
+                    process.returncode == 101 and
+                    'table schema_version already exists' in stderr
                 )
 
                 if is_db_conflict and attempt < max_retries - 1:
-                    safe_print(f"⚠️  Database conflict (exit code {result.returncode}), retrying...")
+                    safe_print(f"⚠️  Database conflict (exit code {process.returncode}), retrying...")
                     time.sleep(1 + attempt)  # Exponential backoff
                     continue
                 else:
-                    safe_print(f"❌ Error (exit code {result.returncode}):")
-                    safe_print(result.stderr)
+                    safe_print(f"❌ Error (exit code {process.returncode}):")
+                    safe_print(stderr)
                     return None
 
             # Look for generated YAML file (clean_pmid already set above)
@@ -414,9 +428,6 @@ def run_goose_review(pmid, input_file, results_dir, doi='', max_retries=3):
                 safe_print(f"⚠️  No YAML file generated")
                 return None
 
-        except subprocess.TimeoutExpired:
-            safe_print(f"❌ Timeout after 10 minutes")
-            return None
         except Exception as e:
             safe_print(f"❌ Error: {e}")
             return None
@@ -443,9 +454,14 @@ def process_single_publication(row, idx, total_pubs, results_dir, inputs_dir, fo
     elif yaml_path.exists() and force_rereviews:
         safe_print(f"🔄 Re-reviewing {pmid} (force flag set)")
 
-    # Skip abstract_only publications - no methods section means tool mining will fail
+    # Skip publications with no cache file at all — Goose will waste its timeout searching
     cached = load_cached_text(pmid)
-    if cached and cached.get('cache_level') == 'abstract_only' and not force_rereviews:
+    if cached is None:
+        safe_print(f"⏭️  Skipping {pmid} (no cache file - run Phase 1 first)")
+        return (pmid, 'skipped_no_cache', None)
+
+    # Skip abstract_only publications - no methods section means tool mining will fail
+    if cached.get('cache_level') == 'abstract_only' and not force_rereviews:
         safe_print(f"⏭️  Skipping {pmid} (abstract_only cache - no methods section for tool mining)")
         return (pmid, 'skipped_abstract_only', None)
 
@@ -735,6 +751,12 @@ def main():
         default=1,
         help='Number of parallel workers for AI validation (default: 1, recommended: 3-5)'
     )
+    parser.add_argument(
+        '--max-reviews',
+        type=int,
+        default=None,
+        help='Maximum number of Goose reviews to run in this invocation (caps queue after skips)'
+    )
 
     args = parser.parse_args()
 
@@ -804,6 +826,36 @@ def main():
 
     # Run goose reviews (unless skip or compile-only)
     if not args.skip_goose and not args.compile_only:
+        # Apply --max-reviews cap: pre-filter out already-reviewed and no-cache publications,
+        # then limit actual Goose calls to avoid exceeding the GitHub Actions timeout.
+        if args.max_reviews is not None:
+            results_path = Path(results_dir)
+            cache_dir = Path('tool_reviews/publication_cache')
+            eligible = []
+            for _, row in mining_df.iterrows():
+                pmid = row['pmid']
+                clean_pmid = sanitize_pmid_for_filename(pmid)
+                yaml_path = results_path / f'{clean_pmid}_tool_review.yaml'
+                if yaml_path.exists() and not args.force_rereviews:
+                    continue  # will be skipped anyway - don't count against limit
+                cache_file = cache_dir / f"{clean_pmid.replace('PMID:', '')}_text.json"
+                if not cache_file.exists():
+                    continue  # no cache - will be skipped anyway
+                eligible.append(pmid)
+            if len(eligible) > args.max_reviews:
+                cap_pmids = set(eligible[:args.max_reviews])
+                # Keep rows that are either already-reviewed (fast skip) or in the cap
+                def keep_row(row):
+                    pmid = row['pmid']
+                    clean_pmid = sanitize_pmid_for_filename(pmid)
+                    yaml_path = results_path / f'{clean_pmid}_tool_review.yaml'
+                    return yaml_path.exists() or pmid in cap_pmids
+                mining_df = mining_df[mining_df.apply(keep_row, axis=1)]
+                print(f"\n⚠️  Capped to {args.max_reviews} Goose reviews this run "
+                      f"({len(eligible) - args.max_reviews} deferred to next run)")
+            else:
+                print(f"\n✅ {len(eligible)} publications need Goose review (within --max-reviews {args.max_reviews})")
+
         print(f"\n{'='*80}")
         print(f"Running Goose Reviews for {len(mining_df)} publications")
         if args.parallel_workers > 1:
@@ -814,6 +866,7 @@ def main():
         reviewed_count = 0
         skipped_count = 0
         skipped_abstract_only_count = 0
+        skipped_no_cache_count = 0
         failed_count = 0
 
         # Use parallel processing if requested
@@ -837,6 +890,8 @@ def main():
                         skipped_count += 1
                     elif status == 'skipped_abstract_only':
                         skipped_abstract_only_count += 1
+                    elif status == 'skipped_no_cache':
+                        skipped_no_cache_count += 1
                     elif status == 'failed':
                         failed_count += 1
         else:
@@ -851,6 +906,8 @@ def main():
                     skipped_count += 1
                 elif status == 'skipped_abstract_only':
                     skipped_abstract_only_count += 1
+                elif status == 'skipped_no_cache':
+                    skipped_no_cache_count += 1
                 elif status == 'failed':
                     failed_count += 1
 
@@ -861,6 +918,8 @@ def main():
         print(f"  ⏭️  Skipped (cached): {skipped_count}")
         if skipped_abstract_only_count > 0:
             print(f"  ⏭️  Skipped (abstract_only, no methods): {skipped_abstract_only_count}")
+        if skipped_no_cache_count > 0:
+            print(f"  ⏭️  Skipped (no cache file): {skipped_no_cache_count}")
         if failed_count > 0:
             print(f"  ❌ Failed: {failed_count}")
         print(f"  📊 Total processed: {total_pubs}")

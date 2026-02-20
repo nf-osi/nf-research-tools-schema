@@ -33,6 +33,11 @@ on:
         required: false
         type: boolean
         default: false
+      max_reviews:
+        description: 'Max Sonnet reviews per run (blank = auto-calculate from timeout budget)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -262,12 +267,13 @@ jobs:
         run: |
           echo "Applying timeout protection to prevent workflow timeout..."
 
-          # Apply timeout protection using screened publications
+          # Phase 1 cache fetch is ~2s/pub (network + parse). Use 5s to be safe.
+          # Sonnet reviews are handled separately via --max-reviews below.
           python tool_coverage/scripts/timeout_protection.py \
             --publications-file tool_coverage/outputs/screened_publications.csv \
             --output-file tool_coverage/outputs/screened_publications_capped.csv \
             --deferred-file tool_coverage/outputs/publications_deferred.txt \
-            --time-per-publication 3.6 > timeout_result.json
+            --time-per-publication 5 > timeout_result.json
 
           # Check if publications were capped
           CAPPED=$(python -c "import json; data=json.load(open('timeout_result.json')); print(data.get('capped', False))")
@@ -288,6 +294,19 @@ jobs:
             echo "✓ All publications fit within timeout"
             echo "capped=false" >> $GITHUB_OUTPUT
           fi
+
+          # Calculate --max-reviews for the Sonnet step.
+          # Budget: 6h total - 30min overhead - time already spent on screening/cache.
+          # Goose timeout is now 6 min/pub; with 4 workers effective rate = 6/4 = 1.5 min/pub.
+          # Conservative: assume 8 min/pub effective (some pubs hit the 6-min timeout).
+          # Available for Sonnet: 300 min (5h). Max reviews = floor(300 / 8) = 37.
+          # Override with workflow input if provided.
+          MAX_REVIEWS=37
+          if [ -n "${{ github.event.inputs.max_reviews }}" ]; then
+            MAX_REVIEWS="${{ github.event.inputs.max_reviews }}"
+          fi
+          echo "max_reviews=${MAX_REVIEWS}" >> $GITHUB_OUTPUT
+          echo "  Sonnet review cap: ${MAX_REVIEWS} publications per run"
 
       - name: Phase 1 - Fetch minimal cache (title + abstract + methods + metadata)
         id: phase1_cache
@@ -352,6 +371,18 @@ jobs:
 
           echo "prep_from_cache_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Upload pre-validation artifacts (cache + screened lists)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-coverage-pre-validation
+          path: |
+            tool_coverage/outputs/
+            tool_reviews/publication_cache/
+          if-no-files-found: warn
+          retention-days: 7
+          overwrite: true
+
       - name: Run AI validation with Sonnet
         id: validation
         if: steps.check_api_key.outputs.api_key_exists == 'true'
@@ -368,6 +399,9 @@ jobs:
           if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
             CMD="$CMD --force-rereviews"
           fi
+
+          # Cap Sonnet reviews to fit within timeout budget
+          CMD="$CMD --max-reviews ${{ steps.timeout.outputs.max_reviews }}"
 
           # Run validation
           echo "Running: $CMD"
