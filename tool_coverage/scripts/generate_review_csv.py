@@ -116,6 +116,8 @@ def _has_nf_title(pub_title: str) -> bool:
 
 # Exact-match generic tools (lowercase)
 GENERIC_COMPUTATIONAL_TOOLS = frozenset({
+    # Self-referential: this registry itself should not appear as an entry
+    'nf research tools database',
     # Statistical environments
     'r', 'python', 'python3', 'matlab', 'excel', 'spss', 'sas', 'stata', 'octave',
     'prism', 'graphpad prism', 'graphpad',
@@ -508,6 +510,25 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
         has_repo = bool(row.get('sourceRepository', '').strip())
         if not has_version and not has_repo and confidence < 0.9:
             return True, "No version and no repository URL (confidence < 0.9 — unidentifiable)"
+        # The software name (or its acronym) must appear in the publication title.
+        # Generic analysis pipelines used in NF papers are captured by antibody/animal model
+        # rows; the computational tools registry is for NF-specific, purpose-built software
+        # whose development is the focus of the paper (e.g. RENOVO-NF1, DINs).
+        title_lc = pub_title.lower()
+        # Strip version suffix to get the base name: "STAR v2.7" → "STAR"
+        base = re.sub(r'\s+v?\d[\d.]*\w*$', '', name, flags=re.IGNORECASE)
+        base = re.sub(r'\s+version\s+\d[\d.]*\w*$', '', base, flags=re.IGNORECASE)
+        base = re.sub(r'\s*\(v?\d[\d.]*[^)]*\)\s*', ' ', base).strip()
+        # Extract acronym from parenthetical (e.g. "Deep Interactive Networks (DINs)" → "DINs")
+        # Require ≥3 chars to avoid matching single letters like "R"
+        abbrev_m = re.search(r'\(([A-Za-z0-9][A-Za-z0-9\-_]{2,15})\)', name)
+        acronym  = abbrev_m.group(1).lower() if abbrev_m else ''
+        base_lc  = re.sub(r'\s*\([^)]*\)\s*', ' ', base).strip().lower()
+        in_title = (name_lc in title_lc or
+                    (len(base_lc) >= 3 and base_lc in title_lc) or
+                    (len(acronym) >= 3 and acronym in title_lc))
+        if not in_title:
+            return True, f"Software name not in publication title — likely generic usage: {name}"
 
     elif tool_type == 'antibodies':
         if row.get('clonality', '').strip() == 'Secondary':
