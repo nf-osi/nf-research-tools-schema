@@ -35,8 +35,26 @@ prompt: |
      - Generic term without specific identity: "mouse model", "cell line", "RNA extraction
        reagent", "statistical software", "quality of life questionnaire"
      - Generic programming language/environment (R, Python, MATLAB, Excel, SPSS, GraphPad Prism,
-       SAS, Stata) without a specific custom NF pipeline
-     - Standard bioinformatics tools (bedtools, SAMtools, FastQC) unless NF-specific
+       SAS, Stata, Fiji, ImageJ) unless used as part of a specifically named NF analysis pipeline
+       with a custom repository URL or NF-specific adaptation
+     - Standard bioinformatics tools (bedtools, SAMtools, FastQC, STAR, HISAT2, bowtie,
+       DESeq2 without version, featureCounts) unless NF-specific or with explicit version
+     - Computational tool with NO version number AND NO repository/source URL — unidentifiable
+     - Secondary antibody (clonality = Secondary) — generic reagent, not an NF-specific tool
+     - Wildtype control strain or xenograft host strain (e.g., nude mouse, NOD SCID, Balb/c)
+       used purely as a recipient for tumor implantation — tag as animalModelGeneticDisorder:
+       "No known disease" and only accept if the strain is essential to the NF experimental design
+     - Hardware device (microscope, digital camera, MRI scanner, wearable device, Apple Watch,
+       EEG system, electrophysiology rig) — these are instruments, NOT clinical assessment tools;
+       reject entirely or reclassify under computational_tool if software-driven
+     - Clinical diagnostic criteria document (e.g., "NIH diagnostic criteria for NF1") — this
+       is a guideline, not an administered assessment instrument; REJECT for clinical_assessment_tool
+     - Behavioural assay without a named validated instrument/protocol (e.g., "rotarod assay",
+       "hind-limb clasping test", "gait test") — accept only if the specific apparatus or
+       registered protocol name is given AND it was used to measure an NF-related outcome
+     - Generic neuropsychological test battery used identically in non-NF populations (WASI,
+       BVMT, HVLT, D-KEFS, NAB) — REJECT unless the study explicitly validates or adapts it
+       for NF; if used as an outcome measure in an NF clinical study, set diseaseSpecific: No
      - Only cited from other work, not used in this publication
      - Confidence < 0.75 (unless named validated clinical instrument)
      - Near-duplicate of another entry — collapse to the most specific name

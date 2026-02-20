@@ -1193,6 +1193,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 '_publicationTitle': pub_title,
                 '_year': pub_year,
                 '_confidence': tracking['_confidence'],
+                '_usageType': tool.get('usageType', ''),
                 '_toolType': tool_type,
                 'resourceName': tool_name,
                 'resourceType': resource_type_map.get(tool_type, tool_type),
@@ -1223,6 +1224,153 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         res_file = output_path / 'SUBMIT_resources.csv'
         res_df.to_csv(res_file, index=False)
         print(f"  Created SUBMIT_resources.csv: {len(res_df)} rows")
+
+
+def write_publication_link_csvs(validation_results, output_dir='.'):
+    """Generate SUBMIT_publications.csv, SUBMIT_usage.csv, and SUBMIT_development.csv.
+
+    Maps to three Synapse tables in the NF Research Tools registry:
+      - Publication (syn26486839): one row per unique publication
+      - Usage       (syn26486841): (publicationId × resourceId) for tools USED in a publication
+      - Development (syn26486807): (resourceId × publicationId) for tools DEVELOPED in a publication
+
+    Publication metadata (abstract, authors, journal, publicationDate) is loaded from the
+    publication cache so the Publication table rows are as complete as possible at mining time.
+
+    The ID columns (publicationId, resourceId, usageId, developmentId) are left blank because
+    they are Synapse-assigned UUIDs resolved at upsert time by clean_submission_csvs.py.
+    Tracking columns (prefixed '_') are stripped before Synapse upload.
+    """
+    print("\n" + "=" * 80)
+    print("Writing Publication Link CSVs")
+    print("=" * 80)
+
+    cache_dir = Path('tool_reviews/publication_cache')
+
+    def _load_pub_meta(pmid: str) -> dict:
+        """Load abstract/authors/journal/publicationDate from local cache."""
+        clean = pmid.replace('PMID:', '').strip()
+        cache_file = cache_dir / f"{clean}_text.json"
+        if cache_file.exists():
+            try:
+                with open(cache_file) as f:
+                    c = json.load(f)
+                return {
+                    'abstract':        c.get('abstract', ''),
+                    'journal':         c.get('journal', ''),
+                    'publicationDate': c.get('publicationDate', ''),
+                    'authors':         ', '.join(c.get('authors', []) or []),
+                }
+            except Exception:
+                pass
+        return {'abstract': '', 'journal': '', 'publicationDate': '', 'authors': ''}
+
+    # ── Collect publications and links ────────────────────────────────────────
+    seen_pmids: set = set()
+    pub_rows: list = []
+    usage_rows: list = []
+    dev_rows: list = []
+
+    for result in validation_results:
+        pmid = result.get('pmid', '')
+        doi = result.get('doi', '')
+        title = result.get('title', '')
+        year = result.get('year', '')
+
+        # One publication row per unique PMID
+        if pmid and pmid not in seen_pmids:
+            seen_pmids.add(pmid)
+            meta = _load_pub_meta(pmid)
+            pub_rows.append({
+                # Synapse Publication table columns (syn26486839)
+                'doi':              doi or '',
+                'pmid':             pmid,
+                'publicationTitle': title,
+                'abstract':         meta['abstract'],
+                'journal':          meta['journal'],
+                'publicationDate':  meta['publicationDate'],
+                'authors':          meta['authors'],
+                # publicationId and publicationDateUnix left blank — Synapse-generated
+            })
+
+        # One Usage or Development row per (pmid × tool)
+        for tool in result.get('acceptedTools', []):
+            usage_type = tool.get('usageType', '')
+            tool_name = tool.get('toolName', '')
+            tool_type = normalize_tool_type(tool.get('toolType', ''))
+            if not tool_name:
+                continue
+
+            link_row = {
+                # Synapse resolves _pmid → publicationId and _toolName → resourceId at upsert
+                '_pmid':             pmid,
+                '_doi':              doi,
+                '_publicationTitle': title,
+                '_year':             year,
+                '_toolName':         tool_name,
+                '_toolType':         tool_type,
+                '_confidence':       tool.get('confidence', ''),
+                '_usageType':        usage_type,
+                # Actual Synapse ID columns (resolved at upsert, blank for now)
+                'publicationId':     '',
+                'resourceId':        '',
+            }
+
+            if usage_type == 'Development':
+                dev_rows.append({**link_row, 'developmentId': ''})
+            elif usage_type in ('Experimental Usage', 'Development'):
+                # Development also gets a Usage row (the tool was both developed and used)
+                usage_rows.append({**link_row, 'usageId': ''})
+            elif usage_type == 'Experimental Usage':
+                usage_rows.append({**link_row, 'usageId': ''})
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    # ── Write SUBMIT_publications.csv ─────────────────────────────────────────
+    if pub_rows:
+        pub_fields = [
+            'doi', 'pmid', 'publicationTitle', 'abstract',
+            'journal', 'publicationDate', 'authors',
+        ]
+        pub_df = pd.DataFrame(pub_rows)[pub_fields]
+        pub_file = output_path / 'SUBMIT_publications.csv'
+        pub_df.to_csv(pub_file, index=False)
+        print(f"  Created SUBMIT_publications.csv: {len(pub_df)} publications")
+
+    # ── Write SUBMIT_usage.csv ────────────────────────────────────────────────
+    if usage_rows:
+        usage_fields = [
+            '_pmid', '_doi', '_publicationTitle', '_year',
+            '_toolName', '_toolType', '_confidence', '_usageType',
+            'publicationId', 'resourceId', 'usageId',
+        ]
+        usage_df = pd.DataFrame(usage_rows)[usage_fields]
+        usage_file = output_path / 'SUBMIT_usage.csv'
+        usage_df.to_csv(usage_file, index=False)
+        print(f"  Created SUBMIT_usage.csv: {len(usage_df)} publication-tool usage links")
+
+    # ── Write SUBMIT_development.csv ──────────────────────────────────────────
+    if dev_rows:
+        dev_fields = [
+            '_pmid', '_doi', '_publicationTitle', '_year',
+            '_toolName', '_toolType', '_confidence', '_usageType',
+            'publicationId', 'resourceId', 'developmentId',
+        ]
+        dev_df = pd.DataFrame(dev_rows)[dev_fields]
+        dev_file = output_path / 'SUBMIT_development.csv'
+        dev_df.to_csv(dev_file, index=False)
+        print(f"  Created SUBMIT_development.csv: {len(dev_df)} publication-tool development links")
+
+    if not pub_rows and not usage_rows and not dev_rows:
+        print("  ⚠️  No publication link data — no SUBMIT_publications/usage/development.csv created")
+        return
+
+    dev_count = len(dev_rows)
+    usage_count = len(usage_rows)
+    pub_count = len(pub_rows)
+    print(f"\n  Summary: {pub_count} unique publications | "
+          f"{usage_count} usage links | {dev_count} development links")
 
 
 def main():
@@ -1502,6 +1650,7 @@ def main():
     # Write SUBMIT_*.csv from validated tools (discovery mode: toolValidations → submission)
     if not args.compile_only:
         write_validated_tools_submit_csv(validation_results, output_dir='tool_coverage/outputs')
+        write_publication_link_csvs(validation_results, output_dir='tool_coverage/outputs')
 
     # Save validation summary
     summary_file = Path(review_dir) / 'validation_summary.json'
@@ -1509,18 +1658,30 @@ def main():
         json.dump(validation_results, f, indent=2)
     print(f"\n✅ Validation summary saved: {summary_file}")
 
-    # Create report
+    # Create validation report with usageType breakdown per publication
     report_rows = []
     for result in validation_results:
+        accepted_tools = result.get('acceptedTools', [])
+        dev_tools = [t for t in accepted_tools if t.get('usageType') == 'Development']
+        usage_tools = [t for t in accepted_tools if t.get('usageType') == 'Experimental Usage']
+        citation_tools = [t for t in accepted_tools if t.get('usageType') == 'Citation Only']
         report_rows.append({
-            'pmid': result['pmid'],
-            'title': result['title'],
-            'accepted': result['toolsAccepted'],
-            'rejected': result['toolsRejected'],
-            'uncertain': result['toolsUncertain'],
-            'acceptedToolNames': ', '.join(
-                t.get('toolName', '') for t in result['acceptedTools']
+            'pmid':                  result['pmid'],
+            'title':                 result['title'],
+            'accepted':              result['toolsAccepted'],
+            'rejected':              result['toolsRejected'],
+            'uncertain':             result['toolsUncertain'],
+            'development_tools':     len(dev_tools),
+            'usage_tools':           len(usage_tools),
+            'citation_only_tools':   len(citation_tools),
+            'publicationRole':       (
+                'Development' if dev_tools and not usage_tools else
+                'Mixed'       if dev_tools and usage_tools else
+                'Usage'       if usage_tools else
+                'Citation Only'
             ),
+            'acceptedToolNames': ', '.join(t.get('toolName', '') for t in accepted_tools),
+            'developmentToolNames': ', '.join(t.get('toolName', '') for t in dev_tools),
         })
 
     report_df = pd.DataFrame(report_rows)
@@ -1536,10 +1697,12 @@ def main():
     print("Validation Complete!")
     print("=" * 80)
     print("\nNext steps:")
-    print("  1. Review validation_report.xlsx for summary")
+    print("  1. Review tool_coverage/outputs/validation_report.csv for publication-level summary")
     print("  2. Check tool_coverage/outputs/VALIDATED_*.csv files (rejected tools removed)")
-    print("  3. Manually review 'uncertain' tools if any")
-    print("  4. Manually verify VALIDATED_*.csv files before uploading to Synapse")
+    print("  3. Check tool_coverage/outputs/SUBMIT_publications.csv  (Publication table upload)")
+    print("  4. Check tool_coverage/outputs/SUBMIT_usage.csv         (Usage link upload)")
+    print("  5. Check tool_coverage/outputs/SUBMIT_development.csv   (Development link upload)")
+    print("  6. Manually review 'uncertain' tools if any")
     print("=" * 80)
 
 if __name__ == '__main__':

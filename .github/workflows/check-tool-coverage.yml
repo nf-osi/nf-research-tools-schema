@@ -491,6 +491,28 @@ jobs:
 
           echo "phase2_review_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Post-filter outputs and generate review CSV
+        id: review_csv
+        if: steps.validation.outputs.validation_complete == 'true'
+        run: |
+          echo "Step 5: Post-filtering VALIDATED_*.csv and generating consolidated review.csv..."
+          echo "  Removes: generic stats tools, secondary antibodies, hardware misclassified as clinical tools"
+          echo "  Removes: computational tools with no version/repo at confidence < 0.9"
+          echo "  Generates: review.csv (all kept tools, sorted by NF-specificity + quality)"
+          echo "  Generates: review_filtered.csv (audit trail of post-filtered tools)"
+
+          python tool_coverage/scripts/generate_review_csv.py \
+            --output-dir tool_coverage/outputs \
+            2>&1 | tee tool_coverage/outputs/review_csv_output.log
+
+          if [ -f "tool_coverage/outputs/review.csv" ]; then
+            REVIEW_COUNT=$(tail -n +2 tool_coverage/outputs/review.csv | wc -l)
+            echo "  ✅ review.csv: $REVIEW_COUNT tools"
+            echo "review_csv_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "  ⚠️  review.csv not generated"
+          fi
+
       - name: Apply pattern improvements
         id: pattern_improvements
         if: steps.validation.outputs.validation_complete == 'true'
