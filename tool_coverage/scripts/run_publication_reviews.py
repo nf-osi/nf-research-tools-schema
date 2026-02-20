@@ -26,7 +26,8 @@ REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 
-# Minimal YAML output template — only fields needed for VALIDATED_*.csv submission files
+# YAML output template — common fields + type-specific Synapse table fields
+# Claude should add the type-specific fields as additional keys on each tool entry.
 TOOL_VALIDATION_YAML_TEMPLATE = """\
 toolValidations:
   - toolName: "Exact tool name as it appears in text"
@@ -36,6 +37,16 @@ toolValidations:
     recommendation: "Keep" | "Remove" | "Manual Review Required"
     contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."
     usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
+    # Add ALL type-specific fields you can extract from the text (omit fields not found):
+    # animal_model:           strainNomenclature*, backgroundStrain, backgroundSubstrain, animalModelGeneticDisorder [Neurofibromatosis type 1|type 2|Schwannomatosis|No known disease], animalModelOfManifestation
+    # antibody:               targetAntigen*, hostOrganism [Mouse|Rabbit|Unknown], clonality [Monoclonal|Polyclonal|Secondary|Recombinant|Unknown], reactiveSpecies [Human|Mouse|Rat|...], conjugate
+    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannamatosis|None], cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma]
+    # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker, gRNAshRNASequence
+    # computational_tool:     softwareType* [Analysis Software|Pipeline|Package/Library|Workflow|Database|Web Application|Command-line Tool|Plugin|Other], softwareVersion, programmingLanguage, sourceRepository
+    # advanced_cellular_model: modelType* [organoid|spheroid|other], derivationSource* [patient|iPSC|primary cell|cell line|other], cellTypes, organoidType, matrixType, cultureSystem
+    # patient_derived_model:  modelSystemType* [PDX|PDO|other], patientDiagnosis*, hostStrain, tumorType, engraftmentSite
+    # clinical_assessment_tool: assessmentType* [scale|questionnaire|interview|performance test|biomarker|other], targetPopulation* [pediatric|adult|caregiver|all ages|other], diseaseSpecific [Yes|No], numberOfItems, scoringMethod
+    # (* = critical field, fill if at all possible)
   # Repeat for each tool. Use [] if no tools found."""
 
 # Observation extraction YAML output template
@@ -707,7 +718,19 @@ def compile_validation_results(mining_df, results_dir):
         rejected_tools = []
         uncertain_tools = []
 
+        # Common fields present in every tool entry
+        _common_keys = {
+            'toolName', 'toolType', 'verdict', 'confidence',
+            'recommendation', 'contextSnippet', 'usageType',
+        }
+
         for tool_val in tool_validations:
+            # Capture all type-specific fields Claude extracted (anything beyond common keys)
+            extracted_fields = {
+                k: v for k, v in tool_val.items()
+                if k not in _common_keys and not k.startswith('#') and v not in (None, '', [])
+            }
+
             tool_info = {
                 'pmid': pmid,
                 'toolName': tool_val.get('toolName'),
@@ -717,6 +740,7 @@ def compile_validation_results(mining_df, results_dir):
                 'recommendation': tool_val.get('recommendation'),
                 'contextSnippet': tool_val.get('contextSnippet', ''),
                 'usageType': tool_val.get('usageType', ''),
+                'extractedFields': extracted_fields,
             }
             rec = tool_val.get('recommendation', '')
             if rec == 'Keep':
@@ -896,96 +920,105 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     # the rest are left blank for curators. ID columns are omitted (Synapse generates them).
     # Types with no name in the detail table (cell_line, advanced_cellular_model,
     # patient_derived_model) carry the tool name as '_toolName' (tracking only).
-    def make_detail_row(tool_type, tool_name):
-        """Return a dict of Synapse detail-table columns for one tool."""
+    def _f(fields, key, fallback=''):
+        """Get a field from Claude's extracted fields, falling back to fallback."""
+        return fields.get(key, fallback) or fallback
+
+    def make_detail_row(tool_type, tool_name, extracted_fields=None):
+        """Return a dict of Synapse detail-table columns for one tool.
+
+        Populated from Claude's extracted type-specific fields where available,
+        with blanks for fields Claude could not find in the text.
+        """
+        f = extracted_fields or {}
         if tool_type == 'animal_model':
             return {
-                'strainNomenclature': tool_name,
-                'backgroundStrain': '',
-                'backgroundSubstrain': '',
-                'animalModelGeneticDisorder': '',
-                'animalModelOfManifestation': '',
-                'transplantationType': '',
-                'animalState': '',
-                'generation': '',
+                'strainNomenclature': _f(f, 'strainNomenclature', tool_name),
+                'backgroundStrain': _f(f, 'backgroundStrain'),
+                'backgroundSubstrain': _f(f, 'backgroundSubstrain'),
+                'animalModelGeneticDisorder': _f(f, 'animalModelGeneticDisorder'),
+                'animalModelOfManifestation': _f(f, 'animalModelOfManifestation'),
+                'transplantationType': _f(f, 'transplantationType'),
+                'animalState': _f(f, 'animalState'),
+                'generation': _f(f, 'generation'),
                 'donorId': '',
                 'transplantationDonorId': '',
             }
         elif tool_type == 'antibody':
             return {
-                'targetAntigen': tool_name,
-                'hostOrganism': '',
-                'clonality': '',
-                'cloneId': '',
-                'uniprotId': '',
-                'reactiveSpecies': '',
-                'conjugate': '',
+                'targetAntigen': _f(f, 'targetAntigen', tool_name),
+                'hostOrganism': _f(f, 'hostOrganism'),
+                'clonality': _f(f, 'clonality'),
+                'cloneId': _f(f, 'cloneId'),
+                'uniprotId': _f(f, 'uniprotId'),
+                'reactiveSpecies': _f(f, 'reactiveSpecies'),
+                'conjugate': _f(f, 'conjugate'),
             }
         elif tool_type == 'cell_line':
             return {
                 '_toolName': tool_name,      # tracking only — name goes in resources
-                'organ': '',                  # required; curator must fill in
-                'tissue': '',
-                'cellLineManifestation': '',
-                'cellLineGeneticDisorder': '',
-                'cellLineCategory': '',
+                'organ': _f(f, 'organ'),     # required; curator fills if Claude couldn't
+                'tissue': _f(f, 'tissue'),
+                'cellLineManifestation': _f(f, 'cellLineManifestation'),
+                'cellLineGeneticDisorder': _f(f, 'cellLineGeneticDisorder'),
+                'cellLineCategory': _f(f, 'cellLineCategory'),
                 'donorId': '',
-                'originYear': '',
+                'originYear': _f(f, 'originYear'),
                 'strProfile': '',
-                'resistance': '',
+                'resistance': _f(f, 'resistance'),
                 'contaminatedMisidentified': '',
                 'populationDoublingTime': '',
             }
         elif tool_type == 'genetic_reagent':
             return {
-                'insertName': tool_name,
-                'vectorType': '',
-                'vectorBackbone': '',
-                'promoter': '',
-                'insertSpecies': '',
-                'insertEntrezId': '',
-                'selectableMarker': '',
-                'copyNumber': '',
-                'gRNAshRNASequence': '',
+                'insertName': _f(f, 'insertName', tool_name),
+                'vectorType': _f(f, 'vectorType'),
+                'vectorBackbone': _f(f, 'vectorBackbone'),
+                'promoter': _f(f, 'promoter'),
+                'insertSpecies': _f(f, 'insertSpecies'),
+                'insertEntrezId': _f(f, 'insertEntrezId'),
+                'selectableMarker': _f(f, 'selectableMarker'),
+                'copyNumber': _f(f, 'copyNumber'),
+                'gRNAshRNASequence': _f(f, 'gRNAshRNASequence'),
             }
         elif tool_type == 'computational_tool':
             return {
                 'softwareName': tool_name,
-                'softwareType': '',
-                'softwareVersion': '',
-                'programmingLanguage': '',
-                'sourceRepository': '',
-                'documentation': '',
-                'licenseType': '',
-                'containerized': '',
-                'maintainer': '',
+                'softwareType': _f(f, 'softwareType'),
+                'softwareVersion': _f(f, 'softwareVersion'),
+                'programmingLanguage': _f(f, 'programmingLanguage'),
+                'sourceRepository': _f(f, 'sourceRepository'),
+                'documentation': _f(f, 'documentation'),
+                'licenseType': _f(f, 'licenseType'),
+                'containerized': _f(f, 'containerized'),
+                'maintainer': _f(f, 'maintainer'),
             }
         elif tool_type == 'advanced_cellular_model':
             return {
                 '_toolName': tool_name,      # tracking only — name goes in resources
-                'modelType': '',              # required; curator must fill in
-                'derivationSource': '',       # required; curator must fill in
-                'cellTypes': '',
-                'organoidType': '',
-                'matrixType': '',
-                'cultureSystem': '',
-                'maturationTime': '',
-                'characterizationMethods': '',
-                'passageNumber': '',
+                'modelType': _f(f, 'modelType'),
+                'derivationSource': _f(f, 'derivationSource'),
+                'cellTypes': _f(f, 'cellTypes'),
+                'organoidType': _f(f, 'organoidType'),
+                'matrixType': _f(f, 'matrixType'),
+                'cultureSystem': _f(f, 'cultureSystem'),
+                'maturationTime': _f(f, 'maturationTime'),
+                'characterizationMethods': _f(f, 'characterizationMethods'),
+                'passageNumber': _f(f, 'passageNumber'),
                 'cryopreservationProtocol': '',
                 'qualityControlMetrics': '',
             }
         elif tool_type == 'patient_derived_model':
             return {
                 '_toolName': tool_name,      # tracking only — name goes in resources
-                'modelSystemType': '',        # required; curator must fill in
-                'patientDiagnosis': '',       # required; curator must fill in
-                'hostStrain': '',
-                'tumorType': '',
-                'engraftmentSite': '',
-                'passageNumber': '',
+                'modelSystemType': _f(f, 'modelSystemType'),
+                'patientDiagnosis': _f(f, 'patientDiagnosis'),
+                'hostStrain': _f(f, 'hostStrain'),
+                'tumorType': _f(f, 'tumorType'),
+                'engraftmentSite': _f(f, 'engraftmentSite'),
+                'passageNumber': _f(f, 'passageNumber'),
                 'establishmentRate': '',
-                'molecularCharacterization': '',
+                'molecularCharacterization': _f(f, 'molecularCharacterization'),
                 'clinicalData': '',
                 'humanizationMethod': '',
                 'immuneSystemComponents': '',
@@ -994,14 +1027,14 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         elif tool_type == 'clinical_assessment_tool':
             return {
                 'assessmentName': tool_name,
-                'assessmentType': '',
-                'targetPopulation': '',
-                'diseaseSpecific': '',
-                'numberOfItems': '',
-                'scoringMethod': '',
-                'validatedLanguages': '',
+                'assessmentType': _f(f, 'assessmentType'),
+                'targetPopulation': _f(f, 'targetPopulation'),
+                'diseaseSpecific': _f(f, 'diseaseSpecific'),
+                'numberOfItems': _f(f, 'numberOfItems'),
+                'scoringMethod': _f(f, 'scoringMethod'),
+                'validatedLanguages': _f(f, 'validatedLanguages'),
                 'psychometricProperties': '',
-                'administrationTime': '',
+                'administrationTime': _f(f, 'administrationTime'),
                 'availabilityStatus': '',
                 'licensingRequirements': '',
                 'digitalVersion': '',
@@ -1035,7 +1068,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 '_usageType': tool.get('usageType', ''),
             }
 
-            detail = make_detail_row(tool_type, tool_name)
+            detail = make_detail_row(tool_type, tool_name, tool.get('extractedFields', {}))
             row = {**tracking, **detail}
 
             if tool_type not in tools_by_type:
