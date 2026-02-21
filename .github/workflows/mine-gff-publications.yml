@@ -1,0 +1,80 @@
+name: Mine GFF Publications
+# One-shot workflow to mine the GFF-funded publications not yet linked to tools.
+# Fetches full text from PubMed Central, runs Sonnet tool extraction,
+# appends results to VALIDATED_*.csv, and pushes back to the target branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to commit results to (defaults to current PR branch)'
+        required: false
+        type: string
+        default: 'tool-coverage-update-33'
+      force_rereviews:
+        description: 'Re-run AI review even if YAML already exists'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  mine-gff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch || 'tool-coverage-update-33' }}
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r tool_coverage/requirements.txt
+
+      - name: Mine GFF publications
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
+            ARGS="$ARGS --force-rereviews"
+          fi
+          python tool_coverage/scripts/mine_gff_publications.py $ARGS \
+            2>&1 | tee tool_coverage/outputs/gff_mining_output.log
+
+      - name: Show summary
+        if: always()
+        run: |
+          echo "=== New VALIDATED counts ==="
+          for f in tool_coverage/outputs/VALIDATED_*.csv; do
+            n=$(tail -n +2 "$f" | wc -l)
+            echo "  $(basename $f): $n rows"
+          done
+
+      - name: Commit and push results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: |
+            Mine GFF publications: add tools from unfunded pubs
+
+            - Fetched full texts from PubMed Central
+            - Ran Sonnet AI extraction on 17 GFF publications
+            - Appended accepted tools to VALIDATED_*.csv
+            - Re-ran generate_review_csv.py filters
+          branch: ${{ github.event.inputs.target_branch || 'tool-coverage-update-33' }}
+          file_pattern: |
+            tool_coverage/outputs/VALIDATED_*.csv
+            tool_coverage/outputs/review.csv
+            tool_coverage/outputs/review_filtered.csv
+            tool_reviews/publication_cache/
+          push_options: '--force-with-lease'
