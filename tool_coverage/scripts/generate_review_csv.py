@@ -736,6 +736,10 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             has_nf_target = any(t in insert_lc for t in _NF_INSERT_TERMS)
             if not has_nf_target:
                 return True, f"Generic fluorescent-label insert without NF-specific cargo: {insert}"
+        # Hard NF core-gene filter: insertName must reference a core NF disease gene.
+        # This ensures only reagents that directly target/encode an NF gene are registered.
+        if not any(g in insert_lc for g in NF_CORE_GENES):
+            return True, f"Insert does not reference a core NF disease gene: {insert}"
 
     elif tool_type == 'patient_derived_models':
         name = row.get('_toolName', '').strip()
