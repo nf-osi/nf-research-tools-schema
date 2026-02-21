@@ -56,43 +56,110 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 
-# ── NF-pathway gene/protein list (for antibody NF-specificity) (for antibody NF-specificity) ────────────────
-# If targetAntigen contains any of these (case-insensitive substring), the
-# antibody is considered NF-pathway-relevant.
-NF_PATHWAY_GENES = frozenset({
-    # Core NF genes
-    'nf1', 'neurofibromin', 'nf2', 'merlin', 'lztr1', 'smarcb1', 'ini1',
-    'eed', 'suz12', 'prkar1a', 'spred1', 'cbl',
-    # RAS/MAPK pathway (primary NF1 downstream)
+# ── NF gene sets for antibody / genetic-reagent NF-specificity filter ─────────
+#
+# NF_CORE_GENES  (default) — Only the disease-causing NF genes and their direct
+#   protein products.  Antibodies must target one of these to pass the hard
+#   NF-specificity filter.  Use this when you want the registry to contain only
+#   reagents that directly probe the causal NF biology.
+#
+# NF_PATHWAY_GENES  (--include-pathway-genes) — Adds the full RAS/MAPK/PI3K/AKT
+#   signalling cascade, Schwann-cell markers, tumor microenvironment proteins, and
+#   other proteins commonly studied in NF research.  Use for a broader registry.
+#
+# _active_nf_genes is set at runtime by process() based on the CLI flag.
+
+NF_CORE_GENES = frozenset({
+    # NF1 — Neurofibromatosis type 1
+    'nf1', 'neurofibromin',
+    # NF2 — Neurofibromatosis type 2 / schwannomatosis
+    'nf2', 'merlin',
+    # Schwannomatosis genes (LZTR1, SMARCB1/INI1)
+    'lztr1', 'smarcb1', 'ini1',
+    # SWN-related PRC2 subunits (EED/SUZ12 schwannomatosis)
+    'eed', 'suz12',
+    # NF1-related syndrome genes (Legius: SPRED1; CBL syndrome; Carney: PRKAR1A)
+    'prkar1a', 'spred1', 'cbl',
+})
+
+NF_PATHWAY_GENES = NF_CORE_GENES | frozenset({
+    # RAS/MAPK pathway (primary NF1 downstream) — include hyphenated RAF forms
     'kras', 'nras', 'hras', 'ras', 'raf1', 'braf', 'craf', 'araf',
-    'map2k1', 'map2k2', 'mek1', 'mek2', 'mek', 'erk1', 'erk2', 'mapk',
+    'b-raf', 'c-raf', 'a-raf',
+    'map2k1', 'map2k2', 'mek1', 'mek2', 'mek', 'erk1', 'erk2', 'erk', 'mapk',
     'p-erk', 'perk', 'p-mek', 'pmek', 'p-ras', 'rsk', 'p90rsk', 'dusp6',
-    # PI3K / AKT / mTOR
+    # PI3K / AKT / mTOR — include S6K/S6 readable variants
     'pi3k', 'pik3ca', 'pik3r1', 'akt', 'p-akt', 'pakt', 'mtor', 'pmtor',
-    'pten', 'tsc1', 'tsc2', 's6k', 'p70s6k', '4ebp1', 'p-4ebp1', 'p4ebp1',
-    'rps6', 'p-s6', 'ps6', 'rictor', 'raptor',
+    'pten', 'tsc1', 'tsc2', 's6k', 'p70s6k', 'p70s6', 's6 kinase', 'ribosomal s6',
+    '4ebp1', 'p-4ebp1', 'p4ebp1', 'rps6', 'p-s6', 'ps6', 'rictor', 'raptor',
+    # PAK / RAC / CDC42 (RAS→RAC effectors in NF)
+    'pak1', 'pak2', 'pak3', 'pak ',
+    'rac1', ' rac ', 'cdc42',
+    # JAK-STAT (studied in NF tumors)
+    'stat3', 'p-stat3', 'jak2', 'p-jak2',
+    # NF-κB (inflammation in NF tumor)
+    'nf-κb', 'nfkb', 'nf-kb',
+    # GSK-3β / CREB (NF1 cAMP / Wnt pathway)
+    'gsk3', 'gsk-3', 'creb',
+    # Autophagy markers (NF treatment studies)
+    'lc3', 'lc3b', 'beclin',
+    # Hypoxia (NF tumor)
+    'hif1', 'hif-1',
+    # AMPK (NF metabolic studies)
+    'ampk',
+    # VEGF (NF tumor angiogenesis)
+    'vegf', 'vegfa',
     # Schwann cell / nerve sheath markers
     'sox10', 's100b', 's100', 'mbp', 'mpz', 'p0', 'plp1', 'ncam',
     'egr2', 'oct6', 'krox20', 'pmp22', 'periaxin',
+    # Schwann cell identity / nerve markers
+    'ngfr', 'p75', 'ng2', 'cnpase', 'mag ', 'pgp9.5',
+    # Glial / neural progenitor (NF optic glioma, neurological phenotype)
+    'olig2', 'sox2', 'sox9', 'map2', 'neun', 'neurofilament', 'nf-200', 'nf-h',
+    'blbp', 'gfap',
     # YAP/Hippo (NF2/schwannoma)
     'yap', 'taz', 'tead', 'lats1', 'lats2', 'mob1',
     # MPNST / tumor markers
     'h3k27me3', 'h3k27', 'ezh2', 'bmi1', 'ring1b', 'cdkn2a', 'p16', 'p14',
     'cdkn2b', 'p15', 'rb ', 'rb1', 'mdm2', 'p53', 'tp53', 'aurora',
+    # NF2/schwannoma-specific
+    'ndrg1', 'rabl6a', 'p55/mpp1', 'mpp1',
+    # PDE4A (NF1 cAMP / gliomagenesis)
+    'pde4',
+    # EPHA2 (studied in NF schwannoma)
+    'epha2', 'epha',
+    # Survivin (NF tumor treatment)
+    'survivin',
     # Growth factor receptors commonly studied in NF
-    'egfr', 'erbb', 'her2', 'her3', 'pdgfr', 'pdgfra', 'pdgfrb',
+    'egfr', 'erbb', 'her2', 'her3', 'her1',
+    'pdgfr', 'pdgfra', 'pdgfrb',
     'vegfr', 'met ', 'c-met', 'axl', 'igf1r', 'igfr', 'kit', 'c-kit',
+    # Immune checkpoint / microenvironment (NF tumor)
+    'pd-l1', 'pdl1', 'pd-1', 'ctla-4', 'ctla4',
+    'gzmb', 'granzyme',
+    # Macrophage / myeloid (NF tumor microenvironment)
+    'cd3', 'cd4', 'cd8', 'cd11b', 'cd11c', 'cd14',
+    'cd34', 'cd56', 'cd57', 'cd68', 'cd163',
+    'foxp3', 'csf1r', 'csf1', 'iba1',
+    # Tumor ECM (NF tumor stroma)
+    'tgf-β', 'tgfb', 'tgf', 'cxcl12', 'cxcr4',
+    'postn', 'periostin', 'ctgf', 'collagen', 'endoglin',
     # Apoptosis / cell death (used in NF drug studies)
     'bcl2', 'bcl-2', 'bclxl', 'bcl-xl', 'bax', 'bad', 'bid', 'noxa', 'puma',
     'caspase', 'parp', 'cytochrome c',
     # Proliferation
     'ki67', 'pcna', 'cyclin', 'cdk4', 'cdk6', 'cdk2',
     # Neuronal / glial
-    'gfap', 'vimentin', 'nestin', 'cd34', 'cd56', 'cd57',
-    # Immune / microenvironment (NF tumor)
-    'cd3', 'cd8', 'cd4', 'cd68', 'cd163', 'foxp3', 'pd-l1', 'pdl1', 'pd-1',
-    'csf1r', 'iba1',
+    'vimentin', 'nestin',
+    # Innate immune signaling (NF)
+    'sting', 'tbk1', 'irf3',
+    # Miscellaneous proteins specifically used as NF tools
+    'rheb', 'rabl6a', 'atrx', 'apc',
 })
+
+# Runtime-selected gene set — default strict; overridden to NF_PATHWAY_GENES
+# by --include-pathway-genes flag.
+_active_nf_genes: frozenset = NF_CORE_GENES
 
 # ── NF-specific publication title filter ─────────────────────────────────────
 # Publications must mention at least one of these terms (case-insensitive) to
@@ -329,24 +396,110 @@ GENETIC_NON_REAGENT_PATTERNS = (
     'vectastain', 'vecta stain',  # Vectastain Elite ABC — IHC detection kit
 )
 
-# Exact-match names for genetic reagents that are too generic for the registry
+# Exact-match names for genetic reagents that are too generic for the registry.
+# Checked case-insensitively against the lowercased insertName.
 GENERIC_GENETIC_REAGENT_NAMES = frozenset({
-    'gateway entry vector',      # Generic cloning system, not a specific construct
-    'baculovirus expression vector',  # Generic vector class
-    'e. coli expression vector',      # Generic bacterial expression class
-    'luciferase reporter',            # Too vague without specific promoter details
-    'dual luciferase reporter',       # Ditto
-    'pan-t-cell isolation',           # Cell isolation kit, not a genetic construct
+    # Generic cloning / expression systems
+    'gateway entry vector',
+    'baculovirus expression vector',
+    'e. coli expression vector',
+    'empty vector',
+    'plko', 'plko.1',               # generic lentiviral backbone
+    'pcdna3.1',                     # generic mammalian expression vector
+    'pcr2.1-topo',                  # generic TOPO cloning vector
+    'mscv',                         # generic retroviral backbone (without NF insert)
+    # Generic luciferase reporters (vague — no NF-specific promoter)
+    'luciferase reporter',
+    'dual luciferase reporter',
+    'ap-1 luciferase',              # generic AP-1 reporter (not NF-specific)
+    'firefly luciferase-gfp fusion',
+    'firefly luciferase-egfp fusion',
+    'luciferase-ires-gfp',
+    'fluc and mcherry',
+    # Generic fluorescent protein inserts (labels, not NF-specific constructs)
+    'gfp', 'egfp', 'eyfp',
+    'rfp', 'mrfp',
+    'nuclear rfp',
+    'nuclight red', 'nuclight',
+    'mcherry',
+    'mruby',
+    'mturquoise',
+    # Generic CRISPR machinery / silencing controls (NF-targeted variants kept below)
+    'cas9',
+    'crispr-cas9', 'crispr/cas9',
+    'guide rna',
+    'grna',
+    'sgrna',
+    'shrna', 'shrnas',              # bare class names without specific target
+    'scramble',                     # scrambled control without named target
+    'scrambled sirna',
+    'non-targeting control',
+    # Generic inducible systems (too vague without NF-specific cargo)
+    'tet-on',
+    'tet-inducible',
+    # Generic viral vector components
+    'packaging',
+    'envelope',
+    # Generic sequencing / capture probes (not NF-specific panels)
+    'human all exon',
+    'human all exon capture probes',
+    'human exome',
+    'dna capture system',
+    'microsatellite markers',
+    # Generic primers / oligonucleotides
+    'oligo-dt',
+    # Cell isolation (not a genetic construct)
+    'pan-t-cell isolation',
 })
 
-# ── Generic loading-control antibodies (should not appear in tool registry) ───
+# NF-specific terms that rescue an otherwise-generic CRISPR/silencing name.
+# If the insertName contains any of these, the reagent is NF-specific and kept.
+_NF_INSERT_TERMS: tuple = (
+    'nf1', 'nf2', 'lztr1', 'smarcb1', 'merlin', 'neurofibromin', 'spred1',
+    'schwann', 'neurofibr',
+)
+
+# Generic CRISPR/silencing patterns: if an insert matches these AND has no
+# NF-specific term, it is too generic to register.
+_GENERIC_CRISPR_RE = re.compile(
+    r'^(?:cas9|crispr|guide\s+rna|grna|sgrna|shrna|rna\s+interference|rnai'
+    r'|short\s+hairpin|short\s+interfering)\b',
+    re.IGNORECASE,
+)
+
+# ── Generic antibodies that must be filtered regardless of NF context ─────────
+# These target generic reporter proteins, affinity tags, or housekeeping
+# proteins that carry no NF-pathway information.
 GENERIC_CONTROL_ANTIBODIES = frozenset({
-    'beta-actin', 'β-actin', 'b-actin', 'beta actin',
+    # Loading controls / housekeeping proteins
+    'beta-actin', 'β-actin', 'b-actin', 'beta actin', 'actin',
     'alpha-tubulin', 'α-tubulin', 'alpha tubulin',
+    'tubulin', 'beta-tubulin', 'β-tubulin', 'beta tubulin',
+    'gamma-tubulin', 'γ-tubulin', 'gamma tubulin',
+    'acetylated tubulin',
     'gapdh',
     'lamin b', 'lamin b1', 'lamin a/c',
     'histone h3', 'total histone h3',
     'vinculin',
+    # Fluorescent reporter proteins (antibodies against GFP/RFP/mCherry etc.
+    # are generic reagents with no NF-pathway specificity)
+    'gfp', 'egfp', 'eyfp', 'yfp',
+    'rfp', 'mrfp', 'mcherry', 'cherry',
+    'tomato', 'tdtomato', 'td-tomato',
+    'mruby', 'ruby', 'mturquoise', 'turquoise',
+    # Generic affinity tags (same reason — used in any biochemistry)
+    'ha', 'ha tag', 'ha-tag',
+    'flag', 'flag tag', 'flag-tag',
+    'v5', 'v5 tag', 'v5-tag',
+    'gst',                          # when used as pure tag (not NF-GRD fusion)
+    # Generic reporters / lineage tracers
+    'β-gal', 'beta-gal', 'β-galactosidase', 'lacz',
+    # Generic conjugate / detection markers (not primary targets)
+    'cy3/cy5', 'cy3', 'cy5', 'dig-fab',
+    # Generic xenograft markers
+    'human nuclear antigen', 'human nuclei',
+    # Generic proliferation dye (not a specific target)
+    'brdu',
 })
 
 # ── Generic cell line names (too vague for NF tool registry) ─────────────────
@@ -457,7 +610,7 @@ def _is_nf_specific(row: dict, tool_type: str) -> bool:
         return any(k in ctx for k in ('nf1', 'nf2', 'neurofibromatosis', 'schwannoma', 'neurofibroma'))
     if tool_type == 'antibodies':
         antigen = row.get('targetAntigen', '').lower()
-        return any(gene in antigen for gene in NF_PATHWAY_GENES)
+        return any(gene in antigen for gene in _active_nf_genes)
     # computational_tools, resources: included by default (used in NF-focused publications)
     return True
 
@@ -533,10 +686,14 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     elif tool_type == 'antibodies':
         if row.get('clonality', '').strip() == 'Secondary':
             return True, "Secondary antibody (not an NF-specific research tool)"
-        # Generic loading-control antibodies used as internal standards
         antigen_lc = row.get('targetAntigen', '').lower().strip()
+        # Blocklist: reporter proteins, affinity tags, generic housekeeping
         if antigen_lc in GENERIC_CONTROL_ANTIBODIES:
-            return True, f"Generic loading-control antibody: {antigen_lc}"
+            return True, f"Generic reporter/tag/housekeeping antibody: {antigen_lc}"
+        # Hard NF-pathway filter: target must map to a protein studied in NF biology.
+        # _is_nf_specific checks NF_PATHWAY_GENES against the lowercase targetAntigen.
+        if not _is_nf_specific(row, 'antibodies'):
+            return True, f"Antibody target not in NF pathway/tumor biology gene list: {row.get('targetAntigen','')}"
 
     elif tool_type == 'cell_lines':
         cell_name = (row.get('_toolName', '') or '').strip()
@@ -558,12 +715,27 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             return True, f"Drug compound (class suffix): {insert}"
         if insert_lc in DRUG_COMPOUND_NAMES:
             return True, f"Drug compound: {insert}"
-        # Exact-match generic reagent class names
+        # Exact-match generic reagent class names (fluorescents, packaging, controls, …)
         if insert_lc in GENERIC_GENETIC_REAGENT_NAMES:
-            return True, f"Generic reagent name (no specific identifier): {insert}"
+            return True, f"Generic reagent (fluorescent label / control / probe): {insert}"
         # Non-genetic lab consumables, assay kits, media, reagents
         if any(p in insert_lc for p in GENETIC_NON_REAGENT_PATTERNS):
             return True, f"Non-genetic lab reagent/kit/consumable: {insert}"
+        # Generic CRISPR/silencing machinery without an NF-specific target.
+        # Names like "Cas9", "sgRNA", "shRNA" are filtered unless they also contain
+        # an NF gene name (e.g. "NF1 gRNA", "shNF1", "nf2a/b-4sgRNA" are kept).
+        if _GENERIC_CRISPR_RE.match(insert_lc):
+            has_nf_target = any(t in insert_lc for t in _NF_INSERT_TERMS)
+            if not has_nf_target:
+                return True, f"Generic CRISPR/silencing tool — no NF-specific target: {insert}"
+        # Generic fluorescent-protein inserts (substring patterns not covered by exact match)
+        _FLUOR_PATTERNS = ('egfp', 'mcherry', 'mrfp', 'mruby', 'mturquoise',
+                           'ires-gfp', 'ires-rfp', 'nuclight', 'nuclear rfp',
+                           'tdtomato', 'td-tomato')
+        if any(p in insert_lc for p in _FLUOR_PATTERNS):
+            has_nf_target = any(t in insert_lc for t in _NF_INSERT_TERMS)
+            if not has_nf_target:
+                return True, f"Generic fluorescent-label insert without NF-specific cargo: {insert}"
 
     elif tool_type == 'patient_derived_models':
         name = row.get('_toolName', '').strip()
@@ -824,7 +996,8 @@ def _make_tool_review_row(row: dict, tool_type: str, nf_specific: bool,
 
 # ── Main processing ───────────────────────────────────────────────────────────
 
-def process(output_dir: str, dry_run: bool = False) -> None:
+def process(output_dir: str, dry_run: bool = False,
+            include_pathway_genes: bool = False) -> None:
     output_path = Path(output_dir)
     if not output_path.exists():
         print(f"❌ Output directory not found: {output_dir}")
@@ -834,6 +1007,16 @@ def process(output_dir: str, dry_run: bool = False) -> None:
     if not validated_files:
         print(f"❌ No VALIDATED_*.csv files found in {output_dir}")
         sys.exit(1)
+
+    # Apply NF gene set selection before any filtering begins
+    global _active_nf_genes
+    if include_pathway_genes:
+        _active_nf_genes = NF_PATHWAY_GENES
+        print(f"\n[NF gene filter] Using EXTENDED pathway gene set ({len(NF_PATHWAY_GENES)} terms)")
+    else:
+        _active_nf_genes = NF_CORE_GENES
+        print(f"\n[NF gene filter] Using CORE NF disease gene set ({len(NF_CORE_GENES)} terms) "
+              f"— use --include-pathway-genes for broader antibody coverage")
 
     # Load publication metadata once (reused for pub-centric pivot + link CSVs)
     pub_meta = _load_pub_meta(output_path)
@@ -1491,8 +1674,15 @@ def main():
                         help='Directory containing VALIDATED_*.csv files')
     parser.add_argument('--dry-run', action='store_true',
                         help='Preview changes without modifying any files')
+    parser.add_argument('--include-pathway-genes', action='store_true',
+                        help=('Broaden the antibody NF-specificity filter to include the full '
+                              'RAS/MAPK/PI3K downstream pathway, Schwann-cell markers, and '
+                              'NF tumor microenvironment genes in addition to core NF disease genes. '
+                              'Default: only antibodies against NF1/NF2/LZTR1/SMARCB1/SPRED1 '
+                              'and their direct protein products are kept.'))
     args = parser.parse_args()
-    process(args.output_dir, dry_run=args.dry_run)
+    process(args.output_dir, dry_run=args.dry_run,
+            include_pathway_genes=args.include_pathway_genes)
 
 
 if __name__ == '__main__':
