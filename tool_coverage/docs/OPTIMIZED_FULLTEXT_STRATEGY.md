@@ -250,27 +250,19 @@ Different tool types require different amounts of publication text for accurate 
 - 60% cost savings on API calls
 - 48% storage savings overall
 
-#### Step 5: Format for Submission (IMPLEMENTED)
+#### Step 5: Post-Filter and Consolidate (IMPLEMENTED)
 
 ```yaml
-- name: Format validated results for submission
+- name: Post-filter and consolidate validated outputs
   run: |
-    python tool_coverage/scripts/format_validation_for_submission.py
-    # Creates VALIDATED_*.csv files
+    python tool_coverage/scripts/generate_review_csv.py \
+      --output-dir tool_coverage/outputs
+    # Removes generic tools, deduplicates synonyms
+    # Writes VALIDATED_*.csv (single prefix per tool type)
     # All metadata already in cache - NO RE-FETCHING
-
-- name: Enrich tool metadata
-  run: |
-    python tool_coverage/scripts/enrich_all_metadata.py
-
-- name: Regenerate FILTERED subset
-  run: |
-    python tool_coverage/scripts/regenerate_filtered_subset.py
-    # Creates FILTERED_*.csv files with authors, doi, publicationDate, journal
-    # ALL METADATA FROM CACHE - NO API CALLS
 ```
 
-**Key Optimization**: All publication metadata for FILTERED CSVs comes from Phase 1 cache. No additional API calls needed.
+**Key Optimization**: All publication metadata for VALIDATED CSVs comes from Phase 1 cache. No additional API calls needed.
 
 ---
 
@@ -423,15 +415,16 @@ Has PMC full text?
 # Phase 1: Minimal cache
 fetch_minimal_fulltext.py
   ↓ (creates cache with title + abstract + methods + metadata)
-run_publication_reviews.py (Sonnet validation)
+run_publication_reviews.py (Sonnet validation, 4 parallel workers)
   ↓ (identifies high-confidence tools)
 
 # Phase 2: Selective upgrade
 upgrade_cache_for_observations.py (based on validation results)
   ↓ (adds results + discussion for high-confidence tools)
-[observation extraction - FUTURE]
-  ↓
-format_validation_for_submission.py (uses cached metadata)
+run_publication_reviews.py --extract-observations (Sonnet observation extraction)
+  ↓ ({PMID}_observations.yaml written alongside tool review YAMLs)
+generate_review_csv.py (post-filter: removes generic tools, deduplicates synonyms)
+  ↓ (writes VALIDATED_*.csv)
 ```
 
 ---
@@ -484,9 +477,9 @@ format_validation_for_submission.py (uses cached metadata)
 - All metadata fields correctly populated
 - Cache upgrade preserves all existing fields
 
-**Next Steps**:
-- Observation extraction (future enhancement)
-- Use 2-phase caching for all new publications
+**Production Status**:
+- Phase 1 & 2 caching and Sonnet validation live in CI/CD
+- Observation extraction (Phase 2) live in CI/CD via `--extract-observations` flag
 
 ---
 

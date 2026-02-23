@@ -1,8 +1,8 @@
-# AI-Powered Tool Validation with Goose
+# AI-Powered Tool Validation with Claude Sonnet
 
 ## Overview
 
-**AI validation runs as a separate step** in the tool mining workflow. This system uses Goose AI agent to automatically filter false positives like gene/disease names being misidentified as research tools, and to detect tools the mining step may have missed.
+**AI validation runs as a separate step** in the tool mining workflow. This system uses the Claude Sonnet API directly (via the `anthropic` Python library) to automatically filter false positives like gene/disease names being misidentified as research tools, and to detect tools the mining step may have missed.
 
 ## Problem It Solves
 
@@ -17,31 +17,41 @@
 - **Keyword Checking:** Verifies tool-specific keywords near mentions
 - **Missed Tool Detection:** Actively searches for tools mining didn't catch
 - **Pattern Suggestions:** Recommends improvements to mining patterns
-- **Observation Extraction:** Mines scientific observations from Results/Discussion sections
+- **Observation Extraction:** Mines scientific observations from Results/Discussion sections (Phase 2)
 
 ## Architecture
 
 ```
 Step 1: Mining
-fetch_fulltext_and_mine.py
-    ↓ (mines tools + caches fetched text)
-processed_publications.csv
-tool_reviews/publication_cache/{PMID}_text.json (cached text)
+fetch_minimal_fulltext.py
+    ↓ (fetches title + abstract + methods + metadata)
+tool_reviews/publication_cache/{PMID}_text.json (Phase 1 cache)
 
-Step 2: AI Validation + Observation Extraction (Separate Step)
+Step 2: AI Validation (Phase 1)
 run_publication_reviews.py
-    ↓ (reads from cache, no duplicate API calls)
-    ↓ (invokes Goose only for non-reviewed publications)
-Goose AI Agent (tool_coverage/scripts/recipes/publication_tool_review.yaml)
-    ↓ (generates per-publication validation + observations)
+    ↓ (reads from Phase 1 cache, calls Claude Sonnet API directly)
+    ↓ (skips already-reviewed publications)
+Claude Sonnet API (system prompt from recipes/publication_tool_review.yaml)
+    ↓ (generates per-publication validation)
 {PMID}_tool_review.yaml
     ↓ (compiles all results)
 VALIDATED_*.csv (filtered submission files)
-observations.csv (scientific observations extracted)
 potentially_missed_tools.csv (tools AI found)
 suggested_patterns.csv (pattern recommendations)
 
-Step 3: Automated Pattern Improvement
+Step 3: Selective Cache Upgrade (Phase 2)
+upgrade_cache_for_observations.py
+    ↓ (upgrades cache for high-confidence tools, confidence ≥0.8)
+tool_reviews/publication_cache/{PMID}_text.json (Phase 2 cache, adds results + discussion)
+
+Step 4: Observation Extraction (Phase 2)
+run_publication_reviews.py --extract-observations
+    ↓ (reads Phase 2 cache, calls Claude Sonnet API directly)
+Claude Sonnet API (system prompt from recipes/publication_observation_extraction.yaml)
+    ↓ (generates per-publication observations)
+{PMID}_observations.yaml
+
+Step 5: Automated Pattern Improvement
 apply_pattern_suggestions.py
     ↓ (reads suggested patterns with confidence scores)
     ↓ (auto-adds patterns with >0.9 confidence)
@@ -52,7 +62,7 @@ PATTERN_IMPROVEMENTS.md (manual review report)
 ```
 
 **Key Optimizations**:
-- 📦 **Text Caching**: Fetched text cached during mining, reused in validation (50% fewer API calls)
+- 📦 **Text Caching**: Fetched text cached during Phase 1, reused in validation (50% fewer API calls)
 - ⏭️ **Smart Skip**: Only validates new publications, skips already-reviewed (85-90% cost savings)
 - 💰 **Combined**: 80-85% reduction in API calls and costs for ongoing operations
 - 🔍 **Missed Tool Detection**: AI actively searches for tools mining didn't catch
@@ -60,12 +70,15 @@ PATTERN_IMPROVEMENTS.md (manual review report)
 
 ## Components
 
-### 1. Goose Recipe (`tool_coverage/scripts/recipes/publication_tool_review.yaml`)
+### 1. Recipe YAMLs (`tool_coverage/scripts/recipes/`)
 
-Defines the AI agent's task, instructions, and output format.
+Two YAML files define the AI agent's instructions, system prompt, and output format. They are loaded by Python and passed directly to the Anthropic API — not run by any external tool.
 
-**Key features:**
-- Uses Claude Sonnet 4 (temperature 0.0 for consistency)
+- **`publication_tool_review.yaml`** — Phase 1: tool validation
+- **`publication_observation_extraction.yaml`** — Phase 2: observation extraction
+
+**Key features of `publication_tool_review.yaml`:**
+- Uses Claude Sonnet (temperature 0.0 for consistency)
 - Analyzes publication type, Methods sections, tool keywords
 - Generates structured YAML with Accept/Reject/Uncertain verdicts
 - Provides detailed reasoning for every decision
@@ -110,16 +123,14 @@ summary:
 
 ### 2. Orchestrator (`run_publication_reviews.py`)
 
-Python script that manages the validation workflow:
-- Loads mining results CSV
+Python script that manages the validation workflow using direct Anthropic API calls:
+- Loads Phase 1 cache files (`{PMID}_text.json`) for publication text
 - **Automatically fetches candidate publications from Synapse**:
   - NF portal publications (syn16857542) not yet in tools table (syn26486839)
   - Tools publications (syn26486839) not linked to usage (syn26486841) or development (syn26486807)
-- Uses cached text from mining step (no duplicate API calls)
-- Prepares input JSON files for Goose
-- Invokes Goose AI agent for each publication
+- Calls Claude Sonnet API directly (4 parallel workers in production)
 - Parses validation YAMLs
-- Filters SUBMIT_*.csv files to remove rejected tools
+- Filters VALIDATED_*.csv files to remove rejected tools
 - Extracts potentially missed tools and pattern suggestions
 - Generates validation reports
 
@@ -131,13 +142,19 @@ python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_
 # Validate specific publications
 python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640,PMID:29415745"
 
+# Validate publications listed in a file (one PMID per line)
+python tool_coverage/scripts/run_publication_reviews.py --pmids-file phase2_upgraded_pmids.txt
+
 # Force re-review of already-reviewed publications
 python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --force-rereviews
 
-# Compile results from existing YAMLs (skip goose reviews)
+# Phase 2: extract observations for high-confidence tools
+python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv --extract-observations
+
+# Compile results from existing YAMLs only (no API calls)
 python tool_coverage/scripts/run_publication_reviews.py --compile-only
 
-# Skip goose, just filter CSVs from existing YAMLs
+# Alias for --compile-only (legacy flag)
 python tool_coverage/scripts/run_publication_reviews.py --skip-goose
 ```
 
@@ -151,17 +168,17 @@ These publications are reviewed to discover potential new tools or confirm they 
 - `VALIDATED_*.csv` - Filtered submission files (rejected tools removed)
 - `tool_reviews/validation_report.xlsx` - Summary report (includes observation counts)
 - `tool_reviews/validation_summary.json` - Machine-readable results
-- `tool_reviews/observations.csv` - Scientific observations extracted from publications
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
 - `tool_reviews/suggested_patterns.csv` - Pattern recommendations
-- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication details (includes observations)
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
+- `tool_reviews/results/{PMID}_observations.yaml` - Per-publication observations (Phase 2)
 
 **Smart Optimizations:**
 
 **Publication Text Caching:**
-- Fetched text (abstract, methods, intro, results, discussion) is **cached during mining** in `tool_reviews/publication_cache/`
+- Phase 1 cache (`{PMID}_text.json`) contains title, abstract, methods, and metadata
+- Phase 2 cache additionally includes results and discussion sections
 - Validation reads from cache instead of re-fetching from PubMed/PMC APIs
-- **5 sections cached**: Abstract, Methods, Introduction (for tool mining), Results & Discussion (for observation extraction)
 - **Eliminates duplicate API calls**: 50% reduction (100 vs 200 for 50 publications)
 - Cache persists across runs, enabling fast re-validation
 - Backwards compatible: falls back to API if cache missing
@@ -218,34 +235,6 @@ python tool_coverage/scripts/apply_pattern_suggestions.py
 python tool_coverage/scripts/apply_pattern_suggestions.py --dry-run
 ```
 
-**Example Output:**
-```
-================================================================================
-PATTERN IMPROVEMENT APPLICATION
-================================================================================
-
-📂 Loading mining patterns configuration...
-📂 Loading AI-suggested patterns...
-   Found 5 suggested patterns
-
-📊 Categorizing suggestions by confidence...
-   High confidence (>0.9): 2 patterns
-   Medium confidence (0.7-0.9): 2 patterns
-   Low confidence (<0.7): 1 patterns (ignored)
-
-🤖 Processing high-confidence patterns...
-✅ Added pattern to antibodies.vendor_indicators: ThermoFisher \\d+
-✅ Added pattern to antibodies.context_phrases: purchased from.*Company
-
-📝 Generated manual review report: PATTERN_IMPROVEMENTS.md
-
-================================================================================
-SUMMARY
-================================================================================
-✅ Automatically added: 2 patterns
-📋 Requiring manual review: 2 patterns
-```
-
 **Audit Trail:**
 
 All AI-added patterns are tracked in `mining_patterns.json`:
@@ -267,24 +256,6 @@ All AI-added patterns are tracked in `mining_patterns.json`:
 }
 ```
 
-**Manual Review Report (`PATTERN_IMPROVEMENTS.md`):**
-
-Generated for medium-confidence patterns requiring human judgment:
-```markdown
-# Pattern Improvement Suggestions - Manual Review Required
-
-## Cell Lines
-
-### Pattern: `NCI-H\\d+`
-
-- **Type**: naming_convention
-- **Confidence**: 0.85
-- **Source PMID**: 23456789
-- **Reasoning**: Standard cell line nomenclature for lung cancer lines
-
-**Action**: Review and manually add to `tool_coverage/config/mining_patterns.json` if appropriate.
-```
-
 **Integration:**
 
 Pattern improvement runs automatically after AI validation in GitHub Actions workflow, creating a continuous improvement cycle:
@@ -296,7 +267,7 @@ Pattern improvement runs automatically after AI validation in GitHub Actions wor
 
 ### 4. Observation Extraction
 
-AI validation also extracts **scientific observations** about tools from Results and Discussion sections of publications.
+AI validation also extracts **scientific observations** about tools from Results and Discussion sections of publications (Phase 2).
 
 **What Are Observations?**
 
@@ -318,39 +289,15 @@ Observations are scientific characterizations of research tools stored in syn264
 
 **Extraction Process:**
 
-1. **AI reads Results/Discussion sections** from cached publication text
-2. **Identifies scientific findings** about validated tools
-3. **Categorizes by observation type** (20 types from schema)
-4. **Links to tool** via resourceName
-5. **Includes quantitative data** when available
-6. **Outputs to observations.csv**
+1. **Phase 2 cache upgrade**: `upgrade_cache_for_observations.py` selectively fetches Results + Discussion for high-confidence publications (confidence ≥0.8)
+2. **AI reads Results/Discussion sections** from upgraded cache
+3. **Identifies scientific findings** about validated tools
+4. **Categorizes by observation type** (20 types from schema)
+5. **Links to tool** via resourceName
+6. **Includes quantitative data** when available
+7. **Outputs to `*_observations.yaml`** alongside tool review YAMLs
 
-**Example Output (`observations.csv`):**
-
-```csv
-pmid,doi,resourceName,resourceType,observationType,details,foundIn,confidence
-12345678,10.1234/journal.2023.001,Nf1+/-,Animal Model,Body Weight,"Nf1+/- mice showed significantly reduced body weight (15% decrease) compared to wild-type at 8 weeks (p<0.01)",results,0.95
-12345678,10.1234/journal.2023.001,Nf1+/-,Animal Model,Tumor Growth,"Optic gliomas developed in 30% of animals by 12 months, higher in females",results,0.92
-```
-
-**Integration with Submission Workflow:**
-
-Observations are integrated into `format_mining_for_submission.py`:
-1. Loads `observations.csv` from AI validation
-2. Matches `resourceName` → `resourceId` via syn51730943 lookup
-3. Creates `SUBMIT_observations.csv` (matched, ready for Synapse)
-4. Creates `SUBMIT_observations_UNMATCHED.csv` (needs manual review)
-
-This allows observations to be reviewed alongside tools before Synapse upload.
-
-**Impact on Tool Completeness:**
-
-Observations contribute **25 points** (25%) to tool completeness scoring:
-- Observations with DOI: 7.5 points each (up to 4)
-- Observations without DOI: 2.5 points each (up to 10)
-- Maximum: 25 points from observations
-
-**YAML Output Structure:**
+**Example Output (`{PMID}_observations.yaml`):**
 
 ```yaml
 observations:
@@ -364,55 +311,30 @@ observations:
     doi: "10.1234/journal.2023.001"
 ```
 
-### 5. Integration with Mining Workflow
+**Impact on Tool Completeness:**
 
-AI validation is integrated into `fetch_fulltext_and_mine.py` via environment variable:
-
-```bash
-# Run mining WITH AI validation
-AI_VALIDATE_TOOLS=true python tool_coverage/scripts/fetch_fulltext_and_mine.py
-
-# Run mining WITHOUT AI validation (default)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py
-```
-
-When enabled, validation runs automatically after mining completes.
+Observations contribute **25 points** (25%) to tool completeness scoring:
+- Observations with DOI: 7.5 points each (up to 4)
+- Observations without DOI: 2.5 points each (up to 10)
+- Maximum: 25 points from observations
 
 ## Setup Requirements
 
-### 1. Install Goose CLI
+### 1. Configure Anthropic API Key
+
+The validation script uses the Anthropic Python SDK directly:
 
 ```bash
-# Install via block/goose (requires Go 1.20+)
-go install github.com/block/goose@latest
-
-# Or via Homebrew (macOS)
-brew install block/tap/goose
-```
-
-Verify installation:
-```bash
-goose --version
-```
-
-### 2. Configure Anthropic API Key
-
-Goose requires an Anthropic API key to use Claude models:
-
-```bash
-# Configure interactively
-goose configure
-
-# Or set environment variable
 export ANTHROPIC_API_KEY="your-api-key-here"
 ```
 
 Get API key from: https://console.anthropic.com/settings/keys
 
-### 3. Install Python Dependencies
+### 2. Install Python Dependencies
 
 Already included in `requirements.txt`:
 ```
+anthropic>=0.39.0
 synapseclient>=4.4.0
 pandas>=2.0.0
 pyyaml>=6.0
@@ -420,28 +342,50 @@ pyyaml>=6.0
 
 ## Workflow
 
-### Step 1: Run Mining (AI Validation Enabled by Default)
+### Step 1: Run Phase 1 Cache Fetch
 
 ```bash
-# With AI validation (default)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py
+python tool_coverage/scripts/fetch_minimal_fulltext.py \
+  --pmids-file tool_coverage/outputs/screened_publications.csv \
+  --output-dir tool_reviews/publication_cache
+```
 
-# Without AI validation (faster, but may have false positives)
-python tool_coverage/scripts/fetch_fulltext_and_mine.py --no-validate
+### Step 2: Run AI Validation
 
-# Standalone validation (if you already have mining results)
-python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
+```bash
+# With 4 parallel workers (recommended for large sets)
+export ANTHROPIC_API_KEY="your-key"
+python tool_coverage/scripts/run_publication_reviews.py \
+  --mining-file tool_coverage/outputs/processed_publications.csv \
+  --parallel-workers 4
 ```
 
 **Generates:**
-- `processed_publications.csv` - All mined tools
-- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication reviews (if validation enabled)
-- `tool_reviews/validation_summary.json` - JSON summary (if validation enabled)
-- `tool_reviews/validation_report.xlsx` - Excel report (if validation enabled)
-- `SUBMIT_*.csv` - Unvalidated submission files
+- `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication reviews
+- `tool_reviews/validation_summary.json` - JSON summary
+- `tool_reviews/validation_report.xlsx` - Excel report
 - `VALIDATED_*.csv` - Validated submission files (false positives removed) ⭐ **USE THESE**
 
-### Step 2: Review Results
+### Step 3: Run Phase 2 (Observation Extraction)
+
+```bash
+# First upgrade the cache for high-confidence tools
+python tool_coverage/scripts/upgrade_cache_for_observations.py \
+  --reviews-dir tool_reviews/results \
+  --cache-dir tool_reviews/publication_cache
+
+# Then extract observations
+python tool_coverage/scripts/run_publication_reviews.py \
+  --mining-file tool_coverage/outputs/processed_publications.csv \
+  --pmids-file tool_coverage/outputs/phase2_upgraded_pmids.txt \
+  --extract-observations \
+  --parallel-workers 4
+```
+
+**Generates:**
+- `tool_reviews/results/{PMID}_observations.yaml` - Per-publication observations
+
+### Step 4: Review Results
 
 **Check validation report:**
 ```bash
@@ -464,7 +408,7 @@ ls VALIDATED_*.csv
 
 Use these instead of `SUBMIT_*.csv` for Synapse upload.
 
-### Step 3: Manual Review (if needed)
+### Step 5: Manual Review (if needed)
 
 For tools with `verdict: "Uncertain"` or `recommendation: "Manual Review Required"`:
 
@@ -478,6 +422,11 @@ For tools with `verdict: "Uncertain"` or `recommendation: "Manual Review Require
 **Location:** `tool_reviews/results/{PMID}_tool_review.yaml`
 
 Contains detailed validation for each tool with reasoning and recommendations.
+
+### Observation YAMLs
+**Location:** `tool_reviews/results/{PMID}_observations.yaml`
+
+Contains scientific observations extracted from Results/Discussion sections (Phase 2 only).
 
 ### Validation Report
 **Location:** `tool_reviews/validation_report.xlsx`
@@ -497,11 +446,6 @@ Filtered versions of `SUBMIT_*.csv` with rejected tools removed:
 - `VALIDATED_SUBMIT_animal_models.csv`
 - `VALIDATED_SUBMIT_genetic_reagents.csv`
 - `VALIDATED_SUBMIT_resources.csv`
-
-### Input Files (for debugging)
-**Location:** `tool_reviews/inputs/{PMID}_input.json`
-
-JSON files containing publication text and mined tools fed to Goose.
 
 ## Expected Results
 
@@ -526,28 +470,28 @@ Based on the false positive example (PMID:28078640):
 ## Performance
 
 **Speed (Initial Run):**
-- ~30-60 seconds per publication (depending on text length)
-- Processes publications serially (for API rate limits)
-- For 50 publications: ~25-50 minutes
+- ~20-60 seconds per publication (direct API call)
+- With 4 parallel workers: ~5-20 seconds effective per publication
+- For 50 publications: ~5-15 minutes (vs 25-50 minutes with serial processing)
 
 **Speed (Subsequent Runs with Optimizations):**
 - Text caching: No API fetch latency (~5 seconds saved per pub)
 - Skip logic: Only processes new publications
-- For 5 new publications: ~2-5 minutes (vs ~25-50 without optimizations)
+- For 5 new publications: ~1-5 minutes
 
 **Cost Analysis:**
 
 *Initial Run (50 publications):*
-- PubMed/PMC API calls: 100 (with caching)
+- Phase 1 cache fetch: ~50 API calls
 - AI validations: 50
 - Total cost: ~$0.50-1.50
 
 *Subsequent Weekly Runs (5 new publications):*
-- PubMed/PMC API calls: 10 (with caching)
+- Phase 1 cache fetch: ~5 API calls
 - AI validations: 5 (with skip logic)
 - Total cost: ~$0.05-0.15
 
-**Monthly Savings**: 80-85% reduction vs without optimizations (~$0.58-1.74 vs $1.50-4.50)
+**Monthly Savings**: 80-85% reduction vs without optimizations
 
 ## Customization
 
@@ -585,44 +529,7 @@ Edit the "ACCEPT ONLY IF" section in recipe to add/remove keywords:
 
 **Solution:**
 ```bash
-goose configure
-# Or
 export ANTHROPIC_API_KEY="your-key"
-```
-
-### Error: "goose command not found"
-
-**Solution:**
-```bash
-# Install goose
-go install github.com/block/goose@latest
-
-# Add to PATH
-export PATH=$PATH:$(go env GOPATH)/bin
-```
-
-### Goose hangs or times out
-
-**Solution:**
-- Check internet connection
-- Verify API key is valid
-- Check Anthropic API status: https://status.anthropic.com/
-- Increase timeout in `run_publication_reviews.py` (line 164): `timeout=1200  # 20 minutes`
-
-### No YAML files generated
-
-**Possible causes:**
-1. Goose error (check stderr output)
-2. Recipe file path incorrect
-3. Input JSON malformed
-
-**Debug:**
-```bash
-# Test recipe directly
-cd tool_reviews/results
-goose run --recipe ../../tool_coverage/scripts/recipes/publication_tool_review.yaml \
-  --params pmid=PMID:28078640 \
-  --params inputFile=/full/path/to/input.json
 ```
 
 ### Validation too strict/lenient
@@ -632,26 +539,47 @@ goose run --recipe ../../tool_coverage/scripts/recipes/publication_tool_review.y
 - Change `verdict` criteria
 - Update tool keyword lists
 
+### No YAML files generated
+
+**Possible causes:**
+1. ANTHROPIC_API_KEY not set
+2. Recipe file path incorrect
+3. Cache file malformed or missing
+
+**Debug:**
+```bash
+# Check API key is set
+echo $ANTHROPIC_API_KEY
+
+# Check cache file exists for PMID
+ls tool_reviews/publication_cache/PMID_28078640_text.json
+
+# Run with a single PMID for targeted debugging
+python tool_coverage/scripts/run_publication_reviews.py --pmids "PMID:28078640"
+```
+
 ## GitHub Actions Integration
 
-**AI validation is now integrated into the workflow and enabled by default.**
+**AI validation is integrated into the workflow and enabled by default.**
 
 The workflow includes manual trigger options:
-- **AI Validation** (default: enabled) - Toggle AI validation on/off
-- **Max Publications** (default: all) - Limit publications for testing
+- **AI Validation** (default: enabled) - Toggle AI validation on/off via `ai_validation` input
+- **Max Publications** (default: all) - Limit publications via `max_publications` input
+- **Force Re-reviews** (default: disabled) - Force re-review via `force_rereviews` input
+- **Max Reviews** (default: auto) - Cap Sonnet reviews via `max_reviews` input
 
 **Required GitHub secret:**
 - `ANTHROPIC_API_KEY` - Anthropic API key for Claude access (https://console.anthropic.com/settings/keys)
 
 **Workflow automatically:**
-1. Installs Goose CLI (if validation enabled)
-2. Configures with `ANTHROPIC_API_KEY`
-3. Runs mining with `--no-validate` flag only if disabled
+1. Checks for `ANTHROPIC_API_KEY` (skips AI validation if missing)
+2. Runs Phase 1 validation with 4 parallel workers
+3. Runs Phase 2 cache upgrade and observation extraction for high-confidence tools
 4. Uploads validation artifacts: `VALIDATED_*.csv`, validation reports, review YAMLs
 
 **To disable AI validation manually:**
 - Go to Actions → Check Tool Coverage → Run workflow
-- Uncheck "Run AI validation"
+- Set `ai_validation` to `false`
 - Click "Run workflow"
 
 ## Best Practices
@@ -659,14 +587,13 @@ The workflow includes manual trigger options:
 1. **Always review uncertain tools manually** - These need human judgment
 2. **Check validation report first** - Identifies systemic issues
 3. **Spot-check accepted tools** - Verify AI isn't being too lenient
-4. **Keep recipe updated** - Add patterns as you find new false positive types
+4. **Keep recipes updated** - Add patterns as you find new false positive types
 5. **Monitor API costs** - Set budget alerts in Anthropic console
 6. **Version control YAMLs** - Git track validation results for audit trail
 
 ## Future Enhancements
 
 Potential improvements:
-- [ ] Parallel processing (with rate limit management)
 - [ ] Confidence threshold tuning based on validation accuracy
 - [ ] Custom MCP tools for fetching publication text (avoid API delays)
 - [ ] Integration with PubMed metadata for journal quality signals
@@ -678,13 +605,11 @@ Potential improvements:
 
 For issues:
 1. Check `tool_reviews/results/{PMID}_tool_review.yaml` for detailed reasoning
-2. Review Goose logs for errors
-3. Validate input JSON files are correctly formatted
-4. Check Anthropic API usage/limits
+2. Check `ANTHROPIC_API_KEY` is set and valid
+3. Validate Phase 1 cache files exist in `tool_reviews/publication_cache/`
+4. Check Anthropic API usage/limits at https://console.anthropic.com/
 
 ## References
 
-- Goose documentation: https://block.github.io/goose/
 - Anthropic API docs: https://docs.anthropic.com/
-- MCP protocol: https://modelcontextprotocol.io/
-- Project reviews (inspiration): `/Users/bgarana/Documents/GitHub/dcc-site/docs/PROJECT_REVIEWS_README.md`
+- Project issue: https://github.com/nf-osi/nf-research-tools-schema/issues/97

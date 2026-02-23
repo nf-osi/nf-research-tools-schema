@@ -15,10 +15,10 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 2. check-tool-coverage.yml
    ├─ Mines NF Portal + PubMed publications for tools
-   ├─ Filters for research-focused publications
-   ├─ Checks PMC full text availability
-   ├─ Incremental processing (caches reviewed PMIDs)
-   ├─ AI validation with Goose (optional)
+   ├─ Filters publications (title + abstract screening with Haiku)
+   ├─ Fetches minimal cache (Phase 1) and upgrades for high-confidence tools (Phase 2)
+   ├─ AI validation with Sonnet (direct API, 4 parallel workers)
+   ├─ Extracts observations for high-confidence tools (Phase 2)
    └─ Creates PR with label: automated-mining
          ↓ (when PR merged)
 
@@ -84,31 +84,46 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 **Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation
 
 **Trigger**:
-- When PR from `review-tool-annotations` is merged
+- When PR from `review-tool-annotations` is merged (label: `automated-annotation-review`)
 - Manual: workflow_dispatch
 
+**Manual Inputs** (workflow_dispatch only):
+| Input | Description | Default |
+|-------|-------------|---------|
+| `ai_validation` | Run AI validation on mined tools using Sonnet | `true` |
+| `max_publications` | Maximum number of publications to mine | all |
+| `force_rereviews` | Force re-review of already-reviewed publications | `false` |
+| `skip_title_screening` | Skip title screening (use existing `screened_publications.csv` from artifact) | `false` |
+| `skip_abstract_screening` | Skip abstract screening (use existing `abstract_screened_publications.csv` from artifact) | `false` |
+| `max_reviews` | Max Sonnet reviews per run | auto-calculated from timeout budget |
+
 **What it does**:
-1. **Runs TWO PubMed queries in parallel** to capture all tool types:
+1. **Runs TWO PubMed queries** to capture all tool types:
    - **Bench science query**: Lab tools, computational tools, organoids, PDX models
    - **Clinical assessment query**: Questionnaires, scales, patient-reported outcomes
 2. **Merges publication lists** by PMID, preserving query_type tags:
    - Publications in both queries tagged: `query_type: "bench,clinical"`
    - Used as hint for AI validation (but all 9 types always scanned)
-3. **Title screening with Haiku**: Pre-filters publications (INCLUDES clinical studies)
-4. **Full text mining**: Fetches and mines Methods, Introduction, Results, Discussion
-5. **Searches for ALL 9 tool types** in every publication:
-   - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
-   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
-   - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
-   - **Patient-derived:** PDX, xenografts, humanized mice
-   - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
-6. **AI validation with Sonnet** (via Goose):
-   - Uses query_type as hint for expected tool categories
+3. **Title screening with Haiku**: Pre-filters publications to research-relevant studies
+4. **Abstract screening with Haiku**: Further filters for NF tool usage/development
+5. **Applies timeout protection**: Caps publications to fit within 6-hour GitHub Actions limit; defers excess to next run
+6. **Appends Synapse candidates**: Fetches unlinked publications from NF portal + unlinked-tools Synapse tables and adds them to the screened list
+7. **Phase 1 cache fetch**: Fetches minimal content per publication (title + abstract + methods + metadata); 48% smaller and 30% faster than full text
+8. **AI validation with Sonnet** (direct Anthropic API, 4 parallel workers):
+   - Searches for ALL 9 tool types in every publication:
+     - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
+     - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
+     - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
+     - **Patient-derived:** PDX, xenografts, humanized mice
+     - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
+   - Uses query_type as a hint for expected tool categories
    - Independently classifies publication type
-   - Validates all 9 tool types regardless of query_type
    - Handles publications with multiple tool types
-7. **Formats results into 9 SUBMIT_*.csv files** (one per tool type)
-8. **Validates and cleans** submission files
+9. **Phase 2 cache upgrade**: Selectively adds Results + Discussion sections for high-confidence validated tools (confidence ≥ 0.8)
+10. **Phase 2 observation extraction**: Extracts efficacy, safety, and outcome observations from upgraded publications; writes `*_observations.yaml` alongside tool review YAMLs
+11. **Post-filter and consolidate**: Removes generic tools, deduplicates synonyms, and writes `VALIDATED_*.csv` files
+12. **Applies pattern improvements**: Updates `mining_patterns.json` based on AI-suggested improvements
+13. **Analyzes tool coverage** and generates summary report
 
 **Multi-Query Strategy**: Runs BOTH queries every time to discover all tool types
 - No separate runs needed - comprehensive coverage in single workflow execution
@@ -116,10 +131,15 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 
 **Outputs**:
 - `tool_coverage/outputs/processed_publications.csv`
-- `tool_coverage/outputs/previously_reviewed_pmids.csv` (cache)
-- `SUBMIT_*.csv` files for various tool types
-- `tool_reviews/validation_report.xlsx`
-- Mining patterns improvements
+- `tool_coverage/outputs/screened_publications.csv` (title + abstract filtered)
+- `tool_coverage/outputs/abstract_screened_publications.csv`
+- `tool_reviews/publication_cache/` — Phase 1 (minimal) and Phase 2 (upgraded) caches
+- `tool_reviews/results/` — per-publication YAML review files
+- `tool_reviews/results/*_observations.yaml` — Phase 2 observation YAMLs
+- `tool_coverage/outputs/VALIDATED_*.csv` — post-filtered tool records
+- `tool_coverage/config/mining_patterns.json` — updated mining patterns
+- `pr_body.md` — coverage summary report
+- Artifacts: `tool-coverage-reports` (30-day retention), `tool-coverage-pre-validation` (7-day), `deferred-publications-<run_id>` (90-day, only if publications were capped)
 
 **PR Labels**: `automated-mining`, `tool-coverage`
 

@@ -293,7 +293,7 @@ Generates markdown summary for GitHub Pull Request:
 - `pr_body.md` - Markdown content for GitHub Pull Request
 
 #### `tool_coverage/scripts/run_publication_reviews.py`
-AI-powered validation of mined tools using Goose agent:
+AI-powered validation of mined tools using Claude Sonnet API (direct Anthropic API calls):
 - **Validates mined tools** to filter out false positives (gene/disease names misidentified as tools)
 - **Analyzes publication type** (lab research vs clinical studies vs bioinformatics vs questionnaires)
 - **Uses query_type as hint** but independently assesses ALL 9 tool types in every publication
@@ -377,42 +377,45 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 - When PR from review-tool-annotations is merged (label: `automated-annotation-review`)
 - Manual trigger via workflow_dispatch
 
-**Manual Trigger Options:**
-- **AI Validation** (default: enabled) - Run Goose AI validation on mined tools
-- **Max Publications** (default: all) - Limit number of publications to mine
-- **Force Re-reviews** (default: disabled) - Force re-review of already-reviewed publications
+**Manual Trigger Options** (`workflow_dispatch` inputs):
+| Input | Description | Default |
+|-------|-------------|---------|
+| `ai_validation` | Run AI validation on mined tools using Sonnet | `true` |
+| `max_publications` | Maximum number of publications to mine | all |
+| `force_rereviews` | Force re-review of already-reviewed publications | `false` |
+| `skip_title_screening` | Skip title screening (use artifact from previous run) | `false` |
+| `skip_abstract_screening` | Skip abstract screening (use artifact from previous run) | `false` |
+| `max_reviews` | Max Sonnet reviews per run | auto-calculated |
 
 **Steps:**
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
 4. Check for ANTHROPIC_API_KEY (skips AI validation if missing)
-5. Install Goose CLI (if AI validation enabled and API key present)
-6. **Prepare publication lists:**
+5. **Prepare publication lists:**
    - Run bench science query → `publication_list_bench.csv`
    - Run clinical assessment query → `publication_list_clinical.csv`
    - Merge by PMID, preserving query_type tags → `publication_list.csv`
-7. **Screen titles with Haiku:** Filter to research publications (includes clinical studies)
-8. **Screen abstracts with Haiku:** Filter for NF tool usage/development
+6. **Screen titles with Haiku:** Filter to research publications (includes clinical studies)
+7. **Screen abstracts with Haiku:** Filter for NF tool usage/development
    - Ensures abstracts available (from Synapse or fetches from PubMed)
    - Screens for 9 tool categories using Claude 3.5 Haiku
    - Batch processing: ~50 abstracts per API call (~$0.002/batch)
-9. **Apply timeout protection:** Cap publications to fit within 6-hour GitHub Actions limit
-10. **Extract publication sections:** Fetch full text and extract all sections
-   - Abstract, Introduction, Methods, Results, Discussion
-   - Caches all sections for Sonnet review
-   - Tool mining disabled by default (focus on section extraction)
-11. **Run AI validation with Sonnet:**
-   - Reviews extracted sections for tools and observations
-   - Uses query_type as hint
-   - Validates all 9 tool types
-   - Handles multi-type publications
-12. **Format mining results:** Create 9 SUBMIT_*.csv files (one per tool type)
-13. **Clean and validate:** Remove tracking columns, validate schema
-14. Run coverage analysis
-15. Generate summary report
-16. Upload all reports as artifacts including validation results (90-day retention)
-17. **Create Pull Request** with result files for review
+8. **Apply timeout protection:** Cap publications to fit within 6-hour GitHub Actions limit; defers excess to `deferred-publications-<run_id>` artifact
+9. **Append Synapse candidates:** Fetches unlinked publications from NF portal + Synapse tables and appends to screened list
+10. **Phase 1 cache fetch:** Fetches minimal content per publication (title + abstract + methods + metadata); ~2s/publication
+11. **Run AI validation with Sonnet** (direct Anthropic API, 4 parallel workers):
+    - Reads Phase 1 cache, no duplicate fetches
+    - Uses query_type as hint; validates all 9 tool types
+    - Writes `{PMID}_tool_review.yaml` per publication
+12. **Phase 2 cache upgrade:** Selectively fetches Results + Discussion for high-confidence tools (confidence ≥0.8)
+13. **Phase 2 observation extraction:** Writes `{PMID}_observations.yaml` alongside tool review YAMLs
+14. **Post-filter and consolidate:** Removes generic tools, deduplicates synonyms, writes `VALIDATED_*.csv`
+15. **Apply pattern improvements:** Updates `mining_patterns.json`
+16. Run coverage analysis
+17. Generate summary report (`pr_body.md`)
+18. Upload artifacts: `tool-coverage-reports` (30-day), `tool-coverage-pre-validation` (7-day), `deferred-publications-*` (90-day, if capped)
+19. **Create Pull Request** with result files for review
 
 ### 3. Synapse Upsert Workflow
 
@@ -548,7 +551,7 @@ The workflow requires the following GitHub secrets to be configured:
    - Generate at: https://www.synapse.org/#!PersonalAccessTokens:
 
 2. **`ANTHROPIC_API_KEY`**
-   - API key for Claude AI (used by Goose for tool validation)
+   - API key for Claude AI (used for AI validation and Haiku screening)
    - Required for AI validation (enabled by default)
    - Generate at: https://console.anthropic.com/settings/keys
    - Cost: ~$0.01-0.03 per publication validated
@@ -670,19 +673,32 @@ python tool_coverage/scripts/mine_publications_improved.py --enable-tool-mining 
 
 **Setup for AI validation:**
 ```bash
-# Install Goose CLI
-go install github.com/block/goose@latest
-
-# Configure with Anthropic API key
-goose configure
-# (Enter API key from https://console.anthropic.com/settings/keys)
+# Set Anthropic API key
+export ANTHROPIC_API_KEY="your-api-key-here"
+# Get key from: https://console.anthropic.com/settings/keys
 ```
 
-**Run validation + observation extraction:**
+**Run validation:**
 ```bash
-# Validates mined tools AND extracts scientific observations
-# Uses cached text (all 5 sections) from mining step - no additional API calls
-python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_publications.csv
+# Validates mined tools (uses Phase 1 cache - no additional API calls)
+python tool_coverage/scripts/run_publication_reviews.py \
+  --mining-file tool_coverage/outputs/processed_publications.csv \
+  --parallel-workers 4
+```
+
+**Run Phase 2 observation extraction:**
+```bash
+# Upgrade cache for high-confidence tools
+python tool_coverage/scripts/upgrade_cache_for_observations.py \
+  --reviews-dir tool_reviews/results \
+  --cache-dir tool_reviews/publication_cache
+
+# Extract observations
+python tool_coverage/scripts/run_publication_reviews.py \
+  --mining-file tool_coverage/outputs/processed_publications.csv \
+  --pmids-file tool_coverage/outputs/phase2_upgraded_pmids.txt \
+  --extract-observations \
+  --parallel-workers 4
 ```
 
 **AI validation performs:**
