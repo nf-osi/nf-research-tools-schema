@@ -34,27 +34,31 @@ run_publication_reviews.py
 Claude Sonnet API (system prompt from recipes/publication_tool_review.yaml)
     ↓ (generates per-publication validation)
 {PMID}_tool_review.yaml
-
-Step 3: Post-filter and Consolidate
-generate_review_csv.py
-    ↓ (removes generic tools, deduplicates synonyms, splits novel vs existing)
-ACCEPTED_*.csv (filtered submission files)
-ACCEPTED_publications.csv (allowlist for Phase 2)
+    ↓ (compiles all results)
+VALIDATED_*.csv (filtered submission files)
 potentially_missed_tools.csv (tools AI found)
+suggested_patterns.csv (pattern recommendations)
 
-Step 4: Selective Cache Upgrade (Phase 2)
-upgrade_cache_for_observations.py --validated-pubs-file ACCEPTED_publications.csv
-    ↓ (upgrades cache only for post-filtered publications with confidence ≥0.8)
-    ↓ (skips publications where all tools were filtered out in Step 3)
+Step 3: Selective Cache Upgrade (Phase 2)
+upgrade_cache_for_observations.py
+    ↓ (upgrades cache for high-confidence tools, confidence ≥0.8)
 tool_reviews/publication_cache/{PMID}_text.json (Phase 2 cache, adds results + discussion)
 
-Step 5: Observation Extraction (Phase 2)
+Step 4: Observation Extraction (Phase 2)
 run_publication_reviews.py --extract-observations
     ↓ (reads Phase 2 cache, calls Claude Sonnet API directly)
 Claude Sonnet API (system prompt from recipes/publication_observation_extraction.yaml)
     ↓ (generates per-publication observations)
 {PMID}_observations.yaml
 
+Step 5: Automated Pattern Improvement
+apply_pattern_suggestions.py
+    ↓ (reads suggested patterns with confidence scores)
+    ↓ (auto-adds patterns with >0.9 confidence)
+    ↓ (generates report for 0.7-0.9 confidence)
+tool_coverage/config/mining_patterns.json (updated)
+PATTERN_IMPROVEMENTS.md (manual review report)
+    ↓ (feedback loop: next mining run uses improved patterns)
 ```
 
 **Key Optimizations**:
@@ -126,7 +130,7 @@ Python script that manages the validation workflow using direct Anthropic API ca
   - Tools publications (syn26486839) not linked to usage (syn26486841) or development (syn26486807)
 - Calls Claude Sonnet API directly (4 parallel workers in production)
 - Parses validation YAMLs
-- Filters ACCEPTED_*.csv files to remove rejected tools
+- Filters VALIDATED_*.csv files to remove rejected tools
 - Extracts potentially missed tools and pattern suggestions
 - Generates validation reports
 
@@ -165,6 +169,7 @@ These publications are reviewed to discover potential new tools or confirm they 
 - `tool_reviews/validation_report.xlsx` - Summary report (includes observation counts)
 - `tool_reviews/validation_summary.json` - Machine-readable results
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
+- `tool_reviews/suggested_patterns.csv` - Pattern recommendations
 - `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication validation details
 - `tool_reviews/results/{PMID}_observations.yaml` - Per-publication observations (Phase 2)
 
@@ -190,6 +195,77 @@ These publications are reviewed to discover potential new tools or confirm they 
 - **Monthly savings**: 80-85% reduction in costs
 
 ### 3. Observation Extraction
+
+Automatically applies high-confidence pattern suggestions from AI validation, creating a feedback loop that continuously improves mining accuracy.
+
+**Features:**
+- **Auto-add high confidence patterns** (>0.9): Directly updates `mining_patterns.json`
+- **Generate manual review report** (0.7-0.9): Creates `PATTERN_IMPROVEMENTS.md` for human review
+- **Ignore low confidence** (<0.7): Filters out unreliable suggestions
+- **Audit trail**: Tracks all AI-added patterns with reasoning and confidence scores
+
+**Pattern Categories:**
+```json
+{
+  "antibodies": {
+    "vendor_indicators": ["Abcam ab\\d+", "Cell Signaling #\\d+"],
+    "context_phrases": ["antibody.*purchased from"]
+  },
+  "cell_lines": {
+    "naming_conventions": ["[A-Z]{2,4}[0-9]{2,3}"],
+    "context_phrases": ["cells were cultured"]
+  },
+  "animal_models": {
+    "strain_nomenclature": ["C57BL/6", "Nf1\\+/-"],
+    "context_phrases": ["knockout mice"]
+  },
+  "genetic_reagents": {
+    "vector_indicators": ["pCMV-", "AAV-"],
+    "context_phrases": ["transfected with"]
+  }
+}
+```
+
+**Usage:**
+```bash
+# Apply pattern improvements
+python tool_coverage/scripts/apply_pattern_suggestions.py
+
+# Preview without modifying files
+python tool_coverage/scripts/apply_pattern_suggestions.py --dry-run
+```
+
+**Audit Trail:**
+
+All AI-added patterns are tracked in `mining_patterns.json`:
+```json
+{
+  "ai_suggested_patterns": {
+    "comment": "Patterns automatically added by AI validation with confidence >0.9",
+    "additions": [
+      {
+        "category": "antibodies",
+        "section": "vendor_indicators",
+        "pattern": "ThermoFisher \\\\d+",
+        "reasoning": "Common vendor catalog number format",
+        "confidence": 0.92,
+        "added_date": "2026-01-28"
+      }
+    ]
+  }
+}
+```
+
+**Integration:**
+
+Pattern improvement runs automatically after AI validation in GitHub Actions workflow, creating a continuous improvement cycle:
+1. Mining extracts tools using current patterns
+2. AI validation identifies missed tools and suggests new patterns
+3. High-confidence patterns auto-added, medium-confidence exported to report
+4. Updated patterns committed to PR
+5. Next mining run benefits from improved patterns
+
+### 4. Observation Extraction
 
 AI validation also extracts **scientific observations** about tools from Results and Discussion sections of publications (Phase 2).
 
@@ -288,7 +364,7 @@ python tool_coverage/scripts/run_publication_reviews.py \
 - `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication reviews
 - `tool_reviews/validation_summary.json` - JSON summary
 - `tool_reviews/validation_report.xlsx` - Excel report
-- `ACCEPTED_*.csv` - Validated submission files (false positives removed) ⭐ **USE THESE**
+- `VALIDATED_*.csv` - Validated submission files (false positives removed) ⭐ **USE THESE**
 
 ### Step 3: Run Phase 2 (Observation Extraction)
 
@@ -365,11 +441,11 @@ Summary spreadsheet showing:
 **Location:** `ACCEPTED_*.csv`
 
 Filtered versions of `SUBMIT_*.csv` with rejected tools removed:
-- `ACCEPTED_SUBMIT_antibodies.csv`
-- `ACCEPTED_SUBMIT_cell_lines.csv`
-- `ACCEPTED_SUBMIT_animal_models.csv`
-- `ACCEPTED_SUBMIT_genetic_reagents.csv`
-- `ACCEPTED_SUBMIT_resources.csv`
+- `VALIDATED_SUBMIT_antibodies.csv`
+- `VALIDATED_SUBMIT_cell_lines.csv`
+- `VALIDATED_SUBMIT_animal_models.csv`
+- `VALIDATED_SUBMIT_genetic_reagents.csv`
+- `VALIDATED_SUBMIT_resources.csv`
 
 ## Expected Results
 
@@ -499,7 +575,7 @@ The workflow includes manual trigger options:
 1. Checks for `ANTHROPIC_API_KEY` (skips AI validation if missing)
 2. Runs Phase 1 validation with 4 parallel workers
 3. Runs Phase 2 cache upgrade and observation extraction for high-confidence tools
-4. Uploads validation artifacts: `ACCEPTED_*.csv`, validation reports, review YAMLs
+4. Uploads validation artifacts: `VALIDATED_*.csv`, validation reports, review YAMLs
 
 **To disable AI validation manually:**
 - Go to Actions → Check Tool Coverage → Run workflow

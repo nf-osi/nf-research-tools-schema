@@ -19,9 +19,8 @@ Workflows are coordinated through **issue close triggers and PR merges**:
    ├─ Fetches minimal cache (Phase 1) and upgrades for high-confidence tools (Phase 2)
    ├─ AI validation with Sonnet (direct API, 4 parallel workers)
    ├─ Extracts observations for high-confidence tools (Phase 2)
-   ├─ Formats mined tools as JSON in submissions/{type}/
-   └─ Creates PR with label: tool-submissions
-         ↓ (reviewer moves accepted files to submissions/{type}/accepted/, then merges PR)
+   └─ Creates PR with label: automated-mining
+         ↓ (when PR merged)
 
 3. upsert-tools.yml
    ├─ Compiles submissions/{type}/accepted/**/*.json → ACCEPTED_*.csv
@@ -87,7 +86,7 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 **Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation
 
 **Trigger**:
-- When monthly issue with label `tool-submissions` is closed
+- When PR from `review-tool-annotations` is merged (label: `automated-annotation-review`)
 - Manual: workflow_dispatch
 
 **Manual Inputs** (workflow_dispatch only):
@@ -104,24 +103,45 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 1. **Runs TWO PubMed queries** to capture all tool types:
    - **Bench science query**: Lab tools, computational tools, organoids, PDX models
    - **Clinical assessment query**: Questionnaires, scales, patient-reported outcomes
-2. **Merges publication lists** by PMID, preserving query_type tags
+2. **Merges publication lists** by PMID, preserving query_type tags:
+   - Publications in both queries tagged: `query_type: "bench,clinical"`
+   - Used as hint for AI validation (but all 9 types always scanned)
 3. **Title screening with Haiku**: Pre-filters publications to research-relevant studies
 4. **Abstract screening with Haiku**: Further filters for NF tool usage/development
-5. **Applies timeout protection**: Caps publications to fit within 6-hour GitHub Actions limit
-6. **Appends Synapse candidates**: Fetches unlinked publications from NF portal
-7. **Phase 1 cache fetch**: Fetches minimal content per publication
+5. **Applies timeout protection**: Caps publications to fit within 6-hour GitHub Actions limit; defers excess to next run
+6. **Appends Synapse candidates**: Fetches unlinked publications from NF portal + unlinked-tools Synapse tables and adds them to the screened list
+7. **Phase 1 cache fetch**: Fetches minimal content per publication (title + abstract + methods + metadata); 48% smaller and 30% faster than full text
 8. **AI validation with Sonnet** (direct Anthropic API, 4 parallel workers):
-   - Searches for ALL 9 tool types in every publication
-9. **Phase 2 cache upgrade**: Selectively adds Results + Discussion sections for high-confidence tools
-10. **Phase 2 observation extraction**: Extracts efficacy, safety, and outcome observations
-11. **Post-filter**: Removes generic tools, deduplicates (ephemeral — not committed)
-12. **Format as submission JSON**: Writes mined tools to `submissions/{type}/*.json`
+   - Searches for ALL 9 tool types in every publication:
+     - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
+     - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
+     - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
+     - **Patient-derived:** PDX, xenografts, humanized mice
+     - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
+   - Uses query_type as a hint for expected tool categories
+   - Independently classifies publication type
+   - Handles publications with multiple tool types
+9. **Phase 2 cache upgrade**: Selectively adds Results + Discussion sections for high-confidence validated tools (confidence ≥ 0.8)
+10. **Phase 2 observation extraction**: Extracts efficacy, safety, and outcome observations from upgraded publications; writes `*_observations.yaml` alongside tool review YAMLs
+11. **Post-filter and consolidate**: Removes generic tools, deduplicates synonyms, and writes `VALIDATED_*.csv` files
+12. **Applies pattern improvements**: Updates `mining_patterns.json` based on AI-suggested improvements
+13. **Analyzes tool coverage** and generates summary report
+
+**Multi-Query Strategy**: Runs BOTH queries every time to discover all tool types
+- No separate runs needed - comprehensive coverage in single workflow execution
+- Expected monthly discovery: 69-83 tools (vs 18 with old single-query system)
 
 **Outputs**:
-- `submissions/{type}/*.json` — mined tools as form-compatible JSON (one file per tool)
+- `tool_coverage/outputs/processed_publications.csv`
+- `tool_coverage/outputs/screened_publications.csv` (title + abstract filtered)
+- `tool_coverage/outputs/abstract_screened_publications.csv`
+- `tool_reviews/publication_cache/` — Phase 1 (minimal) and Phase 2 (upgraded) caches
 - `tool_reviews/results/` — per-publication YAML review files
-- `tool_reviews/publication_cache/` — cached publication text
-- Artifacts: `tool-coverage-reports` (30-day), `tool-coverage-pre-validation` (7-day)
+- `tool_reviews/results/*_observations.yaml` — Phase 2 observation YAMLs
+- `tool_coverage/outputs/VALIDATED_*.csv` — post-filtered tool records
+- `tool_coverage/config/mining_patterns.json` — updated mining patterns
+- `pr_body.md` — coverage summary report
+- Artifacts: `tool-coverage-reports` (30-day retention), `tool-coverage-pre-validation` (7-day), `deferred-publications-<run_id>` (90-day, only if publications were capped)
 
 **PR Labels**: `tool-submissions`
 
