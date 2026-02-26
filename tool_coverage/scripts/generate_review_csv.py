@@ -798,6 +798,47 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     return False, ''
 
 
+# ── VALIDATED_resources.csv rebuild constants ─────────────────────────────────
+
+# Trailing suffixes stripped from resourceName in the resources aggregate table.
+_RES_SUFFIX_RE = re.compile(
+    r'(?:\s+cells?(?:\s+lines?)?|\s+cell\s+lines?|\s+PDX|\s+PDOX|\s+mice|\s+mouse)$',
+    re.IGNORECASE,
+)
+
+# Explicit canonical name overrides applied after suffix-stripping.
+# Any key found as a resourceName is remapped to its canonical form before dedup.
+_RES_CANONICAL_MAP: dict[str, str] = {
+    # 293T / HEK293T family
+    '293T':             '293T',
+    'HEK293T':          '293T',
+    'HEK 293T':         '293T',
+    'HEK-293T':         '293T',
+    'HEK293':           '293T',
+    'NF1-null HEK293T': '293T',
+    'NF1-null 293T':    '293T',
+    # Nf1 conditional knockout allele
+    'Nf1flox/flox':     'Nf1flox/flox',
+    'Nf1 flox/flox':    'Nf1flox/flox',
+    'Nf1fl/fl':         'Nf1flox/flox',
+    'Nf1 fl/fl':        'Nf1flox/flox',
+}
+
+# Synonyms always present for known canonical names regardless of what was seen.
+_RES_EXPLICIT_SYNONYMS: dict[str, list[str]] = {
+    '293T':         ['NF1-null HEK293T', 'NF1-null 293T', 'HEK293T', 'HEK 293T', 'HEK-293T', 'HEK293'],
+    'Nf1flox/flox': ['Nf1 flox/flox', 'Nf1fl/fl', 'Nf1 fl/fl'],
+}
+
+# Output column order for VALIDATED_resources.csv — matches Synapse syn26450069 schema.
+_RESOURCES_FIELDNAMES: list[str] = [
+    'resourceId', 'resourceName', 'resourceType',
+    'synonyms', 'rrid', 'description', 'aiSummary',
+    'usageRequirements', 'howToAcquire',
+    'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId', 'biobankId',
+    '_pmid', '_doi', '_publicationTitle', '_year', '_confidence', '_toolType',
+]
+
 # ── Synonym deduplication ─────────────────────────────────────────────────────
 
 def _normalize_tool_name(name: str, tool_type: str) -> str:
@@ -1098,28 +1139,33 @@ def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict,
     pub_info: dict = {}
 
     for r in tool_rows:
-        pmid = r.get('_pmid', '').strip()
-        if not pmid:
+        raw_pmid = r.get('_pmid', '').strip()
+        if not raw_pmid:
             continue
         tool_type = r.get('toolType', '')
         tool_name = r.get('toolName', '').strip()
-        if tool_name:
-            pub_tools[pmid][tool_type].append({
-                'name': tool_name,
-                'nf':   r.get('nf_specific', False),
-                'pri':  r.get('priority', 'Low'),
-            })
-        if pmid not in pub_info:
-            meta = pub_meta.get(pmid, {})
-            pub_date = meta.get('publicationDate', '')
-            year = r.get('_year', '') or (pub_date[:4] if pub_date else '')
-            pub_info[pmid] = {
-                'pmid':             pmid,
-                'doi':              r.get('_doi', '') or meta.get('doi', ''),
-                'publicationTitle': r.get('_publicationTitle', '') or meta.get('title', ''),
-                'year':             year,
-                'journal':          meta.get('journal', ''),
-            }
+
+        # Deduped rows may have pipe-separated multi-PMID values.  Distribute this
+        # tool to every individual PMID so each paper lists all its tools correctly.
+        pmid_list = [p.strip() for p in raw_pmid.split('|') if p.strip()]
+        for pmid in pmid_list:
+            if tool_name:
+                pub_tools[pmid][tool_type].append({
+                    'name': tool_name,
+                    'nf':   r.get('nf_specific', False),
+                    'pri':  r.get('priority', 'Low'),
+                })
+            if pmid not in pub_info:
+                meta = pub_meta.get(pmid, {})
+                pub_date = meta.get('publicationDate', '')
+                year = (pub_date[:4] if pub_date else '') or r.get('_year', '').split('|')[0].strip()
+                pub_info[pmid] = {
+                    'pmid':             pmid,
+                    'doi':              meta.get('doi', '') or r.get('_doi', '').split('|')[0].strip(),
+                    'publicationTitle': meta.get('title', '') or r.get('_publicationTitle', '').split('|')[0].strip(),
+                    'year':             year,
+                    'journal':          meta.get('journal', ''),
+                }
 
     pub_rows: list = []
     for pmid in sorted(pub_tools.keys()):
@@ -1434,71 +1480,16 @@ def process(output_dir: str, dry_run: bool = False,
 
 
 def _filter_submit_resources(output_path: Path, kept_norm_names: dict) -> None:
-    """Filter SUBMIT_resources.csv and VALIDATED_resources.csv to keep only rows
-    for tools that passed post-filtering in their respective type-specific files.
+    """Rebuild VALIDATED_resources.csv: filter to kept tools, merge any new SUBMIT rows,
+    strip name suffixes, deduplicate, populate synonyms, and apply Synapse schema.
 
-    kept_norm_names maps plural tool type (e.g. 'animal_models') → set of normalized names.
-    The resources CSV uses singular _toolType values (e.g. 'animal_model'), so we map them.
+    Delegates entirely to _rebuild_resources_csv which handles all steps.
+    kept_norm_names maps plural tool type → set of normalized names that passed filtering.
     """
-    SINGULAR_TO_PLURAL = {
-        'animal_model':             'animal_models',
-        'antibody':                 'antibodies',
-        'cell_line':                'cell_lines',
-        'genetic_reagent':          'genetic_reagents',
-        'computational_tool':       'computational_tools',
-        'advanced_cellular_model':  'advanced_cellular_models',
-        'patient_derived_model':    'patient_derived_models',
-        'clinical_assessment_tool': 'clinical_assessment_tools',
-    }
-
     print(f"\n{'='*60}")
-    print("Filtering VALIDATED_resources.csv")
+    print("Rebuilding VALIDATED_resources.csv")
     print(f"{'='*60}")
-
-    for fname in ('VALIDATED_resources.csv',):
-        resources_file = output_path / fname
-        if not resources_file.exists():
-            print(f"  ⏭  {fname} not found — skipping")
-            continue
-
-        try:
-            with open(resources_file, newline='', encoding='utf-8') as f:
-                reader = csv.DictReader(f)
-                fieldnames = list(reader.fieldnames or [])
-                rows = list(reader)
-        except Exception as e:
-            print(f"  ❌ Error reading {fname}: {e}")
-            continue
-
-        kept: list = []
-        removed = 0
-        for row in rows:
-            tool_type_singular = row.get('_toolType', '').strip()
-            tool_type_plural   = SINGULAR_TO_PLURAL.get(tool_type_singular)
-
-            if tool_type_plural not in kept_norm_names:
-                # Type not processed this run (or unknown) — keep row unchanged
-                kept.append(row)
-                continue
-
-            resource_name = row.get('resourceName', '').strip()
-            norm = _normalize_tool_name(resource_name, tool_type_plural)
-            if norm in kept_norm_names[tool_type_plural]:
-                row['_resourceName'] = resource_name
-                kept.append(row)
-            else:
-                removed += 1
-
-        # Ensure _resourceName is in fieldnames
-        if '_resourceName' not in fieldnames:
-            fieldnames.append('_resourceName')
-
-        with open(resources_file, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
-            writer.writeheader()
-            writer.writerows(kept)
-
-        print(f"  ✅ {fname}: {len(kept)} kept, {removed} removed")
+    _rebuild_resources_csv(output_path, kept_norm_names)
 
 
 # ── ID generation ─────────────────────────────────────────────────────────────
@@ -1524,6 +1515,155 @@ def _make_pub_id(pmid: str) -> str:
     if numeric.isdigit():
         return f'PUB{numeric}'
     return 'PUB' + hashlib.sha1(pmid.encode()).hexdigest()[:8]
+
+
+# ── Resources CSV rebuild ──────────────────────────────────────────────────────
+
+def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
+    """Rebuild VALIDATED_resources.csv with Synapse syn26450069 schema.
+
+    Steps performed:
+    1. Read existing VALIDATED_resources.csv (post-filter) + any new SUBMIT_resources.csv.
+    2. Filter SUBMIT rows to only those whose tools passed post-filtering (kept_norm_names).
+    3. Strip trailing suffixes (' cells', ' cell line', ' PDX', ' mice', ' mouse') from
+       resourceName and apply _RES_CANONICAL_MAP to remap known synonyms to canonical forms.
+    4. Deduplicate by (resourceType, norm_key): merge _pmid/_doi/_publicationTitle/_year,
+       collect stripped variant names as synonyms.
+    5. Apply _RES_EXPLICIT_SYNONYMS for known canonical names.
+    6. Assign stable resourceId from canonical name + _toolType.
+    7. Write with _RESOURCES_FIELDNAMES column order.
+    """
+    SINGULAR_TO_PLURAL = {
+        'animal_model':             'animal_models',
+        'antibody':                 'antibodies',
+        'cell_line':                'cell_lines',
+        'genetic_reagent':          'genetic_reagents',
+        'computational_tool':       'computational_tools',
+        'advanced_cellular_model':  'advanced_cellular_models',
+        'patient_derived_model':    'patient_derived_models',
+        'clinical_assessment_tool': 'clinical_assessment_tools',
+    }
+    CONCAT_FIELDS = ['_pmid', '_doi', '_publicationTitle', '_year']
+
+    def _strip_name(name: str, ttype_plural: str) -> str:
+        """Strip RRID parentheticals (shared with _normalize_tool_name) and trailing suffixes."""
+        name = re.sub(
+            r'\s*\([^)]*(?:RRID|ATCC|cat\.?|catalog|CRL-|CVCL_|lot)[^)]*\)',
+            '', name, flags=re.IGNORECASE,
+        ).strip()
+        return _RES_SUFFIX_RE.sub('', name).strip()
+
+    resources_file = output_path / 'VALIDATED_resources.csv'
+    submit_file    = output_path / 'SUBMIT_resources.csv'
+
+    all_rows: list[dict] = []
+
+    # Load existing validated rows
+    if resources_file.exists():
+        with open(resources_file, newline='', encoding='utf-8') as f:
+            all_rows.extend(list(csv.DictReader(f)))
+
+    # Merge new rows from SUBMIT_resources.csv (filtered by kept_norm_names)
+    if submit_file.exists():
+        with open(submit_file, newline='', encoding='utf-8') as f:
+            submit_rows = list(csv.DictReader(f))
+        for row in submit_rows:
+            ttype_singular = row.get('_toolType', '').strip()
+            ttype_plural   = SINGULAR_TO_PLURAL.get(ttype_singular)
+            if ttype_plural not in kept_norm_names:
+                all_rows.append(row)  # type not processed this run — include anyway
+                continue
+            rname = row.get('resourceName', '').strip()
+            norm  = _normalize_tool_name(rname, ttype_plural)
+            if norm in kept_norm_names[ttype_plural]:
+                all_rows.append(row)
+
+    if not all_rows:
+        print("  ⏭  VALIDATED_resources.csv: no rows — skipping rebuild")
+        return
+
+    # Deduplicate by (resourceType, norm_key), applying suffix stripping + canonical map
+    groups: dict = defaultdict(list)   # key → list of (canonical, stripped, row)
+    syn_map: dict = defaultdict(set)   # (rtype, norm_key) → set of synonym names
+
+    for row in all_rows:
+        orig    = row.get('resourceName', '').strip()
+        rtype   = row.get('resourceType', '').strip()
+        ttype_s = row.get('_toolType', '').strip()
+        ttype_p = SINGULAR_TO_PLURAL.get(ttype_s, 'cell_lines')
+
+        stripped  = _strip_name(orig, ttype_p)
+        canonical = _RES_CANONICAL_MAP.get(stripped, stripped)
+        norm      = _normalize_tool_name(canonical, ttype_p)
+        key       = (rtype, norm)
+
+        if stripped != canonical:
+            syn_map[key].add(stripped)
+
+        groups[key].append((canonical, stripped, row))
+
+    USAGE_PRIO = {'Development': 0, 'Experimental Usage': 1, 'Citation Only': 2, '': 3}
+    merged: list[dict] = []
+
+    for key, items in groups.items():
+        rtype, norm = key
+        # Best row: highest confidence first
+        items.sort(key=lambda x: (
+            -float(x[2].get('_confidence', 0) or 0),
+            USAGE_PRIO.get(x[2].get('_usageType', ''), 3),
+        ))
+        canonical = items[0][0]
+        base = dict(items[0][2])
+
+        # Collect synonyms from stripped variant names found across all merged rows
+        syns: set = set(syn_map.get(key, set()))
+        for can, stripped, _ in items:
+            if stripped and stripped != canonical:
+                syns.add(stripped)
+
+        # Merge multi-publication fields
+        if len(items) > 1:
+            for field in CONCAT_FIELDS:
+                seen: list = []
+                seen_set: set = set()
+                for _, _, r in items:
+                    val = r.get(field, '').strip()
+                    if val and val not in seen_set:
+                        seen.append(val)
+                        seen_set.add(val)
+                base[field] = ' | '.join(seen)
+
+        # Add explicit synonyms for well-known canonical names
+        for es in _RES_EXPLICIT_SYNONYMS.get(canonical, []):
+            if es != canonical:
+                syns.add(es)
+
+        # Compute stable resourceId from canonical name + tool type
+        ttype_p = SINGULAR_TO_PLURAL.get(base.get('_toolType', '').strip(), 'cell_lines')
+        norm_id = _normalize_tool_name(canonical, ttype_p)
+        base['resourceId']   = _make_resource_id(norm_id, ttype_p)
+        base['resourceName'] = canonical
+        base['resourceType'] = rtype
+        base['synonyms']     = ', '.join(sorted(syns)) if syns else ''
+
+        # Ensure all schema columns are present (blank if new)
+        for col in _RESOURCES_FIELDNAMES:
+            base.setdefault(col, '')
+
+        merged.append(base)
+
+    # Sort by resourceType then resourceName for stable diffs
+    merged.sort(key=lambda r: (r.get('resourceType', ''), r.get('resourceName', '').lower()))
+
+    n_orig = len(all_rows)
+    with open(resources_file, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=_RESOURCES_FIELDNAMES, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(merged)
+
+    removed = n_orig - len(merged)
+    msg = f", {removed} deduplicated" if removed else ""
+    print(f"  ✅ VALIDATED_resources.csv: {len(merged)} rows{msg} (Synapse schema, synonyms populated)")
 
 
 # ── Species inference for donor CSV ───────────────────────────────────────────
