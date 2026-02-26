@@ -567,6 +567,8 @@ PUB_REVIEW_FIELDS = [
     'existing_tools',
     # Summary
     'total_novel_tools', 'nf_specific_count', 'max_priority',
+    # Per-tool publication cross-reference: "ToolName: PMID1 | PMID2; ..."
+    'tool_usage_publications',
 ]
 
 # review_filtered.csv stays tool-centric (audit trail)
@@ -830,6 +832,138 @@ def _normalize_tool_name(name: str, tool_type: str) -> str:
     return name.strip()
 
 
+def _smart_split(s: str, sep: str = ';') -> list:
+    """Split on sep but not inside parentheses or brackets.
+
+    Handles tool names like 'Human Schwann cells (HSC; ScienCell, Carlsbad, CA)'
+    that contain the separator inside parentheses.
+    """
+    parts, depth, cur = [], 0, []
+    for c in s:
+        if c in '([':
+            depth += 1
+            cur.append(c)
+        elif c in ')]':
+            depth = max(depth - 1, 0)
+            cur.append(c)
+        elif c == sep and depth == 0:
+            parts.append(''.join(cur).strip())
+            cur = []
+        else:
+            cur.append(c)
+    if cur:
+        parts.append(''.join(cur).strip())
+    return [p for p in parts if p]
+
+
+def _build_validated_lookup(output_path: Path) -> dict:
+    """Build a (ttype, norm_key) → (canonical_name, [pmids]) lookup from VALIDATED_*.csv.
+
+    Indexes canonical names, synonyms column entries, and for antibodies also
+    indexes names without the 'anti-' prefix (to match review.csv which omits it).
+    """
+    validated_stems = {
+        'VALIDATED_animal_models':             'animal_models',
+        'VALIDATED_antibodies':                'antibodies',
+        'VALIDATED_cell_lines':                'cell_lines',
+        'VALIDATED_genetic_reagents':          'genetic_reagents',
+        'VALIDATED_computational_tools':       'computational_tools',
+        'VALIDATED_advanced_cellular_models':  'advanced_cellular_models',
+        'VALIDATED_patient_derived_models':    'patient_derived_models',
+        'VALIDATED_clinical_assessment_tools': 'clinical_assessment_tools',
+    }
+    lookup: dict = {}
+    for stem, ttype in validated_stems.items():
+        vfile = output_path / f'{stem}.csv'
+        if not vfile.exists():
+            continue
+        try:
+            with open(vfile, newline='', encoding='utf-8') as f:
+                rows = list(csv.DictReader(f))
+        except Exception:
+            continue
+        name_col = NAME_COLUMN.get(ttype, '_toolName')
+        for row in rows:
+            canonical = (
+                row.get(name_col, '') or row.get('_toolName', '') or
+                row.get('_resourceName', '')
+            ).strip()
+            if not canonical:
+                continue
+            pmids = [p.strip() for p in row.get('_pmid', '').split('|') if p.strip()]
+            # Index canonical name
+            norm = _normalize_tool_name(canonical, ttype)
+            if norm:
+                lookup.setdefault((ttype, norm), (canonical, pmids))
+            # For antibodies: also index without the 'anti-' prefix so that
+            # review.csv entries like 'SUZ12' match VALIDATED entry 'anti-SUZ12'
+            if ttype == 'antibodies' and canonical.lower().startswith('anti-'):
+                bare_norm = _normalize_tool_name(canonical[5:].strip(), ttype)
+                if bare_norm:
+                    lookup.setdefault((ttype, bare_norm), (canonical, pmids))
+            # Index synonyms column entries
+            for syn in _smart_split(row.get('synonyms', ''), ';'):
+                syn_norm = _normalize_tool_name(syn, ttype)
+                if syn_norm:
+                    lookup.setdefault((ttype, syn_norm), (canonical, pmids))
+    return lookup
+
+
+def _lookup_tool_pmids(tool_name: str, ttype: str,
+                        lookup: dict) -> tuple[str, list]:
+    """Return (canonical_name, pmids) for tool_name in the validated lookup.
+
+    Falls back to:
+    1. Antibody anti- prefix (review.csv strips it; VALIDATED always has it)
+    2. Component-of-compound substring matching for animal_models
+       (e.g. 'Olig2-Cre' matches compound key 'Nf1flox/flox; Olig2-Cre')
+
+    Returns (tool_name, []) when no match is found.
+    """
+    norm = _normalize_tool_name(tool_name, ttype)
+    if not norm:
+        return tool_name, []
+    # Direct match
+    if (ttype, norm) in lookup:
+        return lookup[(ttype, norm)]
+    # Antibody: try with 'anti-' prefix prepended
+    if ttype == 'antibodies' and not tool_name.lower().startswith('anti-'):
+        anti_norm = _normalize_tool_name('anti-' + tool_name, ttype)
+        if (ttype, anti_norm) in lookup:
+            return lookup[(ttype, anti_norm)]
+    # Component-of-compound: find entries whose normalized key contains this norm
+    candidates = [
+        v for (tt, k), v in lookup.items()
+        if tt == ttype and len(k) > len(norm) and norm in k
+    ]
+    if candidates:
+        best = min(candidates, key=lambda v: len(_normalize_tool_name(v[0], ttype)))
+        return best
+    return tool_name, []
+
+
+def _compute_tool_usage_publications(pub_row: dict, lookup: dict) -> str:
+    """Build 'ToolName: PMID1 | PMID2; ToolName2: PMID3' for all novel tools in pub_row.
+
+    Looks up each novel tool listed in the novel_* columns against the validated
+    lookup to find which publications used it.  Uses smart_split to handle tool
+    names that contain semicolons inside parentheses.
+    """
+    parts: list[str] = []
+    for col, ttype in CATEGORY_TO_TYPE.items():
+        raw = pub_row.get(col, '').strip()
+        if not raw:
+            continue
+        for tool in _smart_split(raw, ';'):
+            tool = tool.strip()
+            if not tool:
+                continue
+            _canonical, pmids = _lookup_tool_pmids(tool, ttype, lookup)
+            if pmids:
+                parts.append(f"{tool}: {' | '.join(pmids)}")
+    return '; '.join(parts)
+
+
 def _deduplicate_validated_rows(rows: list, tool_type: str) -> list:
     """Collapse synonym/duplicate tool rows into one row per unique tool.
 
@@ -912,11 +1046,13 @@ def _load_pub_meta(output_path: Path) -> dict:
 
 # ── Pub-centric pivot (for review.csv) ───────────────────────────────────────
 
-def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict) -> list:
+def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict,
+                          validated_lookup: dict | None = None) -> list:
     """Pivot per-tool rows to one row per publication.
 
     Each output row has: pub metadata + per-category novel tool lists + summary stats.
     'existing_tools' is left blank (populated via Synapse resourceId lookup at upsert).
+    'tool_usage_publications' shows which publications used each novel tool.
     """
     PRIORITY_ORDER = {'High': 0, 'Medium': 1, 'Low': 2}
 
@@ -975,6 +1111,12 @@ def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict) -> list:
         PRIORITY_ORDER.get(r['max_priority'], 2),
         -r['total_novel_tools'],
     ))
+
+    # Populate tool_usage_publications for each row
+    lu = validated_lookup or {}
+    for row in pub_rows:
+        row['tool_usage_publications'] = _compute_tool_usage_publications(row, lu)
+
     return pub_rows
 
 
@@ -1183,8 +1325,12 @@ def process(output_dir: str, dry_run: bool = False,
         return
 
     # ── Pub-centric review.csv ─────────────────────────────────────────────────
+    # Build validated lookup from final VALIDATED_*.csv files (post-dedup) for
+    # tool_usage_publications cross-reference column.
+    validated_lookup = _build_validated_lookup(output_path)
+
     review_file = output_path / 'review.csv'
-    pub_rows = _pivot_to_pub_centric(all_tool_rows, pub_meta)
+    pub_rows = _pivot_to_pub_centric(all_tool_rows, pub_meta, validated_lookup)
     with open(review_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=PUB_REVIEW_FIELDS, extrasaction='ignore')
         writer.writeheader()

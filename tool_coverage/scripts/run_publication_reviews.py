@@ -40,7 +40,7 @@ toolValidations:
     # Add ALL type-specific fields you can extract from the text (omit fields not found):
     # animal_model:           strainNomenclature*, backgroundStrain, backgroundSubstrain, animalModelGeneticDisorder [Neurofibromatosis type 1|type 2|Schwannomatosis|No known disease], animalModelOfManifestation
     # antibody:               targetAntigen*, hostOrganism [Mouse|Rabbit|Unknown], clonality [Monoclonal|Polyclonal|Secondary|Recombinant|Unknown], reactiveSpecies [Human|Mouse|Rat|...], conjugate
-    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannamatosis|None], cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma]
+    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannamatosis|None], cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma], cultureMedia (base medium + supplements, e.g. "RPMI supplemented with 10% FBS, 2 mM L-glutamine, 1% penicillin-streptomycin")
     # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker, gRNAshRNASequence
     # computational_tool:     softwareType* [Analysis Software|Pipeline|Package/Library|Workflow|Database|Web Application|Command-line Tool|Plugin|Other], softwareVersion, programmingLanguage, sourceRepository
     # advanced_cellular_model: modelType* [organoid|spheroid|other], derivationSource* [patient|iPSC|primary cell|cell line|other], cellTypes, organoidType, matrixType, cultureSystem
@@ -962,6 +962,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 'cellLineManifestation': _f(f, 'cellLineManifestation'),
                 'cellLineGeneticDisorder': _f(f, 'cellLineGeneticDisorder'),
                 'cellLineCategory': _f(f, 'cellLineCategory'),
+                'cultureMedia': _f(f, 'cultureMedia'),
                 'donorId': '',
                 'originYear': _f(f, 'originYear'),
                 'strProfile': '',
