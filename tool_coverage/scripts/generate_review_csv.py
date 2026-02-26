@@ -942,26 +942,64 @@ def _lookup_tool_pmids(tool_name: str, ttype: str,
     return tool_name, []
 
 
-def _compute_tool_usage_publications(pub_row: dict, lookup: dict) -> str:
-    """Build 'ToolName: PMID1 | PMID2; ToolName2: PMID3' for all novel tools in pub_row.
+# Plural tool type → singular resource type label used in tool_usage_publications
+_TTYPE_TO_RESOURCE_TYPE: dict[str, str] = {
+    'animal_models':             'animal_model',
+    'antibodies':                'antibody',
+    'cell_lines':                'cell_line',
+    'genetic_reagents':          'genetic_reagent',
+    'computational_tools':       'computational_tool',
+    'advanced_cellular_models':  'advanced_cellular_model',
+    'patient_derived_models':    'patient_derived_model',
+    'clinical_assessment_tools': 'clinical_assessment_tool',
+}
 
-    Looks up each novel tool listed in the novel_* columns against the validated
-    lookup to find which publications used it.  Uses smart_split to handle tool
-    names that contain semicolons inside parentheses.
+
+def _sort_pmids(pmids: list[str]) -> list[str]:
+    """Sort PMIDs numerically (ascending by numeric part)."""
+    def _key(p: str) -> int:
+        numeric = p.replace('PMID:', '').strip()
+        return int(numeric) if numeric.isdigit() else 0
+    return sorted(pmids, key=_key)
+
+
+def _compute_tool_usage_publications(pub_row: dict, lookup: dict) -> str:
+    """Build a PMID-organised cross-reference for all novel tools in pub_row.
+
+    Format: 'PMID:X (type1: name1, name2; type2: name3) | PMID:Y (...)'
+
+    Hierarchy: sorted PMIDs → resource type → resource names (sorted).
+    Uses smart_split to handle tool names that contain semicolons inside
+    parentheses.
     """
-    parts: list[str] = []
+    # pmid → rtype → [tool_name]
+    by_pmid: dict[str, dict[str, list[str]]] = {}
+
     for col, ttype in CATEGORY_TO_TYPE.items():
         raw = pub_row.get(col, '').strip()
         if not raw:
             continue
+        rtype = _TTYPE_TO_RESOURCE_TYPE.get(ttype, ttype)
         for tool in _smart_split(raw, ';'):
             tool = tool.strip()
             if not tool:
                 continue
             _canonical, pmids = _lookup_tool_pmids(tool, ttype, lookup)
-            if pmids:
-                parts.append(f"{tool}: {' | '.join(pmids)}")
-    return '; '.join(parts)
+            for pmid in pmids:
+                by_pmid.setdefault(pmid, {}).setdefault(rtype, []).append(tool)
+
+    if not by_pmid:
+        return ''
+
+    parts: list[str] = []
+    for pmid in _sort_pmids(list(by_pmid.keys())):
+        rtype_parts: list[str] = []
+        for rtype in sorted(by_pmid[pmid].keys()):
+            names = ', '.join(sorted(by_pmid[pmid][rtype]))
+            rtype_parts.append(f"{rtype}: {names}")
+        parts.append(f"{pmid} ({'; '.join(rtype_parts)})")
+
+    return ' | '.join(parts)
 
 
 def _deduplicate_validated_rows(rows: list, tool_type: str) -> list:
