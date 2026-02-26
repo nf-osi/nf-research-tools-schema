@@ -822,12 +822,19 @@ _RES_CANONICAL_MAP: dict[str, str] = {
     'Nf1 flox/flox':    'Nf1flox/flox',
     'Nf1fl/fl':         'Nf1flox/flox',
     'Nf1 fl/fl':        'Nf1flox/flox',
+    # Nf2 conditional knockout allele ('flox2' is an older loxP-flanked notation)
+    'Nf2flox/flox':     'Nf2flox/flox',
+    'Nf2 flox/flox':    'Nf2flox/flox',
+    'Nf2fl/fl':         'Nf2flox/flox',
+    'Nf2 fl/fl':        'Nf2flox/flox',
+    'Nf2 flox2/flox2':  'Nf2flox/flox',
 }
 
 # Synonyms always present for known canonical names regardless of what was seen.
 _RES_EXPLICIT_SYNONYMS: dict[str, list[str]] = {
     '293T':         ['NF1-null HEK293T', 'NF1-null 293T', 'HEK293T', 'HEK 293T', 'HEK-293T', 'HEK293'],
     'Nf1flox/flox': ['Nf1 flox/flox', 'Nf1fl/fl', 'Nf1 fl/fl'],
+    'Nf2flox/flox': ['Nf2 flox2/flox2', 'Nf2 flox/flox', 'Nf2fl/fl', 'Nf2 fl/fl'],
 }
 
 # Output column order for VALIDATED_resources.csv — matches Synapse syn26450069 schema.
@@ -854,11 +861,14 @@ def _normalize_tool_name(name: str, tool_type: str) -> str:
             r'[\s,]+(?:cell(?:s)?(?:[\s-]?line(?:s)?)?|cell[\s-]?line(?:s)?)$',
             '', name, flags=re.IGNORECASE
         )
-    # Strip trailing animal suffixes; normalize fl ↔ flox synonym
+    # Strip trailing animal suffixes; normalize fl/flox2 ↔ flox synonym
     if tool_type == 'animal_models':
         name = re.sub(r'[\s,]+(?:mice?|rats?|animals?|mouse)$', '', name, flags=re.IGNORECASE)
         # 'fl' is the official abbreviation for 'flox' (loxP-flanked allele).
-        # Normalise so that 'Nf1 fl/fl' and 'Nf1 flox/flox' collapse to one key.
+        # 'flox2' is an older notation for the same loxP-flanked allele.
+        # Normalise so that 'Nf1 fl/fl', 'Nf1 flox/flox', and 'Nf2 flox2/flox2'
+        # all collapse to the same key.
+        name = re.sub(r'flox2', 'flox', name, flags=re.IGNORECASE)
         name = re.sub(r'\bfl\b', 'flox', name, flags=re.IGNORECASE)
     # Strip leading/trailing PDX / PDOX labels for patient-derived models
     # so "PDX JH-2-002", "JH-2-002 PDX", "JH-2-002" all normalize to the same key.
