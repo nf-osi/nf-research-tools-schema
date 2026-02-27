@@ -1463,18 +1463,18 @@ def process(output_dir: str, dry_run: bool = False,
         pct = 100 * c['nf'] / c['total'] if c['total'] else 0
         print(f"  {tt:<30} {c['nf']:>4}/{c['total']:<4} NF-specific ({pct:.0f}%)")
 
-    # ── Sync SUBMIT_resources.csv ─────────────────────────────────────────────
-    _filter_submit_resources(output_path, kept_norm_names)
-
-    # ── Publication link CSVs ─────────────────────────────────────────────────
-    _write_publication_link_csvs(all_tool_rows, output_path, pub_meta)
-
-    # ── Donor / vendor CSVs ───────────────────────────────────────────────────
+    # ── Donor / vendor CSVs (must run before resources rebuild to supply howToAcquire) ──
     print(f"\n{'='*60}")
     print("Generating donor / vendor CSVs")
     print(f"{'='*60}")
     _write_donor_csv(output_path)
-    _write_vendor_csvs(output_path)
+    how_to_acquire = _write_vendor_csvs(output_path)
+
+    # ── Sync SUBMIT_resources.csv ─────────────────────────────────────────────
+    _filter_submit_resources(output_path, kept_norm_names, how_to_acquire)
+
+    # ── Publication link CSVs ─────────────────────────────────────────────────
+    _write_publication_link_csvs(all_tool_rows, output_path, pub_meta)
 
     # ── Remove superseded SUBMIT_*.csv intermediates ──────────────────────────
     # run_publication_reviews.py writes SUBMIT_*.csv as intermediates.
@@ -1493,17 +1493,19 @@ def process(output_dir: str, dry_run: bool = False,
             print(f"    {name}")
 
 
-def _filter_submit_resources(output_path: Path, kept_norm_names: dict) -> None:
+def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
+                              how_to_acquire: dict[str, str] | None = None) -> None:
     """Rebuild VALIDATED_resources.csv: filter to kept tools, merge any new SUBMIT rows,
     strip name suffixes, deduplicate, populate synonyms, and apply Synapse schema.
 
     Delegates entirely to _rebuild_resources_csv which handles all steps.
     kept_norm_names maps plural tool type → set of normalized names that passed filtering.
+    how_to_acquire maps resourceId → howToAcquire string (from _write_vendor_csvs).
     """
     print(f"\n{'='*60}")
     print("Rebuilding VALIDATED_resources.csv")
     print(f"{'='*60}")
-    _rebuild_resources_csv(output_path, kept_norm_names)
+    _rebuild_resources_csv(output_path, kept_norm_names, how_to_acquire)
 
 
 # ── ID generation ─────────────────────────────────────────────────────────────
@@ -1533,7 +1535,8 @@ def _make_pub_id(pmid: str) -> str:
 
 # ── Resources CSV rebuild ──────────────────────────────────────────────────────
 
-def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
+def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
+                            how_to_acquire: dict[str, str] | None = None) -> None:
     """Rebuild VALIDATED_resources.csv with Synapse syn26450069 schema.
 
     Source of truth: all type-specific VALIDATED_*.csv files (freshly written by the
@@ -1583,7 +1586,10 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
         'clinical_assessment_tool': 'clinicalAssessmentToolId',
     }
     CONCAT_FIELDS  = ['_pmid', '_doi', '_publicationTitle', '_year']
-    CURATED_FIELDS = ['rrid', 'description', 'aiSummary', 'usageRequirements', 'howToAcquire']
+    # howToAcquire is auto-computed from vendor extraction each run, so it is NOT
+    # in CURATED_FIELDS.  It falls back to a prior curated value only when the
+    # computed result is empty (handled separately below).
+    CURATED_FIELDS = ['rrid', 'description', 'aiSummary', 'usageRequirements']
 
     def _strip_name(name: str, ttype_plural: str) -> str:
         """Strip RRID parentheticals (shared with _normalize_tool_name) and trailing suffixes."""
@@ -1597,6 +1603,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
     submit_file    = output_path / 'SUBMIT_resources.csv'
 
     # Step 1: Preserve any manually curated fields from the previous VALIDATED_resources.csv.
+    # howToAcquire is auto-computed every run (not preserved) so stale values never persist.
     curated: dict[str, dict] = {}
     if resources_file.exists():
         with open(resources_file, newline='', encoding='utf-8') as f:
@@ -1733,7 +1740,13 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
         base['resourceType'] = rtype
         base['synonyms']     = ', '.join(sorted(syns)) if syns else ''
 
-        # Restore any manually curated fields from a prior run.
+        # Populate howToAcquire from freshly computed vendor/registry extraction.
+        # No fallback to prior values — stale or incorrect extractions are not preserved.
+        computed_hta = (how_to_acquire or {}).get(rid, '')
+        if computed_hta:
+            base['howToAcquire'] = computed_hta
+
+        # Restore manually curated fields from a prior run (curated values win).
         if rid in curated:
             for fld, val in curated[rid].items():
                 if val:
@@ -1852,7 +1865,7 @@ def _write_donor_csv(output_path: Path) -> None:
     print(f'  ✅ VALIDATED_donor.csv: {len(donor_rows)} unique species → {donor_file}')
 
 
-# ── Vendor / catalog extraction for antibody rows ─────────────────────────────
+# ── Vendor / catalog / acquisition extraction ─────────────────────────────────
 
 # Parenthetical form: "(Cell Signaling Technology, Cat# 4370)"
 _VENDOR_PAREN_RE = re.compile(
@@ -1868,9 +1881,61 @@ _VENDOR_BRACKET_RE = re.compile(
 )
 # Short inline form: 1–4 capitalised words immediately before "Cat#/Cat No"
 # Require first word to be Capitalised to avoid matching antibody descriptors.
+# The separator after "Cat" is mandatory (., No., #, :) to prevent false matches
+# on words like "Categories" where "Cat" appears inside a longer word.
 _VENDOR_INLINE_RE = re.compile(
     r'(?<![A-Za-z])((?:[A-Z][A-Za-z\-&]+(?:\s+[A-Za-z\-&]+){0,3}))\s+'
-    r'[Cc]at(?!alog)\.?\s*(?:[Nn]o\.?|#|:)?\s*([A-Za-z0-9][A-Za-z0-9\-._]{2,20})',
+    r'[Cc]at(?!alog)(?:\.|(?:\s*[Nn]o\.?)|\s*#|\s*:)\s*([A-Za-z0-9][A-Za-z0-9\-._]{2,20})',
+)
+
+# Named-registry patterns with embedded ID numbers.
+# Jackson Laboratory stock number: "Jackson Laboratory (stock no. 000664)"
+_JAX_RE = re.compile(
+    r'Jackson\s+Lab(?:oratory|s)?\b[^.]{0,80}?'
+    r'(?:stock\s*(?:no\.?|#)|#)\s*(\d{3,6})',
+    re.IGNORECASE,
+)
+# Short JAX form: "JAX #000664" or "JAX stock #000664"
+_JAX_SHORT_RE = re.compile(
+    r'\bJAX\b[^.]{0,40}?(?:stock\s*)?#\s*(\d{3,6})',
+    re.IGNORECASE,
+)
+# ATCC catalog number: "ATCC CRL-1573" / "ATCC (CCL-2)" / "obtained from ATCC (HTB-22)"
+_ATCC_RE = re.compile(
+    r'\bATCC\b[^.]{0,40}?([A-Z]{2,5}-\d{1,5})',
+    re.IGNORECASE,
+)
+# Addgene plasmid ID: "Addgene #12345" / "Addgene plasmid #56789" / "(Addgene, 81744)"
+_ADDGENE_RE = re.compile(
+    r'\bAddgene\b[^.]{0,40}?(?:plasmid\s*)?[#,]?\s*(\d{4,6})',
+    re.IGNORECASE,
+)
+
+# Source-only phrases (no catalog number) — used for howToAcquire when no ID found.
+# Exclude "generated by/in" (tool was created in the study, not commercially available).
+_SOURCE_FROM_RE = re.compile(
+    r'(?:obtained|purchased|acquired|received)\s+from\s+'
+    r'((?:the\s+)?(?:Dr\.?\s+)?[A-Z][A-Za-z0-9\s\-&]{2,60}?)'
+    r'(?:\s*[,;.(]|\s+using\b|\s+and\b|\s+with\b|\s*$)',
+    re.IGNORECASE,
+)
+_GIFT_RE = re.compile(
+    r'(?:(?:kind\s+)?gift|gifted)\s+(?:from|by|of)\s+'
+    r'((?:Dr\.?\s+)?[A-Z][A-Za-z0-9\s\-&]{2,60}?)'
+    r'(?:\s*[,;.(]|\s*$)',
+    re.IGNORECASE,
+)
+_PROVIDED_RE = re.compile(
+    r'provided\s+by\s+'
+    r'((?:Dr\.?\s+)?[A-Z][A-Za-z0-9\s\-&]{2,60}?)'
+    r'(?:\s*[,;.(]|\s*$)',
+    re.IGNORECASE,
+)
+_DEPOSITED_RE = re.compile(
+    r'deposited\s+(?:at|in|to)\s+'
+    r'([A-Z][A-Za-z0-9\s\-&]{2,60}?)'
+    r'(?:\s*[,;.(]|\s*$)',
+    re.IGNORECASE,
 )
 
 # Words that indicate the captured text is an antibody descriptor, not a vendor
@@ -1879,6 +1944,15 @@ _VENDOR_ANTIBODY_WORDS = frozenset({
     'monoclonal', 'polyclonal', 'secondary', 'primary',
     'used', 'dilution', 'prediluted', 'stem', 'tibody', 'antibody',
 })
+
+# Source texts that indicate in-house generation, not an acquirable resource
+_GENERATED_WORDS = frozenset({'generated', 'created', 'developed', 'constructed',
+                               'produced', 'synthesized', 'designed', 'established'})
+
+# Source words that indicate a human subject / patient, not an acquirable source
+_PATIENT_WORDS = frozenset({'patient', 'patients', 'volunteer', 'volunteers',
+                             'subject', 'subjects', 'donor', 'donors', 'specimen',
+                             'biopsy', 'individual', 'individuals'})
 
 
 def _extract_vendor_from_context(context: str) -> tuple[str, str]:
@@ -1904,53 +1978,137 @@ def _extract_vendor_from_context(context: str) -> tuple[str, str]:
     return '', ''
 
 
-def _write_vendor_csvs(output_path: Path) -> None:
-    """Generate VALIDATED_vendor.csv (→ syn26486850) and VALIDATED_vendorItem.csv (→ syn26486843).
+def _extract_acquisition_from_context(context: str) -> tuple[str, str, str]:
+    """Extract (vendor_name, catalog_number, how_to_acquire) from any tool context.
 
-    Parses antibody context strings for vendor names and catalog numbers.
-    vendor schema:     vendorId, vendorName, vendorUrl
-    vendorItem schema: vendorItemId, vendorId, resourceId, catalogNumber, catalogNumberURL
+    Priority:
+    1. Named registry with ID: Jackson Lab stock#, ATCC, Addgene
+    2. Vendor + catalog number (parenthetical / bracket / inline patterns)
+    3. Source-only phrase (obtained from, gift from, provided by, deposited at)
+       — skipped when the source text starts with a generation verb
+
+    Returns ('', '', '') when nothing is found.
     """
-    antibody_file = output_path / 'VALIDATED_antibodies.csv'
-    if not antibody_file.exists():
-        print('  ⏭  VALIDATED_antibodies.csv not found — skipping vendor CSVs')
-        return
-    try:
-        with open(antibody_file, newline='', encoding='utf-8') as f:
-            rows = list(csv.DictReader(f))
-    except Exception as e:
-        print(f'  ❌ Error reading antibodies: {e}')
-        return
+    # 1a. Jackson Laboratory with stock number
+    for pat in (_JAX_RE, _JAX_SHORT_RE):
+        m = pat.search(context)
+        if m:
+            stock = m.group(1)
+            return 'Jackson Laboratory', stock, f'Available from Jackson Laboratory (Stock# {stock})'
+
+    # 1b. ATCC
+    m = _ATCC_RE.search(context)
+    if m:
+        cat = m.group(1)
+        return 'ATCC', cat, f'Available from ATCC ({cat})'
+
+    # 1c. Addgene
+    m = _ADDGENE_RE.search(context)
+    if m:
+        pid = m.group(1)
+        return 'Addgene', pid, f'Available from Addgene (Plasmid# {pid})'
+
+    # 2. Vendor + catalog number
+    vendor, cat = _extract_vendor_from_context(context)
+    if vendor and cat:
+        return vendor, cat, f'Available from {vendor} (Cat# {cat})'
+
+    # 3. Source-only phrases
+    for pat in (_SOURCE_FROM_RE, _GIFT_RE, _PROVIDED_RE, _DEPOSITED_RE):
+        m = pat.search(context)
+        if m:
+            source = m.group(1).strip().rstrip(',;. ')
+            first = source.split()[0].lower() if source else ''
+            if first in _GENERATED_WORDS:
+                continue
+            if len(source) < 3 or len(source) > 80:
+                continue
+            # Skip if source is a patient/subject reference, not a repository
+            source_words = {w.lower().rstrip('s') for w in source.split()}
+            if source_words & _PATIENT_WORDS:
+                continue
+            return source, '', f'Available from {source}'
+
+    return '', '', ''
+
+
+def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
+    """Generate VALIDATED_vendor.csv and VALIDATED_vendorItem.csv; return howToAcquire map.
+
+    Scans _context fields across ALL type-specific VALIDATED_*.csv files (not only
+    antibodies) using _extract_acquisition_from_context, which handles:
+      - Named registries with IDs: Jackson Laboratory stock#, ATCC catalog#, Addgene plasmid#
+      - Vendor + catalog number (parenthetical, bracket, inline forms)
+      - Source-only phrases: obtained from, gift from, provided by, deposited at
+
+    vendor schema:     vendorId, vendorName, vendorUrl        (→ syn26486850)
+    vendorItem schema: vendorItemId, vendorId, resourceId, catalogNumber, catalogNumberURL
+                                                             (→ syn26486843)
+
+    Returns dict[resourceId, howToAcquire string] for use by _rebuild_resources_csv.
+    """
+    TYPE_FILES = [
+        'VALIDATED_antibodies.csv',
+        'VALIDATED_cell_lines.csv',
+        'VALIDATED_animal_models.csv',
+        'VALIDATED_genetic_reagents.csv',
+        'VALIDATED_patient_derived_models.csv',
+        'VALIDATED_advanced_cellular_models.csv',
+        'VALIDATED_clinical_assessment_tools.csv',
+        'VALIDATED_computational_tools.csv',
+    ]
 
     vendor_map: dict[str, dict] = {}   # norm_name → vendor row
     vendor_items: list[dict]    = []
+    how_to_acquire: dict[str, str] = {}  # resourceId → howToAcquire string
 
-    for row in rows:
-        context     = row.get('_context', '').strip()
-        resource_id = row.get('resourceId', '').strip()
-        vendor_name, cat_num = _extract_vendor_from_context(context)
-        if not vendor_name or not cat_num:
+    for filename in TYPE_FILES:
+        type_file = output_path / filename
+        if not type_file.exists():
+            continue
+        try:
+            with open(type_file, newline='', encoding='utf-8') as f:
+                rows = list(csv.DictReader(f))
+        except Exception as e:
+            print(f'  ❌ Error reading {filename}: {e}')
             continue
 
-        vendor_norm = re.sub(r'\s+', ' ', vendor_name.lower().strip())
-        if vendor_norm not in vendor_map:
-            vendor_id = 'VEN' + hashlib.sha1(vendor_norm.encode()).hexdigest()[:8]
-            vendor_map[vendor_norm] = {
-                'vendorId':   vendor_id,
-                'vendorName': vendor_name,
-                'vendorUrl':  '',
-            }
+        for row in rows:
+            context     = row.get('_context', '').strip()
+            resource_id = row.get('resourceId', '').strip()
+            if not context or not resource_id:
+                continue
 
-        vendor_id = vendor_map[vendor_norm]['vendorId']
-        item_key  = f'{vendor_norm}:{cat_num.lower()}'
-        item_id   = 'VIT' + hashlib.sha1(item_key.encode()).hexdigest()[:8]
-        vendor_items.append({
-            'vendorItemId':     item_id,
-            'vendorId':         vendor_id,
-            'resourceId':       resource_id,
-            'catalogNumber':    cat_num,
-            'catalogNumberURL': '',
-        })
+            vendor_name, cat_num, hta = _extract_acquisition_from_context(context)
+            if not hta:
+                continue
+
+            # Populate howToAcquire map (first match wins per resourceId)
+            how_to_acquire.setdefault(resource_id, hta)
+
+            # Only create vendorItem when we have a named vendor + catalog number
+            if not vendor_name or not cat_num:
+                continue
+
+            vendor_norm = re.sub(r'\s+', ' ', vendor_name.lower().strip())
+            if vendor_norm not in vendor_map:
+                vendor_id = 'VEN' + hashlib.sha1(vendor_norm.encode()).hexdigest()[:8]
+                vendor_map[vendor_norm] = {
+                    'vendorId':   vendor_id,
+                    'vendorName': vendor_name,
+                    'vendorUrl':  '',
+                }
+
+            vendor_id = vendor_map[vendor_norm]['vendorId']
+            item_key  = f'{vendor_norm}:{cat_num.lower()}'
+            item_id   = 'VIT' + hashlib.sha1(item_key.encode()).hexdigest()[:8]
+            vendor_items.append({
+                'vendorItemId':     item_id,
+                'vendorId':         vendor_id,
+                'resourceId':       resource_id,
+                'catalogNumber':    cat_num,
+                'catalogNumberURL': '',
+            })
 
     if vendor_map:
         vendor_rows = sorted(vendor_map.values(), key=lambda r: r['vendorName'])
@@ -1960,6 +2118,8 @@ def _write_vendor_csvs(output_path: Path) -> None:
             writer.writeheader()
             writer.writerows(vendor_rows)
         print(f'  ✅ VALIDATED_vendor.csv: {len(vendor_rows)} unique vendors → {vendor_file}')
+    else:
+        print('  ⚠️  No vendor/catalog info found across tool type files')
 
     if vendor_items:
         item_file = output_path / 'VALIDATED_vendorItem.csv'
@@ -1972,8 +2132,8 @@ def _write_vendor_csvs(output_path: Path) -> None:
             writer.writerows(vendor_items)
         print(f'  ✅ VALIDATED_vendorItem.csv: {len(vendor_items)} vendor-resource items → {item_file}')
 
-    if not vendor_map:
-        print('  ⚠️  No vendor/catalog info found in antibody contexts')
+    print(f'  ✅ howToAcquire populated for {len(how_to_acquire)} resources')
+    return how_to_acquire
 
 
 def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,

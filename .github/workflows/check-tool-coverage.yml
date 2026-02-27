@@ -38,6 +38,16 @@ on:
         required: false
         type: string
         default: ''
+      fill_blanks:
+        description: 'Fill blank fields (rrid, howToAcquire) in existing CSV outputs without running the full mining pipeline'
+        required: false
+        type: boolean
+        default: false
+      scicrunch_api_key:
+        description: 'SciCrunch API key for antibody RRID lookups (optional; can also configure SCICRUNCH_API_KEY secret)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -85,7 +95,7 @@ jobs:
           fi
 
       - name: Download artifacts from previous run (if skipping steps)
-        if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true'
+        if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true' || github.event.inputs.fill_blanks == 'true'
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: check-tool-coverage.yml
@@ -493,7 +503,7 @@ jobs:
 
       - name: Post-filter and consolidate validated outputs
         id: post_filter
-        if: steps.validation.outputs.validation_complete == 'true'
+        if: steps.validation.outputs.validation_complete == 'true' || github.event.inputs.fill_blanks == 'true'
         run: |
           echo "Post-filtering VALIDATED_*.csv: removing generic tools, deduplicating synonyms..."
           echo "Generates VALIDATED_publications/usage/development/resources.csv (single prefix)."
@@ -501,6 +511,21 @@ jobs:
             --output-dir tool_coverage/outputs \
             2>&1 | tee tool_coverage/outputs/post_filter_output.log
           echo "post_filter_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Lookup RRIDs and fill blank fields
+        id: rrid_lookup
+        if: steps.post_filter.outputs.post_filter_complete == 'true'
+        env:
+          SCICRUNCH_API_KEY: ${{ github.event.inputs.scicrunch_api_key || secrets.SCICRUNCH_API_KEY }}
+        run: |
+          echo "Filling blank rrid and howToAcquire fields in VALIDATED_*.csv..."
+          CMD="python tool_coverage/scripts/lookup_rrids.py --output-dir tool_coverage/outputs"
+          if [ -n "$SCICRUNCH_API_KEY" ]; then
+            CMD="$CMD --api-key $SCICRUNCH_API_KEY"
+          fi
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/rrid_lookup_output.log
+          echo "rrid_lookup_complete=true" >> $GITHUB_OUTPUT
 
       - name: Apply pattern improvements
         id: pattern_improvements
@@ -531,7 +556,20 @@ jobs:
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
+          if [ "${{ github.event.inputs.fill_blanks }}" == "true" ]; then
+            echo "## Fill Blanks Report" > pr_body.md
+            echo "" >> pr_body.md
+            echo "Filled blank fields (\`rrid\`, \`howToAcquire\`) in existing \`VALIDATED_*.csv\` files." >> pr_body.md
+            if [ -f "tool_coverage/outputs/rrid_lookup_output.log" ]; then
+              echo "" >> pr_body.md
+              echo "### RRID Lookup Results" >> pr_body.md
+              echo '```' >> pr_body.md
+              grep -E "Summary:|✅" tool_coverage/outputs/rrid_lookup_output.log | tail -20 >> pr_body.md || true
+              echo '```' >> pr_body.md
+            fi
+          else
+            python tool_coverage/scripts/generate_coverage_summary.py > pr_body.md
+          fi
 
           # Read the summary for the PR body
           echo "PR_BODY<<EOF" >> $GITHUB_OUTPUT
@@ -559,27 +597,27 @@ jobs:
           retention-days: 90
 
       - name: Clean up log files before PR
-        if: steps.validation.outputs.validation_complete == 'true'
+        if: steps.validation.outputs.validation_complete == 'true' || github.event.inputs.fill_blanks == 'true'
         run: |
           echo "Removing log files from outputs (kept in artifacts)..."
           find tool_coverage/outputs -name "*.log" -type f -delete
           echo "Log files removed from working directory"
 
       - name: Create Pull Request with results
-        # Only create PR if validation step completed successfully
-        if: steps.validation.outputs.validation_complete == 'true'
+        # Create PR after full validation run OR after fill_blanks post-processing
+        if: steps.validation.outputs.validation_complete == 'true' || github.event.inputs.fill_blanks == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
-            Update tool coverage: automated mining results
+            ${{ github.event.inputs.fill_blanks == 'true' && 'Fill blank fields in tool coverage CSVs' || 'Update tool coverage: automated mining results' }}
 
             - Coverage report updated
-            - Novel tools mined from publications
+            - ${{ github.event.inputs.fill_blanks == 'true' && 'Filled rrid and howToAcquire fields' || 'Novel tools mined from publications' }}
             - Ready for Synapse upload after review
           branch: tool-coverage-update-${{ github.run_number }}
           delete-branch: true
-          title: '🔍 Tool Coverage Update - ${{ github.run_number }}'
+          title: '${{ github.event.inputs.fill_blanks == ''true'' && ''🔧 Fill Blank Fields'' || ''🔍 Tool Coverage Update'' }} - ${{ github.run_number }}'
           body-path: pr_body.md
           assignees: BelindaBGarana
           labels: |

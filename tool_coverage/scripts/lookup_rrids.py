@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""lookup_rrids.py — Populate rrid column in ACCEPTED_resources.csv.
+"""lookup_rrids.py — Populate rrid column in VALIDATED_resources.csv.
 
 Queries public registries by tool name; writes discovered RRIDs back to
-ACCEPTED_resources.csv and the matching type-specific ACCEPTED_*.csv.
+VALIDATED_resources.csv and the matching type-specific VALIDATED_*.csv.
 
 Registries used (all public, no API key required by default):
   cell_line / patient_derived_model
       → Cellosaurus REST API  https://api.cellosaurus.org/
-        Returns rrid:CVCL_XXXX
+        Returns RRID:CVCL_XXXX
   genetic_reagent
       → Addgene search  https://www.addgene.org/search/catalog/plasmids/
-        Returns rrid:Addgene_XXXXX
+        Returns RRID:Addgene_XXXXX
   animal_model
       → IMSR (International Mouse Strain Resource)
           https://www.findmice.org/summary?gfAccessionIds=&strainsOnly=1&q=
-        Returns rrid:IMSR_JAX:XXXXX  (Jackson Laboratory strains)
+        Returns RRID:IMSR_JAX:XXXXX  (Jackson Laboratory strains)
   antibody
       → SciCrunch Antibody Registry (requires --api-key or SCICRUNCH_API_KEY)
-        Returns rrid:AB_XXXXXX
+        Returns RRID:AB_XXXXXX
 
 For any tool type, if the context already contains an explicit RRID: string it
-is extracted directly without a network call (normalized to lowercase rrid: prefix).
+is extracted directly without a network call.
 
 Usage:
   python tool_coverage/scripts/lookup_rrids.py
@@ -49,7 +49,7 @@ _RRID_IN_TEXT_RE = re.compile(r'RRID:\s*([A-Za-z0-9_:\-]+)', re.IGNORECASE)
 def _extract_rrid_from_text(text: str) -> str:
     """Return the first RRID:XXXX string found in text, or ''."""
     m = _RRID_IN_TEXT_RE.search(text or '')
-    return f'rrid:{m.group(1)}' if m else ''
+    return f'RRID:{m.group(1)}' if m else ''
 
 
 def _get(url: str, params: dict | None = None, headers: dict | None = None,
@@ -119,13 +119,13 @@ def _lookup_cellosaurus(name: str) -> str:
         if norm in _all_names(entry):
             accession = _primary_accession(entry)
             if accession:
-                return f'rrid:{accession}'
+                return f'RRID:{accession}'
 
     return ''
 
 
 def _lookup_addgene(name: str) -> str:
-    """Search Addgene for a plasmid by name; return rrid:Addgene_XXXXX or ''."""
+    """Search Addgene for a plasmid by name; return RRID:Addgene_XXXXX or ''."""
     # Addgene does not have an official public JSON API, but their search endpoint
     # returns structured HTML.  We use the JSON search API they expose internally.
     params = {
@@ -143,12 +143,12 @@ def _lookup_addgene(name: str) -> str:
         if _fuzzy_match(norm, plasmid_name):
             pid = entry.get('id') or entry.get('addgene_id', '')
             if pid:
-                return f'rrid:Addgene_{pid}'
+                return f'RRID:Addgene_{pid}'
     return ''
 
 
 def _lookup_imsr(name: str) -> str:
-    """Search IMSR for a mouse strain by name; return rrid:IMSR_JAX:XXXXX or ''."""
+    """Search IMSR for a mouse strain by name; return RRID:IMSR_JAX:XXXXX or ''."""
     # IMSR summary endpoint returns JSON when called with the right parameters.
     params = {
         'gfAccessionIds': '',
@@ -168,14 +168,14 @@ def _lookup_imsr(name: str) -> str:
             # IMSR IDs look like "JAX:000664" — convert to RRID format
             strain_id = strain.get('id', '') or ''
             if strain_id.startswith('JAX:'):
-                return f'rrid:IMSR_{strain_id}'
+                return f'RRID:IMSR_{strain_id}'
             elif strain_id:
-                return f'rrid:IMSR_{strain_id}'
+                return f'RRID:IMSR_{strain_id}'
     return ''
 
 
 def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
-    """Search SciCrunch Antibody Registry; return rrid:AB_XXXXXX or ''."""
+    """Search SciCrunch Antibody Registry; return RRID:AB_XXXXXX or ''."""
     params = {
         'q': name,
         'type': 'Antibody',
@@ -193,7 +193,7 @@ def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
         if _fuzzy_match(norm, entry_name):
             rid = entry.get('rid', '') or ''
             if rid:
-                return f'rrid:AB_{rid}'
+                return f'RRID:AB_{rid}'
     return ''
 
 
@@ -222,14 +222,14 @@ def _fuzzy_match(a: str, b: str, threshold: float = 0.85) -> bool:
 _CONTEXT_FIELDS = ('_context', 'context')  # field names to check for embedded RRIDs
 
 _TYPE_TO_TYPED_FILE = {
-    'animal_model':             'ACCEPTED_animal_models.csv',
-    'antibody':                 'ACCEPTED_antibodies.csv',
-    'cell_line':                'ACCEPTED_cell_lines.csv',
-    'genetic_reagent':          'ACCEPTED_genetic_reagents.csv',
-    'patient_derived_model':    'ACCEPTED_patient_derived_models.csv',
-    'advanced_cellular_model':  'ACCEPTED_advanced_cellular_models.csv',
-    'clinical_assessment_tool': 'ACCEPTED_clinical_assessment_tools.csv',
-    'computational_tool':       'ACCEPTED_computational_tools.csv',
+    'animal_model':             'VALIDATED_animal_models.csv',
+    'antibody':                 'VALIDATED_antibodies.csv',
+    'cell_line':                'VALIDATED_cell_lines.csv',
+    'genetic_reagent':          'VALIDATED_genetic_reagents.csv',
+    'patient_derived_model':    'VALIDATED_patient_derived_models.csv',
+    'advanced_cellular_model':  'VALIDATED_advanced_cellular_models.csv',
+    'clinical_assessment_tool': 'VALIDATED_clinical_assessment_tools.csv',
+    'computational_tool':       'VALIDATED_computational_tools.csv',
 }
 
 
@@ -265,7 +265,7 @@ def _lookup_rrid(name: str, tool_type: str, context: str, api_key: str,
 
 def run_lookup(output_dir: Path, dry_run: bool, force: bool,
                api_key: str, tool_types: list[str], rate_limit: float) -> None:
-    resources_file = output_dir / 'ACCEPTED_resources.csv'
+    resources_file = output_dir / 'VALIDATED_resources.csv'
     if not resources_file.exists():
         print(f'❌  {resources_file} not found')
         return
@@ -294,8 +294,8 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
     # Build vendorItem-derived RRID map: for resources sold by Addgene, construct
     # RRID:Addgene_{catalogNumber} directly from the vendor/vendorItem CSVs.
     rrid_from_vendor: dict[str, str] = {}
-    vendor_file    = output_dir / 'ACCEPTED_vendor.csv'
-    vendoritem_file = output_dir / 'ACCEPTED_vendorItem.csv'
+    vendor_file    = output_dir / 'VALIDATED_vendor.csv'
+    vendoritem_file = output_dir / 'VALIDATED_vendorItem.csv'
     if vendor_file.exists() and vendoritem_file.exists():
         with open(vendor_file, newline='', encoding='utf-8') as f:
             vendors = {row['vendorId']: row.get('vendorName', '') for row in csv.DictReader(f)}
@@ -306,9 +306,9 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
                 rid   = row.get('resourceId', '').strip()
                 if rid and cat:
                     if 'addgene' in vname:
-                        rrid_from_vendor[rid] = f'rrid:Addgene_{cat}'
+                        rrid_from_vendor[rid] = f'RRID:Addgene_{cat}'
                     elif 'jax' in vname or 'jackson' in vname:
-                        rrid_from_vendor[rid] = f'rrid:IMSR_JAX:{cat}'
+                        rrid_from_vendor[rid] = f'RRID:IMSR_JAX:{cat}'
 
     total = attempted = found = skipped = 0
     for row in res_rows:
@@ -348,24 +348,57 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
         print('(dry-run: no files written)')
         return
 
-    # Write updated ACCEPTED_resources.csv
+    # Write updated VALIDATED_resources.csv
     with open(resources_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=res_fieldnames, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(res_rows)
+
+    # Propagate rrid back to type-specific files
+    rid_to_rrid = {r['resourceId']: r['rrid'] for r in res_rows if r.get('rrid', '').strip()}
+    updated_typed: list[str] = []
+    for ttype, filename in _TYPE_TO_TYPED_FILE.items():
+        typed_file = output_dir / filename
+        if not typed_file.exists():
+            continue
+        with open(typed_file, newline='', encoding='utf-8') as f:
+            typed_rows = list(csv.DictReader(f))
+            typed_fieldnames = list(csv.DictReader(open(typed_file)).fieldnames or [])
+
+        changed = 0
+        for row in typed_rows:
+            rid = row.get('resourceId', '').strip()
+            if rid in rid_to_rrid:
+                if 'rrid' not in typed_fieldnames:
+                    typed_fieldnames.insert(1, 'rrid')
+                if row.get('rrid', '') != rid_to_rrid[rid]:
+                    row['rrid'] = rid_to_rrid[rid]
+                    changed += 1
+
+        if changed:
+            with open(typed_file, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=typed_fieldnames, extrasaction='ignore')
+                writer.writeheader()
+                writer.writerows(typed_rows)
+            updated_typed.append(f'{filename} ({changed} rows)')
+
+    if updated_typed:
+        print('Updated type-specific files:')
+        for name in updated_typed:
+            print(f'  {name}')
 
     print(f'\n✅  RRID lookup complete — {resources_file}')
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description='Populate rrid column in ACCEPTED_resources.csv from public registries.',
+        description='Populate rrid column in VALIDATED_resources.csv from public registries.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
     parser.add_argument(
         '--output-dir', default='tool_coverage/outputs',
-        help='Directory containing ACCEPTED_*.csv (default: tool_coverage/outputs)',
+        help='Directory containing VALIDATED_*.csv (default: tool_coverage/outputs)',
     )
     parser.add_argument(
         '--dry-run', action='store_true',
