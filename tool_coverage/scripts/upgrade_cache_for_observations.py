@@ -253,6 +253,10 @@ def main():
                        help='Directory containing Sonnet validation YAML files')
     parser.add_argument('--cache-dir', default='tool_reviews/publication_cache',
                        help='Directory containing cache files')
+    parser.add_argument('--validated-pubs-file',
+                       help='CSV file from post-filter step (e.g. VALIDATED_publications.csv). '
+                            'If provided, only publications with a _pmid column value present in '
+                            'this file will be considered for upgrade, reducing Phase 2 work.')
     parser.add_argument('--dry-run', action='store_true',
                        help='Preview which caches would be upgraded without actually upgrading')
     parser.add_argument('--force', action='store_true',
@@ -271,8 +275,34 @@ def main():
         logger.error(f"Cache directory not found: {cache_dir}")
         return 1
 
+    # Build allowlist of PMIDs from validated publications file (post-filter output)
+    validated_pmids: Optional[set] = None
+    if args.validated_pubs_file:
+        vf = Path(args.validated_pubs_file)
+        if vf.exists():
+            import csv
+            validated_pmids = set()
+            with open(vf, newline='', encoding='utf-8') as f:
+                for row in csv.DictReader(f):
+                    raw = row.get('_pmid', '') or row.get('pmid', '')
+                    for part in raw.split('|'):
+                        pmid_num = part.strip().replace('PMID:', '').strip()
+                        if pmid_num:
+                            validated_pmids.add(pmid_num)
+            logger.info(f"Loaded {len(validated_pmids)} validated PMIDs from {vf.name}")
+            logger.info("  Phase 2 will be limited to these post-filtered publications")
+        else:
+            logger.warning(f"--validated-pubs-file not found: {vf} (proceeding without filter)")
+
     # Find all review YAML files
     review_files = list(reviews_dir.glob('*_tool_review.yaml'))
+    if validated_pmids is not None:
+        before = len(review_files)
+        review_files = [
+            rf for rf in review_files
+            if rf.stem.replace('_tool_review', '') in validated_pmids
+        ]
+        logger.info(f"Filtered {before} → {len(review_files)} review files using validated pubs allowlist")
     logger.info(f"Analyzing {len(review_files)} review files...")
     logger.info("")
 
