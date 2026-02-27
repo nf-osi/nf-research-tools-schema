@@ -354,39 +354,6 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
         writer.writeheader()
         writer.writerows(res_rows)
 
-    # Propagate rrid back to type-specific files
-    rid_to_rrid = {r['resourceId']: r['rrid'] for r in res_rows if r.get('rrid', '').strip()}
-    updated_typed: list[str] = []
-    for ttype, filename in _TYPE_TO_TYPED_FILE.items():
-        typed_file = output_dir / filename
-        if not typed_file.exists():
-            continue
-        with open(typed_file, newline='', encoding='utf-8') as f:
-            typed_rows = list(csv.DictReader(f))
-            typed_fieldnames = list(csv.DictReader(open(typed_file)).fieldnames or [])
-
-        changed = 0
-        for row in typed_rows:
-            rid = row.get('resourceId', '').strip()
-            if rid in rid_to_rrid:
-                if 'rrid' not in typed_fieldnames:
-                    typed_fieldnames.insert(1, 'rrid')
-                if row.get('rrid', '') != rid_to_rrid[rid]:
-                    row['rrid'] = rid_to_rrid[rid]
-                    changed += 1
-
-        if changed:
-            with open(typed_file, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=typed_fieldnames, extrasaction='ignore')
-                writer.writeheader()
-                writer.writerows(typed_rows)
-            updated_typed.append(f'{filename} ({changed} rows)')
-
-    if updated_typed:
-        print('Updated type-specific files:')
-        for name in updated_typed:
-            print(f'  {name}')
-
     print(f'\n✅  RRID lookup complete — {resources_file}')
 
 

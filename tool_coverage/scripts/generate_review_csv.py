@@ -839,16 +839,80 @@ _RES_EXPLICIT_SYNONYMS: dict[str, list[str]] = {
     'Nf2flox/flox': ['Nf2 flox2/flox2', 'Nf2 flox/flox', 'Nf2fl/fl', 'Nf2 fl/fl'],
 }
 
+# Primary key column for each type-specific Synapse detail table (plural → id col name).
+_TTYPE_PLURAL_TO_ID_COL: dict[str, str] = {
+    'animal_models':             'animalModelId',
+    'antibodies':                'antibodyId',
+    'cell_lines':                'cellLineId',
+    'genetic_reagents':          'geneticReagentId',
+    'advanced_cellular_models':  'advancedCellularModelId',
+    'computational_tools':       'computationalToolId',
+    'patient_derived_models':    'patientDerivedModelId',
+    'clinical_assessment_tools': 'clinicalAssessmentToolId',
+}
+
+# Exact uploadable columns for each type-specific Synapse detail table.
+# Columns NOT listed here (rrid, cultureMedia, synonyms, resourceId…) are
+# stripped from the VALIDATED file so it matches the Synapse schema.
+_TYPE_SPECIFIC_SYNAPSE_COLS: dict[str, list[str]] = {
+    'animal_models': [
+        'animalModelId', 'strainNomenclature', 'backgroundStrain', 'backgroundSubstrain',
+        'animalModelGeneticDisorder', 'animalModelOfManifestation', 'transplantationType',
+        'animalState', 'generation', 'donorId', 'transplantationDonorId',
+    ],
+    'antibodies': [
+        'antibodyId', 'targetAntigen', 'hostOrganism', 'clonality', 'cloneId',
+        'uniprotId', 'reactiveSpecies', 'conjugate',
+    ],
+    'cell_lines': [
+        'cellLineId', 'organ', 'tissue', 'cellLineManifestation', 'cellLineGeneticDisorder',
+        'cellLineCategory', 'donorId', 'originYear', 'strProfile', 'resistance',
+        'contaminatedMisidentified', 'populationDoublingTime',
+    ],
+    'genetic_reagents': [
+        'geneticReagentId', 'insertName', 'vectorType', 'vectorBackbone', 'promoter',
+        'insertSpecies', 'insertEntrezId', 'selectableMarker', 'copyNumber',
+        'gRNAshRNASequence', 'bacterialResistance', 'hazardous',
+        'nTerminalTag', 'cTerminalTag', 'totalSize', 'backboneSize', 'insertSize',
+        'growthStrain', 'growthTemp', 'cloningMethod',
+        '5primer', '3primer', '5primeCloningSite', '3primeCloningSite',
+        '5primeSiteDestroyed', '3primeSiteDestroyed',
+    ],
+    'advanced_cellular_models': [
+        'advancedCellularModelId', 'modelType', 'derivationSource', 'cellTypes',
+        'organoidType', 'matrixType', 'cultureSystem', 'maturationTime',
+        'characterizationMethods', 'passageNumber', 'cryopreservationProtocol',
+        'qualityControlMetrics',
+    ],
+    'computational_tools': [
+        'computationalToolId', 'softwareName', 'softwareType', 'softwareVersion',
+        'programmingLanguage', 'sourceRepository', 'documentation', 'licenseType',
+        'containerized', 'dependencies', 'systemRequirements', 'lastUpdate', 'maintainer',
+    ],
+    'patient_derived_models': [
+        'patientDerivedModelId', 'modelSystemType', 'patientDiagnosis', 'hostStrain',
+        'tumorType', 'engraftmentSite', 'passageNumber', 'establishmentRate',
+        'molecularCharacterization', 'clinicalData', 'humanizationMethod',
+        'immuneSystemComponents', 'validationMethods',
+    ],
+    'clinical_assessment_tools': [
+        'clinicalAssessmentToolId', 'assessmentName', 'assessmentType', 'targetPopulation',
+        'diseaseSpecific', 'numberOfItems', 'scoringMethod', 'validatedLanguages',
+        'psychometricProperties', 'administrationTime', 'availabilityStatus',
+        'licensingRequirements', 'digitalVersion',
+    ],
+}
+
 # Output column order for VALIDATED_resources.csv — matches Synapse syn26450069 schema.
+# Only type-specific IDs present as FK columns in syn26450069 are listed here.
 _RESOURCES_FIELDNAMES: list[str] = [
     'resourceId', 'resourceName', 'resourceType',
     'synonyms', 'rrid', 'description', 'aiSummary',
     'usageRequirements', 'howToAcquire',
-    # Type-specific foreign-key IDs (only the column matching _toolType is populated).
-    'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId',
-    'patientDerivedModelId', 'advancedCellularModelId',
-    'computationalToolId', 'clinicalAssessmentToolId',
-    'biobankId',
+    'dateAdded', 'dateModified',
+    # FK IDs present in syn26450069 (animal model, antibody, cell line, genetic reagent, biobank).
+    # The 4 newer detail tables (computational, PDX, organoid, clinical) are not yet FK'd here.
+    'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId', 'biobankId',
     '_pmid', '_doi', '_publicationTitle', '_year', '_confidence', '_toolType',
 ]
 
@@ -1391,16 +1455,17 @@ def process(output_dir: str, dry_run: bool = False,
                     or (_make_resource_id(_norm_key, tool_type) if _norm_key else '')
                 )
 
-            # Build output column order: resourceId + name + domain cols + tracking cols
+            # Build output column order using the exact Synapse schema for this tool type.
+            # Set the type-specific primary key (= resourceId) on every row.
+            type_id_col = _TTYPE_PLURAL_TO_ID_COL.get(tool_type, '')
+            if type_id_col:
+                for r in kept_out:
+                    r[type_id_col] = r.get('resourceId', '')
+            synapse_cols = _TYPE_SPECIFIC_SYNAPSE_COLS.get(tool_type, [])
             tracking_prefix = ['_pmid', '_doi', '_publicationTitle', '_year', '_context',
                                 '_confidence', '_verdict', '_usageType']
-            out_fieldnames = ['resourceId']
-            if name_col and name_col in fieldnames:
-                out_fieldnames.append(name_col)
-            # Remaining domain columns (non-tracking, non-name)
-            out_fieldnames += [f for f in fieldnames
-                               if f not in out_fieldnames and not f.startswith('_')]
-            # Tracking columns last (_resourceName first among tracking, then ordered prefix)
+            # Synapse columns first (exact schema), then _resourceName, then other _metadata.
+            out_fieldnames = list(synapse_cols)
             out_fieldnames.append('_resourceName')
             out_fieldnames += [f for f in tracking_prefix if f in fieldnames]
             out_fieldnames += [f for f in fieldnames
@@ -1634,15 +1699,8 @@ def _load_synapse_ids() -> dict[str, str]:
 
 
 def _make_pub_id(pmid: str) -> str:
-    """Generate a stable publication ID from PMID.
-
-    Numeric PMIDs become 'PUBnnnnnnn'; non-numeric get a short hash suffix.
-    """
-    pmid = pmid.strip()
-    numeric = pmid.lstrip('PMID:').strip()
-    if numeric.isdigit():
-        return f'PUB{numeric}'
-    return 'PUB' + hashlib.sha1(pmid.encode()).hexdigest()[:8]
+    """Generate a stable UUID5 publication ID from PMID."""
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"publication:{pmid.strip()}"))
 
 
 # ── Resources CSV rebuild ──────────────────────────────────────────────────────
@@ -1688,15 +1746,13 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         'patient_derived_model':    'Patient-Derived Model',
         'clinical_assessment_tool': 'Clinical Assessment Tool',
     }
+    # Only the 5 types that have FK columns in the syn26450069 Resource table.
+    # The 4 newer detail tables (computational, PDX, organoid, clinical) are not FK'd there.
     TTYPE_TO_ID_COL = {
-        'animal_model':             'animalModelId',
-        'antibody':                 'antibodyId',
-        'cell_line':                'cellLineId',
-        'genetic_reagent':          'geneticReagentId',
-        'patient_derived_model':    'patientDerivedModelId',
-        'advanced_cellular_model':  'advancedCellularModelId',
-        'computational_tool':       'computationalToolId',
-        'clinical_assessment_tool': 'clinicalAssessmentToolId',
+        'animal_model':    'animalModelId',
+        'antibody':        'antibodyId',
+        'cell_line':       'cellLineId',
+        'genetic_reagent': 'geneticReagentId',
     }
     CONCAT_FIELDS  = ['_pmid', '_doi', '_publicationTitle', '_year']
     # howToAcquire is auto-computed from vendor extraction each run, so it is NOT
@@ -2301,12 +2357,12 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
             'publicationId': pub_id, 'resourceId': res_id,
         }
         if usage_type == 'Development':
-            dev_id = 'DEV' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}'.encode()).hexdigest()[:8]
-            dev_rows.append({**link_row, 'developmentId': dev_id})
-            use_id = 'USE' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}:dev'.encode()).hexdigest()[:8]
+            dev_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"development:{pmid}:{tool_name}:{tool_type}"))
+            dev_rows.append({**link_row, 'developmentId': dev_id, 'investigatorId': '', 'funderId': ''})
+            use_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"usage:{pmid}:{tool_name}:{tool_type}:dev"))
             usage_rows.append({**link_row, 'usageId': use_id})
         elif usage_type == 'Experimental Usage':
-            use_id = 'USE' + hashlib.sha1(f'{pmid}:{tool_name}:{tool_type}'.encode()).hexdigest()[:8]
+            use_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"usage:{pmid}:{tool_name}:{tool_type}"))
             usage_rows.append({**link_row, 'usageId': use_id})
 
     # Second pass: build pub_rows only for PMIDs with at least one link
@@ -2324,19 +2380,26 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         authors_raw = meta.get('authors', '')
         if isinstance(authors_raw, list):
             authors_raw = ', '.join(authors_raw)
+        doi_raw = info.get('doi', '') or meta.get('doi', '')
+        if doi_raw and not doi_raw.startswith('http'):
+            doi_raw = f'https://www.doi.org/{doi_raw}'
         pub_rows.append({
-            'publicationId':   _make_pub_id(pmid),
-            'doi':             info.get('doi', '') or meta.get('doi', ''),
-            'pmid':            pmid,
-            'publicationTitle': info.get('title', '') or meta.get('title', ''),
-            'abstract':        meta.get('abstract', ''),
-            'journal':         meta.get('journal', ''),
-            'publicationDate': meta.get('publicationDate', ''),
-            'authors':         authors_raw,
+            'publicationId':      _make_pub_id(pmid),
+            'doi':                doi_raw,
+            'pmid':               pmid,
+            'abstract':           meta.get('abstract', ''),
+            'journal':            meta.get('journal', ''),
+            'publicationDate':    meta.get('publicationDate', ''),
+            'citation':           '',
+            'publicationDateUnix': '',
+            'authors':            authors_raw,
+            'publicationTitle':   info.get('title', '') or meta.get('title', ''),
         })
 
-    pub_fields = ['publicationId', 'doi', 'pmid', 'publicationTitle', 'abstract',
-                  'journal', 'publicationDate', 'authors']
+    # Column order matches syn26486839 Publication table schema.
+    pub_fields = ['publicationId', 'doi', 'pmid', 'abstract', 'journal',
+                  'publicationDate', 'citation', 'publicationDateUnix', 'authors',
+                  'publicationTitle']
     if pub_rows:
         with open(output_path / 'VALIDATED_publications.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=pub_fields, extrasaction='ignore')
@@ -2344,9 +2407,10 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
             writer.writerows(pub_rows)
         print(f"  ✅ VALIDATED_publications.csv: {len(pub_rows)} unique publications")
 
+    # Column order: metadata prefix, then Synapse schema order (usageId, publicationId, resourceId).
     usage_fields = ['_pmid', '_doi', '_publicationTitle', '_year',
                     '_toolName', '_toolType', '_usageType',
-                    'publicationId', 'resourceId', 'usageId']
+                    'usageId', 'publicationId', 'resourceId']
     if usage_rows:
         with open(output_path / 'VALIDATED_usage.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=usage_fields, extrasaction='ignore')
@@ -2354,9 +2418,11 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
             writer.writerows(usage_rows)
         print(f"  ✅ VALIDATED_usage.csv: {len(usage_rows)} publication-tool usage links")
 
+    # Column order: metadata prefix, then Synapse schema order (developmentId, resourceId,
+    # investigatorId, publicationId, funderId) matching syn26486807.
     dev_fields = ['_pmid', '_doi', '_publicationTitle', '_year',
                   '_toolName', '_toolType', '_usageType',
-                  'publicationId', 'resourceId', 'developmentId']
+                  'developmentId', 'resourceId', 'investigatorId', 'publicationId', 'funderId']
     if dev_rows:
         with open(output_path / 'VALIDATED_development.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=dev_fields, extrasaction='ignore')
@@ -2372,7 +2438,7 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         print(f"    Development (tool created here):  {len(dev_pmids)}")
         print(f"    Usage only (tool used here):      {len(usage_only_pmids)}")
         print(f"    Mixed (both usage + development): {len(mixed_pmids)}")
-        print(f"    ℹ️  publicationId/resourceId are stable hashes — replace with Synapse IDs at upsert time")
+        print(f"    ℹ️  publicationId/usageId/developmentId are UUID5 placeholders — replace with Synapse row IDs at upsert time")
 
 
 def main():
