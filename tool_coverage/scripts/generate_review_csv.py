@@ -50,6 +50,7 @@ Usage:
 
 import csv
 import hashlib
+import os
 import re
 import sys
 import uuid
@@ -1276,10 +1277,14 @@ def process(output_dir: str, dry_run: bool = False,
     # Load publication metadata once (reused for pub-centric pivot + link CSVs)
     pub_meta = _load_pub_meta(output_path)
 
-    # Load known Synapse resource IDs (for UUID assignment + novel-vs-existing split)
-    synapse_ids = _load_synapse_ids(output_path)
+    # Load known Synapse resource IDs (for UUID assignment + novel-vs-existing split).
+    # Requires SYNAPSE_AUTH_TOKEN; silently skips if unavailable.
+    synapse_ids = _load_synapse_ids()
     if synapse_ids:
-        print(f"  Loaded {len(synapse_ids)} Synapse resource ID mappings from synapse_resource_ids.csv")
+        print(f"  Loaded {len(synapse_ids)} Synapse resource ID mappings from syn51730943")
+    else:
+        print("  ℹ️  No SYNAPSE_AUTH_TOKEN — Synapse resource lookup skipped; "
+              "existing tools will appear in novel_* columns")
 
     # Per-tool rows (pre-dedup) — used for pub-centric pivot and link CSVs
     all_tool_rows: list[dict] = []
@@ -1563,37 +1568,63 @@ def _make_resource_id(normalized_name: str, tool_type: str) -> str:
     return str(uuid.uuid5(_PROJECT_NAMESPACE, key))
 
 
-def _load_synapse_ids(output_dir: Path) -> dict[str, str]:
-    """Load known Synapse resource IDs from synapse_resource_ids.csv.
+def _load_synapse_ids() -> dict[str, str]:
+    """Query Synapse for all existing resource IDs (syn51730943 materialized view).
 
     Returns a dict mapping ``"{ttype_plural}:{normalized_name}"`` → Synapse UUID.
     This is used to:
       - assign real Synapse UUIDs to already-uploaded resources (instead of
         generating a local UUID5 placeholder), and
-      - distinguish existing resources (already in syn26450069) from novel ones
+      - distinguish existing resources (already in Synapse) from novel ones
         in review.csv.
 
-    The file lives at output_dir/synapse_resource_ids.csv and has columns:
-      resourceId, resourceName, resourceType (singular), synonyms (comma-sep)
+    Requires SYNAPSE_AUTH_TOKEN env var.  Returns {} on any error so the
+    pipeline degrades gracefully when Synapse is unavailable.
     """
-    path = output_dir / 'synapse_resource_ids.csv'
-    if not path.exists():
+    # Capitalized resourceType labels used in the Synapse table → plural ttype key
+    _RTYPE_TO_TTYPE_P: dict[str, str] = {
+        'animal model':             'animal_models',
+        'antibody':                 'antibodies',
+        'cell line':                'cell_lines',
+        'genetic reagent':          'genetic_reagents',
+        'computational tool':       'computational_tools',
+        'advanced cellular model':  'advanced_cellular_models',
+        'patient-derived model':    'patient_derived_models',
+        'clinical assessment tool': 'clinical_assessment_tools',
+    }
+
+    auth_token = os.getenv('SYNAPSE_AUTH_TOKEN', '')
+    if not auth_token:
+        return {}
+
+    try:
+        import synapseclient
+        syn = synapseclient.Synapse(silent=True)
+        syn.login(authToken=auth_token, silent=True)
+        df = syn.tableQuery(
+            "SELECT resourceId, resourceName, resourceType, synonyms FROM syn51730943"
+        ).asDataFrame()
+    except Exception as exc:
+        print(f'  ⚠️  Synapse resource lookup failed: {exc}')
         return {}
 
     result: dict[str, str] = {}
-    with open(path, newline='', encoding='utf-8') as f:
-        for row in csv.DictReader(f):
-            syn_id  = row.get('resourceId', '').strip()
-            name    = row.get('resourceName', '').strip()
-            ttype_s = row.get('resourceType', '').strip()   # singular form
-            if not (syn_id and name and ttype_s):
-                continue
-            ttype_p = _TTYPE_SINGULAR_TO_PLURAL.get(ttype_s, ttype_s + 's')
-            norm = _normalize_tool_name(name, ttype_p)
-            if norm:
-                result[f"{ttype_p}:{norm}"] = syn_id
-            # Also index any comma-separated synonyms
-            for syn_name in row.get('synonyms', '').split(','):
+    for _, row in df.iterrows():
+        syn_id = str(row.get('resourceId') or '').strip()
+        name   = str(row.get('resourceName') or '').strip()
+        rtype  = str(row.get('resourceType') or '').strip().lower()
+        if not (syn_id and name and rtype):
+            continue
+        ttype_p = _RTYPE_TO_TTYPE_P.get(rtype)
+        if not ttype_p:
+            continue
+        norm = _normalize_tool_name(name, ttype_p)
+        if norm:
+            result[f"{ttype_p}:{norm}"] = syn_id
+        # Also index comma-separated synonyms
+        synonyms_val = row.get('synonyms')
+        if synonyms_val and str(synonyms_val).strip() not in ('', 'nan'):
+            for syn_name in str(synonyms_val).split(','):
                 syn_name = syn_name.strip()
                 if syn_name:
                     syn_norm = _normalize_tool_name(syn_name, ttype_p)
