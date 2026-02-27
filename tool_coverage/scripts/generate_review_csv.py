@@ -52,6 +52,7 @@ import csv
 import hashlib
 import re
 import sys
+import uuid
 import argparse
 from collections import defaultdict
 from pathlib import Path
@@ -1140,11 +1141,13 @@ def _load_pub_meta(output_path: Path) -> dict:
 # ── Pub-centric pivot (for review.csv) ───────────────────────────────────────
 
 def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict,
-                          validated_lookup: dict | None = None) -> list:
+                          validated_lookup: dict | None = None,
+                          synapse_ids: dict | None = None) -> list:
     """Pivot per-tool rows to one row per publication.
 
     Each output row has: pub metadata + per-category novel tool lists + summary stats.
-    'existing_tools' is left blank (populated via Synapse resourceId lookup at upsert).
+    'existing_tools' lists tools already in Synapse (from synapse_resource_ids.csv).
+    'novel_*' columns list tools NOT yet in Synapse (need uploading).
     'tool_usage_publications' shows which publications used each novel tool.
     """
     PRIORITY_ORDER = {'High': 0, 'Medium': 1, 'Low': 2}
@@ -1189,15 +1192,23 @@ def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict,
         row: dict = dict(info)
         all_pris: list = []
         nf_count = total = 0
+        existing_names: list[str] = []
         for col, tt in CATEGORY_TO_TYPE.items():
             tools = pub_tools[pmid].get(tt, [])
-            row[col] = '; '.join(t['name'] for t in tools)
+            novel: list[str] = []
             for t in tools:
-                all_pris.append(PRIORITY_ORDER.get(t['pri'], 2))
-                total += 1
-                if t['nf']:
-                    nf_count += 1
-        row['existing_tools']    = ''
+                norm = _normalize_tool_name(t['name'], tt)
+                lk   = f"{tt}:{norm}"
+                if synapse_ids and lk in synapse_ids:
+                    existing_names.append(t['name'])
+                else:
+                    novel.append(t['name'])
+                    all_pris.append(PRIORITY_ORDER.get(t['pri'], 2))
+                    total += 1
+                    if t['nf']:
+                        nf_count += 1
+            row[col] = '; '.join(novel)
+        row['existing_tools']    = '; '.join(existing_names)
         row['total_novel_tools'] = total
         row['nf_specific_count'] = nf_count
         row['max_priority']      = (
@@ -1264,6 +1275,11 @@ def process(output_dir: str, dry_run: bool = False,
 
     # Load publication metadata once (reused for pub-centric pivot + link CSVs)
     pub_meta = _load_pub_meta(output_path)
+
+    # Load known Synapse resource IDs (for UUID assignment + novel-vs-existing split)
+    synapse_ids = _load_synapse_ids(output_path)
+    if synapse_ids:
+        print(f"  Loaded {len(synapse_ids)} Synapse resource ID mappings from synapse_resource_ids.csv")
 
     # Per-tool rows (pre-dedup) — used for pub-centric pivot and link CSVs
     all_tool_rows: list[dict] = []
@@ -1360,10 +1376,15 @@ def process(output_dir: str, dry_run: bool = False,
                     raw_name = re.sub(r'\s+(?:PDX|PDOX)$', '', raw_name, flags=re.IGNORECASE).strip()
 
                 row['_resourceName'] = raw_name
-                # resourceId uses the pre-transformation name so it stays consistent with
-                # the IDs computed in _write_publication_link_csvs (which sees the same raw value)
+                # resourceId: use real Synapse UUID if known, else generate UUID5 placeholder.
+                # Uses the pre-transformation name so IDs stay consistent with
+                # _write_publication_link_csvs (which sees the same raw NAME_COLUMN value).
                 _norm_key = _normalize_tool_name(_raw_for_id or row.get('_toolName', ''), tool_type)
-                row['resourceId'] = _make_resource_id(_norm_key, tool_type) if _norm_key else ''
+                _lk = f"{tool_type}:{_norm_key}"
+                row['resourceId'] = (
+                    (synapse_ids.get(_lk) if synapse_ids and _norm_key else None)
+                    or (_make_resource_id(_norm_key, tool_type) if _norm_key else '')
+                )
 
             # Build output column order: resourceId + name + domain cols + tracking cols
             tracking_prefix = ['_pmid', '_doi', '_publicationTitle', '_year', '_context',
@@ -1428,7 +1449,8 @@ def process(output_dir: str, dry_run: bool = False,
     validated_lookup = _build_validated_lookup(output_path)
 
     review_file = output_path / 'review.csv'
-    pub_rows = _pivot_to_pub_centric(all_tool_rows, pub_meta, validated_lookup)
+    pub_rows = _pivot_to_pub_centric(all_tool_rows, pub_meta, validated_lookup,
+                                     synapse_ids=synapse_ids)
     with open(review_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=PUB_REVIEW_FIELDS, extrasaction='ignore')
         writer.writeheader()
@@ -1437,7 +1459,7 @@ def process(output_dir: str, dry_run: bool = False,
     med  = sum(1 for r in pub_rows if r['max_priority'] == 'Medium')
     low  = sum(1 for r in pub_rows if r['max_priority'] == 'Low')
     print(f"\n✅ review.csv: {len(pub_rows)} publications  (High={high}, Medium={med}, Low={low})")
-    print(f"   One row per PMID — novel tools listed per category, existing_tools blank until Synapse lookup")
+    print(f"   One row per PMID — novel tools listed per category; existing Synapse tools in existing_tools")
     print(f"   → {review_file}")
 
     # ── Tool-centric review_filtered.csv (audit trail) ────────────────────────
@@ -1471,7 +1493,8 @@ def process(output_dir: str, dry_run: bool = False,
     how_to_acquire = _write_vendor_csvs(output_path)
 
     # ── Sync SUBMIT_resources.csv ─────────────────────────────────────────────
-    _filter_submit_resources(output_path, kept_norm_names, how_to_acquire)
+    _filter_submit_resources(output_path, kept_norm_names, how_to_acquire,
+                             synapse_ids=synapse_ids)
 
     # ── Publication link CSVs ─────────────────────────────────────────────────
     _write_publication_link_csvs(all_tool_rows, output_path, pub_meta)
@@ -1494,7 +1517,8 @@ def process(output_dir: str, dry_run: bool = False,
 
 
 def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
-                              how_to_acquire: dict[str, str] | None = None) -> None:
+                              how_to_acquire: dict[str, str] | None = None,
+                              synapse_ids: dict[str, str] | None = None) -> None:
     """Rebuild VALIDATED_resources.csv: filter to kept tools, merge any new SUBMIT rows,
     strip name suffixes, deduplicate, populate synonyms, and apply Synapse schema.
 
@@ -1505,20 +1529,77 @@ def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
     print(f"\n{'='*60}")
     print("Rebuilding VALIDATED_resources.csv")
     print(f"{'='*60}")
-    _rebuild_resources_csv(output_path, kept_norm_names, how_to_acquire)
+    _rebuild_resources_csv(output_path, kept_norm_names, how_to_acquire,
+                           synapse_ids=synapse_ids)
 
 
 # ── ID generation ─────────────────────────────────────────────────────────────
 
-def _make_resource_id(normalized_name: str, tool_type: str) -> str:
-    """Generate a stable 8-char hex resource ID from normalized name + type.
+# Project-specific UUID5 namespace — ensures IDs are stable and recognisable
+# as local placeholders distinct from Synapse-assigned UUIDs (v4/random).
+_PROJECT_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, 'https://nf.synapse.org/NF-research-tools')
 
-    IDs are deterministic so resourceId is consistent across VALIDATED_*.csv
-    files and the link tables (usage, development).  These are temporary
-    placeholders replaced by real Synapse IDs at upsert time.
+# Singular → plural tool-type name mapping (used by _load_synapse_ids).
+_TTYPE_SINGULAR_TO_PLURAL: dict[str, str] = {
+    'animal_model':             'animal_models',
+    'antibody':                 'antibodies',
+    'cell_line':                'cell_lines',
+    'genetic_reagent':          'genetic_reagents',
+    'computational_tool':       'computational_tools',
+    'advanced_cellular_model':  'advanced_cellular_models',
+    'patient_derived_model':    'patient_derived_models',
+    'clinical_assessment_tool': 'clinical_assessment_tools',
+}
+
+
+def _make_resource_id(normalized_name: str, tool_type: str) -> str:
+    """Generate a stable UUID resource ID from normalized name + type.
+
+    Uses UUID v5 with a project-specific namespace so IDs are deterministic,
+    follow standard UUID format, and are distinguishable from Synapse-assigned
+    UUIDs (v4/random) while remaining usable as local placeholders.
     """
     key = f"{tool_type}:{normalized_name.strip()}"
-    return 'RES' + hashlib.sha1(key.encode()).hexdigest()[:8]
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, key))
+
+
+def _load_synapse_ids(output_dir: Path) -> dict[str, str]:
+    """Load known Synapse resource IDs from synapse_resource_ids.csv.
+
+    Returns a dict mapping ``"{ttype_plural}:{normalized_name}"`` → Synapse UUID.
+    This is used to:
+      - assign real Synapse UUIDs to already-uploaded resources (instead of
+        generating a local UUID5 placeholder), and
+      - distinguish existing resources (already in syn26450069) from novel ones
+        in review.csv.
+
+    The file lives at output_dir/synapse_resource_ids.csv and has columns:
+      resourceId, resourceName, resourceType (singular), synonyms (comma-sep)
+    """
+    path = output_dir / 'synapse_resource_ids.csv'
+    if not path.exists():
+        return {}
+
+    result: dict[str, str] = {}
+    with open(path, newline='', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            syn_id  = row.get('resourceId', '').strip()
+            name    = row.get('resourceName', '').strip()
+            ttype_s = row.get('resourceType', '').strip()   # singular form
+            if not (syn_id and name and ttype_s):
+                continue
+            ttype_p = _TTYPE_SINGULAR_TO_PLURAL.get(ttype_s, ttype_s + 's')
+            norm = _normalize_tool_name(name, ttype_p)
+            if norm:
+                result[f"{ttype_p}:{norm}"] = syn_id
+            # Also index any comma-separated synonyms
+            for syn_name in row.get('synonyms', '').split(','):
+                syn_name = syn_name.strip()
+                if syn_name:
+                    syn_norm = _normalize_tool_name(syn_name, ttype_p)
+                    if syn_norm:
+                        result[f"{ttype_p}:{syn_norm}"] = syn_id
+    return result
 
 
 def _make_pub_id(pmid: str) -> str:
@@ -1536,7 +1617,8 @@ def _make_pub_id(pmid: str) -> str:
 # ── Resources CSV rebuild ──────────────────────────────────────────────────────
 
 def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
-                            how_to_acquire: dict[str, str] | None = None) -> None:
+                            how_to_acquire: dict[str, str] | None = None,
+                            synapse_ids: dict[str, str] | None = None) -> None:
     """Rebuild VALIDATED_resources.csv with Synapse syn26450069 schema.
 
     Source of truth: all type-specific VALIDATED_*.csv files (freshly written by the
@@ -1604,15 +1686,22 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
 
     # Step 1: Preserve any manually curated fields from the previous VALIDATED_resources.csv.
     # howToAcquire is auto-computed every run (not preserved) so stale values never persist.
+    # Secondary index by (resourceName.lower(), resourceType.lower()) handles migration from
+    # the old RES{8hex} ID format to UUID5: old IDs don't match newly computed UUIDs, but
+    # the name+type secondary key allows curated values (e.g. rrid) to survive the transition.
     curated: dict[str, dict] = {}
+    curated_by_name: dict[tuple[str, str], dict] = {}
     if resources_file.exists():
         with open(resources_file, newline='', encoding='utf-8') as f:
             for row in csv.DictReader(f):
-                rid = row.get('resourceId', '').strip()
-                if rid:
-                    vals = {fld: row.get(fld, '').strip() for fld in CURATED_FIELDS}
-                    if any(vals.values()):
-                        curated[rid] = vals
+                rid   = row.get('resourceId', '').strip()
+                rname = row.get('resourceName', '').strip()
+                rtype = row.get('resourceType', '').strip()
+                vals  = {fld: row.get(fld, '').strip() for fld in CURATED_FIELDS}
+                if rid and any(vals.values()):
+                    curated[rid] = vals
+                if rname and rtype and any(vals.values()):
+                    curated_by_name[(rname.lower(), rtype.lower())] = vals
 
     # Step 2: Read every type-specific VALIDATED_*.csv as the primary source of truth.
     all_rows: list[dict] = []
@@ -1734,7 +1823,10 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         # Step 7: Assign stable resourceId; restore curated fields; fill schema columns.
         ttype_p = SINGULAR_TO_PLURAL.get(base.get('_toolType', '').strip(), 'cell_lines')
         norm_id = _normalize_tool_name(canonical, ttype_p)
-        rid     = _make_resource_id(norm_id, ttype_p)
+        # Use real Synapse UUID if known; otherwise generate a UUID5 local placeholder.
+        lk  = f"{ttype_p}:{norm_id}"
+        rid = ((synapse_ids.get(lk) if synapse_ids else None)
+               or _make_resource_id(norm_id, ttype_p))
         base['resourceId']   = rid
         base['resourceName'] = canonical
         base['resourceType'] = rtype
@@ -1746,9 +1838,12 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         if computed_hta:
             base['howToAcquire'] = computed_hta
 
-        # Restore manually curated fields from a prior run (curated values win).
-        if rid in curated:
-            for fld, val in curated[rid].items():
+        # Restore manually curated fields from a prior run.
+        # Primary: look up by current rid.
+        # Fallback: look up by (resourceName, resourceType) for migration from old ID format.
+        curated_vals = curated.get(rid) or curated_by_name.get((canonical.lower(), rtype.lower()))
+        if curated_vals:
+            for fld, val in curated_vals.items():
                 if val:
                     base[fld] = val
 
