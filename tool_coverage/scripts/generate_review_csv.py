@@ -842,7 +842,11 @@ _RESOURCES_FIELDNAMES: list[str] = [
     'resourceId', 'resourceName', 'resourceType',
     'synonyms', 'rrid', 'description', 'aiSummary',
     'usageRequirements', 'howToAcquire',
-    'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId', 'biobankId',
+    # Type-specific foreign-key IDs (only the column matching _toolType is populated).
+    'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId',
+    'patientDerivedModelId', 'advancedCellularModelId',
+    'computationalToolId', 'clinicalAssessmentToolId',
+    'biobankId',
     '_pmid', '_doi', '_publicationTitle', '_year', '_confidence', '_toolType',
 ]
 
@@ -1532,16 +1536,21 @@ def _make_pub_id(pmid: str) -> str:
 def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
     """Rebuild VALIDATED_resources.csv with Synapse syn26450069 schema.
 
-    Steps performed:
-    1. Read existing VALIDATED_resources.csv (post-filter) + any new SUBMIT_resources.csv.
-    2. Filter SUBMIT rows to only those whose tools passed post-filtering (kept_norm_names).
-    3. Strip trailing suffixes (' cells', ' cell line', ' PDX', ' mice', ' mouse') from
-       resourceName and apply _RES_CANONICAL_MAP to remap known synonyms to canonical forms.
-    4. Deduplicate by (resourceType, norm_key): merge _pmid/_doi/_publicationTitle/_year,
-       collect stripped variant names as synonyms.
-    5. Apply _RES_EXPLICIT_SYNONYMS for known canonical names.
-    6. Assign stable resourceId from canonical name + _toolType.
-    7. Write with _RESOURCES_FIELDNAMES column order.
+    Source of truth: all type-specific VALIDATED_*.csv files (freshly written by the
+    main pipeline loop).  Curated fields (rrid, description, etc.) from the previous
+    VALIDATED_resources.csv are preserved by resourceId lookup so manual edits survive
+    repeated pipeline runs.
+
+    Steps:
+    1. Load curated fields keyed by resourceId from the existing VALIDATED_resources.csv.
+    2. Read every type-specific VALIDATED_*.csv and emit one resource row per tool row,
+       setting the matching type-specific ID column (e.g. animalModelId) from the row's
+       own resourceId.
+    3. Also merge any SUBMIT_resources.csv rows (manual-submission escape hatch).
+    4. Strip trailing suffixes and apply _RES_CANONICAL_MAP.
+    5. Deduplicate by (resourceType, norm_key); merge publication fields and ID columns.
+    6. Populate synonyms (_RES_EXPLICIT_SYNONYMS + variant names collected during dedup).
+    7. Assign stable resourceId; restore curated fields; write with _RESOURCES_FIELDNAMES.
     """
     SINGULAR_TO_PLURAL = {
         'animal_model':             'animal_models',
@@ -1553,7 +1562,28 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
         'patient_derived_model':    'patient_derived_models',
         'clinical_assessment_tool': 'clinical_assessment_tools',
     }
-    CONCAT_FIELDS = ['_pmid', '_doi', '_publicationTitle', '_year']
+    TTYPE_TO_RESOURCE_TYPE = {
+        'animal_model':             'Animal Model',
+        'antibody':                 'Antibody',
+        'cell_line':                'Cell Line',
+        'genetic_reagent':          'Genetic Reagent',
+        'computational_tool':       'Computational Tool',
+        'advanced_cellular_model':  'Advanced Cellular Model',
+        'patient_derived_model':    'Patient-Derived Model',
+        'clinical_assessment_tool': 'Clinical Assessment Tool',
+    }
+    TTYPE_TO_ID_COL = {
+        'animal_model':             'animalModelId',
+        'antibody':                 'antibodyId',
+        'cell_line':                'cellLineId',
+        'genetic_reagent':          'geneticReagentId',
+        'patient_derived_model':    'patientDerivedModelId',
+        'advanced_cellular_model':  'advancedCellularModelId',
+        'computational_tool':       'computationalToolId',
+        'clinical_assessment_tool': 'clinicalAssessmentToolId',
+    }
+    CONCAT_FIELDS  = ['_pmid', '_doi', '_publicationTitle', '_year']
+    CURATED_FIELDS = ['rrid', 'description', 'aiSummary', 'usageRequirements', 'howToAcquire']
 
     def _strip_name(name: str, ttype_plural: str) -> str:
         """Strip RRID parentheticals (shared with _normalize_tool_name) and trailing suffixes."""
@@ -1566,14 +1596,51 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
     resources_file = output_path / 'VALIDATED_resources.csv'
     submit_file    = output_path / 'SUBMIT_resources.csv'
 
-    all_rows: list[dict] = []
-
-    # Load existing validated rows
+    # Step 1: Preserve any manually curated fields from the previous VALIDATED_resources.csv.
+    curated: dict[str, dict] = {}
     if resources_file.exists():
         with open(resources_file, newline='', encoding='utf-8') as f:
-            all_rows.extend(list(csv.DictReader(f)))
+            for row in csv.DictReader(f):
+                rid = row.get('resourceId', '').strip()
+                if rid:
+                    vals = {fld: row.get(fld, '').strip() for fld in CURATED_FIELDS}
+                    if any(vals.values()):
+                        curated[rid] = vals
 
-    # Merge new rows from SUBMIT_resources.csv (filtered by kept_norm_names)
+    # Step 2: Read every type-specific VALIDATED_*.csv as the primary source of truth.
+    all_rows: list[dict] = []
+    for ttype_singular, ttype_plural in SINGULAR_TO_PLURAL.items():
+        type_file = output_path / f'VALIDATED_{ttype_plural}.csv'
+        if not type_file.exists():
+            continue
+        with open(type_file, newline='', encoding='utf-8') as f:
+            type_rows = list(csv.DictReader(f))
+
+        name_col    = NAME_COLUMN.get(ttype_plural, '_toolName')
+        type_id_col = TTYPE_TO_ID_COL.get(ttype_singular, '')
+        rtype_label = TTYPE_TO_RESOURCE_TYPE.get(ttype_singular, ttype_singular)
+
+        for row in type_rows:
+            # _resourceName is already suffix-stripped by the main pipeline loop.
+            rname = row.get('_resourceName', '').strip()
+            if not rname:
+                rname = row.get(name_col, '').strip() or row.get('_toolName', '').strip()
+
+            resource_row: dict = {
+                'resourceName':       rname,
+                'resourceType':       rtype_label,
+                '_toolType':          ttype_singular,
+                '_pmid':              row.get('_pmid', ''),
+                '_doi':               row.get('_doi', ''),
+                '_publicationTitle':  row.get('_publicationTitle', ''),
+                '_year':              row.get('_year', ''),
+                '_confidence':        row.get('_confidence', ''),
+            }
+            if type_id_col:
+                resource_row[type_id_col] = row.get('resourceId', '')
+            all_rows.append(resource_row)
+
+    # Step 3: Merge SUBMIT_resources.csv (manual-submission escape hatch).
     if submit_file.exists():
         with open(submit_file, newline='', encoding='utf-8') as f:
             submit_rows = list(csv.DictReader(f))
@@ -1592,7 +1659,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
         print("  ⏭  VALIDATED_resources.csv: no rows — skipping rebuild")
         return
 
-    # Deduplicate by (resourceType, norm_key), applying suffix stripping + canonical map
+    # Steps 4-5: Deduplicate by (resourceType, norm_key).
     groups: dict = defaultdict(list)   # key → list of (canonical, stripped, row)
     syn_map: dict = defaultdict(set)   # (rtype, norm_key) → set of synonym names
 
@@ -1625,13 +1692,13 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
         canonical = items[0][0]
         base = dict(items[0][2])
 
-        # Collect synonyms from stripped variant names found across all merged rows
+        # Collect synonyms from stripped variant names found across all merged rows.
         syns: set = set(syn_map.get(key, set()))
         for can, stripped, _ in items:
             if stripped and stripped != canonical:
                 syns.add(stripped)
 
-        # Merge multi-publication fields
+        # Merge multi-publication fields and collect all type-specific ID columns.
         if len(items) > 1:
             for field in CONCAT_FIELDS:
                 seen: list = []
@@ -1643,37 +1710,55 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict) -> None:
                         seen_set.add(val)
                 base[field] = ' | '.join(seen)
 
-        # Add explicit synonyms for well-known canonical names
+            # Within a dedup group every row has the same type, so all id_col values
+            # should be identical; use setdefault to capture the first non-blank value.
+            for id_col in TTYPE_TO_ID_COL.values():
+                for _, _, r in items:
+                    val = r.get(id_col, '').strip()
+                    if val:
+                        base.setdefault(id_col, val)
+                        break
+
+        # Step 6: Apply explicit synonyms for well-known canonical names.
         for es in _RES_EXPLICIT_SYNONYMS.get(canonical, []):
             if es != canonical:
                 syns.add(es)
 
-        # Compute stable resourceId from canonical name + tool type
+        # Step 7: Assign stable resourceId; restore curated fields; fill schema columns.
         ttype_p = SINGULAR_TO_PLURAL.get(base.get('_toolType', '').strip(), 'cell_lines')
         norm_id = _normalize_tool_name(canonical, ttype_p)
-        base['resourceId']   = _make_resource_id(norm_id, ttype_p)
+        rid     = _make_resource_id(norm_id, ttype_p)
+        base['resourceId']   = rid
         base['resourceName'] = canonical
         base['resourceType'] = rtype
         base['synonyms']     = ', '.join(sorted(syns)) if syns else ''
 
-        # Ensure all schema columns are present (blank if new)
+        # Restore any manually curated fields from a prior run.
+        if rid in curated:
+            for fld, val in curated[rid].items():
+                if val:
+                    base[fld] = val
+
+        # Ensure all schema columns are present (blank if new).
         for col in _RESOURCES_FIELDNAMES:
             base.setdefault(col, '')
 
         merged.append(base)
 
-    # Sort by resourceType then resourceName for stable diffs
+    # Sort by resourceType then resourceName for stable diffs.
     merged.sort(key=lambda r: (r.get('resourceType', ''), r.get('resourceName', '').lower()))
 
-    n_orig = len(all_rows)
+    n_source = len(all_rows)
     with open(resources_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=_RESOURCES_FIELDNAMES, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(merged)
 
-    removed = n_orig - len(merged)
+    removed = n_source - len(merged)
     msg = f", {removed} deduplicated" if removed else ""
-    print(f"  ✅ VALIDATED_resources.csv: {len(merged)} rows{msg} (Synapse schema, synonyms populated)")
+    n_types = len(set(r.get('_toolType', '') for r in merged))
+    print(f"  ✅ VALIDATED_resources.csv: {len(merged)} rows across {n_types} tool types"
+          f"{msg} (Synapse schema, type IDs populated)")
 
 
 # ── Species inference for donor CSV ───────────────────────────────────────────
