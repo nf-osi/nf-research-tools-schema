@@ -254,7 +254,7 @@ def main():
     parser.add_argument('--cache-dir', default='tool_reviews/publication_cache',
                        help='Directory containing cache files')
     parser.add_argument('--validated-pubs-file',
-                       help='CSV file from post-filter step (e.g. ACCEPTED_publications.csv). '
+                       help='CSV file from post-filter step (e.g. VALIDATED_publications.csv). '
                             'If provided, only publications with a _pmid column value present in '
                             'this file will be considered for upgrade, reducing Phase 2 work.')
     parser.add_argument('--dry-run', action='store_true',
