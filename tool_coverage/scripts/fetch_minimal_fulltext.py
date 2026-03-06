@@ -317,23 +317,27 @@ def fetch_pmc_methods_section(pmid: str) -> Optional[Dict]:
                     text_parts.append(elem.tail)
             return ' '.join(text_parts)
 
-        # Find all <sec> elements in a single pass, collecting methods + acknowledgements
+        # Find sections in a single pass, collecting methods + acknowledgements.
+        # Acknowledgements may appear as <sec> with matching title OR as <ack>/<funding-group>
+        # JATS elements directly under <back> (not wrapped in <sec>).
         methods_text = []
         ack_text = []
-        for sec in root.iter():
-            if not sec.tag.endswith('sec'):
-                continue
-            title_elem = None
-            for child in sec:
-                if child.tag.endswith('title'):
-                    title_elem = child
-                    break
-            if title_elem is not None and title_elem.text:
-                title = title_elem.text.lower().strip()
-                if any(t in title for t in methods_titles):
-                    methods_text.append(_extract_section_text(sec))
-                elif any(t in title for t in ack_titles):
-                    ack_text.append(_extract_section_text(sec))
+        for elem in root.iter():
+            tag = elem.tag.split('}')[-1] if '}' in elem.tag else elem.tag  # strip namespace
+            if tag == 'sec':
+                title_elem = None
+                for child in elem:
+                    if (child.tag.split('}')[-1] if '}' in child.tag else child.tag) == 'title':
+                        title_elem = child
+                        break
+                if title_elem is not None and title_elem.text:
+                    title = title_elem.text.lower().strip()
+                    if any(t in title for t in methods_titles):
+                        methods_text.append(_extract_section_text(elem))
+                    elif any(t in title for t in ack_titles):
+                        ack_text.append(_extract_section_text(elem))
+            elif tag in ('ack', 'funding-group', 'funding-statement'):
+                ack_text.append(_extract_section_text(elem))
 
         if not methods_text and not ack_text:
             return None
