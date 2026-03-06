@@ -50,6 +50,7 @@ Usage:
 
 import csv
 import hashlib
+import json
 import os
 import re
 import sys
@@ -1609,6 +1610,70 @@ def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
 # as local placeholders distinct from Synapse-assigned UUIDs (v4/random).
 _PROJECT_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, 'https://nf.synapse.org/NF-research-tools')
 
+# Known NF research funders (from Synapse table syn26486830).
+_KNOWN_FUNDERS = [
+    {
+        'funderId': '55d4b7cf-3cd9-49ba-9f9e-e44b7f917330',
+        'aliases': ['Gilbert Family Foundation', 'GFF'],
+    },
+    {
+        'funderId': 'e57a7c37-49e9-4466-8f38-5226f3525460',
+        'aliases': ["Children's Tumor Foundation", 'CTF'],
+    },
+    {
+        'funderId': '57ded652-4826-4058-bfb6-1c61ac8bd357',
+        'aliases': ['Neurofibromatosis Therapeutic Acceleration Program', 'NTAP'],
+    },
+    {
+        'funderId': '0ba0958e-36c4-41f7-af13-7ea7fde0b7c9',
+        'aliases': ['National Cancer Institute', 'NCI', 'NIH-NCI'],
+    },
+    {
+        'funderId': '3ceffe3e-3897-4ea8-9188-49d8056a07f6',
+        'aliases': [
+            'Congressionally Directed Medical Research Programs', 'CDMRP',
+            'Neurofibromatosis Research Program', 'NFRP',
+            'Department of Defense', 'DoD',
+        ],
+    },
+]
+
+
+def _extract_funder_from_text(text: str) -> str:
+    """Return first matching funderId by scanning text for known funder aliases."""
+    if not text:
+        return ''
+    for funder in _KNOWN_FUNDERS:
+        for alias in funder['aliases']:
+            if re.search(r'\b' + re.escape(alias) + r'\b', text, re.IGNORECASE):
+                return funder['funderId']
+    return ''
+
+
+def _load_pub_cache(cache_dirs: list | None = None) -> dict:
+    """Load publication cache JSON files, returning {pmid_clean: data} dict."""
+    if cache_dirs is None:
+        cache_dirs = [
+            Path('tool_reviews/publication_cache'),
+            Path('tool_coverage/outputs/publication_cache'),
+        ]
+    pub_cache: dict = {}
+    for cache_dir in cache_dirs:
+        cache_dir = Path(cache_dir)
+        if not cache_dir.exists():
+            continue
+        for cache_file in cache_dir.glob('*_text.json'):
+            try:
+                with open(cache_file) as f:
+                    data = json.load(f)
+                pmid = data.get('pmid', '').replace('PMID:', '').strip()
+                if pmid:
+                    pub_cache[pmid] = data
+            except Exception:
+                continue
+    return pub_cache
+
+
 # Singular → plural tool-type name mapping (used by _load_synapse_ids).
 _TTYPE_SINGULAR_TO_PLURAL: dict[str, str] = {
     'animal_model':             'animal_models',
@@ -2328,6 +2393,9 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
     if pub_meta is None:
         pub_meta = _load_pub_meta(output_path)
 
+    # Load publication cache once for funder extraction (dev rows only)
+    _pub_cache = _load_pub_cache()
+
     # First pass: collect link rows
     usage_rows: list = []
     dev_rows: list = []
@@ -2358,7 +2426,14 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
         }
         if usage_type == 'Development':
             dev_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"development:{pmid}:{tool_name}:{tool_type}"))
-            dev_rows.append({**link_row, 'developmentId': dev_id, 'investigatorId': '', 'funderId': ''})
+            pmid_clean = pmid.replace('PMID:', '').strip()
+            pub_data = _pub_cache.get(pmid_clean, {})
+            funder_text = ' '.join(filter(None, [
+                pub_data.get('acknowledgements', ''),
+                pub_data.get('abstract', ''),
+            ]))
+            funder_id = _extract_funder_from_text(funder_text)
+            dev_rows.append({**link_row, 'developmentId': dev_id, 'investigatorId': '', 'funderId': funder_id})
             use_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"usage:{pmid}:{tool_name}:{tool_type}:dev"))
             usage_rows.append({**link_row, 'usageId': use_id})
         elif usage_type == 'Experimental Usage':
