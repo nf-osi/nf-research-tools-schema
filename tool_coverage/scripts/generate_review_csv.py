@@ -568,7 +568,7 @@ PUB_REVIEW_FIELDS = [
     # Tools already in Synapse Resource table (populated from resourceId lookup at upsert)
     'existing_tools',
     # Summary
-    'total_novel_tools', 'nf_specific_count', 'max_priority',
+    'total_novel_tools', 'nf_disorder_assigned', 'max_priority',
     # Per-tool publication cross-reference: "ToolName: PMID1 | PMID2; ..."
     'tool_usage_publications',
 ]
@@ -1275,7 +1275,7 @@ def _pivot_to_pub_centric(tool_rows: list, pub_meta: dict,
             row[col] = '; '.join(novel)
         row['existing_tools']    = '; '.join(existing_names)
         row['total_novel_tools'] = total
-        row['nf_specific_count'] = nf_count
+        row['nf_disorder_assigned'] = nf_count
         row['max_priority']      = (
             ['High', 'Medium', 'Low'][min(all_pris)] if all_pris else 'Low'
         )
