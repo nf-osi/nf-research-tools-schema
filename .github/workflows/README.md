@@ -34,11 +34,6 @@ Workflows are coordinated through **issue close triggers and PR merges**:
    ├─ Calculates tool completeness scores
    ├─ Uploads directly to Synapse
    └─ No PR created (direct upload)
-         ↓ (workflow_run trigger)
-
-5. update-observation-schema.yml
-   ├─ Updates observation schema from Synapse
-   └─ Creates PR only if changes detected
 ```
 
 ### Key Points
@@ -46,7 +41,7 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 - **Entry point**: `monthly-submission-check.yml` runs on the 1st of each month (9 AM UTC)
 - **publication-mining**: Triggers when monthly issue with label `tool-submissions` is closed
 - **upsert-tools**: Triggers on push to main with files in `submissions/*/accepted/`
-- **All other workflows**: Trigger on PR merge from previous step
+- **score-tools**: Triggers on PR merge with label `tool-submissions`
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
 - **Annotation review**: Embedded in the monthly issue workflow (not a separate weekly step)
 
@@ -146,25 +141,6 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 
 ---
 
-### 5. Update Observation Schema (update-observation-schema.yml)
-
-**Purpose**: Keep observation schema in sync with Synapse data
-
-**Trigger**:
-- When `score-tools` workflow completes (workflow_run)
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Queries syn51730943 for unique resourceType and resourceName values
-2. Compares with current SubmitObservationSchema.json
-3. If changes detected, updates schema and creates PR
-4. If no changes, workflow completes without PR
-
-**PR Labels**: `automated`, `schema-update`
-
-**Assignee**: BelindaBGarana
-
----
 
 ## 🔧 Supporting Workflows
 
@@ -272,7 +248,7 @@ All workflows can be manually triggered:
 1. monthly-submission-check (entry point) — or close an issue with `tool-submissions` label
 2. publication-mining triggers automatically → creates PR
 3. Review PR: move accepted JSONs to `submissions/{type}/accepted/`, merge → triggers upsert-tools
-4. Merge also triggers score-tools → completes → update-observation-schema runs automatically
+4. Merge also triggers score-tools
 
 ## 📊 Monitoring
 
@@ -289,7 +265,7 @@ Filter PRs by labels:
 - `annotation-submissions` - New cell lines from annotations
 - `tool-submissions` - Mined tools from publications (review + move to accepted/ before merging)
 
-- `schema-update` - Observation schema updates
+
 
 ## 🔍 Troubleshooting
 

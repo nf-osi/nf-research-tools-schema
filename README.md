@@ -45,7 +45,7 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 2. **publication-mining.yml** - Multi-query mining (bench + clinical) for ALL 9 tool types with AI validation
 
 4. **score-tools.yml** - Calculates tool completeness scores, uploads to Synapse
-5. **update-observation-schema.yml** - Updates observation schema from Synapse data
+
 
 **Supporting Workflows:**
 - **upsert-tools.yml** - Uploads validated tool data to Synapse (triggered by CSV files on main)

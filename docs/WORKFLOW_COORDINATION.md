@@ -22,8 +22,7 @@ graph TD
     F -->|push triggers| G[upsert-tools]
     F -->|merge triggers| H[score-tools]
     G -->|Uploads to Synapse| H
-    H -->|workflow_run| I[update-observation-schema]
-    I -->|Creates PR if changes| J[Final Review]
+    H -->|Uploads scores to Synapse| I[Done]
 ```
 
 ## Detailed Flow
@@ -83,17 +82,6 @@ Compiles accepted JSON submissions and uploads to Synapse tables.
 
 Calculates tool completeness scores and uploads to Synapse tables.
 
-**Next Step**: When workflow completes → triggers `update-observation-schema`
-
----
-
-### 5. Update Observation Schema
-**Workflow**: `update-observation-schema.yml`
-**Trigger**: `workflow_run` (after `score-tools` completes)
-**Creates PR**: Only if schema changes detected
-
-Updates observation schema with latest tool data from Synapse.
-
 **End of Chain**: Final step in the sequence
 
 ## Technical Implementation
@@ -145,7 +133,7 @@ jobs:
 | publication-mining | `tool-submissions` (issue closed) | `tool-submissions` |
 | upsert-tools | N/A (path trigger: `submissions/*/accepted/`) | N/A (no PR) |
 | score-tools | `tool-submissions` | N/A (no PR) |
-| update-observation-schema | N/A (workflow_run) | `schema-update` |
+
 
 ### submissions/{type}/ → submissions/{type}/accepted/ Review Flow
 
@@ -225,6 +213,7 @@ If a workflow doesn't trigger:
 1. **publication-mining**: Check that the issue has `tool-submissions` label and was closed
 2. **score-tools**: Check PR was merged (not just closed) and has `tool-submissions` label
 3. **Check workflow permissions** in Settings
+
 4. **Review Actions logs** for errors
 5. **Verify secrets** are configured correctly
 
