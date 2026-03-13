@@ -42,10 +42,10 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 1. **review-tool-annotations.yml** (Monday 9 AM UTC) - Analyzes individualID annotations, suggests new cell lines
 
 **Main Sequence (PR-merge triggered):**
-2. **check-tool-coverage.yml** - Multi-query mining (bench + clinical) for ALL 9 tool types with AI validation
-3. **link-tool-datasets.yml** - Links datasets to tools via publications
+2. **publication-mining.yml** - Multi-query mining (bench + clinical) for ALL 9 tool types with AI validation
+
 4. **score-tools.yml** - Calculates tool completeness scores, uploads to Synapse
-5. **update-observation-schema.yml** - Updates observation schema from Synapse data
+
 
 **Supporting Workflows:**
 - **upsert-tools.yml** - Uploads validated tool data to Synapse (triggered by CSV files on main)

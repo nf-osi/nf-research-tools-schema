@@ -112,6 +112,34 @@
         "Other"
       ]
     },
+    "transplantationType": {
+      "type": "string",
+      "title": "Transplantation Type",
+      "description": "If this model involves cell/tumor transplantation, specify the type.",
+      "enum": [
+        "",
+        "Allograft",
+        "Syngraft",
+        "Xenograft",
+        "Isograft",
+        "None"
+      ]
+    },
+    "animalState": {
+      "type": "string",
+      "title": "Animal State",
+      "enum": [
+        "",
+        "Alive",
+        "Deceased",
+        "Unknown"
+      ]
+    },
+    "generation": {
+      "type": "string",
+      "title": "Generation",
+      "description": "Filial generation (e.g. F0, F1, F2) or other generation descriptor."
+    },
     "alleleType": {
       "type": "string",
       "title": "Allele Type",
@@ -199,9 +227,17 @@
       "type": "string",
       "title": "Sequence Variation"
     },
-    "publicationDOI": {
+    "developmentPublicationDOI": {
       "type": "string",
-      "title": "Publication Link (DOI)"
+      "title": "Development Publication DOI (where tool was first described)"
+    },
+    "usagePublicationDOIs": {
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": {
+        "type": "string",
+        "title": "DOI"
+      }
     },
     "itemAcquisition": {
       "type": "string",

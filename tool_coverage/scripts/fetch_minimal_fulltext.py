@@ -239,10 +239,10 @@ def fetch_pubmed_metadata(pmid: str) -> Optional[Dict]:
         return None
 
 
-def fetch_pmc_methods_section(pmid: str) -> Optional[str]:
+def fetch_pmc_methods_section(pmid: str) -> Optional[Dict]:
     """
-    Fetch ONLY the methods section from PMC using official OAI-PMH API.
-    Returns None if PMC full text not available.
+    Fetch methods and acknowledgements sections from PMC using official OAI-PMH API.
+    Returns dict with 'methods' and 'acknowledgements' keys, or None if unavailable.
 
     Uses PMC OAI-PMH API as recommended by https://pmc.ncbi.nlm.nih.gov/tools/oai/
     """
@@ -297,45 +297,55 @@ def fetch_pmc_methods_section(pmid: str) -> Optional[str]:
         # Parse XML (namespace-aware)
         root = ET.fromstring(response.content)
 
-        # Common section titles for methods
+        # Section title sets to match
         methods_titles = [
             'methods', 'materials and methods', 'experimental procedures',
             'materials & methods', 'methodology', 'experimental methods',
             'methods and materials', 'materials', 'experimental design'
         ]
+        ack_titles = [
+            'acknowledgements', 'acknowledgments', 'acknowledgement',
+            'funding', 'funding information', 'funding sources',
+        ]
 
-        # Find all <sec> elements (works with or without namespaces)
+        def _extract_section_text(sec) -> str:
+            text_parts = []
+            for elem in sec.iter():
+                if elem.text:
+                    text_parts.append(elem.text)
+                if elem.tail:
+                    text_parts.append(elem.tail)
+            return ' '.join(text_parts)
+
+        # Find sections in a single pass, collecting methods + acknowledgements.
+        # Acknowledgements may appear as <sec> with matching title OR as <ack>/<funding-group>
+        # JATS elements directly under <back> (not wrapped in <sec>).
         methods_text = []
-        for sec in root.iter():
-            if not sec.tag.endswith('sec'):
-                continue
+        ack_text = []
+        for elem in root.iter():
+            tag = elem.tag.split('}')[-1] if '}' in elem.tag else elem.tag  # strip namespace
+            if tag == 'sec':
+                title_elem = None
+                for child in elem:
+                    if (child.tag.split('}')[-1] if '}' in child.tag else child.tag) == 'title':
+                        title_elem = child
+                        break
+                if title_elem is not None and title_elem.text:
+                    title = title_elem.text.lower().strip()
+                    if any(t in title for t in methods_titles):
+                        methods_text.append(_extract_section_text(elem))
+                    elif any(t in title for t in ack_titles):
+                        ack_text.append(_extract_section_text(elem))
+            elif tag in ('ack', 'funding-group', 'funding-statement'):
+                ack_text.append(_extract_section_text(elem))
 
-            # Find title element within this section
-            title_elem = None
-            for child in sec:
-                if child.tag.endswith('title'):
-                    title_elem = child
-                    break
+        if not methods_text and not ack_text:
+            return None
 
-            if title_elem is not None and title_elem.text:
-                title = title_elem.text.lower().strip()
-
-                # Check if this is a methods section
-                if any(methods_title in title for methods_title in methods_titles):
-                    # Extract all text from this section
-                    text_parts = []
-                    for elem in sec.iter():
-                        if elem.text:
-                            text_parts.append(elem.text)
-                        if elem.tail:
-                            text_parts.append(elem.tail)
-
-                    methods_text.append(' '.join(text_parts))
-
-        if methods_text:
-            return ' '.join(methods_text).strip()
-
-        return None
+        return {
+            'methods': ' '.join(methods_text).strip(),
+            'acknowledgements': ' '.join(ack_text).strip(),
+        }
 
     except Exception as e:
         logger.debug(f"Could not fetch PMC methods for PMID:{pmid}: {e}")
@@ -364,9 +374,11 @@ def create_minimal_cache(pmid: str, output_dir: Path) -> Dict:
 
     # Try to fetch methods from PMC
     logger.info(f"  Attempting PMC methods fetch for PMID:{pmid_clean}")
-    methods = fetch_pmc_methods_section(pmid_clean)
+    pmc_result = fetch_pmc_methods_section(pmid_clean)
 
-    has_fulltext = bool(methods)
+    methods_text = pmc_result['methods'] if pmc_result else ''
+    ack_text = pmc_result['acknowledgements'] if pmc_result else ''
+    has_fulltext = bool(methods_text or ack_text)
     cache_level = 'minimal' if has_fulltext else 'abstract_only'
 
     cache_data = {
@@ -377,7 +389,8 @@ def create_minimal_cache(pmid: str, output_dir: Path) -> Dict:
         'journal': metadata['journal'],
         'publicationDate': metadata['publicationDate'],
         'doi': metadata['doi'],
-        'methods': methods if methods else '',
+        'methods': methods_text,
+        'acknowledgements': ack_text,
         'cache_level': cache_level,
         'has_fulltext': has_fulltext,
         'fetch_date': time.strftime('%Y-%m-%d %H:%M:%S')
@@ -390,7 +403,7 @@ def create_minimal_cache(pmid: str, output_dir: Path) -> Dict:
 
     author_count = len(metadata['authors'].split('; ')) if metadata['authors'] else 0
     logger.info(f"  ✓ Cached as '{cache_level}' ({len(metadata['abstract'])} chars abstract, "
-                f"{len(methods) if methods else 0} chars methods, {author_count} authors)")
+                f"{len(methods_text)} chars methods, {len(ack_text)} chars acknowledgements, {author_count} authors)")
 
     return cache_data
 
@@ -489,9 +502,11 @@ def main():
                 else:
                     # Fetch methods from PMC (individual requests)
                     logger.info(f"    Attempting PMC methods fetch...")
-                    methods = fetch_pmc_methods_section(pmid_clean)
+                    pmc_result = fetch_pmc_methods_section(pmid_clean)
 
-                    has_fulltext = bool(methods)
+                    methods_text = pmc_result['methods'] if pmc_result else ''
+                    ack_text = pmc_result['acknowledgements'] if pmc_result else ''
+                    has_fulltext = bool(methods_text or ack_text)
                     cache_level = 'minimal' if has_fulltext else 'abstract_only'
 
                     cache_data = {
@@ -502,7 +517,8 @@ def main():
                         'journal': metadata['journal'],
                         'publicationDate': metadata['publicationDate'],
                         'doi': metadata['doi'],
-                        'methods': methods if methods else '',
+                        'methods': methods_text,
+                        'acknowledgements': ack_text,
                         'cache_level': cache_level,
                         'has_fulltext': has_fulltext,
                         'fetch_date': time.strftime('%Y-%m-%d %H:%M:%S')
@@ -514,7 +530,7 @@ def main():
 
                     author_count = len(metadata['authors'].split('; ')) if metadata['authors'] else 0
                     logger.info(f"    ✓ Cached as '{cache_level}' ({len(metadata['abstract'])} chars abstract, "
-                                f"{len(methods) if methods else 0} chars methods, {author_count} authors)")
+                                f"{len(methods_text)} chars methods, {len(ack_text)} chars acknowledgements, {author_count} authors)")
 
                 # Save to cache
                 cache_file = output_dir / f"{pmid_clean}_text.json"

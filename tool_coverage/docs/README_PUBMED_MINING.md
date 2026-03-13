@@ -143,7 +143,7 @@ The script respects NCBI E-utilities guidelines:
 ## Related Workflows
 
 1. **This workflow** - Mine PubMed for NF publications (#97 Step 1)
-2. **check-tool-coverage.yml** - Mine existing publications for tools (#92)
+2. **publication-mining.yml** - Mine existing publications for tools (#92)
 3. **upsert-tools.yml** - Upload discovered tools to Synapse
 
 ## References
