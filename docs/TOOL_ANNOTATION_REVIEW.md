@@ -112,7 +112,7 @@ The system assumes all `individualID` values refer to cell lines. This is becaus
          ↓ (issue closed by reviewer)
 2. publication-mining → Mines NF Portal + PubMed for tools
          ↓ (PR merged)
-3. link-tool-datasets → Links tools to datasets
+3. upsert-tools → Uploads accepted tools to Synapse
          ↓ ...
 ```
 

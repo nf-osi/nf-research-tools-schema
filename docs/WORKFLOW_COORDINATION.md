@@ -6,7 +6,7 @@ The automated workflows in this repository run in a coordinated sequence. The mo
 
 - ✅ Human review gates between steps
 - ✅ Annotation review embedded in monthly workflow (no separate weekly run)
-- ✅ Unified `submissions/` → `submissions/accepted/` review flow for all tool sources
+- ✅ Unified `submissions/{type}/` → `submissions/{type}/accepted/` review flow for all tool sources
 - ✅ Clear audit trail of changes
 
 ## Workflow Sequence
@@ -18,12 +18,12 @@ graph TD
     B -->|No| D[Create monthly issue<br/>label: tool-submissions]
     C --> D
     D -->|Reviewer closes issue| E[publication-mining]
-    E -->|Creates PR| F[PR Review & Merge<br/>move submissions/ → submissions/accepted/]
-    F -->|Triggers| G[link-tool-datasets]
-    G -->|Creates PR| H[PR Review & Merge]
-    H -->|Triggers| I[score-tools]
-    I -->|workflow_run| J[update-observation-schema]
-    J -->|Creates PR if changes| K[Final Review]
+    E -->|Creates PR| F[PR Review & Merge<br/>move submissions/{type}/ → submissions/{type}/accepted/]
+    F -->|push triggers| G[upsert-tools]
+    F -->|merge triggers| H[score-tools]
+    G -->|Uploads to Synapse| H
+    H -->|workflow_run| I[update-observation-schema]
+    I -->|Creates PR if changes| J[Final Review]
 ```
 
 ## Detailed Flow
@@ -43,7 +43,7 @@ graph TD
 **Manual Action Required**:
 - Review the annotation PR: confirm cell line names are real NF-relevant cell lines
 - Check Formspark dashboard for new form submissions; process with `process_formspark_export.py`
-- Move accepted files: `git mv submissions/{type}/*.json submissions/accepted/{type}/`
+- Move accepted files: `git mv submissions/{type}/*.json submissions/{type}/accepted/`
 - Close the monthly issue when done (triggers next step)
 
 **Next Step**: Closing the monthly issue → triggers `publication-mining`
@@ -53,7 +53,7 @@ graph TD
 ### 2. Publication Mining
 **Workflow**: `publication-mining.yml`
 **Trigger**: Monthly issue closed with label `tool-submissions`
-**Creates PR**: Yes (label: `automated-mining`)
+**Creates PR**: Yes (label: `tool-submissions`)
 
 Mines NF Portal and PubMed publications for novel tools:
 - Filters for research-focused publications (excludes clinical case reports, reviews)
@@ -61,25 +61,24 @@ Mines NF Portal and PubMed publications for novel tools:
 - Maintains cache of reviewed publications for incremental processing
 - Validates findings with AI (optional)
 - Formats mined tools as JSON in `submissions/{type}/`
+- Extracts observations into `submissions/{type}/observations/`
 
-**Next Step**: When PR is merged (after reviewer moves accepted files to `submissions/accepted/`) → triggers `upsert-tools.yml`, then `link-tool-datasets`
+**Next Step**: Reviewer moves accepted files to `submissions/{type}/accepted/`, then merges PR → triggers `upsert-tools` (via push) and `score-tools` (via PR merge)
 
 ---
 
-### 3. Link Tool Datasets
-**Workflow**: `link-tool-datasets.yml`
-**Trigger**: PR merge with label `automated-mining`
-**Creates PR**: Yes (label: `dataset-linking`)
+### 3. Upsert Tools to Synapse
+**Workflow**: `upsert-tools.yml`
+**Trigger**: Push to main with files in `submissions/*/accepted/`
+**Creates PR**: No (uploads directly to Synapse)
 
-Links datasets to tools via publication relationships.
-
-**Next Step**: When PR is merged → triggers `score-tools`
+Compiles accepted JSON submissions and uploads to Synapse tables.
 
 ---
 
 ### 4. Calculate Completeness Scores
 **Workflow**: `score-tools.yml`
-**Trigger**: PR merge with label `dataset-linking`
+**Trigger**: PR merge with label `tool-submissions`
 **Creates PR**: No (uploads directly to Synapse)
 
 Calculates tool completeness scores and uploads to Synapse tables.
@@ -110,14 +109,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-coverage:
+  mine-publications:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issues' &&
        contains(github.event.issue.labels.*.name, 'tool-submissions'))
 ```
 
-### PR Merge Triggers (link-tool-datasets, score-tools)
+### PR Merge Triggers (score-tools)
 
 Later workflows use this pattern:
 
@@ -143,12 +142,12 @@ jobs:
 | Workflow | Checks for Label | Creates issue/PR with Label |
 |----------|-----------------|----------------------|
 | monthly-submission-check | N/A (entry point - scheduled) | `tool-submissions` (issue), `annotation-submissions` (PR if new cells) |
-| publication-mining | `tool-submissions` (issue closed) | `automated-mining` |
-| link-tool-datasets | `automated-mining` | `dataset-linking` |
-| score-tools | `dataset-linking` | N/A (no PR) |
+| publication-mining | `tool-submissions` (issue closed) | `tool-submissions` |
+| upsert-tools | N/A (path trigger: `submissions/*/accepted/`) | N/A (no PR) |
+| score-tools | `tool-submissions` | N/A (no PR) |
 | update-observation-schema | N/A (workflow_run) | `schema-update` |
 
-### submissions/ → submissions/accepted/ Review Flow
+### submissions/{type}/ → submissions/{type}/accepted/ Review Flow
 
 All tool sources (mining, form submissions, annotation review) produce JSON files in `submissions/{type}/`:
 
@@ -158,17 +157,17 @@ submissions/
     annotation_NF90-8.json        ← from annotation review
     form_abc123_NF90-8.json       ← from Formspark export
     pmid12345678_NF90-8.json      ← from publication mining
-  animal_models/
-  antibodies/
-  ...
-  accepted/                       ← reviewer moves files here
-    cell_lines/
+    accepted/                     ← reviewer moves files here
       annotation_NF90-8.json
-    ...
+    observations/                 ← per-tool observations (read-only, from mining)
+  animal_models/
+    accepted/
+    observations/
+  ...
 ```
 
-When `submissions/accepted/**/*.json` is pushed to main, `upsert-tools.yml` triggers:
-1. Compiles `submissions/accepted/**/*.json` → appends new rows to `ACCEPTED_*.csv`
+When `submissions/*/accepted/**/*.json` is pushed to main, `upsert-tools.yml` triggers:
+1. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv`
 2. Validates CSV schemas
 3. Uploads to Synapse tables
 
@@ -184,22 +183,22 @@ All workflows support manual triggers via `workflow_dispatch`:
 
 2. **Review annotation PR** (if created)
    - Confirm cell line names are real NF-relevant cell lines
-   - Move valid files to `submissions/accepted/cell_lines/` or delete if not a cell line
+   - Move valid files to `submissions/cell_lines/accepted/` or delete if not a cell line
 
 3. **Review Formspark submissions**
    - Export from dashboard → run `process_formspark_export.py`
-   - Move accepted files to `submissions/accepted/{type}/`
+   - Move accepted files to `submissions/{type}/accepted/`
 
 4. **Close the monthly issue**
    - Triggers `publication-mining` automatically
 
 5. **Automatic**: `publication-mining` runs
    - Mines NF Portal and PubMed publications
-   - Creates PR with mined tools in `submissions/`
+   - Creates PR with mined tools in `submissions/{type}/`
 
 6. **Review & merge PR**
-   - Move accepted tools from `submissions/` → `submissions/accepted/`
-   - Merging triggers `link-tool-datasets`
+   - Move accepted tools from `submissions/{type}/` → `submissions/{type}/accepted/`
+   - Merging triggers `upsert-tools` (path-based) and `score-tools` (label-based)
 
 7. Continue through remaining workflows
 
@@ -224,7 +223,7 @@ All workflows support manual triggers via `workflow_dispatch`:
 If a workflow doesn't trigger:
 
 1. **publication-mining**: Check that the issue has `tool-submissions` label and was closed
-2. **link-tool-datasets, score-tools**: Check PR was merged (not just closed) and has correct label
+2. **score-tools**: Check PR was merged (not just closed) and has `tool-submissions` label
 3. **Check workflow permissions** in Settings
 4. **Review Actions logs** for errors
 5. **Verify secrets** are configured correctly
@@ -235,7 +234,7 @@ If a workflow doesn't trigger:
 
 1. **Annotation review**: Verify cell line names are real, NF-relevant (not sample IDs or typos)
 2. **Formspark submissions**: Check for new submissions before closing the monthly issue
-3. **Mining PR**: Inspect `submissions/` JSON files — move valid tools to `submissions/accepted/`, delete rejects
+3. **Mining PR**: Inspect `submissions/{type}/` JSON files — move valid tools to `submissions/{type}/accepted/`, delete rejects
 4. **Look for anomalies** in suggested values
 5. **Read workflow logs** if something looks wrong
 

@@ -10,8 +10,8 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 1. monthly-submission-check.yml (1st of each month, 9 AM UTC)
    ├─ Runs annotation review (new cell lines from individualID annotations)
    ├─ Creates annotation PR if new cell lines found
-   └─ Creates monthly issue (Formspark checklist + annotation results)
-         ↓ (when issue is closed)
+   └─ Creates monthly issue with label: tool-submissions
+         ↓ (when issue with label tool-submissions is closed)
 
 2. publication-mining.yml
    ├─ Mines NF Portal + PubMed publications for tools
@@ -19,14 +19,16 @@ Workflows are coordinated through **issue close triggers and PR merges**:
    ├─ Fetches minimal cache (Phase 1) and upgrades for high-confidence tools (Phase 2)
    ├─ AI validation with Sonnet (direct API, 4 parallel workers)
    ├─ Extracts observations for high-confidence tools (Phase 2)
-   ├─ Formats mined tools as JSON in submissions/
-   └─ Creates PR with label: automated-mining
-         ↓ (when PR merged)
+   ├─ Formats mined tools as JSON in submissions/{type}/
+   └─ Creates PR with label: tool-submissions
+         ↓ (reviewer moves accepted files to submissions/{type}/accepted/, then merges PR)
 
-3. link-tool-datasets.yml
-   ├─ Links datasets to tool publications
-   └─ Creates PR with label: dataset-linking
-         ↓ (when PR merged)
+3. upsert-tools.yml
+   ├─ Compiles submissions/{type}/accepted/**/*.json → ACCEPTED_*.csv
+   ├─ Validates CSV schemas
+   ├─ Uploads to Synapse tables (animal models, antibodies, cell lines, etc.)
+   └─ No PR created (uploads directly to Synapse)
+         ↓ (when PR from step 2 is merged, label: tool-submissions)
 
 4. score-tools.yml
    ├─ Calculates tool completeness scores
@@ -42,7 +44,8 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 ### Key Points
 
 - **Entry point**: `monthly-submission-check.yml` runs on the 1st of each month (9 AM UTC)
-- **publication-mining**: Triggers when monthly issue is closed (label: `tool-submissions`)
+- **publication-mining**: Triggers when monthly issue with label `tool-submissions` is closed
+- **upsert-tools**: Triggers on push to main with files in `submissions/*/accepted/`
 - **All other workflows**: Trigger on PR merge from previous step
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
 - **Annotation review**: Embedded in the monthly issue workflow (not a separate weekly step)
@@ -117,33 +120,11 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 - `tool_reviews/publication_cache/` — cached publication text
 - Artifacts: `tool-coverage-reports` (30-day), `tool-coverage-pre-validation` (7-day)
 
-**PR Labels**: `automated-mining`, `tool-coverage`
+**PR Labels**: `tool-submissions`
 
 **Assignee**: BelindaBGarana
 
 **Documentation**: See [`tool_coverage/README.md`](../../tool_coverage/README.md)
-
----
-
-### 3. Link Tool Datasets (link-tool-datasets.yml)
-
-**Purpose**: Link datasets to tools via publication relationships
-
-**Trigger**:
-- When PR from `publication-mining` is merged
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Queries NF Portal publications linked to tools
-2. Finds datasets associated with those publications
-3. Creates tool-dataset linkage CSV
-4. Generates PR if new linkages found
-
-**PR Labels**: `automated`, `dataset-linking`
-
-**Assignee**: BelindaBGarana
-
-**Documentation**: See [`tool_coverage/docs/Dataset-tool_linking_README.md`](../../tool_coverage/docs/Dataset-tool_linking_README.md)
 
 ---
 
@@ -152,7 +133,7 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 **Purpose**: Calculate and upload tool completeness scores
 
 **Trigger**:
-- When PR from `link-tool-datasets` is merged
+- When PR with label `tool-submissions` is merged to main
 - Manual: workflow_dispatch
 
 **What it does**:
@@ -189,30 +170,31 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 
 These workflows support the main sequence but run independently:
 
-### Upsert Tools to Synapse (upsert-tools.yml)
+### 3. Upsert Tools to Synapse (upsert-tools.yml)
 
-**Purpose**: Automatically compile accepted JSON submissions and upload to Synapse
+**Purpose**: Compile accepted JSON submissions and upload to Synapse
 
 **Trigger**:
-- When `submissions/accepted/**/*.json` or `ACCEPTED_*.csv` files are pushed to main
+- When `submissions/*/accepted/**/*.json` files are pushed to main (i.e. when a tool-submissions PR is merged)
 - Manual: workflow_dispatch with optional dry-run
 
 **What it does**:
-1. Compiles `submissions/accepted/**/*.json` → `ACCEPTED_*.csv` (appends new rows, deduplicates)
-2. Validates CSV schemas
-3. Cleans tracking columns (prefixed with `_`)
-4. Uploads to corresponding Synapse tables:
+1. Diffs changed files — only processes JSON files that changed in the push (diff-based compile)
+2. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv`
+3. Validates CSV schemas
+4. Cleans tracking columns (prefixed with `_`)
+5. Uploads to corresponding Synapse tables:
    - syn26486808 (animal models)
    - syn26486811 (antibodies)
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
    - syn26450069 (resources)
-5. Regenerates coverage report
+6. Regenerates coverage report
 
 **Review flow**:
-- Mined tools and form submissions are written as JSON to `submissions/{type}/`
-- Reviewer moves accepted files: `git mv submissions/{type}/file.json submissions/accepted/{type}/`
-- PR merge triggers this workflow to compile and upload
+- Mined tools are written as JSON to `submissions/{type}/`
+- Reviewer moves accepted files: `git mv submissions/{type}/file.json submissions/{type}/accepted/`
+- Merging the PR pushes `*/accepted/*.json` to main → triggers this workflow
 
 **No PR Created**: Uploads directly, creates summary in Actions
 
@@ -287,11 +269,10 @@ All workflows can be manually triggered:
 5. Click **Run workflow**
 
 **Testing Order** (if running entire chain manually):
-1. monthly-submission-check (entry point) — or just close an issue with `tool-submissions` label
-2. publication-mining triggers automatically
-3. Review & merge PR → triggers link-tool-datasets
-4. Review & merge PR → triggers score-tools
-5. Automatically runs → update-observation-schema
+1. monthly-submission-check (entry point) — or close an issue with `tool-submissions` label
+2. publication-mining triggers automatically → creates PR
+3. Review PR: move accepted JSONs to `submissions/{type}/accepted/`, merge → triggers upsert-tools
+4. Merge also triggers score-tools → completes → update-observation-schema runs automatically
 
 ## 📊 Monitoring
 
@@ -306,8 +287,8 @@ All workflows can be manually triggered:
 
 Filter PRs by labels:
 - `annotation-submissions` - New cell lines from annotations
-- `automated-mining` - Novel tools from publications
-- `dataset-linking` - Dataset-tool linkages
+- `tool-submissions` - Mined tools from publications (review + move to accepted/ before merging)
+
 - `schema-update` - Observation schema updates
 
 ## 🔍 Troubleshooting

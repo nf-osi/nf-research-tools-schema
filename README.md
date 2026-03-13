@@ -43,7 +43,7 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 
 **Main Sequence (PR-merge triggered):**
 2. **publication-mining.yml** - Multi-query mining (bench + clinical) for ALL 9 tool types with AI validation
-3. **link-tool-datasets.yml** - Links datasets to tools via publications
+
 4. **score-tools.yml** - Calculates tool completeness scores, uploads to Synapse
 5. **update-observation-schema.yml** - Updates observation schema from Synapse data
 
