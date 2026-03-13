@@ -551,56 +551,56 @@ def enrich_all_tool_types():
     tool_configs = [
         {
             'name': 'Cell Lines',
-            'file': 'tool_coverage/outputs/VALIDATED_cell_lines.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_cell_lines.csv',
             'name_col': '_cellLineName',
             'extractor': extract_cell_line_metadata_from_text,
             'use_observations': True
         },
         {
             'name': 'Animal Models',
-            'file': 'tool_coverage/outputs/VALIDATED_animal_models.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_animal_models.csv',
             'name_col': 'strainNomenclature',
             'extractor': extract_animal_model_metadata_from_text,
             'use_observations': True
         },
         {
             'name': 'Genetic Reagents',
-            'file': 'tool_coverage/outputs/VALIDATED_genetic_reagents.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_genetic_reagents.csv',
             'name_col': 'insertName',
             'extractor': extract_genetic_reagent_metadata_from_text,
             'use_observations': True
         },
         {
             'name': 'Antibodies',
-            'file': 'tool_coverage/outputs/VALIDATED_antibodies.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_antibodies.csv',
             'name_col': 'targetAntigen',
             'extractor': extract_antibody_metadata_from_text,
             'use_observations': True
         },
         {
             'name': 'Computational Tools',
-            'file': 'tool_coverage/outputs/VALIDATED_computational_tools.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_computational_tools.csv',
             'name_col': 'softwareName',
             'extractor': extract_computational_tool_metadata,
             'use_observations': False
         },
         {
             'name': 'Patient-Derived Models',
-            'file': 'tool_coverage/outputs/VALIDATED_patient_derived_models.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_patient_derived_models.csv',
             'name_col': '_modelName',
             'extractor': extract_patient_derived_model_metadata,
             'use_observations': False
         },
         {
             'name': 'Advanced Cellular Models',
-            'file': 'tool_coverage/outputs/VALIDATED_advanced_cellular_models.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_advanced_cellular_models.csv',
             'name_col': '_modelName',
             'extractor': extract_advanced_cellular_model_metadata,
             'use_observations': False
         },
         {
             'name': 'Clinical Assessment Tools',
-            'file': 'tool_coverage/outputs/VALIDATED_clinical_assessment_tools.csv',
+            'file': 'tool_coverage/outputs/ACCEPTED_clinical_assessment_tools.csv',
             'name_col': 'assessmentName',
             'extractor': extract_clinical_assessment_metadata,
             'use_observations': False
@@ -684,7 +684,7 @@ def enrich_all_tool_types():
     print("✅ METADATA ENRICHMENT COMPLETE")
     print("=" * 80)
     print(f"\nTotal fields enriched across all tool types: {total_enriched_all}")
-    print("All VALIDATED_*.csv files have been updated with extracted metadata")
+    print("All ACCEPTED_*.csv files have been updated with extracted metadata")
 
 
 if __name__ == '__main__':
