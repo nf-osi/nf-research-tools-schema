@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files for Synapse upsert.
+Compile submissions/accepted/**/*.json into ACCEPTED_*.csv files for Synapse upsert.
 
-Run by upsert-tools.yml after JSON files have been moved from submissions/{type}/ to
-submissions/{type}/accepted/. New rows are appended to existing ACCEPTED_*.csv files,
-deduplicating by _resourceName so re-running is safe.
+Run by upsert-tools.yml after JSON files have been moved from submissions/ to submissions/accepted/.
+New rows are appended to existing ACCEPTED_*.csv files, deduplicating by _resourceName
+so re-running is safe.
 
 Usage:
-    python compile_accepted_submissions.py [--accepted-dir submissions]
+    python compile_accepted_submissions.py [--accepted-dir submissions/accepted]
                                            [--csv-dir tool_coverage/outputs]
                                            [--dry-run]
 """
@@ -22,7 +22,7 @@ from pathlib import Path
 # so form submissions and mined tools produce identical CSV rows.
 
 CSV_DIR_DEFAULT = Path("tool_coverage/outputs")
-ACCEPTED_DIR_DEFAULT = Path("submissions")
+ACCEPTED_DIR_DEFAULT = Path("submissions/accepted")
 
 # ---------------------------------------------------------------------------
 # Column definitions (must match ACCEPTED_*.csv headers exactly)
@@ -80,7 +80,7 @@ COLUMNS = {
     ],
     "advanced_cellular_models": [
         "advancedCellularModelId", "modelType", "derivationSource", "cellTypes",
-        "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
+        "organoidType", "matrixType", "cultureSystem", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -178,11 +178,11 @@ def _tool_type_from_json(data: dict) -> str | None:
     checks = [
         ("cell_line",              ["basicInfo.cellLineName", "cellLineGeneticDisorder"]),
         ("antibody",               ["basicInfo.antibodyName", "targetAntigen"]),
-        ("animal_model",           ["basicInfo.animalModelName", "animalModelGeneticDisorder"]),
+        ("animal_model",           ["basicInfo.animalModelName", "animalModelDisease"]),
         ("genetic_reagent",        ["insertName", "vectorType"]),
-        ("patient_derived_model",  ["basicInfo.resourceName", "basicInfo.modelSystemType"]),
+        ("patient_derived_model",  ["basicInfo.modelName", "basicInfo.modelSystemType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareType"]),
-        ("advanced_cellular_model",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
+        ("advanced_cellular_model",["basicInfo.modelType", "basicInfo.derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "basicInfo.assessmentType"]),
         ("observation",            ["resourceType", "observationType"]),
     ]
@@ -200,16 +200,16 @@ def _build_cell_line(d: dict) -> dict:
     tissue = _get(d, "tissue")
     return {
         "cellLineId": "",
-        "organ": _get(d, "organ"),
+        "organ": "",
         "tissue": tissue,
         "cellLineManifestation": _get(d, "cellLineManifestation"),
         "cellLineGeneticDisorder": _get(d, "cellLineGeneticDisorder"),
         "cellLineCategory": _get(d, "category", "cellLineCategory"),
         "donorId": "",
-        "originYear": _get(d, "originYear"),
-        "strProfile": _get(d, "strProfile"),
-        "resistance": _get(d, "resistance"),
-        "contaminatedMisidentified": _get(d, "contaminatedMisidentified"),
+        "originYear": "",
+        "strProfile": "",
+        "resistance": "",
+        "contaminatedMisidentified": "",
         "populationDoublingTime": _get(d, "populationDoublingTime"),
         "cultureMedia": _get(d, "cultureMedia"),
         "_resourceName": _get(d, "basicInfo.cellLineName", "cellLineName"),
@@ -227,7 +227,7 @@ def _build_cell_line(d: dict) -> dict:
 
 def _build_antibody(d: dict) -> dict:
     reactive = _get(d, "basicInfo.reactiveSpecies", "reactiveSpecies")
-    conj_raw = _get(d, "conjugate")
+    conj_raw = _get(d, "conjugated")
     return {
         "antibodyId": "",
         "targetAntigen": _get(d, "targetAntigen"),
@@ -250,14 +250,14 @@ def _build_antibody(d: dict) -> dict:
 
 
 def _build_animal_model(d: dict) -> dict:
-    disease_raw = _get(d, "animalModelGeneticDisorder")
+    disease_raw = _get(d, "animalModelDisease")
     return {
         "animalModelId": "",
         "strainNomenclature": _get(d, "strainNomenclature"),
         "backgroundStrain": _get(d, "backgroundStrain"),
         "backgroundSubstrain": _get(d, "backgroundSubstrain"),
         "animalModelGeneticDisorder": _DISEASE_MAP.get(disease_raw, disease_raw),
-        "animalModelOfManifestation": _get(d, "animalModelOfManifestation"),
+        "animalModelOfManifestation": _get(d, "animalModelManifestation"),
         "transplantationType": _get(d, "transplantationType"),
         "animalState": _get(d, "animalState"),
         "generation": _get(d, "generation"),
@@ -332,7 +332,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "humanizationMethod": _get(bi, "humanizationMethod"),
         "immuneSystemComponents": _fmt_list(_get(bi, "immuneSystemComponents")),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
-        "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
+        "_resourceName": _get(bi, "modelName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -341,7 +341,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
         "_usageType": _get(d, "_usageType", default="novel"),
-        "_toolName": _get(bi, "resourceName") or _get(d, "_resourceName"),
+        "_toolName": _get(bi, "modelName") or _get(d, "_resourceName"),
     }
 
 
@@ -383,13 +383,12 @@ def _build_advanced_cellular_model(d: dict) -> dict:
         "organoidType": _get(bi, "organoidType"),
         "matrixType": _get(bi, "matrixType"),
         "cultureSystem": _get(bi, "cultureSystem"),
-        "cultureMedia": _get(bi, "cultureMedia"),
         "maturationTime": _get(bi, "maturationTime"),
         "characterizationMethods": _fmt_list(_get(bi, "characterizationMethods")),
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _get(bi, "qualityControlMetrics"),
-        "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
+        "_resourceName": _get(bi, "modelName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -398,7 +397,7 @@ def _build_advanced_cellular_model(d: dict) -> dict:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
         "_usageType": _get(d, "_usageType", default="novel"),
-        "_toolName": _get(bi, "resourceName") or _get(d, "_resourceName"),
+        "_toolName": _get(bi, "modelName") or _get(d, "_resourceName"),
     }
 
 
@@ -606,12 +605,12 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files."
+        description="Compile submissions/accepted/**/*.json into ACCEPTED_*.csv files."
     )
     parser.add_argument(
         "--accepted-dir", type=Path, default=ACCEPTED_DIR_DEFAULT,
-        help="Root submissions directory to scan for */accepted/**/*.json files "
-             "(default: submissions/). Ignored when --files-list is provided.",
+        help="Directory to scan for accepted JSON files (default: submissions/accepted/). "
+             "Ignored when --files-list is provided.",
     )
     parser.add_argument(
         "--files-list", type=Path, default=None,
@@ -643,9 +642,9 @@ def main():
             json_files = [p for p in json_files if p.exists()]
     else:
         if not args.accepted_dir.exists():
-            print(f"No submissions directory found at {args.accepted_dir} — nothing to compile")
+            print(f"No accepted directory found at {args.accepted_dir} — nothing to compile")
             sys.exit(0)
-        json_files = sorted(args.accepted_dir.glob("*/accepted/**/*.json"))
+        json_files = sorted(args.accepted_dir.rglob("*.json"))
 
     compile_accepted(json_files, args.csv_dir, args.dry_run)
 

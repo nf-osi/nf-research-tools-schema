@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Post-process VALIDATED_*.csv outputs to apply quality filters and generate outputs.
+Post-process ACCEPTED_*.csv outputs to apply quality filters and generate outputs.
 
 Filters applied (beyond AI verdict):
   All tool types:
@@ -36,11 +36,11 @@ Filters applied (beyond AI verdict):
     - Trailing ' cells' / ' cell line' stripped from _resourceName
 
 Outputs:
-  - Updated VALIDATED_*.csv: deduplicated (1 row per unique tool, synonyms merged),
+  - Updated ACCEPTED_*.csv: deduplicated (1 row per unique tool, synonyms merged),
     blank resourceId column added (populated at Synapse upsert time)
-  - VALIDATED_donor.csv: species-level donor info for animal models (→ syn26486829)
-  - VALIDATED_vendor.csv: vendor names extracted from antibody contexts (→ syn26486850)
-  - VALIDATED_vendorItem.csv: catalog numbers per vendor-resource (→ syn26486843)
+  - ACCEPTED_donor.csv: species-level donor info for animal models (→ syn26486829)
+  - ACCEPTED_vendor.csv: vendor names extracted from antibody contexts (→ syn26486850)
+  - ACCEPTED_vendorItem.csv: catalog numbers per vendor-resource (→ syn26486843)
   - review.csv: 1 row per PMID, novel tools listed by category (pub-centric)
   - review_filtered.csv: tools removed by post-filter, tool-centric (audit trail)
 
@@ -801,7 +801,7 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
     return False, ''
 
 
-# ── VALIDATED_resources.csv rebuild constants ─────────────────────────────────
+# ── ACCEPTED_resources.csv rebuild constants ─────────────────────────────────
 
 # Trailing suffixes stripped from resourceName in the resources aggregate table.
 _RES_SUFFIX_RE = re.compile(
@@ -904,7 +904,7 @@ _TYPE_SPECIFIC_SYNAPSE_COLS: dict[str, list[str]] = {
     ],
 }
 
-# Output column order for VALIDATED_resources.csv — matches Synapse syn26450069 schema.
+# Output column order for ACCEPTED_resources.csv — matches Synapse syn26450069 schema.
 # Only type-specific IDs present as FK columns in syn26450069 are listed here.
 _RESOURCES_FIELDNAMES: list[str] = [
     'resourceId', 'resourceName', 'resourceType',
@@ -979,20 +979,20 @@ def _smart_split(s: str, sep: str = ';') -> list:
 
 
 def _build_validated_lookup(output_path: Path) -> dict:
-    """Build a (ttype, norm_key) → (canonical_name, [pmids]) lookup from VALIDATED_*.csv.
+    """Build a (ttype, norm_key) → (canonical_name, [pmids]) lookup from ACCEPTED_*.csv.
 
     Indexes canonical names, synonyms column entries, and for antibodies also
     indexes names without the 'anti-' prefix (to match review.csv which omits it).
     """
     validated_stems = {
-        'VALIDATED_animal_models':             'animal_models',
-        'VALIDATED_antibodies':                'antibodies',
-        'VALIDATED_cell_lines':                'cell_lines',
-        'VALIDATED_genetic_reagents':          'genetic_reagents',
-        'VALIDATED_computational_tools':       'computational_tools',
-        'VALIDATED_advanced_cellular_models':  'advanced_cellular_models',
-        'VALIDATED_patient_derived_models':    'patient_derived_models',
-        'VALIDATED_clinical_assessment_tools': 'clinical_assessment_tools',
+        'ACCEPTED_animal_models':             'animal_models',
+        'ACCEPTED_antibodies':                'antibodies',
+        'ACCEPTED_cell_lines':                'cell_lines',
+        'ACCEPTED_genetic_reagents':          'genetic_reagents',
+        'ACCEPTED_computational_tools':       'computational_tools',
+        'ACCEPTED_advanced_cellular_models':  'advanced_cellular_models',
+        'ACCEPTED_patient_derived_models':    'patient_derived_models',
+        'ACCEPTED_clinical_assessment_tools': 'clinical_assessment_tools',
     }
     lookup: dict = {}
     for stem, ttype in validated_stems.items():
@@ -1324,9 +1324,9 @@ def process(output_dir: str, dry_run: bool = False,
         print(f"❌ Output directory not found: {output_dir}")
         sys.exit(1)
 
-    validated_files = sorted(output_path.glob('VALIDATED_*.csv'))
+    validated_files = sorted(output_path.glob('ACCEPTED_*.csv'))
     if not validated_files:
-        print(f"❌ No VALIDATED_*.csv files found in {output_dir}")
+        print(f"❌ No ACCEPTED_*.csv files found in {output_dir}")
         sys.exit(1)
 
     # Apply NF gene set selection before any filtering begins
@@ -1365,7 +1365,7 @@ def process(output_dir: str, dry_run: bool = False,
     })
 
     for validated_file in validated_files:
-        tool_type = validated_file.stem.replace('VALIDATED_', '')
+        tool_type = validated_file.stem.replace('ACCEPTED_', '')
         if tool_type in _LINK_TABLE_TYPES:
             continue
 
@@ -1477,7 +1477,7 @@ def process(output_dir: str, dry_run: bool = False,
                 writer.writeheader()
                 writer.writerows(kept_out)
 
-            # Track normalized kept names to filter VALIDATED_resources.csv
+            # Track normalized kept names to filter ACCEPTED_resources.csv
             name_col_key = NAME_COLUMN.get(tool_type, '_toolName')
             kept_norm_names[tool_type] = {
                 _normalize_tool_name(r.get(name_col_key, '') or r.get('_toolName', ''), tool_type)
@@ -1515,7 +1515,7 @@ def process(output_dir: str, dry_run: bool = False,
         return
 
     # ── Pub-centric review.csv ─────────────────────────────────────────────────
-    # Build validated lookup from final VALIDATED_*.csv files (post-dedup) for
+    # Build validated lookup from final ACCEPTED_*.csv files (post-dedup) for
     # tool_usage_publications cross-reference column.
     validated_lookup = _build_validated_lookup(output_path)
 
@@ -1572,17 +1572,17 @@ def process(output_dir: str, dry_run: bool = False,
 
     # ── Remove superseded SUBMIT_*.csv intermediates ──────────────────────────
     # run_publication_reviews.py writes SUBMIT_*.csv as intermediates.
-    # generate_review_csv.py produces VALIDATED_*.csv for everything.
+    # generate_review_csv.py produces ACCEPTED_*.csv for everything.
     # Any SUBMIT_*.csv that has a VALIDATED equivalent is now redundant.
     removed_submits: list[str] = []
     for submit_file in sorted(output_path.glob('SUBMIT_*.csv')):
-        validated_equiv = output_path / submit_file.name.replace('SUBMIT_', 'VALIDATED_')
+        validated_equiv = output_path / submit_file.name.replace('SUBMIT_', 'ACCEPTED_')
         if validated_equiv.exists():
             submit_file.unlink()
             removed_submits.append(submit_file.name)
     if removed_submits:
         print(f"\n🗑  Removed {len(removed_submits)} superseded SUBMIT_*.csv files "
-              f"(VALIDATED_*.csv are canonical):")
+              f"(ACCEPTED_*.csv are canonical):")
         for name in removed_submits:
             print(f"    {name}")
 
@@ -1590,7 +1590,7 @@ def process(output_dir: str, dry_run: bool = False,
 def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
                               how_to_acquire: dict[str, str] | None = None,
                               synapse_ids: dict[str, str] | None = None) -> None:
-    """Rebuild VALIDATED_resources.csv: filter to kept tools, merge any new SUBMIT rows,
+    """Rebuild ACCEPTED_resources.csv: filter to kept tools, merge any new SUBMIT rows,
     strip name suffixes, deduplicate, populate synonyms, and apply Synapse schema.
 
     Delegates entirely to _rebuild_resources_csv which handles all steps.
@@ -1598,7 +1598,7 @@ def _filter_submit_resources(output_path: Path, kept_norm_names: dict,
     how_to_acquire maps resourceId → howToAcquire string (from _write_vendor_csvs).
     """
     print(f"\n{'='*60}")
-    print("Rebuilding VALIDATED_resources.csv")
+    print("Rebuilding ACCEPTED_resources.csv")
     print(f"{'='*60}")
     _rebuild_resources_csv(output_path, kept_norm_names, how_to_acquire,
                            synapse_ids=synapse_ids)
@@ -1773,16 +1773,16 @@ def _make_pub_id(pmid: str) -> str:
 def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
                             how_to_acquire: dict[str, str] | None = None,
                             synapse_ids: dict[str, str] | None = None) -> None:
-    """Rebuild VALIDATED_resources.csv with Synapse syn26450069 schema.
+    """Rebuild ACCEPTED_resources.csv with Synapse syn26450069 schema.
 
-    Source of truth: all type-specific VALIDATED_*.csv files (freshly written by the
+    Source of truth: all type-specific ACCEPTED_*.csv files (freshly written by the
     main pipeline loop).  Curated fields (rrid, description, etc.) from the previous
-    VALIDATED_resources.csv are preserved by resourceId lookup so manual edits survive
+    ACCEPTED_resources.csv are preserved by resourceId lookup so manual edits survive
     repeated pipeline runs.
 
     Steps:
-    1. Load curated fields keyed by resourceId from the existing VALIDATED_resources.csv.
-    2. Read every type-specific VALIDATED_*.csv and emit one resource row per tool row,
+    1. Load curated fields keyed by resourceId from the existing ACCEPTED_resources.csv.
+    2. Read every type-specific ACCEPTED_*.csv and emit one resource row per tool row,
        setting the matching type-specific ID column (e.g. animalModelId) from the row's
        own resourceId.
     3. Also merge any SUBMIT_resources.csv rows (manual-submission escape hatch).
@@ -1833,10 +1833,10 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         ).strip()
         return _RES_SUFFIX_RE.sub('', name).strip()
 
-    resources_file = output_path / 'VALIDATED_resources.csv'
+    resources_file = output_path / 'ACCEPTED_resources.csv'
     submit_file    = output_path / 'SUBMIT_resources.csv'
 
-    # Step 1: Preserve any manually curated fields from the previous VALIDATED_resources.csv.
+    # Step 1: Preserve any manually curated fields from the previous ACCEPTED_resources.csv.
     # howToAcquire is auto-computed every run (not preserved) so stale values never persist.
     # Secondary index by (resourceName.lower(), resourceType.lower()) handles migration from
     # the old RES{8hex} ID format to UUID5: old IDs don't match newly computed UUIDs, but
@@ -1855,10 +1855,10 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
                 if rname and rtype and any(vals.values()):
                     curated_by_name[(rname.lower(), rtype.lower())] = vals
 
-    # Step 2: Read every type-specific VALIDATED_*.csv as the primary source of truth.
+    # Step 2: Read every type-specific ACCEPTED_*.csv as the primary source of truth.
     all_rows: list[dict] = []
     for ttype_singular, ttype_plural in SINGULAR_TO_PLURAL.items():
-        type_file = output_path / f'VALIDATED_{ttype_plural}.csv'
+        type_file = output_path / f'ACCEPTED_{ttype_plural}.csv'
         if not type_file.exists():
             continue
         with open(type_file, newline='', encoding='utf-8') as f:
@@ -1904,7 +1904,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
                 all_rows.append(row)
 
     if not all_rows:
-        print("  ⏭  VALIDATED_resources.csv: no rows — skipping rebuild")
+        print("  ⏭  ACCEPTED_resources.csv: no rows — skipping rebuild")
         return
 
     # Steps 4-5: Deduplicate by (resourceType, norm_key).
@@ -2017,7 +2017,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
     removed = n_source - len(merged)
     msg = f", {removed} deduplicated" if removed else ""
     n_types = len(set(r.get('_toolType', '') for r in merged))
-    print(f"  ✅ VALIDATED_resources.csv: {len(merged)} rows across {n_types} tool types"
+    print(f"  ✅ ACCEPTED_resources.csv: {len(merged)} rows across {n_types} tool types"
           f"{msg} (Synapse schema, type IDs populated)")
 
 
@@ -2062,14 +2062,14 @@ def _infer_species(strain: str, context: str = '') -> str:
 
 
 def _write_donor_csv(output_path: Path) -> None:
-    """Generate VALIDATED_donor.csv (→ syn26486829) from animal model strain data.
+    """Generate ACCEPTED_donor.csv (→ syn26486829) from animal model strain data.
 
     One row per unique species found across all kept animal model rows.
     Schema: donorId, parentDonorId, transplantationDonorId, species, sex, age, race
     """
-    animal_file = output_path / 'VALIDATED_animal_models.csv'
+    animal_file = output_path / 'ACCEPTED_animal_models.csv'
     if not animal_file.exists():
-        print('  ⏭  VALIDATED_animal_models.csv not found — skipping donor CSV')
+        print('  ⏭  ACCEPTED_animal_models.csv not found — skipping donor CSV')
         return
     try:
         with open(animal_file, newline='', encoding='utf-8') as f:
@@ -2098,18 +2098,18 @@ def _write_donor_csv(output_path: Path) -> None:
             })
 
     if not donor_rows:
-        print('  ⚠️  No species inferred from animal model strains — VALIDATED_donor.csv not written')
+        print('  ⚠️  No species inferred from animal model strains — ACCEPTED_donor.csv not written')
         return
 
     donor_rows.sort(key=lambda r: r['species'])
-    donor_file   = output_path / 'VALIDATED_donor.csv'
+    donor_file   = output_path / 'ACCEPTED_donor.csv'
     donor_fields = ['donorId', 'parentDonorId', 'transplantationDonorId',
                     'species', 'sex', 'age', 'race']
     with open(donor_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=donor_fields)
         writer.writeheader()
         writer.writerows(donor_rows)
-    print(f'  ✅ VALIDATED_donor.csv: {len(donor_rows)} unique species → {donor_file}')
+    print(f'  ✅ ACCEPTED_donor.csv: {len(donor_rows)} unique species → {donor_file}')
 
 
 # ── Vendor / catalog / acquisition extraction ─────────────────────────────────
@@ -2280,9 +2280,9 @@ def _extract_acquisition_from_context(context: str) -> tuple[str, str, str]:
 
 
 def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
-    """Generate VALIDATED_vendor.csv and VALIDATED_vendorItem.csv; return howToAcquire map.
+    """Generate ACCEPTED_vendor.csv and ACCEPTED_vendorItem.csv; return howToAcquire map.
 
-    Scans _context fields across ALL type-specific VALIDATED_*.csv files (not only
+    Scans _context fields across ALL type-specific ACCEPTED_*.csv files (not only
     antibodies) using _extract_acquisition_from_context, which handles:
       - Named registries with IDs: Jackson Laboratory stock#, ATCC catalog#, Addgene plasmid#
       - Vendor + catalog number (parenthetical, bracket, inline forms)
@@ -2295,14 +2295,14 @@ def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
     Returns dict[resourceId, howToAcquire string] for use by _rebuild_resources_csv.
     """
     TYPE_FILES = [
-        'VALIDATED_antibodies.csv',
-        'VALIDATED_cell_lines.csv',
-        'VALIDATED_animal_models.csv',
-        'VALIDATED_genetic_reagents.csv',
-        'VALIDATED_patient_derived_models.csv',
-        'VALIDATED_advanced_cellular_models.csv',
-        'VALIDATED_clinical_assessment_tools.csv',
-        'VALIDATED_computational_tools.csv',
+        'ACCEPTED_antibodies.csv',
+        'ACCEPTED_cell_lines.csv',
+        'ACCEPTED_animal_models.csv',
+        'ACCEPTED_genetic_reagents.csv',
+        'ACCEPTED_patient_derived_models.csv',
+        'ACCEPTED_advanced_cellular_models.csv',
+        'ACCEPTED_clinical_assessment_tools.csv',
+        'ACCEPTED_computational_tools.csv',
     ]
 
     vendor_map: dict[str, dict] = {}   # norm_name → vendor row
@@ -2359,17 +2359,17 @@ def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
 
     if vendor_map:
         vendor_rows = sorted(vendor_map.values(), key=lambda r: r['vendorName'])
-        vendor_file = output_path / 'VALIDATED_vendor.csv'
+        vendor_file = output_path / 'ACCEPTED_vendor.csv'
         with open(vendor_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=['vendorId', 'vendorName', 'vendorUrl'])
             writer.writeheader()
             writer.writerows(vendor_rows)
-        print(f'  ✅ VALIDATED_vendor.csv: {len(vendor_rows)} unique vendors → {vendor_file}')
+        print(f'  ✅ ACCEPTED_vendor.csv: {len(vendor_rows)} unique vendors → {vendor_file}')
     else:
         print('  ⚠️  No vendor/catalog info found across tool type files')
 
     if vendor_items:
-        item_file = output_path / 'VALIDATED_vendorItem.csv'
+        item_file = output_path / 'ACCEPTED_vendorItem.csv'
         with open(item_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(
                 f, fieldnames=['vendorItemId', 'vendorId', 'resourceId',
@@ -2377,7 +2377,7 @@ def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
             )
             writer.writeheader()
             writer.writerows(vendor_items)
-        print(f'  ✅ VALIDATED_vendorItem.csv: {len(vendor_items)} vendor-resource items → {item_file}')
+        print(f'  ✅ ACCEPTED_vendorItem.csv: {len(vendor_items)} vendor-resource items → {item_file}')
 
     print(f'  ✅ howToAcquire populated for {len(how_to_acquire)} resources')
     return how_to_acquire
@@ -2476,22 +2476,22 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
                   'publicationDate', 'citation', 'publicationDateUnix', 'authors',
                   'publicationTitle']
     if pub_rows:
-        with open(output_path / 'VALIDATED_publications.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'ACCEPTED_publications.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=pub_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(pub_rows)
-        print(f"  ✅ VALIDATED_publications.csv: {len(pub_rows)} unique publications")
+        print(f"  ✅ ACCEPTED_publications.csv: {len(pub_rows)} unique publications")
 
     # Column order: metadata prefix, then Synapse schema order (usageId, publicationId, resourceId).
     usage_fields = ['_pmid', '_doi', '_publicationTitle', '_year',
                     '_toolName', '_toolType', '_usageType',
                     'usageId', 'publicationId', 'resourceId']
     if usage_rows:
-        with open(output_path / 'VALIDATED_usage.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'ACCEPTED_usage.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=usage_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(usage_rows)
-        print(f"  ✅ VALIDATED_usage.csv: {len(usage_rows)} publication-tool usage links")
+        print(f"  ✅ ACCEPTED_usage.csv: {len(usage_rows)} publication-tool usage links")
 
     # Column order: metadata prefix, then Synapse schema order (developmentId, resourceId,
     # investigatorId, publicationId, funderId) matching syn26486807.
@@ -2499,11 +2499,11 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
                   '_toolName', '_toolType', '_usageType',
                   'developmentId', 'resourceId', 'investigatorId', 'publicationId', 'funderId']
     if dev_rows:
-        with open(output_path / 'VALIDATED_development.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(output_path / 'ACCEPTED_development.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=dev_fields, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(dev_rows)
-        print(f"  ✅ VALIDATED_development.csv: {len(dev_rows)} publication-tool development links")
+        print(f"  ✅ ACCEPTED_development.csv: {len(dev_rows)} publication-tool development links")
 
     if pub_rows:
         dev_pmids        = {r['_pmid'] for r in dev_rows}
@@ -2518,10 +2518,10 @@ def _write_publication_link_csvs(review_rows: list[dict], output_path: Path,
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Post-filter VALIDATED_*.csv and generate pub-centric review.csv'
+        description='Post-filter ACCEPTED_*.csv and generate pub-centric review.csv'
     )
     parser.add_argument('--output-dir', default='tool_coverage/outputs',
-                        help='Directory containing VALIDATED_*.csv files')
+                        help='Directory containing ACCEPTED_*.csv files')
     parser.add_argument('--dry-run', action='store_true',
                         help='Preview changes without modifying any files')
     parser.add_argument('--include-pathway-genes', action='store_true',

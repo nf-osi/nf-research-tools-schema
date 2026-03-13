@@ -38,12 +38,12 @@ Claude Sonnet API (system prompt from recipes/publication_tool_review.yaml)
 Step 3: Post-filter and Consolidate
 generate_review_csv.py
     ↓ (removes generic tools, deduplicates synonyms, splits novel vs existing)
-VALIDATED_*.csv (filtered submission files)
-VALIDATED_publications.csv (allowlist for Phase 2)
+ACCEPTED_*.csv (filtered submission files)
+ACCEPTED_publications.csv (allowlist for Phase 2)
 potentially_missed_tools.csv (tools AI found)
 
 Step 4: Selective Cache Upgrade (Phase 2)
-upgrade_cache_for_observations.py --validated-pubs-file VALIDATED_publications.csv
+upgrade_cache_for_observations.py --validated-pubs-file ACCEPTED_publications.csv
     ↓ (upgrades cache only for post-filtered publications with confidence ≥0.8)
     ↓ (skips publications where all tools were filtered out in Step 3)
 tool_reviews/publication_cache/{PMID}_text.json (Phase 2 cache, adds results + discussion)
@@ -126,7 +126,7 @@ Python script that manages the validation workflow using direct Anthropic API ca
   - Tools publications (syn26486839) not linked to usage (syn26486841) or development (syn26486807)
 - Calls Claude Sonnet API directly (4 parallel workers in production)
 - Parses validation YAMLs
-- Filters VALIDATED_*.csv files to remove rejected tools
+- Filters ACCEPTED_*.csv files to remove rejected tools
 - Extracts potentially missed tools and pattern suggestions
 - Generates validation reports
 
@@ -288,7 +288,7 @@ python tool_coverage/scripts/run_publication_reviews.py \
 - `tool_reviews/results/{PMID}_tool_review.yaml` - Per-publication reviews
 - `tool_reviews/validation_summary.json` - JSON summary
 - `tool_reviews/validation_report.xlsx` - Excel report
-- `VALIDATED_*.csv` - Validated submission files (false positives removed) ⭐ **USE THESE**
+- `ACCEPTED_*.csv` - Validated submission files (false positives removed) ⭐ **USE THESE**
 
 ### Step 3: Run Phase 2 (Observation Extraction)
 
@@ -365,11 +365,11 @@ Summary spreadsheet showing:
 **Location:** `ACCEPTED_*.csv`
 
 Filtered versions of `SUBMIT_*.csv` with rejected tools removed:
-- `VALIDATED_SUBMIT_antibodies.csv`
-- `VALIDATED_SUBMIT_cell_lines.csv`
-- `VALIDATED_SUBMIT_animal_models.csv`
-- `VALIDATED_SUBMIT_genetic_reagents.csv`
-- `VALIDATED_SUBMIT_resources.csv`
+- `ACCEPTED_SUBMIT_antibodies.csv`
+- `ACCEPTED_SUBMIT_cell_lines.csv`
+- `ACCEPTED_SUBMIT_animal_models.csv`
+- `ACCEPTED_SUBMIT_genetic_reagents.csv`
+- `ACCEPTED_SUBMIT_resources.csv`
 
 ## Expected Results
 
@@ -499,7 +499,7 @@ The workflow includes manual trigger options:
 1. Checks for `ANTHROPIC_API_KEY` (skips AI validation if missing)
 2. Runs Phase 1 validation with 4 parallel workers
 3. Runs Phase 2 cache upgrade and observation extraction for high-confidence tools
-4. Uploads validation artifacts: `VALIDATED_*.csv`, validation reports, review YAMLs
+4. Uploads validation artifacts: `ACCEPTED_*.csv`, validation reports, review YAMLs
 
 **To disable AI validation manually:**
 - Go to Actions → Check Tool Coverage → Run workflow

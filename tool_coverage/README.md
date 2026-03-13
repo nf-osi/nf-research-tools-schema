@@ -410,7 +410,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
     - Writes `{PMID}_tool_review.yaml` per publication
 12. **Phase 2 cache upgrade:** Selectively fetches Results + Discussion for high-confidence tools (confidence ≥0.8)
 13. **Phase 2 observation extraction:** Writes `{PMID}_observations.yaml` alongside tool review YAMLs
-14. **Post-filter and consolidate:** Removes generic tools, deduplicates synonyms, writes `VALIDATED_*.csv`
+14. **Post-filter and consolidate:** Removes generic tools, deduplicates synonyms, writes `ACCEPTED_*.csv`
 15. **Apply pattern improvements:** Updates `mining_patterns.json`
 16. Run coverage analysis
 17. Generate summary report (`pr_body.md`)

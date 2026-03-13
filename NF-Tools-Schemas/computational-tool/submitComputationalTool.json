@@ -119,28 +119,15 @@
           "itemAcquisition": { "enum": ["GitHub/GitLab", "CRAN", "Bioconductor", "Docker Hub", "PyPI"] }
         }
       },
-      "then": {
-        "properties": {
-          "downloadURL": { "type": "string", "title": "Download/Repository URL", "format": "uri" }
-        }
-      }
+      "required": ["softwareName", "softwareType", "howToAcquire"]
     },
-    {
-      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
-      "then": {
-        "properties": {
-          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
-        }
-      }
+    "developmentPublicationDOI": {
+      "type": "string",
+      "title": "Development Publication DOI (where tool was first described)"
     },
-    {
-      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
-      "then": {
-        "properties": {
-          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
-        },
-        "required": ["additionalDetails"]
-      }
+    "usagePublicationDOIs": {
+      "type": "string",
+      "title": "Usage Publication DOI(s) where tool was used (separate multiple with commas)"
     }
   ]
 }

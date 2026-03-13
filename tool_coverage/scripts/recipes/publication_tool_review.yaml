@@ -56,35 +56,49 @@ prompt: |
        backgroundSubstrain  (e.g. "C57BL/6J")
        animalModelGeneticDisorder*  [Neurofibromatosis type 1 | Neurofibromatosis type 2 | Schwannomatosis | No known disease]
        animalModelOfManifestation   (e.g. "Plexiform Neurofibroma", "Optic Nerve Glioma")
+       transplantationType  (e.g. "syngeneic", "orthotopic", "subcutaneous") — if transplantation is described
+       animalState          (e.g. "transgenic", "knockout", "wild-type")
+       generation           (e.g. "F1", "F2") — if mentioned
 
      antibody:
        targetAntigen*  (what the antibody recognises, e.g. "NF1", "Ki67", "p-ERK")
        hostOrganism    [Mouse | Rabbit | Unknown]
        clonality       [Monoclonal | Polyclonal | Secondary | Recombinant | Control | Unknown]
+       cloneId         (clone identifier or catalog number, e.g. "EP1648Y", "ab32134")
        reactiveSpecies (e.g. "Human, Mouse")
        conjugate       (e.g. "HRP", "Alexa Fluor 488", or "Non-conjugated")
+       uniprotId       (UniProt accession if mentioned, e.g. "P21359")
 
      cell_line:
        organ*          (tissue/organ of origin — required for Synapse, e.g. "Nerve", "Brain", "Blood")
        tissue          (e.g. "Peripheral nerve sheath", "Optic nerve")
-       cellLineGeneticDisorder*  [Neurofibromatosis Type 1 | Neurofibromatosis Type 2 | Schwannamatosis | None]
+       cellLineGeneticDisorder*  [Neurofibromatosis Type 1 | Neurofibromatosis Type 2 | Schwannomatosis | None]
        cellLineManifestation     (tumour or phenotype, e.g. "Malignant Peripheral Nerve Sheath Tumor")
        cellLineCategory [Cancer cell line | Embryonic stem cell | Finite cell line | Hybrid cell line | Hybridoma]
+       cultureMedia     (base medium + supplements, e.g. "RPMI supplemented with 10% FBS, 2 mM L-glutamine, 1% penicillin-streptomycin")
+       originYear       (year cell line was established, if mentioned)
+       resistance       (selection resistance, e.g. "puromycin", "neomycin") — if mentioned
 
      genetic_reagent:
-       insertName*     (gene/construct name, e.g. "Nf1", "Cre", "shNF1")
-       vectorType      [Plasmid | Viral | Transposon | Other]
-       vectorBackbone  (e.g. "pLenti", "AAV2", "pX330")
-       promoter        (e.g. "CMV", "EF1α", "U6")
-       insertSpecies   (e.g. "Mouse", "Human")
+       insertName*      (gene/construct name, e.g. "Nf1", "Cre", "shNF1")
+       vectorType       [Plasmid | Viral | Transposon | Other]
+       vectorBackbone   (e.g. "pLenti", "AAV2", "pX330")
+       promoter         (e.g. "CMV", "EF1α", "U6")
+       insertSpecies    (e.g. "Mouse", "Human")
        selectableMarker (e.g. "Puromycin", "GFP")
-       gRNAshRNASequence (if applicable)
+       copyNumber       (number of copies, if mentioned)
+       gRNAshRNASequence (sequence if provided)
+       insertEntrezId   (NCBI Entrez gene ID, if explicitly cited)
 
      computational_tool:
-       softwareType*   [Analysis Software | Pipeline | Package/Library | Workflow | Database | Web Application | Command-line Tool | Plugin | Other]
-       softwareVersion (e.g. "v1.4.2", "2023")
+       softwareType*    [Analysis Software | Pipeline | Package/Library | Workflow | Database | Web Application | Command-line Tool | Plugin | Other]
+       softwareVersion  (e.g. "v1.4.2", "2023")
        programmingLanguage (e.g. "Python", "R", "Java")
        sourceRepository (full URL to GitHub/GitLab/Bitbucket repo)
+       documentation    (URL to documentation/wiki, if provided)
+       licenseType      (e.g. "MIT", "GPL-3.0", "Apache 2.0") — if stated
+       containerized    (e.g. "Docker", "Singularity", "None") — if described
+       maintainer       (author name or contact email, if provided)
 
      advanced_cellular_model:
        modelType*       [organoid | spheroid | tumoroid | assembloid | other]
@@ -93,6 +107,9 @@ prompt: |
        organoidType     (e.g. "brain organoid", "nerve organoid")
        matrixType       (e.g. "Matrigel", "collagen")
        cultureSystem    (e.g. "suspension", "embedded")
+       maturationTime   (e.g. "21 days", "4 weeks") — if described
+       characterizationMethods (e.g. "IHC, RNA-seq, flow cytometry") — methods used to validate the model
+       passageNumber    (passage used in experiments, e.g. "P5–P10") — if mentioned
 
      patient_derived_model:
        modelSystemType* [PDX | PDO | cell line | organoid | other]
@@ -100,6 +117,8 @@ prompt: |
        hostStrain       (e.g. "NSG", "nude mouse") — for PDX
        tumorType        (e.g. "MPNST", "neurofibroma")
        engraftmentSite  (e.g. "subcutaneous", "orthotopic")
+       passageNumber    (passage used in experiments, e.g. "P3") — if mentioned
+       molecularCharacterization (e.g. "NF1 loss, CDKN2A deletion") — mutations/characterization described
 
      clinical_assessment_tool:
        assessmentType*   [scale | questionnaire | structured interview | performance test | biomarker assay | other]
@@ -107,6 +126,8 @@ prompt: |
        diseaseSpecific   [Yes | No]
        numberOfItems     (integer, e.g. 36)
        scoringMethod     (e.g. "0–100 scale", "Likert 1–5", "sum score")
+       validatedLanguages (e.g. "English, French, Spanish") — if stated
+       administrationTime (e.g. "5–10 minutes") — if mentioned
 
 activities:
   - Evaluate each mined tool (or discover tools in discovery mode)

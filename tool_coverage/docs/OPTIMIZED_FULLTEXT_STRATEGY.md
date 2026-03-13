@@ -258,7 +258,7 @@ Different tool types require different amounts of publication text for accurate 
     python tool_coverage/scripts/generate_review_csv.py \
       --output-dir tool_coverage/outputs
     # Removes generic tools, deduplicates synonyms
-    # Writes VALIDATED_*.csv (single prefix per tool type)
+    # Writes ACCEPTED_*.csv (single prefix per tool type)
     # All metadata already in cache - NO RE-FETCHING
 ```
 
@@ -424,7 +424,7 @@ upgrade_cache_for_observations.py (based on validation results)
 run_publication_reviews.py --extract-observations (Sonnet observation extraction)
   ↓ ({PMID}_observations.yaml written alongside tool review YAMLs)
 generate_review_csv.py (post-filter: removes generic tools, deduplicates synonyms)
-  ↓ (writes VALIDATED_*.csv)
+  ↓ (writes ACCEPTED_*.csv)
 ```
 
 ---

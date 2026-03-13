@@ -38,14 +38,14 @@ toolValidations:
     contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."
     usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
     # Add ALL type-specific fields you can extract from the text (omit fields not found):
-    # animal_model:           strainNomenclature*, backgroundStrain, backgroundSubstrain, animalModelGeneticDisorder [Neurofibromatosis type 1|type 2|Schwannomatosis|No known disease], animalModelOfManifestation
-    # antibody:               targetAntigen*, hostOrganism [Mouse|Rabbit|Unknown], clonality [Monoclonal|Polyclonal|Secondary|Recombinant|Unknown], reactiveSpecies [Human|Mouse|Rat|...], conjugate
-    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannomatosis|None] (use "None" for wild-type/control lines with no NF genetic disorder; omit field only if unknown), cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma], cultureMedia (base medium + supplements, e.g. "RPMI supplemented with 10% FBS, 2 mM L-glutamine, 1% penicillin-streptomycin")
-    # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker, gRNAshRNASequence
-    # computational_tool:     softwareType* [Analysis Software|Pipeline|Package/Library|Workflow|Database|Web Application|Command-line Tool|Plugin|Other], softwareVersion, programmingLanguage, sourceRepository
-    # advanced_cellular_model: modelType* [organoid|spheroid|other], derivationSource* [patient|iPSC|primary cell|cell line|other], cellTypes, organoidType, matrixType, cultureSystem
-    # patient_derived_model:  modelSystemType* [PDX|PDO|other], patientDiagnosis*, hostStrain, tumorType, engraftmentSite
-    # clinical_assessment_tool: assessmentType* [scale|questionnaire|interview|performance test|biomarker|other], targetPopulation* [pediatric|adult|caregiver|all ages|other], diseaseSpecific [Yes|No], numberOfItems, scoringMethod
+    # animal_model:           strainNomenclature*, backgroundStrain, backgroundSubstrain, animalModelGeneticDisorder [Neurofibromatosis type 1|type 2|Schwannomatosis|No known disease], animalModelOfManifestation, transplantationType, animalState, generation
+    # antibody:               targetAntigen*, hostOrganism [Mouse|Rabbit|Unknown], clonality [Monoclonal|Polyclonal|Secondary|Recombinant|Control|Unknown], cloneId, reactiveSpecies, conjugate, uniprotId
+    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannomatosis|None] (use "None" for wild-type/control lines; omit only if truly unknown), cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma], cultureMedia (base medium + supplements, e.g. "RPMI supplemented with 10% FBS"), originYear, resistance
+    # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker, copyNumber, gRNAshRNASequence, insertEntrezId
+    # computational_tool:     softwareType* [Analysis Software|Pipeline|Package/Library|Workflow|Database|Web Application|Command-line Tool|Plugin|Other], softwareVersion, programmingLanguage, sourceRepository, documentation, licenseType, containerized, maintainer
+    # advanced_cellular_model: modelType* [organoid|spheroid|tumoroid|assembloid|other], derivationSource* [patient tissue|iPSC|primary cell|cell line|other], cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber
+    # patient_derived_model:  modelSystemType* [PDX|PDO|cell line|organoid|other], patientDiagnosis*, hostStrain, tumorType, engraftmentSite, passageNumber, molecularCharacterization
+    # clinical_assessment_tool: assessmentType* [scale|questionnaire|structured interview|performance test|biomarker assay|other], targetPopulation* [pediatric|adult|caregiver|all ages|clinician-rated|other], diseaseSpecific [Yes|No], numberOfItems, scoringMethod, validatedLanguages, administrationTime
     # (* = critical field, fill if at all possible)
   # Repeat for each tool. Use [] if no tools found."""
 
@@ -862,8 +862,8 @@ def filter_submission_csvs(validation_results, output_dir='.'):
                 df_filtered = df[df.apply(should_keep_row, axis=1)]
                 removed_count = original_count - len(df_filtered)
 
-                # Save filtered version (VALIDATED_animal_models.csv, not VALIDATED_SUBMIT_animal_models.csv)
-                output_file = Path(output_dir) / submit_file.name.replace('SUBMIT_', 'VALIDATED_')
+                # Save filtered version (ACCEPTED_animal_models.csv, not ACCEPTED_SUBMIT_animal_models.csv)
+                output_file = Path(output_dir) / submit_file.name.replace('SUBMIT_', 'ACCEPTED_')
                 df_filtered.to_csv(output_file, index=False)
 
                 print(f"  ✅ Removed {removed_count} rows → {output_file.name}")
@@ -1475,9 +1475,9 @@ def main():
     print("=" * 80)
     print("\nNext steps:")
     print("  1. Review validation_report.xlsx for summary")
-    print("  2. Check tool_coverage/outputs/VALIDATED_*.csv files (rejected tools removed)")
+    print("  2. Check tool_coverage/outputs/ACCEPTED_*.csv files (rejected tools removed)")
     print("  3. Manually review 'uncertain' tools if any")
-    print("  4. Manually verify VALIDATED_*.csv files before uploading to Synapse")
+    print("  4. Manually verify ACCEPTED_*.csv files before uploading to Synapse")
     print("=" * 80)
 
 if __name__ == '__main__':
