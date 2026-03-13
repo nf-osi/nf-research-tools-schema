@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'VALIDATED_*.csv'
-      - 'SUBMIT_*.csv'
+      - 'submissions/*/accepted/**/*.json'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -25,6 +24,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed to diff against github.event.before for changed-file detection
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,21 +37,78 @@ jobs:
         run: |
           pip install -r tool_coverage/requirements.txt
 
-      - name: Check for validated or submit files
+      - name: Identify changed JSON files
+        id: changed_files
+        run: |
+          echo "=========================================="
+          echo "IDENTIFYING changed submissions/*/accepted/**/*.json"
+          echo "=========================================="
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — will process all accepted JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "Initial push to main — will process all accepted JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          else
+            git diff --name-only --diff-filter=AM \
+              "${{ github.event.before }}" "${{ github.sha }}" \
+              -- 'submissions/' \
+              | grep '/accepted/' \
+              | grep '\.json$' > changed_json_files.txt || true
+
+            COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
+            echo "Found ${COUNT} changed JSON file(s):"
+            cat changed_json_files.txt
+            echo "changed_count=${COUNT}" >> $GITHUB_OUTPUT
+            echo "use_all=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compile changed JSON submissions into ACCEPTED_*.csv
+        id: compile_json
+        run: |
+          echo "=========================================="
+          echo "COMPILING changed JSON → ACCEPTED_*.csv"
+          echo "=========================================="
+
+          if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
+            # workflow_dispatch or initial push — process all accepted files
+            if find submissions -path "*/accepted/*.json" | grep -q .; then
+              python tool_coverage/scripts/compile_accepted_submissions.py \
+                --accepted-dir submissions \
+                --csv-dir tool_coverage/outputs
+              echo "compile_ran=true" >> $GITHUB_OUTPUT
+              echo "✅ Compilation complete (all files)"
+            else
+              echo "No JSON files found in submissions/*/accepted/ — skipping"
+              echo "compile_ran=false" >> $GITHUB_OUTPUT
+            fi
+
+          elif [ -s changed_json_files.txt ]; then
+            python tool_coverage/scripts/compile_accepted_submissions.py \
+              --files-list changed_json_files.txt \
+              --csv-dir tool_coverage/outputs
+            echo "compile_ran=true" >> $GITHUB_OUTPUT
+            echo "✅ Compilation complete (${{ steps.changed_files.outputs.changed_count }} changed file(s))"
+
+          else
+            echo "No changed JSON files detected — skipping compilation"
+            echo "compile_ran=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for validated files
         id: check_files
         run: |
-          if ls VALIDATED_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=true" >> $GITHUB_OUTPUT
-            echo "✅ Found VALIDATED_*.csv files (AI-validated)"
-          elif ls SUBMIT_*.csv 1> /dev/null 2>&1; then
-            echo "has_validated=false" >> $GITHUB_OUTPUT
-            echo "⚠️  Found SUBMIT_*.csv files (not AI-validated)"
+          if ls tool_coverage/outputs/ACCEPTED_*.csv 1> /dev/null 2>&1; then
+            echo "has_files=true" >> $GITHUB_OUTPUT
+            echo "✅ Found ACCEPTED_*.csv files"
           else
             echo "has_files=false" >> $GITHUB_OUTPUT
-            echo "❌ No CSV files found to upload"
+            echo "❌ No ACCEPTED_*.csv files found in tool_coverage/outputs/"
             exit 0
           fi
-          echo "has_files=true" >> $GITHUB_OUTPUT
 
       - name: Validate CSV schema
         if: steps.check_files.outputs.has_files == 'true'
@@ -143,11 +201,7 @@ jobs:
 
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ steps.check_files.outputs.has_validated }}" = "true" ]; then
-            echo "- Using VALIDATED_*.csv (AI-validated, false positives removed)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Using SUBMIT_*.csv (not AI-validated)" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "- Using ACCEPTED_*.csv (AI-validated, post-filtered)" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ github.event.inputs.dry_run }}" != "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -161,6 +215,26 @@ jobs:
             echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
           fi
 
+      - name: Calculate tool completeness scores
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "CALCULATING Tool Completeness Scores"
+          echo "=========================================="
+          python tool_scoring.py
+
+          echo ""
+          echo "✅ Completeness scores updated"
+
+      - name: Generate completeness report
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python tool_scoring_report.py || echo "⚠️  PDF report generation failed (non-fatal)"
+
       - name: Upload summary artifacts
         if: steps.check_files.outputs.has_files == 'true'
         uses: actions/upload-artifact@v4
@@ -168,5 +242,7 @@ jobs:
           name: synapse-upload-logs
           path: |
             CLEAN_*.csv
+            tool_coverage/outputs/CLEAN_*.csv
             GFF_Tool_Coverage_Report.pdf
+            tool_scoring_report.pdf
           retention-days: 30

@@ -41,7 +41,7 @@ PUBMED_QUERY_FILTERS = [
     'NOT people[Title] NOT decision*[Title] NOT autopsy*[Title] NOT isolated[Title] NOT solitary[Title]',
     'NOT "JA clinical reports"[Journal])',
     'AND (hasabstract)',
-    'AND (free full text[Filter])',
+    'AND (pmc open access[filter])',
     'AND (Journal Article[Publication Type])',
     'NOT (preprint[Publication Type])'  # Exclude preprints (bioRxiv, medRxiv, arXiv, etc.)
 ]
