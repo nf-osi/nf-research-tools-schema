@@ -142,7 +142,7 @@ Before merging the annotation PR:
 - [ ] Verify suggested cell lines are legitimate NF-relevant cell lines (not typos, sample IDs, or errors)
 - [ ] For each valid cell line: move to `submissions/accepted/`:
   ```bash
-  git mv submissions/cell_lines/annotation_<name>.json submissions/accepted/cell_lines/
+  git mv submissions/cell_lines/annotation_<name>.json submissions/cell_lines/accepted/
   ```
 - [ ] Fill in known fields (tissue, disease, species, etc.) in the JSON
 - [ ] Delete files that are not real cell lines
@@ -154,7 +154,7 @@ Before merging the annotation PR:
 When the annotation PR (or any PR touching `submissions/accepted/`) is merged:
 
 1. **Immediate**: `upsert-tools.yml` triggers automatically
-   - Compiles `submissions/accepted/**/*.json` → appends new rows to `ACCEPTED_cell_lines.csv`
+   - Compiles `submissions/*/accepted/**/*.json` → appends new rows to `ACCEPTED_cell_lines.csv`
    - Validates CSV schemas
    - Cleans tracking columns (prefixed with `_`)
    - Uploads to Synapse:
