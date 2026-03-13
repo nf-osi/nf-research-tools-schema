@@ -22,8 +22,7 @@ graph TD
     F -->|push triggers| G[upsert-tools]
     F -->|merge triggers| H[score-tools]
     G -->|Uploads to Synapse| H
-    H -->|workflow_run| I[update-observation-schema]
-    I -->|Creates PR if changes| J[Final Review]
+    H -->|Uploads scores to Synapse| I[Done]
 ```
 
 ## Detailed Flow
@@ -134,7 +133,7 @@ jobs:
 | publication-mining | `tool-submissions` (issue closed) | `tool-submissions` |
 | upsert-tools | N/A (path trigger: `submissions/*/accepted/`) | N/A (no PR) |
 | score-tools | `tool-submissions` | N/A (no PR) |
-| update-observation-schema | N/A (workflow_run) | `schema-update` |
+
 
 ### submissions/{type}/ → submissions/{type}/accepted/ Review Flow
 
