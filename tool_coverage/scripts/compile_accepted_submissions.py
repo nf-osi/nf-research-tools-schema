@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Compile submissions/accepted/**/*.json into ACCEPTED_*.csv files for Synapse upsert.
+Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files for Synapse upsert.
 
-Run by upsert-tools.yml after JSON files have been moved from submissions/ to submissions/accepted/.
-New rows are appended to existing ACCEPTED_*.csv files, deduplicating by _resourceName
-so re-running is safe.
+Run by upsert-tools.yml after JSON files have been moved from submissions/{type}/ to
+submissions/{type}/accepted/. New rows are appended to existing ACCEPTED_*.csv files,
+deduplicating by _resourceName so re-running is safe.
 
 Usage:
-    python compile_accepted_submissions.py [--accepted-dir submissions/accepted]
+    python compile_accepted_submissions.py [--accepted-dir submissions]
                                            [--csv-dir tool_coverage/outputs]
                                            [--dry-run]
 """
@@ -22,7 +22,7 @@ from pathlib import Path
 # so form submissions and mined tools produce identical CSV rows.
 
 CSV_DIR_DEFAULT = Path("tool_coverage/outputs")
-ACCEPTED_DIR_DEFAULT = Path("submissions/accepted")
+ACCEPTED_DIR_DEFAULT = Path("submissions")
 
 # ---------------------------------------------------------------------------
 # Column definitions (must match ACCEPTED_*.csv headers exactly)
@@ -605,12 +605,12 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Compile submissions/accepted/**/*.json into ACCEPTED_*.csv files."
+        description="Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files."
     )
     parser.add_argument(
         "--accepted-dir", type=Path, default=ACCEPTED_DIR_DEFAULT,
-        help="Directory to scan for accepted JSON files (default: submissions/accepted/). "
-             "Ignored when --files-list is provided.",
+        help="Root submissions directory to scan for */accepted/**/*.json files "
+             "(default: submissions/). Ignored when --files-list is provided.",
     )
     parser.add_argument(
         "--files-list", type=Path, default=None,
@@ -642,9 +642,9 @@ def main():
             json_files = [p for p in json_files if p.exists()]
     else:
         if not args.accepted_dir.exists():
-            print(f"No accepted directory found at {args.accepted_dir} — nothing to compile")
+            print(f"No submissions directory found at {args.accepted_dir} — nothing to compile")
             sys.exit(0)
-        json_files = sorted(args.accepted_dir.rglob("*.json"))
+        json_files = sorted(args.accepted_dir.glob("*/accepted/**/*.json"))
 
     compile_accepted(json_files, args.csv_dir, args.dry_run)
 
