@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Regenerate FILTERED_*.csv files from enriched VALIDATED_*.csv files.
+Regenerate FILTERED_*.csv files from enriched ACCEPTED_*.csv files.
 
 This script:
-1. Reads VALIDATED_*.csv files (after metadata enrichment)
+1. Reads ACCEPTED_*.csv files (after metadata enrichment)
 2. Calculates completeness on enriched schema fields
 3. Filters to high-completeness subset (≥60% critical fields)
 4. Enriches funderId for high-confidence development publications
@@ -87,15 +87,15 @@ DEVELOPMENT_TOOL_TYPES = [
 
 
 # Mapping of VALIDATED file names to their tool types
-VALIDATED_FILE_TO_TYPE = {
-    'VALIDATED_animal_models.csv': 'Animal Model',
-    'VALIDATED_antibodies.csv': 'Antibody',
-    'VALIDATED_cell_lines.csv': 'Cell Line',
-    'VALIDATED_genetic_reagents.csv': 'Genetic Reagent',
-    'VALIDATED_computational_tools.csv': 'Computational Tool',
-    'VALIDATED_patient_derived_models.csv': 'Patient-Derived Model',
-    'VALIDATED_advanced_cellular_models.csv': 'Advanced Cellular Model',
-    'VALIDATED_clinical_assessment_tools.csv': 'Clinical Assessment Tool'
+ACCEPTED_FILE_TO_TYPE = {
+    'ACCEPTED_animal_models.csv': 'Animal Model',
+    'ACCEPTED_antibodies.csv': 'Antibody',
+    'ACCEPTED_cell_lines.csv': 'Cell Line',
+    'ACCEPTED_genetic_reagents.csv': 'Genetic Reagent',
+    'ACCEPTED_computational_tools.csv': 'Computational Tool',
+    'ACCEPTED_patient_derived_models.csv': 'Patient-Derived Model',
+    'ACCEPTED_advanced_cellular_models.csv': 'Advanced Cellular Model',
+    'ACCEPTED_clinical_assessment_tools.csv': 'Clinical Assessment Tool'
 }
 
 
@@ -271,7 +271,7 @@ def regenerate_filtered_file(validated_file, tool_type, outputs_dir, pub_cache):
     Regenerate FILTERED file from enriched VALIDATED file.
 
     Args:
-        validated_file: Path to VALIDATED_*.csv file
+        validated_file: Path to ACCEPTED_*.csv file
         tool_type: Normalized tool type
         outputs_dir: Output directory path
         pub_cache: Publication cache for funder extraction
@@ -280,7 +280,7 @@ def regenerate_filtered_file(validated_file, tool_type, outputs_dir, pub_cache):
         Number of tools in filtered subset
     """
     validated_path = os.path.join(outputs_dir, validated_file)
-    filtered_file = validated_file.replace('VALIDATED_', 'FILTERED_')
+    filtered_file = validated_file.replace('ACCEPTED_', 'FILTERED_')
     filtered_path = os.path.join(outputs_dir, filtered_file)
 
     if not os.path.exists(validated_path):
@@ -338,7 +338,7 @@ def regenerate_filtered_file(validated_file, tool_type, outputs_dir, pub_cache):
 
 
 def main():
-    """Regenerate all FILTERED_*.csv files from enriched VALIDATED_*.csv files."""
+    """Regenerate all FILTERED_*.csv files from enriched ACCEPTED_*.csv files."""
     print("=" * 80)
     print("REGENERATING FILTERED_*.csv FILES FROM ENRICHED DATA")
     print("=" * 80)
@@ -362,13 +362,13 @@ def main():
     print(f"  ✓ Loaded cache for {len(pub_cache)} publications")
     print()
 
-    print("Processing enriched VALIDATED_*.csv files...")
+    print("Processing enriched ACCEPTED_*.csv files...")
     print("-" * 80)
 
     total_filtered = 0
     total_validated = 0
 
-    for validated_file, tool_type in VALIDATED_FILE_TO_TYPE.items():
+    for validated_file, tool_type in ACCEPTED_FILE_TO_TYPE.items():
         filtered_count = regenerate_filtered_file(validated_file, tool_type, outputs_dir, pub_cache)
         total_filtered += filtered_count
 

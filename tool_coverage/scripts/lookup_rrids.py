@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""lookup_rrids.py — Populate rrid column in VALIDATED_resources.csv.
+"""lookup_rrids.py — Populate rrid column in ACCEPTED_resources.csv.
 
 Queries public registries by tool name; writes discovered RRIDs back to
-VALIDATED_resources.csv and the matching type-specific VALIDATED_*.csv.
+ACCEPTED_resources.csv and the matching type-specific ACCEPTED_*.csv.
 
 Registries used (all public, no API key required by default):
   cell_line / patient_derived_model
@@ -222,14 +222,14 @@ def _fuzzy_match(a: str, b: str, threshold: float = 0.85) -> bool:
 _CONTEXT_FIELDS = ('_context', 'context')  # field names to check for embedded RRIDs
 
 _TYPE_TO_TYPED_FILE = {
-    'animal_model':             'VALIDATED_animal_models.csv',
-    'antibody':                 'VALIDATED_antibodies.csv',
-    'cell_line':                'VALIDATED_cell_lines.csv',
-    'genetic_reagent':          'VALIDATED_genetic_reagents.csv',
-    'patient_derived_model':    'VALIDATED_patient_derived_models.csv',
-    'advanced_cellular_model':  'VALIDATED_advanced_cellular_models.csv',
-    'clinical_assessment_tool': 'VALIDATED_clinical_assessment_tools.csv',
-    'computational_tool':       'VALIDATED_computational_tools.csv',
+    'animal_model':             'ACCEPTED_animal_models.csv',
+    'antibody':                 'ACCEPTED_antibodies.csv',
+    'cell_line':                'ACCEPTED_cell_lines.csv',
+    'genetic_reagent':          'ACCEPTED_genetic_reagents.csv',
+    'patient_derived_model':    'ACCEPTED_patient_derived_models.csv',
+    'advanced_cellular_model':  'ACCEPTED_advanced_cellular_models.csv',
+    'clinical_assessment_tool': 'ACCEPTED_clinical_assessment_tools.csv',
+    'computational_tool':       'ACCEPTED_computational_tools.csv',
 }
 
 
@@ -265,7 +265,7 @@ def _lookup_rrid(name: str, tool_type: str, context: str, api_key: str,
 
 def run_lookup(output_dir: Path, dry_run: bool, force: bool,
                api_key: str, tool_types: list[str], rate_limit: float) -> None:
-    resources_file = output_dir / 'VALIDATED_resources.csv'
+    resources_file = output_dir / 'ACCEPTED_resources.csv'
     if not resources_file.exists():
         print(f'❌  {resources_file} not found')
         return
@@ -294,8 +294,8 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
     # Build vendorItem-derived RRID map: for resources sold by Addgene, construct
     # RRID:Addgene_{catalogNumber} directly from the vendor/vendorItem CSVs.
     rrid_from_vendor: dict[str, str] = {}
-    vendor_file    = output_dir / 'VALIDATED_vendor.csv'
-    vendoritem_file = output_dir / 'VALIDATED_vendorItem.csv'
+    vendor_file    = output_dir / 'ACCEPTED_vendor.csv'
+    vendoritem_file = output_dir / 'ACCEPTED_vendorItem.csv'
     if vendor_file.exists() and vendoritem_file.exists():
         with open(vendor_file, newline='', encoding='utf-8') as f:
             vendors = {row['vendorId']: row.get('vendorName', '') for row in csv.DictReader(f)}
@@ -348,7 +348,7 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
         print('(dry-run: no files written)')
         return
 
-    # Write updated VALIDATED_resources.csv
+    # Write updated ACCEPTED_resources.csv
     with open(resources_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=res_fieldnames, extrasaction='ignore')
         writer.writeheader()
@@ -359,13 +359,13 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description='Populate rrid column in VALIDATED_resources.csv from public registries.',
+        description='Populate rrid column in ACCEPTED_resources.csv from public registries.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
     parser.add_argument(
         '--output-dir', default='tool_coverage/outputs',
-        help='Directory containing VALIDATED_*.csv (default: tool_coverage/outputs)',
+        help='Directory containing ACCEPTED_*.csv (default: tool_coverage/outputs)',
     )
     parser.add_argument(
         '--dry-run', action='store_true',

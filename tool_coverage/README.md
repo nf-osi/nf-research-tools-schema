@@ -302,7 +302,7 @@ AI-powered validation of mined tools using Claude Sonnet API (direct Anthropic A
 - **Detects potentially missed tools** that mining didn't catch
 - **Suggests new patterns** to improve future mining accuracy
 - **Generates validation reports** with detailed reasoning for accept/reject decisions
-- **Creates VALIDATED_*.csv** files with rejected tools removed (9 files, one per tool type)
+- **Creates ACCEPTED_*.csv** files with rejected tools removed (9 files, one per tool type)
 
 **How query_type is used:**
 - Publications tagged with `query_type: "bench"` → Likely contains lab tools
@@ -331,7 +331,7 @@ python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_
 - Use `--force-rereviews` to override skip logic when needed
 
 **Outputs:**
-- `VALIDATED_*.csv` - Validated submissions (false positives removed, recommended)
+- `ACCEPTED_*.csv` - Validated submissions (false positives removed, recommended)
 - `tool_reviews/validation_report.xlsx` - AI validation summary
 - `tool_reviews/validation_summary.json` - Machine-readable validation results
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed
@@ -371,7 +371,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 
 ### 2. GitHub Actions Workflow
 
-**File:** `.github/workflows/check-tool-coverage.yml`
+**File:** `.github/workflows/publication-mining.yml`
 
 **Trigger:**
 - When PR from review-tool-annotations is merged (label: `automated-annotation-review`)
@@ -410,7 +410,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
     - Writes `{PMID}_tool_review.yaml` per publication
 12. **Phase 2 cache upgrade:** Selectively fetches Results + Discussion for high-confidence tools (confidence ≥0.8)
 13. **Phase 2 observation extraction:** Writes `{PMID}_observations.yaml` alongside tool review YAMLs
-14. **Post-filter and consolidate:** Removes generic tools, deduplicates synonyms, writes `VALIDATED_*.csv`
+14. **Post-filter and consolidate:** Removes generic tools, deduplicates synonyms, writes `ACCEPTED_*.csv`
 15. **Apply pattern improvements:** Updates `mining_patterns.json`
 16. Run coverage analysis
 17. Generate summary report (`pr_body.md`)
@@ -422,7 +422,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 **File:** `.github/workflows/upsert-tools.yml`
 
 **Triggers:**
-- Automatically when PR is merged to `main` branch with `VALIDATED_*.csv` or `SUBMIT_*.csv` files
+- Automatically when PR is merged to `main` branch with `ACCEPTED_*.csv` or `SUBMIT_*.csv` files
 - Manual trigger via workflow dispatch (with optional `dry_run` mode)
 
 **Steps:**
@@ -441,7 +441,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 **Safety Features:**
 - **Schema validation** checks required fields before upload
 - **Dry-run mode** available via workflow_dispatch input (validate without uploading)
-- Prefers `VALIDATED_*.csv` files (AI-validated, false positives removed)
+- Prefers `ACCEPTED_*.csv` files (AI-validated, false positives removed)
 - Falls back to `SUBMIT_*.csv` if validated files not present
 - Runs dry-run preview before actual upload
 - Skips if no CSV files found or validation fails
@@ -708,7 +708,7 @@ python tool_coverage/scripts/run_publication_reviews.py \
 - **Scientific observation extraction** (from Results/Discussion sections)
 
 **Outputs:**
-- `VALIDATED_*.csv` - Filtered tool lists (false positives removed)
+- `ACCEPTED_*.csv` - Filtered tool lists (false positives removed)
 - `observations.csv` - Scientific observations about tools
 - `potentially_missed_tools.csv` - Tools that mining may have missed
 - `suggested_patterns.csv` - Patterns to improve future mining
@@ -805,7 +805,7 @@ A weekly PR is created with:
   - Top priority publications to review
   - Summary of submission-ready CSVs
 - **Files included:**
-  - `VALIDATED_*.csv` or `SUBMIT_*.csv` - Submission files
+  - `ACCEPTED_*.csv` or `SUBMIT_*.csv` - Submission files
   - `GFF_Tool_Coverage_Report.pdf` - Coverage analysis
   - `processed_publications.csv` - All mining results
   - `priority_publications_FULLTEXT.csv` - Top publications
@@ -838,7 +838,7 @@ All reports are available as workflow artifacts:
 Navigate to the created PR and review the changes:
 - Check the PR description for coverage summary
 - Download artifacts from the workflow run if needed
-- Review `VALIDATED_*.csv` or `SUBMIT_*.csv` files in the PR
+- Review `ACCEPTED_*.csv` or `SUBMIT_*.csv` files in the PR
 - Check `priority_publications_FULLTEXT.csv` for context
 - Review PDF coverage reports
 
@@ -971,7 +971,7 @@ Scripts currently write output files to the **repository root** (for GitHub Acti
 **Tracked files (persistent state):**
 - `processed_publications.csv` - Cache of all processed publications
 - `SUBMIT_*.csv` - Unvalidated submission files
-- `VALIDATED_*.csv` - AI-validated submission files (production-ready)
+- `ACCEPTED_*.csv` - AI-validated submission files (production-ready)
 - Analysis CSVs (priority publications, GFF pubs, missing tools)
 - `tool_reviews/validation_report.xlsx` - AI validation summary
 - `tool_reviews/potentially_missed_tools.csv` - Tools AI found that mining missed

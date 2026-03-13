@@ -1,7 +1,7 @@
 name: Mine GFF Publications
 # One-shot workflow to mine the GFF-funded publications not yet linked to tools.
 # Fetches full text from PubMed Central, runs Sonnet tool extraction,
-# appends results to VALIDATED_*.csv, and pushes back to the target branch.
+# appends results to ACCEPTED_*.csv, and pushes back to the target branch.
 
 on:
   workflow_dispatch:
@@ -56,7 +56,7 @@ jobs:
         if: always()
         run: |
           echo "=== New VALIDATED counts ==="
-          for f in tool_coverage/outputs/VALIDATED_*.csv; do
+          for f in tool_coverage/outputs/ACCEPTED_*.csv; do
             n=$(tail -n +2 "$f" | wc -l)
             echo "  $(basename $f): $n rows"
           done
@@ -69,11 +69,11 @@ jobs:
 
             - Fetched full texts from PubMed Central
             - Ran Sonnet AI extraction on 17 GFF publications
-            - Appended accepted tools to VALIDATED_*.csv
+            - Appended accepted tools to ACCEPTED_*.csv
             - Re-ran generate_review_csv.py filters
           branch: ${{ github.event.inputs.target_branch || 'tool-coverage-update-33' }}
           file_pattern: |
-            tool_coverage/outputs/VALIDATED_*.csv
+            tool_coverage/outputs/ACCEPTED_*.csv
             tool_coverage/outputs/review.csv
             tool_coverage/outputs/review_filtered.csv
             tool_reviews/publication_cache/

@@ -162,7 +162,7 @@ Different tool types require different amounts of publication text for accurate 
 
 ### Integrated Workflow (CI/CD)
 
-**File**: `.github/workflows/check-tool-coverage.yml`
+**File**: `.github/workflows/publication-mining.yml`
 
 #### Step 1: Screen Publications (Haiku)
 
@@ -258,7 +258,7 @@ Different tool types require different amounts of publication text for accurate 
     python tool_coverage/scripts/generate_review_csv.py \
       --output-dir tool_coverage/outputs
     # Removes generic tools, deduplicates synonyms
-    # Writes VALIDATED_*.csv (single prefix per tool type)
+    # Writes ACCEPTED_*.csv (single prefix per tool type)
     # All metadata already in cache - NO RE-FETCHING
 ```
 
@@ -395,7 +395,7 @@ Has PMC full text?
 
 ### ✅ Workflow Integration
 
-- ✅ `.github/workflows/check-tool-coverage.yml` updated
+- ✅ `.github/workflows/publication-mining.yml` updated
   - Phase 1 cache step added (replaces old "Extract publication sections")
   - Phase 2 upgrade step added (after Sonnet validation)
   - Publications list prepared from cache (no re-fetching)
@@ -424,7 +424,7 @@ upgrade_cache_for_observations.py (based on validation results)
 run_publication_reviews.py --extract-observations (Sonnet observation extraction)
   ↓ ({PMID}_observations.yaml written alongside tool review YAMLs)
 generate_review_csv.py (post-filter: removes generic tools, deduplicates synonyms)
-  ↓ (writes VALIDATED_*.csv)
+  ↓ (writes ACCEPTED_*.csv)
 ```
 
 ---

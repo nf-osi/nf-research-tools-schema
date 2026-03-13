@@ -1,48 +1,58 @@
 # Workflow Coordination
 
-**Implementation of [Issue #97](https://github.com/nf-osi/nf-research-tools-schema/issues/97)**
-
 ## Overview
 
-The automated workflows in this repository run in a coordinated sequence where each workflow creates a Pull Request, and when that PR is merged, it triggers the next workflow in the chain. This ensures:
+The automated workflows in this repository run in a coordinated sequence. The monthly issue serves as the human-in-the-loop gate that coordinates annotation review, Formspark submission review, and publication mining.
 
-- ✅ Data dependencies are respected
-- ✅ Manual review gates between steps
-- ✅ No race conditions or overlapping workflows
+- ✅ Human review gates between steps
+- ✅ Annotation review embedded in monthly workflow (no separate weekly run)
+- ✅ Unified `submissions/` → `submissions/accepted/` review flow for all tool sources
 - ✅ Clear audit trail of changes
 
 ## Workflow Sequence
 
 ```mermaid
 graph TD
-    A[review-tool-annotations<br/>Monday 9 AM UTC] -->|Creates PR| B[PR Review & Merge]
-    B -->|Triggers| C[check-tool-coverage]
-    C -->|Creates PR| D[PR Review & Merge]
-    D -->|Triggers| E[link-tool-datasets]
-    E -->|Creates PR| F[PR Review & Merge]
-    F -->|Triggers| G[score-tools]
-    G -->|workflow_run| H[update-observation-schema]
-    H -->|Creates PR if changes| I[Final Review]
+    A[monthly-submission-check<br/>1st of month, 9 AM UTC] -->|Runs annotation review| B{New cell lines?}
+    B -->|Yes| C[Create annotation PR<br/>submissions/cell_lines/annotation_*.json]
+    B -->|No| D[Create monthly issue<br/>label: tool-submissions]
+    C --> D
+    D -->|Reviewer closes issue| E[publication-mining]
+    E -->|Creates PR| F[PR Review & Merge<br/>move submissions/ → submissions/accepted/]
+    F -->|Triggers| G[link-tool-datasets]
+    G -->|Creates PR| H[PR Review & Merge]
+    H -->|Triggers| I[score-tools]
+    I -->|workflow_run| J[update-observation-schema]
+    J -->|Creates PR if changes| K[Final Review]
 ```
 
 ## Detailed Flow
 
-### 1. Review Tool Annotations (Entry Point)
-**Workflow**: `review-tool-annotations.yml`
-**Trigger**: Schedule (Monday 9 AM UTC)
-**Creates PR**: Yes (label: `automated-annotation-review`)
+### 1. Monthly Submission Check (Entry Point)
+**Workflow**: `monthly-submission-check.yml`
+**Trigger**: Schedule (1st of month, 9 AM UTC)
+**Creates**: Annotation PR (if new cell lines) + monthly issue
 
-Analyzes individualID annotations from Synapse, suggests new cell lines and synonyms.
+1. Runs `scripts/review_tool_annotations.py`
+2. Converts new cell line suggestions → `submissions/cell_lines/annotation_*.json`
+3. Creates annotation PR (label: `annotation-submissions`) if new cells found
+4. Creates monthly issue (label: `tool-submissions`) with:
+   - Annotation review results and link to annotation PR
+   - Formspark submission review checklist
 
-**Manual Action Required**: Fill in `organ` field for cell lines
+**Manual Action Required**:
+- Review the annotation PR: confirm cell line names are real NF-relevant cell lines
+- Check Formspark dashboard for new form submissions; process with `process_formspark_export.py`
+- Move accepted files: `git mv submissions/{type}/*.json submissions/accepted/{type}/`
+- Close the monthly issue when done (triggers next step)
 
-**Next Step**: When PR is merged → triggers `check-tool-coverage`
+**Next Step**: Closing the monthly issue → triggers `publication-mining`
 
 ---
 
-### 2. Check Tool Coverage
-**Workflow**: `check-tool-coverage.yml`
-**Trigger**: PR merge with label `automated-annotation-review`
+### 2. Publication Mining
+**Workflow**: `publication-mining.yml`
+**Trigger**: Monthly issue closed with label `tool-submissions`
 **Creates PR**: Yes (label: `automated-mining`)
 
 Mines NF Portal and PubMed publications for novel tools:
@@ -50,8 +60,9 @@ Mines NF Portal and PubMed publications for novel tools:
 - Checks PMC full text availability
 - Maintains cache of reviewed publications for incremental processing
 - Validates findings with AI (optional)
+- Formats mined tools as JSON in `submissions/{type}/`
 
-**Next Step**: When PR is merged → triggers `link-tool-datasets`
+**Next Step**: When PR is merged (after reviewer moves accepted files to `submissions/accepted/`) → triggers `upsert-tools.yml`, then `link-tool-datasets`
 
 ---
 
@@ -88,9 +99,27 @@ Updates observation schema with latest tool data from Synapse.
 
 ## Technical Implementation
 
-### PR Merge Triggers
+### Issue Close Trigger (publication-mining)
 
-Most workflows use this pattern:
+`publication-mining.yml` uses this pattern:
+
+```yaml
+on:
+  issues:
+    types: [closed]
+  workflow_dispatch:
+
+jobs:
+  check-coverage:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' &&
+       contains(github.event.issue.labels.*.name, 'tool-submissions'))
+```
+
+### PR Merge Triggers (link-tool-datasets, score-tools)
+
+Later workflows use this pattern:
 
 ```yaml
 on:
@@ -98,11 +127,10 @@ on:
     types: [closed]
     branches:
       - main
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
 
 jobs:
   workflow-name:
-    # Only run if PR was merged (not just closed) and has correct label
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
@@ -112,53 +140,37 @@ jobs:
 
 ### Label-Based Coordination
 
-Each workflow checks for specific labels to ensure correct chaining:
-
-| Workflow | Checks for Label | Creates PR with Label |
+| Workflow | Checks for Label | Creates issue/PR with Label |
 |----------|-----------------|----------------------|
-| review-tool-annotations | N/A (entry point - scheduled) | `automated-annotation-review` |
-| check-tool-coverage | `automated-annotation-review` | `automated-mining` |
+| monthly-submission-check | N/A (entry point - scheduled) | `tool-submissions` (issue), `annotation-submissions` (PR if new cells) |
+| publication-mining | `tool-submissions` (issue closed) | `automated-mining` |
 | link-tool-datasets | `automated-mining` | `dataset-linking` |
 | score-tools | `dataset-linking` | N/A (no PR) |
 | update-observation-schema | N/A (workflow_run) | `schema-update` |
 
-### Workflow Run Trigger
+### submissions/ → submissions/accepted/ Review Flow
 
-The final step uses `workflow_run` since `score-tools` doesn't create a PR:
+All tool sources (mining, form submissions, annotation review) produce JSON files in `submissions/{type}/`:
 
-```yaml
-on:
-  workflow_run:
-    workflows: ["Calculate Tool Completeness Scores"]
-    types:
-      - completed
-    branches:
-      - main
+```
+submissions/
+  cell_lines/
+    annotation_NF90-8.json        ← from annotation review
+    form_abc123_NF90-8.json       ← from Formspark export
+    pmid12345678_NF90-8.json      ← from publication mining
+  animal_models/
+  antibodies/
+  ...
+  accepted/                       ← reviewer moves files here
+    cell_lines/
+      annotation_NF90-8.json
+    ...
 ```
 
-## Benefits of PR-Merge Coordination
-
-### 1. **Manual Review Gates**
-Each step can be reviewed before proceeding. Reviewers can:
-- Verify data quality
-- Check for errors or anomalies
-- Make corrections before proceeding
-- Stop the chain if issues found
-
-### 2. **Clear Audit Trail**
-- Each PR documents what changed
-- Git history shows when and why changes were made
-- Easy to track which workflow triggered which changes
-
-### 3. **Fail-Safe Design**
-- If a PR is closed without merging, chain stops
-- Bad data doesn't propagate through the pipeline
-- Can fix issues at any step
-
-### 4. **Flexible Testing**
-- Can test individual workflows without running entire chain
-- Manual triggers available for all workflows
-- Can merge PRs out of order if needed (for testing)
+When `submissions/accepted/**/*.json` is pushed to main, `upsert-tools.yml` triggers:
+1. Compiles `submissions/accepted/**/*.json` → appends new rows to `ACCEPTED_*.csv`
+2. Validates CSV schemas
+3. Uploads to Synapse tables
 
 ## Manual Trigger Guide
 
@@ -166,29 +178,30 @@ All workflows support manual triggers via `workflow_dispatch`:
 
 ### To Run Entire Chain Manually:
 
-1. **Trigger**: `review-tool-annotations`
-   - Go to Actions → Weekly Tool Annotation Review → Run workflow
+1. **Trigger**: `monthly-submission-check`
+   - Go to Actions → Monthly Tool Submission Check → Run workflow
    - Wait for completion
 
-2. **Review & Merge PR**
-   - Fill in required fields (organ for cell lines)
-   - Check the created PR
-   - Merge when ready
+2. **Review annotation PR** (if created)
+   - Confirm cell line names are real NF-relevant cell lines
+   - Move valid files to `submissions/accepted/cell_lines/` or delete if not a cell line
 
-3. **Automatic**: `check-tool-coverage` triggers
-   - Runs automatically after merge
+3. **Review Formspark submissions**
+   - Export from dashboard → run `process_formspark_export.py`
+   - Move accepted files to `submissions/accepted/{type}/`
+
+4. **Close the monthly issue**
+   - Triggers `publication-mining` automatically
+
+5. **Automatic**: `publication-mining` runs
    - Mines NF Portal and PubMed publications
-   - Wait for completion
+   - Creates PR with mined tools in `submissions/`
 
-4. **Review & Merge PR**
-   - Check mined tools and AI validation results
-   - Merge when ready
+6. **Review & merge PR**
+   - Move accepted tools from `submissions/` → `submissions/accepted/`
+   - Merging triggers `link-tool-datasets`
 
-5. **Automatic**: `link-tool-datasets` triggers
-   - Continues automatically
-   - Repeat review & merge pattern
-
-6. Continue through remaining workflows
+7. Continue through remaining workflows
 
 ### To Test Single Workflow:
 
@@ -203,76 +216,42 @@ All workflows support manual triggers via `workflow_dispatch`:
 ### Check Progress
 
 1. **Actions Tab**: See all running/completed workflows
-2. **Pull Requests**: Filter by labels to see chain PRs
-3. **Workflow Dependencies**: Each workflow shows what triggered it
+2. **Issues**: Filter by `tool-submissions` label for monthly issues
+3. **Pull Requests**: Filter by labels to see chain PRs
 
 ### Troubleshooting Breaks
 
 If a workflow doesn't trigger:
 
-1. **Check PR was merged** (not just closed)
-2. **Verify labels** on the merged PR
+1. **publication-mining**: Check that the issue has `tool-submissions` label and was closed
+2. **link-tool-datasets, score-tools**: Check PR was merged (not just closed) and has correct label
 3. **Check workflow permissions** in Settings
 4. **Review Actions logs** for errors
 5. **Verify secrets** are configured correctly
-
-## Schedule vs. PR Triggers
-
-Only `review-tool-annotations` has a schedule (entry point). All others are triggered by PR merges.
-
-### Why Only One Schedule?
-
-- **Prevents race conditions**: Only one entry point
-- **Ensures order**: Chain runs sequentially
-- **Data consistency**: Each step uses previous step's outputs
-- **Manual control**: Review gates between steps
-
-### Schedule Pattern
-
-```
-Monday 9 AM UTC: review-tool-annotations runs
-    ↓
-Monday/Tuesday: Review & merge annotation PR
-    ↓
-Tuesday: Tool coverage runs (mines NF Portal + PubMed)
-    ↓
-Tuesday/Wednesday: Review & merge tool coverage PR
-    ↓
-Wednesday: Dataset linking runs & merges
-    ↓
-Wednesday/Thursday: Scoring runs (no PR)
-    ↓
-Thursday: Schema update runs (if changes)
-```
-
-Actual timing depends on:
-- When PRs are reviewed and merged
-- Workflow execution time
-- Synapse data availability
 
 ## Best Practices
 
 ### For Reviewers
 
-1. **Check data quality** before merging
-2. **Fill in required fields** (e.g., organ for cell lines)
-3. **Look for anomalies** in suggested values
-4. **Verify counts** match expectations
+1. **Annotation review**: Verify cell line names are real, NF-relevant (not sample IDs or typos)
+2. **Formspark submissions**: Check for new submissions before closing the monthly issue
+3. **Mining PR**: Inspect `submissions/` JSON files — move valid tools to `submissions/accepted/`, delete rejects
+4. **Look for anomalies** in suggested values
 5. **Read workflow logs** if something looks wrong
 
 ### For Maintainers
 
 1. **Monitor Actions tab** regularly
 2. **Set up notifications** for failed workflows
-3. **Review PRs promptly** to keep chain moving
-4. **Check labels** are correct on PRs
+3. **Close monthly issues promptly** to keep chain moving
+4. **Check labels** are correct on issues and PRs
 5. **Update secrets** before they expire
 
 ### For Developers
 
 1. **Test changes** with manual triggers first
 2. **Don't modify labels** used for coordination
-3. **Keep PR conditionals** in sync with labels
+3. **Keep conditionals** in sync with labels
 4. **Document changes** in workflow files
 5. **Update this documentation** when changing flows
 

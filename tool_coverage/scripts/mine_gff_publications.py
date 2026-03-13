@@ -6,7 +6,7 @@ Steps:
 1. Fetch full text from PubMed Central for uncached GFF publications
 2. Run Anthropic AI tool extraction on each publication
 3. Save YAML results to tool_reviews/results/
-4. Append accepted tools (as new rows) to existing VALIDATED_*.csv files
+4. Append accepted tools (as new rows) to existing ACCEPTED_*.csv files
 5. Run generate_review_csv.py to re-filter / deduplicate
 
 Usage:
@@ -484,7 +484,7 @@ def run_review(pmid: str, cached: dict, client: anthropic.Anthropic,
     return None
 
 
-# ── Append tools to VALIDATED_*.csv ───────────────────────────────────────────
+# ── Append tools to ACCEPTED_*.csv ───────────────────────────────────────────
 
 _COMMON_KEYS = {
     'toolName', 'toolType', 'verdict', 'confidence',
@@ -610,7 +610,7 @@ def make_detail_row(tool_type: str, tool_name: str, fields: dict) -> dict:
 
 def build_validated_rows(pmid: str, doi: str, title: str, year: str,
                          tool_validations: list) -> dict[str, list[dict]]:
-    """Convert tool validations to rows suitable for appending to VALIDATED_*.csv."""
+    """Convert tool validations to rows suitable for appending to ACCEPTED_*.csv."""
     by_type: dict[str, list[dict]] = {}
 
     for tv in tool_validations:
@@ -665,10 +665,10 @@ def build_validated_rows(pmid: str, doi: str, title: str, year: str,
 
 
 def append_to_validated(by_type: dict[str, list[dict]], dry_run: bool = False):
-    """Append new tool rows to the existing VALIDATED_*.csv files."""
+    """Append new tool rows to the existing ACCEPTED_*.csv files."""
     for tool_type, rows in by_type.items():
         stem = TYPE_TO_STEM[tool_type]
-        validated_file = OUTPUT_DIR / f'VALIDATED_{stem}.csv'
+        validated_file = OUTPUT_DIR / f'ACCEPTED_{stem}.csv'
 
         if not validated_file.exists():
             print(f"  ⚠️  {validated_file.name} not found — skipping {tool_type}")
@@ -838,9 +838,9 @@ def main():
         print("\nℹ️  No new tools found — nothing to append.")
         return
 
-    # ── Step 3: Append to VALIDATED_*.csv ────────────────────────────────────
+    # ── Step 3: Append to ACCEPTED_*.csv ────────────────────────────────────
     print(f"\n{'='*60}")
-    print(f"Step 3: Appending to VALIDATED_*.csv{'  [DRY-RUN]' if args.dry_run else ''}")
+    print(f"Step 3: Appending to ACCEPTED_*.csv{'  [DRY-RUN]' if args.dry_run else ''}")
     print(f"{'='*60}")
 
     append_to_validated(all_by_type, dry_run=args.dry_run)
@@ -862,7 +862,7 @@ def main():
     if result.returncode != 0:
         print(f"\n❌ generate_review_csv.py exited with code {result.returncode}")
     else:
-        print(f"\n✅ Done — VALIDATED_*.csv files updated.")
+        print(f"\n✅ Done — ACCEPTED_*.csv files updated.")
 
 
 if __name__ == '__main__':
