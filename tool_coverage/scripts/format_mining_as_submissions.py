@@ -75,6 +75,18 @@ _RESOURCE_TYPE_MAP = {
     "clinical_assessment_tool": "Clinical Assessment Tool",
 }
 
+# Form enum value → submissions/ subdirectory name
+_RTYPE_TO_SUBDIR = {
+    "Animal Model":             "animal_models",
+    "Antibody":                 "antibodies",
+    "Cell Line":                "cell_lines",
+    "Genetic Reagent":          "genetic_reagents",
+    "Computational Tool":       "computational_tools",
+    "Advanced Cellular Model":  "advanced_cellular_models",
+    "Patient-Derived Model":    "patient_derived_models",
+    "Clinical Assessment Tool": "clinical_assessment_tools",
+}
+
 # Map tool type → (csv_filename, subdir, converter_fn name)
 _TYPE_CONFIG = {
     "cell_lines":              ("ACCEPTED_cell_lines.csv",              "cell_lines"),
@@ -398,17 +410,13 @@ def _load_pub_cache(cache_dir: Path) -> dict:
 def format_observations_from_yaml(
     yaml_dir: Path, cache_dir: Path, output_dir: Path, dry_run: bool
 ) -> int:
-    """Read *_observations.yaml files and write one JSON per observation to submissions/observations/."""
+    """Read *_observations.yaml files and write one JSON per observation to submissions/{type}/observations/."""
     obs_files = sorted(yaml_dir.glob("*_observations.yaml"))
     if not obs_files:
         print(f"  observations: no *_observations.yaml files found in {yaml_dir} — skipping")
         return 0
 
     pub_meta = _load_pub_cache(cache_dir)
-
-    out_subdir = output_dir / "observations"
-    if not dry_run:
-        out_subdir.mkdir(parents=True, exist_ok=True)
 
     count = 0
     for obs_file in obs_files:
@@ -436,6 +444,8 @@ def format_observations_from_yaml(
             resource_name = obs.get("resourceName", "")
             obs_type_raw  = obs.get("observationType", "Other")
             rtype_raw     = obs.get("resourceType", "")
+            rtype         = _RESOURCE_TYPE_MAP.get(rtype_raw, rtype_raw)
+            tdir          = _RTYPE_TO_SUBDIR.get(rtype, "unknown")
 
             data = {
                 "_source": "mining",
@@ -447,12 +457,16 @@ def format_observations_from_yaml(
                 "_confidence": str(obs.get("confidence", "")),
                 "_foundIn": obs.get("foundIn", ""),
                 "_contextSnippet": obs.get("contextSnippet", ""),
-                "resourceType": _RESOURCE_TYPE_MAP.get(rtype_raw, rtype_raw),
+                "resourceType": rtype,
                 "resourceName": resource_name,
                 "observationType": _OBS_TYPE_MAP.get(obs_type_raw, "Other"),
                 "details": obs.get("details", ""),
                 "referencePublication": doi or pmid_key,
             }
+
+            out_subdir = output_dir / tdir / "observations"
+            if not dry_run:
+                out_subdir.mkdir(parents=True, exist_ok=True)
 
             filename = f"{_sanitize(resource_name)}_{pmid_num}_{i:04d}.json"
             out_path = out_subdir / filename
@@ -464,7 +478,7 @@ def format_observations_from_yaml(
                     json.dump(data, fout, indent=2, ensure_ascii=False)
             count += 1
 
-    print(f"  observations: {count} JSON files → submissions/observations/")
+    print(f"  observations: {count} JSON files → submissions/{{type}}/observations/")
     return count
 
 

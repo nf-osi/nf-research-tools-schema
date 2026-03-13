@@ -512,7 +512,7 @@ jobs:
           python tool_coverage/scripts/format_mining_as_submissions.py \
             --csv-dir tool_coverage/outputs \
             --output-dir submissions
-          NEW_COUNT=$(find submissions -name "*.json" -not -path "*/accepted/*" -not -name ".gitkeep" | wc -l | tr -d ' ')
+          NEW_COUNT=$(find submissions -name "*.json" -not -path "*/accepted/*" -not -path "*/observations/*" | wc -l | tr -d ' ')
           echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
           echo "✅ ${NEW_COUNT} submission JSON files written"
 
@@ -557,9 +557,9 @@ jobs:
             ### Review instructions
 
             1. Inspect JSON files in `submissions/{type}/`
-            2. Move accepted tools: `git mv submissions/{type}/{name}.json submissions/accepted/{type}/`
+            2. Move accepted tools: `git mv submissions/{type}/{name}.json submissions/{type}/accepted/`
             3. Delete any that are incorrect or duplicates
-            4. Merge this PR — `upsert-tools.yml` compiles `submissions/accepted/**/*.json` → `ACCEPTED_*.csv` → Synapse upload
+            4. Merge this PR — `upsert-tools.yml` compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` → Synapse upload
 
             > **Note**: `_publications` array shows each publication where the tool was found, with `_usageType` and `_confidence` per entry. Check the artifacts for full pipeline logs.
           assignees: BelindaBGarana
@@ -568,4 +568,4 @@ jobs:
             tool-coverage
           add-paths: |
             tool_reviews/publication_cache/
-            submissions/
+            submissions/**

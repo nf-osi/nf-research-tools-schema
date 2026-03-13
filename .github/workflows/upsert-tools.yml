@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'submissions/accepted/**/*.json'
+      - 'submissions/*/accepted/**/*.json'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -41,7 +41,7 @@ jobs:
         id: changed_files
         run: |
           echo "=========================================="
-          echo "IDENTIFYING changed submissions/accepted/**/*.json"
+          echo "IDENTIFYING changed submissions/*/accepted/**/*.json"
           echo "=========================================="
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -55,7 +55,8 @@ jobs:
           else
             git diff --name-only --diff-filter=AM \
               "${{ github.event.before }}" "${{ github.sha }}" \
-              -- 'submissions/accepted/' \
+              -- 'submissions/' \
+              | grep '/accepted/' \
               | grep '\.json$' > changed_json_files.txt || true
 
             COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
@@ -74,14 +75,14 @@ jobs:
 
           if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
             # workflow_dispatch or initial push — process all accepted files
-            if find submissions/accepted -name "*.json" | grep -q .; then
+            if find submissions -path "*/accepted/*.json" | grep -q .; then
               python tool_coverage/scripts/compile_accepted_submissions.py \
-                --accepted-dir submissions/accepted \
+                --accepted-dir submissions \
                 --csv-dir tool_coverage/outputs
               echo "compile_ran=true" >> $GITHUB_OUTPUT
               echo "✅ Compilation complete (all files)"
             else
-              echo "No JSON files found in submissions/accepted/ — skipping"
+              echo "No JSON files found in submissions/*/accepted/ — skipping"
               echo "compile_ran=false" >> $GITHUB_OUTPUT
             fi
 
