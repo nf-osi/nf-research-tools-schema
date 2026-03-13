@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Convert ACCEPTED_*.csv rows to per-tool JSON files in submissions/.
+Convert ACCEPTED_*.csv rows and *_observations.yaml files to per-tool JSON files in submissions/.
 
-Run after generate_review_csv.py produces the ACCEPTED_*.csv files.
+Run after generate_review_csv.py produces the ACCEPTED_*.csv files and after
+run_publication_reviews.py --extract-observations produces *_observations.yaml files.
 Output JSON matches the form submission schema so the same compile step
 handles both mined tools and Formspark form submissions.
 
 Usage:
     python format_mining_as_submissions.py [--output-dir submissions]
                                            [--csv-dir tool_coverage/outputs]
+                                           [--observations-yaml-dir tool_reviews/results]
+                                           [--cache-dir tool_reviews/publication_cache]
                                            [--dry-run]
 """
 
@@ -18,6 +21,15 @@ import json
 import re
 import sys
 from pathlib import Path
+
+try:
+    import yaml as _yaml
+    def _load_yaml(path):
+        return _yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+except ImportError:
+    import json as _json_yaml
+    def _load_yaml(path):
+        raise ImportError("PyYAML is required for observation YAML support — pip install pyyaml")
 
 # ---------------------------------------------------------------------------
 # Reverse value maps (Synapse → form enum values)
@@ -39,6 +51,28 @@ _INSERT_SPECIES_REVERSE = {
     "Homo sapiens": "Human",
     "Mus musculus": "Mouse",
     "Rattus norvegicus": "Rat",
+}
+
+# Observation type mapping: mining types → form enum values
+_OBS_TYPE_MAP = {
+    "Behavioral": "Behavior",
+    "Biomarker":  "Molecular",
+    "Efficacy":   "Other",
+    "Mechanistic":"Cellular",
+    "Safety":     "Other",
+    "Other":      "Other",
+}
+
+# Resource type mapping: CSV snake_case → form enum values
+_RESOURCE_TYPE_MAP = {
+    "animal_model":             "Animal Model",
+    "antibody":                 "Antibody",
+    "cell_line":                "Cell Line",
+    "genetic_reagent":          "Genetic Reagent",
+    "computational_tool":       "Computational Tool",
+    "advanced_cellular_model":  "Advanced Cellular Model",
+    "patient_derived_model":    "Patient-Derived Model",
+    "clinical_assessment_tool": "Clinical Assessment Tool",
 }
 
 # Map tool type → (csv_filename, subdir, converter_fn name)
@@ -343,6 +377,97 @@ def _clinical_assessment_tool(row: dict) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Observation converter: reads *_observations.yaml directly (no CSV intermediate)
+# ---------------------------------------------------------------------------
+
+def _load_pub_cache(cache_dir: Path) -> dict:
+    """Return {pmid_key: {doi, title}} from publication_cache/*_text.json files."""
+    meta = {}
+    for cache_file in cache_dir.glob("*_text.json"):
+        try:
+            with open(cache_file, encoding="utf-8") as f:
+                data = json.load(f)
+            pmid_val = data.get("pmid", "")
+            meta[pmid_val] = {"doi": data.get("doi", ""), "title": data.get("title", "")}
+        except Exception:
+            pass
+    return meta
+
+
+def format_observations_from_yaml(
+    yaml_dir: Path, cache_dir: Path, output_dir: Path, dry_run: bool
+) -> int:
+    """Read *_observations.yaml files and write one JSON per observation to submissions/observations/."""
+    obs_files = sorted(yaml_dir.glob("*_observations.yaml"))
+    if not obs_files:
+        print(f"  observations: no *_observations.yaml files found in {yaml_dir} — skipping")
+        return 0
+
+    pub_meta = _load_pub_cache(cache_dir)
+
+    out_subdir = output_dir / "observations"
+    if not dry_run:
+        out_subdir.mkdir(parents=True, exist_ok=True)
+
+    count = 0
+    for obs_file in obs_files:
+        m = re.match(r"^(\d+)_observations\.yaml$", obs_file.name)
+        if not m:
+            continue
+        pmid_num = m.group(1)
+        pmid_key = f"PMID:{pmid_num}"
+
+        meta  = pub_meta.get(pmid_key, {})
+        doi   = meta.get("doi", "")
+        title = meta.get("title", "")
+
+        try:
+            content = _load_yaml(obs_file)
+        except Exception as e:
+            print(f"  ⚠️  Could not parse {obs_file.name}: {e}")
+            continue
+
+        observations = content.get("observations") or []
+        for i, obs in enumerate(observations):
+            if not isinstance(obs, dict):
+                continue
+
+            resource_name = obs.get("resourceName", "")
+            obs_type_raw  = obs.get("observationType", "Other")
+            rtype_raw     = obs.get("resourceType", "")
+
+            data = {
+                "_source": "mining",
+                "_publications": [{
+                    "_pmid": pmid_key,
+                    "_doi": doi,
+                    "_publicationTitle": title,
+                }],
+                "_confidence": str(obs.get("confidence", "")),
+                "_foundIn": obs.get("foundIn", ""),
+                "_contextSnippet": obs.get("contextSnippet", ""),
+                "resourceType": _RESOURCE_TYPE_MAP.get(rtype_raw, rtype_raw),
+                "resourceName": resource_name,
+                "observationType": _OBS_TYPE_MAP.get(obs_type_raw, "Other"),
+                "details": obs.get("details", ""),
+                "referencePublication": doi or pmid_key,
+            }
+
+            filename = f"{_sanitize(resource_name)}_{pmid_num}_{i:04d}.json"
+            out_path = out_subdir / filename
+
+            if dry_run:
+                print(f"  [dry-run] Would write {out_path.relative_to(output_dir.parent)}")
+            else:
+                with open(out_path, "w", encoding="utf-8") as fout:
+                    json.dump(data, fout, indent=2, ensure_ascii=False)
+            count += 1
+
+    print(f"  observations: {count} JSON files → submissions/observations/")
+    return count
+
+
 _CONVERTERS = {
     "cell_lines":               _cell_line,
     "animal_models":            _animal_model,
@@ -412,7 +537,7 @@ def format_csv_to_submissions(csv_dir: Path, output_dir: Path, dry_run: bool) ->
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert ACCEPTED_*.csv to per-tool JSON files in submissions/."
+        description="Convert ACCEPTED_*.csv and *_observations.yaml files to JSON in submissions/."
     )
     parser.add_argument(
         "--csv-dir", type=Path,
@@ -423,6 +548,16 @@ def main():
         "--output-dir", type=Path,
         default=Path("submissions"),
         help="Root output directory for JSON files (default: submissions/)",
+    )
+    parser.add_argument(
+        "--observations-yaml-dir", type=Path,
+        default=Path("tool_reviews/results"),
+        help="Directory containing *_observations.yaml files (default: tool_reviews/results)",
+    )
+    parser.add_argument(
+        "--cache-dir", type=Path,
+        default=Path("tool_reviews/publication_cache"),
+        help="Directory containing *_text.json publication cache files (default: tool_reviews/publication_cache)",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -437,6 +572,14 @@ def main():
     print(f"Reading ACCEPTED_*.csv from {args.csv_dir}/")
     print(f"Writing JSON to {args.output_dir}/\n")
     format_csv_to_submissions(args.csv_dir, args.output_dir, args.dry_run)
+
+    if args.observations_yaml_dir.exists():
+        print(f"\nReading observations from {args.observations_yaml_dir}/")
+        format_observations_from_yaml(
+            args.observations_yaml_dir, args.cache_dir, args.output_dir, args.dry_run
+        )
+    else:
+        print(f"No observations YAML dir found at {args.observations_yaml_dir} — skipping observations")
 
 
 if __name__ == "__main__":
