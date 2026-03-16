@@ -2,16 +2,16 @@
 
 ## Overview
 
-The tool annotation review system analyzes `individualID` annotations from Synapse and suggests new cell lines and synonyms to add to the tools database.
+The tool annotation review system analyzes `individualID` annotations from Synapse and suggests new cell lines to add to the tools database.
 
-**Workflow**: `review-tool-annotations.yml`
+**Workflow**: `monthly-submission-check.yml` (embedded step)
 **Script**: `scripts/review_tool_annotations.py`
-**Trigger**: Scheduled weekly (Monday 9 AM UTC) OR manual workflow_dispatch
-**Schedule Position**: Step 1 in workflow sequence (entry point)
+**Trigger**: Runs as part of monthly check (1st of each month, 9 AM UTC) OR manual workflow_dispatch
+**Schedule Position**: Part of Step 1 in workflow sequence (monthly entry point)
 
 ## Purpose
 
-Ensures that individualID values used in file annotations are properly represented in the tools database as cell lines, preventing orphaned or unrecognized tool references.
+Ensures that `individualID` values used in file annotations are properly represented in the tools database as cell lines, preventing orphaned or unrecognized tool references.
 
 ## How It Works
 
@@ -45,7 +45,7 @@ For each individualID value, the script:
 
 4. **No match**
    - Suggest creating as new cell line
-   - Generates SUBMIT_cell_lines.csv entry
+   - Generates `submissions/cell_lines/annotation_*.json` entry
 
 ### 3. Facet Analysis
 
@@ -81,9 +81,11 @@ Creates multiple files:
 - Facet recommendations
 - Usage frequencies
 
-**Submission CSVs**:
-- `SUBMIT_cell_lines.csv` - New cell lines
-- `SUBMIT_resources.csv` - Corresponding resource entries
+**Submission JSON files** (`submissions/cell_lines/annotation_*.json`):
+- One file per suggested new cell line
+- Form-compatible JSON with `_source: annotation_review`
+- Pre-filled: cell line name, source context
+- Needs manual review before moving to `submissions/accepted/`
 
 ## Assumptions
 
@@ -95,63 +97,75 @@ The system assumes all `individualID` values refer to cell lines. This is becaus
 2. Most biospecimens in NF research come from cell lines
 3. Cell lines are the most common type of individual/specimen
 
-**Manual Review Required**: Before merging the PR, verify that suggested resources are indeed cell lines and fill in the required `organ` field.
+**Manual Review Required**: Before merging the PR, verify that suggested resources are indeed cell lines (not sample IDs or typos).
 
 ## Workflow Integration
 
 ### Position in Chain
 
 ```
-1. review-tool-annotations (scheduled Mon 9AM UTC) → Analyzes annotations → Creates PR  ← ENTRY POINT
+1. monthly-submission-check (1st of month, 9 AM UTC)
+   ├─ Runs annotation review
+   ├─ Creates submissions/cell_lines/annotation_*.json for new cell lines
+   ├─ Creates annotation PR if new cell lines found
+   └─ Creates monthly issue (label: tool-submissions)
+         ↓ (issue closed by reviewer)
+2. publication-mining → Mines NF Portal + PubMed for tools
          ↓ (PR merged)
-2. check-tool-coverage → Mines NF Portal + PubMed for tools
-         ↓ (PR merged)
-3. link-tool-datasets → Links tools to datasets
+3. upsert-tools → Uploads accepted tools to Synapse
          ↓ ...
 ```
 
 ### PR Creation
 
-When new resources are found, creates a PR with:
+When new cell lines are found, `monthly-submission-check.yml` creates a PR with:
 
-**Title**: `🔍 Annotation Review - New Cell Lines (N suggested)`
+**Title**: `Annotation Review: N new cell line suggestion(s)`
+
+**Branch**: `annotation-submissions-{run_number}`
 
 **Labels**:
-- `automated-annotation-review`
-- `cell-lines`
+- `annotation-submissions`
 - `needs-manual-review`
 
 **Assignee**: BelindaBGarana
 
 **Files Included**:
-- `SUBMIT_cell_lines.csv`
-- `SUBMIT_resources.csv`
+- `submissions/cell_lines/annotation_*.json` — one per suggested cell line
 - `tool_annotation_suggestions.json`
 - `tool_annotation_suggestions.md`
 
 ### Manual Review Checklist
 
-Before merging the PR:
+Before merging the annotation PR:
 
-- [ ] Verify suggested cell lines are legitimate (not typos or errors)
-- [ ] Fill in `organ` field for each cell line (REQUIRED)
-- [ ] Check suggested synonyms make sense
-- [ ] Review facet suggestions (informational only)
+- [ ] Verify suggested cell lines are legitimate NF-relevant cell lines (not typos, sample IDs, or errors)
+- [ ] For each valid cell line: move to `submissions/accepted/`:
+  ```bash
+  git mv submissions/cell_lines/annotation_<name>.json submissions/accepted/cell_lines/
+  ```
+- [ ] Fill in known fields (tissue, disease, species, etc.) in the JSON
+- [ ] Delete files that are not real cell lines
+- [ ] Check suggested synonyms in `tool_annotation_suggestions.md` (informational; update manually if needed)
 - [ ] Ensure no duplicate entries
 
 ### What Happens After Merge
 
-When the PR is merged:
+When the annotation PR (or any PR touching `submissions/accepted/`) is merged:
 
 1. **Immediate**: `upsert-tools.yml` triggers automatically
+   - Compiles `submissions/accepted/**/*.json` → appends new rows to `ACCEPTED_cell_lines.csv`
    - Validates CSV schemas
    - Cleans tracking columns (prefixed with `_`)
    - Uploads to Synapse:
      - syn26486823 (cell lines table)
      - syn26450069 (resources table)
 
-2. **Next Step**: `check-tool-coverage.yml` triggers
-   - Continues the workflow chain
+### What Happens If No New Cell Lines Found
+
+- No annotation PR is created
+- Monthly issue still created with annotation results section:
+  > ✅ No new cell lines found in `individualID` annotations this month — nothing to do.
 
 ## Configuration
 
@@ -161,10 +175,6 @@ When the PR is merged:
 - `MIN_FREQUENCY = 2` - Minimum occurrences to suggest a value
 - `MIN_FILTER_FREQUENCY = 5` - Minimum unique values for facet suggestion
 - `FUZZY_MATCH_THRESHOLD = 0.85` - Similarity threshold for synonym matching
-
-**In Workflow** (`review-tool-annotations.yml`):
-- `min_count` input - Override minimum frequency (workflow_dispatch)
-- `annotation_limit` input - Limit records for testing
 
 ### Data Sources
 
@@ -186,7 +196,7 @@ When the PR is merged:
 individualID: "NF-ipsc-1234"
 Usage count: 15
 Status: New cell line
-Action: Create SUBMIT_cell_lines.csv entry
+Action: Write submissions/cell_lines/annotation_NF-ipsc-1234.json
 ```
 
 ### Synonym Suggested
@@ -195,8 +205,7 @@ Action: Create SUBMIT_cell_lines.csv entry
 individualID: "NF-90.8"
 Fuzzy matched: "NF90-8" in resource "NF90-8 Cell Line" (score: 0.92)
 Usage count: 8
-Action: Add "NF-90.8" to synonyms field
-Note: Manual update required (not in SUBMIT_*.csv)
+Action: Add "NF-90.8" to synonyms field (manual update required)
 ```
 
 ### Facet Suggestion
@@ -228,9 +237,8 @@ Sample values: ["Cancer cell line", "Induced pluripotent stem cell", ...]
 **Problem**: IndividualID should not be a cell line
 
 **Solution**:
-- Close PR without merging
-- Update script assumption if needed
-- Or manually create correct resource type in Synapse
+- Delete the `submissions/cell_lines/annotation_*.json` file for that entry
+- Or manually create the correct resource type in Synapse
 
 ### Fuzzy Matching Issues
 
@@ -252,24 +260,39 @@ Uses Python's `difflib.SequenceMatcher`:
 - Case-insensitive comparison
 - Works well for typos, formatting variations
 
-### CSV Format
+### Submission JSON Format
 
-**SUBMIT_cell_lines.csv** schema:
-```
-cellLineId,donorId,originYear,organ,strProfile,tissue,...
-uuid1234,,,,[empty fields]...,
+Each `submissions/cell_lines/annotation_*.json` file:
+```json
+{
+  "toolType": "cell_line",
+  "_source": "annotation_review",
+  "_context": "Found as individualID annotation in N Synapse dataset(s)",
+  "_confidence": "",
+  "_verdict": "include",
+  "_usageType": "novel",
+  "_pmid": "",
+  "_doi": "",
+  "_publicationTitle": "",
+  "_year": "",
+  "userInfo": {},
+  "basicInfo": {
+    "cellLineName": "NF-ipsc-1234",
+    "description": "",
+    "synonyms": "",
+    "species": "",
+    "sex": "",
+    "age": null,
+    "race": ""
+  },
+  "category": "",
+  "cellLineGeneticDisorder": "",
+  ...
+}
 ```
 
-**Tracking columns** (prefixed with `_`, removed before upload):
-```
-_cellLineName,_individualID,_usage_count,_source
-```
-
-**SUBMIT_resources.csv** schema:
-```
-resourceId,resourceName,resourceType,synonyms,cellLineId,...
-uuid5678,NF-ipsc-1234,Cell Line,,uuid1234,...
-```
+**Tracking columns** (prefixed with `_`, removed before Synapse upload):
+- `_source`, `_context`, `_confidence`, `_verdict`, `_usageType`, `_pmid`, etc.
 
 ## Related Documentation
 

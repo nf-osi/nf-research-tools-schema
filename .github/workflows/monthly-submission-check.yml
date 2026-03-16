@@ -1,0 +1,272 @@
+name: Monthly Tool Submission Check
+
+on:
+  schedule:
+    - cron: '0 9 1 * *'  # 1st of each month at 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  monthly-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install synapseclient pandas pyyaml
+
+      # ------------------------------------------------------------------
+      # Annotation review
+      # ------------------------------------------------------------------
+
+      - name: Run annotation review
+        id: annotation
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python scripts/review_tool_annotations.py 2>&1 | tee annotation_output.log
+
+          if [ ! -f tool_annotation_suggestions.json ]; then
+            echo "⚠️  review_tool_annotations.py produced no output file"
+            echo "has_new=false" >> $GITHUB_OUTPUT
+            echo "new_count=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          NEW_COUNT=$(python3 -c "
+          import json
+          d = json.load(open('tool_annotation_suggestions.json'))
+          print(len(d.get('individual_id_suggestions', {}).get('new_resources', [])))
+          ")
+          echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$NEW_COUNT" -gt 0 ]; then
+            echo "has_new=true" >> $GITHUB_OUTPUT
+            echo "✅ Found $NEW_COUNT new cell line suggestion(s)"
+          else
+            echo "has_new=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  No new cell line suggestions this month"
+          fi
+
+      - name: Convert annotation suggestions to submission JSON
+        id: format
+        if: steps.annotation.outputs.has_new == 'true'
+        run: |
+          python3 << 'EOF'
+          import json, re
+          from pathlib import Path
+
+          with open('tool_annotation_suggestions.json') as f:
+              data = json.load(f)
+
+          suggestions = data.get('individual_id_suggestions', {}).get('new_resources', [])
+          out_dir = Path('submissions/cell_lines')
+          out_dir.mkdir(parents=True, exist_ok=True)
+
+          written = []
+          for item in suggestions:
+              name = item['value']
+              count = item['count']
+              safe = re.sub(r'[^\w\-]', '_', name)[:80].strip('_') or 'unnamed'
+              out_path = out_dir / f"annotation_{safe}.json"
+
+              # Skip if already exists (re-run safety)
+              if out_path.exists():
+                  continue
+
+              out = {
+                  "toolType": "cell_line",
+                  "_source": "annotation_review",
+                  "_context": f"Found as individualID annotation in {count} Synapse dataset(s)",
+                  "_confidence": "",
+                  "_verdict": "include",
+                  "_usageType": "novel",
+                  "_pmid": "",
+                  "_doi": "",
+                  "_publicationTitle": "",
+                  "_year": "",
+                  "userInfo": {},
+                  "basicInfo": {
+                      "cellLineName": name,
+                      "description": "",
+                      "synonyms": "",
+                      "species": "",
+                      "sex": "",
+                      "age": None,
+                      "race": ""
+                  },
+                  "category": "",
+                  "cellLineGeneticDisorder": "",
+                  "cellLineManifestation": "",
+                  "tissue": "",
+                  "populationDoublingTime": None,
+                  "cultureMedia": "",
+                  "publicationDOI": "",
+                  "itemAcquisition": ""
+              }
+              out_path.write_text(json.dumps(out, indent=2))
+              written.append(name)
+
+          print(f"Written {len(written)} submission JSON file(s) to submissions/cell_lines/")
+          for name in written:
+              print(f"  • {name}")
+          EOF
+          echo "format_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Create PR for annotation submissions
+        id: annotation_pr
+        if: steps.format.outputs.format_complete == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            Add annotation review cell line suggestions to submissions/
+
+            - ${{ steps.annotation.outputs.new_count }} new cell line(s) from individualID annotations (syn52702673)
+            - Compared against tools registry (syn51730943)
+            - Move to submissions/accepted/cell_lines/ to include in Synapse upload
+          branch: annotation-submissions-${{ github.run_number }}
+          delete-branch: true
+          title: 'Annotation Review: ${{ steps.annotation.outputs.new_count }} new cell line suggestion(s)'
+          body: |
+            ## Annotation Review — New Cell Line Suggestions
+
+            Found **${{ steps.annotation.outputs.new_count }}** `individualID` annotation value(s) in Synapse
+            datasets that are not yet in the NF Research Tools registry.
+
+            ### Review instructions
+
+            For each file in `submissions/cell_lines/` with `_source: annotation_review`:
+
+            1. Confirm the cell line name is a real, NF-relevant cell line (not a sample ID or typo)
+            2. If valid, move it to `submissions/accepted/`:
+               ```bash
+               git mv submissions/cell_lines/annotation_<name>.json submissions/accepted/cell_lines/
+               ```
+            3. Fill in any known fields directly in the JSON (tissue, disease, species, etc.)
+            4. If not a cell line or a duplicate, delete the file
+
+            Merging this PR triggers `upsert-tools.yml` which compiles `submissions/accepted/**/*.json`
+            → `ACCEPTED_*.csv` → Synapse upload.
+
+            > **Note**: These submissions have minimal metadata — only the cell line name and
+            > source context are pre-filled. Additional fields should be completed during review.
+
+            See `tool_annotation_suggestions.md` for full analysis.
+          labels: |
+            annotation-submissions
+            needs-manual-review
+          assignees: BelindaBGarana
+          add-paths: |
+            submissions/cell_lines/annotation_*.json
+            tool_annotation_suggestions.json
+            tool_annotation_suggestions.md
+
+      # ------------------------------------------------------------------
+      # Monthly issue (always created; includes annotation review results)
+      # ------------------------------------------------------------------
+
+      - name: Create monthly check issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const now = new Date();
+            const monthName = now.toLocaleString('en-US', { month: 'long' });
+            const year = now.getFullYear();
+
+            const hasNew = '${{ steps.annotation.outputs.has_new }}' === 'true';
+            const newCount = '${{ steps.annotation.outputs.new_count }}' || '0';
+            const prNumber = '${{ steps.annotation_pr.outputs.pull-request-number }}';
+            const prUrl = '${{ steps.annotation_pr.outputs.pull-request-url }}';
+
+            // Annotation review section
+            let annotationSection;
+            if (hasNew && prUrl) {
+              annotationSection = [
+                '### Annotation Review',
+                '',
+                `Found **${newCount}** new cell line suggestion(s) from Synapse \`individualID\` annotations.`,
+                '',
+                `**Action required**: Review PR ${prUrl}`,
+                '- Move valid cell lines from `submissions/cell_lines/` → `submissions/accepted/cell_lines/`',
+                '- Delete any that are not real cell lines',
+                '- Merge the PR (can be combined with Formspark submissions in one PR)',
+              ].join('\n');
+            } else if ('${{ steps.annotation.outputs.has_new }}' === '') {
+              annotationSection = [
+                '### Annotation Review',
+                '',
+                '⚠️  Annotation review could not run (Synapse connection issue or script error).',
+                'Run manually: `workflow_dispatch` on **Monthly Tool Submission Check**.',
+              ].join('\n');
+            } else {
+              annotationSection = [
+                '### Annotation Review',
+                '',
+                '✅ No new cell lines found in `individualID` annotations this month — nothing to do.',
+              ].join('\n');
+            }
+
+            const body = [
+              '## Monthly Tool Submission Check',
+              '',
+              'This issue covers both the monthly Formspark submission review and the automated annotation review.',
+              '',
+              '---',
+              '',
+              annotationSection,
+              '',
+              '---',
+              '',
+              '### Formspark Submissions',
+              '',
+              'Check the [Formspark dashboard](https://dashboard.formspark.io/) for new tool submissions.',
+              '',
+              '1. - [ ] Log in to [Formspark](https://dashboard.formspark.io/) and navigate to form `KwZ46H4T`',
+              '2. - [ ] Check for submissions since the last issue was closed',
+              '3. - [ ] If there are new submissions, export them as JSON (**Submissions → select new entries → Export → JSON**)',
+              '4. - [ ] Run the conversion script from the repo root:',
+              '   ```bash',
+              '   python tool_coverage/scripts/process_formspark_export.py path/to/export.json',
+              '   ```',
+              '5. - [ ] Review files written to `submissions/{tool_type}/`',
+              '6. - [ ] Move accepted submissions: `git mv submissions/{type}/form_*.json submissions/accepted/{type}/`',
+              '7. - [ ] Delete rejected submissions',
+              '',
+              '---',
+              '',
+              '### Creating the PR',
+              '',
+              '8. - [ ] Create a PR with all changes to `submissions/accepted/` (annotation + Formspark)',
+              '9. - [ ] Verify `git diff` shows only expected new entries',
+              '10. - [ ] Merge PR — `upsert-tools.yml` will compile and upload to Synapse automatically',
+              '11. - [ ] Manually update `ACCEPTED_resources.csv` with descriptions and synonyms from form submissions',
+              '12. - [ ] Close this issue',
+              '',
+              '### Notes',
+              '',
+              '- If there are no Formspark submissions and no annotation suggestions, close this issue with label `no submissions`',
+              '- Submitter contact info is printed by the script but never committed',
+              '- Tool forms currently active on nf.synapse.org: **cell line, animal model, antibody, genetic reagent**',
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Monthly Tool Submission Check – ${monthName} ${year}`,
+              labels: ['tool-submissions'],
+              assignees: ['BelindaBGarana'],
+              body: body,
+            });

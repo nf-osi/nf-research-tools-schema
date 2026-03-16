@@ -2,154 +2,124 @@
 
 This repository uses automated GitHub Actions workflows to maintain and improve the NF Research Tools schema.
 
-## 🔗 Workflow Sequence (Issue #97)
+## 🔗 Workflow Sequence
 
-Workflows are coordinated through **PR merge triggers** - each workflow creates a PR, and when merged, triggers the next workflow in the sequence:
+Workflows are coordinated through **issue close triggers and PR merges**:
 
 ```
-1. review-tool-annotations.yml (Monday 9 AM UTC)
-   ├─ Analyzes individualID annotations vs tools
-   ├─ Suggests new cell lines and synonyms
-   └─ Creates PR with label: automated-annotation-review
-         ↓ (when PR merged)
+1. monthly-submission-check.yml (1st of each month, 9 AM UTC)
+   ├─ Runs annotation review (new cell lines from individualID annotations)
+   ├─ Creates annotation PR if new cell lines found
+   └─ Creates monthly issue with label: tool-submissions
+         ↓ (when issue with label tool-submissions is closed)
 
-2. check-tool-coverage.yml
+2. publication-mining.yml
    ├─ Mines NF Portal + PubMed publications for tools
-   ├─ Filters for research-focused publications
-   ├─ Checks PMC full text availability
-   ├─ Incremental processing (caches reviewed PMIDs)
-   ├─ AI validation with Goose (optional)
-   └─ Creates PR with label: automated-mining
-         ↓ (when PR merged)
+   ├─ Filters publications (title + abstract screening with Haiku)
+   ├─ Fetches minimal cache (Phase 1) and upgrades for high-confidence tools (Phase 2)
+   ├─ AI validation with Sonnet (direct API, 4 parallel workers)
+   ├─ Extracts observations for high-confidence tools (Phase 2)
+   ├─ Formats mined tools as JSON in submissions/{type}/
+   └─ Creates PR with label: tool-submissions
+         ↓ (reviewer moves accepted files to submissions/{type}/accepted/, then merges PR)
 
-3. link-tool-datasets.yml
-   ├─ Links datasets to tool publications
-   └─ Creates PR with label: dataset-linking
-         ↓ (when PR merged)
+3. upsert-tools.yml
+   ├─ Compiles submissions/{type}/accepted/**/*.json → ACCEPTED_*.csv
+   ├─ Validates CSV schemas
+   ├─ Uploads to Synapse tables (animal models, antibodies, cell lines, etc.)
+   └─ No PR created (uploads directly to Synapse)
+         ↓ (when PR from step 2 is merged, label: tool-submissions)
 
 4. score-tools.yml
    ├─ Calculates tool completeness scores
    ├─ Uploads directly to Synapse
    └─ No PR created (direct upload)
-         ↓ (workflow_run trigger)
-
-5. update-observation-schema.yml
-   ├─ Updates observation schema from Synapse
-   └─ Creates PR only if changes detected
 ```
 
 ### Key Points
 
-- **Entry point**: `review-tool-annotations.yml` runs on schedule (Monday 9 AM UTC)
-- **All other workflows**: Trigger on PR merge from previous step
+- **Entry point**: `monthly-submission-check.yml` runs on the 1st of each month (9 AM UTC)
+- **publication-mining**: Triggers when monthly issue with label `tool-submissions` is closed
+- **upsert-tools**: Triggers on push to main with files in `submissions/*/accepted/`
+- **score-tools**: Triggers on PR merge with label `tool-submissions`
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
-- **No schedules**: Only the entry point has a schedule; others are PR-driven
+- **Annotation review**: Embedded in the monthly issue workflow (not a separate weekly step)
 
 ## 📋 Workflow Details
 
-### 1. Review Tool Annotations (review-tool-annotations.yml)
+### 1. Monthly Submission Check (monthly-submission-check.yml)
 
-**Purpose**: Analyze individualID annotations and suggest new tools (ENTRY POINT)
+**Purpose**: Coordinate monthly tool review — runs annotation review and creates a GitHub issue with Formspark checklist (ENTRY POINT)
 
 **Trigger**:
-- Schedule: Monday 9 AM UTC
+- Schedule: 1st of each month at 9 AM UTC
 - Manual: workflow_dispatch
 
 **What it does**:
-1. Queries `individualID` from syn52702673 (annotations)
-2. Compares against tools in syn51730943
-3. Suggests new cell lines (assumes all individualIDs are cell lines)
-4. Uses fuzzy matching (0.85 threshold) to suggest synonyms
-5. Analyzes facet configuration
-6. Creates SUBMIT_*.csv files ready for Synapse upload
+1. Runs `scripts/review_tool_annotations.py` to compare `individualID` annotations (syn52702673) against tools registry (syn51730943)
+2. Converts annotation suggestions to `submissions/cell_lines/annotation_*.json`
+3. Creates a PR for annotation submissions if new cell lines found
+4. Creates a monthly GitHub issue with:
+   - Annotation review results (and link to PR if applicable)
+   - Formspark submission review checklist
 
 **Outputs**:
-- `SUBMIT_cell_lines.csv`
-- `SUBMIT_resources.csv`
+- `submissions/cell_lines/annotation_*.json` (if new cell lines found)
 - `tool_annotation_suggestions.json`
 - `tool_annotation_suggestions.md`
-
-**PR Labels**: `automated-annotation-review`, `cell-lines`, `needs-manual-review`
-
-**Assignee**: BelindaBGarana
-
-**Manual Review Required**: Fill in `organ` field for cell lines before merging
+- GitHub issue with label `tool-submissions`
+- PR with label `annotation-submissions` (if new cell lines found)
 
 **Documentation**: See [`docs/TOOL_ANNOTATION_REVIEW.md`](../../docs/TOOL_ANNOTATION_REVIEW.md)
 
 ---
 
-### 2. Check Tool Coverage (check-tool-coverage.yml)
+### 2. Publication Mining (publication-mining.yml)
 
 **Purpose**: Mine NF Portal + PubMed publications for ALL 9 tool types using multi-query strategy with AI validation
 
 **Trigger**:
-- When PR from `review-tool-annotations` is merged
+- When monthly issue with label `tool-submissions` is closed
 - Manual: workflow_dispatch
 
+**Manual Inputs** (workflow_dispatch only):
+| Input | Description | Default |
+|-------|-------------|---------|
+| `ai_validation` | Run AI validation on mined tools using Sonnet | `true` |
+| `max_publications` | Maximum number of publications to mine | all |
+| `force_rereviews` | Force re-review of already-reviewed publications | `false` |
+| `skip_title_screening` | Skip title screening (use existing `screened_publications.csv` from artifact) | `false` |
+| `skip_abstract_screening` | Skip abstract screening (use existing `abstract_screened_publications.csv` from artifact) | `false` |
+| `max_reviews` | Max Sonnet reviews per run | auto-calculated from timeout budget |
+
 **What it does**:
-1. **Runs TWO PubMed queries in parallel** to capture all tool types:
+1. **Runs TWO PubMed queries** to capture all tool types:
    - **Bench science query**: Lab tools, computational tools, organoids, PDX models
    - **Clinical assessment query**: Questionnaires, scales, patient-reported outcomes
-2. **Merges publication lists** by PMID, preserving query_type tags:
-   - Publications in both queries tagged: `query_type: "bench,clinical"`
-   - Used as hint for AI validation (but all 9 types always scanned)
-3. **Title screening with Haiku**: Pre-filters publications (INCLUDES clinical studies)
-4. **Full text mining**: Fetches and mines Methods, Introduction, Results, Discussion
-5. **Searches for ALL 9 tool types** in every publication:
-   - **Lab tools:** Cell lines, antibodies, animal models, genetic reagents, biobanks
-   - **Computational:** Software, pipelines (R, Python, ImageJ, STAR, Seurat, scanpy, 50+ tools)
-   - **Advanced models:** Organoids, assembloids, 3D cultures, spheroids
-   - **Patient-derived:** PDX, xenografts, humanized mice
-   - **Clinical:** SF-36, PROMIS, PedsQL, VAS, questionnaires, outcome measures
-6. **AI validation with Sonnet** (via Goose):
-   - Uses query_type as hint for expected tool categories
-   - Independently classifies publication type
-   - Validates all 9 tool types regardless of query_type
-   - Handles publications with multiple tool types
-7. **Formats results into 9 SUBMIT_*.csv files** (one per tool type)
-8. **Validates and cleans** submission files
-
-**Multi-Query Strategy**: Runs BOTH queries every time to discover all tool types
-- No separate runs needed - comprehensive coverage in single workflow execution
-- Expected monthly discovery: 69-83 tools (vs 18 with old single-query system)
+2. **Merges publication lists** by PMID, preserving query_type tags
+3. **Title screening with Haiku**: Pre-filters publications to research-relevant studies
+4. **Abstract screening with Haiku**: Further filters for NF tool usage/development
+5. **Applies timeout protection**: Caps publications to fit within 6-hour GitHub Actions limit
+6. **Appends Synapse candidates**: Fetches unlinked publications from NF portal
+7. **Phase 1 cache fetch**: Fetches minimal content per publication
+8. **AI validation with Sonnet** (direct Anthropic API, 4 parallel workers):
+   - Searches for ALL 9 tool types in every publication
+9. **Phase 2 cache upgrade**: Selectively adds Results + Discussion sections for high-confidence tools
+10. **Phase 2 observation extraction**: Extracts efficacy, safety, and outcome observations
+11. **Post-filter**: Removes generic tools, deduplicates (ephemeral — not committed)
+12. **Format as submission JSON**: Writes mined tools to `submissions/{type}/*.json`
 
 **Outputs**:
-- `tool_coverage/outputs/processed_publications.csv`
-- `tool_coverage/outputs/previously_reviewed_pmids.csv` (cache)
-- `SUBMIT_*.csv` files for various tool types
-- `tool_reviews/validation_report.xlsx`
-- Mining patterns improvements
+- `submissions/{type}/*.json` — mined tools as form-compatible JSON (one file per tool)
+- `tool_reviews/results/` — per-publication YAML review files
+- `tool_reviews/publication_cache/` — cached publication text
+- Artifacts: `tool-coverage-reports` (30-day), `tool-coverage-pre-validation` (7-day)
 
-**PR Labels**: `automated-mining`, `tool-coverage`
+**PR Labels**: `tool-submissions`
 
 **Assignee**: BelindaBGarana
 
 **Documentation**: See [`tool_coverage/README.md`](../../tool_coverage/README.md)
-
----
-
-### 3. Link Tool Datasets (link-tool-datasets.yml)
-
-**Purpose**: Link datasets to tools via publication relationships
-
-**Trigger**:
-- When PR from `check-tool-coverage` is merged
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Queries NF Portal publications linked to tools
-2. Finds datasets associated with those publications
-3. Creates tool-dataset linkage CSV
-4. Generates PR if new linkages found
-
-**Outputs**: `SUBMIT_tool_datasets.csv`
-
-**PR Labels**: `automated`, `dataset-linking`
-
-**Assignee**: BelindaBGarana
-
-**Documentation**: See [`tool_coverage/docs/Dataset-tool_linking_README.md`](../../tool_coverage/docs/Dataset-tool_linking_README.md)
 
 ---
 
@@ -158,7 +128,7 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 **Purpose**: Calculate and upload tool completeness scores
 
 **Trigger**:
-- When PR from `link-tool-datasets` is merged
+- When PR with label `tool-submissions` is merged to main
 - Manual: workflow_dispatch
 
 **What it does**:
@@ -167,65 +137,44 @@ Workflows are coordinated through **PR merge triggers** - each workflow creates 
 3. Uploads scores directly to Synapse
 4. Generates PDF report
 
-**Outputs**:
-- Synapse tables: ToolCompletenessScores, ToolCompletenessSummary
-- PDF report (artifact)
-
 **No PR Created**: Uploads directly to Synapse
 
 ---
 
-### 5. Update Observation Schema (update-observation-schema.yml)
-
-**Purpose**: Keep observation schema in sync with Synapse data
-
-**Trigger**:
-- When `score-tools` workflow completes (workflow_run)
-- Manual: workflow_dispatch
-
-**What it does**:
-1. Queries syn51730943 for unique resourceType and resourceName values
-2. Compares with current SubmitObservationSchema.json
-3. If changes detected, updates schema and creates PR
-4. If no changes, workflow completes without PR
-
-**Outputs**: Updated `SubmitObservationSchema.json` (if changes)
-
-**PR Labels**: `automated`, `schema-update`
-
-**Assignee**: BelindaBGarana
-
----
 
 ## 🔧 Supporting Workflows
 
 These workflows support the main sequence but run independently:
 
-### Upsert Tools to Synapse (upsert-tools.yml)
+### 3. Upsert Tools to Synapse (upsert-tools.yml)
 
-**Purpose**: Automatically upload validated tool data to Synapse
+**Purpose**: Compile accepted JSON submissions and upload to Synapse
 
 **Trigger**:
-- When SUBMIT_*.csv or VALIDATED_*.csv files are pushed to main
+- When `submissions/*/accepted/**/*.json` files are pushed to main (i.e. when a tool-submissions PR is merged)
 - Manual: workflow_dispatch with optional dry-run
 
 **What it does**:
-1. Detects VALIDATED_*.csv (AI-validated) or SUBMIT_*.csv files
-2. Validates CSV schemas
-3. Cleans tracking columns (prefixed with `_`)
-4. Uploads to corresponding Synapse tables:
+1. Diffs changed files — only processes JSON files that changed in the push (diff-based compile)
+2. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv`
+3. Validates CSV schemas
+4. Cleans tracking columns (prefixed with `_`)
+5. Uploads to corresponding Synapse tables:
    - syn26486808 (animal models)
    - syn26486811 (antibodies)
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
    - syn26450069 (resources)
-5. Regenerates coverage report
+6. Regenerates coverage report
+
+**Review flow**:
+- Mined tools are written as JSON to `submissions/{type}/`
+- Reviewer moves accepted files: `git mv submissions/{type}/file.json submissions/{type}/accepted/`
+- Merging the PR pushes `*/accepted/*.json` to main → triggers this workflow
 
 **No PR Created**: Uploads directly, creates summary in Actions
 
 ---
-
-
 
 ### Upsert Tool Datasets (upsert-tool-datasets.yml)
 
@@ -234,11 +183,6 @@ These workflows support the main sequence but run independently:
 **Trigger**:
 - When SUBMIT_tool_datasets.csv is pushed to main
 - Manual: workflow_dispatch
-
-**What it does**:
-1. Validates dataset linkage CSV
-2. Uploads to appropriate Synapse table
-3. Links datasets to tools via publications
 
 ---
 
@@ -250,13 +194,6 @@ These workflows support the main sequence but run independently:
 - When schema files change
 - Manual: workflow_dispatch
 
-**What it does**:
-1. Generates visual representation of schema
-2. Creates interactive documentation
-3. Publishes to GitHub Pages or artifact
-
-**Output**: Interactive schema browser
-
 ---
 
 ### Schematic Schema Convert (schematic-schema-convert.yml)
@@ -266,11 +203,6 @@ These workflows support the main sequence but run independently:
 **Trigger**:
 - When schema CSV is updated
 - Manual: workflow_dispatch
-
-**What it does**:
-1. Converts nf_research_tools.rdb.model.csv to JSON-LD
-2. Validates schema format
-3. Commits converted schema
 
 **Note**: Keeps CSV and JSON-LD schemas in sync
 
@@ -291,7 +223,7 @@ These workflows support the main sequence but run independently:
    - Configure in: Settings → Secrets and variables → Actions
 
 3. **ANTHROPIC_API_KEY** (optional, for AI validation)
-   - Only needed for check-tool-coverage.yml AI validation
+   - Only needed for publication-mining.yml AI validation
    - Can skip validation if not configured
    - Configure in: Settings → Secrets and variables → Actions
 
@@ -300,7 +232,7 @@ These workflows support the main sequence but run independently:
 Ensure workflows have these permissions:
 - `contents: write` - to commit changes
 - `pull-requests: write` - to create PRs
-- `issues: write` - for check-tool-coverage workflow
+- `issues: write` - for monthly-submission-check workflow
 
 ## 🧪 Manual Testing
 
@@ -313,11 +245,10 @@ All workflows can be manually triggered:
 5. Click **Run workflow**
 
 **Testing Order** (if running entire chain manually):
-1. review-tool-annotations (entry point)
-2. Review & merge PR → triggers check-tool-coverage
-3. Review & merge PR → triggers link-tool-datasets
-4. Review & merge PR → triggers score-tools
-5. Automatically runs → update-observation-schema
+1. monthly-submission-check (entry point) — or close an issue with `tool-submissions` label
+2. publication-mining triggers automatically → creates PR
+3. Review PR: move accepted JSONs to `submissions/{type}/accepted/`, merge → triggers upsert-tools
+4. Merge also triggers score-tools
 
 ## 📊 Monitoring
 
@@ -331,21 +262,20 @@ All workflows can be manually triggered:
 ### Review PRs
 
 Filter PRs by labels:
-- `pubmed-mining` - PubMed mining results
-- `automated-annotation-review` - New cell lines from annotations
-- `automated-mining` - Novel tools from publications
-- `dataset-linking` - Dataset-tool linkages
-- `schema-update` - Observation schema updates
+- `annotation-submissions` - New cell lines from annotations
+- `tool-submissions` - Mined tools from publications (review + move to accepted/ before merging)
+
+
 
 ## 🔍 Troubleshooting
 
 ### Workflow Not Triggering
 
-**Problem**: Next workflow doesn't trigger after merging PR
+**Problem**: publication-mining doesn't trigger after closing the monthly issue
 
 **Check**:
-- Verify PR has the correct label (e.g., `automated-annotation-review`)
-- Confirm PR was merged (not just closed)
+- Verify issue has the `tool-submissions` label
+- Confirm issue was closed (not just commented on)
 - Check Actions tab for any failed runs
 - Verify workflow permissions are correct
 
