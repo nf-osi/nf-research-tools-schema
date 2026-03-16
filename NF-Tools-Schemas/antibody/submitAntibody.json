@@ -3,148 +3,54 @@
   "title": "Submit Antibody",
   "type": "object",
   "properties": {
-    "userInfo": {
-      "type": "object",
-      "title": "Your Information",
-      "properties": {
-        "firstandlastName": {
-          "type": "string",
-          "title": "First and Last Name"
-        },
-        "email": {
-          "type": "string",
-          "title": "Contact Email",
-          "format": "email"
-        },
-        "institution": {
-          "type": "string",
-          "title": "Institution/Affiliation",
-          "default": ""
-        },
-        "isDeveloper": {
-          "type": "string",
-          "title": "Are you the developer?",
-          "enum": [
-            "Yes",
-            "No"
-          ],
-          "default": "Yes"
-        }
-      },
-      "required": [
-        "firstandlastName",
-        "email",
-        "isDeveloper"
-      ]
-    },
     "basicInfo": {
       "type": "object",
-      "title": "",
+      "title": "Antibody Information",
       "properties": {
-        "antibodyName": {
-          "type": "string",
-          "title": "Name of Antibody"
-        },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20 words)"
-        },
+        "antibodyName": { "type": "string", "title": "Name of Antibody" },
+        "synonyms": { "type": "string", "title": "Synonyms" },
+        "description": { "type": "string", "title": "Description (~20 words)" },
         "hostOrganism": {
           "type": "string",
           "title": "Host Organism",
-          "enum": [
-            "Mouse",
-            "Rabbit",
-            "Unknown"
-          ]
+          "enum": ["Mouse", "Rabbit", "Unknown"]
         },
         "reactiveSpecies": {
           "type": "object",
           "title": "Reactive Species",
           "properties": {
-            "Human": {
-              "type": "boolean"
-            },
-            "Mouse": {
-              "type": "boolean"
-            },
-            "Rat": {
-              "type": "boolean"
-            },
-            "Chicken": {
-              "type": "boolean"
-            },
-            "Rabbit": {
-              "type": "boolean"
-            },
-            "Pig": {
-              "type": "boolean"
-            },
-            "Dog": {
-              "type": "boolean"
-            },
-            "Zebrafish": {
-              "type": "boolean"
-            },
-            "Fish": {
-              "type": "boolean"
-            },
-            "Non-humanprimate": {
-              "type": "boolean"
-            },
-            "GuineaPig": {
-              "type": "boolean"
-            },
-            "Hamster": {
-              "type": "boolean"
-            },
-            "Cow": {
-              "type": "boolean"
-            },
-            "Monkey": {
-              "type": "boolean"
-            },
-            "Avian": {
-              "type": "boolean"
-            },
-            "Horse": {
-              "type": "boolean"
-            },
-            "Rodent": {
-              "type": "boolean"
-            },
-            "Drosophila": {
-              "type": "boolean"
-            },
-            "Unknown": {
-              "type": "boolean"
-            }
+            "Human": { "type": "boolean" },
+            "Mouse": { "type": "boolean" },
+            "Rat": { "type": "boolean" },
+            "Chicken": { "type": "boolean" },
+            "Rabbit": { "type": "boolean" },
+            "Pig": { "type": "boolean" },
+            "Dog": { "type": "boolean" },
+            "Zebrafish": { "type": "boolean" },
+            "Fish": { "type": "boolean" },
+            "Non-humanprimate": { "type": "boolean" },
+            "GuineaPig": { "type": "boolean" },
+            "Hamster": { "type": "boolean" },
+            "Cow": { "type": "boolean" },
+            "Monkey": { "type": "boolean" },
+            "Avian": { "type": "boolean" },
+            "Horse": { "type": "boolean" },
+            "Rodent": { "type": "boolean" },
+            "Drosophila": { "type": "boolean" },
+            "Unknown": { "type": "boolean" }
           }
-        }
+        },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": [
-        "antibodyName",
-        "description",
-        "hostOrganism",
-        "reactiveSpecies"
-      ]
+      "required": ["antibodyName", "description", "hostOrganism", "reactiveSpecies"]
     },
-    "conjugated": {
+    "conjugate": {
       "type": "string",
       "title": "Conjugated",
-      "enum": [
-        "Yes",
-        "Non-conjugated"
-      ]
+      "enum": ["Conjugated", "Non-conjugated"]
     },
-    "targetAntigen": {
-      "type": "string",
-      "title": "Target Antigen"
-    },
+    "targetAntigen": { "type": "string", "title": "Target Antigen" },
     "cloneId": {
       "type": "string",
       "title": "Clone ID",
@@ -158,113 +64,63 @@
     "clonality": {
       "type": "string",
       "title": "Clonality",
-      "enum": [
-        "Monoclonal",
-        "Polyclonal",
-        "Secondary",
-        "Recombinant",
-        "Control",
-        "Cocktail",
-        "Isotope Control",
-        "Unknown"
-      ]
+      "enum": ["Monoclonal", "Polyclonal", "Secondary", "Recombinant", "Control", "Cocktail", "Isotope Control", "Unknown"]
     },
     "developmentPublicationDOI": {
       "type": "string",
-      "title": "Development Publication DOI (where tool was first described)"
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
     },
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": {
-        "type": "string",
-        "title": "DOI"
-      }
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
     },
     "itemAcquisition": {
       "type": "string",
       "title": "How to acquire",
-      "enum": [
-        "Contact Developer",
-        "Purchase from Vendor",
-        "Other"
-      ],
+      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
       "default": "Contact Developer"
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Antibody"
     }
   },
+  "required": ["basicInfo"],
   "allOf": [
     {
-      "if": {
-        "properties": {
-          "userInfo": {
-            "properties": {
-              "isDeveloper": {
-                "const": "No"
-              }
-            }
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
       "then": {
         "properties": {
-          "userInfo": {
-            "properties": {
-              "developerName": {
-                "type": "string",
-                "title": "Developer Name"
-              },
-              "developerAffiliation": {
-                "type": "string",
-                "title": "Developer Affiliation"
-              }
-            }
-          }
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Purchase from Vendor"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
       "then": {
         "properties": {
-          "vendor": {
-            "type": "string",
-            "title": "Vendor Name"
-          },
-          "catalogNumber": {
-            "type": "string",
-            "title": "Catalog Number"
-          },
-          "catalogURL": {
-            "type": "string",
-            "title": "Link to vendor page"
-          }
+          "vendor": { "type": "string", "title": "Vendor Name" },
+          "catalogNumber": { "type": "string", "title": "Catalog Number" },
+          "catalogURL": { "type": "string", "title": "Link to vendor page" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Other"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
       "then": {
         "properties": {
-          "additionalDetails": {
-            "type": "string",
-            "title": "Please provide additional details."
-          }
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
         },
-        "required": [
-          "additionalDetails"
-        ]
+        "required": ["additionalDetails"]
       }
     }
   ]

@@ -80,7 +80,7 @@ COLUMNS = {
     ],
     "advanced_cellular_models": [
         "advancedCellularModelId", "modelType", "derivationSource", "cellTypes",
-        "organoidType", "matrixType", "cultureSystem", "maturationTime",
+        "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -178,11 +178,11 @@ def _tool_type_from_json(data: dict) -> str | None:
     checks = [
         ("cell_line",              ["basicInfo.cellLineName", "cellLineGeneticDisorder"]),
         ("antibody",               ["basicInfo.antibodyName", "targetAntigen"]),
-        ("animal_model",           ["basicInfo.animalModelName", "animalModelDisease"]),
+        ("animal_model",           ["basicInfo.animalModelName", "animalModelGeneticDisorder"]),
         ("genetic_reagent",        ["insertName", "vectorType"]),
-        ("patient_derived_model",  ["basicInfo.modelName", "basicInfo.modelSystemType"]),
+        ("patient_derived_model",  ["basicInfo.resourceName", "basicInfo.modelSystemType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareType"]),
-        ("advanced_cellular_model",["basicInfo.modelType", "basicInfo.derivationSource"]),
+        ("advanced_cellular_model",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "basicInfo.assessmentType"]),
         ("observation",            ["resourceType", "observationType"]),
     ]
@@ -200,16 +200,16 @@ def _build_cell_line(d: dict) -> dict:
     tissue = _get(d, "tissue")
     return {
         "cellLineId": "",
-        "organ": "",
+        "organ": _get(d, "organ"),
         "tissue": tissue,
         "cellLineManifestation": _get(d, "cellLineManifestation"),
         "cellLineGeneticDisorder": _get(d, "cellLineGeneticDisorder"),
         "cellLineCategory": _get(d, "category", "cellLineCategory"),
         "donorId": "",
-        "originYear": "",
-        "strProfile": "",
-        "resistance": "",
-        "contaminatedMisidentified": "",
+        "originYear": _get(d, "originYear"),
+        "strProfile": _get(d, "strProfile"),
+        "resistance": _get(d, "resistance"),
+        "contaminatedMisidentified": _get(d, "contaminatedMisidentified"),
         "populationDoublingTime": _get(d, "populationDoublingTime"),
         "cultureMedia": _get(d, "cultureMedia"),
         "_resourceName": _get(d, "basicInfo.cellLineName", "cellLineName"),
@@ -227,7 +227,7 @@ def _build_cell_line(d: dict) -> dict:
 
 def _build_antibody(d: dict) -> dict:
     reactive = _get(d, "basicInfo.reactiveSpecies", "reactiveSpecies")
-    conj_raw = _get(d, "conjugated")
+    conj_raw = _get(d, "conjugate")
     return {
         "antibodyId": "",
         "targetAntigen": _get(d, "targetAntigen"),
@@ -250,14 +250,14 @@ def _build_antibody(d: dict) -> dict:
 
 
 def _build_animal_model(d: dict) -> dict:
-    disease_raw = _get(d, "animalModelDisease")
+    disease_raw = _get(d, "animalModelGeneticDisorder")
     return {
         "animalModelId": "",
         "strainNomenclature": _get(d, "strainNomenclature"),
         "backgroundStrain": _get(d, "backgroundStrain"),
         "backgroundSubstrain": _get(d, "backgroundSubstrain"),
         "animalModelGeneticDisorder": _DISEASE_MAP.get(disease_raw, disease_raw),
-        "animalModelOfManifestation": _get(d, "animalModelManifestation"),
+        "animalModelOfManifestation": _get(d, "animalModelOfManifestation"),
         "transplantationType": _get(d, "transplantationType"),
         "animalState": _get(d, "animalState"),
         "generation": _get(d, "generation"),
@@ -332,7 +332,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "humanizationMethod": _get(bi, "humanizationMethod"),
         "immuneSystemComponents": _fmt_list(_get(bi, "immuneSystemComponents")),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
-        "_resourceName": _get(bi, "modelName") or _get(d, "_resourceName"),
+        "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -341,7 +341,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
         "_usageType": _get(d, "_usageType", default="novel"),
-        "_toolName": _get(bi, "modelName") or _get(d, "_resourceName"),
+        "_toolName": _get(bi, "resourceName") or _get(d, "_resourceName"),
     }
 
 
@@ -383,12 +383,13 @@ def _build_advanced_cellular_model(d: dict) -> dict:
         "organoidType": _get(bi, "organoidType"),
         "matrixType": _get(bi, "matrixType"),
         "cultureSystem": _get(bi, "cultureSystem"),
+        "cultureMedia": _get(bi, "cultureMedia"),
         "maturationTime": _get(bi, "maturationTime"),
         "characterizationMethods": _fmt_list(_get(bi, "characterizationMethods")),
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _get(bi, "qualityControlMetrics"),
-        "_resourceName": _get(bi, "modelName") or _get(d, "_resourceName"),
+        "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -397,7 +398,7 @@ def _build_advanced_cellular_model(d: dict) -> dict:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
         "_usageType": _get(d, "_usageType", default="novel"),
-        "_toolName": _get(bi, "modelName") or _get(d, "_resourceName"),
+        "_toolName": _get(bi, "resourceName") or _get(d, "_resourceName"),
     }
 
 

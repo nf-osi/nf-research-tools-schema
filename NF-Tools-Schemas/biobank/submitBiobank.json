@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Submit Biobank",
+  "type": "object",
+  "properties": {
+    "basicInfo": {
+      "type": "object",
+      "title": "Biobank Information",
+      "properties": {
+        "biobankName": { "type": "string", "title": "Name of Biobank" },
+        "synonyms": { "type": "string", "title": "Synonyms or Abbreviations" },
+        "description": { "type": "string", "title": "Description (~20-50 words)" },
+        "biobankURL": { "type": "string", "title": "Biobank URL", "format": "uri" },
+        "diseaseType": {
+          "type": "array",
+          "title": "NF Disease Type(s)",
+          "items": {
+            "type": "string",
+            "enum": ["Neurofibromatosis type 1", "Neurofibromatosis type 2", "Schwannomatosis"]
+          },
+          "uniqueItems": true
+        },
+        "specimenType": {
+          "type": "array",
+          "title": "Specimen Types Available",
+          "items": {
+            "type": "string",
+            "enum": ["cell lines", "human tissue", "xenograft tumors", "blood", "DNA", "RNA", "Other"]
+          },
+          "uniqueItems": true
+        },
+        "specimenTissueType": {
+          "type": "array",
+          "title": "Tissue Types Represented",
+          "items": {
+            "type": "string",
+            "enum": ["Tumor", "Blood", "Bone", "Cerebrospinal Fluid", "Brain", "Skin", "Other"]
+          },
+          "uniqueItems": true
+        },
+        "tumorType": {
+          "type": "array",
+          "title": "Tumor Types Available",
+          "items": {
+            "type": "string",
+            "enum": [
+              "plexiform neurofibroma", "cutaneous neurofibroma", "atypical neurofibroma",
+              "malignant peripheral nerve sheath tumor", "schwannoma", "meningioma",
+              "optic nerve glioma", "low grade glioma", "high grade glioma",
+              "neurofibroma NOS", "diffuse infiltrating neurofibroma", "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "specimenPreparationMethod": {
+          "type": "array",
+          "title": "Specimen Preparation Methods",
+          "items": {
+            "type": "string",
+            "enum": ["Flash frozen", "FFPE", "Cryopreserved", "RNA later", "Formalin-fixed", "Ethanol", "Other"]
+          },
+          "uniqueItems": true
+        },
+        "specimenFormat": {
+          "type": "array",
+          "title": "Specimen Formats Available",
+          "items": {
+            "type": "string",
+            "enum": ["whole tumor", "DNA", "RNA", "cells", "whole cell lysate", "FFPE sections", "Other"]
+          },
+          "uniqueItems": true
+        },
+        "contact": { "type": "string", "title": "Contact / Acquisition Instructions" },
+        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "developerName": { "type": "string", "title": "Curator/Contact Name" },
+        "developerAffiliation": { "type": "string", "title": "Curator/Contact Affiliation" }
+      },
+      "required": ["biobankName"]
+    },
+    "developmentPublicationDOI": {
+      "type": "string",
+      "title": "Development Publication DOI (where biobank was first described)",
+      "pattern": "^$|^10\\."
+    },
+    "usagePublicationDOIs": {
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to request samples",
+      "enum": [
+        "Submit Request",
+        "Contact Curator",
+        "Other"
+      ]
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Biobank" }
+  },
+  "required": ["basicInfo"],
+  "allOf": [
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Submit Request" } } },
+      "then": {
+        "properties": {
+          "requestFormURL": { "type": "string", "title": "Request Form URL", "format": "uri" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Curator" } } },
+      "then": {
+        "properties": {
+          "developerContactEmail": { "type": "string", "title": "Curator Contact Email (optional)", "format": "email" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "then": {
+        "properties": {
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+        },
+        "required": ["additionalDetails"]
+      }
+    }
+  ]
+}

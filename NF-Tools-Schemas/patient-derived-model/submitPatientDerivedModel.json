@@ -3,176 +3,115 @@
   "title": "Submit Patient-Derived Model",
   "type": "object",
   "properties": {
-    "userInfo": {
-      "type": "object",
-      "title": "Your Information",
-      "properties": {
-        "firstandlastName": {
-          "type": "string",
-          "title": "First and Last Name"
-        },
-        "email": {
-          "type": "string",
-          "title": "Contact Email",
-          "format": "email"
-        },
-        "institution": {
-          "type": "string",
-          "title": "Institution/Affiliation",
-          "default": ""
-        },
-        "isDeveloper": {
-          "type": "string",
-          "title": "Are you the developer?",
-          "enum": [
-            "Yes",
-            "No"
-          ],
-          "default": "Yes"
-        }
-      },
-      "required": ["firstandlastName", "email", "isDeveloper"]
-    },
     "basicInfo": {
       "type": "object",
-      "title": "",
+      "title": "Patient-Derived Model Information",
       "properties": {
-        "modelName": {
-          "type": "string",
-          "title": "Name of Patient-Derived Model"
-        },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
+        "resourceName": { "type": "string", "title": "Name of Patient-Derived Model" },
+        "synonyms": { "type": "string", "title": "Synonyms" },
+        "description": { "type": "string", "title": "Description (~20-50 words)" },
         "modelSystemType": {
           "type": "string",
           "title": "Model System Type",
-          "enum": [
-            "PDX (Patient-Derived Xenograft)",
-            "Humanized Mouse",
-            "Patient-Derived Organoid",
-            "Patient-Derived Cell Line",
-            "Other"
-          ]
+          "enum": ["PDX (Patient-Derived Xenograft)", "Humanized Mouse", "Patient-Derived Organoid", "Patient-Derived Cell Line", "Other"]
         },
-        "patientDiagnosis": {
-          "type": "string",
-          "title": "Patient Diagnosis/Condition"
-        },
+        "patientDiagnosis": { "type": "string", "title": "Patient Diagnosis/Condition" },
         "hostStrain": {
           "type": "string",
           "title": "Host Strain (for xenografts)",
-          "enum": [
-            "",
-            "NSG",
-            "NOD-SCID",
-            "nude",
-            "SCID",
-            "Other"
-          ]
+          "enum": ["NSG", "NOD-SCID", "nude", "SCID", "Other"]
         },
-        "passageNumber": {
-          "type": "string",
-          "title": "Current Passage Number"
-        },
+        "passageNumber": { "type": "string", "title": "Current Passage Number" },
         "tumorType": {
           "type": "string",
           "title": "Tumor Type (if applicable)",
-          "enum": [
-            "",
-            "cutaneous neurofibroma",
-            "plexiform neurofibroma",
-            "atypical neurofibroma",
-            "schwannoma",
-            "meningioma",
-            "malignant peripheral nerve sheath tumor",
-            "low grade glioma",
-            "high grade glioma",
-            "pheochromocytoma",
-            "optic nerve glioma",
-            "Other"
-          ]
+          "enum": ["Cutaneous Neurofibroma", "Plexiform Neurofibroma", "Atypical Neurofibroma", "Schwannoma", "Meningioma", "Malignant Peripheral Nerve Sheath Tumor", "Low Grade Glioma", "High Grade Glioma", "Pheochromocytoma", "Optic Nerve Glioma", "Other"]
         },
         "engraftmentSite": {
           "type": "string",
           "title": "Engraftment Site",
-          "enum": [
-            "Subcutaneous",
-            "Orthotopic",
-            "Intracranial",
-            "Mammary Fat Pad",
-            "Other"
-          ]
+          "enum": ["Subcutaneous", "Orthotopic", "Intracranial", "Mammary Fat Pad", "Other"]
         },
-        "establishmentRate": {
-          "type": "string",
-          "title": "Establishment/Success Rate"
-        },
+        "establishmentRate": { "type": "string", "title": "Establishment/Success Rate" },
         "molecularCharacterization": {
           "type": "array",
           "title": "Molecular Characterization Performed",
           "items": {
             "type": "string",
-            "enum": [
-              "Genomic Sequencing",
-              "RNA-seq",
-              "Proteomics",
-              "Immunohistochemistry",
-              "Other"
-            ]
+            "enum": ["Genomic Sequencing", "RNA-seq", "Proteomics", "Immunohistochemistry", "Other"]
           },
           "uniqueItems": true
         },
-        "clinicalData": {
-          "type": "string",
-          "title": "Available Clinical Data from Patient"
-        },
-        "humanizationMethod": {
-          "type": "string",
-          "title": "Humanization Method (if applicable)"
-        },
+        "clinicalData": { "type": "string", "title": "Available Clinical Data from Patient" },
+        "humanizationMethod": { "type": "string", "title": "Humanization Method (if applicable)" },
         "immuneSystemComponents": {
           "type": "array",
           "title": "Human Immune System Components Present",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "validationMethods": {
           "type": "array",
           "title": "Validation Methods Used",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
-        "rrid": {
-          "type": "string",
-          "title": "RRID (if available)"
-        },
-        "howToAcquire": {
-          "type": "string",
-          "title": "How to Acquire This Model"
-        }
+        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["modelName", "modelSystemType", "patientDiagnosis", "howToAcquire"]
+      "required": ["resourceName", "modelSystemType", "patientDiagnosis"]
     },
     "developmentPublicationDOI": {
       "type": "string",
-      "title": "Development Publication DOI (where tool was first described)"
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
     },
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": {
-        "type": "string",
-        "title": "DOI"
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
+      "default": "Contact Developer"
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Patient-Derived Model" }
+  },
+  "required": ["basicInfo"],
+  "allOf": [
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
+      "then": {
+        "properties": {
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
+      "then": {
+        "properties": {
+          "vendor": { "type": "string", "title": "Vendor Name" },
+          "catalogNumber": { "type": "string", "title": "Catalog Number" },
+          "catalogURL": { "type": "string", "title": "Link to vendor page" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "then": {
+        "properties": {
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+        },
+        "required": ["additionalDetails"]
       }
     }
-  },
-  "required": ["userInfo", "basicInfo"]
+  ]
 }

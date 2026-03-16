@@ -3,88 +3,25 @@
   "title": "Submit Computational Tool",
   "type": "object",
   "properties": {
-    "userInfo": {
-      "type": "object",
-      "title": "Your Information",
-      "properties": {
-        "firstandlastName": {
-          "type": "string",
-          "title": "First and Last Name"
-        },
-        "email": {
-          "type": "string",
-          "title": "Contact Email",
-          "format": "email"
-        },
-        "institution": {
-          "type": "string",
-          "title": "Institution/Affiliation",
-          "default": ""
-        },
-        "isDeveloper": {
-          "type": "string",
-          "title": "Are you the developer?",
-          "enum": [
-            "Yes",
-            "No"
-          ],
-          "default": "Yes"
-        }
-      },
-      "required": ["firstandlastName", "email", "isDeveloper"]
-    },
     "basicInfo": {
       "type": "object",
-      "title": "",
+      "title": "Computational Tool Information",
       "properties": {
-        "softwareName": {
-          "type": "string",
-          "title": "Name of Software/Tool"
-        },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms or Alternative Names"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
+        "softwareName": { "type": "string", "title": "Name of Software/Tool" },
+        "synonyms": { "type": "string", "title": "Synonyms or Alternative Names" },
+        "description": { "type": "string", "title": "Description (~20-50 words)" },
         "softwareType": {
           "type": "string",
           "title": "Type of Computational Tool",
-          "enum": [
-            "Analysis Software",
-            "Pipeline",
-            "Package/Library",
-            "Workflow",
-            "Database",
-            "Web Application",
-            "Command-line Tool",
-            "Plugin",
-            "Other"
-          ]
+          "enum": ["Analysis Software", "Pipeline", "Package/Library", "Workflow", "Database", "Web Application", "Command-line Tool", "Plugin", "Other"]
         },
-        "softwareVersion": {
-          "type": "string",
-          "title": "Current Version"
-        },
+        "softwareVersion": { "type": "string", "title": "Current Version" },
         "programmingLanguage": {
           "type": "array",
           "title": "Programming Language(s)",
           "items": {
             "type": "string",
-            "enum": [
-              "Python",
-              "R",
-              "Java",
-              "C++",
-              "MATLAB",
-              "Julia",
-              "Perl",
-              "Shell Script",
-              "JavaScript",
-              "Other"
-            ]
+            "enum": ["Python", "R", "Java", "C++", "MATLAB", "Julia", "Perl", "Shell Script", "JavaScript", "Other"]
           },
           "uniqueItems": true
         },
@@ -101,69 +38,88 @@
         "licenseType": {
           "type": "string",
           "title": "Software License",
-          "enum": [
-            "MIT",
-            "Apache 2.0",
-            "GPL",
-            "BSD",
-            "Creative Commons",
-            "Proprietary",
-            "Other",
-            "Unknown"
-          ]
+          "enum": ["MIT", "Apache 2.0", "GPL", "BSD", "Creative Commons", "Proprietary", "Other", "Unknown"]
         },
         "containerized": {
           "type": "string",
           "title": "Containerized Version Available?",
-          "enum": [
-            "Yes",
-            "No",
-            "Unknown"
-          ]
+          "enum": ["Yes", "No", "Unknown"]
         },
         "dependencies": {
           "type": "array",
           "title": "Key Software Dependencies",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
-        "systemRequirements": {
-          "type": "string",
-          "title": "System Requirements (OS, memory, compute)"
-        },
-        "lastUpdate": {
-          "type": "string",
-          "title": "Date of Last Update",
-          "format": "date"
-        },
-        "maintainer": {
-          "type": "string",
-          "title": "Maintainer Name or Organization"
-        },
-        "rrid": {
-          "type": "string",
-          "title": "RRID (if available)"
-        },
-        "howToAcquire": {
-          "type": "string",
-          "title": "How to Access/Download This Tool"
-        }
+        "systemRequirements": { "type": "string", "title": "System Requirements (OS, memory, compute)" },
+        "lastUpdate": { "type": "string", "title": "Date of Last Update", "format": "date" },
+        "maintainer": { "type": "string", "title": "Maintainer Name or Organization" },
+        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["softwareName", "softwareType", "howToAcquire"]
+      "required": ["softwareName", "softwareType"]
     },
     "developmentPublicationDOI": {
       "type": "string",
-      "title": "Development Publication DOI (where tool was first described)"
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
     },
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": {
-        "type": "string",
-        "title": "DOI"
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": [
+        "GitHub/GitLab",
+        "CRAN",
+        "Bioconductor",
+        "Docker Hub",
+        "PyPI",
+        "Contact Developer",
+        "Other"
+      ]
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Computational Tool" }
+  },
+  "required": ["basicInfo"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "itemAcquisition": { "enum": ["GitHub/GitLab", "CRAN", "Bioconductor", "Docker Hub", "PyPI"] }
+        }
+      },
+      "then": {
+        "properties": {
+          "downloadURL": { "type": "string", "title": "Download/Repository URL", "format": "uri" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
+      "then": {
+        "properties": {
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "then": {
+        "properties": {
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+        },
+        "required": ["additionalDetails"]
       }
     }
-  },
-  "required": ["userInfo", "basicInfo"]
+  ]
 }

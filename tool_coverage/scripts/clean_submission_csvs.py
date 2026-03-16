@@ -23,6 +23,9 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_cell_lines.csv': 'syn26486823',
     'CLEAN_genetic_reagents.csv': 'syn26486832',
 
+    # Biobank (v2.0)
+    'CLEAN_biobanks.csv': 'syn26486821',  # BiobankDetails table
+
     # New tool types (v2.0) - Created 2026-02-11
     'CLEAN_computational_tools.csv': 'syn73709226',  # ComputationalToolDetails table
     'CLEAN_advanced_cellular_models.csv': 'syn73709227',  # AdvancedCellularModelDetails table
