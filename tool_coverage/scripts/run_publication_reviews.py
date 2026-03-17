@@ -134,7 +134,16 @@ OBSERVATION_YAML_TEMPLATE = """\
 observations:
   - resourceName: "Exact tool name from validated tools list"
     resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
-    observationType: "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
+    observationType: choose from the list below based on resourceType:
+      animal_model:             Tumor Growth/Burden | Survival/Lifespan | Body Weight/Growth | Behavioral | Nervous System | Cardiovascular System | Immune Response | Metabolic | Developmental | Cellular/Molecular | Coat Color | Drug Efficacy | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      cell_line:                Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      advanced_cellular_model:  Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      patient_derived_model:    Drug Response/Efficacy | Tumor Growth/Burden | Viability/Proliferation | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      antibody:                 Specificity | Sensitivity | Application Performance | Cross-reactivity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      genetic_reagent:          Editing/Knockdown Efficiency | Off-target Effects | Expression Level | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      computational_tool:       Accuracy/Performance | Usability | Scalability/Compatibility | Reproducibility | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      clinical_assessment_tool: Reliability | Validity | Clinical Utility | Sensitivity/Specificity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      biobank:                  Sample Quality | Availability | Collection Completeness | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
     details: "Specific finding, including quantitative values where available (e.g., 50% tumor reduction)"
     foundIn: "Results" | "Discussion" | "Both"
     contextSnippet: "...up to 300 chars of verbatim text supporting this observation..."
