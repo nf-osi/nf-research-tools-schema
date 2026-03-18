@@ -53,6 +53,27 @@
         "systemRequirements": { "type": "string", "title": "System Requirements (OS, memory, compute)" },
         "lastUpdate": { "type": "string", "title": "Date of Last Update", "format": "date" },
         "maintainer": { "type": "string", "title": "Maintainer Name or Organization" },
+        "analyticalPlatformSupport": {
+          "type": "array",
+          "title": "Analytical Platform Support",
+          "description": "Experimental data types or analytical platforms this tool is designed to process or integrate.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Mass spectrometry / proteomics",
+              "Metabolomics",
+              "RNA-seq / transcriptomics",
+              "Whole genome / exome sequencing",
+              "Single-cell RNA-seq",
+              "Imaging / pathology",
+              "Pharmacokinetics / PK modeling",
+              "Pharmacodynamics / PD modeling",
+              "Clinical / EHR data",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
         "rrid": { "type": "string", "title": "RRID (if available)" },
         "developerName": { "type": "string", "title": "Developer Name" },
         "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
@@ -90,7 +111,7 @@
     },
     "resourceType": { "type": "string", "title": "Resource Type", "default": "Computational Tool" }
   },
-  "required": ["basicInfo"],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
       "if": {

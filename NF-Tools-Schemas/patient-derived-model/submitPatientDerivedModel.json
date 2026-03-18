@@ -54,11 +54,137 @@
           "title": "Validation Methods Used",
           "items": { "type": "string" }
         },
+        "species": {
+          "type": "string",
+          "title": "Species",
+          "enum": ["Human", "Mouse", "Other"]
+        },
+        "sex": {
+          "type": "string",
+          "title": "Sex",
+          "enum": ["Male", "Female", "Unknown"]
+        },
+        "race": {
+          "type": "string",
+          "title": "Race",
+          "enum": [
+            "American Indian or Alaska Native", "Asian", "Black or African American",
+            "Native Hawaiian or Other Pacific Islander", "White", "Hispanic or Latino",
+            "Middle Eastern or North African", "Multiracial", "Other", "Not specified"
+          ]
+        },
+        "age": {
+          "type": "number",
+          "title": "Patient Age at Collection (years)",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "nfGeneticDisorder": {
+          "type": "string",
+          "title": "NF Genetic Disorder",
+          "enum": ["Neurofibromatosis Type 1", "Neurofibromatosis Type 2", "Schwannomatosis", "NF1 Spontaneous Mutation", "None"]
+        },
         "rrid": { "type": "string", "title": "RRID (if available)" },
         "developerName": { "type": "string", "title": "Developer Name" },
         "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["resourceName", "modelSystemType", "patientDiagnosis"]
+      "required": ["resourceName", "modelSystemType", "patientDiagnosis", "species", "nfGeneticDisorder"]
+    },
+    "bbbIntegrityStatus": {
+      "type": "string",
+      "title": "Blood-Brain Barrier Integrity",
+      "description": "Whether the blood-brain barrier is intact, compromised, or not applicable in this model.",
+      "enum": ["", "Intact", "Compromised", "Not Applicable", "Unknown"]
+    },
+    "routeOfAdministration": {
+      "type": "array",
+      "title": "Supported Drug Administration Routes",
+      "description": "Drug delivery routes that have been validated or are feasible in this model.",
+      "items": {
+        "type": "string",
+        "enum": ["Oral", "Intravenous (IV)", "Intraperitoneal (IP)", "Intracranial", "Subcutaneous", "Topical", "Intranasal", "Other"]
+      },
+      "uniqueItems": true
+    },
+    "pkpdCapabilities": {
+      "type": "array",
+      "title": "PK/PD Measurement Capabilities",
+      "description": "Pharmacokinetic and pharmacodynamic measurements that can be performed in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Drug concentration in plasma",
+          "Drug concentration in brain/CNS tissue",
+          "Drug concentration in tumor",
+          "Drug concentration in CSF",
+          "Target engagement measurement",
+          "Pathway modulation (e.g., pERK, pAKT)",
+          "Biomarker response",
+          "Metabolite profiling",
+          "Metabolic pathway flux analysis",
+          "Drug-drug interaction assessment",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "mechanismOfActionValidation": {
+      "type": "array",
+      "title": "Validated Drug Mechanisms",
+      "description": "Drug mechanisms of action that have been successfully tested in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "MEK inhibitors",
+          "RAS pathway (non-MEK)",
+          "mTOR inhibitors",
+          "VEGF/angiogenesis",
+          "CDK inhibitors",
+          "HDAC inhibitors",
+          "Other kinase inhibitors",
+          "Immunotherapy",
+          "Chemotherapy",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "pediatricSuitability": {
+      "type": "string",
+      "title": "Age Relevance",
+      "description": "Whether this model is suitable for studying pediatric, adult, or both age groups.",
+      "enum": ["", "Pediatric", "Adult", "Both", "Unknown"]
+    },
+    "timelineToResults": {
+      "type": "string",
+      "title": "Typical Timeline to Results",
+      "description": "Estimated time from experiment start to primary endpoint readout.",
+      "enum": ["", "Less than 1 month", "1–3 months", "3–6 months", "6–12 months", "More than 12 months", "Unknown"]
+    },
+    "modelLimitations": {
+      "type": "string",
+      "title": "Known Model Limitations",
+      "description": "Explicit description of what this model does NOT recapitulate or where it may produce false positive/negative results."
+    },
+    "clinicalTranslationHistory": {
+      "type": "string",
+      "title": "Clinical Translation History",
+      "description": "Known instances where findings from this model did or did not translate to human clinical outcomes."
+    },
+    "regulatoryAcceptanceHistory": {
+      "type": "string",
+      "title": "Regulatory Acceptance History",
+      "description": "Known FDA/EMA precedents where data from this model type supported a regulatory submission or approval."
+    },
+    "mtaRequired": {
+      "type": "boolean",
+      "title": "MTA Required?",
+      "description": "Whether a Material Transfer Agreement is required to access this model."
+    },
+    "ngnriRepositoryStatus": {
+      "type": "boolean",
+      "title": "Deposited in NGNRI Repository?",
+      "description": "Whether this model is deposited in the NF Gene Network Research Initiative repository for equitable access."
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -84,7 +210,7 @@
     },
     "resourceType": { "type": "string", "title": "Resource Type", "default": "Patient-Derived Model" }
   },
-  "required": ["basicInfo"],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
       "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },

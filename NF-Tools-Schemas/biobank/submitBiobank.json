@@ -72,10 +72,20 @@
         },
         "contact": { "type": "string", "title": "Contact / Acquisition Instructions" },
         "rrid": { "type": "string", "title": "RRID (if available)" },
+        "mtaRequired": {
+          "type": "boolean",
+          "title": "MTA Required?",
+          "description": "Whether a Material Transfer Agreement is required to request specimens."
+        },
+        "ngnriRepositoryStatus": {
+          "type": "boolean",
+          "title": "Affiliated with NGNRI Repository?",
+          "description": "Whether this biobank operates under or is affiliated with the NGNRI equitable access framework."
+        },
         "developerName": { "type": "string", "title": "Curator/Contact Name" },
         "developerAffiliation": { "type": "string", "title": "Curator/Contact Affiliation" }
       },
-      "required": ["biobankName"]
+      "required": ["biobankName", "biobankURL"]
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -104,7 +114,7 @@
     },
     "resourceType": { "type": "string", "title": "Resource Type", "default": "Biobank" }
   },
-  "required": ["basicInfo"],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
       "if": { "properties": { "itemAcquisition": { "const": "Submit Request" } } },

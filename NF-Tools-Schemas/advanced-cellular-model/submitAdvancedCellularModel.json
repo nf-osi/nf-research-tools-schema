@@ -62,11 +62,119 @@
           "title": "Quality Control Metrics",
           "items": { "type": "string" }
         },
+        "nfGeneticDisorder": {
+          "type": "string",
+          "title": "NF Genetic Disorder",
+          "enum": ["Neurofibromatosis Type 1", "Neurofibromatosis Type 2", "Schwannomatosis", "NF1 Spontaneous Mutation", "None"]
+        },
+        "nfManifestation": {
+          "type": "string",
+          "title": "NF Manifestation",
+          "enum": [
+            "Plexiform Neurofibroma", "Cutaneous Neurofibroma", "Atypical Neurofibroma",
+            "Malignant Peripheral Nerve Sheath Tumor", "Schwannoma", "Meningioma",
+            "Low Grade Glioma", "High Grade Glioma", "Optic Nerve Glioma",
+            "Pheochromocytoma", "Cognition", "Other", "None"
+          ]
+        },
         "rrid": { "type": "string", "title": "RRID (if available)" },
         "developerName": { "type": "string", "title": "Developer Name" },
         "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["resourceName", "modelType", "derivationSource", "cellTypes"]
+      "required": ["resourceName", "modelType", "derivationSource", "cellTypes", "nfGeneticDisorder"]
+    },
+    "bbbModelCapability": {
+      "type": "boolean",
+      "title": "Models Blood-Brain Barrier?",
+      "description": "Whether this model incorporates BBB components (e.g., endothelial cells, astrocytes) enabling assessment of drug CNS penetration."
+    },
+    "routeOfAdministration": {
+      "type": "array",
+      "title": "Supported Drug Administration Routes",
+      "description": "Drug delivery routes that have been validated or are feasible in this model.",
+      "items": {
+        "type": "string",
+        "enum": ["Direct media addition", "Microfluidic perfusion", "Other"]
+      },
+      "uniqueItems": true
+    },
+    "pkpdCapabilities": {
+      "type": "array",
+      "title": "PK/PD Measurement Capabilities",
+      "description": "Pharmacokinetic and pharmacodynamic measurements that can be performed in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Drug concentration in media",
+          "Drug concentration in tissue/organoid",
+          "Target engagement measurement",
+          "Pathway modulation (e.g., pERK, pAKT)",
+          "Biomarker response",
+          "Metabolite profiling",
+          "Metabolic pathway flux analysis",
+          "Drug-drug interaction assessment",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "mechanismOfActionValidation": {
+      "type": "array",
+      "title": "Validated Drug Mechanisms",
+      "description": "Drug mechanisms of action that have been successfully tested in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "MEK inhibitors",
+          "RAS pathway (non-MEK)",
+          "mTOR inhibitors",
+          "VEGF/angiogenesis",
+          "CDK inhibitors",
+          "HDAC inhibitors",
+          "Other kinase inhibitors",
+          "Immunotherapy",
+          "Chemotherapy",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "pediatricSuitability": {
+      "type": "string",
+      "title": "Age Relevance",
+      "description": "Whether this model is derived from or suitable for studying pediatric, adult, or both age groups.",
+      "enum": ["", "Pediatric", "Adult", "Both", "Unknown"]
+    },
+    "timelineToResults": {
+      "type": "string",
+      "title": "Typical Timeline to Results",
+      "description": "Estimated time from model establishment to primary endpoint readout.",
+      "enum": ["", "Less than 1 month", "1–3 months", "3–6 months", "More than 6 months", "Unknown"]
+    },
+    "modelLimitations": {
+      "type": "string",
+      "title": "Known Model Limitations",
+      "description": "Explicit description of what this model does NOT recapitulate or where it may produce misleading results."
+    },
+    "regulatoryAcceptanceHistory": {
+      "type": "string",
+      "title": "Regulatory Acceptance History",
+      "description": "Known FDA/EMA precedents where data from this model type supported a regulatory submission or approval."
+    },
+    "suitableForRegulatoryPackage": {
+      "type": "boolean",
+      "title": "Suitable as Standalone Evidence for Regulatory Package?",
+      "description": "Whether this model has been accepted or is considered sufficient as standalone (non-animal) evidence in a regulatory submission (e.g., for repurposed drugs)."
+    },
+    "mtaRequired": {
+      "type": "boolean",
+      "title": "MTA Required?",
+      "description": "Whether a Material Transfer Agreement is required to access this model."
+    },
+    "ngnriRepositoryStatus": {
+      "type": "boolean",
+      "title": "Deposited in NGNRI Repository?",
+      "description": "Whether this model is deposited in the NF Gene Network Research Initiative repository for equitable access."
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -92,7 +200,7 @@
     },
     "resourceType": { "type": "string", "title": "Resource Type", "default": "Advanced Cellular Model" }
   },
-  "required": ["basicInfo"],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
       "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
