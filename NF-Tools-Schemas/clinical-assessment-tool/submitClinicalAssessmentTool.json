@@ -45,6 +45,34 @@
           "title": "Digital/Electronic Version Available?",
           "enum": ["Yes", "No", "In Development", "Unknown"]
         },
+        "cognitiveAndBehavioralDomains": {
+          "type": "array",
+          "title": "Cognitive/Behavioral Domains Assessed",
+          "description": "Specific cognitive or behavioral outcome domains captured by this tool (relevant for NF-related brain tumor and CNS manifestations).",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Attention / ADHD",
+              "Executive function",
+              "Memory",
+              "Learning disabilities",
+              "Language / communication",
+              "Anxiety",
+              "Depression / mood",
+              "Social cognition",
+              "Academic achievement",
+              "Adaptive behavior",
+              "Global cognitive ability",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "regulatoryAcceptanceHistory": {
+          "type": "string",
+          "title": "Regulatory Acceptance History",
+          "description": "Known FDA/EMA endorsement or acceptance of this tool as a clinical outcome assessment (COA) for trials."
+        },
         "rrid": { "type": "string", "title": "RRID (if available)" },
         "developerName": { "type": "string", "title": "Developer Name" },
         "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
@@ -78,7 +106,7 @@
     },
     "resourceType": { "type": "string", "title": "Resource Type", "default": "Clinical Assessment Tool" }
   },
-  "required": ["basicInfo"],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
       "if": { "properties": { "itemAcquisition": { "const": "Freely Available Online" } } },
