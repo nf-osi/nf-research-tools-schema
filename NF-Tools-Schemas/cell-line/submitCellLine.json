@@ -3,43 +3,9 @@
   "title": "Submit Cell Line",
   "type": "object",
   "properties": {
-    "userInfo": {
-      "type": "object",
-      "title": "Your Information",
-      "properties": {
-        "firstandlastName": {
-          "type": "string",
-          "title": "First and Last Name"
-        },
-        "email": {
-          "type": "string",
-          "title": "Contact Email",
-          "format": "email"
-        },
-        "institution": {
-          "type": "string",
-          "title": "Institution/Affiliation",
-          "default": ""
-        },
-        "isDeveloper": {
-          "type": "string",
-          "title": "Are you the developer?",
-          "enum": [
-            "Yes",
-            "No"
-          ],
-          "default": "Yes"
-        }
-      },
-      "required": [
-        "firstandlastName",
-        "email",
-        "isDeveloper"
-      ]
-    },
     "basicInfo": {
       "type": "object",
-      "title": "",
+      "title": "Cell Line Information",
       "properties": {
         "cellLineName": {
           "type": "string",
@@ -47,10 +13,7 @@
           "minLength": 3,
           "maxLength": 100,
           "description": "Provide the official name of the cell line.",
-          "examples": [
-            "HEK293 NF1 -/- with R1306X mNf1 cDNA",
-            "SZ-NF4"
-          ],
+          "examples": ["HEK293 NF1 -/- with R1306X mNf1 cDNA", "SZ-NF4"],
           "errorMessage": {
             "minLength": "Cell line name should have at least 3 characters.",
             "maxLength": "Cell line name should not exceed 100 characters."
@@ -69,22 +32,12 @@
         "species": {
           "type": "string",
           "title": "Species",
-          "enum": [
-            "Human",
-            "Mouse",
-            "Dog",
-            "Chinese Hamster",
-            "E. Coli"
-          ]
+          "enum": ["Human", "Mouse", "Dog", "Chinese Hamster", "E. Coli"]
         },
         "sex": {
           "type": "string",
           "title": "Sex",
-          "enum": [
-            "Male",
-            "Female",
-            "Unknown"
-          ]
+          "enum": ["Male", "Female", "Unknown"]
         },
         "race": {
           "type": "string",
@@ -107,217 +60,211 @@
           "title": "Age (years)",
           "minimum": 0,
           "maximum": 120
-        }
+        },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": [
-        "cellLineName",
-        "description",
-        "species"
-      ]
+      "required": ["cellLineName", "description", "species"]
     },
-    "category": {
+    "cellLineCategory": {
       "type": "string",
       "title": "Cell Line Category",
       "enum": [
-        "Cancer cell line",
-        "Embryonic stem cell",
-        "Finite cell line",
-        "Hybrid cell line",
-        "Hybridoma"
+        "Cancer cell line", "Embryonic stem cell", "Finite cell line", "Hybrid cell line",
+        "Hybridoma", "Induced pluripotent stem cell", "Spontaneously immortalized cell line",
+        "Telomerase immortalized cell line", "Transformed cell line", "Undefined cell line type"
       ]
     },
+    "organ": {
+      "type": "string",
+      "title": "Organ",
+      "enum": [
+        "Adrenal Gland", "Blood", "Bone Marrow", "Brain", "Breast", "Cervix", "Colon",
+        "Intestine", "Liver", "Lung", "Lymph Node", "Nerve", "Ovary", "Pancreas",
+        "Peripheral Nervous System", "Prostate", "Skin", "Spinal Cord", "Stomach",
+        "Thyroid Gland", "Uterus", "Other"
+      ]
+    },
+    "strProfile": { "type": "string", "title": "STR Profile" },
+    "resistance": { "type": "string", "title": "Drug Resistance (if any)" },
+    "contaminatedMisidentified": {
+      "type": "string",
+      "title": "Contaminated or Misidentified?",
+      "enum": ["No", "Yes - contaminated", "Yes - misidentified", "Unknown"]
+    },
+    "originYear": { "type": "integer", "title": "Year of Establishment" },
     "cellLineGeneticDisorder": {
       "type": "string",
       "title": "Genetic Disorder",
-      "enum": [
-        "Neurofibromatosis Type 1",
-        "Neurofibromatosis Type 2",
-        "Schwannamatosis",
-        "None"
-      ]
+      "enum": ["Neurofibromatosis Type 1", "Neurofibromatosis Type 2", "Schwannomatosis", "None"]
     },
     "cellLineManifestation": {
       "type": "string",
       "title": "Manifestation",
       "enum": [
-        "Acute Lymphocytic Leukemia",
-        "Adult T Acute Lymphoblastic Leukemia",
-        "Amelanotic Cutaneous Melanoma",
-        "Askin Tumor",
-        "Astrocytoma",
-        "Atypical",
-        "BRCA2 Syndrome",
-        "BCR-ABL1 positive",
-        "Cafe-Au-Lait Spots",
-        "Canine Histiocytic Sarcoma",
-        "Canine Lymphoma",
-        "Canine Melanoma",
-        "Canine Soft Tissue Sarcoma",
-        "Cecum Adenocarcinoma",
-        "Cervical Adenocarcinoma",
-        "Chronic Myelogenous Leukemia",
-        "Clinically Affected",
-        "Clinically Asymptomatic (Self-reported)",
-        "Clinically Asymptomatic But At Risk",
-        "Colon Adenocarcinoma",
-        "Colon Carcinoma",
-        "Cutaneous Melanoma",
-        "Cutaneous Neurofibroma",
-        "Cystic Fibrosis",
-        "General NF1 Deficiency",
-        "Glioblastoma",
-        "Hereditary Breast and Ovarian Cancer Syndrome",
+        "Acute Lymphocytic Leukemia", "Adult T Acute Lymphoblastic Leukemia",
+        "Amelanotic Cutaneous Melanoma", "Askin Tumor", "Astrocytoma", "Atypical",
+        "BRCA2 Syndrome", "BCR-ABL1 positive", "Cafe-Au-Lait Spots",
+        "Canine Histiocytic Sarcoma", "Canine Lymphoma", "Canine Melanoma",
+        "Canine Soft Tissue Sarcoma", "Cecum Adenocarcinoma", "Cervical Adenocarcinoma",
+        "Chronic Myelogenous Leukemia", "Clinically Affected",
+        "Clinically Asymptomatic (Self-reported)", "Clinically Asymptomatic But At Risk",
+        "Colon Adenocarcinoma", "Colon Carcinoma", "Cutaneous Melanoma",
+        "Cutaneous Neurofibroma", "Cystic Fibrosis", "General NF1 Deficiency",
+        "Glioblastoma", "Hereditary Breast and Ovarian Cancer Syndrome",
         "Human Papillomavirus-Related Endocervical Adenocarcinoma",
-        "Invasive Breast Carcinoma",
-        "Lipoma",
-        "Lung Adenocarcinoma",
-        "Lung Adenosquamous Carcinoma",
-        "Lung Carcinoid Tumor",
-        "Lung Giant Cell Carcinoma",
-        "Lung Large Cell Carcinoma",
-        "Lung Non-Small Cell Carcinoma",
-        "Lung Papillary Adenocarcinoma",
-        "Lung Small Cell Carcinoma",
-        "Lung Squamous Cell Carcinoma",
-        "Malignant Peripheral Nerve Sheath Tumor",
-        "Melanoma",
-        "Minimally Invasive Lung Adenocarcinoma",
-        "Mouse Adrenal Gland Pheochromocytoma",
-        "Neuroblastoma",
-        "Neurofibroma",
-        "Noonan Syndrome",
-        "Ovarian Cystadenocarcinoma",
-        "Pancreatic Adenocarcinoma",
-        "Pancreatic Adenosquamous Carcinoma",
-        "Pancreatic Carcinoma",
-        "Pancreatic Ductal Adenocarcinoma",
-        "Pancreatic Somatostatinoma",
-        "Plexiform Neurofibroma",
-        "Pleural Malignant Mesothelioma",
-        "Poorly Differentiated Thyroid Gland Carcinoma",
-        "Rectal Adenocarcinoma",
-        "Schwannoma",
-        "Thyroid Gland Anaplastic Carcinoma",
-        "Thyroid Gland Follicular Carcinoma",
-        "Unaffected Nerve"
+        "Invasive Breast Carcinoma", "Lipoma", "Lung Adenocarcinoma",
+        "Lung Adenosquamous Carcinoma", "Lung Carcinoid Tumor",
+        "Lung Giant Cell Carcinoma", "Lung Large Cell Carcinoma",
+        "Lung Non-Small Cell Carcinoma", "Lung Papillary Adenocarcinoma",
+        "Lung Small Cell Carcinoma", "Lung Squamous Cell Carcinoma",
+        "Malignant Peripheral Nerve Sheath Tumor", "Melanoma",
+        "Minimally Invasive Lung Adenocarcinoma", "Mouse Adrenal Gland Pheochromocytoma",
+        "Neuroblastoma", "Neurofibroma", "Noonan Syndrome",
+        "Ovarian Cystadenocarcinoma", "Pancreatic Adenocarcinoma",
+        "Pancreatic Adenosquamous Carcinoma", "Pancreatic Carcinoma",
+        "Pancreatic Ductal Adenocarcinoma", "Pancreatic Somatostatinoma",
+        "Plexiform Neurofibroma", "Pleural Malignant Mesothelioma",
+        "Poorly Differentiated Thyroid Gland Carcinoma", "Rectal Adenocarcinoma",
+        "Schwannoma", "Thyroid Gland Anaplastic Carcinoma",
+        "Thyroid Gland Follicular Carcinoma", "Unaffected Nerve"
       ]
     },
     "tissue": {
       "type": "string",
       "title": "Tissue Type",
       "enum": [
-        "Blood",
-        "Bone Marrow",
-        "Buccal Mucosa",
-        "Buffy Coat",
-        "Cerebral Cortex",
-        "Dorsal Root Ganglion",
-        "Embryonic Tissue",
-        "Meninges",
-        "Nerve Tissue",
-        "Optic Nerve",
-        "Plasma",
-        "Primary Tumor",
-        "Sciatic Nerve",
-        "Serum",
-        "Splenocyte",
-        "Unspecified",
-        "Urine",
-        "Whole Brain"
+        "Blood", "Bone Marrow", "Buccal Mucosa", "Buffy Coat", "Cerebral Cortex",
+        "Dorsal Root Ganglion", "Embryonic Tissue", "Meninges", "Nerve Tissue",
+        "Optic Nerve", "Plasma", "Primary Tumor", "Sciatic Nerve", "Serum",
+        "Splenocyte", "Unspecified", "Urine", "Whole Brain"
       ]
     },
     "populationDoublingTime": {
       "type": "number",
       "title": "Population Doubling Time (in hours)"
     },
-    "publicationDOI": {
+    "cultureMedia": {
       "type": "string",
-      "title": "Publication Link (DOI)"
+      "title": "Culture Media",
+      "description": "Growth media used to culture this cell line (e.g. DMEM, RPMI 1640, DMEM/F12). Include any supplements such as serum, antibiotics, or growth factors."
+    },
+    "pkpdCapabilities": {
+      "type": "array",
+      "title": "PK/PD Measurement Capabilities",
+      "description": "Pharmacokinetic and pharmacodynamic measurements that can be performed using this cell line.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Drug concentration in cell lysate/media",
+          "Target engagement measurement",
+          "Pathway modulation (e.g., pERK, pAKT)",
+          "Biomarker response",
+          "Metabolite profiling",
+          "Drug-drug interaction assessment",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "mechanismOfActionValidation": {
+      "type": "array",
+      "title": "Validated Drug Mechanisms",
+      "description": "Drug mechanisms of action that have been successfully tested in this cell line.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "MEK inhibitors",
+          "RAS pathway (non-MEK)",
+          "mTOR inhibitors",
+          "VEGF/angiogenesis",
+          "CDK inhibitors",
+          "HDAC inhibitors",
+          "Other kinase inhibitors",
+          "Immunotherapy",
+          "Chemotherapy",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "pediatricSuitability": {
+      "type": "string",
+      "title": "Age Relevance",
+      "description": "Whether this cell line was derived from or is relevant to pediatric, adult, or both age groups.",
+      "enum": ["", "Pediatric", "Adult", "Both", "Unknown"]
+    },
+    "timelineToResults": {
+      "type": "string",
+      "title": "Typical Timeline to Results",
+      "description": "Estimated time from plating/passage to primary assay endpoint readout.",
+      "enum": ["", "Less than 1 week", "1–4 weeks", "1–3 months", "More than 3 months", "Unknown"]
+    },
+    "mtaRequired": {
+      "type": "boolean",
+      "title": "MTA Required?",
+      "description": "Whether a Material Transfer Agreement is required to access this cell line."
+    },
+    "ngnriRepositoryStatus": {
+      "type": "boolean",
+      "title": "Deposited in NGNRI Repository?",
+      "description": "Whether this cell line is deposited in the NF Gene Network Research Initiative repository for equitable access."
+    },
+    "developmentPublicationDOI": {
+      "type": "string",
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
+    },
+    "usagePublicationDOIs": {
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
     },
     "itemAcquisition": {
       "type": "string",
       "title": "How to acquire",
-      "enum": [
-        "Contact Developer",
-        "Purchase from Vendor",
-        "Other"
-      ],
+      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
       "default": "Contact Developer"
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Cell Line"
     }
   },
+  "required": ["basicInfo", "itemAcquisition", "cellLineGeneticDisorder", "cellLineManifestation"],
   "allOf": [
     {
-      "if": {
-        "properties": {
-          "userInfo": {
-            "properties": {
-              "isDeveloper": {
-                "const": "No"
-              }
-            }
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
       "then": {
         "properties": {
-          "userInfo": {
-            "properties": {
-              "developerName": {
-                "type": "string",
-                "title": "Developer Name"
-              },
-              "developerAffiliation": {
-                "type": "string",
-                "title": "Developer Affiliation"
-              }
-            }
-          }
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Purchase from Vendor"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
       "then": {
         "properties": {
-          "vendor": {
-            "type": "string",
-            "title": "Vendor Name"
-          },
-          "catalogNumber": {
-            "type": "string",
-            "title": "Catalog Number"
-          },
-          "catalogURL": {
-            "type": "string",
-            "title": "Link to vendor page"
-          }
+          "vendor": { "type": "string", "title": "Vendor Name" },
+          "catalogNumber": { "type": "string", "title": "Catalog Number" },
+          "catalogURL": { "type": "string", "title": "Link to vendor page" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Other"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
       "then": {
         "properties": {
-          "additionalDetails": {
-            "type": "string",
-            "title": "Please provide additional details."
-          }
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
         },
-        "required": [
-          "additionalDetails"
-        ]
+        "required": ["additionalDetails"]
       }
     }
   ]

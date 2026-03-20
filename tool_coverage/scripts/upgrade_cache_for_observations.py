@@ -43,19 +43,17 @@ def should_upgrade_cache(review_file: Path) -> tuple[bool, str, int]:
         with open(review_file) as f:
             review = yaml.safe_load(f)
 
-        pmid = review.get('publicationMetadata', {}).get('pmid', 'Unknown')
-
         # Check for accepted tools with high confidence
         accepted_tools = [
-            t for t in review.get('toolValidations', [])
+            t for t in review.get('toolValidations', []) or []
             if t.get('verdict') == 'Accept' and t.get('confidence', 0) >= 0.8
         ]
 
         if len(accepted_tools) == 0:
             return False, "No high-confidence validated tools", 0
 
-        # Check publication type
-        pub_type = review['publicationMetadata'].get('publicationType', '')
+        # Check publication type if available (optional field in new YAML format)
+        pub_type = review.get('publicationMetadata', {}).get('publicationType', '')
         skip_types = ['Review Article', 'Editorial', 'Letter', 'Comment', 'News']
         if pub_type in skip_types:
             return False, f"Publication type: {pub_type}", len(accepted_tools)
@@ -255,6 +253,10 @@ def main():
                        help='Directory containing Sonnet validation YAML files')
     parser.add_argument('--cache-dir', default='tool_reviews/publication_cache',
                        help='Directory containing cache files')
+    parser.add_argument('--validated-pubs-file',
+                       help='CSV file from post-filter step (e.g. ACCEPTED_publications.csv). '
+                            'If provided, only publications with a _pmid column value present in '
+                            'this file will be considered for upgrade, reducing Phase 2 work.')
     parser.add_argument('--dry-run', action='store_true',
                        help='Preview which caches would be upgraded without actually upgrading')
     parser.add_argument('--force', action='store_true',
@@ -273,8 +275,34 @@ def main():
         logger.error(f"Cache directory not found: {cache_dir}")
         return 1
 
+    # Build allowlist of PMIDs from validated publications file (post-filter output)
+    validated_pmids: Optional[set] = None
+    if args.validated_pubs_file:
+        vf = Path(args.validated_pubs_file)
+        if vf.exists():
+            import csv
+            validated_pmids = set()
+            with open(vf, newline='', encoding='utf-8') as f:
+                for row in csv.DictReader(f):
+                    raw = row.get('_pmid', '') or row.get('pmid', '')
+                    for part in raw.split('|'):
+                        pmid_num = part.strip().replace('PMID:', '').strip()
+                        if pmid_num:
+                            validated_pmids.add(pmid_num)
+            logger.info(f"Loaded {len(validated_pmids)} validated PMIDs from {vf.name}")
+            logger.info("  Phase 2 will be limited to these post-filtered publications")
+        else:
+            logger.warning(f"--validated-pubs-file not found: {vf} (proceeding without filter)")
+
     # Find all review YAML files
     review_files = list(reviews_dir.glob('*_tool_review.yaml'))
+    if validated_pmids is not None:
+        before = len(review_files)
+        review_files = [
+            rf for rf in review_files
+            if rf.stem.replace('_tool_review', '') in validated_pmids
+        ]
+        logger.info(f"Filtered {before} → {len(review_files)} review files using validated pubs allowlist")
     logger.info(f"Analyzing {len(review_files)} review files...")
     logger.info("")
 
@@ -340,6 +368,7 @@ def main():
         'failed': 0,
         'skipped': 0
     }
+    upgraded_pmids = []
 
     for i, candidate in enumerate(upgrade_candidates, 1):
         pmid = candidate['pmid']
@@ -349,12 +378,20 @@ def main():
 
         if result:
             stats['upgraded'] += 1
+            upgraded_pmids.append(f"PMID:{pmid}")
         else:
             stats['failed'] += 1
 
         # Rate limiting
         time.sleep(0.34)
         logger.info("")
+
+    # Write list of upgraded PMIDs for phase 2 re-review step
+    upgraded_pmids_file = Path('tool_coverage/outputs/phase2_upgraded_pmids.txt')
+    upgraded_pmids_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(upgraded_pmids_file, 'w') as f:
+        f.write('\n'.join(upgraded_pmids))
+    logger.info(f"Wrote {len(upgraded_pmids)} upgraded PMIDs to {upgraded_pmids_file}")
 
     # Print summary
     logger.info("="*80)
@@ -368,7 +405,7 @@ def main():
     if stats['upgraded'] > 0:
         logger.info(f"✓ Upgraded {stats['upgraded']} caches to full level")
         logger.info(f"  These caches now have Results + Discussion sections")
-        logger.info(f"  Ready for observation extraction")
+        logger.info(f"  Ready for observation extraction via phase 2 re-review")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NF Research Tools Registry — Submission Forms Overview</title>
+<style>
+  :root {
+    --blue: #1a4b8c;
+    --teal: #006e8c;
+    --green: #2e7d32;
+    --orange: #e65100;
+    --purple: #6a1b9a;
+    --light-blue: #e8f0fb;
+    --light-teal: #e0f4f7;
+    --accent: #0077b6;
+    --text: #1a1a2e;
+    --muted: #5a6a7a;
+    --bg: #f5f7fa;
+    --white: #ffffff;
+    --border: #d0dce8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── SLIDES ───────────────────────────────────── */
+  .slide {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px 80px;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+  }
+  .slide + .slide { border-top: 3px solid var(--border); }
+
+  .slide-hero {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+    color: white;
+    text-align: center;
+    align-items: center;
+  }
+  .slide-section {
+    background: linear-gradient(135deg, var(--teal) 0%, #004f6d 100%);
+    color: white;
+  }
+  .slide-white  { background: var(--white); }
+  .slide-light  { background: var(--light-blue); }
+  .slide-teal   { background: var(--light-teal); }
+
+  /* ── TYPE ─────────────────────────────────────── */
+  .eyebrow {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: rgba(255,255,255,0.85);   /* always white on hero/section */
+  }
+  .slide-white  .eyebrow,
+  .slide-light  .eyebrow,
+  .slide-teal   .eyebrow { color: var(--muted); }
+
+  h1.hero { font-size: 2.7rem; font-weight: 700; line-height: 1.2; margin-bottom: 14px; }
+  p.hero-sub { font-size: 1.2rem; opacity: 0.88; max-width: 680px; }
+
+  h2 { font-size: 1.85rem; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+  .slide-section h2 { color: white; }
+
+  h3 { font-size: 1.05rem; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+
+  p { color: var(--muted); margin-bottom: 10px; }
+  .slide-section p { color: rgba(255,255,255,0.82); }
+  .slide-hero p     { color: rgba(255,255,255,0.88); }
+  p:last-child { margin-bottom: 0; }
+
+  .divider {
+    width: 52px; height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+  .slide-section .divider { background: rgba(255,255,255,0.45); }
+
+  /* ── PILL ─────────────────────────────────────── */
+  .pill {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin: 3px 2px;
+  }
+  .p-blue   { background: #cce3f5; color: #0a4f78; }
+  .p-teal   { background: #c8edf0; color: #005f6b; }
+  .p-green  { background: #d4edda; color: #1b5e20; }
+  .p-orange { background: #fde8c8; color: #7b4000; }
+  .p-purple { background: #e8d5f5; color: #4a148c; }
+  .p-grey   { background: #e2e8f0; color: #4a5568; }
+  .p-white  { background: rgba(255,255,255,0.18); color: white; }
+  .p-red    { background: #fde8e8; color: #7b1010; }
+
+  /* ── LAYOUT HELPERS ───────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+  .two-col-wide { display: grid; grid-template-columns: 3fr 2fr; gap: 36px; align-items: start; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* ── CARD ─────────────────────────────────────── */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .card-t-blue   { border-top: 4px solid var(--blue); }
+  .card-t-teal   { border-top: 4px solid var(--teal); }
+  .card-t-green  { border-top: 4px solid var(--green); }
+  .card-t-orange { border-top: 4px solid var(--orange); }
+  .card-t-purple { border-top: 4px solid var(--purple); }
+  .card-t-grey   { border-top: 4px solid #90a4ae; }
+
+  .card-icon { font-size: 1.7rem; margin-bottom: 8px; }
+  .card h3   { margin-bottom: 6px; }
+  .card p    { font-size: 0.86rem; }
+
+  /* ── STAT BAR ─────────────────────────────────── */
+  .stat-row { display: flex; gap: 16px; margin-bottom: 28px; }
+  .stat-box {
+    flex: 1; background: white; border-radius: 10px;
+    padding: 18px 14px; text-align: center; border: 1px solid var(--border);
+  }
+  .stat-n  { font-size: 2.2rem; font-weight: 700; color: var(--accent); display: block; line-height: 1; margin-bottom: 4px; }
+  .stat-l  { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  /* ── FLOW ─────────────────────────────────────── */
+  .flow { display: flex; align-items: center; margin: 20px 0; }
+  .flow-box {
+    flex: 1; background: white; border: 2px solid var(--accent);
+    border-radius: 9px; padding: 12px 14px; text-align: center;
+    font-size: 0.82rem; font-weight: 600; color: var(--blue);
+  }
+  .flow-arrow { font-size: 1.3rem; color: var(--accent); padding: 0 8px; }
+
+  /* ── HIGHLIGHT ────────────────────────────────── */
+  .hl {
+    background: var(--light-teal); border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0;
+    font-size: 0.9rem; color: var(--text);
+  }
+  .hl-blue {
+    background: var(--light-blue); border-color: var(--blue);
+  }
+  .hl p { color: var(--text); margin: 0; }
+
+  /* ── CHECK LIST ───────────────────────────────── */
+  .chk { list-style: none; padding: 0; margin: 0; }
+  .chk li {
+    padding: 7px 0 7px 26px; position: relative;
+    font-size: 0.87rem; color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .chk li:last-child { border-bottom: none; }
+  .chk li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+
+  /* ── UNIVERSAL FIELDS TABLE ───────────────────── */
+  .field-block {
+    background: white; border-radius: 10px; border: 1px solid var(--border);
+    padding: 16px 20px; margin-bottom: 14px;
+  }
+  .field-block h4 { font-size: 0.9rem; color: var(--blue); margin-bottom: 8px; font-weight: 700; }
+
+  .field-row {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.84rem;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-name { font-weight: 600; color: var(--text); min-width: 200px; }
+  .field-note { color: var(--muted); }
+
+  /* ── COMPARISON TABLE ─────────────────────────── */
+  .tbl {
+    width: 100%; border-collapse: collapse; font-size: 0.82rem;
+  }
+  .tbl th {
+    background: var(--light-blue); color: var(--blue);
+    padding: 9px 12px; text-align: left; font-weight: 700;
+    border-bottom: 2px solid var(--border);
+  }
+  .tbl td {
+    padding: 9px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl .req  { color: #b71c1c; font-weight: 700; }
+  .tbl .opt  { color: var(--muted); }
+  .tbl .all  { color: var(--green); font-weight: 600; }
+
+  /* ── BADGE ROW ────────────────────────────────── */
+  .badge-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .badge-icon { font-size: 1.5rem; width: 40px; text-align: center; flex-shrink: 0; }
+  .badge-body h4 { font-size: 0.92rem; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+  .badge-body p  { font-size: 0.82rem; margin: 0; }
+
+  /* ── GROUP SECTION ────────────────────────────── */
+  .group-header {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+    font-weight: 700; color: var(--muted); margin-bottom: 10px; margin-top: 20px;
+  }
+  .group-header:first-child { margin-top: 0; }
+
+  /* ── FOOTER ───────────────────────────────────── */
+  .pg {
+    position: absolute; bottom: 18px; right: 28px;
+    font-size: 0.73rem; color: var(--muted); opacity: 0.55;
+  }
+  .slide-hero .pg,
+  .slide-section .pg { color: rgba(255,255,255,0.55); opacity: 1; }
+
+  /* ── PRINT ────────────────────────────────────── */
+  @page {
+    size: 13.33in 7.5in;
+    margin: 0;
+  }
+  @media print {
+    body { background: white; }
+    .slide {
+      min-height: unset;
+      height: 7.5in;
+      width: 13.33in;
+      padding: 0.55in 0.85in;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .slide + .slide { border-top: none; }
+
+    /* ── Slide 6: Research Model Systems ── */
+    #slide-model-systems {
+      padding: 0.18in 0.7in;
+    }
+    #slide-model-systems h2 { font-size: 1.35rem; margin-bottom: 3px; }
+    #slide-model-systems .divider { margin-bottom: 8px; }
+    #slide-model-systems > p { font-size: 0.78rem; margin-bottom: 8px; }
+    #slide-model-systems .card { padding: 7px 10px; }
+    #slide-model-systems .card h3 { font-size: 0.88rem; margin-bottom: 2px; }
+    #slide-model-systems .card > p { display: none; }
+    #slide-model-systems .card-icon { display: none; }
+    #slide-model-systems .pill { font-size: 0.62rem; padding: 1px 6px; margin: 1px 1px; }
+    #slide-model-systems [style*="display:grid"] { gap: 8px; }
+    #slide-model-systems [style*="margin-top:10px"] { margin-top: 3px !important; }
+    #slide-model-systems [style*="margin-bottom:4px"] { margin-bottom: 1px !important; }
+    #slide-model-systems .card [style*="font-size:0.75rem"] { font-size: 0.6rem !important; }
+
+    /* ── Slide 10: Required vs Optional table ── */
+    #slide-summary-table {
+      padding: 0.25in 0.75in;
+    }
+    #slide-summary-table h2 { font-size: 1.45rem; margin-bottom: 4px; }
+    #slide-summary-table .divider { margin-bottom: 10px; }
+    #slide-summary-table > p { font-size: 0.8rem; margin-bottom: 10px; }
+    #slide-summary-table .tbl { font-size: 0.7rem; }
+    #slide-summary-table .tbl th { padding: 5px 8px; }
+    #slide-summary-table .tbl td { padding: 4px 8px; line-height: 1.3; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- ══════════════════════════════════════
+     1 · HERO
+══════════════════════════════════════ -->
+<div class="slide slide-hero">
+  <div style="font-size:2.4rem; margin-bottom:16px;">🧬</div>
+  <p class="eyebrow">Program Overview · March 2026</p>
+  <h1 class="hero">NF Research Tools Registry<br>Submission Forms</h1>
+  <p class="hero-sub">
+    How researchers document, standardize, and share the tools that drive
+    Neurofibromatosis research — and why it matters for the field.
+  </p>
+  <p style="font-size:0.72rem; opacity:0.5; margin-top:24px;">Generated with AI assistance from Claude Code</p>
+  <div class="pg">1 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     2 · THE PROBLEM
+══════════════════════════════════════ -->
+<div class="slide slide-white">
+  <div class="eyebrow">Context</div>
+  <h2>The Challenge: Fragmented Research Infrastructure</h2>
+  <div class="divider"></div>
+
+  <div class="two-col">
+    <div>
+      <p>NF research spans dozens of institutions, disease manifestations, and model systems.
+         Without a common registry, tools developed with public funding are:</p>
+      <ul class="chk" style="margin-top:14px;">
+        <li>Rediscovered or rebuilt independently at each institution</li>
+        <li>Described inconsistently across publications</li>
+        <li>Difficult for new investigators to locate and request</li>
+        <li>Hard for funders to track as research outputs</li>
+        <li>Invisible to the patient and clinical communities</li>
+      </ul>
+    </div>
+    <div>
+      <div class="hl">
+        <p><strong>The goal:</strong> A single, structured, publicly accessible registry of every research tool produced by the NF community — so tools can be found, cited, and reused.</p>
+      </div>
+      <div class="hl hl-blue" style="margin-top:14px;">
+        <p><strong>These submission forms</strong> are the front door: the standardized interface through which researchers contribute entries to that registry, hosted on Synapse.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pg">2 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     3 · REGISTRY AT A GLANCE
+══════════════════════════════════════ -->
+<div class="slide slide-light">
+  <div class="eyebrow">Scale &amp; Scope</div>
+  <h2>The Registry at a Glance</h2>
+  <div class="divider"></div>
+
+  <div class="stat-row">
+    <div class="stat-box"><span class="stat-n">9</span><span class="stat-l">Tool<br>Categories</span></div>
+    <div class="stat-box"><span class="stat-n">600+</span><span class="stat-l">Cell Lines<br>Tracked</span></div>
+    <div class="stat-box"><span class="stat-n">150+</span><span class="stat-l">Antibodies<br>Cataloged</span></div>
+    <div class="stat-box"><span class="stat-n">100+</span><span class="stat-l">Animal Models<br>Registered</span></div>
+    <div class="stat-box"><span class="stat-n">366</span><span class="stat-l">Total Validated<br>Resources</span></div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-box">Researcher<br>Submits Form</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Schema<br>Validation</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Curation<br>Review</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Synapse<br>Registry Entry</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Community<br>Discovery &amp; Reuse</div>
+  </div>
+
+  <p style="text-align:center; font-size:0.85rem; margin-top:8px;">
+    Every registered tool becomes a citable, RRID-eligible record — permanently linked to the publications that describe and use it.
+  </p>
+  <div class="pg">3 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     4 · UNIVERSAL FIELDS (all 9 forms)
+══════════════════════════════════════ -->
+<div class="slide slide-white">
+  <div class="eyebrow">Form Architecture · Universal Fields</div>
+  <h2>What Every Form Shares</h2>
+  <div class="divider"></div>
+
+  <p style="margin-bottom:20px;">All 9 submission forms — regardless of tool type — collect the same core metadata. These fields appear on every form, giving the registry a consistent backbone.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="field-block">
+        <h4>Identity</h4>
+        <div class="field-row"><span class="field-name">Tool name</span><span class="field-note"><span class="pill p-red">Required</span></span></div>
+        <div class="field-row"><span class="field-name">Synonyms / alternate names</span><span class="field-note"><span class="pill p-grey">Optional</span></span></div>
+        <div class="field-row"><span class="field-name">Description</span><span class="field-note"><span class="pill p-red">Required</span></span></div>
+        <div class="field-row"><span class="field-name">RRID</span><span class="field-note"><span class="pill p-grey">Optional — auto-looked-up by pipeline</span></span></div>
+      </div>
+
+      <div class="field-block">
+        <h4>Provenance</h4>
+        <div class="field-row"><span class="field-name">Developer name</span><span class="field-note"><span class="pill p-grey">Optional</span></span></div>
+        <div class="field-row"><span class="field-name">Developer affiliation</span><span class="field-note"><span class="pill p-grey">Optional</span></span></div>
+        <div class="field-row"><span class="field-name">Submitter contact email</span><span class="field-note"><span class="pill p-grey">Optional</span></span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="field-block" style="border-top: 4px solid var(--accent);">
+        <h4 style="color: var(--accent);">Publication Linkage <span style="font-weight:400; color:var(--muted);">— on every form</span></h4>
+        <div class="field-row">
+          <span class="field-name">Development publication DOI</span>
+          <span class="field-note"><span class="pill p-grey">Optional</span> — the paper that first described this tool</span>
+        </div>
+        <div class="field-row">
+          <span class="field-name">Usage publication DOIs</span>
+          <span class="field-note"><span class="pill p-grey">Optional</span> — every paper that has used this tool (add as many as needed)</span>
+        </div>
+      </div>
+
+      <div class="field-block" style="border-top: 4px solid var(--green);">
+        <h4 style="color: var(--green);">Acquisition <span style="font-weight:400; color:var(--muted);">— on every form</span></h4>
+        <div class="field-row"><span class="field-name">How to acquire</span><span class="field-note"><span class="pill p-red">Required</span> — Contact developer / Purchase from vendor / Other</span></div>
+        <div class="field-row" style="padding-left:12px; font-style:italic;"><span class="field-name" style="color:var(--muted);">→ Developer contact email</span><span class="field-note">shown if "Contact developer"</span></div>
+        <div class="field-row" style="padding-left:12px; font-style:italic;"><span class="field-name" style="color:var(--muted);">→ Vendor name, catalog #, URL</span><span class="field-note">shown if "Purchase from vendor"</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pg">4 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     5 · SECTION BREAK — TOOL TYPES
+══════════════════════════════════════ -->
+<div class="slide slide-section">
+  <div class="eyebrow">Part 1</div>
+  <h2>The Nine Tool Categories</h2>
+  <div class="divider"></div>
+  <p style="font-size:1.05rem; max-width:640px;">
+    Beyond the universal fields, each category captures the metadata specific to that tool type.
+    The nine categories fall into four natural scientific groupings.
+  </p>
+  <div style="margin-top:28px;">
+    <div style="display:flex; flex-wrap:wrap; gap:10px; max-width:700px;">
+      <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.55); width:100%; margin-bottom:4px;">Research Model Systems</span>
+      <span class="pill p-white">Cell Lines</span>
+      <span class="pill p-white">Animal Models</span>
+      <span class="pill p-white">Patient-Derived Models</span>
+      <span class="pill p-white">Advanced Cellular Models</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; max-width:700px; margin-top:16px;">
+      <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.55); width:100%; margin-bottom:4px;">Molecular Reagents</span>
+      <span class="pill p-white">Antibodies</span>
+      <span class="pill p-white">Genetic Reagents</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; max-width:700px; margin-top:16px;">
+      <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.55); width:100%; margin-bottom:4px;">Analytical &amp; Assessment Tools</span>
+      <span class="pill p-white">Computational Tools</span>
+      <span class="pill p-white">Clinical Assessment Tools</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; max-width:700px; margin-top:16px;">
+      <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.55); width:100%; margin-bottom:4px;">Infrastructure</span>
+      <span class="pill p-white">Biobanks</span>
+    </div>
+  </div>
+  <div class="pg">5 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     6 · RESEARCH MODEL SYSTEMS
+══════════════════════════════════════ -->
+<div class="slide slide-white" id="slide-model-systems">
+  <div class="eyebrow">Tool Categories · Research Model Systems</div>
+  <h2>Research Model Systems</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Systems in which NF biology is actively studied — from 2D cultures to whole animals. These forms capture how the model was established, its genetic and disease context, and how to access it.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+
+    <div class="card card-t-blue">
+      <div class="card-icon">🧫</div>
+      <h3>Cell Lines</h3>
+      <p>Cultured cell lines from NF patients or models.</p>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Species</span>
+        <span class="pill p-red">NF disorder</span>
+        <span class="pill p-red">Manifestation</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-blue">Sex, race, age</span>
+        <span class="pill p-blue">Tissue / organ of origin</span>
+        <span class="pill p-blue">STR profile / contamination status</span>
+        <span class="pill p-blue">Culture media</span>
+        <span class="pill p-blue">Doubling time</span>
+        <span class="pill p-blue">Drug resistance</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Translational Decision-Support (new)</div>
+        <span class="pill p-grey">PK/PD capabilities</span>
+        <span class="pill p-grey">Validated drug mechanisms</span>
+        <span class="pill p-grey">Age relevance (pediatric/adult)</span>
+        <span class="pill p-grey">Timeline to results</span>
+        <span class="pill p-grey">MTA required</span>
+        <span class="pill p-grey">NGNRI repository</span>
+      </div>
+    </div>
+
+    <div class="card card-t-teal">
+      <div class="card-icon">🐭</div>
+      <h3>Animal Models</h3>
+      <p>Transgenic and mutant animals (mouse, rat, zebrafish) engineered to study NF.</p>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Species</span>
+        <span class="pill p-red">NF disorder</span>
+        <span class="pill p-red">Manifestation</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-teal">Background strain &amp; nomenclature</span>
+        <span class="pill p-teal">Allele type</span>
+        <span class="pill p-teal">Mutation type (15+ options)</span>
+        <span class="pill p-teal">Affected gene symbol</span>
+        <span class="pill p-teal">Protein / sequence variation</span>
+        <span class="pill p-teal">Animal state, generation</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Translational Decision-Support (new)</div>
+        <span class="pill p-grey">Induced vs. developmental model</span>
+        <span class="pill p-grey">BBB integrity status</span>
+        <span class="pill p-grey">Route of administration</span>
+        <span class="pill p-grey">PK/PD capabilities</span>
+        <span class="pill p-grey">Validated drug mechanisms</span>
+        <span class="pill p-grey">Timeline to results</span>
+        <span class="pill p-grey">Model limitations</span>
+        <span class="pill p-grey">Clinical translation history</span>
+        <span class="pill p-grey">MTA required · NGNRI repository</span>
+      </div>
+    </div>
+
+    <div class="card card-t-green">
+      <div class="card-icon">🧪</div>
+      <h3>Patient-Derived Models</h3>
+      <p>PDX, humanized mice, organoids, and cell lines established directly from NF patient tissue.</p>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Model system type</span>
+        <span class="pill p-red">Patient diagnosis</span>
+        <span class="pill p-red">Species</span>
+        <span class="pill p-red">NF disorder</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-green">Sex, race, age at collection</span>
+        <span class="pill p-green">Host strain (NSG, nude, etc.)</span>
+        <span class="pill p-green">Tumor type &amp; engraftment site</span>
+        <span class="pill p-green">Passage number</span>
+        <span class="pill p-green">Molecular characterization methods</span>
+        <span class="pill p-green">Clinical data linkage</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Translational Decision-Support (new)</div>
+        <span class="pill p-grey">BBB integrity status</span>
+        <span class="pill p-grey">Route of administration</span>
+        <span class="pill p-grey">PK/PD capabilities</span>
+        <span class="pill p-grey">Validated drug mechanisms</span>
+        <span class="pill p-grey">Clinical translation history</span>
+        <span class="pill p-grey">Timeline · limitations · MTA · NGNRI</span>
+      </div>
+    </div>
+
+    <div class="card card-t-orange">
+      <div class="card-icon">🔬</div>
+      <h3>Advanced Cellular Models</h3>
+      <p>3D culture systems — organoids, assembloids, spheroids — from iPSCs, ESCs, or patient tissue.</p>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Model type</span>
+        <span class="pill p-red">Derivation source</span>
+        <span class="pill p-red">Cell types present</span>
+        <span class="pill p-red">NF disorder</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-orange">NF manifestation</span>
+        <span class="pill p-orange">Matrix type (Matrigel, hydrogel…)</span>
+        <span class="pill p-orange">Culture system (bioreactor, chip…)</span>
+        <span class="pill p-orange">Culture media &amp; supplements</span>
+        <span class="pill p-orange">Time to maturation, passage #</span>
+        <span class="pill p-orange">Characterization methods</span>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Translational Decision-Support (new)</div>
+        <span class="pill p-grey">BBB model capability</span>
+        <span class="pill p-grey">PK/PD capabilities</span>
+        <span class="pill p-grey">Validated drug mechanisms</span>
+        <span class="pill p-grey">Standalone regulatory evidence flag</span>
+        <span class="pill p-grey">Timeline · limitations · MTA · NGNRI</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="pg">6 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     7 · MOLECULAR REAGENTS
+══════════════════════════════════════ -->
+<div class="slide slide-light">
+  <div class="eyebrow">Tool Categories · Molecular Reagents</div>
+  <h2>Molecular Reagents</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Physical tools used to conduct experiments — detecting proteins or manipulating genes. These forms capture the technical specifics needed for another lab to validly reproduce an experiment.</p>
+
+  <div class="two-col">
+
+    <div class="card card-t-purple">
+      <div class="card-icon">💉</div>
+      <h3>Antibodies</h3>
+      <p>Antibodies used to detect NF-related proteins in experiments and diagnostics.</p>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Host organism</span>
+        <span class="pill p-red">Reactive species</span>
+        <span class="pill p-red">Target antigen</span>
+        <span class="pill p-red">UniProt ID</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-purple">Clonality (mono / polyclonal)</span>
+        <span class="pill p-purple">Clone ID</span>
+        <span class="pill p-purple">Conjugate</span>
+      </div>
+    </div>
+
+    <div class="card card-t-teal">
+      <div class="card-icon">🧬</div>
+      <h3>Genetic Reagents</h3>
+      <p>Plasmids, CRISPR constructs, shRNA, lentiviral vectors, and expression cassettes.</p>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Insert species</span>
+        <span class="pill p-red">Entrez gene ID</span>
+        <span class="pill p-red">Vector backbone</span>
+        <span class="pill p-red">Vector type</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-teal">gRNA / shRNA sequence</span>
+        <span class="pill p-teal">Cloning method &amp; sites</span>
+        <span class="pill p-teal">Resistance markers</span>
+        <span class="pill p-teal">Biosafety / hazardous flag</span>
+        <span class="pill p-teal">Insert &amp; total construct size</span>
+      </div>
+      <div class="hl" style="margin-top:14px; font-size:0.82rem; padding:10px 14px;">
+        This is the most technically detailed form — capturing everything needed to order or reconstruct a plasmid from a repository like Addgene.
+      </div>
+    </div>
+
+  </div>
+  <div class="pg">7 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     8 · ANALYTICAL & ASSESSMENT TOOLS
+══════════════════════════════════════ -->
+<div class="slide slide-white">
+  <div class="eyebrow">Tool Categories · Analytical &amp; Assessment Tools</div>
+  <h2>Analytical &amp; Assessment Tools</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Tools for making sense of data or measuring patient outcomes — these are used <em>after</em> an experiment or in the clinic, not to generate biological material.</p>
+
+  <div class="two-col">
+
+    <div class="card card-t-blue">
+      <div class="card-icon">💻</div>
+      <h3>Computational Tools</h3>
+      <p>Software, pipelines, databases, and web apps built for NF data analysis.</p>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Software type</span>
+        <span style="font-size:0.8rem; color:var(--muted);"> (analysis software, pipeline, package, database, web app…)</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-blue">Programming language(s)</span>
+        <span class="pill p-blue">Version</span>
+        <span class="pill p-blue">Source repository URL</span>
+        <span class="pill p-blue">Documentation URL</span>
+        <span class="pill p-blue">License type</span>
+        <span class="pill p-blue">Container available (Docker)</span>
+        <span class="pill p-blue">Dependencies &amp; system requirements</span>
+        <span class="pill p-blue">Maintainer name &amp; organization</span>
+        <span class="pill p-blue">Distribution channel (PyPI, CRAN, Bioconductor…)</span>
+        <span class="pill p-blue">Analytical platform support (mass spec, metabolomics, PK/PD…)</span>
+      </div>
+    </div>
+
+    <div class="card card-t-orange">
+      <div class="card-icon">📋</div>
+      <h3>Clinical Assessment Tools</h3>
+      <p>Validated scales, questionnaires, and patient-reported outcome measures (PROMs) used in NF clinical studies and trials.</p>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Required (beyond universal)</div>
+        <span class="pill p-red">Assessment type</span>
+        <span class="pill p-red">Target population</span>
+        <span style="font-size:0.8rem; color:var(--muted); display:block; margin-top:4px;">(pediatric / adult / disease-specific)</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+        <span class="pill p-orange">NF-specific vs. adapted from general use</span>
+        <span class="pill p-orange">Number of items / questions</span>
+        <span class="pill p-orange">Scoring method</span>
+        <span class="pill p-orange">Psychometric validation status</span>
+        <span class="pill p-orange">Validated languages</span>
+        <span class="pill p-orange">Administration time</span>
+        <span class="pill p-orange">Availability / licensing status</span>
+        <span class="pill p-orange">Digital / electronic format available</span>
+        <span class="pill p-orange">Cognitive/behavioral domains assessed</span>
+        <span class="pill p-orange">Regulatory acceptance history (FDA/EMA COA endorsement)</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="pg">8 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     9 · BIOBANKS (INFRASTRUCTURE)
+══════════════════════════════════════ -->
+<div class="slide slide-teal">
+  <div class="eyebrow">Tool Categories · Infrastructure</div>
+  <h2>Biobanks</h2>
+  <div class="divider"></div>
+
+  <div class="two-col-wide">
+    <div>
+      <p style="margin-bottom:16px;">Biobanks are repositories that store and distribute NF biospecimens — tumor tissue, blood, DNA, RNA, and cell preparations. Rather than a single experimental tool, a biobank entry makes an entire collection of specimens discoverable.</p>
+
+      <div class="card card-t-teal">
+        <div class="card-icon">🏦</div>
+        <h3>Biobank Form Fields</h3>
+        <div style="margin-top:10px;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">Required (beyond universal)</div>
+          <span class="pill p-red">Biobank URL</span>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Notable Optional Fields</div>
+          <span class="pill p-teal">NF disease types covered (NF1, NF2, Schwannomatosis)</span>
+          <span class="pill p-teal">Specimen types (tissue, blood, DNA, RNA, cells)</span>
+          <span class="pill p-teal">Tumor types available</span>
+          <span class="pill p-teal">Preservation methods (FFPE, cryopreserved, flash-frozen)</span>
+          <span class="pill p-teal">Specimen formats</span>
+          <span class="pill p-teal">Access procedure &amp; request form URL</span>
+          <span class="pill p-teal">Biobank website URL</span>
+          <span class="pill p-teal">Curator / contact name &amp; affiliation</span>
+          <span class="pill p-teal">MTA required</span>
+          <span class="pill p-teal">NGNRI repository affiliation</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hl" style="background:white; border-color:var(--teal);">
+        <p><strong>4 NF biobanks</strong> are already registered, making specimen access discoverable through a single interface for the first time.</p>
+      </div>
+      <div class="hl hl-blue" style="margin-top:14px;">
+        <p>Biobank entries require a name and URL — enough for the community to find and contact the biobank immediately. All specimen and content details can be added over time.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pg">9 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     10 · REQUIRED VS OPTIONAL SUMMARY
+══════════════════════════════════════ -->
+<div class="slide slide-white" id="slide-summary-table">
+  <div class="eyebrow">Form Architecture · Summary</div>
+  <h2>Required vs. Optional at a Glance</h2>
+  <div class="divider"></div>
+
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Tool Category</th>
+        <th>Required Fields <span style="font-weight:400">(all forms also require tool name &amp; description)</span></th>
+        <th>Key Optional Fields</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Cell Lines</strong></td>
+        <td><span class="req">Species, NF disorder, Manifestation</span></td>
+        <td class="opt">Sex, race, age; tissue/organ; STR profile; culture media; doubling time; drug resistance; PK/PD capabilities; validated drug mechanisms; age relevance; timeline to results; MTA required; NGNRI repository</td>
+      </tr>
+      <tr>
+        <td><strong>Animal Models</strong></td>
+        <td><span class="req">Species, NF disorder, Manifestation</span></td>
+        <td class="opt">Strain nomenclature, allele type, mutation type, gene symbol, sequence variation; induced vs. developmental; BBB integrity; route of administration; PK/PD capabilities; validated drug mechanisms; pediatric suitability; timeline to results; model limitations; clinical translation history; regulatory acceptance history; MTA required; NGNRI repository</td>
+      </tr>
+      <tr>
+        <td><strong>Patient-Derived Models</strong></td>
+        <td><span class="req">Model system type, Patient diagnosis, Species, NF disorder</span></td>
+        <td class="opt">Sex, race, age; host strain; tumor type; engraftment site; characterization methods; BBB integrity; route of administration; PK/PD capabilities; validated drug mechanisms; clinical translation history; timeline; model limitations; regulatory acceptance history; MTA required; NGNRI repository</td>
+      </tr>
+      <tr>
+        <td><strong>Advanced Cellular Models</strong></td>
+        <td><span class="req">Model type, Derivation source, Cell types, NF disorder</span></td>
+        <td class="opt">NF manifestation, matrix type, culture system, culture media, maturation time, QC metrics; BBB model capability; PK/PD capabilities; validated drug mechanisms; age relevance; timeline; model limitations; regulatory acceptance history; standalone regulatory evidence flag; MTA required; NGNRI repository</td>
+      </tr>
+      <tr>
+        <td><strong>Antibodies</strong></td>
+        <td><span class="req">Host organism, Reactive species, Target antigen, UniProt ID</span></td>
+        <td class="opt">Clonality, clone ID, conjugate</td>
+      </tr>
+      <tr>
+        <td><strong>Genetic Reagents</strong></td>
+        <td><span class="req">Insert species, Entrez gene ID, Vector backbone, Vector type</span></td>
+        <td class="opt">gRNA/shRNA sequence, cloning method, resistance markers, biosafety flag</td>
+      </tr>
+      <tr>
+        <td><strong>Computational Tools</strong></td>
+        <td><span class="req">Software type</span></td>
+        <td class="opt">Language, version, repo URL, license, container, distribution channel, dependencies; analytical platform support (mass spec, metabolomics, PK/PD modeling…)</td>
+      </tr>
+      <tr>
+        <td><strong>Clinical Assessment Tools</strong></td>
+        <td><span class="req">Assessment type, Target population</span></td>
+        <td class="opt">NF-specific flag, number of items, psychometric validation, languages, licensing; cognitive/behavioral domains assessed; regulatory acceptance history (FDA/EMA COA endorsement)</td>
+      </tr>
+      <tr>
+        <td><strong>Biobanks</strong></td>
+        <td><span class="req">Biobank URL</span></td>
+        <td class="opt">Disease types, specimen types, tumor types, preservation methods, access procedure; MTA required; NGNRI repository affiliation</td>
+      </tr>
+      <tr style="background: var(--light-blue);">
+        <td><strong>ALL forms</strong></td>
+        <td><span class="all">Tool name + Description + How to acquire</span></td>
+        <td class="all">Development DOI, Usage DOIs, Synonyms, Developer info, RRID</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pg">10 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     11 · 2026 UPDATE: TRANSLATIONAL FIELDS
+══════════════════════════════════════ -->
+<div class="slide slide-light">
+  <div class="eyebrow">2026 Update · Funder-Driven Expansion</div>
+  <h2>New: Translational Decision-Support Metadata</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Based on the 2026 NFRTC funder technical specifications, model system forms now capture metadata enabling <strong>go/no-go decisions</strong> — so drug developers, clinical trialists, and regulatory strategists can identify which models answer their specific translational questions.</p>
+
+  <div class="three-col">
+
+    <div class="card card-t-blue">
+      <div class="card-icon">💊</div>
+      <h3>Drug Testing Capabilities</h3>
+      <p style="font-size:0.8rem; margin-bottom:8px;">Added to all 4 model system forms</p>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Route of administration</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">BBB integrity / penetration assessment</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">PK/PD measurement capabilities</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Validated drug mechanisms (MEK, RAS, mTOR…)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--orange);">Advanced cellular only: BBB model capability flag</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--orange);">Advanced cellular only: standalone regulatory evidence flag</span></div>
+    </div>
+
+    <div class="card card-t-teal">
+      <div class="card-icon">📐</div>
+      <h3>Model Reliability &amp; Context</h3>
+      <p style="font-size:0.8rem; margin-bottom:8px;">Enables convergent evidence evaluation</p>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Known model limitations (explicit free text)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Clinical translation history</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Regulatory acceptance history (FDA/EMA)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Age relevance (pediatric / adult / both)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Typical timeline to results</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--teal);">Animal model only: induced vs. developmental</span></div>
+    </div>
+
+    <div class="card card-t-green">
+      <div class="card-icon">🔓</div>
+      <h3>Access &amp; Repository</h3>
+      <p style="font-size:0.8rem; margin-bottom:8px;">Reduces bureaucratic friction</p>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">MTA required? (yes/no)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset;">Deposited in NGNRI repository?</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--muted);">Also on Biobanks: NGNRI affiliation flag</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--blue);">Computational tools: analytical platform support</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--blue);">(mass spec, metabolomics, PK/PD modeling…)</span></div>
+      <div class="field-row"><span class="field-name" style="min-width:unset; color:var(--orange);">Clinical tools: cognitive/behavioral domains; regulatory COA history</span></div>
+    </div>
+
+  </div>
+
+  <div class="hl" style="margin-top:18px; font-size:0.84rem;">
+    <p><strong>Also updated:</strong> Animal model manifestation enum now includes <em>Low Grade Glioma</em> (NF1-LGG) explicitly. NF disorder fields on patient-derived and advanced cellular model forms now include <em>NF1 Spontaneous Mutation</em> as an option.</p>
+  </div>
+  <div class="pg">11 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     12 · OBSERVATIONS FORM (was 11)
+══════════════════════════════════════ -->
+<div class="slide slide-light">
+  <div class="eyebrow">Part 2 · Observations</div>
+  <h2>Linking Experimental Findings to Tools</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:18px;">Beyond cataloging tools, the registry captures <strong>how they perform</strong> — connecting specific experimental findings from publications to the tools that generated them. This transforms the registry from a directory into a living evidence base.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="badge-row">
+        <div class="badge-icon">1️⃣</div>
+        <div class="badge-body">
+          <h4>Select Tool &amp; Observation Type</h4>
+          <p>Dropdowns pre-populated with all existing registry entries by category. Observation types are context-sensitive: a cell line offers drug response, viability, gene expression; an animal model offers tumor growth, survival, behavioral, drug efficacy.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">2️⃣</div>
+        <div class="badge-body">
+          <h4>Describe the Finding</h4>
+          <p>Free-text description of the specific experimental result or observation, plus the DOI of the paper it comes from.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">3️⃣</div>
+        <div class="badge-body">
+          <h4>Tag with Ontology (Optional)</h4>
+          <p>Phenotypic observations can be tagged with Mammalian Phenotype (MP) ontology IDs, enabling cross-study comparisons.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">4️⃣</div>
+        <div class="badge-body">
+          <h4>Attach Files (Optional)</h4>
+          <p>Supporting images, datasets, or figures can be uploaded alongside the observation record.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card card-t-blue">
+        <h3>Observation Types by Category</h3>
+        <table class="tbl" style="margin-top:12px; font-size:0.79rem;">
+          <thead>
+            <tr><th>Tool Type</th><th>Example Observation Types</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Animal Models</strong></td><td>Tumor growth, survival, drug efficacy, behavioral, immune, metabolic</td></tr>
+            <tr><td><strong>Cell Lines</strong></td><td>Drug response, viability, migration/invasion, gene expression, morphological</td></tr>
+            <tr><td><strong>PDX / Adv. Cellular</strong></td><td>Drug response, gene expression, morphological, molecular/biochemical</td></tr>
+            <tr><td><strong>Antibodies</strong></td><td>Validation data, cross-reactivity, usage protocol, quality note</td></tr>
+            <tr><td><strong>Computational</strong></td><td>Performance benchmark, validation result, issue report</td></tr>
+            <tr><td><strong>Clinical Tools</strong></td><td>Psychometric validation, population-specific findings</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="pg">12 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     13 · VALUE TO FUNDER
+══════════════════════════════════════ -->
+<div class="slide slide-white">
+  <div class="eyebrow">Strategic Value</div>
+  <h2>Why This Matters for the Funding Organization</h2>
+  <div class="divider"></div>
+
+  <div class="two-col-wide">
+    <div>
+      <div class="badge-row">
+        <div class="badge-icon">📊</div>
+        <div class="badge-body">
+          <h4>Portfolio Visibility</h4>
+          <p>Every grant-funded tool is structured, tagged, and searchable — giving program officers a real-time view of what the portfolio has produced, filterable by disease area, model type, or institution.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">♻️</div>
+        <div class="badge-body">
+          <h4>Maximizing Return on Investment</h4>
+          <p>When tools are registered with acquisition instructions, other funded investigators can access and reuse them immediately — reducing duplication and stretching grant dollars further.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">📎</div>
+        <div class="badge-body">
+          <h4>Publication Tracking</h4>
+          <p>The registry links each tool to every paper that has used it. Program managers can pull a citation map showing downstream research productivity enabled by any specific funded tool.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">🤝</div>
+        <div class="badge-body">
+          <h4>Community Coordination</h4>
+          <p>Biobanks, clinical assessment tools, and patient-derived models are visible across institutions — enabling the program office to actively broker resource sharing and cross-institutional collaborations.</p>
+        </div>
+      </div>
+      <div class="badge-row">
+        <div class="badge-icon">✅</div>
+        <div class="badge-body">
+          <h4>Grant Reporting Support</h4>
+          <p>Grantees can point to registry entries as structured evidence of deliverables met. Program officers can generate standardized tool-output reports directly from the registry.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hl" style="font-size:0.95rem;">
+        <p><strong>The submission forms are more than data entry.</strong> They are the mechanism by which the organization's investment in tools becomes a permanent, shared, and growing community asset.</p>
+      </div>
+      <div style="background: var(--light-blue); border-radius:10px; padding:18px; margin-top:16px;">
+        <h3 style="margin-bottom:10px; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; color:var(--blue);">What Every Submission Captures</h3>
+        <ul class="chk">
+          <li>Tool identity &amp; scientific description</li>
+          <li>NF disease relevance &amp; model system</li>
+          <li>Publication that first described it</li>
+          <li>All publications that have used it</li>
+          <li>How another lab can access it</li>
+          <li>RRID for durable citation tracking</li>
+          <li>Experimental observations from literature</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="pg">13 / 14</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     13 · CLOSING
+══════════════════════════════════════ -->
+<div class="slide slide-hero">
+  <p class="eyebrow">Summary</p>
+  <h1 class="hero" style="font-size:2.2rem;">A Shared Infrastructure<br>for NF Research</h1>
+  <p class="hero-sub">
+    The submission forms are a community-wide standard for capturing, validating, and sharing the experimental tools that drive Neurofibromatosis research.
+  </p>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:36px; max-width:860px;">
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:18px; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:8px;">🔗</div>
+      <div style="font-size:0.82rem; font-weight:700;">Universal Backbone</div>
+      <div style="font-size:0.75rem; opacity:0.75; margin-top:4px;">Name, description, publication DOIs, and acquisition on every form</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:18px; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:8px;">🗂️</div>
+      <div style="font-size:0.82rem; font-weight:700;">4 Scientific Groupings</div>
+      <div style="font-size:0.75rem; opacity:0.75; margin-top:4px;">Models · Reagents · Analytical · Infrastructure</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:18px; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:8px;">✏️</div>
+      <div style="font-size:0.82rem; font-weight:700;">Low Barrier to Entry</div>
+      <div style="font-size:0.75rem; opacity:0.75; margin-top:4px;">Minimal required fields; optional fields enrich over time</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:18px; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:8px;">🌐</div>
+      <div style="font-size:0.82rem; font-weight:700;">Openly Discoverable</div>
+      <div style="font-size:0.75rem; opacity:0.75; margin-top:4px;">Hosted on Synapse, RRID-indexed, publication-linked</div>
+    </div>
+  </div>
+  <div class="pg">14 / 14</div>
+</div>
+
+
+</body>
+</html>

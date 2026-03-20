@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Format Sonnet validation results into VALIDATED_*.csv files for Synapse submission.
+Format Sonnet validation results into ACCEPTED_*.csv files for Synapse submission.
 
 This is the CONSOLIDATED formatting script that processes ALL validated tools:
 1. Accepted mined tools (from validation_summary.json - tools that passed Sonnet review)
@@ -9,7 +9,7 @@ This is the CONSOLIDATED formatting script that processes ALL validated tools:
 4. Publications metadata
 5. Usage and Development links
 
-The output VALIDATED_*.csv files contain ALL tools that passed AI validation,
+The output ACCEPTED_*.csv files contain ALL tools that passed AI validation,
 combining both mining results (filtered for false positives) and newly discovered tools.
 
 All files follow the exact Synapse table schemas for direct upsert.
@@ -1591,7 +1591,7 @@ def integrate_nf_modified_cell_lines_into_tool_dfs(tool_dfs):
                 duplicate_count += 1
                 continue
 
-        # Create new entry matching VALIDATED_cell_lines.csv format
+        # Create new entry matching ACCEPTED_cell_lines.csv format
         new_entry = {
             'cellLineId': row['cellLineId'],
             'organ': '',
@@ -2523,11 +2523,11 @@ def main():
         'Patient-Derived Model': 'patient_derived_models'
     }
 
-    print("\n10. Saving VALIDATED_*.csv (all tools passing confidence + NF filters)...")
+    print("\n10. Saving ACCEPTED_*.csv (all tools passing confidence + NF filters)...")
     for tool_type, file_suffix in type_file_map.items():
         if tool_type in tool_dfs and not tool_dfs[tool_type].empty:
             df = tool_dfs[tool_type]
-            output_file = f'tool_coverage/outputs/VALIDATED_{file_suffix}.csv'
+            output_file = f'tool_coverage/outputs/ACCEPTED_{file_suffix}.csv'
             df.to_csv(output_file, index=False)
             print(f"   ✓ {len(df)} {tool_type}s → {output_file}")
         else:
@@ -2544,40 +2544,40 @@ def main():
             print(f"   - {tool_type}s... (none in priority)")
 
     # Format resources (main table with one row per unique resource)
-    print("\n12. Formatting VALIDATED_resources.csv (one row per unique resource)...")
+    print("\n12. Formatting ACCEPTED_resources.csv (one row per unique resource)...")
     resources_df = format_resources(tool_dfs)
     if not resources_df.empty:
-        output_file = 'tool_coverage/outputs/VALIDATED_resources.csv'
+        output_file = 'tool_coverage/outputs/ACCEPTED_resources.csv'
         resources_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(resources_df)} unique resources → {output_file}")
     else:
         print("   - No resources to format")
 
     # Format publications
-    print("\n13. Formatting VALIDATED_publications.csv (one row per unique publication)...")
+    print("\n13. Formatting ACCEPTED_publications.csv (one row per unique publication)...")
     publications_df = format_publications(tool_dfs)
     if not publications_df.empty:
-        output_file = 'tool_coverage/outputs/VALIDATED_publications.csv'
+        output_file = 'tool_coverage/outputs/ACCEPTED_publications.csv'
         publications_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(publications_df)} unique publications → {output_file}")
     else:
         print("   - No publications to format")
 
     # Format usage links
-    print("\n14. Formatting VALIDATED_usage.csv (publication-resource links)...")
+    print("\n14. Formatting ACCEPTED_usage.csv (publication-resource links)...")
     usage_df = format_usage_links(tool_dfs, resources_df, publications_df)
     if not usage_df.empty:
-        output_file = 'tool_coverage/outputs/VALIDATED_usage.csv'
+        output_file = 'tool_coverage/outputs/ACCEPTED_usage.csv'
         usage_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(usage_df)} usage links → {output_file}")
     else:
         print("   - No usage links to format")
 
     # Format development links (NEW tools not in Synapse)
-    print("\n15. Formatting VALIDATED_development.csv (NEW tools)...")
+    print("\n15. Formatting ACCEPTED_development.csv (NEW tools)...")
     development_df = format_development_links(tool_dfs, resources_df, publications_df)
     if not development_df.empty:
-        output_file = 'tool_coverage/outputs/VALIDATED_development.csv'
+        output_file = 'tool_coverage/outputs/ACCEPTED_development.csv'
         development_df.to_csv(output_file, index=False)
         print(f"   ✓ {len(development_df)} development links (new tools) → {output_file}")
 
@@ -2623,7 +2623,7 @@ def main():
         print("   - No new resources to format")
 
     # Load and format observations
-    print("\n17. Formatting VALIDATED_observations.csv...")
+    print("\n17. Formatting ACCEPTED_observations.csv...")
     obs_file = 'tool_reviews/observations.csv'
     if os.path.exists(obs_file):
         obs_df = pd.read_csv(obs_file)
@@ -2639,7 +2639,7 @@ def main():
 
         if not obs_df.empty:
             formatted_obs = format_observations(obs_df)
-            output_file = 'tool_coverage/outputs/VALIDATED_observations.csv'
+            output_file = 'tool_coverage/outputs/ACCEPTED_observations.csv'
             formatted_obs.to_csv(output_file, index=False)
             print(f"   ✓ {len(formatted_obs)} observations → {output_file}")
         else:
@@ -2686,27 +2686,27 @@ def main():
     print(f"   - Tools with minimum critical fields: {tools_with_minimum}/{total_tools}")
     print(f"   - High-completeness tools (priority): {priority_count}/{total_tools} ({priority_count/total_tools*100:.1f}%)")
 
-    print("\n📋 VALIDATED_*.csv Files (all tools passing confidence + NF filters):")
+    print("\n📋 ACCEPTED_*.csv Files (all tools passing confidence + NF filters):")
     print("\n   Core Tables:")
     if not resources_df.empty:
-        print(f"   ✓ VALIDATED_resources.csv ({len(resources_df)} unique resources)")
+        print(f"   ✓ ACCEPTED_resources.csv ({len(resources_df)} unique resources)")
     if not publications_df.empty:
-        print(f"   ✓ VALIDATED_publications.csv ({len(publications_df)} unique publications)")
+        print(f"   ✓ ACCEPTED_publications.csv ({len(publications_df)} unique publications)")
 
     print("\n   Relationship Tables:")
     if not usage_df.empty:
-        print(f"   ✓ VALIDATED_usage.csv ({len(usage_df)} links)")
+        print(f"   ✓ ACCEPTED_usage.csv ({len(usage_df)} links)")
     if not development_df.empty:
-        print(f"   ✓ VALIDATED_development.csv ({len(development_df)} links)")
+        print(f"   ✓ ACCEPTED_development.csv ({len(development_df)} links)")
 
     print("\n   Detail Tables:")
     for tool_type, file_suffix in type_file_map.items():
         if tool_type in tool_dfs and not tool_dfs[tool_type].empty:
-            print(f"   ✓ VALIDATED_{file_suffix}.csv ({len(tool_dfs[tool_type])} entries)")
+            print(f"   ✓ ACCEPTED_{file_suffix}.csv ({len(tool_dfs[tool_type])} entries)")
 
     print("\n   Observations:")
     if not formatted_obs.empty:
-        print(f"   ✓ VALIDATED_observations.csv ({len(formatted_obs)} entries)")
+        print(f"   ✓ ACCEPTED_observations.csv ({len(formatted_obs)} entries)")
 
     print("\n📋 FILTERED_*.csv Files (high-completeness subset for priority review):")
     priority_total = sum(len(df) for df in priority_tool_dfs.values())
@@ -2721,7 +2721,7 @@ def main():
     print("\n✅ Validation formatting complete!")
     print(f"\n💡 Next Steps:")
     print(f"   1. Review FILTERED_*.csv files for priority manual review (high completeness)")
-    print(f"   2. Use VALIDATED_*.csv files for comprehensive review (all passing tools)")
+    print(f"   2. Use ACCEPTED_*.csv files for comprehensive review (all passing tools)")
     print(f"   3. After manual review, upsert approved tools to Synapse")
     print("   - All files follow Synapse table schemas")
     print("   - Generic tools filtered out (ImageJ, GraphPad, R, MATLAB, etc.)")

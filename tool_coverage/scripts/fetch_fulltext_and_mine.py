@@ -2333,7 +2333,7 @@ Note: Run run_publication_reviews.py separately for AI validation
     print("      python tool_coverage/scripts/run_publication_reviews.py")
     print("   2. Format mining results for submission:")
     print("      python tool_coverage/scripts/format_mining_for_submission.py")
-    print("   3. Use VALIDATED_*.csv files (after validation) or SUBMIT_*.csv files")
+    print("   3. Use ACCEPTED_*.csv files (after validation) or SUBMIT_*.csv files")
     print("=" * 80)
 
 

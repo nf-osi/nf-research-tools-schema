@@ -1,0 +1,571 @@
+name: Publication Mining
+# Workflow for automated tool mining from NF Portal + PubMed publications
+
+on:
+  issues:
+    types: [closed]
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      ai_validation:
+        description: 'Run AI validation on mined tools using Sonnet'
+        required: false
+        type: boolean
+        default: true
+      max_publications:
+        description: 'Maximum number of publications to mine (blank = all)'
+        required: false
+        type: string
+        default: ''
+      force_rereviews:
+        description: 'Force re-review of already-reviewed publications'
+        required: false
+        type: boolean
+        default: false
+      skip_title_screening:
+        description: 'Skip title screening (use existing screened_publications.csv)'
+        required: false
+        type: boolean
+        default: false
+      skip_abstract_screening:
+        description: 'Skip abstract screening (use existing abstract_screened_publications.csv)'
+        required: false
+        type: boolean
+        default: false
+      max_reviews:
+        description: 'Max Sonnet reviews per run (blank = auto-calculate from timeout budget)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+# Cancel previous runs if a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mine-publications:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours - GitHub Actions maximum
+    # Run if: (1) manual trigger, OR (2) monthly tool-submissions issue closed
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && github.event.action == 'closed' && contains(github.event.issue.labels.*.name, 'tool-submissions'))
+
+    env:
+      ENABLE_AI_VALIDATION: ${{ github.event.inputs.ai_validation != 'false' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r tool_coverage/requirements.txt
+
+      - name: Check for ANTHROPIC_API_KEY
+        id: check_api_key
+        run: |
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "api_key_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ ANTHROPIC_API_KEY is configured"
+          else
+            echo "api_key_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️  ANTHROPIC_API_KEY not found - AI validation will be skipped"
+          fi
+
+      - name: Download artifacts from previous run (if skipping steps)
+        if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true'
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: publication-mining.yml
+          name: tool-coverage-reports
+          path: .
+          if_no_artifact_found: warn
+        continue-on-error: true
+
+      - name: Prepare publication list (bench + clinical queries)
+        id: prep_list
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.skip_title_screening }}" == "true" ] || [ "${{ github.event.inputs.skip_abstract_screening }}" == "true" ]; then
+            echo "⏭️  Skipping publication list preparation (using existing artifacts)"
+            echo "prep_complete=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Step 1: Preparing publication lists for all tool types..."
+          echo "Running both bench and clinical queries to capture all 9 tool types"
+
+          # Create outputs directory
+          mkdir -p tool_coverage/outputs
+
+          # Run bench science query (computational, PDX, organoids, lab tools)
+          echo "1a. Bench science query (computational, PDX, organoids, antibodies, cell lines)..."
+          python tool_coverage/scripts/prepare_publication_list.py \
+            --query-type bench \
+            --output tool_coverage/outputs/publication_list_bench.csv \
+            2>&1 | tee tool_coverage/outputs/prep_list_bench.log || echo "bench_failed=true" >> $GITHUB_OUTPUT
+
+          # Run clinical assessment query (questionnaires, scales, PROMs)
+          echo "1b. Clinical assessment query (SF-36, PROMIS, PedsQL, outcome measures)..."
+          python tool_coverage/scripts/prepare_publication_list.py \
+            --query-type clinical \
+            --output tool_coverage/outputs/publication_list_clinical.csv \
+            2>&1 | tee tool_coverage/outputs/prep_list_clinical.log || echo "clinical_failed=true" >> $GITHUB_OUTPUT
+
+          # Merge publication lists (deduplicate by PMID, merge query_types)
+          echo "1c. Merging publication lists..."
+          python3 <<'EOF' || echo "merge_failed=true" >> $GITHUB_OUTPUT
+          import pandas as pd
+
+          bench = pd.read_csv('tool_coverage/outputs/publication_list_bench.csv')
+          clinical = pd.read_csv('tool_coverage/outputs/publication_list_clinical.csv')
+
+          # Concatenate both query results
+          merged = pd.concat([bench, clinical], ignore_index=True)
+
+          # Deduplicate by PMID, merging query_types for publications in both queries
+          # Example: If PMID appears in both bench and clinical, query_type becomes 'bench,clinical'
+          merged = merged.groupby('pmid', as_index=False).agg({
+              'title': 'first',
+              'doi': 'first',
+              'journal': 'first',
+              'year': 'first',
+              'query_type': lambda x: ','.join(sorted(set(x))),  # Merge query types
+              'source': 'first'
+          })
+
+          merged.to_csv('tool_coverage/outputs/publication_list.csv', index=False)
+          print(f'Merged: {len(bench)} bench + {len(clinical)} clinical -> {len(merged)} unique publications')
+          print(f'  Publications in both queries: {len(bench) + len(clinical) - len(merged)}')
+          EOF
+
+          # Only mark complete if no errors
+          if [ ! -f $GITHUB_OUTPUT ] || ! grep -q "_failed=true" $GITHUB_OUTPUT; then
+            echo "prep_complete=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Screen publication titles with Haiku
+        id: screening
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.prep_list.outputs.prep_complete == 'true' && github.event.inputs.skip_title_screening != 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Step 2: Pre-screening titles with Haiku (research vs clinical)..."
+
+          # Build command
+          CMD="python tool_coverage/scripts/screen_publication_titles.py"
+
+          # Add max publications limit if specified
+          if [ -n "${{ github.event.inputs.max_publications }}" ]; then
+            CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
+          fi
+
+          # Run screening (uses cheap Haiku model via direct API)
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/screening_output.log || echo "screening_failed=true" >> $GITHUB_OUTPUT
+
+          echo "screening_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Use existing title screening results
+        id: screening_skipped
+        if: github.event.inputs.skip_title_screening == 'true'
+        run: |
+          echo "⏭️  Skipping title screening - using existing results"
+          if [ -f "tool_coverage/outputs/screened_publications.csv" ]; then
+            echo "   ✅ Found existing screened_publications.csv"
+            echo "screening_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "   ❌ ERROR: screened_publications.csv not found!"
+            echo "   Please upload artifacts from previous run or run without skip flag"
+            exit 1
+          fi
+
+      - name: Screen publication abstracts with Haiku
+        id: abstract_screening
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && (steps.screening.outputs.screening_complete == 'true' || steps.screening_skipped.outputs.screening_complete == 'true') && github.event.inputs.skip_abstract_screening != 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Step 2b: Screening abstracts with Haiku (NF tool usage/development)..."
+
+          # Build command
+          CMD="python tool_coverage/scripts/screen_publication_abstracts.py"
+
+          # Add max publications limit if specified
+          if [ -n "${{ github.event.inputs.max_publications }}" ]; then
+            CMD="$CMD --max-publications ${{ github.event.inputs.max_publications }}"
+          fi
+
+          # Run abstract screening (uses Haiku to check for NF tool usage)
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/abstract_screening_output.log || echo "abstract_screening_failed=true" >> $GITHUB_OUTPUT
+
+          # Update the screened_publications.csv to be the output of abstract screening
+          if [ -f "tool_coverage/outputs/abstract_screened_publications.csv" ]; then
+            cp tool_coverage/outputs/abstract_screened_publications.csv tool_coverage/outputs/screened_publications.csv
+            echo "abstract_screening_complete=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Use existing abstract screening results
+        id: abstract_screening_skipped
+        if: github.event.inputs.skip_abstract_screening == 'true'
+        run: |
+          echo "⏭️  Skipping abstract screening - using existing results"
+          if [ -f "tool_coverage/outputs/abstract_screened_publications.csv" ]; then
+            echo "   ✅ Found existing abstract_screened_publications.csv"
+            # Copy to screened_publications.csv for next steps
+            cp tool_coverage/outputs/abstract_screened_publications.csv tool_coverage/outputs/screened_publications.csv
+            echo "abstract_screening_complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "   ❌ ERROR: abstract_screened_publications.csv not found!"
+            echo "   Please upload artifacts from previous run or run without skip flag"
+            exit 1
+          fi
+
+      - name: Apply timeout protection
+        id: timeout
+        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true' || steps.abstract_screening_skipped.outputs.abstract_screening_complete == 'true'
+        run: |
+          echo "Applying timeout protection to prevent workflow timeout..."
+
+          # Phase 1 cache fetch is ~2s/pub (network + parse). Use 5s to be safe.
+          # Sonnet reviews are handled separately via --max-reviews below.
+          python tool_coverage/scripts/timeout_protection.py \
+            --publications-file tool_coverage/outputs/screened_publications.csv \
+            --output-file tool_coverage/outputs/screened_publications_capped.csv \
+            --deferred-file tool_coverage/outputs/publications_deferred.txt \
+            --time-per-publication 5 > timeout_result.json
+
+          # Check if publications were capped
+          CAPPED=$(python -c "import json; data=json.load(open('timeout_result.json')); print(data.get('capped', False))")
+
+          if [ "$CAPPED" == "True" ]; then
+            echo "⚠️  Publications capped to fit within 6-hour timeout limit"
+            echo "capped=true" >> $GITHUB_OUTPUT
+
+            # Use capped list for mining
+            cp tool_coverage/outputs/screened_publications_capped.csv tool_coverage/outputs/screened_publications.csv
+
+            FINAL_COUNT=$(wc -l < tool_coverage/outputs/screened_publications.csv)
+            DEFERRED_COUNT=$(wc -l < tool_coverage/outputs/publications_deferred.txt)
+
+            echo "Publications to process (this run): $FINAL_COUNT"
+            echo "Publications deferred (next run): $DEFERRED_COUNT"
+          else
+            echo "✓ All publications fit within timeout"
+            echo "capped=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Calculate --max-reviews for the Sonnet step.
+          # Direct API call: ~30-60s per publication (vs 3-8 min with Goose).
+          # With 4 parallel workers: effective ~15-20s per publication.
+          # Budget: 300 min (5h). Conservative: 60s/pub effective = 300 pubs max.
+          # Override with workflow input if provided.
+          MAX_REVIEWS=300
+          if [ -n "${{ github.event.inputs.max_reviews }}" ]; then
+            MAX_REVIEWS="${{ github.event.inputs.max_reviews }}"
+          fi
+          echo "max_reviews=${MAX_REVIEWS}" >> $GITHUB_OUTPUT
+          echo "  Sonnet review cap: ${MAX_REVIEWS} publications per run"
+
+      - name: Append Synapse candidate publications to screened list
+        id: append_synapse
+        if: steps.abstract_screening.outputs.abstract_screening_complete == 'true' || steps.abstract_screening_skipped.outputs.abstract_screening_complete == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "Fetching NF portal + unlinked-tools publications from Synapse..."
+          echo "These are added to screened_publications.csv BEFORE Phase 1 cache fetch"
+          echo "so they go through the same cache fetch and eligibility filter as mined pubs."
+
+          python3 <<'EOF'
+          import sys
+          sys.path.insert(0, 'tool_coverage/scripts')
+          from run_publication_reviews import fetch_unlinked_publications
+          import synapseclient
+          import pandas as pd
+
+          screened_file = 'tool_coverage/outputs/screened_publications.csv'
+
+          try:
+              syn = synapseclient.Synapse()
+              candidate_df = fetch_unlinked_publications(syn)
+          except Exception as e:
+              print(f"⚠️  Synapse fetch failed: {e}")
+              print("   Continuing without Synapse candidates")
+              sys.exit(0)
+
+          if candidate_df.empty:
+              print("ℹ️  No new Synapse candidates to add")
+              sys.exit(0)
+
+          # Load existing screened list
+          try:
+              screened_df = pd.read_csv(screened_file)
+          except Exception:
+              screened_df = pd.DataFrame(columns=['pmid'])
+
+          existing_pmids = set(screened_df['pmid'].dropna().astype(str).tolist())
+
+          # Filter to only truly new PMIDs not already in the screened list
+          new_candidates = candidate_df[~candidate_df['pmid'].astype(str).isin(existing_pmids)].copy()
+
+          if new_candidates.empty:
+              print("ℹ️  All Synapse candidates already in screened list")
+              sys.exit(0)
+
+          # Align columns (screened_publications.csv has pmid, title, doi, journal, year, query_type, source)
+          new_candidates['journal'] = ''
+          new_candidates['year'] = ''
+          new_candidates['query_type'] = 'synapse_candidate'
+          # source column is already set by fetch_unlinked_publications
+
+          # Keep only columns present in screened_df (plus pmid minimum)
+          keep_cols = ['pmid', 'title', 'doi', 'journal', 'year', 'query_type', 'source']
+          new_candidates = new_candidates[[c for c in keep_cols if c in new_candidates.columns]]
+
+          # Append
+          combined = pd.concat([screened_df, new_candidates], ignore_index=True)
+          combined.to_csv(screened_file, index=False)
+          print(f"✅ Added {len(new_candidates)} Synapse candidate publications to screened list")
+          print(f"   Total screened publications: {len(combined)}")
+          EOF
+
+          echo "append_synapse_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Phase 1 - Fetch minimal cache (title + abstract + methods + metadata)
+        id: phase1_cache
+        if: steps.prep_list.outputs.prep_complete == 'true'
+        run: |
+          echo "Step 3: Phase 1 - Fetching minimal cache for tool mining..."
+          echo "  Fetching: title + abstract + methods + publication metadata"
+          echo "  Purpose: Tool mining, cell lines, models (48% smaller, 30% faster than full)"
+
+          python tool_coverage/scripts/fetch_minimal_fulltext.py \
+            --pmids-file tool_coverage/outputs/screened_publications.csv \
+            --output-dir tool_reviews/publication_cache \
+            2>&1 | tee tool_coverage/outputs/phase1_cache_output.log || echo "phase1_failed=true" >> $GITHUB_OUTPUT
+
+          echo "phase1_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Prepare publications list from cache
+        id: prep_from_cache
+        if: steps.phase1_cache.outputs.phase1_complete == 'true'
+        run: |
+          echo "Creating processed_publications.csv from cache..."
+
+          # Read cache files and create processed_publications.csv with all metadata
+          python3 <<'EOF'
+          import json
+          import csv
+          from pathlib import Path
+
+          cache_dir = Path('tool_reviews/publication_cache')
+          output_file = 'tool_coverage/outputs/processed_publications.csv'
+
+          publications = []
+          for cache_file in cache_dir.glob('*_text.json'):
+              with open(cache_file) as f:
+                  cache = json.load(f)
+
+              # Extract PMID number
+              pmid = cache['pmid'].replace('PMID:', '')
+
+              publications.append({
+                  'pmid': f"PMID:{pmid}",
+                  'title': cache.get('title', ''),
+                  'abstract': cache.get('abstract', ''),
+                  'methods': cache.get('methods', ''),
+                  'authors': cache.get('authors', ''),
+                  'journal': cache.get('journal', ''),
+                  'publicationDate': cache.get('publicationDate', ''),
+                  'doi': cache.get('doi', ''),
+                  'cache_level': cache.get('cache_level', ''),
+                  'has_fulltext': cache.get('has_fulltext', False)
+              })
+
+          # Write to CSV
+          if publications:
+              with open(output_file, 'w', newline='') as f:
+                  writer = csv.DictWriter(f, fieldnames=publications[0].keys())
+                  writer.writeheader()
+                  writer.writerows(publications)
+
+              print(f"Created {output_file} with {len(publications)} publications")
+          EOF
+
+          echo "prep_from_cache_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Upload pre-validation artifacts (cache + screened lists)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-coverage-pre-validation
+          path: |
+            tool_coverage/outputs/
+            tool_reviews/publication_cache/
+          if-no-files-found: warn
+          retention-days: 7
+          overwrite: true
+
+      - name: Run AI validation with Sonnet
+        id: validation
+        if: steps.check_api_key.outputs.api_key_exists == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Running AI validation on publications (Sonnet review of full text)..."
+
+          # Build command with optional flags
+          # Note: --include-unlinked is now the default (fetches from NF portal + unlinked tools pubs)
+          CMD="python tool_coverage/scripts/run_publication_reviews.py --mining-file tool_coverage/outputs/processed_publications.csv --parallel-workers 4"
+
+          # Add force re-reviews flag if specified
+          if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
+            CMD="$CMD --force-rereviews"
+          fi
+
+          # Cap Sonnet reviews to fit within timeout budget
+          CMD="$CMD --max-reviews ${{ steps.timeout.outputs.max_reviews }}"
+
+          # Run validation
+          echo "Running: $CMD"
+          $CMD 2>&1 | tee tool_coverage/outputs/validation_output.log || echo "validation_failed=true" >> $GITHUB_OUTPUT
+
+          echo "validation_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Post-filter and consolidate validated outputs
+        id: post_filter
+        if: steps.validation.outputs.validation_complete == 'true'
+        run: |
+          echo "Post-filtering mined tools: removing generic tools, deduplicating synonyms..."
+          echo "Note: ACCEPTED_*.csv produced here is ephemeral (runner only) — used to drive"
+          echo "format_mining_as_submissions.py (dedup against Synapse) but never committed."
+          python tool_coverage/scripts/generate_review_csv.py \
+            --output-dir tool_coverage/outputs \
+            2>&1 | tee tool_coverage/outputs/post_filter_output.log
+          echo "post_filter_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Phase 2 - Selective cache upgrade (results + discussion for observations)
+        id: phase2_cache
+        if: steps.post_filter.outputs.post_filter_complete == 'true'
+        run: |
+          echo "Step 4b: Phase 2 - Selectively upgrading cache for observation extraction..."
+          echo "  Criteria: High-confidence validated tools (confidence ≥0.8)"
+          echo "  Adding: Results + Discussion sections"
+          echo "  Purpose: Extract observations (efficacy, safety, outcomes)"
+
+          python tool_coverage/scripts/upgrade_cache_for_observations.py \
+            --reviews-dir tool_reviews/results \
+            --cache-dir tool_reviews/publication_cache \
+            2>&1 | tee tool_coverage/outputs/phase2_cache_output.log
+
+          echo "phase2_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Phase 2 - Extract observations for high-confidence tool publications
+        id: phase2_review
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.phase2_cache.outputs.phase2_complete == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Step 4c: Phase 2 - Extracting observations from Results + Discussion..."
+          echo "  Runs for publications with high-confidence validated tools (confidence ≥0.8)"
+          echo "  Reads existing Phase 1 YAMLs for accepted tool names"
+          echo "  Writes *_observations.yaml alongside tool review YAMLs"
+
+          if [ -f "tool_coverage/outputs/phase2_upgraded_pmids.txt" ] && [ -s "tool_coverage/outputs/phase2_upgraded_pmids.txt" ]; then
+            UPGRADED_COUNT=$(wc -l < tool_coverage/outputs/phase2_upgraded_pmids.txt)
+            echo "  Processing $UPGRADED_COUNT publications with upgraded caches..."
+
+            python tool_coverage/scripts/run_publication_reviews.py \
+              --mining-file tool_coverage/outputs/processed_publications.csv \
+              --pmids-file tool_coverage/outputs/phase2_upgraded_pmids.txt \
+              --extract-observations \
+              --parallel-workers 4 \
+              2>&1 | tee tool_coverage/outputs/phase2_review_output.log
+          else
+            echo "  No publications were upgraded in phase 2 - skipping observation extraction"
+          fi
+
+          echo "phase2_review_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Format mined tools as submission JSON
+        id: format_submissions
+        if: steps.post_filter.outputs.post_filter_complete == 'true'
+        run: |
+          echo "Writing one JSON file per tool to submissions/{tool_type}/"
+          echo "Reviewer: move accepted files to submissions/accepted/{tool_type}/ before merging."
+          python tool_coverage/scripts/format_mining_as_submissions.py \
+            --csv-dir tool_coverage/outputs \
+            --output-dir submissions
+          NEW_COUNT=$(find submissions -name "*.json" -not -path "*/accepted/*" -not -path "*/observations/*" | wc -l | tr -d ' ')
+          echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
+          echo "✅ ${NEW_COUNT} submission JSON files written"
+
+      - name: Upload reports as artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-coverage-reports
+          path: |
+            tool_coverage/outputs/
+            tool_reviews/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload deferred publications
+        if: steps.timeout.outputs.capped == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: deferred-publications-${{ github.run_id }}
+          path: tool_coverage/outputs/publications_deferred.txt
+          retention-days: 90
+
+      - name: Create Pull Request (mining results)
+        if: steps.format_submissions.outputs.new_count != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            Add ${{ steps.format_submissions.outputs.new_count }} mined tool submission(s)
+
+            - Mined from NF Portal + PubMed publications
+            - Review submissions/{type}/*.json, move accepted to submissions/accepted/{type}/
+            - Merge triggers upsert-tools.yml → Synapse upload
+          branch: tool-coverage-update-${{ github.run_number }}
+          delete-branch: true
+          title: 'Tool Mining: ${{ steps.format_submissions.outputs.new_count }} submission(s) — ${{ github.run_number }}'
+          body: |
+            ## Mined Tool Submissions
+
+            Found **${{ steps.format_submissions.outputs.new_count }}** tool submission(s) from NF Portal + PubMed publications.
+
+            ### Review instructions
+
+            1. Inspect JSON files in `submissions/{type}/`
+            2. Move accepted tools: `git mv submissions/{type}/{name}.json submissions/{type}/accepted/`
+            3. Delete any that are incorrect or duplicates
+            4. Merge this PR — `upsert-tools.yml` compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` → Synapse upload
+
+            > **Note**: `_publications` array shows each publication where the tool was found, with `_usageType` and `_confidence` per entry. Check the artifacts for full pipeline logs.
+          assignees: BelindaBGarana
+          labels: |
+            automated-mining
+            tool-coverage
+          add-paths: |
+            tool_reviews/publication_cache/
+            submissions/**

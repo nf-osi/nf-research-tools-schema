@@ -3,167 +3,231 @@
   "title": "Submit Advanced Cellular Model",
   "type": "object",
   "properties": {
-    "userInfo": {
-      "type": "object",
-      "title": "Your Information",
-      "properties": {
-        "firstandlastName": {
-          "type": "string",
-          "title": "First and Last Name"
-        },
-        "email": {
-          "type": "string",
-          "title": "Contact Email",
-          "format": "email"
-        },
-        "institution": {
-          "type": "string",
-          "title": "Institution/Affiliation",
-          "default": ""
-        },
-        "isDeveloper": {
-          "type": "string",
-          "title": "Are you the developer?",
-          "enum": [
-            "Yes",
-            "No"
-          ],
-          "default": "Yes"
-        }
-      },
-      "required": ["firstandlastName", "email", "isDeveloper"]
-    },
     "basicInfo": {
       "type": "object",
-      "title": "",
+      "title": "Advanced Cellular Model Information",
       "properties": {
-        "modelName": {
-          "type": "string",
-          "title": "Name of Advanced Cellular Model"
-        },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
+        "resourceName": { "type": "string", "title": "Name of Advanced Cellular Model" },
+        "synonyms": { "type": "string", "title": "Synonyms" },
+        "description": { "type": "string", "title": "Description (~20-50 words)" },
         "modelType": {
           "type": "string",
           "title": "Type of Model",
-          "enum": [
-            "Organoid",
-            "Assembloid",
-            "Spheroid",
-            "3D Culture",
-            "Other"
-          ]
+          "enum": ["Organoid", "Assembloid", "Spheroid", "3D Culture", "Other"]
         },
         "derivationSource": {
           "type": "string",
           "title": "Derivation Source",
-          "enum": [
-            "iPSC",
-            "ESC",
-            "Primary Tissue",
-            "Cell Line",
-            "Patient-Derived",
-            "Other"
-          ]
+          "enum": ["iPSC", "ESC", "Primary Tissue", "Cell Line", "Patient-Derived", "Other"]
         },
         "cellTypes": {
           "type": "array",
           "title": "Cell Types Present",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "organoidType": {
           "type": "string",
           "title": "Organoid Type (if applicable)",
-          "enum": [
-            "",
-            "Cerebral",
-            "Intestinal",
-            "Liver",
-            "Kidney",
-            "Cardiac",
-            "Retinal",
-            "Lung",
-            "Pancreatic",
-            "Other"
-          ]
+          "enum": ["Cerebral", "Intestinal", "Liver", "Kidney", "Cardiac", "Retinal", "Lung", "Pancreatic", "Other"]
         },
         "matrixType": {
           "type": "string",
           "title": "Matrix/Scaffold Type",
-          "enum": [
-            "Matrigel",
-            "BME",
-            "Hydrogel",
-            "Synthetic Matrix",
-            "Scaffold-Free",
-            "Other"
-          ]
+          "enum": ["Matrigel", "BME", "Hydrogel", "Synthetic Matrix", "Scaffold-Free", "Other"]
         },
         "cultureSystem": {
           "type": "string",
           "title": "Culture System",
-          "enum": [
-            "Static",
-            "Spinning Bioreactor",
-            "Microfluidic",
-            "Air-Liquid Interface",
-            "Other"
-          ]
+          "enum": ["Static", "Spinning Bioreactor", "Microfluidic", "Air-Liquid Interface", "Other"]
         },
-        "maturationTime": {
+        "cultureMedia": {
           "type": "string",
-          "title": "Time Required for Maturation"
+          "title": "Culture Media",
+          "description": "Growth media used to culture this model (e.g. DMEM, RPMI 1640, mTeSR1). Include any supplements such as growth factors, serum, or antibiotics."
         },
+        "maturationTime": { "type": "string", "title": "Time Required for Maturation" },
         "characterizationMethods": {
           "type": "array",
           "title": "Characterization Methods Used",
           "items": {
             "type": "string",
-            "enum": [
-              "Immunofluorescence",
-              "RNA-seq",
-              "scRNA-seq",
-              "Electrophysiology",
-              "Imaging",
-              "Other"
-            ]
+            "enum": ["Immunofluorescence", "RNA-seq", "scRNA-seq", "Electrophysiology", "Imaging", "Other"]
           },
           "uniqueItems": true
         },
-        "passageNumber": {
-          "type": "string",
-          "title": "Passage Number (if applicable)"
-        },
-        "cryopreservationProtocol": {
-          "type": "string",
-          "title": "Cryopreservation Protocol (if available)"
-        },
+        "passageNumber": { "type": "string", "title": "Passage Number (if applicable)" },
+        "cryopreservationProtocol": { "type": "string", "title": "Cryopreservation Protocol (if available)" },
         "qualityControlMetrics": {
           "type": "array",
           "title": "Quality Control Metrics",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
-        "rrid": {
+        "nfGeneticDisorder": {
           "type": "string",
-          "title": "RRID (if available)"
+          "title": "NF Genetic Disorder",
+          "enum": ["Neurofibromatosis Type 1", "Neurofibromatosis Type 2", "Schwannomatosis", "NF1 Spontaneous Mutation", "None"]
         },
-        "howToAcquire": {
+        "nfManifestation": {
           "type": "string",
-          "title": "How to Acquire This Model"
-        }
+          "title": "NF Manifestation",
+          "enum": [
+            "Plexiform Neurofibroma", "Cutaneous Neurofibroma", "Atypical Neurofibroma",
+            "Malignant Peripheral Nerve Sheath Tumor", "Schwannoma", "Meningioma",
+            "Low Grade Glioma", "High Grade Glioma", "Optic Nerve Glioma",
+            "Pheochromocytoma", "Cognition", "Other", "None"
+          ]
+        },
+        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["modelName", "modelType", "derivationSource", "cellTypes", "howToAcquire"]
-    }
+      "required": ["resourceName", "modelType", "derivationSource", "cellTypes", "nfGeneticDisorder"]
+    },
+    "bbbModelCapability": {
+      "type": "boolean",
+      "title": "Models Blood-Brain Barrier?",
+      "description": "Whether this model incorporates BBB components (e.g., endothelial cells, astrocytes) enabling assessment of drug CNS penetration."
+    },
+    "routeOfAdministration": {
+      "type": "array",
+      "title": "Supported Drug Administration Routes",
+      "description": "Drug delivery routes that have been validated or are feasible in this model.",
+      "items": {
+        "type": "string",
+        "enum": ["Direct media addition", "Microfluidic perfusion", "Other"]
+      },
+      "uniqueItems": true
+    },
+    "pkpdCapabilities": {
+      "type": "array",
+      "title": "PK/PD Measurement Capabilities",
+      "description": "Pharmacokinetic and pharmacodynamic measurements that can be performed in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Drug concentration in media",
+          "Drug concentration in tissue/organoid",
+          "Target engagement measurement",
+          "Pathway modulation (e.g., pERK, pAKT)",
+          "Biomarker response",
+          "Metabolite profiling",
+          "Metabolic pathway flux analysis",
+          "Drug-drug interaction assessment",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "mechanismOfActionValidation": {
+      "type": "array",
+      "title": "Validated Drug Mechanisms",
+      "description": "Drug mechanisms of action that have been successfully tested in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "MEK inhibitors",
+          "RAS pathway (non-MEK)",
+          "mTOR inhibitors",
+          "VEGF/angiogenesis",
+          "CDK inhibitors",
+          "HDAC inhibitors",
+          "Other kinase inhibitors",
+          "Immunotherapy",
+          "Chemotherapy",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "pediatricSuitability": {
+      "type": "string",
+      "title": "Age Relevance",
+      "description": "Whether this model is derived from or suitable for studying pediatric, adult, or both age groups.",
+      "enum": ["", "Pediatric", "Adult", "Both", "Unknown"]
+    },
+    "timelineToResults": {
+      "type": "string",
+      "title": "Typical Timeline to Results",
+      "description": "Estimated time from model establishment to primary endpoint readout.",
+      "enum": ["", "Less than 1 month", "1–3 months", "3–6 months", "More than 6 months", "Unknown"]
+    },
+    "modelLimitations": {
+      "type": "string",
+      "title": "Known Model Limitations",
+      "description": "Explicit description of what this model does NOT recapitulate or where it may produce misleading results."
+    },
+    "regulatoryAcceptanceHistory": {
+      "type": "string",
+      "title": "Regulatory Acceptance History",
+      "description": "Known FDA/EMA precedents where data from this model type supported a regulatory submission or approval."
+    },
+    "suitableForRegulatoryPackage": {
+      "type": "boolean",
+      "title": "Suitable as Standalone Evidence for Regulatory Package?",
+      "description": "Whether this model has been accepted or is considered sufficient as standalone (non-animal) evidence in a regulatory submission (e.g., for repurposed drugs)."
+    },
+    "mtaRequired": {
+      "type": "boolean",
+      "title": "MTA Required?",
+      "description": "Whether a Material Transfer Agreement is required to access this model."
+    },
+    "ngnriRepositoryStatus": {
+      "type": "boolean",
+      "title": "Deposited in NGNRI Repository?",
+      "description": "Whether this model is deposited in the NF Gene Network Research Initiative repository for equitable access."
+    },
+    "developmentPublicationDOI": {
+      "type": "string",
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
+    },
+    "usagePublicationDOIs": {
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+    },
+    "itemAcquisition": {
+      "type": "string",
+      "title": "How to acquire",
+      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
+      "default": "Contact Developer"
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Advanced Cellular Model" }
   },
-  "required": ["userInfo", "basicInfo"]
+  "required": ["basicInfo", "itemAcquisition"],
+  "allOf": [
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
+      "then": {
+        "properties": {
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
+      "then": {
+        "properties": {
+          "vendor": { "type": "string", "title": "Vendor Name" },
+          "catalogNumber": { "type": "string", "title": "Catalog Number" },
+          "catalogURL": { "type": "string", "title": "Link to vendor page" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "then": {
+        "properties": {
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+        },
+        "required": ["additionalDetails"]
+      }
+    }
+  ]
 }
