@@ -146,7 +146,7 @@
         {
             "@id": "bts:rrid",
             "@type": "rdf:Property",
-            "rdfs:comment": "The RRID, a standard resource identifier that will facilitate interoperability with other databases, and is an increasingly-used identifier for publications https://scicrunch.org/resources if available",
+            "rdfs:comment": "The RRID, a standard resource identifier that will facilitate interoperability with other databases, and is an increasingly-used identifier for publications https://scicrunch.org/resources if available. Must include the 'RRID:' prefix.",
             "rdfs:label": "rrid",
             "schema:domainIncludes": [
                 {
@@ -158,7 +158,9 @@
             },
             "sms:displayName": "rrid",
             "sms:required": "sms:false",
-            "sms:validationRules": []
+            "sms:validationRules": [
+                "match ^[Rr][Rr][Ii][Dd]:[a-zA-Z]+.+$"
+            ]
         },
         {
             "@id": "bts:resourceName",
