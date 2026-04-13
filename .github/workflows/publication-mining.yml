@@ -508,13 +508,115 @@ jobs:
         if: steps.post_filter.outputs.post_filter_complete == 'true'
         run: |
           echo "Writing one JSON file per tool to submissions/{tool_type}/"
-          echo "Reviewer: move accepted files to submissions/accepted/{tool_type}/ before merging."
           python tool_coverage/scripts/format_mining_as_submissions.py \
             --csv-dir tool_coverage/outputs \
             --output-dir submissions
-          NEW_COUNT=$(find submissions -name "*.json" -not -path "*/accepted/*" -not -path "*/observations/*" | wc -l | tr -d ' ')
+          NEW_COUNT=$(find submissions -name "*.json" -not -path "*/observations/*" | wc -l | tr -d ' ')
           echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
           echo "✅ ${NEW_COUNT} submission JSON files written"
+
+      - name: Generate confidence score summary
+        id: confidence_summary
+        if: steps.format_submissions.outputs.new_count != ''
+        env:
+          NEW_COUNT: ${{ steps.format_submissions.outputs.new_count }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 <<'PYEOF'
+          import json, os, pathlib, collections
+
+          submissions_dir = pathlib.Path("submissions")
+          results = collections.defaultdict(list)
+
+          for f in sorted(submissions_dir.glob("*/*.json")):
+              if "observations" in f.parts:
+                  continue
+              try:
+                  d = json.loads(f.read_text())
+              except Exception:
+                  continue
+              cat = f.parent.name
+              bi = d.get("basicInfo", {})
+              name = (bi.get("resourceName") or bi.get("assessmentName") or
+                      bi.get("softwareName") or bi.get("modelName") or f.stem)
+              conf = float(d.get("_confidence", 0))
+              results[cat].append((conf, name))
+
+          table_rows = []
+          detail_lines = []
+          review_lines = []
+
+          for cat, items in sorted(results.items()):
+              items.sort()
+              scores = [s for s, _ in items]
+              avg = sum(scores) / len(scores)
+              table_rows.append(
+                  f"| {cat} | {len(items)} | {min(scores):.2f} | {avg:.2f} | {max(scores):.2f} |"
+              )
+              detail_lines.append(
+                  f"\n**{cat}** — n={len(items)} | "
+                  f"min={min(scores):.2f} avg={avg:.2f} max={max(scores):.2f}"
+              )
+              for score, name in items:
+                  if score < 0.85:
+                      flag = " ⚠️"
+                      review_lines.append(
+                          f"- `{score:.2f}` **{name}** ({cat}) — low confidence"
+                      )
+                  elif score < 0.90:
+                      flag = " 🔍"
+                      review_lines.append(f"- `{score:.2f}` **{name}** ({cat})")
+                  else:
+                      flag = ""
+                  detail_lines.append(f"  - `{score:.2f}` {name}{flag}")
+
+          table_md = (
+              "| Category | n | Min | Avg | Max |\n"
+              "|---|---|---|---|---|\n" +
+              "\n".join(table_rows)
+          )
+          detail_md = "\n".join(detail_lines)
+          flagged_md = (
+              "\n\n**Flagged for closer review (score < 0.90):**\n\n" +
+              "\n".join(review_lines)
+          ) if review_lines else ""
+
+          new_count = os.environ.get("NEW_COUNT", "")
+
+          # GitHub Step Summary
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("## Confidence Score Summary\n\n")
+              fh.write(table_md + "\n")
+              fh.write(detail_md + "\n")
+              if review_lines:
+                  fh.write("\n### Flagged for closer review\n\n")
+                  fh.write("\n".join(review_lines) + "\n")
+
+          # Full PR body written to file for create-pull-request body-path
+          pr_body = (
+              f"## Mined Tool Submissions\n\n"
+              f"Found **{new_count}** tool submission(s) from NF Portal + PubMed publications.\n\n"
+              f"### Review instructions\n\n"
+              f"1. Inspect JSON files in `submissions/{{type}}/`\n"
+              f"2. Delete any that are incorrect or duplicates\n"
+              f"3. Add label `tool-submissions` before merging — "
+              f"triggers `upsert-tools.yml` → Synapse upload\n\n"
+              f"> **Note**: `_publications` array shows each publication where the tool was found, "
+              f"with `_usageType` and `_confidence` per entry. "
+              f"Check the artifacts for full pipeline logs.\n\n"
+              f"### Confidence Score Summary\n\n"
+              f"{table_md}\n"
+              f"{detail_md}\n"
+              f"{flagged_md}\n"
+          )
+          with open("pr_body.md", "w") as fh:
+              fh.write(pr_body)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"flagged_count={len(review_lines)}\n")
+
+          print(table_md)
+          PYEOF
 
       - name: Upload reports as artifacts
         if: always()
@@ -544,24 +646,12 @@ jobs:
             Add ${{ steps.format_submissions.outputs.new_count }} mined tool submission(s)
 
             - Mined from NF Portal + PubMed publications
-            - Review submissions/{type}/*.json, move accepted to submissions/accepted/{type}/
-            - Merge triggers upsert-tools.yml → Synapse upload
+            - Review submissions/{type}/*.json; delete any that are incorrect or duplicates
+            - Add label tool-submissions before merging → triggers upsert-tools.yml → Synapse upload
           branch: tool-coverage-update-${{ github.run_number }}
           delete-branch: true
           title: 'Tool Mining: ${{ steps.format_submissions.outputs.new_count }} submission(s) — ${{ github.run_number }}'
-          body: |
-            ## Mined Tool Submissions
-
-            Found **${{ steps.format_submissions.outputs.new_count }}** tool submission(s) from NF Portal + PubMed publications.
-
-            ### Review instructions
-
-            1. Inspect JSON files in `submissions/{type}/`
-            2. Move accepted tools: `git mv submissions/{type}/{name}.json submissions/{type}/accepted/`
-            3. Delete any that are incorrect or duplicates
-            4. Merge this PR — `upsert-tools.yml` compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` → Synapse upload
-
-            > **Note**: `_publications` array shows each publication where the tool was found, with `_usageType` and `_confidence` per entry. Check the artifacts for full pipeline logs.
+          body-path: pr_body.md
           assignees: BelindaBGarana
           labels: |
             automated-mining
