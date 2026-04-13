@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files for Synapse upsert.
+Compile submissions/{type}/*.json into ACCEPTED_*.csv files for Synapse upsert.
 
 Run by upsert-tools.yml after JSON files have been moved from submissions/{type}/ to
-submissions/{type}/accepted/. New rows are appended to existing ACCEPTED_*.csv files,
+submissions/{type}/. New rows are appended to existing ACCEPTED_*.csv files,
 deduplicating by _resourceName so re-running is safe.
 
 Usage:
@@ -606,11 +606,11 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Compile submissions/{type}/accepted/**/*.json into ACCEPTED_*.csv files."
+        description="Compile submissions/{type}/*.json into ACCEPTED_*.csv files."
     )
     parser.add_argument(
         "--accepted-dir", type=Path, default=ACCEPTED_DIR_DEFAULT,
-        help="Root submissions directory to scan for */accepted/**/*.json files "
+        help="Root submissions directory to scan for */*.json files, excluding observations/ "
              "(default: submissions/). Ignored when --files-list is provided.",
     )
     parser.add_argument(
@@ -645,7 +645,10 @@ def main():
         if not args.accepted_dir.exists():
             print(f"No submissions directory found at {args.accepted_dir} — nothing to compile")
             sys.exit(0)
-        json_files = sorted(args.accepted_dir.glob("*/accepted/**/*.json"))
+        json_files = sorted(
+            p for p in args.accepted_dir.glob("*/*.json")
+            if "observations" not in p.parts
+        )
 
     compile_accepted(json_files, args.csv_dir, args.dry_run)
 
