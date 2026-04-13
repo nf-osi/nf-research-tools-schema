@@ -8,8 +8,9 @@ in the NF-OSI database. The scoring system evaluates resources across multiple d
 - Critical Info (30 points): Type-specific essential fields
 - Other Info (15 points): Type-specific additional fields
 - Observations (25 points): Scientific characterizations with DOI weighting
+- Datasets (10 bonus points): Linked datasets from NF Portal
 
-Total Maximum Score: 100 points
+Total Maximum Score: 110 points
 """
 
 import synapseclient
@@ -63,7 +64,7 @@ def is_filled(value):
 
 
 def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFrame,
-                         pub_data: pd.DataFrame) -> Dict:
+                         pub_data: pd.DataFrame, datasets_data: pd.DataFrame = None) -> Dict:
     """
     Calculate completeness score for a tool
 
@@ -71,6 +72,7 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
         resource_data: Series containing resource information
         observations_data: DataFrame containing observations for this resource
         pub_data: DataFrame containing publications for this resource
+        datasets_data: DataFrame containing dataset links for this resource (optional)
 
     Returns:
         Dictionary with total_score, breakdown, and missing_fields
@@ -144,6 +146,14 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
             fields = ["insertName", "insertSpecies", "vectorType", "insertEntrezId", "vectorBackbone"]
         elif tool_type == "Biobank":
             fields = ["specimenTissueType", "diseaseType", "tumorType", "specimenFormat", "specimenType"]
+        elif tool_type == "Computational Tool":
+            fields = ["softwareName", "softwareType", "programmingLanguage", "sourceRepository"]
+        elif tool_type == "Advanced Cellular Model":
+            fields = ["modelType", "derivationSource", "cellTypes", "cultureSystem"]
+        elif tool_type == "Patient-Derived Model":
+            fields = ["modelSystemType", "patientDiagnosis", "hostStrain", "tumorType"]
+        elif tool_type == "Clinical Assessment Tool":
+            fields = ["assessmentName", "assessmentType", "targetPopulation", "validatedLanguages"]
         else:
             fields = []
 
@@ -174,6 +184,14 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
             fields = ["synonyms", "promoter"]
         elif tool_type == "Biobank":
             fields = ["specimenPreparationMethod"]
+        elif tool_type == "Computational Tool":
+            fields = ["softwareVersion", "containerized"]
+        elif tool_type == "Advanced Cellular Model":
+            fields = ["maturationTime", "characterizationMethods"]
+        elif tool_type == "Patient-Derived Model":
+            fields = ["passageNumber", "molecularCharacterization"]
+        elif tool_type == "Clinical Assessment Tool":
+            fields = ["psychometricProperties", "availabilityStatus"]
         else:
             fields = []
 
@@ -218,6 +236,36 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
     score_breakdown['observations'] = observation_score
     total_score += observation_score
 
+    # Datasets (10 bonus points max)
+    # 5 points for having any datasets, 2.5 points per additional dataset (max 10)
+    dataset_score = 0
+    dataset_count = 0
+
+    if datasets_data is not None and len(datasets_data) > 0:
+        # Get unique datasets across all publications for this resource
+        all_datasets = set()
+        for _, pub_row in datasets_data.iterrows():
+            datasets_str = pub_row.get('datasets', '')
+            if is_filled(datasets_str):
+                # Split comma-separated dataset IDs
+                dataset_ids = [d.strip() for d in str(datasets_str).split(',') if d.strip()]
+                all_datasets.update(dataset_ids)
+
+        dataset_count = len(all_datasets)
+        if dataset_count > 0:
+            # 5 points for first dataset, 2.5 points each for next 2 datasets
+            dataset_score = 5.0
+            if dataset_count > 1:
+                additional_datasets = min(dataset_count - 1, 2)  # Max 2 additional
+                dataset_score += additional_datasets * 2.5
+        dataset_status = f"{dataset_count} dataset(s)"
+    else:
+        dataset_status = "No datasets"
+
+    missing_fields['datasets'] = dataset_status
+    score_breakdown['datasets'] = dataset_score
+    total_score += dataset_score
+
     return {
         'total_score': round(total_score, 1),
         'breakdown': score_breakdown,
@@ -255,6 +303,18 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     print("Reading Genetic Reagent data...")
     genetic_reagent_df = syn.tableQuery("SELECT * FROM syn26486832").asDataFrame()
 
+    print("Reading Computational Tool data...")
+    computational_tool_df = syn.tableQuery("SELECT * FROM syn73709226").asDataFrame()
+
+    print("Reading Advanced Cellular Model data...")
+    advanced_cellular_model_df = syn.tableQuery("SELECT * FROM syn73709227").asDataFrame()
+
+    print("Reading Patient-Derived Model data...")
+    patient_derived_model_df = syn.tableQuery("SELECT * FROM syn73709228").asDataFrame()
+
+    print("Reading Clinical Assessment Tool data...")
+    clinical_assessment_tool_df = syn.tableQuery("SELECT * FROM syn73709229").asDataFrame()
+
     # Join base resource data with type-specific data
     print("Joining resource data with type-specific tables...")
 
@@ -289,6 +349,30 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
             on='geneticReagentId', how='left', suffixes=('', '_genetic')
         )
 
+    if 'computationalToolId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            computational_tool_df[computational_tool_df['computationalToolId'].notna()],
+            on='computationalToolId', how='left', suffixes=('', '_computational')
+        )
+
+    if 'advancedCellularModelId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            advanced_cellular_model_df[advanced_cellular_model_df['advancedCellularModelId'].notna()],
+            on='advancedCellularModelId', how='left', suffixes=('', '_advancedcellular')
+        )
+
+    if 'patientDerivedModelId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            patient_derived_model_df[patient_derived_model_df['patientDerivedModelId'].notna()],
+            on='patientDerivedModelId', how='left', suffixes=('', '_patientderived')
+        )
+
+    if 'clinicalAssessmentToolId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            clinical_assessment_tool_df[clinical_assessment_tool_df['clinicalAssessmentToolId'].notna()],
+            on='clinicalAssessmentToolId', how='left', suffixes=('', '_clinicalassessment')
+        )
+
     # Read observations data
     print("Reading Observation data from Synapse...")
     obs_df = syn.tableQuery("SELECT * FROM syn26486836").asDataFrame()
@@ -296,6 +380,15 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     # Read publications data
     print("Reading Publication data from Synapse...")
     pub_df = syn.tableQuery("SELECT resourceId, publicationId FROM syn26486807").asDataFrame()
+
+    # Read tool publications with datasets
+    print("Reading Tool Publications with datasets from Synapse...")
+    try:
+        tool_pubs_df = syn.tableQuery("SELECT resourceId, datasets FROM syn26486839 WHERE datasets IS NOT NULL").asDataFrame()
+    except Exception as e:
+        print(f"  Warning: Could not read datasets column: {e}")
+        print("  Continuing without dataset scoring...")
+        tool_pubs_df = pd.DataFrame(columns=['resourceId', 'datasets'])
 
     # Initialize results list
     results = []
@@ -309,8 +402,11 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
         # Get publications for this resource
         resource_pub = pub_df[pub_df['resourceId'] == resource['resourceId']]
 
+        # Get datasets for this resource
+        resource_datasets = tool_pubs_df[tool_pubs_df['resourceId'] == resource['resourceId']]
+
         # Calculate score
-        score_result = calculate_tool_score(resource, resource_obs, resource_pub)
+        score_result = calculate_tool_score(resource, resource_obs, resource_pub, resource_datasets)
 
         # Create result row
         result_row = {
@@ -327,10 +423,12 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
             'critical_info_score': score_result['breakdown']['critical_info'],
             'other_info_score': score_result['breakdown']['other_info'],
             'observation_score': score_result['breakdown']['observations'],
+            'dataset_score': score_result['breakdown'].get('datasets', 0),
             'missing_availability': score_result['missing_fields']['availability'],
             'missing_critical_info': score_result['missing_fields']['critical_info'],
             'missing_other_info': score_result['missing_fields']['other_info'],
-            'observation_status': score_result['missing_fields']['observations']
+            'observation_status': score_result['missing_fields']['observations'],
+            'dataset_status': score_result['missing_fields'].get('datasets', 'No datasets')
         }
 
         results.append(result_row)
@@ -462,10 +560,12 @@ def store_results_to_synapse(syn: synapseclient.Synapse, all_scores: pd.DataFram
             synapseclient.Column(name='critical_info_score', columnType='DOUBLE'),
             synapseclient.Column(name='other_info_score', columnType='DOUBLE'),
             synapseclient.Column(name='observation_score', columnType='DOUBLE'),
+            synapseclient.Column(name='dataset_score', columnType='DOUBLE'),
             synapseclient.Column(name='missing_availability', columnType='STRING', maximumSize=500),
             synapseclient.Column(name='missing_critical_info', columnType='STRING', maximumSize=500),
             synapseclient.Column(name='missing_other_info', columnType='STRING', maximumSize=500),
             synapseclient.Column(name='observation_status', columnType='STRING', maximumSize=200),
+            synapseclient.Column(name='dataset_status', columnType='STRING', maximumSize=200),
             synapseclient.Column(name='completeness_category', columnType='STRING', maximumSize=50),
             synapseclient.Column(name='availability_category', columnType='STRING', maximumSize=4),
             synapseclient.Column(name='critical_info_category', columnType='STRING', maximumSize=4),
@@ -595,6 +695,17 @@ def update_materialized_view(syn: synapseclient.Synapse, view_id: str, scores_ta
     BB.specimenFormat AS specimenFormat,
     BB.specimenType AS specimenType,
     BB.contact AS contact,
+    CT.softwareName AS softwareName,
+    CT.softwareType AS softwareType,
+    CT.programmingLanguage AS programmingLanguage,
+    ACM.modelType AS modelType,
+    ACM.derivationSource AS derivationSource,
+    ACM.cellTypes AS cellTypes,
+    PDM.modelSystemType AS modelSystemType,
+    PDM.patientDiagnosis AS patientDiagnosis,
+    CAT.assessmentName AS assessmentName,
+    CAT.assessmentType AS assessmentType,
+    CAT.targetPopulation AS targetPopulation,
     D_F.funderName AS funderName,
     AM_CL_R_DON.race AS race,
     AM_CL_R_DON.sex AS sex,
@@ -619,6 +730,14 @@ LEFT JOIN
     syn26486811 AB ON (R.antibodyId = AB.antibodyId)
 LEFT JOIN
     syn26486821 BB ON (R.resourceId = BB.resourceId)
+LEFT JOIN
+    syn73709226 CT ON (R.computationalToolId = CT.computationalToolId)
+LEFT JOIN
+    syn73709227 ACM ON (R.advancedCellularModelId = ACM.advancedCellularModelId)
+LEFT JOIN
+    syn73709228 PDM ON (R.patientDerivedModelId = PDM.patientDerivedModelId)
+LEFT JOIN
+    syn73709229 CAT ON (R.clinicalAssessmentToolId = CAT.clinicalAssessmentToolId)
 LEFT JOIN
     syn51734029 D_I ON (R.resourceId = D_I.resourceId)
 LEFT JOIN

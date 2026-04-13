@@ -60,6 +60,7 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 - **Comprehensive workflow guide:** [`.github/workflows/README.md`](.github/workflows/README.md)
 - **Workflow coordination details:** [`docs/WORKFLOW_COORDINATION.md`](docs/WORKFLOW_COORDINATION.md)
 - **Tool annotation review:** [`docs/TOOL_ANNOTATION_REVIEW.md`](docs/TOOL_ANNOTATION_REVIEW.md)
+- **Tool completeness scoring:** [`docs/TOOL_SCORING.md`](docs/TOOL_SCORING.md)
 - **Tool coverage system:** [`tool_coverage/README.md`](tool_coverage/README.md)
 
 # Contributing
