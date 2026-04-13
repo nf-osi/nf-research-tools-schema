@@ -168,6 +168,30 @@ def _fmt_list(val) -> str:
     return str(val) if val else ""
 
 
+def _flatten_publications(d: dict) -> dict:
+    """Flatten the first (or Development) publication's fields to top level.
+
+    Mining-pipeline JSONs store publication info in a ``_publications`` list;
+    Formspark submissions use flat top-level ``_pmid`` / ``_doi`` / etc. fields.
+    This normalises both formats so builder functions work unchanged.
+    """
+    pubs = d.get("_publications")
+    if not isinstance(pubs, list) or not pubs:
+        return d
+
+    # Prefer the Development publication; fall back to first entry
+    pub = next(
+        (p for p in pubs if p.get("_usageType", "").lower() == "development"),
+        pubs[0],
+    )
+
+    out = dict(d)
+    for key in ("_pmid", "_doi", "_publicationTitle", "_year", "_context", "_usageType"):
+        if pub.get(key) and not out.get(key):
+            out[key] = pub[key]
+    return out
+
+
 def _tool_type_from_json(data: dict) -> str | None:
     """Determine tool type from JSON contents."""
     ttype = data.get("toolType", "")
@@ -551,6 +575,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
             skipped.append(path.name)
             continue
 
+        data = _flatten_publications(data)
         ttype = _tool_type_from_json(data)
         if ttype is None:
             print(f"  WARNING: Could not detect tool type in {path.name} — skipping")
