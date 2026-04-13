@@ -37,7 +37,9 @@ def create_tools_materialized_view(syn: synapseclient.Synapse,
     print(f"Scores table: {scores_table_id}")
 
     # Define SQL query for the materialized view
-    # Removed category columns (except cellLineCategory) to stay under 64KB limit
+    # Excluded from view to stay under 64KB row limit:
+    #   pkpdCapabilities, mechanismOfActionValidation (long multi-select arrays)
+    #   modelLimitations, clinicalTranslationHistory, regulatoryAcceptanceHistory (free text)
     defining_sql = f"""SELECT
     R.resourceId AS resourceId,
     R.rrid AS rrid,
@@ -65,12 +67,22 @@ def create_tools_materialized_view(syn: synapseclient.Synapse,
     CL.cellLineGeneticDisorder AS cellLineGeneticDisorder,
     CL.cellLineManifestation AS cellLineManifestation,
     CL.tissue AS tissue,
+    CL.pediatricSuitability AS clPediatricSuitability,
+    CL.timelineToResults AS clTimelineToResults,
+    CL.mtaRequired AS clMtaRequired,
+    CL.ngnriRepositoryStatus AS clNgnriRepositoryStatus,
 
     AM.backgroundStrain AS backgroundStrain,
     AM.backgroundSubstrain AS backgroundSubstrain,
     AM.animalModelGeneticDisorder AS animalModelGeneticDisorder,
     AM.animalModelOfManifestation AS animalModelOfManifestation,
     AM.animalState AS animalState,
+    AM.bbbIntegrityStatus AS amBbbIntegrityStatus,
+    AM.routeOfAdministration AS amRouteOfAdministration,
+    AM.pediatricSuitability AS amPediatricSuitability,
+    AM.timelineToResults AS amTimelineToResults,
+    AM.mtaRequired AS amMtaRequired,
+    AM.ngnriRepositoryStatus AS amNgnriRepositoryStatus,
 
     GR.insertName AS insertName,
     GR.insertSpecies AS insertSpecies,
@@ -105,12 +117,25 @@ def create_tools_materialized_view(syn: synapseclient.Synapse,
     ACM.cellTypes AS cellTypes,
     ACM.cultureSystem AS cultureSystem,
     ACM.maturationTime AS maturationTime,
+    ACM.bbbModelCapability AS bbbModelCapability,
+    ACM.routeOfAdministration AS acmRouteOfAdministration,
+    ACM.pediatricSuitability AS acmPediatricSuitability,
+    ACM.timelineToResults AS acmTimelineToResults,
+    ACM.suitableForRegulatoryPackage AS suitableForRegulatoryPackage,
+    ACM.mtaRequired AS acmMtaRequired,
+    ACM.ngnriRepositoryStatus AS acmNgnriRepositoryStatus,
 
     PDM.modelSystemType AS modelSystemType,
     PDM.patientDiagnosis AS patientDiagnosis,
     PDM.hostStrain AS hostStrain,
     PDM.tumorType AS pdmTumorType,
     PDM.passageNumber AS passageNumber,
+    PDM.bbbIntegrityStatus AS pdmBbbIntegrityStatus,
+    PDM.routeOfAdministration AS pdmRouteOfAdministration,
+    PDM.pediatricSuitability AS pdmPediatricSuitability,
+    PDM.timelineToResults AS pdmTimelineToResults,
+    PDM.mtaRequired AS pdmMtaRequired,
+    PDM.ngnriRepositoryStatus AS pdmNgnriRepositoryStatus,
 
     CAT.assessmentName AS assessmentName,
     CAT.assessmentType AS assessmentType,
