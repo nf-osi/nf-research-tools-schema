@@ -26,35 +26,124 @@ REVIEW_OUTPUT_DIR = 'tool_reviews'
 MINING_RESULTS_FILE = 'processed_publications.csv'
 ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 
-# YAML output template — common fields + type-specific Synapse table fields
-# Claude should add the type-specific fields as additional keys on each tool entry.
-TOOL_VALIDATION_YAML_TEMPLATE = """\
-toolValidations:
-  - toolName: "Exact tool name as it appears in text"
-    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
-    verdict: "Accept" | "Reject" | "Uncertain"
-    confidence: 0.0-1.0
-    recommendation: "Keep" | "Remove" | "Manual Review Required"
-    contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."
-    usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"
-    # Add ALL type-specific fields you can extract from the text (omit fields not found):
-    # animal_model:           strainNomenclature*, backgroundStrain, backgroundSubstrain, animalModelGeneticDisorder [Neurofibromatosis type 1|type 2|Schwannomatosis|No known disease], animalModelOfManifestation, transplantationType, animalState, generation
-    # antibody:               targetAntigen*, hostOrganism [Mouse|Rabbit|Unknown], clonality [Monoclonal|Polyclonal|Secondary|Recombinant|Control|Unknown], cloneId, reactiveSpecies, conjugate, uniprotId
-    # cell_line:              organ*, tissue, cellLineGeneticDisorder [Neurofibromatosis Type 1|Type 2|Schwannomatosis|None] (use "None" for wild-type/control lines; omit only if truly unknown), cellLineManifestation, cellLineCategory [Cancer cell line|Embryonic stem cell|Finite cell line|Hybrid cell line|Hybridoma], cultureMedia (base medium + supplements, e.g. "RPMI supplemented with 10% FBS"), originYear, resistance
-    # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker, copyNumber, gRNAshRNASequence, insertEntrezId
-    # computational_tool:     softwareType* [Analysis Software|Pipeline|Package/Library|Workflow|Database|Web Application|Command-line Tool|Plugin|Other], softwareVersion, programmingLanguage, sourceRepository, documentation, licenseType, containerized, maintainer
-    # advanced_cellular_model: modelType* [organoid|spheroid|tumoroid|assembloid|other], derivationSource* [patient tissue|iPSC|primary cell|cell line|other], cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber
-    # patient_derived_model:  modelSystemType* [PDX|PDO|cell line|organoid|other], patientDiagnosis*, hostStrain, tumorType, engraftmentSite, passageNumber, molecularCharacterization
-    # clinical_assessment_tool: assessmentType* [scale|questionnaire|structured interview|performance test|biomarker assay|other], targetPopulation* [pediatric|adult|caregiver|all ages|clinician-rated|other], diseaseSpecific [Yes|No], numberOfItems, scoringMethod, validatedLanguages, administrationTime
-    # (* = critical field, fill if at all possible)
-  # Repeat for each tool. Use [] if no tools found."""
+# Fields excluded from the mining template — either submission-form metadata
+# (not Synapse columns) or curator-only data not found in publication text.
+_TEMPLATE_SKIP_FIELDS = {
+    # Submission form / acquisition metadata
+    'resourceType', 'contactEmail', 'developerContactEmail',
+    'requestFormURL', 'toolURL', 'downloadURL', 'catalogURL',
+    'itemAcquisition', 'additionalDetails', 'vendor', 'catalogNumber',
+    'developerName', 'developerAffiliation', 'synonyms', 'description',
+    'developmentPublicationDOI', 'usagePublicationDOIs',
+    # Internal Synapse IDs (auto-generated)
+    'donorId', 'transplantationDonorId',
+    # Curator-only — not extractable from publication text
+    'strProfile', 'contaminatedMisidentified', 'rrid',
+    # Captured as toolName at the top level, not a separate field
+    'resourceName',
+}
+
+# Maps internal type key → form schema path (relative to repo root)
+_TYPE_SCHEMA_PATHS = {
+    'animal_model':             'NF-Tools-Schemas/animal-model/submitAnimalModel.json',
+    'antibody':                 'NF-Tools-Schemas/antibody/submitAntibody.json',
+    'cell_line':                'NF-Tools-Schemas/cell-line/submitCellLine.json',
+    'genetic_reagent':          'NF-Tools-Schemas/genetic-reagent/submitGeneticReagent.json',
+    'computational_tool':       'NF-Tools-Schemas/computational-tool/submitComputationalTool.json',
+    'advanced_cellular_model':  'NF-Tools-Schemas/advanced-cellular-model/submitAdvancedCellularModel.json',
+    'patient_derived_model':    'NF-Tools-Schemas/patient-derived-model/submitPatientDerivedModel.json',
+    'clinical_assessment_tool': 'NF-Tools-Schemas/clinical-assessment-tool/submitClinicalAssessmentTool.json',
+}
+
+
+def _build_tool_validation_template() -> str:
+    """Build TOOL_VALIDATION_YAML_TEMPLATE dynamically from form JSON schemas.
+
+    Reads each type's submission form to determine which fields to request from
+    Claude. Adding a field to a form schema automatically propagates to the
+    mining prompt — no manual sync needed.
+
+    Falls back to an empty field list per type if a schema file cannot be read,
+    so the script stays runnable even outside the repo root.
+    """
+    type_lines = []
+    for ttype, schema_rel in _TYPE_SCHEMA_PATHS.items():
+        # Support both repo-root and script-relative invocation
+        candidates = [Path(schema_rel), Path(__file__).parents[2] / schema_rel]
+        schema_path = next((p for p in candidates if p.exists()), None)
+        if schema_path is None:
+            type_lines.append(f'    # {ttype}: (schema not found at {schema_rel})')
+            continue
+
+        try:
+            with open(schema_path) as fh:
+                schema = json.load(fh)
+        except Exception:
+            type_lines.append(f'    # {ttype}: (schema unreadable)')
+            continue
+
+        props = schema.get('properties', {})
+        bi = props.get('basicInfo', {})
+        bi_props = bi.get('properties', {})
+        bi_required = set(bi.get('required', []))
+
+        # basicInfo fields first, then remaining top-level properties
+        all_fields: dict[str, tuple] = {}
+        for k, v in bi_props.items():
+            all_fields[k] = (v, k in bi_required)
+        for k, v in props.items():
+            if k != 'basicInfo' and k not in all_fields:
+                all_fields[k] = (v, False)
+
+        hints = []
+        for fname, (fschema, is_req) in all_fields.items():
+            if fname in _TEMPLATE_SKIP_FIELDS:
+                continue
+            hint = fname + ('*' if is_req else '')
+            enum_vals = fschema.get('enum')
+            if not enum_vals and fschema.get('type') == 'array':
+                enum_vals = fschema.get('items', {}).get('enum')
+            if enum_vals:
+                hint += ' [' + ' | '.join(str(v) for v in enum_vals if v) + ']'
+            hints.append(hint)
+
+        type_lines.append(f'    # {ttype}: {", ".join(hints)}')
+
+    header = (
+        'toolValidations:\n'
+        '  - toolName: "Exact tool name as it appears in text"\n'
+        '    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent"'
+        ' | "computational_tool" | "advanced_cellular_model"'
+        ' | "patient_derived_model" | "clinical_assessment_tool"\n'
+        '    verdict: "Accept" | "Reject" | "Uncertain"\n'
+        '    confidence: 0.0-1.0\n'
+        '    recommendation: "Keep" | "Remove" | "Manual Review Required"\n'
+        '    contextSnippet: "...up to 200 chars of surrounding text showing tool usage..."\n'
+        '    usageType: "Development" | "Experimental Usage" | "Citation Only" | "Not Found in Context"\n'
+        '    # Add ALL type-specific fields you can extract from the text (omit fields not found):\n'
+        '    # (* = critical field, fill if at all possible)\n'
+    )
+    return header + '\n'.join(type_lines) + '\n  # Repeat for each tool. Use [] if no tools found.'
+
+
+# Built once at import time from the form schemas — stays in sync automatically.
+TOOL_VALIDATION_YAML_TEMPLATE = _build_tool_validation_template()
 
 # Observation extraction YAML output template
 OBSERVATION_YAML_TEMPLATE = """\
 observations:
   - resourceName: "Exact tool name from validated tools list"
     resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
-    observationType: "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
+    observationType: choose from the list below based on resourceType:
+      animal_model:             Tumor Growth/Burden | Survival/Lifespan | Body Weight/Growth | Behavioral | Nervous System | Cardiovascular System | Immune Response | Metabolic | Developmental | Cellular/Molecular | Coat Color | Drug Efficacy | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      cell_line:                Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      advanced_cellular_model:  Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      patient_derived_model:    Drug Response/Efficacy | Tumor Growth/Burden | Viability/Proliferation | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      antibody:                 Specificity | Sensitivity | Application Performance | Cross-reactivity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      genetic_reagent:          Editing/Knockdown Efficiency | Off-target Effects | Expression Level | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      computational_tool:       Accuracy/Performance | Usability | Scalability/Compatibility | Reproducibility | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      clinical_assessment_tool: Reliability | Validity | Clinical Utility | Sensitivity/Specificity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      biobank:                  Sample Quality | Availability | Collection Completeness | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
     details: "Specific finding, including quantitative values where available (e.g., 50% tumor reduction)"
     foundIn: "Results" | "Discussion" | "Both"
     contextSnippet: "...up to 300 chars of verbatim text supporting this observation..."
@@ -1003,11 +1092,12 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 'organoidType': _f(f, 'organoidType'),
                 'matrixType': _f(f, 'matrixType'),
                 'cultureSystem': _f(f, 'cultureSystem'),
+                'cultureMedia': _f(f, 'cultureMedia'),
                 'maturationTime': _f(f, 'maturationTime'),
                 'characterizationMethods': _f(f, 'characterizationMethods'),
                 'passageNumber': _f(f, 'passageNumber'),
-                'cryopreservationProtocol': '',
-                'qualityControlMetrics': '',
+                'cryopreservationProtocol': _f(f, 'cryopreservationProtocol'),
+                'qualityControlMetrics': _f(f, 'qualityControlMetrics'),
             }
         elif tool_type == 'patient_derived_model':
             return {
@@ -1018,12 +1108,12 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 'tumorType': _f(f, 'tumorType'),
                 'engraftmentSite': _f(f, 'engraftmentSite'),
                 'passageNumber': _f(f, 'passageNumber'),
-                'establishmentRate': '',
+                'establishmentRate': _f(f, 'establishmentRate'),
                 'molecularCharacterization': _f(f, 'molecularCharacterization'),
-                'clinicalData': '',
-                'humanizationMethod': '',
-                'immuneSystemComponents': '',
-                'validationMethods': '',
+                'clinicalData': _f(f, 'clinicalData'),
+                'humanizationMethod': _f(f, 'humanizationMethod'),
+                'immuneSystemComponents': _f(f, 'immuneSystemComponents'),
+                'validationMethods': _f(f, 'validationMethods'),
             }
         elif tool_type == 'clinical_assessment_tool':
             return {
@@ -1034,11 +1124,11 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 'numberOfItems': _f(f, 'numberOfItems'),
                 'scoringMethod': _f(f, 'scoringMethod'),
                 'validatedLanguages': _f(f, 'validatedLanguages'),
-                'psychometricProperties': '',
+                'psychometricProperties': _f(f, 'psychometricProperties'),
                 'administrationTime': _f(f, 'administrationTime'),
-                'availabilityStatus': '',
-                'licensingRequirements': '',
-                'digitalVersion': '',
+                'availabilityStatus': _f(f, 'availabilityStatus'),
+                'licensingRequirements': _f(f, 'licensingRequirements'),
+                'digitalVersion': _f(f, 'digitalVersion'),
             }
         else:
             return {'_toolName': tool_name}

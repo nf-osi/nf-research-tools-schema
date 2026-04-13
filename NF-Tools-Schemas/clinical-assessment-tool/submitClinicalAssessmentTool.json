@@ -77,16 +77,34 @@
         "developerName": { "type": "string", "title": "Developer Name" },
         "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": ["assessmentName", "assessmentType", "targetPopulation", "howToAcquire"]
+      "required": ["assessmentName", "assessmentType", "targetPopulation"]
     },
     "developmentPublicationDOI": {
       "type": "string",
-      "title": "Development Publication DOI (where tool was first described)"
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
     },
     "usagePublicationDOIs": {
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+    },
+    "itemAcquisition": {
       "type": "string",
-      "title": "Usage Publication DOI(s) where tool was used (separate multiple with commas)"
-    }
+      "title": "How to acquire",
+      "enum": [
+        "Freely Available Online",
+        "Contact Developer/Author",
+        "Other"
+      ]
+    },
+    "contactEmail": {
+      "type": "string",
+      "title": "Your Contact Email (optional)",
+      "description": "Your email address for follow-up questions about this submission.",
+      "format": "email"
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Clinical Assessment Tool" }
   },
   "required": ["basicInfo", "itemAcquisition"],
   "allOf": [

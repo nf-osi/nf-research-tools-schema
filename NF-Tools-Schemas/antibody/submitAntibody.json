@@ -13,11 +13,7 @@
         "hostOrganism": {
           "type": "string",
           "title": "Host Organism",
-          "enum": [
-            "Mouse",
-            "Rabbit",
-            "Unknown"
-          ]
+          "enum": ["Mouse", "Rabbit", "Unknown"]
         },
         "reactiveSpecies": {
           "type": "object",
@@ -65,16 +61,6 @@
       "title": "UniProt ID",
       "description": "UniProt accession for the target protein (e.g. P21359 for NF1). Find at uniprot.org."
     },
-    "cloneId": {
-      "type": "string",
-      "title": "Clone ID",
-      "description": "Clone identifier if monoclonal (e.g. 2D1, EP1879Y)."
-    },
-    "uniprotId": {
-      "type": "string",
-      "title": "UniProt ID",
-      "description": "UniProt accession for the target protein (e.g. P21359 for NF1). Find at uniprot.org."
-    },
     "clonality": {
       "type": "string",
       "title": "Clonality",
@@ -82,11 +68,13 @@
     },
     "developmentPublicationDOI": {
       "type": "string",
-      "title": "Development Publication DOI (where tool was first described)"
+      "title": "Development Publication DOI (where tool was first described)",
+      "pattern": "^$|^10\\."
     },
     "usagePublicationDOIs": {
-      "type": "string",
-      "title": "Usage Publication DOI(s) where tool was used (separate multiple with commas)"
+      "type": "array",
+      "title": "Usage Publication DOI(s)",
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
     },
     "itemAcquisition": {
       "type": "string",

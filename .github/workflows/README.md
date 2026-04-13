@@ -30,10 +30,17 @@ Workflows are coordinated through **issue close triggers and PR merges**:
    └─ No PR created (uploads directly to Synapse)
          ↓ (when PR from step 2 is merged, label: tool-submissions)
 
+         ↓ (when PR from step 2 is merged, triggers independently):
+
 4. score-tools.yml
    ├─ Calculates tool completeness scores
    ├─ Uploads directly to Synapse
    └─ No PR created (direct upload)
+
+4. update-observation-schema.yml  (runs in parallel with score-tools)
+   ├─ Fetches latest tool data from syn51730943
+   ├─ Updates SubmitObservationSchema.json enums
+   └─ Creates PR if schema changes detected (label: schema-update)
 ```
 
 ### Key Points
@@ -42,6 +49,7 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 - **publication-mining**: Triggers when monthly issue with label `tool-submissions` is closed
 - **upsert-tools**: Triggers on push to main with files in `submissions/*/accepted/`
 - **score-tools**: Triggers on PR merge with label `tool-submissions`
+- **update-observation-schema**: Triggers after `upsert-tools` completes (independent of score-tools)
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
 - **Annotation review**: Embedded in the monthly issue workflow (not a separate weekly step)
 
@@ -123,7 +131,24 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 
 ---
 
-### 4. Calculate Completeness Scores (score-tools.yml)
+### 4a. Update Observation Schema (update-observation-schema.yml)
+
+**Purpose**: Keep `SubmitObservationSchema.json` in sync with tools in Synapse (resourceType/resourceName enums)
+
+**Trigger**:
+- After `upsert-tools.yml` completes on main (independent of score-tools)
+- Manual: workflow_dispatch
+
+**What it does**:
+1. Fetches current tool data from syn51730943
+2. Updates `resourceType` and `resourceName` enum values in `SubmitObservationSchema.json`
+3. Creates a PR if changes are detected (label: `schema-update`)
+
+**No PR Created if no changes**: Only creates PR when enums differ from current schema
+
+---
+
+### 4b. Calculate Completeness Scores (score-tools.yml)
 
 **Purpose**: Calculate and upload tool completeness scores
 
@@ -248,7 +273,7 @@ All workflows can be manually triggered:
 1. monthly-submission-check (entry point) — or close an issue with `tool-submissions` label
 2. publication-mining triggers automatically → creates PR
 3. Review PR: move accepted JSONs to `submissions/{type}/accepted/`, merge → triggers upsert-tools
-4. Merge also triggers score-tools
+4. Merge also triggers score-tools and update-observation-schema (independently)
 
 ## 📊 Monitoring
 

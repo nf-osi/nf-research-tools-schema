@@ -7,20 +7,20 @@ ACCEPTED_resources.csv and the matching type-specific ACCEPTED_*.csv.
 Registries used (all public, no API key required by default):
   cell_line / patient_derived_model
       → Cellosaurus REST API  https://api.cellosaurus.org/
-        Returns RRID:CVCL_XXXX
+        Returns rrid:CVCL_XXXX
   genetic_reagent
       → Addgene search  https://www.addgene.org/search/catalog/plasmids/
-        Returns RRID:Addgene_XXXXX
+        Returns rrid:Addgene_XXXXX
   animal_model
       → IMSR (International Mouse Strain Resource)
           https://www.findmice.org/summary?gfAccessionIds=&strainsOnly=1&q=
-        Returns RRID:IMSR_JAX:XXXXX  (Jackson Laboratory strains)
+        Returns rrid:IMSR_JAX:XXXXX  (Jackson Laboratory strains)
   antibody
       → SciCrunch Antibody Registry (requires --api-key or SCICRUNCH_API_KEY)
-        Returns RRID:AB_XXXXXX
+        Returns rrid:AB_XXXXXX
 
 For any tool type, if the context already contains an explicit RRID: string it
-is extracted directly without a network call.
+is extracted directly without a network call (normalized to lowercase rrid: prefix).
 
 Usage:
   python tool_coverage/scripts/lookup_rrids.py
@@ -49,7 +49,7 @@ _RRID_IN_TEXT_RE = re.compile(r'RRID:\s*([A-Za-z0-9_:\-]+)', re.IGNORECASE)
 def _extract_rrid_from_text(text: str) -> str:
     """Return the first RRID:XXXX string found in text, or ''."""
     m = _RRID_IN_TEXT_RE.search(text or '')
-    return f'RRID:{m.group(1)}' if m else ''
+    return f'rrid:{m.group(1)}' if m else ''
 
 
 def _get(url: str, params: dict | None = None, headers: dict | None = None,
@@ -119,13 +119,13 @@ def _lookup_cellosaurus(name: str) -> str:
         if norm in _all_names(entry):
             accession = _primary_accession(entry)
             if accession:
-                return f'RRID:{accession}'
+                return f'rrid:{accession}'
 
     return ''
 
 
 def _lookup_addgene(name: str) -> str:
-    """Search Addgene for a plasmid by name; return RRID:Addgene_XXXXX or ''."""
+    """Search Addgene for a plasmid by name; return rrid:Addgene_XXXXX or ''."""
     # Addgene does not have an official public JSON API, but their search endpoint
     # returns structured HTML.  We use the JSON search API they expose internally.
     params = {
@@ -143,12 +143,12 @@ def _lookup_addgene(name: str) -> str:
         if _fuzzy_match(norm, plasmid_name):
             pid = entry.get('id') or entry.get('addgene_id', '')
             if pid:
-                return f'RRID:Addgene_{pid}'
+                return f'rrid:Addgene_{pid}'
     return ''
 
 
 def _lookup_imsr(name: str) -> str:
-    """Search IMSR for a mouse strain by name; return RRID:IMSR_JAX:XXXXX or ''."""
+    """Search IMSR for a mouse strain by name; return rrid:IMSR_JAX:XXXXX or ''."""
     # IMSR summary endpoint returns JSON when called with the right parameters.
     params = {
         'gfAccessionIds': '',
@@ -168,14 +168,14 @@ def _lookup_imsr(name: str) -> str:
             # IMSR IDs look like "JAX:000664" — convert to RRID format
             strain_id = strain.get('id', '') or ''
             if strain_id.startswith('JAX:'):
-                return f'RRID:IMSR_{strain_id}'
+                return f'rrid:IMSR_{strain_id}'
             elif strain_id:
-                return f'RRID:IMSR_{strain_id}'
+                return f'rrid:IMSR_{strain_id}'
     return ''
 
 
 def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
-    """Search SciCrunch Antibody Registry; return RRID:AB_XXXXXX or ''."""
+    """Search SciCrunch Antibody Registry; return rrid:AB_XXXXXX or ''."""
     params = {
         'q': name,
         'type': 'Antibody',
@@ -193,7 +193,7 @@ def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
         if _fuzzy_match(norm, entry_name):
             rid = entry.get('rid', '') or ''
             if rid:
-                return f'RRID:AB_{rid}'
+                return f'rrid:AB_{rid}'
     return ''
 
 
@@ -306,9 +306,9 @@ def run_lookup(output_dir: Path, dry_run: bool, force: bool,
                 rid   = row.get('resourceId', '').strip()
                 if rid and cat:
                     if 'addgene' in vname:
-                        rrid_from_vendor[rid] = f'RRID:Addgene_{cat}'
+                        rrid_from_vendor[rid] = f'rrid:Addgene_{cat}'
                     elif 'jax' in vname or 'jackson' in vname:
-                        rrid_from_vendor[rid] = f'RRID:IMSR_JAX:{cat}'
+                        rrid_from_vendor[rid] = f'rrid:IMSR_JAX:{cat}'
 
     total = attempted = found = skipped = 0
     for row in res_rows:

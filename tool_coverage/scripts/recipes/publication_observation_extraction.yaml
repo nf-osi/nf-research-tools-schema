@@ -27,7 +27,16 @@ prompt: |
   - Confidence: 0.9+ = explicit quantitative result; 0.7-0.89 = qualitative finding with evidence;
     below 0.7 = omit the observation entirely
 
-  observationType values: "Efficacy" | "Safety" | "Biomarker" | "Behavioral" | "Mechanistic" | "Other"
+  observationType values depend on resourceType:
+    animal_model:             "Tumor Growth/Burden" | "Survival/Lifespan" | "Body Weight/Growth" | "Behavioral" | "Nervous System" | "Cardiovascular System" | "Immune Response" | "Metabolic" | "Developmental" | "Cellular/Molecular" | "Coat Color" | "Drug Efficacy" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    cell_line:                "Drug Response/Efficacy" | "Viability/Proliferation" | "Migration/Invasion" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    advanced_cellular_model:  "Drug Response/Efficacy" | "Viability/Proliferation" | "Migration/Invasion" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    patient_derived_model:    "Drug Response/Efficacy" | "Tumor Growth/Burden" | "Viability/Proliferation" | "Gene/Protein Expression" | "Morphological" | "Molecular/Biochemical" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    antibody:                 "Specificity" | "Sensitivity" | "Application Performance" | "Cross-reactivity" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    genetic_reagent:          "Editing/Knockdown Efficiency" | "Off-target Effects" | "Expression Level" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    computational_tool:       "Accuracy/Performance" | "Usability" | "Scalability/Compatibility" | "Reproducibility" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    clinical_assessment_tool: "Reliability" | "Validity" | "Clinical Utility" | "Sensitivity/Specificity" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
+    biobank:                  "Sample Quality" | "Availability" | "Collection Completeness" | "General Comment or Review" | "Usage Instructions" | "Depositor Comment" | "Issue" | "Other"
 
 activities:
   - Read Results and Discussion sections for observations about validated tools
