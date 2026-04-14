@@ -655,20 +655,31 @@ def _collect_pub_and_dev_rows(json_files: list) -> tuple:
                 })
 
             if usage_type.lower() == "development" and resource_name:
-                dev_id = str(uuid.uuid5(
-                    _PROJECT_NAMESPACE,
-                    f"dev:{pmid or doi}:{resource_name}:{ttype}",
-                ))
-                dev_rows.append({
-                    "publicationDevelopmentId": dev_id,
-                    "publicationId": _make_pub_id(pmid or doi),
-                    "resourceId": "",  # resolved at upsert time from syn51730943
-                    "funderId": _resolve_funder_id(funding),
-                    "investigatorId": "",
-                    "_pmid": pmid,
-                    "_toolName": resource_name,
-                    "_toolType": ttype,
-                })
+                # Split on ";" to support multiple funders per publication
+                funder_agencies = [a.strip() for a in funding.split(";") if a.strip()] if funding else [""]
+                funder_ids = []
+                for agency in funder_agencies:
+                    fid = _resolve_funder_id(agency)
+                    if fid and fid not in funder_ids:
+                        funder_ids.append(fid)
+                if not funder_ids:
+                    funder_ids = [""]
+
+                for funder_id in funder_ids:
+                    dev_id = str(uuid.uuid5(
+                        _PROJECT_NAMESPACE,
+                        f"dev:{pmid or doi}:{resource_name}:{ttype}:{funder_id}",
+                    ))
+                    dev_rows.append({
+                        "publicationDevelopmentId": dev_id,
+                        "publicationId": _make_pub_id(pmid or doi),
+                        "resourceId": "",  # resolved at upsert time from syn51730943
+                        "funderId": funder_id,
+                        "investigatorId": "",
+                        "_pmid": pmid,
+                        "_toolName": resource_name,
+                        "_toolType": ttype,
+                    })
 
     return pub_rows, dev_rows
 
