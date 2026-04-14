@@ -145,6 +145,22 @@ jobs:
           echo "=========================================="
           python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
+      - name: Dry-run preview - publications and development links
+        if: steps.check_files.outputs.has_files == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "DRY-RUN: Preview of publication/dev link uploads"
+          echo "=========================================="
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+            python tool_coverage/scripts/upsert_publication_links.py \
+              --csv-dir tool_coverage/outputs \
+              --dry-run
+          else
+            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+          fi
+
       - name: Confirm and upload to Synapse
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
@@ -157,6 +173,23 @@ jobs:
 
           echo ""
           echo "✅ Upload completed successfully"
+
+      - name: Upsert publications and development links to Synapse
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "UPSERTING Publications + Development Links"
+          echo "=========================================="
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+            python tool_coverage/scripts/upsert_publication_links.py \
+              --csv-dir tool_coverage/outputs
+            echo ""
+            echo "✅ Publication and development link upsert complete"
+          else
+            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+          fi
 
       - name: Dry-run mode - skip upload
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run == 'true'
@@ -211,6 +244,8 @@ jobs:
             echo "- Cell Lines: syn26486823" >> $GITHUB_STEP_SUMMARY
             echo "- Genetic Reagents: syn26486832" >> $GITHUB_STEP_SUMMARY
             echo "- Resources (links): syn51730943" >> $GITHUB_STEP_SUMMARY
+            echo "- Publications: syn26486839" >> $GITHUB_STEP_SUMMARY
+            echo "- Development links: syn26486807" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
           fi

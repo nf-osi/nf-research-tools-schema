@@ -15,7 +15,9 @@ Usage:
 import argparse
 import csv
 import json
+import re
 import sys
+import uuid
 from pathlib import Path
 
 # Re-use the same column definitions and field mappers as process_formspark_export.py
@@ -142,6 +144,39 @@ _CONJUGATE_MAP = {
     "Non-conjugated": "Nonconjugated",
 }
 
+# UUID namespace shared with generate_review_csv.py so IDs are consistent.
+_PROJECT_NAMESPACE = uuid.uuid5(
+    uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools"
+)
+
+# Known NF funders — mirrors generate_review_csv.py _KNOWN_FUNDERS.
+_KNOWN_FUNDERS = [
+    {
+        "funderId": "55d4b7cf-3cd9-49ba-9f9e-e44b7f917330",
+        "aliases": ["Gilbert Family Foundation", "GFF"],
+    },
+    {
+        "funderId": "e57a7c37-49e9-4466-8f38-5226f3525460",
+        "aliases": ["Children's Tumor Foundation", "CTF"],
+    },
+    {
+        "funderId": "57ded652-4826-4058-bfb6-1c61ac8bd357",
+        "aliases": ["Neurofibromatosis Therapeutic Acceleration Program", "NTAP"],
+    },
+    {
+        "funderId": "0ba0958e-36c4-41f7-af13-7ea7fde0b7c9",
+        "aliases": ["National Cancer Institute", "NCI", "NIH-NCI"],
+    },
+    {
+        "funderId": "3ceffe3e-3897-4ea8-9188-49d8056a07f6",
+        "aliases": [
+            "Congressionally Directed Medical Research Programs", "CDMRP",
+            "Neurofibromatosis Research Program", "NFRP",
+            "Department of Defense", "DoD",
+        ],
+    },
+]
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -173,6 +208,43 @@ def _fmt_list(val) -> str:
     if isinstance(val, list):
         return ", ".join(str(v) for v in val if v)
     return str(val) if val else ""
+
+
+def _make_pub_id(pmid_or_doi: str) -> str:
+    """Deterministic UUID5 for a publication — matches generate_review_csv.py."""
+    clean = pmid_or_doi.replace("PMID:", "").strip()
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"publication:{clean}"))
+
+
+def _resolve_funder_id(agency: str) -> str:
+    """Resolve a funding agency text string to its known funder UUID."""
+    if not agency:
+        return ""
+    for funder in _KNOWN_FUNDERS:
+        for alias in funder["aliases"]:
+            if re.search(r"\b" + re.escape(alias) + r"\b", agency, re.IGNORECASE):
+                return funder["funderId"]
+    return ""
+
+
+def _resource_name_from_data(data: dict, ttype: str) -> str:
+    """Extract the canonical resource name for any tool type."""
+    bi = data.get("basicInfo", {})
+    if ttype == "cell_line":
+        return _get(data, "basicInfo.cellLineName", "cellLineName")
+    if ttype == "antibody":
+        return _get(data, "basicInfo.antibodyName", "antibodyName")
+    if ttype == "animal_model":
+        return _get(data, "basicInfo.animalModelName", "animalModelName")
+    if ttype == "genetic_reagent":
+        return _get(data, "insertName")
+    if ttype in ("patient_derived_model", "advanced_cellular_model"):
+        return _get(bi, "resourceName") or _get(data, "_resourceName")
+    if ttype == "computational_tool":
+        return _get(bi, "softwareName")
+    if ttype == "clinical_assessment_tool":
+        return _get(bi, "assessmentName")
+    return ""
 
 
 def _flatten_publications(d: dict) -> dict:
@@ -510,6 +582,97 @@ def _build_observation(d: dict) -> dict:
     }
 
 
+def _collect_pub_and_dev_rows(json_files: list) -> tuple:
+    """
+    Scan submission JSONs and collect publication and development-link rows.
+
+    Publications are deduplicated by PMID (or ``doi:<doi>`` key when no PMID).
+    Development links: one row per (tool, development-publication) pair, with
+    ``funderId`` resolved from any ``_fundingAgency`` annotation in the JSON.
+
+    Returns:
+        (pub_rows, dev_rows) — lists of dicts for submission_publications.csv
+        and submission_dev_links.csv.
+    """
+    seen_pub_keys: set = set()
+    pub_rows: list = []
+    dev_rows: list = []
+
+    for path in sorted(json_files):
+        try:
+            with open(path, encoding="utf-8") as f:
+                raw = json.load(f)
+        except Exception:
+            continue
+
+        ttype = _tool_type_from_json(raw)
+        if ttype is None or ttype == "observation":
+            continue
+
+        resource_name = _resource_name_from_data(raw, ttype)
+
+        # Prefer _publications array; fall back to flat top-level fields
+        pubs_list = raw.get("_publications")
+        if isinstance(pubs_list, list) and pubs_list:
+            publications = pubs_list
+        else:
+            pmid = raw.get("_pmid", "")
+            doi = raw.get("_doi") or raw.get("developmentPublicationDOI", "")
+            if pmid or doi:
+                publications = [{
+                    "_pmid": pmid,
+                    "_doi": doi,
+                    "_publicationTitle": raw.get("_publicationTitle", ""),
+                    "_year": raw.get("_year", ""),
+                    "_usageType": raw.get("_usageType", "Development"),
+                    "_fundingAgency": raw.get("_fundingAgency", ""),
+                }]
+            else:
+                publications = []
+
+        for pub in publications:
+            pmid = (pub.get("_pmid") or "").strip()
+            doi = (pub.get("_doi") or "").strip()
+            usage_type = pub.get("_usageType", "")
+            funding = pub.get("_fundingAgency", "")
+
+            if not pmid and not doi:
+                continue
+
+            pub_key = pmid if pmid else f"doi:{doi}"
+            if pub_key not in seen_pub_keys:
+                seen_pub_keys.add(pub_key)
+                pub_rows.append({
+                    "publicationId": _make_pub_id(pmid or doi),
+                    "pmid": pmid,
+                    "doi": doi,
+                    "publicationTitle": pub.get("_publicationTitle", ""),
+                    "year": pub.get("_year", ""),
+                    "_fundingAgency": funding,
+                    "_toolName": resource_name,
+                    "_toolType": ttype,
+                    "_usageType": usage_type,
+                })
+
+            if usage_type.lower() == "development" and resource_name:
+                dev_id = str(uuid.uuid5(
+                    _PROJECT_NAMESPACE,
+                    f"dev:{pmid or doi}:{resource_name}:{ttype}",
+                ))
+                dev_rows.append({
+                    "publicationDevelopmentId": dev_id,
+                    "publicationId": _make_pub_id(pmid or doi),
+                    "resourceId": "",  # resolved at upsert time from syn51730943
+                    "funderId": _resolve_funder_id(funding),
+                    "investigatorId": "",
+                    "_pmid": pmid,
+                    "_toolName": resource_name,
+                    "_toolType": ttype,
+                })
+
+    return pub_rows, dev_rows
+
+
 _BUILDERS = {
     "cell_line":               ("cell_lines",               _build_cell_line),
     "antibody":                ("antibodies",               _build_antibody),
@@ -659,6 +822,43 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         print(f"\nTotal: {total_appended} new rows appended across {len(grouped)} tool type(s)")
         if skipped:
             print(f"Skipped {len(skipped)} file(s): {skipped}")
+
+    # --- Publications & development links ---
+    # Always scan the full submissions dir so these CSVs stay complete even
+    # when compile is called with --files-list (a changed-file subset).
+    all_sub_files = sorted(
+        p for p in ACCEPTED_DIR_DEFAULT.glob("*/*.json")
+        if "observations" not in p.parts
+    )
+    scan_files = all_sub_files if all_sub_files else json_files
+    pub_rows, dev_rows = _collect_pub_and_dev_rows(scan_files)
+
+    pub_cols = [
+        "publicationId", "pmid", "doi", "publicationTitle", "year",
+        "_fundingAgency", "_toolName", "_toolType", "_usageType",
+    ]
+    dev_cols = [
+        "publicationDevelopmentId", "publicationId", "resourceId",
+        "funderId", "investigatorId", "_pmid", "_toolName", "_toolType",
+    ]
+    pub_csv = csv_dir / "submission_publications.csv"
+    dev_csv = csv_dir / "submission_dev_links.csv"
+
+    if dry_run:
+        print(f"\n  [dry-run] publications: {len(pub_rows)} records")
+        print(f"  [dry-run] development links: {len(dev_rows)} records")
+    else:
+        with open(pub_csv, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=pub_cols, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(pub_rows)
+        print(f"\n  publications: {len(pub_rows)} records → {pub_csv.name}")
+
+        with open(dev_csv, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=dev_cols, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(dev_rows)
+        print(f"  development links: {len(dev_rows)} records → {dev_csv.name}")
 
 
 def main():
