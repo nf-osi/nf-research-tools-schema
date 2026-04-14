@@ -7,21 +7,54 @@
       "type": "object",
       "title": "Computational Tool Information",
       "properties": {
-        "softwareName": { "type": "string", "title": "Name of Software/Tool" },
-        "synonyms": { "type": "string", "title": "Synonyms or Alternative Names" },
-        "description": { "type": "string", "title": "Description (~20-50 words)" },
+        "softwareName": {
+          "type": "string",
+          "title": "Name of Software/Tool"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Alternative Names"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
         "softwareType": {
           "type": "string",
           "title": "Type of Computational Tool",
-          "enum": ["Analysis Software", "Pipeline", "Package/Library", "Workflow", "Database", "Web Application", "Command-line Tool", "Plugin", "Other"]
+          "enum": [
+            "Analysis Software",
+            "Pipeline",
+            "Package/Library",
+            "Workflow",
+            "Database",
+            "Web Application",
+            "Command-line Tool",
+            "Plugin",
+            "Other"
+          ]
         },
-        "softwareVersion": { "type": "string", "title": "Current Version" },
+        "softwareVersion": {
+          "type": "string",
+          "title": "Current Version"
+        },
         "programmingLanguage": {
           "type": "array",
           "title": "Programming Language(s)",
           "items": {
             "type": "string",
-            "enum": ["Python", "R", "Java", "C++", "MATLAB", "Julia", "Perl", "Shell Script", "JavaScript", "Other"]
+            "enum": [
+              "Python",
+              "R",
+              "Java",
+              "C++",
+              "MATLAB",
+              "Julia",
+              "Perl",
+              "Shell Script",
+              "JavaScript",
+              "Other"
+            ]
           },
           "uniqueItems": true
         },
@@ -38,7 +71,16 @@
         "licenseType": {
           "type": "string",
           "title": "Software License",
-          "enum": ["MIT", "Apache 2.0", "GPL", "BSD", "Creative Commons", "Proprietary", "Other", "Unknown"]
+          "enum": [
+            "MIT",
+            "Apache 2.0",
+            "GPL",
+            "BSD",
+            "Creative Commons",
+            "Proprietary",
+            "Other",
+            "Unknown"
+          ]
         },
         "licenseDetails": {
           "type": "string",
@@ -48,16 +90,32 @@
         "containerized": {
           "type": "string",
           "title": "Containerized Version Available?",
-          "enum": ["Yes", "No", "Unknown"]
+          "enum": [
+            "Yes",
+            "No",
+            "Unknown"
+          ]
         },
         "dependencies": {
           "type": "array",
           "title": "Key Software Dependencies",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "systemRequirements": { "type": "string", "title": "System Requirements (OS, memory, compute)" },
-        "lastUpdate": { "type": "string", "title": "Date of Last Update", "format": "date" },
-        "maintainer": { "type": "string", "title": "Maintainer Name or Organization" },
+        "systemRequirements": {
+          "type": "string",
+          "title": "System Requirements (OS, memory, compute)"
+        },
+        "lastUpdate": {
+          "type": "string",
+          "title": "Date of Last Update",
+          "format": "date"
+        },
+        "maintainer": {
+          "type": "string",
+          "title": "Maintainer Name or Organization"
+        },
         "analyticalPlatformSupport": {
           "type": "array",
           "title": "Analytical Platform Support",
@@ -79,11 +137,23 @@
           },
           "uniqueItems": true
         },
-        "rrid": { "type": "string", "title": "RRID (if available)" },
-        "developerName": { "type": "string", "title": "Developer Name" },
-        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "developerName": {
+          "type": "string",
+          "title": "Developer Name"
+        },
+        "developerAffiliation": {
+          "type": "string",
+          "title": "Developer Affiliation"
+        }
       },
-      "required": ["softwareName", "softwareType"]
+      "required": [
+        "softwareName",
+        "softwareType"
+      ]
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -93,7 +163,11 @@
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+      "items": {
+        "type": "string",
+        "title": "DOI",
+        "pattern": "^$|^10\\."
+      }
     },
     "itemAcquisition": {
       "type": "string",
@@ -108,43 +182,83 @@
         "Other"
       ]
     },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Computational Tool"
+    },
     "contactEmail": {
       "type": "string",
       "title": "Your Contact Email (optional)",
       "description": "Your email address for follow-up questions about this submission.",
       "format": "email"
-    },
-    "resourceType": { "type": "string", "title": "Resource Type", "default": "Computational Tool" }
+    }
   },
-  "required": ["basicInfo", "itemAcquisition"],
+  "required": [
+    "basicInfo",
+    "itemAcquisition"
+  ],
   "allOf": [
     {
       "if": {
         "properties": {
-          "itemAcquisition": { "enum": ["GitHub/GitLab", "CRAN", "Bioconductor", "Docker Hub", "PyPI"] }
+          "itemAcquisition": {
+            "enum": [
+              "GitHub/GitLab",
+              "CRAN",
+              "Bioconductor",
+              "Docker Hub",
+              "PyPI"
+            ]
+          }
         }
       },
       "then": {
         "properties": {
-          "downloadURL": { "type": "string", "title": "Download/Repository URL", "format": "uri" }
+          "downloadURL": {
+            "type": "string",
+            "title": "Download/Repository URL",
+            "format": "uri"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Contact Developer"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+          "developerContactEmail": {
+            "type": "string",
+            "title": "Developer Contact Email (optional)",
+            "format": "email"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
         },
-        "required": ["additionalDetails"]
+        "required": [
+          "additionalDetails"
+        ]
       }
     }
   ]

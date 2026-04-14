@@ -7,43 +7,99 @@
       "type": "object",
       "title": "Assessment Tool Information",
       "properties": {
-        "assessmentName": { "type": "string", "title": "Name of Assessment Tool" },
-        "synonyms": { "type": "string", "title": "Synonyms or Abbreviations" },
-        "description": { "type": "string", "title": "Description (~20-50 words)" },
+        "assessmentName": {
+          "type": "string",
+          "title": "Name of Assessment Tool"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Abbreviations"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
         "assessmentType": {
           "type": "string",
           "title": "Type of Assessment",
-          "enum": ["Quality of Life", "Pain Assessment", "Functional Assessment", "Cognitive Assessment", "Symptom Scale", "Psychological Assessment", "Patient-Reported Outcome", "Other"]
+          "enum": [
+            "Quality of Life",
+            "Pain Assessment",
+            "Functional Assessment",
+            "Cognitive Assessment",
+            "Symptom Scale",
+            "Psychological Assessment",
+            "Patient-Reported Outcome",
+            "Other"
+          ]
         },
         "targetPopulation": {
           "type": "string",
           "title": "Target Population",
-          "enum": ["Pediatric", "Adult", "Elderly", "General", "Disease-Specific"]
+          "enum": [
+            "Pediatric",
+            "Adult",
+            "Elderly",
+            "General",
+            "Disease-Specific"
+          ]
         },
         "diseaseSpecific": {
           "type": "string",
           "title": "Disease-Specific or General?",
-          "enum": ["Yes - NF-specific", "No - General", "Adapted for NF"]
+          "enum": [
+            "Yes - NF-specific",
+            "No - General",
+            "Adapted for NF"
+          ]
         },
-        "numberOfItems": { "type": "integer", "title": "Number of Items/Questions" },
-        "scoringMethod": { "type": "string", "title": "Scoring Method/Methodology" },
+        "numberOfItems": {
+          "type": "integer",
+          "title": "Number of Items/Questions"
+        },
+        "scoringMethod": {
+          "type": "string",
+          "title": "Scoring Method/Methodology"
+        },
         "validatedLanguages": {
           "type": "array",
           "title": "Validated Languages",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "psychometricProperties": { "type": "string", "title": "Psychometric Properties (reliability, validity)" },
-        "administrationTime": { "type": "string", "title": "Typical Administration Time" },
+        "psychometricProperties": {
+          "type": "string",
+          "title": "Psychometric Properties (reliability, validity)"
+        },
+        "administrationTime": {
+          "type": "string",
+          "title": "Typical Administration Time"
+        },
         "availabilityStatus": {
           "type": "string",
           "title": "Availability Status",
-          "enum": ["Freely Available", "License Required", "Permission Required", "Proprietary", "Unknown"]
+          "enum": [
+            "Freely Available",
+            "License Required",
+            "Permission Required",
+            "Proprietary",
+            "Unknown"
+          ]
         },
-        "licensingRequirements": { "type": "string", "title": "Licensing/Permission Requirements" },
+        "licensingRequirements": {
+          "type": "string",
+          "title": "Licensing/Permission Requirements"
+        },
         "digitalVersion": {
           "type": "string",
           "title": "Digital/Electronic Version Available?",
-          "enum": ["Yes", "No", "In Development", "Unknown"]
+          "enum": [
+            "Yes",
+            "No",
+            "In Development",
+            "Unknown"
+          ]
         },
         "cognitiveAndBehavioralDomains": {
           "type": "array",
@@ -73,11 +129,24 @@
           "title": "Regulatory Acceptance History",
           "description": "Known FDA/EMA endorsement or acceptance of this tool as a clinical outcome assessment (COA) for trials."
         },
-        "rrid": { "type": "string", "title": "RRID (if available)" },
-        "developerName": { "type": "string", "title": "Developer Name" },
-        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
+        "developerName": {
+          "type": "string",
+          "title": "Developer Name"
+        },
+        "developerAffiliation": {
+          "type": "string",
+          "title": "Developer Affiliation"
+        }
       },
-      "required": ["assessmentName", "assessmentType", "targetPopulation"]
+      "required": [
+        "assessmentName",
+        "assessmentType",
+        "targetPopulation"
+      ]
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -87,7 +156,11 @@
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+      "items": {
+        "type": "string",
+        "title": "DOI",
+        "pattern": "^$|^10\\."
+      }
     },
     "itemAcquisition": {
       "type": "string",
@@ -98,39 +171,77 @@
         "Other"
       ]
     },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Clinical Assessment Tool"
+    },
     "contactEmail": {
       "type": "string",
       "title": "Your Contact Email (optional)",
       "description": "Your email address for follow-up questions about this submission.",
       "format": "email"
-    },
-    "resourceType": { "type": "string", "title": "Resource Type", "default": "Clinical Assessment Tool" }
+    }
   },
-  "required": ["basicInfo", "itemAcquisition"],
+  "required": [
+    "basicInfo",
+    "itemAcquisition"
+  ],
   "allOf": [
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Freely Available Online" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Freely Available Online"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "toolURL": { "type": "string", "title": "Tool URL", "format": "uri" }
+          "toolURL": {
+            "type": "string",
+            "title": "Tool URL",
+            "format": "uri"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer/Author" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Contact Developer/Author"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+          "developerContactEmail": {
+            "type": "string",
+            "title": "Developer Contact Email (optional)",
+            "format": "email"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
         },
-        "required": ["additionalDetails"]
+        "required": [
+          "additionalDetails"
+        ]
       }
     }
   ]
