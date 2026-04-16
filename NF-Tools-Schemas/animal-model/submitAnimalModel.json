@@ -108,6 +108,19 @@
         "None"
       ]
     },
+    "humanizationMethod": {
+      "type": "string",
+      "title": "Humanization Method",
+      "description": "For humanized mouse models, the method used to engraft human immune system components (e.g., HSC engraftment, PBMC transfer, BLT model). Leave blank if not applicable."
+    },
+    "immuneSystemComponents": {
+      "type": "array",
+      "title": "Human Immune System Components Present",
+      "description": "For humanized mouse models, the human immune cell populations engrafted. Leave blank if not applicable.",
+      "items": {
+        "type": "string"
+      }
+    },
     "animalState": {
       "type": "string",
       "title": "Animal State",
@@ -314,9 +327,9 @@
       "enum": [
         "",
         "Less than 1 month",
-        "1\u20133 months",
-        "3\u20136 months",
-        "6\u201312 months",
+        "1–3 months",
+        "3–6 months",
+        "6–12 months",
         "More than 12 months",
         "Unknown"
       ]
@@ -475,6 +488,78 @@
         "required": [
           "additionalDetails"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "animalModelOfManifestation": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "animalModelOfManifestationOther": {
+            "type": "string",
+            "title": "Please specify manifestation"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "alleleType": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "alleleTypeOther": {
+            "type": "string",
+            "title": "Please specify allele type"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "routeOfAdministration": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherRouteOfAdministration": {
+            "type": "string",
+            "title": "Please specify other route(s) of administration"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mechanismOfActionValidation": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherMechanismOfActionValidation": {
+            "type": "string",
+            "title": "Please specify other mechanism(s) of action"
+          }
+        }
       }
     }
   ]

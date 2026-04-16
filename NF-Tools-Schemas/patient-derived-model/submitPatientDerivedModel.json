@@ -24,9 +24,7 @@
           "title": "Model System Type",
           "enum": [
             "PDX (Patient-Derived Xenograft)",
-            "Humanized Mouse",
             "Patient-Derived Organoid",
-            "Patient-Derived Cell Line",
             "Other"
           ]
         },
@@ -88,9 +86,13 @@
             "type": "string",
             "enum": [
               "Genomic Sequencing",
-              "RNA-seq",
+              "Whole Genome Sequencing",
+              "Whole Exome Sequencing",
+              "RNA sequencing",
               "Proteomics",
               "Immunohistochemistry",
+              "Flow Cytometry",
+              "Methylation",
               "Other"
             ]
           },
@@ -99,17 +101,6 @@
         "clinicalData": {
           "type": "string",
           "title": "Available Clinical Data from Patient"
-        },
-        "humanizationMethod": {
-          "type": "string",
-          "title": "Humanization Method (if applicable)"
-        },
-        "immuneSystemComponents": {
-          "type": "array",
-          "title": "Human Immune System Components Present",
-          "items": {
-            "type": "string"
-          }
         },
         "validationMethods": {
           "type": "array",
@@ -283,9 +274,9 @@
       "enum": [
         "",
         "Less than 1 month",
-        "1\u20133 months",
-        "3\u20136 months",
-        "6\u201312 months",
+        "1–3 months",
+        "3–6 months",
+        "6–12 months",
         "More than 12 months",
         "Unknown"
       ]
@@ -417,6 +408,239 @@
         "required": [
           "additionalDetails"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "modelSystemType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "modelSystemType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "modelSystemTypeOther": {
+                "type": "string",
+                "title": "Please specify model system type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "hostStrain": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "hostStrain"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "hostStrainOther": {
+                "type": "string",
+                "title": "Please specify host strain"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "tumorType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "tumorType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "tumorTypeOther": {
+                "type": "string",
+                "title": "Please specify tumor type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "engraftmentSite": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "engraftmentSite"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "engraftmentSiteOther": {
+                "type": "string",
+                "title": "Please specify engraftment site"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "species": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "species"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "speciesOther": {
+                "type": "string",
+                "title": "Please specify species"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "race": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "race"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "raceOther": {
+                "type": "string",
+                "title": "Please specify race/ethnicity"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "molecularCharacterization": {
+                "contains": {
+                  "const": "Other"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherMolecularCharacterization": {
+                "type": "string",
+                "title": "Please specify other molecular characterization method(s)"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "routeOfAdministration": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherRouteOfAdministration": {
+            "type": "string",
+            "title": "Please specify other route(s) of administration"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mechanismOfActionValidation": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherMechanismOfActionValidation": {
+            "type": "string",
+            "title": "Please specify other mechanism(s) of action"
+          }
+        }
       }
     }
   ]
