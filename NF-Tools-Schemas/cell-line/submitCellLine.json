@@ -322,8 +322,8 @@
       "enum": [
         "",
         "Less than 1 week",
-        "1\u20134 weeks",
-        "1\u20133 months",
+        "1–4 weeks",
+        "1–3 months",
         "More than 3 months",
         "Unknown"
       ]
@@ -442,6 +442,89 @@
         "required": [
           "additionalDetails"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "race": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "race"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "raceOther": {
+                "type": "string",
+                "title": "Please specify race/ethnicity"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "organ": {
+            "const": "Other"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "organOther": {
+            "type": "string",
+            "title": "Please specify organ"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pkpdCapabilities": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherPkpdCapabilities": {
+            "type": "string",
+            "title": "Please specify PK/PD capability/capabilities"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mechanismOfActionValidation": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherMechanismOfActionValidation": {
+            "type": "string",
+            "title": "Please specify mechanism(s) of action"
+          }
+        }
       }
     }
   ]

@@ -260,6 +260,88 @@
           "additionalDetails"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "softwareType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "softwareType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "softwareTypeOther": {
+                "type": "string",
+                "title": "Please specify software type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "programmingLanguage": {
+                "contains": {
+                  "const": "Other"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherProgrammingLanguage": {
+                "type": "string",
+                "title": "Please specify programming language(s)"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "analyticalPlatformSupport": {
+                "contains": {
+                  "const": "Other"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherAnalyticalPlatformSupport": {
+                "type": "string",
+                "title": "Please specify analytical platform(s)"
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

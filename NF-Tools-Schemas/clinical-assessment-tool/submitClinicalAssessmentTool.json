@@ -243,6 +243,61 @@
           "additionalDetails"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "assessmentType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "assessmentType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "assessmentTypeOther": {
+                "type": "string",
+                "title": "Please specify assessment type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "cognitiveAndBehavioralDomains": {
+                "contains": {
+                  "const": "Other"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherCognitiveAndBehavioralDomains": {
+                "type": "string",
+                "title": "Please specify cognitive/behavioral domain(s)"
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

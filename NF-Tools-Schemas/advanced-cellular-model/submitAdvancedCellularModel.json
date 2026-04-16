@@ -258,8 +258,8 @@
       "enum": [
         "",
         "Less than 1 month",
-        "1\u20133 months",
-        "3\u20136 months",
+        "1–3 months",
+        "3–6 months",
         "More than 6 months",
         "Unknown"
       ]
@@ -391,6 +391,258 @@
         "required": [
           "additionalDetails"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "modelType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "modelType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "modelTypeOther": {
+                "type": "string",
+                "title": "Please specify model type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "derivationSource": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "derivationSource"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "derivationSourceOther": {
+                "type": "string",
+                "title": "Please specify derivation source"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "organoidType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "organoidType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "organoidTypeOther": {
+                "type": "string",
+                "title": "Please specify organoid type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "matrixType": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "matrixType"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "matrixTypeOther": {
+                "type": "string",
+                "title": "Please specify matrix/scaffold type"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "cultureSystem": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "cultureSystem"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "cultureSystemOther": {
+                "type": "string",
+                "title": "Please specify culture system"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "characterizationMethods": {
+                "contains": {
+                  "const": "Other"
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "otherCharacterizationMethods": {
+                "type": "string",
+                "title": "Please specify characterization method(s)"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "nfManifestation": {
+                "const": "Other"
+              }
+            },
+            "required": [
+              "nfManifestation"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "basicInfo": {
+            "properties": {
+              "nfManifestationOther": {
+                "type": "string",
+                "title": "Please specify NF manifestation"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "routeOfAdministration": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherRouteOfAdministration": {
+            "type": "string",
+            "title": "Please specify route(s) of administration"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pkpdCapabilities": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherPkpdCapabilities": {
+            "type": "string",
+            "title": "Please specify PK/PD capability/capabilities"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mechanismOfActionValidation": {
+            "contains": {
+              "const": "Other"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "otherMechanismOfActionValidation": {
+            "type": "string",
+            "title": "Please specify mechanism(s) of action"
+          }
+        }
       }
     }
   ]
