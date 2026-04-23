@@ -32,6 +32,12 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_patient_derived_models.csv': 'syn73709228',  # PatientDerivedModelDetails table
     'CLEAN_clinical_assessment_tools.csv': 'syn73709229',  # ClinicalAssessmentToolDetails table
 
+    # Vendor / donor tables — syn26486850, syn26486843, syn26486829
+    'CLEAN_vendor.csv': 'syn26486850',        # Vendor table
+    'CLEAN_donor.csv': 'syn26486829',         # Donor table
+    # Note: CLEAN_vendorItem.csv is NOT uploaded here — it needs resourceId resolution
+    # via upsert_publication_links.py (run after resources are in Synapse)
+
     # Common tables
     'CLEAN_resources.csv': 'syn26450069',
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
@@ -71,6 +77,10 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'organoid_protocols': ['modelType', 'derivationSource'],
         'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
         'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation'],
+
+        # Vendor / donor tables
+        'vendor': ['vendorId', 'vendorName'],
+        'donor': ['donorId', 'species'],
 
         # Common tables
         'publications': ['publicationId', 'pmid'],

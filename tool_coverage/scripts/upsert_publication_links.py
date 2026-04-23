@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Upsert publication records and development links from submission CSVs to Synapse.
+Upsert publication records, development links, and vendor items from submission CSVs to Synapse.
 
 Sources (produced by compile_accepted_submissions.py):
   tool_coverage/outputs/submission_publications.csv
   tool_coverage/outputs/submission_dev_links.csv
+  tool_coverage/outputs/ACCEPTED_vendorItem.csv
 
 Targets:
   syn26486839  NF Tool Publications (base publication table)
   syn26486807  Tool Development links (tool ↔ development publication)
+  syn26486843  VendorItem (vendor ↔ resource catalog links; needs resourceId resolution)
 
-FK resolution for development links:
+FK resolution:
   publicationId : UUID5 already correct (same namespace as generate_review_csv.py)
   resourceId    : looked up from syn51730943 by (resourceName, resourceType)
 
@@ -28,6 +30,7 @@ from synapseclient import Table
 PUB_TABLE = "syn26486839"
 DEV_TABLE = "syn26486807"
 RES_TABLE = "syn51730943"
+VENDOR_ITEM_TABLE = "syn26486843"
 
 CSV_DIR_DEFAULT = "tool_coverage/outputs"
 
@@ -178,9 +181,93 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
     return len(rows_to_add)
 
 
+def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
+    """
+    Upsert vendor item records from ACCEPTED_vendorItem.csv to syn26486843.
+
+    Resolves resourceId from syn51730943 by (_resourceName, "Antibody").
+    Skips rows already present (by vendorItemId) or where resourceId cannot be resolved.
+    """
+    df = pd.read_csv(vendor_item_csv)
+    if df.empty:
+        print("  No vendor item rows to process")
+        return 0
+
+    print(f"  Fetching resource registry from {RES_TABLE}...")
+    res_df = syn.tableQuery(
+        f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
+    ).asDataFrame()
+    res_map: dict = {}
+    for _, row in res_df.iterrows():
+        rname = (row.get("resourceName") or "").strip()
+        rtype = row.get("resourceType", "")
+        res_map[(rname.lower(), rtype)] = row["resourceId"]
+
+    existing_vi = syn.tableQuery(
+        f"SELECT vendorItemId FROM {VENDOR_ITEM_TABLE}"
+    ).asDataFrame()
+    existing_ids = (
+        set(existing_vi["vendorItemId"].dropna())
+        if len(existing_vi) > 0 else set()
+    )
+
+    rows_to_add = []
+    skipped_dup = []
+    skipped_no_res = []
+
+    for _, row in df.iterrows():
+        vi_id = row.get("vendorItemId", "")
+        if vi_id in existing_ids:
+            skipped_dup.append(vi_id)
+            continue
+
+        resource_name = (row.get("_resourceName") or "").strip()
+        # Antibodies are the primary source of vendor items; try all types if needed
+        resource_id = res_map.get((resource_name.lower(), "Antibody")) or \
+                      next((v for k, v in res_map.items() if k[0] == resource_name.lower()), None)
+
+        if not resource_id:
+            skipped_no_res.append(resource_name)
+            continue
+
+        rows_to_add.append({
+            "vendorItemId": vi_id,
+            "vendorId": row.get("vendorId", ""),
+            "resourceId": resource_id,
+            "catalogNumber": row.get("catalogNumber", ""),
+            "catalogNumberURL": row.get("catalogNumberURL", ""),
+        })
+
+    print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
+          f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved "
+          f"| {len(skipped_dup)} duplicate")
+
+    if skipped_no_res:
+        print(f"  ⚠️  Could not resolve resourceId for {len(skipped_no_res)} row(s):")
+        for name in skipped_no_res[:10]:
+            print(f"    - {name}")
+        print("  (Resource may not yet be in syn51730943 — run upsert-tools first)")
+
+    if dry_run:
+        for r in rows_to_add:
+            print(f"    + {r['vendorItemId'][:8]}… catalog={r['catalogNumber']} "
+                  f"vendor={r['vendorId'][:8]}…")
+        return len(rows_to_add)
+
+    if rows_to_add:
+        df_clean = pd.DataFrame(rows_to_add)
+        syn.store(Table(VENDOR_ITEM_TABLE, df_clean))
+        syn.create_snapshot_version(VENDOR_ITEM_TABLE)
+        print(f"  ✅ Added {len(rows_to_add)} vendor items to {VENDOR_ITEM_TABLE}")
+    else:
+        print("  ✅ No new vendor items to add")
+
+    return len(rows_to_add)
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Upsert publication records and development links to Synapse."
+        description="Upsert publication records, development links, and vendor items to Synapse."
     )
     parser.add_argument(
         "--csv-dir", default=CSV_DIR_DEFAULT,
@@ -199,6 +286,10 @@ def main():
         "--skip-development", action="store_true",
         help=f"Skip upserting to the development links table ({DEV_TABLE})"
     )
+    parser.add_argument(
+        "--skip-vendor-items", action="store_true",
+        help=f"Skip upserting to the vendor item table ({VENDOR_ITEM_TABLE})"
+    )
     args = parser.parse_args()
 
     if args.dry_run:
@@ -211,23 +302,35 @@ def main():
 
     pub_csv = os.path.join(args.csv_dir, "submission_publications.csv")
     dev_csv = os.path.join(args.csv_dir, "submission_dev_links.csv")
+    vi_csv  = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
 
     total_added = 0
+    step = 1
 
     if not args.skip_publications:
         if not os.path.exists(pub_csv):
             print(f"⚠️  {pub_csv} not found — skipping publication upsert")
         else:
-            print(f"[1/2] Publications → {PUB_TABLE}")
+            print(f"[{step}/3] Publications → {PUB_TABLE}")
             total_added += upsert_publications(syn, pub_csv, args.dry_run)
             print()
+        step += 1
 
     if not args.skip_development:
         if not os.path.exists(dev_csv):
             print(f"⚠️  {dev_csv} not found — skipping development link upsert")
         else:
-            print(f"[2/2] Development links → {DEV_TABLE}")
+            print(f"[{step}/3] Development links → {DEV_TABLE}")
             total_added += upsert_development_links(syn, dev_csv, args.dry_run)
+            print()
+        step += 1
+
+    if not args.skip_vendor_items:
+        if not os.path.exists(vi_csv):
+            print(f"⚠️  {vi_csv} not found — skipping vendor item upsert")
+        else:
+            print(f"[{step}/3] Vendor items → {VENDOR_ITEM_TABLE}")
+            total_added += upsert_vendor_items(syn, vi_csv, args.dry_run)
             print()
 
     print("=" * 70)
