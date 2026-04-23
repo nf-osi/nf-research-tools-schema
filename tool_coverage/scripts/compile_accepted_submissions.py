@@ -87,8 +87,8 @@ COLUMNS = {
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
-    "advanced_cellular_models": [
-        "advancedCellularModelId", "modelType", "derivationSource", "cellTypes",
+    "organoid_protocols": [
+        "organoidProtocolId", "modelType", "derivationSource", "cellTypes",
         "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics",
@@ -119,7 +119,7 @@ CSV_FILES = {
     "genetic_reagents":         "ACCEPTED_genetic_reagents.csv",
     "patient_derived_models":   "ACCEPTED_patient_derived_models.csv",
     "computational_tools":      "ACCEPTED_computational_tools.csv",
-    "advanced_cellular_models": "ACCEPTED_advanced_cellular_models.csv",
+    "organoid_protocols": "ACCEPTED_organoid_protocols.csv",
     "clinical_assessment_tools":"ACCEPTED_clinical_assessment_tools.csv",
     "observations":             "ACCEPTED_observations.csv",
 }
@@ -238,7 +238,7 @@ def _resource_name_from_data(data: dict, ttype: str) -> str:
         return _get(data, "basicInfo.animalModelName", "animalModelName")
     if ttype == "genetic_reagent":
         return _get(data, "insertName")
-    if ttype in ("patient_derived_model", "advanced_cellular_model"):
+    if ttype in ("patient_derived_model", "organoid_protocol"):
         return _get(bi, "resourceName") or _get(data, "_resourceName")
     if ttype == "computational_tool":
         return _get(bi, "softwareName")
@@ -285,7 +285,7 @@ def _tool_type_from_json(data: dict) -> str | None:
         ("genetic_reagent",        ["insertName", "vectorType"]),
         ("patient_derived_model",  ["basicInfo.resourceName", "basicInfo.modelSystemType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareType"]),
-        ("advanced_cellular_model",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
+        ("organoid_protocol",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "basicInfo.assessmentType"]),
         ("observation",            ["resourceType", "observationType"]),
     ]
@@ -501,10 +501,10 @@ def _build_computational_tool(d: dict) -> dict:
     }
 
 
-def _build_advanced_cellular_model(d: dict) -> dict:
+def _build_organoid_protocol(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     return {
-        "advancedCellularModelId": "",
+        "organoidProtocolId": "",
         "modelType": _get(bi, "modelType"),
         "derivationSource": _get(bi, "derivationSource"),
         "cellTypes": _fmt_list(_get(bi, "cellTypes")),
@@ -691,7 +691,7 @@ _BUILDERS = {
     "genetic_reagent":         ("genetic_reagents",         _build_genetic_reagent),
     "patient_derived_model":   ("patient_derived_models",   _build_patient_derived_model),
     "computational_tool":      ("computational_tools",      _build_computational_tool),
-    "advanced_cellular_model": ("advanced_cellular_models", _build_advanced_cellular_model),
+    "organoid_protocol": ("organoid_protocols", _build_organoid_protocol),
     "clinical_assessment_tool":("clinical_assessment_tools",_build_clinical_assessment_tool),
     "observation":             ("observations",             _build_observation),
 }

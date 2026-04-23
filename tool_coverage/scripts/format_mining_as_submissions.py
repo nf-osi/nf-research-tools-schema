@@ -70,7 +70,7 @@ _RESOURCE_TYPE_MAP = {
     "cell_line":                "Cell Line",
     "genetic_reagent":          "Genetic Reagent",
     "computational_tool":       "Computational Tool",
-    "advanced_cellular_model":  "Advanced Cellular Model",
+    "organoid_protocol":  "Organoid Protocol",
     "patient_derived_model":    "Patient-Derived Model",
     "clinical_assessment_tool": "Clinical Assessment Tool",
 }
@@ -82,7 +82,7 @@ _RTYPE_TO_SUBDIR = {
     "Cell Line":                "cell_lines",
     "Genetic Reagent":          "genetic_reagents",
     "Computational Tool":       "computational_tools",
-    "Advanced Cellular Model":  "advanced_cellular_models",
+    "Organoid Protocol":  "organoid_protocols",
     "Patient-Derived Model":    "patient_derived_models",
     "Clinical Assessment Tool": "clinical_assessment_tools",
 }
@@ -95,7 +95,7 @@ _TYPE_CONFIG = {
     "genetic_reagents":        ("ACCEPTED_genetic_reagents.csv",        "genetic_reagents"),
     "patient_derived_models":  ("ACCEPTED_patient_derived_models.csv",  "patient_derived_models"),
     "computational_tools":     ("ACCEPTED_computational_tools.csv",     "computational_tools"),
-    "advanced_cellular_models":("ACCEPTED_advanced_cellular_models.csv","advanced_cellular_models"),
+    "organoid_protocols":("ACCEPTED_organoid_protocols.csv","organoid_protocols"),
     "clinical_assessment_tools":("ACCEPTED_clinical_assessment_tools.csv","clinical_assessment_tools"),
 }
 
@@ -334,12 +334,12 @@ def _computational_tool(row: dict) -> dict:
     }
 
 
-def _advanced_cellular_model(row: dict) -> dict:
+def _organoid_protocol(row: dict) -> dict:
     char_raw = row.get("characterizationMethods", "")
     cell_raw = row.get("cellTypes", "")
     return {
         **_meta(row),
-        "toolType": "advanced_cellular_model",
+        "toolType": "organoid_protocol",
         "userInfo": {},
         "basicInfo": {
             "modelName": row.get("_toolName") or row.get("_resourceName", ""),
@@ -489,7 +489,7 @@ _CONVERTERS = {
     "genetic_reagents":         _genetic_reagent,
     "patient_derived_models":   _patient_derived_model,
     "computational_tools":      _computational_tool,
-    "advanced_cellular_models": _advanced_cellular_model,
+    "organoid_protocols": _organoid_protocol,
     "clinical_assessment_tools":_clinical_assessment_tool,
 }
 

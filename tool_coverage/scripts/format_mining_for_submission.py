@@ -441,9 +441,9 @@ def format_computational_tools(mining_df):
     return pd.DataFrame(tool_rows)
 
 
-def format_advanced_cellular_models(mining_df):
+def format_organoid_protocols(mining_df):
     """
-    Format advanced cellular model suggestions for new Synapse table.
+    Format organoid protocol suggestions for new Synapse table.
 
     Processes NOVEL models only (organoids, assembloids, etc.).
     """
@@ -458,7 +458,7 @@ def format_advanced_cellular_models(mining_df):
         except:
             continue
 
-        models = novel_tools.get('advanced_cellular_models', [])
+        models = novel_tools.get('organoid_protocols', [])
         if not models:
             continue
 
@@ -467,10 +467,10 @@ def format_advanced_cellular_models(mining_df):
                 continue
 
             # Get extracted metadata
-            metadata = get_tool_metadata(row, 'advanced_cellular_models', model_name)
+            metadata = get_tool_metadata(row, 'organoid_protocols', model_name)
 
             model_rows.append({
-                'advancedCellularModelId': generate_uuid(),
+                'organoidProtocolId': generate_uuid(),
                 'modelType': '',  # To be filled manually (Organoid/Assembloid/etc.)
                 'derivationSource': '',
                 'cellTypes': [],
@@ -1029,14 +1029,14 @@ def main():
     else:
         print(" (none found)")
 
-    # Advanced Cellular Models
-    print("   - Advanced Cellular Models...", end='')
-    advanced_cellular_model_df = format_advanced_cellular_models(mining_df)
-    tool_csvs['Advanced Cellular Model'] = advanced_cellular_model_df
-    if not advanced_cellular_model_df.empty:
-        output_file = 'tool_coverage/outputs/SUBMIT_advanced_cellular_models.csv'
-        advanced_cellular_model_df.to_csv(output_file, index=False)
-        print(f" ✓ {len(advanced_cellular_model_df)} entries → {output_file}")
+    # Organoid Protocols
+    print("   - Organoid Protocols...", end='')
+    organoid_protocol_df = format_organoid_protocols(mining_df)
+    tool_csvs['Organoid Protocol'] = organoid_protocol_df
+    if not organoid_protocol_df.empty:
+        output_file = 'tool_coverage/outputs/SUBMIT_organoid_protocols.csv'
+        organoid_protocol_df.to_csv(output_file, index=False)
+        print(f" ✓ {len(organoid_protocol_df)} entries → {output_file}")
     else:
         print(" (none found)")
 

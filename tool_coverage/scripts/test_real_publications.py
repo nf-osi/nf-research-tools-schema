@@ -37,7 +37,7 @@ def extract_from_publication(pub_data):
 
     all_results = {
         'computational_tools': [],
-        'advanced_cellular_models': [],
+        'organoid_protocols': [],
         'patient_derived_models': [],
         'clinical_assessment_tools': []
     }
@@ -131,7 +131,7 @@ def print_report(stats, detailed_results):
 
     print("Example Extractions by Type:")
     print("-" * 80)
-    for tool_type in ['computational_tools', 'advanced_cellular_models',
+    for tool_type in ['computational_tools', 'organoid_protocols',
                       'patient_derived_models', 'clinical_assessment_tools']:
         if stats['example_tools'][tool_type]:
             print(f"\n{tool_type.upper().replace('_', ' ')}:")

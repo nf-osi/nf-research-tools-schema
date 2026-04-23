@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Extraction functions for new tool types: Computational Tools, Advanced Cellular Models,
+Extraction functions for new tool types: Computational Tools, Organoid Protocols,
 Patient-Derived Models, and Clinical Assessment Tools.
 
 These functions use pattern-based extraction since these tool types don't yet exist
@@ -192,9 +192,9 @@ def extract_tool_name_from_context(context: str, version_str: str) -> str:
     return version_str
 
 
-def extract_advanced_cellular_models(text: str, patterns: Dict = None) -> List[Dict]:
+def extract_organoid_protocols(text: str, patterns: Dict = None) -> List[Dict]:
     """
-    Extract advanced cellular models (organoids, assembloids) from text.
+    Extract organoid protocols (organoids, assembloids) from text.
 
     Uses:
     - Organoid/assembloid indicators
@@ -210,7 +210,7 @@ def extract_advanced_cellular_models(text: str, patterns: Dict = None) -> List[D
     """
     if patterns is None:
         all_patterns = load_mining_patterns()
-        patterns = all_patterns.get('advanced_cellular_models', {})
+        patterns = all_patterns.get('organoid_protocols', {})
 
     models = []
     seen_models = set()
@@ -242,7 +242,7 @@ def extract_advanced_cellular_models(text: str, patterns: Dict = None) -> List[D
                 if base_term not in seen_models:
                     models.append({
                         'name': model_desc,
-                        'type': 'advanced_cellular_models',
+                        'type': 'organoid_protocols',
                         'context': context,
                         'confidence': 0.8
                     })
@@ -463,8 +463,8 @@ def extract_all_new_tool_types(text: str) -> Dict[str, List[Dict]]:
     results = {
         'computational_tools': extract_computational_tools(text,
             patterns.get('computational_tools', {})),
-        'advanced_cellular_models': extract_advanced_cellular_models(text,
-            patterns.get('advanced_cellular_models', {})),
+        'organoid_protocols': extract_organoid_protocols(text,
+            patterns.get('organoid_protocols', {})),
         'patient_derived_models': extract_patient_derived_models(text,
             patterns.get('patient_derived_models', {})),
         'clinical_assessment_tools': extract_clinical_assessment_tools(text,

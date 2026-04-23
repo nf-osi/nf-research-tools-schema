@@ -16,7 +16,7 @@ The schema supports **9 resource types** for cataloging research tools:
 
 **New Types (v2.0):**
 - **Computational Tools** - Software, pipelines, analysis tools (50+ known tools)
-- **Advanced Cellular Models** - Organoids, assembloids, 3D cultures
+- **Organoid Protocols** - Organoids, assembloids, 3D cultures
 - **Patient-Derived Models** - PDX, xenografts, humanized systems
 - **Clinical Assessment Tools** - Questionnaires, scales, patient-reported outcomes (SF-36, PROMIS, PedsQL)
 

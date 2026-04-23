@@ -28,7 +28,7 @@ SYNAPSE_TABLE_MAP = {
 
     # New tool types (v2.0) - Created 2026-02-11
     'CLEAN_computational_tools.csv': 'syn73709226',  # ComputationalToolDetails table
-    'CLEAN_advanced_cellular_models.csv': 'syn73709227',  # AdvancedCellularModelDetails table
+    'CLEAN_organoid_protocols.csv': 'syn73709227',  # OrganoidProtocolDetails table
     'CLEAN_patient_derived_models.csv': 'syn73709228',  # PatientDerivedModelDetails table
     'CLEAN_clinical_assessment_tools.csv': 'syn73709229',  # ClinicalAssessmentToolDetails table
 
@@ -68,7 +68,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
 
         # New tool types (v2.0) — syn73709226-syn73709229
         'computational_tools': ['softwareName', 'softwareType'],
-        'advanced_cellular_models': ['modelType', 'derivationSource'],
+        'organoid_protocols': ['modelType', 'derivationSource'],
         'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
         'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation'],
 

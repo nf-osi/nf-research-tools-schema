@@ -48,9 +48,9 @@ db_config = [
                 "foreign_column_name": "computationalToolId"
             },
             {
-                "column_name": "advancedCellularModelId",
-                "foreign_table_name": "AdvancedCellularModelDetails",
-                "foreign_column_name": "advancedCellularModelId"
+                "column_name": "organoidProtocolId",
+                "foreign_table_name": "OrganoidProtocolDetails",
+                "foreign_column_name": "organoidProtocolId"
             },
             {
                 "column_name": "patientDerivedModelId",
@@ -73,8 +73,8 @@ db_config = [
         "primary_key": "computationalToolId"
     },
     {
-        "name": "AdvancedCellularModelDetails",
-        "primary_key": "advancedCellularModelId"
+        "name": "OrganoidProtocolDetails",
+        "primary_key": "organoidProtocolId"
     },
     {
         "name": "PatientDerivedModelDetails",

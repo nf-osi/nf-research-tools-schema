@@ -522,7 +522,7 @@ CRITICAL_FIELDS: dict[str, list[str]] = {
     'cell_lines':                ['_toolName', 'organ', 'cellLineGeneticDisorder'],
     'genetic_reagents':          ['insertName', 'vectorType'],
     'computational_tools':       ['softwareName', 'softwareType'],
-    'advanced_cellular_models':  ['_toolName', 'modelType', 'derivationSource'],
+    'organoid_protocols':  ['_toolName', 'modelType', 'derivationSource'],
     'patient_derived_models':    ['_toolName', 'modelSystemType', 'patientDiagnosis'],
     'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation', 'diseaseSpecific'],
 }
@@ -534,7 +534,7 @@ NAME_COLUMN: dict[str, str] = {
     'cell_lines':                '_toolName',
     'genetic_reagents':          'insertName',
     'computational_tools':       'softwareName',
-    'advanced_cellular_models':  '_toolName',
+    'organoid_protocols':  '_toolName',
     'patient_derived_models':    '_toolName',
     'clinical_assessment_tools': 'assessmentName',
     'resources':                 'resourceName',
@@ -549,7 +549,7 @@ CATEGORY_TO_TYPE: dict[str, str] = {
     'novel_cell_lines':                'cell_lines',
     'novel_genetic_reagents':          'genetic_reagents',
     'novel_computational_tools':       'computational_tools',
-    'novel_advanced_cellular_models':  'advanced_cellular_models',
+    'novel_organoid_protocols':  'organoid_protocols',
     'novel_patient_derived_models':    'patient_derived_models',
     'novel_clinical_assessment_tools': 'clinical_assessment_tools',
 }
@@ -563,7 +563,7 @@ PUB_REVIEW_FIELDS = [
     'novel_cell_lines',
     'novel_genetic_reagents',
     'novel_computational_tools',
-    'novel_advanced_cellular_models',
+    'novel_organoid_protocols',
     'novel_patient_derived_models',
     'novel_clinical_assessment_tools',
     # Tools already in Synapse Resource table (populated from resourceId lookup at upsert)
@@ -610,7 +610,7 @@ def _is_nf_specific(row: dict, tool_type: str) -> bool:
     if tool_type == 'patient_derived_models':
         diag = row.get('patientDiagnosis', '').lower()
         return any(k in diag for k in ('nf1', 'nf2', 'neurofibromatosis', 'schwannomatosis', 'mpnst', 'neurofibroma'))
-    if tool_type == 'advanced_cellular_models':
+    if tool_type == 'organoid_protocols':
         ctx = (row.get('_context', '') + row.get('_toolName', '')).lower()
         return any(k in ctx for k in ('nf1', 'nf2', 'neurofibromatosis', 'schwannoma', 'neurofibroma'))
     if tool_type == 'antibodies':
@@ -790,7 +790,7 @@ def _should_post_filter(row: dict, tool_type: str) -> tuple[bool, str]:
             return True, (f"Assessment name not in title and 'tool' not in title — "
                           f"likely generic usage, not development: {name}")
 
-    elif tool_type == 'advanced_cellular_models':
+    elif tool_type == 'organoid_protocols':
         # The publication title should mention 3D/organoid/spheroid terminology
         title_lc = pub_title.lower()
         _3D_TERMS = ('3d', '3-d', 'organoid', 'spheroid', 'sphere', 'tumoroid',
@@ -846,7 +846,7 @@ _TTYPE_PLURAL_TO_ID_COL: dict[str, str] = {
     'antibodies':                'antibodyId',
     'cell_lines':                'cellLineId',
     'genetic_reagents':          'geneticReagentId',
-    'advanced_cellular_models':  'advancedCellularModelId',
+    'organoid_protocols':  'organoidProtocolId',
     'computational_tools':       'computationalToolId',
     'patient_derived_models':    'patientDerivedModelId',
     'clinical_assessment_tools': 'clinicalAssessmentToolId',
@@ -879,8 +879,8 @@ _TYPE_SPECIFIC_SYNAPSE_COLS: dict[str, list[str]] = {
         '5primer', '3primer', '5primeCloningSite', '3primeCloningSite',
         '5primeSiteDestroyed', '3primeSiteDestroyed',
     ],
-    'advanced_cellular_models': [
-        'advancedCellularModelId', 'modelType', 'derivationSource', 'cellTypes',
+    'organoid_protocols': [
+        'organoidProtocolId', 'modelType', 'derivationSource', 'cellTypes',
         'organoidType', 'matrixType', 'cultureSystem', 'maturationTime',
         'characterizationMethods', 'passageNumber', 'cryopreservationProtocol',
         'qualityControlMetrics',
@@ -990,7 +990,7 @@ def _build_validated_lookup(output_path: Path) -> dict:
         'ACCEPTED_cell_lines':                'cell_lines',
         'ACCEPTED_genetic_reagents':          'genetic_reagents',
         'ACCEPTED_computational_tools':       'computational_tools',
-        'ACCEPTED_advanced_cellular_models':  'advanced_cellular_models',
+        'ACCEPTED_organoid_protocols':  'organoid_protocols',
         'ACCEPTED_patient_derived_models':    'patient_derived_models',
         'ACCEPTED_clinical_assessment_tools': 'clinical_assessment_tools',
     }
@@ -1071,7 +1071,7 @@ _TTYPE_TO_RESOURCE_TYPE: dict[str, str] = {
     'cell_lines':                'cell_line',
     'genetic_reagents':          'genetic_reagent',
     'computational_tools':       'computational_tool',
-    'advanced_cellular_models':  'advanced_cellular_model',
+    'organoid_protocols':  'organoid_protocol',
     'patient_derived_models':    'patient_derived_model',
     'clinical_assessment_tools': 'clinical_assessment_tool',
 }
@@ -1681,7 +1681,7 @@ _TTYPE_SINGULAR_TO_PLURAL: dict[str, str] = {
     'cell_line':                'cell_lines',
     'genetic_reagent':          'genetic_reagents',
     'computational_tool':       'computational_tools',
-    'advanced_cellular_model':  'advanced_cellular_models',
+    'organoid_protocol':  'organoid_protocols',
     'patient_derived_model':    'patient_derived_models',
     'clinical_assessment_tool': 'clinical_assessment_tools',
 }
@@ -1718,7 +1718,7 @@ def _load_synapse_ids() -> dict[str, str]:
         'cell line':                'cell_lines',
         'genetic reagent':          'genetic_reagents',
         'computational tool':       'computational_tools',
-        'advanced cellular model':  'advanced_cellular_models',
+        'organoid protocol':  'organoid_protocols',
         'patient-derived model':    'patient_derived_models',
         'clinical assessment tool': 'clinical_assessment_tools',
     }
@@ -1797,7 +1797,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         'cell_line':                'cell_lines',
         'genetic_reagent':          'genetic_reagents',
         'computational_tool':       'computational_tools',
-        'advanced_cellular_model':  'advanced_cellular_models',
+        'organoid_protocol':  'organoid_protocols',
         'patient_derived_model':    'patient_derived_models',
         'clinical_assessment_tool': 'clinical_assessment_tools',
     }
@@ -1807,7 +1807,7 @@ def _rebuild_resources_csv(output_path: Path, kept_norm_names: dict,
         'cell_line':                'Cell Line',
         'genetic_reagent':          'Genetic Reagent',
         'computational_tool':       'Computational Tool',
-        'advanced_cellular_model':  'Advanced Cellular Model',
+        'organoid_protocol':  'Organoid Protocol',
         'patient_derived_model':    'Patient-Derived Model',
         'clinical_assessment_tool': 'Clinical Assessment Tool',
     }
@@ -2300,7 +2300,7 @@ def _write_vendor_csvs(output_path: Path) -> dict[str, str]:
         'ACCEPTED_animal_models.csv',
         'ACCEPTED_genetic_reagents.csv',
         'ACCEPTED_patient_derived_models.csv',
-        'ACCEPTED_advanced_cellular_models.csv',
+        'ACCEPTED_organoid_protocols.csv',
         'ACCEPTED_clinical_assessment_tools.csv',
         'ACCEPTED_computational_tools.csv',
     ]

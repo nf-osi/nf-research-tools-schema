@@ -39,7 +39,7 @@ _TTYPE_TO_RTYPE = {
     "genetic_reagent":          "Genetic Reagent",
     "patient_derived_model":    "Patient-Derived Model",
     "computational_tool":       "Computational Tool",
-    "advanced_cellular_model":  "Advanced Cellular Model",
+    "organoid_protocol":  "Organoid Protocol",
     "clinical_assessment_tool": "Clinical Assessment Tool",
 }
 

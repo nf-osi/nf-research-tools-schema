@@ -13,7 +13,7 @@ submissions/
 ```
 
 Tool types: `animal_models`, `antibodies`, `cell_lines`, `genetic_reagents`,
-`patient_derived_models`, `advanced_cellular_models`, `computational_tools`,
+`patient_derived_models`, `organoid_protocols`, `computational_tools`,
 `clinical_assessment_tools`
 
 ## How submissions get into this folder
