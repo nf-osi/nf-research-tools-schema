@@ -7,177 +7,81 @@
       "type": "object",
       "title": "Organoid Protocol Information",
       "properties": {
-        "resourceName": {
-          "type": "string",
-          "title": "Name of Organoid Protocol"
-        },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
+        "resourceName": { "type": "string", "title": "Name of Organoid Protocol" },
+        "synonyms": { "type": "string", "title": "Synonyms" },
+        "description": { "type": "string", "title": "Description (~20-50 words)" },
         "modelType": {
           "type": "string",
           "title": "Type of Model",
-          "enum": [
-            "Organoid",
-            "Assembloid",
-            "Spheroid",
-            "3D Culture",
-            "Other"
-          ]
+          "enum": ["Organoid", "Assembloid", "Spheroid", "3D Culture", "Other"]
         },
         "derivationSource": {
           "type": "string",
           "title": "Derivation Source",
-          "enum": [
-            "iPSC",
-            "ESC",
-            "Primary Tissue",
-            "Cell Line",
-            "Patient-Derived",
-            "Other"
-          ]
+          "enum": ["iPSC", "ESC", "Primary Tissue", "Cell Line", "Patient-Derived", "Other"]
         },
         "cellTypes": {
           "type": "array",
           "title": "Cell Types Present",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "organoidType": {
           "type": "string",
           "title": "Organoid Type (if applicable)",
-          "enum": [
-            "Cerebral",
-            "Intestinal",
-            "Liver",
-            "Kidney",
-            "Cardiac",
-            "Retinal",
-            "Lung",
-            "Pancreatic",
-            "Other"
-          ]
+          "enum": ["Cerebral", "Intestinal", "Liver", "Kidney", "Cardiac", "Retinal", "Lung", "Pancreatic", "Other"]
         },
         "matrixType": {
           "type": "string",
           "title": "Matrix/Scaffold Type",
-          "enum": [
-            "Matrigel",
-            "BME",
-            "Hydrogel",
-            "Synthetic Matrix",
-            "Scaffold-Free",
-            "Other"
-          ]
+          "enum": ["Matrigel", "BME", "Hydrogel", "Synthetic Matrix", "Scaffold-Free", "Other"]
         },
         "cultureSystem": {
           "type": "string",
           "title": "Culture System",
-          "enum": [
-            "Static",
-            "Spinning Bioreactor",
-            "Microfluidic",
-            "Air-Liquid Interface",
-            "Other"
-          ]
+          "enum": ["Static", "Spinning Bioreactor", "Microfluidic", "Air-Liquid Interface", "Other"]
         },
         "cultureMedia": {
           "type": "string",
           "title": "Culture Media",
           "description": "Growth media used to culture this model (e.g. DMEM, RPMI 1640, mTeSR1). Include any supplements such as growth factors, serum, or antibiotics."
         },
-        "maturationTime": {
-          "type": "string",
-          "title": "Time Required for Maturation"
-        },
+        "maturationTime": { "type": "string", "title": "Time Required for Maturation" },
         "characterizationMethods": {
           "type": "array",
           "title": "Characterization Methods Used",
           "items": {
             "type": "string",
-            "enum": [
-              "Imaging",
-              "RNA-seq",
-              "scRNA-seq",
-              "Electrophysiology",
-              "Flow Cytometry",
-              "Methylation",
-              "Other"
-            ]
+            "enum": ["Immunofluorescence", "RNA-seq", "scRNA-seq", "Electrophysiology", "Imaging", "Other"]
           },
           "uniqueItems": true
         },
-        "passageNumber": {
-          "type": "string",
-          "title": "Passage Number (if applicable)"
-        },
-        "cryopreservationProtocol": {
-          "type": "string",
-          "title": "Cryopreservation Protocol (if available)"
-        },
+        "passageNumber": { "type": "string", "title": "Passage Number (if applicable)" },
+        "cryopreservationProtocol": { "type": "string", "title": "Cryopreservation Protocol (if available)" },
         "qualityControlMetrics": {
           "type": "array",
           "title": "Quality Control Metrics",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "nfGeneticDisorder": {
           "type": "string",
           "title": "NF Genetic Disorder",
-          "enum": [
-            "Neurofibromatosis Type 1",
-            "Neurofibromatosis Type 2",
-            "Schwannomatosis",
-            "NF1 Spontaneous Mutation",
-            "None"
-          ]
+          "enum": ["Neurofibromatosis Type 1", "Neurofibromatosis Type 2", "Schwannomatosis", "NF1 Spontaneous Mutation", "None"]
         },
         "nfManifestation": {
           "type": "string",
           "title": "NF Manifestation",
           "enum": [
-            "Plexiform Neurofibroma",
-            "Cutaneous Neurofibroma",
-            "Atypical Neurofibroma",
-            "Malignant Peripheral Nerve Sheath Tumor",
-            "Schwannoma",
-            "Meningioma",
-            "Low Grade Glioma",
-            "High Grade Glioma",
-            "Optic Nerve Glioma",
-            "Pheochromocytoma",
-            "Cognition",
-            "Other",
-            "None"
+            "Plexiform Neurofibroma", "Cutaneous Neurofibroma", "Atypical Neurofibroma",
+            "Malignant Peripheral Nerve Sheath Tumor", "Schwannoma", "Meningioma",
+            "Low Grade Glioma", "High Grade Glioma", "Optic Nerve Glioma",
+            "Pheochromocytoma", "Cognition", "Other", "None"
           ]
         },
-        "rrid": {
-          "type": "string",
-          "title": "RRID (if available)"
-        },
-        "developerName": {
-          "type": "string",
-          "title": "Developer Name"
-        },
-        "developerAffiliation": {
-          "type": "string",
-          "title": "Developer Affiliation"
-        }
+        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "developerName": { "type": "string", "title": "Developer Name" },
+        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
       },
-      "required": [
-        "resourceName",
-        "modelType",
-        "derivationSource",
-        "cellTypes",
-        "nfGeneticDisorder"
-      ]
+      "required": ["resourceName", "modelType", "derivationSource", "cellTypes", "nfGeneticDisorder"]
     },
     "bbbModelCapability": {
       "type": "boolean",
@@ -190,11 +94,7 @@
       "description": "Drug delivery routes that have been validated or are feasible in this model.",
       "items": {
         "type": "string",
-        "enum": [
-          "Direct media addition",
-          "Microfluidic perfusion",
-          "Other"
-        ]
+        "enum": ["Direct media addition", "Microfluidic perfusion", "Other"]
       },
       "uniqueItems": true
     },
@@ -243,26 +143,13 @@
       "type": "string",
       "title": "Age Relevance",
       "description": "Whether this model is derived from or suitable for studying pediatric, adult, or both age groups.",
-      "enum": [
-        "",
-        "Pediatric",
-        "Adult",
-        "Both",
-        "Unknown"
-      ]
+      "enum": ["", "Pediatric", "Adult", "Both", "Unknown"]
     },
     "timelineToResults": {
       "type": "string",
       "title": "Typical Timeline to Results",
       "description": "Estimated time from model establishment to primary endpoint readout.",
-      "enum": [
-        "",
-        "Less than 1 month",
-        "1–3 months",
-        "3–6 months",
-        "More than 6 months",
-        "Unknown"
-      ]
+      "enum": ["", "Less than 1 month", "1–3 months", "3–6 months", "More than 6 months", "Unknown"]
     },
     "modelLimitations": {
       "type": "string",
@@ -297,352 +184,49 @@
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": {
-        "type": "string",
-        "title": "DOI",
-        "pattern": "^$|^10\\."
-      }
+      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
     },
     "itemAcquisition": {
       "type": "string",
       "title": "How to acquire",
-      "enum": [
-        "Contact Developer",
-        "Purchase from Vendor",
-        "Other"
-      ],
+      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
       "default": "Contact Developer"
-    },
-    "resourceType": {
-      "type": "string",
-      "title": "Resource Type",
-      "default": "Organoid Protocol"
     },
     "contactEmail": {
       "type": "string",
       "title": "Your Contact Email (optional)",
       "description": "Your email address for follow-up questions about this submission.",
       "format": "email"
-    }
+    },
+    "resourceType": { "type": "string", "title": "Resource Type", "default": "Organoid Protocol" }
   },
-  "required": [
-    "basicInfo",
-    "itemAcquisition"
-  ],
+  "required": ["basicInfo", "itemAcquisition"],
   "allOf": [
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Contact Developer"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
       "then": {
         "properties": {
-          "developerContactEmail": {
-            "type": "string",
-            "title": "Developer Contact Email (optional)",
-            "format": "email"
-          }
+          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Purchase from Vendor"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
       "then": {
         "properties": {
-          "vendor": {
-            "type": "string",
-            "title": "Vendor Name"
-          },
-          "catalogNumber": {
-            "type": "string",
-            "title": "Catalog Number"
-          },
-          "catalogURL": {
-            "type": "string",
-            "title": "Link to vendor page"
-          }
+          "vendor": { "type": "string", "title": "Vendor Name" },
+          "catalogNumber": { "type": "string", "title": "Catalog Number" },
+          "catalogURL": { "type": "string", "title": "Link to vendor page" }
         }
       }
     },
     {
-      "if": {
-        "properties": {
-          "itemAcquisition": {
-            "const": "Other"
-          }
-        }
-      },
+      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
       "then": {
         "properties": {
-          "additionalDetails": {
-            "type": "string",
-            "title": "Please provide additional details."
-          }
+          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
         },
-        "required": [
-          "additionalDetails"
-        ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "modelType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "modelType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "modelTypeOther": {
-                "type": "string",
-                "title": "Please specify model type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "derivationSource": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "derivationSource"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "derivationSourceOther": {
-                "type": "string",
-                "title": "Please specify derivation source"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "organoidType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "organoidType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "organoidTypeOther": {
-                "type": "string",
-                "title": "Please specify organoid type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "matrixType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "matrixType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "matrixTypeOther": {
-                "type": "string",
-                "title": "Please specify matrix/scaffold type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "cultureSystem": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "cultureSystem"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "cultureSystemOther": {
-                "type": "string",
-                "title": "Please specify culture system"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "characterizationMethods": {
-                "contains": {
-                  "const": "Other"
-                }
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "otherCharacterizationMethods": {
-                "type": "string",
-                "title": "Please specify characterization method(s)"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "nfManifestation": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "nfManifestation"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "nfManifestationOther": {
-                "type": "string",
-                "title": "Please specify NF manifestation"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "routeOfAdministration": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherRouteOfAdministration": {
-            "type": "string",
-            "title": "Please specify route(s) of administration"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "pkpdCapabilities": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherPkpdCapabilities": {
-            "type": "string",
-            "title": "Please specify PK/PD capability/capabilities"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "mechanismOfActionValidation": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherMechanismOfActionValidation": {
-            "type": "string",
-            "title": "Please specify mechanism(s) of action"
-          }
-        }
+        "required": ["additionalDetails"]
       }
     }
   ]
