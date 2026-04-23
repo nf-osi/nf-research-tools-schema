@@ -33,9 +33,15 @@ on:
         required: false
         type: boolean
         default: false
+      max_reviews:
+        description: 'Max Sonnet reviews per run (blank = auto-calculate from timeout budget)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   issues: write
 
 # Cancel previous runs if a new one is triggered
@@ -77,32 +83,6 @@ jobs:
             echo "api_key_exists=false" >> $GITHUB_OUTPUT
             echo "⚠️  ANTHROPIC_API_KEY not found - AI validation will be skipped"
           fi
-
-      - name: Cache Goose CLI
-        if: steps.check_api_key.outputs.api_key_exists == 'true'
-        id: cache-goose
-        uses: actions/cache@v4
-        with:
-          path: ~/goose-bin
-          key: goose-1.23.2-linux-x86_64
-
-      - name: Install Goose CLI
-        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.cache-goose.outputs.cache-hit != 'true'
-        run: |
-          echo "Installing Goose CLI for AI validation..."
-          # Download pre-built binary from GitHub releases
-          GOOSE_VERSION="1.23.2"
-          mkdir -p ~/goose-bin
-          wget -q https://github.com/block/goose/releases/download/v${GOOSE_VERSION}/goose-x86_64-unknown-linux-gnu.tar.bz2
-          tar -xjf goose-x86_64-unknown-linux-gnu.tar.bz2 -C ~/goose-bin
-          chmod +x ~/goose-bin/goose
-          rm goose-x86_64-unknown-linux-gnu.tar.bz2
-
-      - name: Add Goose to PATH
-        if: steps.check_api_key.outputs.api_key_exists == 'true'
-        run: |
-          echo "$HOME/goose-bin" >> $GITHUB_PATH
-          ~/goose-bin/goose --version
 
       - name: Download artifacts from previous run (if skipping steps)
         if: github.event.inputs.skip_title_screening == 'true' || github.event.inputs.skip_abstract_screening == 'true'
@@ -262,12 +242,13 @@ jobs:
         run: |
           echo "Applying timeout protection to prevent workflow timeout..."
 
-          # Apply timeout protection using screened publications
+          # Phase 1 cache fetch is ~2s/pub (network + parse). Use 5s to be safe.
+          # Sonnet reviews are handled separately via --max-reviews below.
           python tool_coverage/scripts/timeout_protection.py \
             --publications-file tool_coverage/outputs/screened_publications.csv \
             --output-file tool_coverage/outputs/screened_publications_capped.csv \
             --deferred-file tool_coverage/outputs/publications_deferred.txt \
-            --time-per-publication 3.6 > timeout_result.json
+            --time-per-publication 5 > timeout_result.json
 
           # Check if publications were capped
           CAPPED=$(python -c "import json; data=json.load(open('timeout_result.json')); print(data.get('capped', False))")
@@ -288,6 +269,18 @@ jobs:
             echo "✓ All publications fit within timeout"
             echo "capped=false" >> $GITHUB_OUTPUT
           fi
+
+          # Calculate --max-reviews for the Sonnet step.
+          # Direct API call: ~30-60s per publication (vs 3-8 min with Goose).
+          # With 4 parallel workers: effective ~15-20s per publication.
+          # Budget: 300 min (5h). Conservative: 60s/pub effective = 300 pubs max.
+          # Override with workflow input if provided.
+          MAX_REVIEWS=300
+          if [ -n "${{ github.event.inputs.max_reviews }}" ]; then
+            MAX_REVIEWS="${{ github.event.inputs.max_reviews }}"
+          fi
+          echo "max_reviews=${MAX_REVIEWS}" >> $GITHUB_OUTPUT
+          echo "  Sonnet review cap: ${MAX_REVIEWS} publications per run"
 
       - name: Phase 1 - Fetch minimal cache (title + abstract + methods + metadata)
         id: phase1_cache
@@ -352,6 +345,18 @@ jobs:
 
           echo "prep_from_cache_complete=true" >> $GITHUB_OUTPUT
 
+      - name: Upload pre-validation artifacts (cache + screened lists)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-coverage-pre-validation
+          path: |
+            tool_coverage/outputs/
+            tool_reviews/publication_cache/
+          if-no-files-found: warn
+          retention-days: 7
+          overwrite: true
+
       - name: Run AI validation with Sonnet
         id: validation
         if: steps.check_api_key.outputs.api_key_exists == 'true'
@@ -368,6 +373,9 @@ jobs:
           if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
             CMD="$CMD --force-rereviews"
           fi
+
+          # Cap Sonnet reviews to fit within timeout budget
+          CMD="$CMD --max-reviews ${{ steps.timeout.outputs.max_reviews }}"
 
           # Run validation
           echo "Running: $CMD"
@@ -390,6 +398,31 @@ jobs:
             2>&1 | tee tool_coverage/outputs/phase2_cache_output.log
 
           echo "phase2_complete=true" >> $GITHUB_OUTPUT
+
+      - name: Phase 2 - Re-review upgraded publications for observations
+        id: phase2_review
+        if: steps.check_api_key.outputs.api_key_exists == 'true' && steps.phase2_cache.outputs.phase2_complete == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "Step 4c: Phase 2 - Re-reviewing publications with upgraded caches..."
+          echo "  Now that Results + Discussion are cached, Sonnet can extract observations"
+
+          if [ -f "tool_coverage/outputs/phase2_upgraded_pmids.txt" ] && [ -s "tool_coverage/outputs/phase2_upgraded_pmids.txt" ]; then
+            UPGRADED_COUNT=$(wc -l < tool_coverage/outputs/phase2_upgraded_pmids.txt)
+            echo "  Re-reviewing $UPGRADED_COUNT publications with upgraded caches..."
+
+            python tool_coverage/scripts/run_publication_reviews.py \
+              --mining-file tool_coverage/outputs/processed_publications.csv \
+              --pmids-file tool_coverage/outputs/phase2_upgraded_pmids.txt \
+              --force-rereviews \
+              --parallel-workers 4 \
+              2>&1 | tee tool_coverage/outputs/phase2_review_output.log
+          else
+            echo "  No publications were upgraded in phase 2 - skipping re-review"
+          fi
+
+          echo "phase2_review_complete=true" >> $GITHUB_OUTPUT
 
       - name: Apply pattern improvements
         id: pattern_improvements
@@ -459,15 +492,15 @@ jobs:
           retention-days: 90
 
       - name: Clean up log files before PR
-        if: steps.mining.outputs.mining_complete == 'true'
+        if: steps.validation.outputs.validation_complete == 'true'
         run: |
           echo "Removing log files from outputs (kept in artifacts)..."
           find tool_coverage/outputs -name "*.log" -type f -delete
           echo "Log files removed from working directory"
 
       - name: Create Pull Request with results
-        # Only create PR if mining step completed successfully
-        if: steps.mining.outputs.mining_complete == 'true'
+        # Only create PR if validation step completed successfully
+        if: steps.validation.outputs.validation_complete == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
