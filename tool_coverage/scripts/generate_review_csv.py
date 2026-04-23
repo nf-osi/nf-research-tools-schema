@@ -912,7 +912,9 @@ _RESOURCES_FIELDNAMES: list[str] = [
     'usageRequirements', 'howToAcquire',
     'dateAdded', 'dateModified',
     # FK IDs present in syn26450069 (animal model, antibody, cell line, genetic reagent, biobank).
-    # The 4 newer detail tables (computational, PDX, organoid, clinical) are not yet FK'd here.
+    # TODO: after adding computationalToolId, organoidProtocolId, patientDerivedModelId,
+    # and clinicalAssessmentToolId columns to syn26450069 via Synapse admin, add them here
+    # so the JOINs in the materialized view (tool_scoring.py update_materialized_view) work.
     'animalModelId', 'antibodyId', 'cellLineId', 'geneticReagentId', 'biobankId',
     '_pmid', '_doi', '_publicationTitle', '_year', '_confidence', '_toolType',
 ]
