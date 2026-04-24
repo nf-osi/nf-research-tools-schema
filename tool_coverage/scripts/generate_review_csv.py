@@ -894,7 +894,7 @@ _TYPE_SPECIFIC_SYNAPSE_COLS: dict[str, list[str]] = {
         'patientDerivedModelId', 'modelSystemType', 'patientDiagnosis', 'hostStrain',
         'tumorType', 'engraftmentSite', 'passageNumber', 'establishmentRate',
         'molecularCharacterization', 'clinicalData', 'humanizationMethod',
-        'immuneSystemComponents', 'validationMethods',
+        'immuneSystemComponents', 'validationMethods', 'donorId',
     ],
     'clinical_assessment_tools': [
         'clinicalAssessmentToolId', 'assessmentName', 'assessmentType', 'targetPopulation',

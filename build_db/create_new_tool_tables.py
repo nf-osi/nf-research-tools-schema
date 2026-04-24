@@ -86,6 +86,7 @@ def create_patient_derived_model_table(syn, parent_id):
 
     columns = [
         Column(name='patientDerivedModelId', columnType='STRING', maximumSize=50),
+        Column(name='donorId', columnType='STRING', maximumSize=50),
         Column(name='modelSystemType', columnType='STRING', maximumSize=100),
         Column(name='patientDiagnosis', columnType='STRING', maximumSize=200),
         Column(name='hostStrain', columnType='STRING', maximumSize=50),

@@ -77,6 +77,7 @@ COLUMNS = {
         "hostStrain", "tumorType", "engraftmentSite", "passageNumber",
         "establishmentRate", "molecularCharacterization", "clinicalData",
         "humanizationMethod", "immuneSystemComponents", "validationMethods",
+        "donorId",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex", "_age", "_race",
@@ -486,6 +487,7 @@ def _build_patient_derived_model(d: dict) -> dict:
     species = _get(bi, "species")
     return {
         "patientDerivedModelId": "",
+        "donorId": _make_donor_id(resource_name) if species else "",
         "modelSystemType": _get(bi, "modelSystemType"),
         "patientDiagnosis": _get(bi, "patientDiagnosis"),
         "hostStrain": _get(bi, "hostStrain"),
