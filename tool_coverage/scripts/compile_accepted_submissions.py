@@ -914,7 +914,17 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
             with open(out_path, newline="", encoding="utf-8") as f:
                 for r in csv.DictReader(f):
                     existing_ids.add(r.get(id_col, ""))
-        new_rows = [r for r in rows if r.get(id_col, "") not in existing_ids]
+        # Deduplicate within batch too (same donorId from cell line + PDM),
+        # keeping whichever record has more non-empty fields (PDM has age/race).
+        seen: dict[str, dict] = {}
+        for r in rows:
+            rid = r.get(id_col, "")
+            if rid in existing_ids:
+                continue
+            if rid not in seen or \
+               sum(bool(v) for v in r.values()) > sum(bool(v) for v in seen[rid].values()):
+                seen[rid] = r
+        new_rows = list(seen.values())
         if new_rows:
             write_header = not out_path.exists()
             with open(out_path, "a", newline="", encoding="utf-8") as f:
