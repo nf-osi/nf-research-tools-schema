@@ -135,7 +135,6 @@ jobs:
 
             - ${{ steps.annotation.outputs.new_count }} new cell line(s) from individualID annotations (syn52702673)
             - Compared against tools registry (syn51730943)
-            - Move to submissions/accepted/cell_lines/ to include in Synapse upload
           branch: annotation-submissions-${{ github.run_number }}
           delete-branch: true
           title: 'Annotation Review: ${{ steps.annotation.outputs.new_count }} new cell line suggestion(s)'
@@ -150,15 +149,11 @@ jobs:
             For each file in `submissions/cell_lines/` with `_source: annotation_review`:
 
             1. Confirm the cell line name is a real, NF-relevant cell line (not a sample ID or typo)
-            2. If valid, move it to `submissions/accepted/`:
-               ```bash
-               git mv submissions/cell_lines/annotation_<name>.json submissions/accepted/cell_lines/
-               ```
-            3. Fill in any known fields directly in the JSON (tissue, disease, species, etc.)
-            4. If not a cell line or a duplicate, delete the file
+            2. Fill in any known fields directly in the JSON (tissue, disease, species, etc.)
+            3. If not a cell line or a duplicate, **delete the file**
 
-            Merging this PR triggers `upsert-tools.yml` which compiles `submissions/accepted/**/*.json`
-            → `ACCEPTED_*.csv` → Synapse upload.
+            Everything remaining in `submissions/cell_lines/` at merge is uploaded automatically.
+            Merging this PR triggers `upsert-tools.yml` → `ACCEPTED_*.csv` → Synapse upload.
 
             > **Note**: These submissions have minimal metadata — only the cell line name and
             > source context are pre-filled. Additional fields should be completed during review.
@@ -200,8 +195,8 @@ jobs:
                 `Found **${newCount}** new cell line suggestion(s) from Synapse \`individualID\` annotations.`,
                 '',
                 `**Action required**: Review PR ${prUrl}`,
-                '- Move valid cell lines from `submissions/cell_lines/` → `submissions/accepted/cell_lines/`',
-                '- Delete any that are not real cell lines',
+                '- Fill in known fields (tissue, disease, species, etc.) for valid cell lines',
+                '- Delete any that are not real NF-relevant cell lines',
                 '- Merge the PR (can be combined with Formspark submissions in one PR)',
               ].join('\n');
             } else if ('${{ steps.annotation.outputs.has_new }}' === '') {
@@ -241,22 +236,21 @@ jobs:
               '   ```bash',
               '   python tool_coverage/scripts/process_formspark_export.py path/to/export.json',
               '   ```',
-              '5. - [ ] Review files written to `submissions/{tool_type}/`',
-              '6. - [ ] Move accepted submissions: `git mv submissions/{type}/form_*.json submissions/accepted/{type}/`',
-              '7. - [ ] Delete rejected submissions',
+              '5. - [ ] Review files written to `submissions/{tool_type}/` — edit to fill in missing fields, delete any that are duplicates or should not be added',
+              '6. - [ ] Delete rejected submissions',
               '',
               '---',
               '',
               '### Creating the PR',
               '',
-              '8. - [ ] Create a PR with all changes to `submissions/accepted/` (annotation + Formspark)',
-              '9. - [ ] Verify `git diff` shows only expected new entries',
-              '10. - [ ] Merge PR — `upsert-tools.yml` will compile and upload to Synapse automatically',
-              '11. - [ ] Manually update `ACCEPTED_resources.csv` with descriptions and synonyms from form submissions',
-              '12. - [ ] Close this issue',
+              '7. - [ ] Create a PR with all new/edited files in `submissions/` (annotation + Formspark)',
+              '8. - [ ] Verify `git diff` shows only expected new entries',
+              '9. - [ ] Merge PR — `upsert-tools.yml` will compile and upload to Synapse automatically',
+              '10. - [ ] Close this issue',
               '',
               '### Notes',
               '',
+              '- Everything remaining in `submissions/{type}/` at merge is uploaded — no `accepted/` subdirectory needed',
               '- If there are no Formspark submissions and no annotation suggestions, close this issue with label `no submissions`',
               '- Submitter contact info is printed by the script but never committed',
               '- Tool forms currently active on nf.synapse.org: **cell line, animal model, antibody, genetic reagent**',

@@ -1342,7 +1342,7 @@ def mine_abstract(abstract_text: str, tool_patterns: Dict[str, List[str]]) -> Tu
         'animal_models': set(),
         'genetic_reagents': set(),
         'computational_tools': set(),
-        'advanced_cellular_models': set(),
+        'organoid_protocols': set(),
         'patient_derived_models': set(),
         'clinical_assessment_tools': set()
     }
@@ -1403,7 +1403,7 @@ def mine_introduction_section(intro_text: str, tool_patterns: Dict[str, List[str
         'animal_models': set(),
         'genetic_reagents': set(),
         'computational_tools': set(),
-        'advanced_cellular_models': set(),
+        'organoid_protocols': set(),
         'patient_derived_models': set(),
         'clinical_assessment_tools': set()
     }
@@ -1497,7 +1497,7 @@ def mine_methods_section(methods_text: str, tool_patterns: Dict[str, List[str]])
         'animal_models': set(),
         'genetic_reagents': set(),
         'computational_tools': set(),
-        'advanced_cellular_models': set(),
+        'organoid_protocols': set(),
         'patient_derived_models': set(),
         'clinical_assessment_tools': set()
     }
@@ -1603,7 +1603,7 @@ def merge_mining_results(abstract_results: Tuple, methods_results: Tuple,
         'animal_models': set(),
         'genetic_reagents': set(),
         'computational_tools': set(),
-        'advanced_cellular_models': set(),
+        'organoid_protocols': set(),
         'patient_derived_models': set(),
         'clinical_assessment_tools': set()
     }

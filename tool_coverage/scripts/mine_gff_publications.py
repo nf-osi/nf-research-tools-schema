@@ -76,7 +76,7 @@ ANTHROPIC_MODEL = 'claude-sonnet-4-20250514'
 TOOL_VALIDATION_YAML_TEMPLATE = """\
 toolValidations:
   - toolName: "Exact tool name as it appears in text"
-    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "organoid_protocol" | "patient_derived_model" | "clinical_assessment_tool"
     verdict: "Accept" | "Reject" | "Uncertain"
     confidence: 0.0-1.0
     recommendation: "Keep" | "Remove" | "Manual Review Required"
@@ -88,7 +88,7 @@ toolValidations:
     # cell_line:              organ*, tissue, cellLineGeneticDisorder, cellLineManifestation, cellLineCategory
     # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker
     # computational_tool:     softwareType*, softwareVersion, programmingLanguage, sourceRepository
-    # advanced_cellular_model: modelType*, derivationSource*, cellTypes, organoidType, matrixType
+    # organoid_protocol: modelType*, derivationSource*, cellTypes, organoidType, matrixType
     # patient_derived_model:  modelSystemType*, patientDiagnosis*, hostStrain, tumorType, engraftmentSite
     # clinical_assessment_tool: assessmentType*, targetPopulation*, diseaseSpecific, numberOfItems
     # (* = critical, fill if at all possible)
@@ -497,7 +497,7 @@ TYPE_TO_STEM = {
     'cell_line': 'cell_lines',
     'genetic_reagent': 'genetic_reagents',
     'computational_tool': 'computational_tools',
-    'advanced_cellular_model': 'advanced_cellular_models',
+    'organoid_protocol': 'organoid_protocols',
     'patient_derived_model': 'patient_derived_models',
     'clinical_assessment_tool': 'clinical_assessment_tools',
 }
@@ -508,7 +508,7 @@ RESOURCE_TYPE_MAP = {
     'cell_line': 'Cell Line',
     'genetic_reagent': 'Genetic Reagent',
     'computational_tool': 'Computational Tool',
-    'advanced_cellular_model': 'Advanced Cellular Model',
+    'organoid_protocol': 'Organoid Protocol',
     'patient_derived_model': 'Patient-Derived Model',
     'clinical_assessment_tool': 'Clinical Assessment Tool',
 }
@@ -576,7 +576,7 @@ def make_detail_row(tool_type: str, tool_name: str, fields: dict) -> dict:
             'sourceRepository': _f(f, 'sourceRepository'),
             'RRID': '',
         }
-    elif tool_type == 'advanced_cellular_model':
+    elif tool_type == 'organoid_protocol':
         return {
             'modelType': _f(f, 'modelType'),
             'derivationSource': _f(f, 'derivationSource'),

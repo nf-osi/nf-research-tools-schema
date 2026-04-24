@@ -15,7 +15,7 @@ This repository includes an automated workflow to monitor tool coverage in the N
 
 **New Types (v2.0) - Expanded Coverage:**
 - 💻 **Computational Tools** - Software, pipelines, analysis tools (50+ known tools)
-- 🧪 **Advanced Cellular Models** - Organoids, assembloids, 3D cultures
+- 🧪 **Organoid Protocols** - Organoids, assembloids, 3D cultures
 - 🐁 **Patient-Derived Models** - PDX, xenografts, humanized systems
 - 📋 **Clinical Assessment Tools** - Questionnaires, scales, PROMs (SF-36, PROMIS, PedsQL)
 
@@ -456,7 +456,7 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 
 **New Tool Types (v2.0):**
 - Computational Tools: syn73709226
-- Advanced Cellular Models: syn73709227
+- Organoid Protocols: syn73709227
 - Patient-Derived Models: syn73709228
 - Clinical Assessment Tools: syn73709229
 
@@ -740,7 +740,7 @@ The mining process identifies potential tools in **nine categories**:
 
 **Computational & Model Systems:**
 - **Computational Tools** (💻) - Software (ImageJ, R, Python, STAR, Cell Ranger, etc.)
-- **Advanced Cellular Models** (🧪) - Organoids, assembloids, 3D cultures
+- **Organoid Protocols** (🧪) - Organoids, assembloids, 3D cultures
 - **Patient-Derived Models** (🐁) - PDX, xenografts, humanized mice
 
 **Clinical Tools:**

@@ -7,50 +7,118 @@
       "type": "object",
       "title": "Antibody Information",
       "properties": {
-        "antibodyName": { "type": "string", "title": "Name of Antibody" },
-        "synonyms": { "type": "string", "title": "Synonyms" },
-        "description": { "type": "string", "title": "Description (~20 words)" },
+        "antibodyName": {
+          "type": "string",
+          "title": "Name of Antibody"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20 words)"
+        },
         "hostOrganism": {
           "type": "string",
           "title": "Host Organism",
-          "enum": ["Mouse", "Rabbit", "Unknown"]
+          "enum": [
+            "Mouse",
+            "Rabbit",
+            "Unknown"
+          ]
         },
         "reactiveSpecies": {
           "type": "object",
           "title": "Reactive Species",
           "properties": {
-            "Human": { "type": "boolean" },
-            "Mouse": { "type": "boolean" },
-            "Rat": { "type": "boolean" },
-            "Chicken": { "type": "boolean" },
-            "Rabbit": { "type": "boolean" },
-            "Pig": { "type": "boolean" },
-            "Dog": { "type": "boolean" },
-            "Zebrafish": { "type": "boolean" },
-            "Fish": { "type": "boolean" },
-            "Non-humanprimate": { "type": "boolean" },
-            "GuineaPig": { "type": "boolean" },
-            "Hamster": { "type": "boolean" },
-            "Cow": { "type": "boolean" },
-            "Monkey": { "type": "boolean" },
-            "Avian": { "type": "boolean" },
-            "Horse": { "type": "boolean" },
-            "Rodent": { "type": "boolean" },
-            "Drosophila": { "type": "boolean" },
-            "Unknown": { "type": "boolean" }
+            "Human": {
+              "type": "boolean"
+            },
+            "Mouse": {
+              "type": "boolean"
+            },
+            "Rat": {
+              "type": "boolean"
+            },
+            "Chicken": {
+              "type": "boolean"
+            },
+            "Rabbit": {
+              "type": "boolean"
+            },
+            "Pig": {
+              "type": "boolean"
+            },
+            "Dog": {
+              "type": "boolean"
+            },
+            "Zebrafish": {
+              "type": "boolean"
+            },
+            "Fish": {
+              "type": "boolean"
+            },
+            "Non-humanprimate": {
+              "type": "boolean"
+            },
+            "GuineaPig": {
+              "type": "boolean"
+            },
+            "Hamster": {
+              "type": "boolean"
+            },
+            "Cow": {
+              "type": "boolean"
+            },
+            "Monkey": {
+              "type": "boolean"
+            },
+            "Avian": {
+              "type": "boolean"
+            },
+            "Horse": {
+              "type": "boolean"
+            },
+            "Rodent": {
+              "type": "boolean"
+            },
+            "Drosophila": {
+              "type": "boolean"
+            },
+            "Unknown": {
+              "type": "boolean"
+            }
           }
         },
-        "developerName": { "type": "string", "title": "Developer Name" },
-        "developerAffiliation": { "type": "string", "title": "Developer Affiliation" }
+        "developerName": {
+          "type": "string",
+          "title": "Developer Name"
+        },
+        "developerAffiliation": {
+          "type": "string",
+          "title": "Developer Affiliation"
+        }
       },
-      "required": ["antibodyName", "description", "hostOrganism", "reactiveSpecies"]
+      "required": [
+        "antibodyName",
+        "description",
+        "hostOrganism",
+        "reactiveSpecies"
+      ]
     },
     "conjugate": {
       "type": "string",
       "title": "Conjugated",
-      "enum": ["Conjugated", "Non-conjugated"]
+      "enum": [
+        "Conjugated",
+        "Non-conjugated"
+      ]
     },
-    "targetAntigen": { "type": "string", "title": "Target Antigen" },
+    "targetAntigen": {
+      "type": "string",
+      "title": "Target Antigen"
+    },
     "cloneId": {
       "type": "string",
       "title": "Clone ID",
@@ -64,7 +132,16 @@
     "clonality": {
       "type": "string",
       "title": "Clonality",
-      "enum": ["Monoclonal", "Polyclonal", "Secondary", "Recombinant", "Control", "Cocktail", "Isotope Control", "Unknown"]
+      "enum": [
+        "Monoclonal",
+        "Polyclonal",
+        "Secondary",
+        "Recombinant",
+        "Control",
+        "Cocktail",
+        "Isotope Control",
+        "Unknown"
+      ]
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -74,53 +151,102 @@
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+      "items": {
+        "type": "string",
+        "title": "DOI",
+        "pattern": "^$|^10\\."
+      }
     },
     "itemAcquisition": {
       "type": "string",
       "title": "How to acquire",
-      "enum": ["Contact Developer", "Purchase from Vendor", "Other"],
+      "enum": [
+        "Contact Developer",
+        "Purchase from Vendor",
+        "Other"
+      ],
       "default": "Contact Developer"
+    },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Antibody"
     },
     "contactEmail": {
       "type": "string",
       "title": "Your Contact Email (optional)",
       "description": "Your email address for follow-up questions about this submission.",
       "format": "email"
-    },
-    "resourceType": {
-      "type": "string",
-      "title": "Resource Type",
-      "default": "Antibody"
     }
   },
-  "required": ["basicInfo", "itemAcquisition", "targetAntigen", "uniprotId"],
+  "required": [
+    "basicInfo",
+    "itemAcquisition",
+    "targetAntigen",
+    "uniprotId"
+  ],
   "allOf": [
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Contact Developer" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Contact Developer"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "developerContactEmail": { "type": "string", "title": "Developer Contact Email (optional)", "format": "email" }
+          "developerContactEmail": {
+            "type": "string",
+            "title": "Developer Contact Email (optional)",
+            "format": "email"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Purchase from Vendor" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Purchase from Vendor"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "vendor": { "type": "string", "title": "Vendor Name" },
-          "catalogNumber": { "type": "string", "title": "Catalog Number" },
-          "catalogURL": { "type": "string", "title": "Link to vendor page" }
+          "vendor": {
+            "type": "string",
+            "title": "Vendor Name"
+          },
+          "catalogNumber": {
+            "type": "string",
+            "title": "Catalog Number"
+          },
+          "catalogURL": {
+            "type": "string",
+            "title": "Link to vendor page"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
         },
-        "required": ["additionalDetails"]
+        "required": [
+          "additionalDetails"
+        ]
       }
     }
   ]

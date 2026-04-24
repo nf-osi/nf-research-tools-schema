@@ -31,7 +31,7 @@ _TYPE_SUBDIRS = {
     "genetic_reagent":         "genetic_reagents",
     "patient_derived_model":   "patient_derived_models",
     "computational_tool":      "computational_tools",
-    "advanced_cellular_model": "advanced_cellular_models",
+    "organoid_protocol": "organoid_protocols",
     "clinical_assessment_tool":"clinical_assessment_tools",
     "observation":             "observations",
 }
@@ -67,7 +67,7 @@ def _detect_tool_type(s: dict) -> str | None:
         ("genetic_reagent",        ["insertName", "vectorType", "vectorBackbone"]),
         ("patient_derived_model",  ["basicInfo.modelName", "modelName", "basicInfo.modelSystemType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareName", "softwareType"]),
-        ("advanced_cellular_model",["basicInfo.modelType", "modelType", "derivationSource"]),
+        ("organoid_protocol",["basicInfo.modelType", "modelType", "derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "assessmentName", "assessmentType"]),
         ("observation",            ["observationsSection", "resourceType", "observationType"]),
     ]
@@ -85,7 +85,7 @@ def _resource_name(s: dict, ttype: str) -> str:
         "genetic_reagent":         ["insertName"],
         "patient_derived_model":   ["basicInfo.modelName", "modelName"],
         "computational_tool":      ["basicInfo.softwareName", "softwareName"],
-        "advanced_cellular_model": ["basicInfo.modelName", "modelName"],
+        "organoid_protocol": ["basicInfo.modelName", "modelName"],
         "clinical_assessment_tool":["basicInfo.assessmentName", "assessmentName"],
         "observation":             ["observationsSection.observations.0.resourceName", "resourceName"],
     }
