@@ -74,9 +74,15 @@ _STRIP_BEFORE_UPLOAD = {
         'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
         'licenseDetails',
     ],
-    # organoidProtocolId not yet added to syn73709227 — remove once schema updated:
+    # organoidProtocolId not yet added to syn73709227 — remove once schema updated
+    # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
     'CLEAN_organoid_protocols.csv': [
         'organoidProtocolId',
+        'qualityControlMetrics',
+    ],
+    # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
+    'CLEAN_patient_derived_models.csv': [
+        'validationMethods',
     ],
 }
 

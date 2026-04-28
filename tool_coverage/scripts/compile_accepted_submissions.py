@@ -566,7 +566,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "characterizationMethods": _fmt_list(_get(bi, "characterizationMethods")),
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
-        "qualityControlMetrics": _get(bi, "qualityControlMetrics"),
+        "qualityControlMetrics": _fmt_list(_get(bi, "qualityControlMetrics")),
         "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
