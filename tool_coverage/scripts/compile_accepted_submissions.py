@@ -305,7 +305,11 @@ def _resource_name_from_data(data: dict, ttype: str) -> str:
         return _get(data, "basicInfo.animalModelName", "animalModelName")
     if ttype == "genetic_reagent":
         return _get(data, "insertName")
-    if ttype in ("patient_derived_model", "organoid_protocol"):
+    if ttype == "patient_derived_model":
+        base = _get(bi, "resourceName") or _get(data, "_resourceName")
+        mst = _get(bi, "modelSystemType")
+        return f"{base} ({mst})" if mst else base
+    if ttype == "organoid_protocol":
         return _get(bi, "resourceName") or _get(data, "_resourceName")
     if ttype == "computational_tool":
         return _get(bi, "softwareName")
