@@ -515,11 +515,15 @@ def _build_genetic_reagent(d: dict) -> dict:
 def _build_patient_derived_model(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     resource_name = _get(bi, "resourceName") or _get(d, "_resourceName")
+    model_system_type = _get(bi, "modelSystemType")
+    # PDX and 3D culture variants of the same base name are distinct resources;
+    # append the modelSystemType so every downstream key (dedup, ID, lookup) is unique.
+    unique_name = f"{resource_name} ({model_system_type})" if model_system_type else resource_name
     species = _get(bi, "species")
     return {
         "patientDerivedModelId": "",
         "donorId": _make_donor_id(resource_name) if species else "",
-        "modelSystemType": _get(bi, "modelSystemType"),
+        "modelSystemType": model_system_type,
         "patientDiagnosis": _get(bi, "patientDiagnosis"),
         "hostStrain": _get(bi, "hostStrain"),
         "tumorType": _get(bi, "tumorType"),
@@ -531,7 +535,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "humanizationMethod": _get(bi, "humanizationMethod"),
         "immuneSystemComponents": _fmt_list(_get(bi, "immuneSystemComponents")),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
-        "_resourceName": resource_name,
+        "_resourceName": unique_name,
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -540,7 +544,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
         "_usageType": _get(d, "_usageType", default="novel"),
-        "_toolName": resource_name,
+        "_toolName": unique_name,
         "_species": species,
         "_sex": _get(bi, "sex"),
         "_age": str(_get(bi, "age")) if _get(bi, "age") else "",

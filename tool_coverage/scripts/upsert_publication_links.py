@@ -83,8 +83,13 @@ def _login() -> synapseclient.Synapse:
     return syn
 
 
-def _build_res_map(syn) -> dict:
-    """Return (name_lower, resourceType) → resourceId from syn51730943."""
+def _build_res_map(syn, csv_dir: str | None = None) -> dict:
+    """Return (name_lower, resourceType) → resourceId.
+
+    Combines syn51730943 (existing Synapse resources) with the local
+    ACCEPTED_resources.csv (newly compiled resources not yet in Synapse).
+    Local entries supplement but do not override Synapse entries.
+    """
     res_df = syn.tableQuery(
         f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
     ).asDataFrame()
@@ -93,6 +98,25 @@ def _build_res_map(syn) -> dict:
         rname = (row.get("resourceName") or "").strip()
         rtype = row.get("resourceType", "")
         res_map[(rname.lower(), rtype)] = row["resourceId"]
+
+    # Supplement with locally compiled resources (not yet in Synapse)
+    if csv_dir:
+        local_csv = os.path.join(csv_dir, "ACCEPTED_resources.csv")
+        if os.path.exists(local_csv):
+            local_df = pd.read_csv(local_csv)
+            added = 0
+            for _, row in local_df.iterrows():
+                rname = (row.get("resourceName") or "").strip()
+                rtype = row.get("resourceType", "")
+                rid = (row.get("resourceId") or "").strip()
+                if rname and rtype and rid:
+                    key = (rname.lower(), rtype)
+                    if key not in res_map:
+                        res_map[key] = rid
+                        added += 1
+            if added:
+                print(f"  + {added} local-only resource(s) added from ACCEPTED_resources.csv")
+
     return res_map
 
 
@@ -391,7 +415,7 @@ def main():
 
     # Build shared resource map once — reused by dev links, vendor items, investigators
     print(f"Fetching resource registry from {RES_TABLE}...")
-    res_map = _build_res_map(syn)
+    res_map = _build_res_map(syn, csv_dir=args.csv_dir)
     print(f"  {len(res_map)} resources loaded\n")
 
     total_added = 0
