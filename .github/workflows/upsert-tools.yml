@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'submissions/*/accepted/**/*.json'
+      - 'submissions/*/*.json'
   workflow_dispatch:  # Allow manual triggering
     inputs:
       dry_run:
@@ -41,7 +41,7 @@ jobs:
         id: changed_files
         run: |
           echo "=========================================="
-          echo "IDENTIFYING changed submissions/*/accepted/**/*.json"
+          echo "IDENTIFYING changed submissions/*/*.json"
           echo "=========================================="
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -56,7 +56,7 @@ jobs:
             git diff --name-only --diff-filter=AM \
               "${{ github.event.before }}" "${{ github.sha }}" \
               -- 'submissions/' \
-              | grep '/accepted/' \
+              | grep -v '/observations/' \
               | grep '\.json$' > changed_json_files.txt || true
 
             COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
@@ -74,15 +74,15 @@ jobs:
           echo "=========================================="
 
           if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
-            # workflow_dispatch or initial push — process all accepted files
-            if find submissions -path "*/accepted/*.json" | grep -q .; then
+            # workflow_dispatch or initial push — process all submission files
+            if find submissions -maxdepth 2 -name "*.json" ! -path "*/observations/*" | grep -q .; then
               python tool_coverage/scripts/compile_accepted_submissions.py \
                 --accepted-dir submissions \
                 --csv-dir tool_coverage/outputs
               echo "compile_ran=true" >> $GITHUB_OUTPUT
               echo "✅ Compilation complete (all files)"
             else
-              echo "No JSON files found in submissions/*/accepted/ — skipping"
+              echo "No JSON files found in submissions/*/ — skipping"
               echo "compile_ran=false" >> $GITHUB_OUTPUT
             fi
 
@@ -145,6 +145,22 @@ jobs:
           echo "=========================================="
           python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
+      - name: Dry-run preview - publications and development links
+        if: steps.check_files.outputs.has_files == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "DRY-RUN: Preview of publication/dev link uploads"
+          echo "=========================================="
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+            python tool_coverage/scripts/upsert_publication_links.py \
+              --csv-dir tool_coverage/outputs \
+              --dry-run
+          else
+            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+          fi
+
       - name: Confirm and upload to Synapse
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
@@ -157,6 +173,23 @@ jobs:
 
           echo ""
           echo "✅ Upload completed successfully"
+
+      - name: Upsert publications and development links to Synapse
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "UPSERTING Publications + Development Links"
+          echo "=========================================="
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+            python tool_coverage/scripts/upsert_publication_links.py \
+              --csv-dir tool_coverage/outputs
+            echo ""
+            echo "✅ Publication and development link upsert complete"
+          else
+            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+          fi
 
       - name: Dry-run mode - skip upload
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run == 'true'
@@ -210,7 +243,16 @@ jobs:
             echo "- Antibodies: syn26486811" >> $GITHUB_STEP_SUMMARY
             echo "- Cell Lines: syn26486823" >> $GITHUB_STEP_SUMMARY
             echo "- Genetic Reagents: syn26486832" >> $GITHUB_STEP_SUMMARY
-            echo "- Resources (links): syn51730943" >> $GITHUB_STEP_SUMMARY
+            echo "- Patient-Derived Models: syn73709228" >> $GITHUB_STEP_SUMMARY
+            echo "- Organoid Protocols: syn73709227" >> $GITHUB_STEP_SUMMARY
+            echo "- Computational Tools: syn73709226" >> $GITHUB_STEP_SUMMARY
+            echo "- Clinical Assessment Tools: syn73709229" >> $GITHUB_STEP_SUMMARY
+            echo "- Vendor: syn26486850" >> $GITHUB_STEP_SUMMARY
+            echo "- VendorItem: syn26486843" >> $GITHUB_STEP_SUMMARY
+            echo "- Donor: syn26486829" >> $GITHUB_STEP_SUMMARY
+            echo "- Resources: syn26450069" >> $GITHUB_STEP_SUMMARY
+            echo "- Publications: syn26486839" >> $GITHUB_STEP_SUMMARY
+            echo "- Development links: syn26486807" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Coverage Report**: Updated GFF_Tool_Coverage_Report.pdf generated (see artifacts)" >> $GITHUB_STEP_SUMMARY
           fi

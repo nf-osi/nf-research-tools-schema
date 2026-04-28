@@ -15,7 +15,7 @@ Different tool types require different amounts of publication text for accurate 
 |-----------|---------------|-----------|
 | **Computational Tools** | Title + Abstract | Tool name, purpose, and approach usually in abstract |
 | **Clinical Assessment Tools** | Title + Abstract | Questionnaire development/validation described in abstract |
-| **Advanced Cellular Models** | Title + Abstract | Novel organoid/3D culture systems highlighted in abstract |
+| **Organoid Protocols** | Title + Abstract | Novel organoid/3D culture systems highlighted in abstract |
 | **Cell Lines** | Methods | Specific cell line names/identifiers primarily in methods |
 | **Animal Models** | Methods | Strain nomenclature and genotypes detailed in methods |
 | **Patient-Derived Models** | Methods | PDX identifiers and establishment procedures in methods |
@@ -535,7 +535,7 @@ def get_publication_metadata(pmid, cache_dir):
 **Current**: Haiku screens ALL abstracts after title screening
 **Optimization**: Enhance title screening for novel tool development
 
-**Rationale**: For novel tool development publications (computational tools, clinical assessment tools, advanced cellular models), the tool acronym or name is usually in the TITLE.
+**Rationale**: For novel tool development publications (computational tools, clinical assessment tools, organoid protocols), the tool acronym or name is usually in the TITLE.
 
 **Proposed Enhancement**:
 ```yaml

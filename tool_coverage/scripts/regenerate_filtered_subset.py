@@ -81,7 +81,7 @@ FUNDING_AGENCY_MAP = {
 DEVELOPMENT_TOOL_TYPES = [
     'Computational Tool',
     'Patient-Derived Model',
-    'Advanced Cellular Model',
+    'Organoid Protocol',
     'Clinical Assessment Tool'
 ]
 
@@ -94,7 +94,7 @@ ACCEPTED_FILE_TO_TYPE = {
     'ACCEPTED_genetic_reagents.csv': 'Genetic Reagent',
     'ACCEPTED_computational_tools.csv': 'Computational Tool',
     'ACCEPTED_patient_derived_models.csv': 'Patient-Derived Model',
-    'ACCEPTED_advanced_cellular_models.csv': 'Advanced Cellular Model',
+    'ACCEPTED_organoid_protocols.csv': 'Organoid Protocol',
     'ACCEPTED_clinical_assessment_tools.csv': 'Clinical Assessment Tool'
 }
 

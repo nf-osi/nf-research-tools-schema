@@ -7,16 +7,33 @@
       "type": "object",
       "title": "Biobank Information",
       "properties": {
-        "biobankName": { "type": "string", "title": "Name of Biobank" },
-        "synonyms": { "type": "string", "title": "Synonyms or Abbreviations" },
-        "description": { "type": "string", "title": "Description (~20-50 words)" },
-        "biobankURL": { "type": "string", "title": "Biobank URL", "format": "uri" },
+        "biobankName": {
+          "type": "string",
+          "title": "Name of Biobank"
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Abbreviations"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
+        },
+        "biobankURL": {
+          "type": "string",
+          "title": "Biobank URL",
+          "format": "uri"
+        },
         "diseaseType": {
           "type": "array",
           "title": "NF Disease Type(s)",
           "items": {
             "type": "string",
-            "enum": ["Neurofibromatosis type 1", "Neurofibromatosis type 2", "Schwannomatosis"]
+            "enum": [
+              "Neurofibromatosis type 1",
+              "Neurofibromatosis type 2",
+              "Schwannomatosis"
+            ]
           },
           "uniqueItems": true
         },
@@ -25,7 +42,15 @@
           "title": "Specimen Types Available",
           "items": {
             "type": "string",
-            "enum": ["cell lines", "human tissue", "xenograft tumors", "blood", "DNA", "RNA", "Other"]
+            "enum": [
+              "cell lines",
+              "human tissue",
+              "xenograft tumors",
+              "blood",
+              "DNA",
+              "RNA",
+              "Other"
+            ]
           },
           "uniqueItems": true
         },
@@ -34,7 +59,15 @@
           "title": "Tissue Types Represented",
           "items": {
             "type": "string",
-            "enum": ["Tumor", "Blood", "Bone", "Cerebrospinal Fluid", "Brain", "Skin", "Other"]
+            "enum": [
+              "Tumor",
+              "Blood",
+              "Bone",
+              "Cerebrospinal Fluid",
+              "Brain",
+              "Skin",
+              "Other"
+            ]
           },
           "uniqueItems": true
         },
@@ -44,10 +77,18 @@
           "items": {
             "type": "string",
             "enum": [
-              "plexiform neurofibroma", "cutaneous neurofibroma", "atypical neurofibroma",
-              "malignant peripheral nerve sheath tumor", "schwannoma", "meningioma",
-              "optic nerve glioma", "low grade glioma", "high grade glioma",
-              "neurofibroma NOS", "diffuse infiltrating neurofibroma", "Other"
+              "plexiform neurofibroma",
+              "cutaneous neurofibroma",
+              "atypical neurofibroma",
+              "malignant peripheral nerve sheath tumor",
+              "schwannoma",
+              "meningioma",
+              "optic nerve glioma",
+              "low grade glioma",
+              "high grade glioma",
+              "neurofibroma NOS",
+              "diffuse infiltrating neurofibroma",
+              "Other"
             ]
           },
           "uniqueItems": true
@@ -57,7 +98,15 @@
           "title": "Specimen Preparation Methods",
           "items": {
             "type": "string",
-            "enum": ["Flash frozen", "FFPE", "Cryopreserved", "RNA later", "Formalin-fixed", "Ethanol", "Other"]
+            "enum": [
+              "Flash frozen",
+              "FFPE",
+              "Cryopreserved",
+              "RNA later",
+              "Formalin-fixed",
+              "Ethanol",
+              "Other"
+            ]
           },
           "uniqueItems": true
         },
@@ -66,12 +115,26 @@
           "title": "Specimen Formats Available",
           "items": {
             "type": "string",
-            "enum": ["whole tumor", "DNA", "RNA", "cells", "whole cell lysate", "FFPE sections", "Other"]
+            "enum": [
+              "whole tumor",
+              "DNA",
+              "RNA",
+              "cells",
+              "whole cell lysate",
+              "FFPE sections",
+              "Other"
+            ]
           },
           "uniqueItems": true
         },
-        "contact": { "type": "string", "title": "Contact / Acquisition Instructions" },
-        "rrid": { "type": "string", "title": "RRID (if available)" },
+        "contact": {
+          "type": "string",
+          "title": "Contact / Acquisition Instructions"
+        },
+        "rrid": {
+          "type": "string",
+          "title": "RRID (if available)"
+        },
         "mtaRequired": {
           "type": "boolean",
           "title": "MTA Required?",
@@ -82,10 +145,19 @@
           "title": "Affiliated with NGNRI Repository?",
           "description": "Whether this biobank operates under or is affiliated with the NGNRI equitable access framework."
         },
-        "developerName": { "type": "string", "title": "Curator/Contact Name" },
-        "developerAffiliation": { "type": "string", "title": "Curator/Contact Affiliation" }
+        "developerName": {
+          "type": "string",
+          "title": "Curator/Contact Name"
+        },
+        "developerAffiliation": {
+          "type": "string",
+          "title": "Curator/Contact Affiliation"
+        }
       },
-      "required": ["biobankName", "biobankURL"]
+      "required": [
+        "biobankName",
+        "biobankURL"
+      ]
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -95,7 +167,11 @@
     "usagePublicationDOIs": {
       "type": "array",
       "title": "Usage Publication DOI(s)",
-      "items": { "type": "string", "title": "DOI", "pattern": "^$|^10\\." }
+      "items": {
+        "type": "string",
+        "title": "DOI",
+        "pattern": "^$|^10\\."
+      }
     },
     "itemAcquisition": {
       "type": "string",
@@ -106,39 +182,77 @@
         "Other"
       ]
     },
+    "resourceType": {
+      "type": "string",
+      "title": "Resource Type",
+      "default": "Biobank"
+    },
     "contactEmail": {
       "type": "string",
       "title": "Your Contact Email (optional)",
       "description": "Your email address for follow-up questions about this submission.",
       "format": "email"
-    },
-    "resourceType": { "type": "string", "title": "Resource Type", "default": "Biobank" }
+    }
   },
-  "required": ["basicInfo", "itemAcquisition"],
+  "required": [
+    "basicInfo",
+    "itemAcquisition"
+  ],
   "allOf": [
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Submit Request" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Submit Request"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "requestFormURL": { "type": "string", "title": "Request Form URL", "format": "uri" }
+          "requestFormURL": {
+            "type": "string",
+            "title": "Request Form URL",
+            "format": "uri"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Contact Curator" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Contact Curator"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "developerContactEmail": { "type": "string", "title": "Curator Contact Email (optional)", "format": "email" }
+          "developerContactEmail": {
+            "type": "string",
+            "title": "Curator Contact Email (optional)",
+            "format": "email"
+          }
         }
       }
     },
     {
-      "if": { "properties": { "itemAcquisition": { "const": "Other" } } },
+      "if": {
+        "properties": {
+          "itemAcquisition": {
+            "const": "Other"
+          }
+        }
+      },
       "then": {
         "properties": {
-          "additionalDetails": { "type": "string", "title": "Please provide additional details." }
+          "additionalDetails": {
+            "type": "string",
+            "title": "Please provide additional details."
+          }
         },
-        "required": ["additionalDetails"]
+        "required": [
+          "additionalDetails"
+        ]
       }
     }
   ]

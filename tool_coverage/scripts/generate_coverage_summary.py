@@ -21,7 +21,7 @@ TOOL_TYPE_LABELS = {
     'genetic_reagents':        ('🧬', 'Genetic Reagents'),
     'computational_tools':     ('💻', 'Computational Tools'),
     'clinical_assessment_tools': ('📋', 'Clinical Assessment Tools'),
-    'advanced_cellular_models':  ('🫧', 'Advanced Cellular Models'),
+    'organoid_protocols':  ('🫧', 'Organoid Protocols'),
     'patient_derived_models':    ('🧪', 'Patient-Derived Models'),
 }
 

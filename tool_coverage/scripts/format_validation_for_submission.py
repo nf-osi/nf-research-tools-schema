@@ -38,7 +38,7 @@ CRITICAL_FIELDS_BY_TYPE = {
     'Genetic Reagent': ['insertName', 'insertSpecies', 'vectorType'],
     'Computational Tool': [],  # No critical fields required (name and type are sufficient)
     'Patient-Derived Model': ['modelSystemType', 'tumorType'],
-    'Advanced Cellular Model': ['modelType', 'derivationSource'],
+    'Organoid Protocol': ['modelType', 'derivationSource'],
     'Clinical Assessment Tool': ['assessmentType', 'targetPopulation']
 }
 
@@ -845,8 +845,8 @@ def is_generic_tool(tool_name, tool_type):
             if re.search(pattern, name_lower):
                 return True
 
-    # Filter advanced cellular models (generic culture methods)
-    elif tool_type == 'advanced_cellular_model':
+    # Filter organoid protocols (generic culture methods)
+    elif tool_type == 'organoid_protocol':
         # Check against generic 3D culture methodologies
         if name_lower in GENERIC_3D_CULTURE_METHODS:
             return True
@@ -1093,7 +1093,7 @@ def normalize_tool_type(tool_type):
         'genetic_reagent': 'Genetic Reagent',
         'computational_tool': 'Computational Tool',
         'patient_derived_model': 'Patient-Derived Model',
-        'advanced_cellular_model': 'Advanced Cellular Model',
+        'organoid_protocol': 'Organoid Protocol',
         'clinical_assessment_tool': 'Clinical Assessment Tool'
     }
 
@@ -1482,9 +1482,9 @@ def format_validated_tools(tools_df):
             formatted = format_clinical_assessment_tools(type_tools)
             tool_dfs['Clinical Assessment Tool'] = formatted
 
-        elif tool_type == 'advanced_cellular_model':
-            formatted = format_advanced_cellular_models(type_tools)
-            tool_dfs['Advanced Cellular Model'] = formatted
+        elif tool_type == 'organoid_protocol':
+            formatted = format_organoid_protocols(type_tools)
+            tool_dfs['Organoid Protocol'] = formatted
 
         elif tool_type == 'patient_derived_model':
             formatted = format_patient_derived_models(type_tools)
@@ -1853,15 +1853,15 @@ def format_clinical_assessment_tools(tools_df):
     return pd.DataFrame(rows)
 
 
-def format_advanced_cellular_models(tools_df):
-    """Format advanced cellular models for Synapse AdvancedCellularModelDetails table (syn73709227)."""
+def format_organoid_protocols(tools_df):
+    """Format organoid protocols for Synapse OrganoidProtocolDetails table (syn73709227)."""
     rows = []
 
     for _, tool in tools_df.iterrows():
         tool_id = generate_uuid()
         # Note: Synapse table does NOT have 'modelName' - name goes in Resource table
         rows.append({
-            'advancedCellularModelId': tool_id,
+            'organoidProtocolId': tool_id,
             'modelType': '',  # organoid, spheroid, etc.
             'derivationSource': '',
             'cellTypes': '',
@@ -1937,7 +1937,7 @@ def format_resources(tool_dfs):
     the original 4 tool types. The new tool types need their columns added:
     - computationalToolId (STRING)
     - clinicalAssessmentToolId (STRING)
-    - advancedCellularModelId (STRING)
+    - organoidProtocolId (STRING)
     - patientDerivedModelId (STRING)
 
     Until then, these IDs are stored in tracking fields (_detailTableId, _detailTableType).
@@ -1958,7 +1958,7 @@ def format_resources(tool_dfs):
         'Cell Line': ('cellLineId', 'Cell Line'),
         'Genetic Reagent': ('geneticReagentId', 'Genetic Reagent'),
         'Clinical Assessment Tool': ('clinicalAssessmentToolId', 'Clinical Assessment Tool'),
-        'Advanced Cellular Model': ('advancedCellularModelId', 'Advanced Cellular Model'),
+        'Organoid Protocol': ('organoidProtocolId', 'Organoid Protocol'),
         'Patient-Derived Model': ('patientDerivedModelId', 'Patient-Derived Model')
     }
 
@@ -1985,7 +1985,7 @@ def format_resources(tool_dfs):
             name_col = 'insertName'
         elif tool_type_key == 'Clinical Assessment Tool':
             name_col = 'assessmentName'
-        elif tool_type_key in ['Advanced Cellular Model', 'Patient-Derived Model']:
+        elif tool_type_key in ['Organoid Protocol', 'Patient-Derived Model']:
             name_col = '_modelName'  # Special case - name in tracking field
 
         # Create resource entries (deduplicated globally using normalized names)
@@ -2157,8 +2157,8 @@ def format_usage_links(tool_dfs, resources_df, publications_df):
                 detail_id_col = 'geneticReagentId'
             elif tool_type == 'Clinical Assessment Tool':
                 detail_id_col = 'clinicalAssessmentToolId'
-            elif tool_type == 'Advanced Cellular Model':
-                detail_id_col = 'advancedCellularModelId'
+            elif tool_type == 'Organoid Protocol':
+                detail_id_col = 'organoidProtocolId'
             elif tool_type == 'Patient-Derived Model':
                 detail_id_col = 'patientDerivedModelId'
 
@@ -2519,7 +2519,7 @@ def main():
         'Cell Line': 'cell_lines',
         'Genetic Reagent': 'genetic_reagents',
         'Clinical Assessment Tool': 'clinical_assessment_tools',
-        'Advanced Cellular Model': 'advanced_cellular_models',
+        'Organoid Protocol': 'organoid_protocols',
         'Patient-Derived Model': 'patient_derived_models'
     }
 

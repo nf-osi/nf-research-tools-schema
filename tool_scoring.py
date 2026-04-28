@@ -144,6 +144,14 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
             fields = ["insertName", "insertSpecies", "vectorType", "insertEntrezId", "vectorBackbone"]
         elif tool_type == "Biobank":
             fields = ["specimenTissueType", "diseaseType", "tumorType", "specimenFormat", "specimenType"]
+        elif tool_type == "Patient-Derived Model":
+            fields = ["modelSystemType", "patientDiagnosis", "hostStrain", "tumorType"]
+        elif tool_type == "Computational Tool":
+            fields = ["softwareName", "softwareType", "sourceRepository", "licenseType"]
+        elif tool_type == "Organoid Protocol":
+            fields = ["modelType", "derivationSource", "organoidType", "cultureSystem"]
+        elif tool_type == "Clinical Assessment Tool":
+            fields = ["assessmentName", "assessmentType", "targetPopulation", "diseaseSpecific"]
         else:
             fields = []
 
@@ -174,6 +182,14 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
             fields = ["synonyms", "promoter"]
         elif tool_type == "Biobank":
             fields = ["specimenPreparationMethod"]
+        elif tool_type == "Patient-Derived Model":
+            fields = ["engraftmentSite", "clinicalData"]
+        elif tool_type == "Computational Tool":
+            fields = ["programmingLanguage", "documentation"]
+        elif tool_type == "Organoid Protocol":
+            fields = ["cellTypes", "matrixType"]
+        elif tool_type == "Clinical Assessment Tool":
+            fields = ["scoringMethod", "availabilityStatus"]
         else:
             fields = []
 
@@ -255,6 +271,18 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     print("Reading Genetic Reagent data...")
     genetic_reagent_df = syn.tableQuery("SELECT * FROM syn26486832").asDataFrame()
 
+    print("Reading Computational Tool data...")
+    computational_tool_df = syn.tableQuery("SELECT * FROM syn73709226").asDataFrame()
+
+    print("Reading Organoid Protocol data...")
+    organoid_protocol_df = syn.tableQuery("SELECT * FROM syn73709227").asDataFrame()
+
+    print("Reading Patient-Derived Model data...")
+    patient_derived_model_df = syn.tableQuery("SELECT * FROM syn73709228").asDataFrame()
+
+    print("Reading Clinical Assessment Tool data...")
+    clinical_assessment_tool_df = syn.tableQuery("SELECT * FROM syn73709229").asDataFrame()
+
     # Join base resource data with type-specific data
     print("Joining resource data with type-specific tables...")
 
@@ -287,6 +315,30 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
         resource_df = resource_df.merge(
             genetic_reagent_df[genetic_reagent_df['geneticReagentId'].notna()],
             on='geneticReagentId', how='left', suffixes=('', '_genetic')
+        )
+
+    if 'computationalToolId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            computational_tool_df[computational_tool_df['computationalToolId'].notna()],
+            on='computationalToolId', how='left', suffixes=('', '_comptool')
+        )
+
+    if 'organoidProtocolId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            organoid_protocol_df[organoid_protocol_df['organoidProtocolId'].notna()],
+            on='organoidProtocolId', how='left', suffixes=('', '_organoid')
+        )
+
+    if 'patientDerivedModelId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            patient_derived_model_df[patient_derived_model_df['patientDerivedModelId'].notna()],
+            on='patientDerivedModelId', how='left', suffixes=('', '_pdm')
+        )
+
+    if 'clinicalAssessmentToolId' in resource_df.columns:
+        resource_df = resource_df.merge(
+            clinical_assessment_tool_df[clinical_assessment_tool_df['clinicalAssessmentToolId'].notna()],
+            on='clinicalAssessmentToolId', how='left', suffixes=('', '_cat')
         )
 
     # Read observations data
@@ -586,6 +638,26 @@ def update_materialized_view(syn: synapseclient.Synapse, view_id: str, scores_ta
     AB.targetAntigen AS targetAntigen,
     AB.reactiveSpecies AS reactiveSpecies,
     AB.hostOrganism AS hostOrganism,
+    PDM.modelSystemType AS modelSystemType,
+    PDM.patientDiagnosis AS patientDiagnosis,
+    PDM.hostStrain AS hostStrain,
+    PDM.tumorType AS pdmTumorType,
+    PDM.engraftmentSite AS engraftmentSite,
+    PDM.clinicalData AS clinicalData,
+    CT.softwareName AS softwareName,
+    CT.softwareType AS softwareType,
+    CT.programmingLanguage AS programmingLanguage,
+    CT.sourceRepository AS sourceRepository,
+    CT.licenseType AS licenseType,
+    OP.modelType AS modelType,
+    OP.derivationSource AS derivationSource,
+    OP.organoidType AS organoidType,
+    OP.cultureSystem AS cultureSystem,
+    CAT.assessmentName AS assessmentName,
+    CAT.assessmentType AS assessmentType,
+    CAT.targetPopulation AS targetPopulation,
+    CAT.diseaseSpecific AS diseaseSpecific,
+    CAT.availabilityStatus AS availabilityStatus,
     BB.biobankName AS biobankName,
     BB.biobankURL AS biobankURL,
     BB.specimenTissueType AS specimenTissueType,
@@ -617,6 +689,14 @@ LEFT JOIN
     syn26486832 GR ON (R.geneticReagentId = GR.geneticReagentId)
 LEFT JOIN
     syn26486811 AB ON (R.antibodyId = AB.antibodyId)
+LEFT JOIN
+    syn73709228 PDM ON (R.patientDerivedModelId = PDM.patientDerivedModelId)
+LEFT JOIN
+    syn73709226 CT ON (R.computationalToolId = CT.computationalToolId)
+LEFT JOIN
+    syn73709227 OP ON (R.organoidProtocolId = OP.organoidProtocolId)
+LEFT JOIN
+    syn73709229 CAT ON (R.clinicalAssessmentToolId = CAT.clinicalAssessmentToolId)
 LEFT JOIN
     syn26486821 BB ON (R.resourceId = BB.resourceId)
 LEFT JOIN

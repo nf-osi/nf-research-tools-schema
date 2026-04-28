@@ -118,7 +118,7 @@ def generate_review_summary():
         row['antibodies'] = tool_types.get('antibody', 0)
         row['computationalTools'] = tool_types.get('computational_tool', 0)
         row['patientDerivedModels'] = tool_types.get('patient_derived_model', 0)
-        row['advancedCellularModels'] = tool_types.get('advanced_cellular_model', 0)
+        row['organoidProtocols'] = tool_types.get('organoid_protocol', 0)
         row['clinicalAssessmentTools'] = tool_types.get('clinical_assessment_tool', 0)
 
         # New tools discovered by Sonnet (from missed tools)
@@ -197,7 +197,7 @@ def generate_review_summary():
         'pmid', 'publicationTitle', 'year', 'journal', 'publicationType', 'queryType',
         'totalMinedTools', 'acceptedTools', 'rejectedTools', 'uncertainTools', 'missedTools',
         'cellLines', 'animalModels', 'geneticReagents', 'antibodies',
-        'computationalTools', 'patientDerivedModels', 'advancedCellularModels', 'clinicalAssessmentTools',
+        'computationalTools', 'patientDerivedModels', 'organoidProtocols', 'clinicalAssessmentTools',
         'acceptedToolNames', 'newToolsDiscovered',
         'observationsExtracted', 'topObservationTypes',
         'sampleMetadata', 'sampleContext',

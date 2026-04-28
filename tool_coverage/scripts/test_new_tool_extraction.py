@@ -6,7 +6,7 @@ Comprehensive tests for new tool type extraction functions.
 import sys
 from extract_new_tool_types import (
     extract_computational_tools,
-    extract_advanced_cellular_models,
+    extract_organoid_protocols,
     extract_patient_derived_models,
     extract_clinical_assessment_tools,
     extract_all_new_tool_types
@@ -69,9 +69,9 @@ def test_computational_tools():
     return passed == len(test_cases)
 
 
-def test_advanced_cellular_models():
-    """Test advanced cellular model extraction."""
-    print("Testing Advanced Cellular Models Extraction")
+def test_organoid_protocols():
+    """Test organoid protocol extraction."""
+    print("Testing Organoid Protocols Extraction")
     print("=" * 60)
 
     test_cases = [
@@ -103,7 +103,7 @@ def test_advanced_cellular_models():
 
     passed = 0
     for tc in test_cases:
-        results = extract_advanced_cellular_models(tc["text"])
+        results = extract_organoid_protocols(tc["text"])
         success = len(results) >= tc["expected_count"]
 
         if tc["expected_term"]:
@@ -279,7 +279,7 @@ def test_integrated_extraction():
     # Expected counts (approximate)
     expected = {
         'computational_tools': 2,  # ImageJ, Python, GitHub repo
-        'advanced_cellular_models': 1,  # cerebral organoids
+        'organoid_protocols': 1,  # cerebral organoids
         'patient_derived_models': 2,  # PDX, NSG
         'clinical_assessment_tools': 1  # SF-36
     }
@@ -307,7 +307,7 @@ def run_all_tests():
     results = []
 
     results.append(("Computational Tools", test_computational_tools()))
-    results.append(("Advanced Cellular Models", test_advanced_cellular_models()))
+    results.append(("Organoid Protocols", test_organoid_protocols()))
     results.append(("Patient-Derived Models", test_patient_derived_models()))
     results.append(("Clinical Assessment Tools", test_clinical_assessment_tools()))
     results.append(("Integrated Extraction", test_integrated_extraction()))

@@ -268,7 +268,7 @@ def mine_text_section_improved(text: str, tool_patterns: Dict[str, List[str]],
         'animal_models': set(),
         'genetic_reagents': set(),
         'computational_tools': set(),
-        'advanced_cellular_models': set(),
+        'organoid_protocols': set(),
         'patient_derived_models': set(),
         'clinical_assessment_tools': set()
     }
@@ -646,7 +646,7 @@ def main():
 
     # Initialize all tool types (including those not in Resource table)
     all_tool_types = ['cell_lines', 'antibodies', 'animal_models', 'genetic_reagents',
-                      'computational_tools', 'advanced_cellular_models',
+                      'computational_tools', 'organoid_protocols',
                       'patient_derived_models', 'clinical_assessment_tools']
 
     # Ensure existing_tools has all types (empty dict if not present)
@@ -683,14 +683,14 @@ def main():
                 print(f"   - Loaded {len(comp_patterns['tool_names'])} computational tool names")
 
         # Add other pattern types if they have tool_names
-        for tool_type in ['advanced_cellular_models', 'patient_derived_models', 'clinical_assessment_tools']:
+        for tool_type in ['organoid_protocols', 'patient_derived_models', 'clinical_assessment_tools']:
             if tool_type not in tool_patterns:
                 tool_patterns[tool_type] = []
             # These will be empty for now but structure is ready
     else:
         print(f"   ⚠️  Warning: {patterns_file} not found")
         tool_patterns['computational_tools'] = []
-        tool_patterns['advanced_cellular_models'] = []
+        tool_patterns['organoid_protocols'] = []
         tool_patterns['patient_derived_models'] = []
         tool_patterns['clinical_assessment_tools'] = []
 

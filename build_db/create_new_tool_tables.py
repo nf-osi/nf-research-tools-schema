@@ -4,7 +4,7 @@ Create 4 new tool type tables in Synapse for v2.0 schema expansion.
 
 Tables created:
 - ComputationalToolDetails
-- AdvancedCellularModelDetails
+- OrganoidProtocolDetails
 - PatientDerivedModelDetails
 - ClinicalAssessmentToolDetails
 
@@ -50,12 +50,12 @@ def create_computational_tool_table(syn, parent_id):
     return table.id
 
 
-def create_advanced_cellular_model_table(syn, parent_id):
-    """Create AdvancedCellularModelDetails table."""
-    print("\n2. Creating AdvancedCellularModelDetails table...")
+def create_organoid_protocol_table(syn, parent_id):
+    """Create OrganoidProtocolDetails table."""
+    print("\n2. Creating OrganoidProtocolDetails table...")
 
     columns = [
-        Column(name='advancedCellularModelId', columnType='STRING', maximumSize=50),
+        Column(name='organoidProtocolId', columnType='STRING', maximumSize=50),
         Column(name='modelType', columnType='STRING', maximumSize=50),
         Column(name='derivationSource', columnType='STRING', maximumSize=100),
         Column(name='cellTypes', columnType='STRING_LIST', maximumSize=50, maximumListLength=10),
@@ -70,7 +70,7 @@ def create_advanced_cellular_model_table(syn, parent_id):
     ]
 
     schema = Schema(
-        name='AdvancedCellularModelDetails',
+        name='OrganoidProtocolDetails',
         columns=columns,
         parent=parent_id
     )
@@ -86,6 +86,7 @@ def create_patient_derived_model_table(syn, parent_id):
 
     columns = [
         Column(name='patientDerivedModelId', columnType='STRING', maximumSize=50),
+        Column(name='donorId', columnType='STRING', maximumSize=50),
         Column(name='modelSystemType', columnType='STRING', maximumSize=100),
         Column(name='patientDiagnosis', columnType='STRING', maximumSize=200),
         Column(name='hostStrain', columnType='STRING', maximumSize=50),
@@ -171,7 +172,7 @@ def main():
 
     try:
         table_ids['computational_tools'] = create_computational_tool_table(syn, parent_id)
-        table_ids['advanced_cellular_models'] = create_advanced_cellular_model_table(syn, parent_id)
+        table_ids['organoid_protocols'] = create_organoid_protocol_table(syn, parent_id)
         table_ids['patient_derived_models'] = create_patient_derived_model_table(syn, parent_id)
         table_ids['clinical_assessment_tools'] = create_clinical_assessment_tool_table(syn, parent_id)
 
@@ -181,7 +182,7 @@ def main():
         print("=" * 80)
         print("\nTable IDs:")
         print(f"  ComputationalToolDetails:        {table_ids['computational_tools']}")
-        print(f"  AdvancedCellularModelDetails:    {table_ids['advanced_cellular_models']}")
+        print(f"  OrganoidProtocolDetails:    {table_ids['organoid_protocols']}")
         print(f"  PatientDerivedModelDetails:      {table_ids['patient_derived_models']}")
         print(f"  ClinicalAssessmentToolDetails:   {table_ids['clinical_assessment_tools']}")
 
@@ -193,7 +194,7 @@ def main():
         print("\nSYNAPSE_TABLE_MAP = {")
         print("    # ... existing mappings ...")
         print(f"    'CLEAN_computational_tools.csv': '{table_ids['computational_tools']}',")
-        print(f"    'CLEAN_advanced_cellular_models.csv': '{table_ids['advanced_cellular_models']}',")
+        print(f"    'CLEAN_organoid_protocols.csv': '{table_ids['organoid_protocols']}',")
         print(f"    'CLEAN_patient_derived_models.csv': '{table_ids['patient_derived_models']}',")
         print(f"    'CLEAN_clinical_assessment_tools.csv': '{table_ids['clinical_assessment_tools']}',")
         print("}")

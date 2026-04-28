@@ -12,7 +12,7 @@ Tool Types:
 4. Antibodies
 5. Computational Tools
 6. Patient-Derived Models
-7. Advanced Cellular Models
+7. Organoid Protocols
 8. Clinical Assessment Tools
 """
 
@@ -374,8 +374,8 @@ def extract_patient_derived_model_metadata(model_name, context, reasoning):
     return metadata
 
 
-def extract_advanced_cellular_model_metadata(model_name, context, reasoning):
-    """Extract metadata for advanced cellular models from text."""
+def extract_organoid_protocol_metadata(model_name, context, reasoning):
+    """Extract metadata for organoid protocols from text."""
     if pd.isna(context):
         context = ""
     if pd.isna(reasoning):
@@ -592,10 +592,10 @@ def enrich_all_tool_types():
             'use_observations': False
         },
         {
-            'name': 'Advanced Cellular Models',
-            'file': 'tool_coverage/outputs/ACCEPTED_advanced_cellular_models.csv',
+            'name': 'Organoid Protocols',
+            'file': 'tool_coverage/outputs/ACCEPTED_organoid_protocols.csv',
             'name_col': '_modelName',
-            'extractor': extract_advanced_cellular_model_metadata,
+            'extractor': extract_organoid_protocol_metadata,
             'use_observations': False
         },
         {

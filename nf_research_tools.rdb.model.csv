@@ -1,18 +1,18 @@
 Attribute,Description,Valid Values,DependsOn,Required,Source,Parent,Properties,DependsOn Component,Validation Rules
 Component,Type of submitted information.,,,TRUE,,,,,
-resource,"A tool used in the research process (i.e. animal model, cell line, etc.)",,"Component, resourceId, rrid, resourceName, synonyms, resourceType, description, aiSummary, usageRequirements, howToAcquire, dateAdded, dateModified",FALSE,,,"resourceId, animalModelId, antibodyId, cellLineId, geneticReagentId, biobankId, computationalToolId, advancedCellularModelId, patientDerivedModelId, clinicalAssessmentToolId, rrid, resourceName, synonyms, resourceType, description, aiSummary, usageRequirements, howToAcquire, dateAdded, dateModified","geneticReagentDetails, antibodyDetails, cellLineDetails, animalModelDetails, biobankDetails, computationalToolDetails, advancedCellularModelDetails, patientDerivedModelDetails, clinicalAssessmentToolDetails",
+resource,"A tool used in the research process (i.e. animal model, cell line, etc.)",,"Component, resourceId, rrid, resourceName, synonyms, resourceType, description, aiSummary, usageRequirements, howToAcquire, dateAdded, dateModified",FALSE,,,"resourceId, animalModelId, antibodyId, cellLineId, geneticReagentId, biobankId, computationalToolId, organoidProtocolId, patientDerivedModelId, clinicalAssessmentToolId, rrid, resourceName, synonyms, resourceType, description, aiSummary, usageRequirements, howToAcquire, dateAdded, dateModified","geneticReagentDetails, antibodyDetails, cellLineDetails, animalModelDetails, biobankDetails, computationalToolDetails, organoidProtocolDetails, patientDerivedModelDetails, clinicalAssessmentToolDetails",
 resourceId,A unique identifier for the resource.,,,TRUE,,resource,,,
 rrid,"The RRID, a standard resource identifier that will facilitate interoperability with other databases, and is an increasingly-used identifier for publications https://scicrunch.org/resources if available. Must include the lowercase 'rrid:' prefix.",,,FALSE,,resource,,,match ^rrid:[a-zA-Z]+.+$
 resourceName,The 'canonical' name of the resource,,,TRUE,,resource,,,
 synonyms,Synonyms of the resource,,,FALSE,,resource,,,list like
-resourceType,"Type of resource. (e.g. animal model, antibody, plasmid, etc.)","Animal Model, Cell Line, Antibody, Genetic Reagent, Biobank, Computational Tool, Advanced Cellular Model, Patient-Derived Model, Clinical Assessment Tool",,TRUE,,resource,,,
+resourceType,"Type of resource. (e.g. animal model, antibody, plasmid, etc.)","Animal Model, Cell Line, Antibody, Genetic Reagent, Biobank, Computational Tool, Organoid Protocol, Patient-Derived Model, Clinical Assessment Tool",,TRUE,,resource,,,
 Animal Model,,,animalModelId,,,resourceType,,,
 Cell Line,,,cellLineId,,,resourceType,,,
 Genetic Reagent,,,geneticReagentId,,,resourceType,,,
 Antibody,,,antibodyId,,,resourceType,,,
 Biobank,,,biobankId,,,resourceType,,,
 Computational Tool,,,computationalToolId,,,resourceType,,,
-Advanced Cellular Model,,,advancedCellularModelId,,,resourceType,,,
+Organoid Protocol,,,organoidProtocolId,,,resourceType,,,
 Patient-Derived Model,,,patientDerivedModelId,,,resourceType,,,
 Clinical Assessment Tool,,,clinicalAssessmentToolId,,,resourceType,,,
 description,Free text description/summary/overview/purpose of the resource.,,,FALSE,,resource,,,
@@ -81,19 +81,19 @@ dependencies,Key software dependencies or requirements.,,,FALSE,,computationalTo
 systemRequirements,"System requirements (OS, memory, compute).",,,FALSE,,computationalToolDetails,,,
 lastUpdate,Date of last software update or release.,,,FALSE,,computationalToolDetails,,,
 maintainer,Name or organization maintaining the software.,,,FALSE,,computationalToolDetails,,,
-advancedCellularModelDetails,Advanced 3D cellular models including organoids and assembloids.,,"Component, advancedCellularModelId, modelType, derivationSource, cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber, cryopreservationProtocol, qualityControlMetrics",FALSE,,advancedCellularModelDetails,"advancedCellularModelId, modelType, derivationSource, cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber, cryopreservationProtocol, qualityControlMetrics",,
-advancedCellularModelId,A unique identifier for the advanced cellular model.,,,FALSE,,advancedCellularModelDetails,,,
-modelType,Type of advanced cellular model.,"Organoid, Assembloid, Spheroid, 3D Culture, Other",,TRUE,,advancedCellularModelDetails,,,
-derivationSource,Source of cells used to generate the model.,"iPSC, ESC, Primary Tissue, Cell Line, Patient-Derived, Other",,TRUE,,advancedCellularModelDetails,,,
-cellTypes,Cell types present in the model.,,,TRUE,,advancedCellularModelDetails,,,list like
-organoidType,Specific type of organoid if applicable.,"Cerebral, Intestinal, Liver, Kidney, Cardiac, Retinal, Lung, Pancreatic, Other",,FALSE,,advancedCellularModelDetails,,,
-matrixType,Extracellular matrix or scaffold used.,"Matrigel, BME, Hydrogel, Synthetic Matrix, Scaffold-Free, Other",,FALSE,,advancedCellularModelDetails,,,
-cultureSystem,Culture system used for maintenance.,"Static, Spinning Bioreactor, Microfluidic, Air-Liquid Interface, Other",,FALSE,,advancedCellularModelDetails,,,
-maturationTime,Time required for model maturation.,,,FALSE,,advancedCellularModelDetails,,,
-characterizationMethods,Methods used to characterize the model.,"Immunofluorescence, RNA-seq, scRNA-seq, Electrophysiology, Imaging, Other",,FALSE,,advancedCellularModelDetails,,,list like
-passageNumber,Passage number if applicable.,,,FALSE,,advancedCellularModelDetails,,,
-cryopreservationProtocol,Protocol for freezing/thawing if available.,,,FALSE,,advancedCellularModelDetails,,,
-qualityControlMetrics,Quality control metrics used.,,,FALSE,,advancedCellularModelDetails,,,list like
+organoidProtocolDetails,Advanced 3D cellular models including organoids and assembloids.,,"Component, organoidProtocolId, modelType, derivationSource, cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber, cryopreservationProtocol, qualityControlMetrics",FALSE,,organoidProtocolDetails,"organoidProtocolId, modelType, derivationSource, cellTypes, organoidType, matrixType, cultureSystem, maturationTime, characterizationMethods, passageNumber, cryopreservationProtocol, qualityControlMetrics",,
+organoidProtocolId,A unique identifier for the organoid protocol.,,,FALSE,,organoidProtocolDetails,,,
+modelType,Type of organoid protocol.,"Organoid, Assembloid, Spheroid, 3D Culture, Other",,TRUE,,organoidProtocolDetails,,,
+derivationSource,Source of cells used to generate the model.,"iPSC, ESC, Primary Tissue, Cell Line, Patient-Derived, Other",,TRUE,,organoidProtocolDetails,,,
+cellTypes,Cell types present in the model.,,,TRUE,,organoidProtocolDetails,,,list like
+organoidType,Specific type of organoid if applicable.,"Cerebral, Intestinal, Liver, Kidney, Cardiac, Retinal, Lung, Pancreatic, Other",,FALSE,,organoidProtocolDetails,,,
+matrixType,Extracellular matrix or scaffold used.,"Matrigel, BME, Hydrogel, Synthetic Matrix, Scaffold-Free, Other",,FALSE,,organoidProtocolDetails,,,
+cultureSystem,Culture system used for maintenance.,"Static, Spinning Bioreactor, Microfluidic, Air-Liquid Interface, Other",,FALSE,,organoidProtocolDetails,,,
+maturationTime,Time required for model maturation.,,,FALSE,,organoidProtocolDetails,,,
+characterizationMethods,Methods used to characterize the model.,"Immunofluorescence, RNA-seq, scRNA-seq, Electrophysiology, Imaging, Other",,FALSE,,organoidProtocolDetails,,,list like
+passageNumber,Passage number if applicable.,,,FALSE,,organoidProtocolDetails,,,
+cryopreservationProtocol,Protocol for freezing/thawing if available.,,,FALSE,,organoidProtocolDetails,,,
+qualityControlMetrics,Quality control metrics used.,,,FALSE,,organoidProtocolDetails,,,list like
 patientDerivedModelDetails,Patient-derived models including PDX and humanized systems.,,"Component, patientDerivedModelId, modelSystemType, patientDiagnosis, hostStrain, passageNumber, tumorType, engraftmentSite, establishmentRate, molecularCharacterization, clinicalData, humanizationMethod, immuneSystemComponents, validationMethods",FALSE,,patientDerivedModelDetails,"patientDerivedModelId, modelSystemType, patientDiagnosis, hostStrain, passageNumber, tumorType, engraftmentSite, establishmentRate, molecularCharacterization, clinicalData, humanizationMethod, immuneSystemComponents, validationMethods",,
 patientDerivedModelId,A unique identifier for the patient-derived model.,,,FALSE,,patientDerivedModelDetails,,,
 modelSystemType,Type of patient-derived model system.,"PDX (Patient-Derived Xenograft), Humanized Mouse, Patient-Derived Organoid, Patient-Derived Cell Line, Other",,TRUE,,patientDerivedModelDetails,,,
@@ -127,7 +127,7 @@ observationId,A unique identifier for the observation.,,,TRUE,,observation,,,
 observationSubmitterName,The name of the person submitting the observation. ,,,TRUE,,observation,,,
 synapseId,The synapse identifier for the person submitting the observation. ,,,FALSE,,observation,,,
 observationText,Free text observation about the resource.,,,TRUE,,observation,,,
-observationType,Type of observation (values depend on resourceType),"Animal Model: Tumor Growth/Burden, Survival/Lifespan, Body Weight/Growth, Behavioral, Nervous System, Cardiovascular System, Immune Response, Metabolic, Developmental, Cellular/Molecular, Coat Color, Drug Efficacy | Cell Line / Advanced Cellular Model / Patient-Derived Model: Drug Response/Efficacy, Viability/Proliferation, Migration/Invasion, Gene/Protein Expression, Morphological, Molecular/Biochemical | Antibody: Specificity, Sensitivity, Application Performance, Cross-reactivity | Genetic Reagent: Editing/Knockdown Efficiency, Off-target Effects, Expression Level | Computational Tool: Accuracy/Performance, Usability, Scalability/Compatibility, Reproducibility | Clinical Assessment Tool: Reliability, Validity, Clinical Utility, Sensitivity/Specificity | Biobank: Sample Quality, Availability, Collection Completeness | All types: General Comment or Review, Usage Instructions, Depositor Comment, Issue, Other",,TRUE,,observation,,,list like
+observationType,Type of observation (values depend on resourceType),"Animal Model: Tumor Growth/Burden, Survival/Lifespan, Body Weight/Growth, Behavioral, Nervous System, Cardiovascular System, Immune Response, Metabolic, Developmental, Cellular/Molecular, Coat Color, Drug Efficacy | Cell Line / Organoid Protocol / Patient-Derived Model: Drug Response/Efficacy, Viability/Proliferation, Migration/Invasion, Gene/Protein Expression, Morphological, Molecular/Biochemical | Antibody: Specificity, Sensitivity, Application Performance, Cross-reactivity | Genetic Reagent: Editing/Knockdown Efficiency, Off-target Effects, Expression Level | Computational Tool: Accuracy/Performance, Usability, Scalability/Compatibility, Reproducibility | Clinical Assessment Tool: Reliability, Validity, Clinical Utility, Sensitivity/Specificity | Biobank: Sample Quality, Availability, Collection Completeness | All types: General Comment or Review, Usage Instructions, Depositor Comment, Issue, Other",,TRUE,,observation,,,list like
 observationTypeOntologyId,Mammalian Phenotype Ontology (MP) term identifier,,,FALSE,,observation,,,
 observationPhase,What t=0 for the observationTime is,"adolescent, adult, death phase, embryo, juvenile, larval, log phase, neonatal, postnatal, prenatal, pupal, stationary phase, weanling",,FALSE,,observation,,,
 observationTime,When the observation was.,,,FALSE,,observation,,,

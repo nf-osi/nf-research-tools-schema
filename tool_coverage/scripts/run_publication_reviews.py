@@ -50,7 +50,7 @@ _TYPE_SCHEMA_PATHS = {
     'cell_line':                'NF-Tools-Schemas/cell-line/submitCellLine.json',
     'genetic_reagent':          'NF-Tools-Schemas/genetic-reagent/submitGeneticReagent.json',
     'computational_tool':       'NF-Tools-Schemas/computational-tool/submitComputationalTool.json',
-    'advanced_cellular_model':  'NF-Tools-Schemas/advanced-cellular-model/submitAdvancedCellularModel.json',
+    'organoid_protocol':  'NF-Tools-Schemas/organoid-protocol/submitOrganoidProtocol.json',
     'patient_derived_model':    'NF-Tools-Schemas/patient-derived-model/submitPatientDerivedModel.json',
     'clinical_assessment_tool': 'NF-Tools-Schemas/clinical-assessment-tool/submitClinicalAssessmentTool.json',
 }
@@ -113,7 +113,7 @@ def _build_tool_validation_template() -> str:
         'toolValidations:\n'
         '  - toolName: "Exact tool name as it appears in text"\n'
         '    toolType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent"'
-        ' | "computational_tool" | "advanced_cellular_model"'
+        ' | "computational_tool" | "organoid_protocol"'
         ' | "patient_derived_model" | "clinical_assessment_tool"\n'
         '    verdict: "Accept" | "Reject" | "Uncertain"\n'
         '    confidence: 0.0-1.0\n'
@@ -133,11 +133,11 @@ TOOL_VALIDATION_YAML_TEMPLATE = _build_tool_validation_template()
 OBSERVATION_YAML_TEMPLATE = """\
 observations:
   - resourceName: "Exact tool name from validated tools list"
-    resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "advanced_cellular_model" | "patient_derived_model" | "clinical_assessment_tool"
+    resourceType: "animal_model" | "antibody" | "cell_line" | "genetic_reagent" | "computational_tool" | "organoid_protocol" | "patient_derived_model" | "clinical_assessment_tool"
     observationType: choose from the list below based on resourceType:
       animal_model:             Tumor Growth/Burden | Survival/Lifespan | Body Weight/Growth | Behavioral | Nervous System | Cardiovascular System | Immune Response | Metabolic | Developmental | Cellular/Molecular | Coat Color | Drug Efficacy | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
       cell_line:                Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
-      advanced_cellular_model:  Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
+      organoid_protocol:  Drug Response/Efficacy | Viability/Proliferation | Migration/Invasion | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
       patient_derived_model:    Drug Response/Efficacy | Tumor Growth/Burden | Viability/Proliferation | Gene/Protein Expression | Morphological | Molecular/Biochemical | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
       antibody:                 Specificity | Sensitivity | Application Performance | Cross-reactivity | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
       genetic_reagent:          Editing/Knockdown Efficiency | Off-target Effects | Expression Level | General Comment or Review | Usage Instructions | Depositor Comment | Issue | Other
@@ -609,7 +609,7 @@ def prepare_input_data(pub_row, cached):
     tools_list = []
     for tool_type in [
         'antibodies', 'cell_lines', 'animal_models', 'genetic_reagents',
-        'computational_tools', 'advanced_cellular_models',
+        'computational_tools', 'organoid_protocols',
         'patient_derived_models', 'clinical_assessment_tools'
     ]:
         for tool_name in novel_tools.get(tool_type, []):
@@ -926,7 +926,7 @@ def filter_submission_csvs(validation_results, output_dir='.'):
                     'cell_lines':             ('cell_line',             '_toolName'),
                     'genetic_reagents':       ('genetic_reagent',       'insertName'),
                     'computational_tools':    ('computational_tool',    'softwareName'),
-                    'advanced_cellular_models': ('advanced_cellular_model', '_toolName'),
+                    'organoid_protocols': ('organoid_protocol', '_toolName'),
                     'patient_derived_models': ('patient_derived_model', '_toolName'),
                     'clinical_assessment_tools': ('clinical_assessment_tool', 'assessmentName'),
                     'resources':              (None,                    'resourceName'),
@@ -972,7 +972,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     Column names match the actual Synapse table schemas (verified from live tables).
     Tracking columns prefixed with '_' are stripped by clean_submission_csvs.py before upload.
 
-    For types with no name column in the detail table (cell_line, advanced_cellular_model,
+    For types with no name column in the detail table (cell_line, organoid_protocol,
     patient_derived_model), the tool name is recorded in SUBMIT_resources.csv under resourceName.
     All other types also get a resources row so the Resources table stays in sync.
     """
@@ -987,7 +987,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         'cell_line': 'cell_lines',
         'genetic_reagent': 'genetic_reagents',
         'computational_tool': 'computational_tools',
-        'advanced_cellular_model': 'advanced_cellular_models',
+        'organoid_protocol': 'organoid_protocols',
         'patient_derived_model': 'patient_derived_models',
         'clinical_assessment_tool': 'clinical_assessment_tools',
     }
@@ -999,7 +999,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         'cell_line': 'Cell Line',
         'genetic_reagent': 'Genetic Reagent',
         'computational_tool': 'Computational Tool',
-        'advanced_cellular_model': 'Advanced Cellular Model',
+        'organoid_protocol': 'Organoid Protocol',
         'patient_derived_model': 'Patient-Derived Model',
         'clinical_assessment_tool': 'Clinical Assessment Tool',
     }
@@ -1007,7 +1007,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
     # Synapse column templates per type (verified against live Synapse tables).
     # Only columns that can be pre-populated from AI mining are filled;
     # the rest are left blank for curators. ID columns are omitted (Synapse generates them).
-    # Types with no name in the detail table (cell_line, advanced_cellular_model,
+    # Types with no name in the detail table (cell_line, organoid_protocol,
     # patient_derived_model) carry the tool name as '_toolName' (tracking only).
     def _f(fields, key, fallback=''):
         """Get a field from Claude's extracted fields, falling back to fallback."""
@@ -1083,7 +1083,7 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
                 'containerized': _f(f, 'containerized'),
                 'maintainer': _f(f, 'maintainer'),
             }
-        elif tool_type == 'advanced_cellular_model':
+        elif tool_type == 'organoid_protocol':
             return {
                 '_toolName': tool_name,      # tracking only — name goes in resources
                 'modelType': _f(f, 'modelType'),

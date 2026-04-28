@@ -227,7 +227,7 @@ _TYPE_TO_TYPED_FILE = {
     'cell_line':                'ACCEPTED_cell_lines.csv',
     'genetic_reagent':          'ACCEPTED_genetic_reagents.csv',
     'patient_derived_model':    'ACCEPTED_patient_derived_models.csv',
-    'advanced_cellular_model':  'ACCEPTED_advanced_cellular_models.csv',
+    'organoid_protocol':  'ACCEPTED_organoid_protocols.csv',
     'clinical_assessment_tool': 'ACCEPTED_clinical_assessment_tools.csv',
     'computational_tool':       'ACCEPTED_computational_tools.csv',
 }
