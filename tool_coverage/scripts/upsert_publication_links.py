@@ -304,6 +304,10 @@ def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool)
             continue
 
         resource_name = (row.get("_resourceName") or "").strip()
+        if not resource_name:
+            print(f"  ⚠️  Skipping vendorItem row with blank _resourceName (vendorItemId={vi_id!r})")
+            continue
+
         resource_id = res_map.get((resource_name.lower(), "Antibody")) or \
                       next((v for k, v in res_map.items() if k[0] == resource_name.lower()), None)
 

@@ -240,7 +240,7 @@ def clean_csv(input_file):
     df_clean = df.drop(columns=tracking_cols)
 
     # Save to CLEAN_ prefixed file
-    output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+    output_file = input_file.replace('ACCEPTED_', 'CLEAN_')
     df_clean.to_csv(output_file, index=False)
 
     print(f"   {input_file}: Removed {len(tracking_cols)} columns → {output_file}")
