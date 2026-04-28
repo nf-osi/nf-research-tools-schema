@@ -22,6 +22,14 @@ except ImportError:
     USE_NEW_API = False
 
 
+def _run_url_comment() -> str:
+    """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
+    server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
+    repo   = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Upsert PubMed publications to Synapse'
@@ -166,7 +174,7 @@ def main():
 
         # Create snapshot version for tracking
         print("   Creating snapshot version...")
-        syn.create_snapshot_version(table_id)
+        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
         print("   ✅ Snapshot version created")
 
     # Log the PMIDs

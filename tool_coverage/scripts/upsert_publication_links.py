@@ -40,6 +40,14 @@ INVESTIGATOR_TABLE = "syn51734029"
 
 CSV_DIR_DEFAULT = "tool_coverage/outputs"
 
+
+def _run_url_comment() -> str:
+    """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
+    server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
+    repo   = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
+
 # Shared UUID namespace — must match compile_accepted_submissions.py
 _PROJECT_NAMESPACE = uuid.uuid5(
     uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools"
@@ -118,7 +126,7 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
 
     if len(new_pubs) > 0:
         syn.store(Table(PUB_TABLE, new_pubs))
-        syn.create_snapshot_version(PUB_TABLE)
+        syn.create_snapshot_version(PUB_TABLE, comment=_run_url_comment() or None)
         print(f"  ✅ Added {len(new_pubs)} publications to {PUB_TABLE}")
     else:
         print("  ✅ No new publications to add")
@@ -191,7 +199,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
     if rows_to_add:
         syn.store(Table(DEV_TABLE, pd.DataFrame(rows_to_add)))
-        syn.create_snapshot_version(DEV_TABLE)
+        syn.create_snapshot_version(DEV_TABLE, comment=_run_url_comment() or None)
         print(f"  ✅ Added {len(rows_to_add)} development links to {DEV_TABLE}")
     else:
         print("  ✅ No new development links to add")
@@ -265,7 +273,7 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
 
     if new_rows:
         syn.store(Table(INVESTIGATOR_TABLE, pd.DataFrame(new_rows)))
-        syn.create_snapshot_version(INVESTIGATOR_TABLE)
+        syn.create_snapshot_version(INVESTIGATOR_TABLE, comment=_run_url_comment() or None)
         print(f"  ✅ Added {len(new_rows)} investigators to {INVESTIGATOR_TABLE}")
     else:
         print("  ✅ No new investigators to add")
@@ -341,7 +349,7 @@ def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool)
 
     if rows_to_add:
         syn.store(Table(VENDOR_ITEM_TABLE, pd.DataFrame(rows_to_add)))
-        syn.create_snapshot_version(VENDOR_ITEM_TABLE)
+        syn.create_snapshot_version(VENDOR_ITEM_TABLE, comment=_run_url_comment() or None)
         print(f"  ✅ Added {len(rows_to_add)} vendor items to {VENDOR_ITEM_TABLE}")
     else:
         print("  ✅ No new vendor items to add")

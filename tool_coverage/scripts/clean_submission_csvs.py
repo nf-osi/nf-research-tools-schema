@@ -18,6 +18,14 @@ from typing import List, Dict, Tuple
 
 SYN_RESOURCES_TABLE = "syn26450069"
 
+
+def _run_url_comment() -> str:
+    """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
+    server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
+    repo   = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
+
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
     # Existing tool types (v1.0)
@@ -331,7 +339,7 @@ def upsert_to_synapse(syn, clean_file, df_clean):
 
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
         print(f"         Creating snapshot version...")
-        syn.create_snapshot_version(table_id)
+        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
         print(f"         ✅ Snapshot version created")
 
         return True
