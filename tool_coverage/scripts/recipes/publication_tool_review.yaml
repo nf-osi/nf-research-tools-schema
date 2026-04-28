@@ -101,6 +101,10 @@ prompt: |
        maintainer       (author name or contact email, if provided)
 
      organoid_protocol:
+       **NOTE**: Organoid protocols describe 3D culture methods and may use primary tissue,
+       iPSCs, primary cells, OR established cell lines as starting material. Classify as
+       `organoid_protocol` when the paper introduces or characterises a 3D culture system/method.
+       If the paper simply uses a named cell line in standard 2D culture, classify as `cell_line`.
        modelType*       [organoid | spheroid | tumoroid | assembloid | other]
        derivationSource* [patient tissue | iPSC | primary cell | cell line | other]
        cellTypes        (e.g. "Schwann cells, fibroblasts")
@@ -112,7 +116,11 @@ prompt: |
        passageNumber    (passage used in experiments, e.g. "P5–P10") — if mentioned
 
      patient_derived_model:
-       modelSystemType* [PDX | PDO | cell line | organoid | other]
+       **IMPORTANT**: Patient-derived models (PDX, PDO) are established directly from patient
+       tissue specimens and are NOT catalogued cell lines. If the tool has a standard cell line
+       designation (named, catalogued, commercially available or deposited), classify it as
+       `cell_line` instead — even if labelled "patient-derived" in the paper.
+       modelSystemType* [PDX | PDO | organoid | other]
        patientDiagnosis* (e.g. "NF1-associated MPNST", "plexiform neurofibroma")
        hostStrain       (e.g. "NSG", "nude mouse") — for PDX
        tumorType        (e.g. "MPNST", "neurofibroma")

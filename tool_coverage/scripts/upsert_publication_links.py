@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """
-Upsert publication records, development links, and vendor items from submission CSVs to Synapse.
+Upsert publication records, development links, vendor items, and investigators
+from submission CSVs to Synapse.
 
 Sources (produced by compile_accepted_submissions.py):
   tool_coverage/outputs/submission_publications.csv
   tool_coverage/outputs/submission_dev_links.csv
   tool_coverage/outputs/ACCEPTED_vendorItem.csv
+  tool_coverage/outputs/ACCEPTED_animal_models.csv    (developerName/Affiliation)
+  tool_coverage/outputs/ACCEPTED_computational_tools.csv (developerName/Affiliation)
 
 Targets:
-  syn26486839  NF Tool Publications (base publication table)
+  syn26486839  NF Tool Publications
   syn26486807  Tool Development links (tool ↔ development publication)
-  syn26486843  VendorItem (vendor ↔ resource catalog links; needs resourceId resolution)
+  syn26486843  VendorItem (vendor ↔ resource catalog links)
+  syn51734029  Investigator (developer name/affiliation per resource)
 
 FK resolution:
   publicationId : UUID5 already correct (same namespace as generate_review_csv.py)
@@ -22,17 +26,24 @@ Usage:
 
 import os
 import sys
+import uuid
 import argparse
 import pandas as pd
 import synapseclient
 from synapseclient import Table
 
-PUB_TABLE = "syn26486839"
-DEV_TABLE = "syn26486807"
-RES_TABLE = "syn51730943"
-VENDOR_ITEM_TABLE = "syn26486843"
+PUB_TABLE          = "syn26486839"
+DEV_TABLE          = "syn26486807"
+RES_TABLE          = "syn51730943"
+VENDOR_ITEM_TABLE  = "syn26486843"
+INVESTIGATOR_TABLE = "syn51734029"
 
 CSV_DIR_DEFAULT = "tool_coverage/outputs"
+
+# Shared UUID namespace — must match compile_accepted_submissions.py
+_PROJECT_NAMESPACE = uuid.uuid5(
+    uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools"
+)
 
 # Maps compile_accepted ttype values → Synapse resourceType strings in syn51730943
 _TTYPE_TO_RTYPE = {
@@ -42,8 +53,15 @@ _TTYPE_TO_RTYPE = {
     "genetic_reagent":          "Genetic Reagent",
     "patient_derived_model":    "Patient-Derived Model",
     "computational_tool":       "Computational Tool",
-    "organoid_protocol":  "Organoid Protocol",
+    "organoid_protocol":        "Organoid Protocol",
     "clinical_assessment_tool": "Clinical Assessment Tool",
+}
+
+# ACCEPTED_*.csv files that carry developerName/developerAffiliation fields,
+# mapped to the Synapse resourceType used for resourceId lookup.
+_DEVELOPER_CSV_RTYPES = {
+    "ACCEPTED_animal_models.csv":       "Animal Model",
+    "ACCEPTED_computational_tools.csv": "Computational Tool",
 }
 
 
@@ -57,17 +75,28 @@ def _login() -> synapseclient.Synapse:
     return syn
 
 
+def _build_res_map(syn) -> dict:
+    """Return (name_lower, resourceType) → resourceId from syn51730943."""
+    res_df = syn.tableQuery(
+        f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
+    ).asDataFrame()
+    res_map: dict = {}
+    for _, row in res_df.iterrows():
+        rname = (row.get("resourceName") or "").strip()
+        rtype = row.get("resourceType", "")
+        res_map[(rname.lower(), rtype)] = row["resourceId"]
+    return res_map
+
+
 def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
     """Upsert new publications from submission_publications.csv to syn26486839."""
     df = pd.read_csv(pubs_csv)
 
-    # Strip internal tracking columns and local-only columns not in the Synapse schema
-    _LOCAL_ONLY = {"year"}
-    pub_cols = [c for c in df.columns if not c.startswith("_") and c not in _LOCAL_ONLY]
+    # Strip internal tracking columns; year is a real column now (added to syn26486839)
+    pub_cols = [c for c in df.columns if not c.startswith("_")]
     df_clean = df[pub_cols].drop_duplicates(subset="pmid", keep="first").copy()
     df_clean = df_clean[df_clean["pmid"].notna() & (df_clean["pmid"] != "")]
 
-    # Fetch PMIDs already in Synapse
     existing = syn.tableQuery(f"SELECT pmid FROM {PUB_TABLE}").asDataFrame()
     existing_pmids = (
         set(existing["pmid"].dropna().str.strip().str.upper())
@@ -97,35 +126,20 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
     return len(new_pubs)
 
 
-def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
+def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) -> int:
     """
     Upsert development links from submission_dev_links.csv to syn26486807.
 
-    Resolves resourceId from syn51730943 using (_toolName, _toolType).
-    Skips rows already present (by resourceId+publicationId+funderId) or unresolvable.
+    Resolves resourceId from res_map using (_toolName, _toolType).
+    Skips rows already present (by publicationDevelopmentId) or unresolvable.
     """
     df = pd.read_csv(dev_csv)
 
-    # Build (name_lower, resourceType) → resourceId lookup from syn51730943
-    print(f"  Fetching resource registry from {RES_TABLE}...")
-    res_df = syn.tableQuery(
-        f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
-    ).asDataFrame()
-    res_map: dict = {}
-    for _, row in res_df.iterrows():
-        rname = (row.get("resourceName") or "").strip()
-        rtype = row.get("resourceType", "")
-        res_map[(rname.lower(), rtype)] = row["resourceId"]
-
-    # Fetch existing links to avoid duplicates — use (resourceId, publicationId)
     existing_dev = syn.tableQuery(
-        f"SELECT resourceId, publicationId FROM {DEV_TABLE}"
+        f"SELECT publicationDevelopmentId FROM {DEV_TABLE}"
     ).asDataFrame()
-    existing_keys = (
-        set(zip(
-            existing_dev["resourceId"].fillna(""),
-            existing_dev["publicationId"].fillna(""),
-        ))
+    existing_ids = (
+        set(existing_dev["publicationDevelopmentId"].dropna())
         if len(existing_dev) > 0 else set()
     )
 
@@ -134,6 +148,11 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
     skipped_no_res = []
 
     for _, row in df.iterrows():
+        dev_id = row.get("publicationDevelopmentId", "")
+        if dev_id in existing_ids:
+            skipped_dup.append(dev_id)
+            continue
+
         tool_name = (row.get("_toolName") or "").strip()
         ttype = row.get("_toolType", "")
         rtype = _TTYPE_TO_RTYPE.get(ttype, "")
@@ -143,21 +162,15 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
 
-        pub_id = row.get("publicationId", "") or ""
-        funder_id = row.get("funderId") or ""
-        key = (resource_id, pub_id)
-        if key in existing_keys:
-            skipped_dup.append(key)
-            continue
-
         rows_to_add.append({
-            "publicationId": pub_id,
+            "publicationDevelopmentId": dev_id,
+            "publicationId": row.get("publicationId", "") or "",
             "resourceId": resource_id,
-            "funderId": funder_id,
+            "funderId": row.get("funderId") or "",
             "investigatorId": row.get("investigatorId") or "",
         })
 
-    print(f"  {len(df)} in CSV | {len(existing_keys)} existing (resourceId,publicationId) pairs "
+    print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
           f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved "
           f"| {len(skipped_dup)} duplicate")
 
@@ -171,13 +184,13 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
 
     if dry_run:
         for r in rows_to_add:
-            print(f"    + pubId={r['publicationId'][:8]}… "
-                  f"resId={r['resourceId'][:8]}… funder={r['funderId'][:8] if r['funderId'] else '—'}")
+            dev_id = r['publicationDevelopmentId']
+            print(f"    + devId={dev_id[:8]}… resId={r['resourceId'][:8]}… "
+                  f"funder={r['funderId'][:8] if r['funderId'] else '—'}")
         return len(rows_to_add)
 
     if rows_to_add:
-        df_clean = pd.DataFrame(rows_to_add)
-        syn.store(Table(DEV_TABLE, df_clean))
+        syn.store(Table(DEV_TABLE, pd.DataFrame(rows_to_add)))
         syn.create_snapshot_version(DEV_TABLE)
         print(f"  ✅ Added {len(rows_to_add)} development links to {DEV_TABLE}")
     else:
@@ -186,27 +199,91 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
     return len(rows_to_add)
 
 
-def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
+def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int:
+    """
+    Upsert investigator records to syn51734029 from developer fields in tool CSVs.
+
+    developerName and developerAffiliation are stripped from the detail-table upload
+    in clean_submission_csvs.py and routed here instead.  Covers animal models and
+    computational tools (the two types that carry developer info).
+    """
+    inv_rows: dict = {}  # investigatorId → row dict (dedup within batch)
+
+    for csv_name, rtype in _DEVELOPER_CSV_RTYPES.items():
+        csv_path = os.path.join(csv_dir, csv_name)
+        if not os.path.exists(csv_path):
+            continue
+        df = pd.read_csv(csv_path)
+        if "developerName" not in df.columns:
+            continue
+
+        for _, row in df.iterrows():
+            dev_name = (row.get("developerName") or "").strip()
+            if not dev_name:
+                continue
+            dev_affil = (row.get("developerAffiliation") or "").strip()
+            tool_name = (row.get("_resourceName") or "").strip()
+            resource_id = res_map.get((tool_name.lower(), rtype))
+            if not resource_id:
+                continue
+
+            inv_id = str(uuid.uuid5(
+                _PROJECT_NAMESPACE,
+                f"investigator:{dev_name}:{dev_affil}:{resource_id}",
+            ))
+            inv_rows[inv_id] = {
+                "investigatorId":       inv_id,
+                "resourceId":           resource_id,
+                "investigatorName":     dev_name,
+                "institution":          dev_affil,
+                "orcid":                "",
+                "investigatorSynapseId": "",
+            }
+
+    if not inv_rows:
+        print("  No investigator records found in CSVs")
+        return 0
+
+    existing_inv = syn.tableQuery(
+        f"SELECT investigatorId FROM {INVESTIGATOR_TABLE}"
+    ).asDataFrame()
+    existing_ids = (
+        set(existing_inv["investigatorId"].dropna())
+        if len(existing_inv) > 0 else set()
+    )
+
+    new_rows = [r for inv_id, r in inv_rows.items() if inv_id not in existing_ids]
+
+    print(f"  {len(inv_rows)} in CSVs | {len(existing_ids)} already in Synapse "
+          f"| {len(new_rows)} to add")
+
+    if dry_run:
+        for r in new_rows:
+            print(f"    + {r['investigatorName']} ({r['institution'] or '—'}) "
+                  f"→ resId={r['resourceId'][:8]}…")
+        return len(new_rows)
+
+    if new_rows:
+        syn.store(Table(INVESTIGATOR_TABLE, pd.DataFrame(new_rows)))
+        syn.create_snapshot_version(INVESTIGATOR_TABLE)
+        print(f"  ✅ Added {len(new_rows)} investigators to {INVESTIGATOR_TABLE}")
+    else:
+        print("  ✅ No new investigators to add")
+
+    return len(new_rows)
+
+
+def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool) -> int:
     """
     Upsert vendor item records from ACCEPTED_vendorItem.csv to syn26486843.
 
-    Resolves resourceId from syn51730943 by (_resourceName, "Antibody").
+    Resolves resourceId from res_map by (_resourceName, "Antibody").
     Skips rows already present (by vendorItemId) or where resourceId cannot be resolved.
     """
     df = pd.read_csv(vendor_item_csv)
     if df.empty:
         print("  No vendor item rows to process")
         return 0
-
-    print(f"  Fetching resource registry from {RES_TABLE}...")
-    res_df = syn.tableQuery(
-        f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
-    ).asDataFrame()
-    res_map: dict = {}
-    for _, row in res_df.iterrows():
-        rname = (row.get("resourceName") or "").strip()
-        rtype = row.get("resourceType", "")
-        res_map[(rname.lower(), rtype)] = row["resourceId"]
 
     existing_vi = syn.tableQuery(
         f"SELECT vendorItemId FROM {VENDOR_ITEM_TABLE}"
@@ -227,7 +304,6 @@ def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
             continue
 
         resource_name = (row.get("_resourceName") or "").strip()
-        # Antibodies are the primary source of vendor items; try all types if needed
         resource_id = res_map.get((resource_name.lower(), "Antibody")) or \
                       next((v for k, v in res_map.items() if k[0] == resource_name.lower()), None)
 
@@ -236,10 +312,10 @@ def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
             continue
 
         rows_to_add.append({
-            "vendorItemId": vi_id,
-            "vendorId": row.get("vendorId", ""),
-            "resourceId": resource_id,
-            "catalogNumber": row.get("catalogNumber", ""),
+            "vendorItemId":    vi_id,
+            "vendorId":        row.get("vendorId", ""),
+            "resourceId":      resource_id,
+            "catalogNumber":   row.get("catalogNumber", ""),
             "catalogNumberURL": row.get("catalogNumberURL", ""),
         })
 
@@ -260,8 +336,7 @@ def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
         return len(rows_to_add)
 
     if rows_to_add:
-        df_clean = pd.DataFrame(rows_to_add)
-        syn.store(Table(VENDOR_ITEM_TABLE, df_clean))
+        syn.store(Table(VENDOR_ITEM_TABLE, pd.DataFrame(rows_to_add)))
         syn.create_snapshot_version(VENDOR_ITEM_TABLE)
         print(f"  ✅ Added {len(rows_to_add)} vendor items to {VENDOR_ITEM_TABLE}")
     else:
@@ -272,29 +347,22 @@ def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Upsert publication records, development links, and vendor items to Synapse."
+        description="Upsert publications, development links, vendor items, and investigators to Synapse."
     )
     parser.add_argument(
         "--csv-dir", default=CSV_DIR_DEFAULT,
-        help=f"Directory with submission_publications.csv and submission_dev_links.csv "
-             f"(default: {CSV_DIR_DEFAULT})"
+        help=f"Directory containing submission CSVs (default: {CSV_DIR_DEFAULT})"
     )
-    parser.add_argument(
-        "--dry-run", action="store_true",
-        help="Preview what would be uploaded without making changes"
-    )
-    parser.add_argument(
-        "--skip-publications", action="store_true",
-        help=f"Skip upserting to the publications table ({PUB_TABLE})"
-    )
-    parser.add_argument(
-        "--skip-development", action="store_true",
-        help=f"Skip upserting to the development links table ({DEV_TABLE})"
-    )
-    parser.add_argument(
-        "--skip-vendor-items", action="store_true",
-        help=f"Skip upserting to the vendor item table ({VENDOR_ITEM_TABLE})"
-    )
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Preview what would be uploaded without making changes")
+    parser.add_argument("--skip-publications", action="store_true",
+                        help=f"Skip {PUB_TABLE}")
+    parser.add_argument("--skip-development", action="store_true",
+                        help=f"Skip {DEV_TABLE}")
+    parser.add_argument("--skip-vendor-items", action="store_true",
+                        help=f"Skip {VENDOR_ITEM_TABLE}")
+    parser.add_argument("--skip-investigators", action="store_true",
+                        help=f"Skip {INVESTIGATOR_TABLE}")
     args = parser.parse_args()
 
     if args.dry_run:
@@ -309,14 +377,25 @@ def main():
     dev_csv = os.path.join(args.csv_dir, "submission_dev_links.csv")
     vi_csv  = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
 
+    # Build shared resource map once — reused by dev links, vendor items, investigators
+    print(f"Fetching resource registry from {RES_TABLE}...")
+    res_map = _build_res_map(syn)
+    print(f"  {len(res_map)} resources loaded\n")
+
     total_added = 0
     step = 1
+    total_steps = sum([
+        not args.skip_publications,
+        not args.skip_development,
+        not args.skip_vendor_items,
+        not args.skip_investigators,
+    ])
 
     if not args.skip_publications:
         if not os.path.exists(pub_csv):
             print(f"⚠️  {pub_csv} not found — skipping publication upsert")
         else:
-            print(f"[{step}/3] Publications → {PUB_TABLE}")
+            print(f"[{step}/{total_steps}] Publications → {PUB_TABLE}")
             total_added += upsert_publications(syn, pub_csv, args.dry_run)
             print()
         step += 1
@@ -325,8 +404,8 @@ def main():
         if not os.path.exists(dev_csv):
             print(f"⚠️  {dev_csv} not found — skipping development link upsert")
         else:
-            print(f"[{step}/3] Development links → {DEV_TABLE}")
-            total_added += upsert_development_links(syn, dev_csv, args.dry_run)
+            print(f"[{step}/{total_steps}] Development links → {DEV_TABLE}")
+            total_added += upsert_development_links(syn, dev_csv, res_map, args.dry_run)
             print()
         step += 1
 
@@ -334,9 +413,15 @@ def main():
         if not os.path.exists(vi_csv):
             print(f"⚠️  {vi_csv} not found — skipping vendor item upsert")
         else:
-            print(f"[{step}/3] Vendor items → {VENDOR_ITEM_TABLE}")
-            total_added += upsert_vendor_items(syn, vi_csv, args.dry_run)
+            print(f"[{step}/{total_steps}] Vendor items → {VENDOR_ITEM_TABLE}")
+            total_added += upsert_vendor_items(syn, vi_csv, res_map, args.dry_run)
             print()
+        step += 1
+
+    if not args.skip_investigators:
+        print(f"[{step}/{total_steps}] Investigators → {INVESTIGATOR_TABLE}")
+        total_added += upsert_investigators(syn, args.csv_dir, res_map, args.dry_run)
+        print()
 
     print("=" * 70)
     mode = "DRY-RUN" if args.dry_run else "LIVE"

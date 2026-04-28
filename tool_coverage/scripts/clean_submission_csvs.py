@@ -7,6 +7,7 @@ These columns are for manual review only and must be removed before
 uploading to Synapse.
 """
 
+import json
 import pandas as pd
 import os
 import glob
@@ -47,10 +48,74 @@ SYNAPSE_TABLE_MAP = {
     # Note: syn51735450 is a materialized view that auto-updates from usage + resources
 }
 
+# Columns that exist in ACCEPTED_*.csv for routing/tracking purposes but do NOT belong
+# in the corresponding Synapse detail table.  They are either stored in a different table
+# by upsert_publication_links.py or are handled elsewhere in the pipeline.
+_STRIP_BEFORE_UPLOAD = {
+    # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
+    # developerContactEmail → no schema home; dropped
+    # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
+    'CLEAN_animal_models.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
+    ],
+    # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
+    'CLEAN_antibodies.csv': [
+        'vendor', 'catalogNumber', 'catalogURL',
+    ],
+    # rrid → resource table (syn26450069); developer fields same as animal models
+    'CLEAN_computational_tools.csv': [
+        'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
+    ],
+}
+
+
 def get_synapse_table_id(filename):
     """Get Synapse table ID for a given cleaned CSV file."""
     basename = os.path.basename(filename)
     return SYNAPSE_TABLE_MAP.get(basename)
+
+
+def _get_string_list_columns(syn: synapseclient.Synapse, table_id: str) -> List[str]:
+    """Return the names of STRING_LIST columns in a Synapse table."""
+    try:
+        schema = syn.get(table_id)
+        cols = list(syn.getColumns(schema))
+        return [c.name for c in cols if getattr(c, 'columnType', '') == 'STRING_LIST']
+    except Exception as e:
+        print(f"      ⚠️  Could not fetch schema for {table_id}: {e}")
+        return []
+
+
+def _serialize_string_lists(df: pd.DataFrame, string_list_cols: List[str]) -> pd.DataFrame:
+    """Convert STRING_LIST columns from plain comma-separated strings to JSON arrays.
+
+    compile_accepted_submissions._fmt_list() produces comma-joined strings
+    (e.g. "French, English").  Synapse requires JSON arrays (["French","English"]).
+    """
+    if not string_list_cols:
+        return df
+    df = df.copy()
+
+    def _to_json_array(val):
+        if pd.isna(val) or val == '' or val == 'NULL':
+            return None
+        if isinstance(val, str):
+            try:
+                parsed = json.loads(val)
+                if isinstance(parsed, list):
+                    return val  # already a valid JSON array
+            except (json.JSONDecodeError, ValueError):
+                pass
+            items = [v.strip() for v in val.split(',') if v.strip()]
+            return json.dumps(items)
+        if isinstance(val, list):
+            return json.dumps([str(v) for v in val if v])
+        return json.dumps([str(val)])
+
+    for col in string_list_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(_to_json_array)
+    return df
 
 def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[str]]:
     """Validate CSV against expected schema requirements.
@@ -152,11 +217,9 @@ def clean_csv(input_file):
 def upsert_to_synapse(syn, clean_file, df_clean):
     """Upsert cleaned data to Synapse table.
 
-    This function appends new rows to the Synapse table. Since we're working with
-    new tool discoveries and publication links, we're always adding new rows rather
-    than updating existing ones.
-
-    After uploading, creates a snapshot version of the table to track this update.
+    Strips routing columns (those belonging to other Synapse tables), serializes
+    STRING_LIST columns to JSON arrays, then appends new rows.  Creates a snapshot
+    version after each successful upload.
 
     Args:
         syn: Synapse client
@@ -166,7 +229,6 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     Returns:
         bool: True if successful, False otherwise
     """
-    # Get Synapse table ID for this file
     table_id = get_synapse_table_id(clean_file)
 
     if not table_id:
@@ -177,13 +239,25 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         print(f"      ⚠️  Empty DataFrame, skipping upload")
         return False
 
+    basename = os.path.basename(clean_file)
+
+    # Strip columns that belong to other tables
+    cols_to_strip = [c for c in _STRIP_BEFORE_UPLOAD.get(basename, []) if c in df_clean.columns]
+    if cols_to_strip:
+        df_clean = df_clean.drop(columns=cols_to_strip)
+        print(f"      ℹ️  Stripped {cols_to_strip} (routed to other tables)")
+
+    # Serialize STRING_LIST columns to JSON arrays
+    string_list_cols = _get_string_list_columns(syn, table_id)
+    present_sl = [c for c in string_list_cols if c in df_clean.columns]
+    if present_sl:
+        df_clean = _serialize_string_lists(df_clean, present_sl)
+        print(f"      ℹ️  Serialized STRING_LIST columns: {present_sl}")
+
     try:
-        # Store the DataFrame to Synapse table
-        # This appends new rows to the existing table
         table = Table(table_id, df_clean)
         table = syn.store(table)
 
-        # Create a snapshot version to track this update
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
         print(f"         Creating snapshot version...")
         syn.create_snapshot_version(table_id)

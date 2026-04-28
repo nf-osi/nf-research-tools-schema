@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   upsert-to-synapse:
@@ -162,6 +163,7 @@ jobs:
           fi
 
       - name: Confirm and upload to Synapse
+        id: upload_clean
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
@@ -169,12 +171,13 @@ jobs:
           echo "=========================================="
           echo "UPLOADING to Synapse"
           echo "=========================================="
-          python tool_coverage/scripts/clean_submission_csvs.py --upsert
+          python tool_coverage/scripts/clean_submission_csvs.py --upsert 2>&1 | tee /tmp/clean_upload.log
 
           echo ""
           echo "✅ Upload completed successfully"
 
       - name: Upsert publications and development links to Synapse
+        id: upload_pub_links
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
@@ -184,7 +187,7 @@ jobs:
           echo "=========================================="
           if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
             python tool_coverage/scripts/upsert_publication_links.py \
-              --csv-dir tool_coverage/outputs
+              --csv-dir tool_coverage/outputs 2>&1 | tee /tmp/pub_upload.log
             echo ""
             echo "✅ Publication and development link upsert complete"
           else
@@ -199,6 +202,56 @@ jobs:
           echo "=========================================="
           echo "✅ Validation passed, files are ready for upload"
           echo "⚠️  Run workflow without dry_run option to actually upload"
+
+      - name: Report upload failures
+        if: always() && steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILURES=""
+
+          # Collect ❌ lines from upload logs (silent Python-level failures)
+          for log in /tmp/clean_upload.log /tmp/pub_upload.log; do
+            if [ -f "$log" ]; then
+              ERRS=$(grep "❌" "$log" || true)
+              if [ -n "$ERRS" ]; then
+                FAILURES="$FAILURES
+          $ERRS"
+              fi
+            fi
+          done
+
+          # Also flag if either upload step itself exited non-zero
+          STEP_FAILURES=""
+          if [ "${{ steps.upload_clean.outcome }}" = "failure" ]; then
+            STEP_FAILURES="$STEP_FAILURES
+          - clean_submission_csvs.py exited non-zero"
+          fi
+          if [ "${{ steps.upload_pub_links.outcome }}" = "failure" ]; then
+            STEP_FAILURES="$STEP_FAILURES
+          - upsert_publication_links.py exited non-zero"
+          fi
+
+          if [ -n "$FAILURES" ] || [ -n "$STEP_FAILURES" ]; then
+            gh issue create \
+              --title "Synapse upload failures — run ${{ github.run_id }}" \
+              --label "bug" \
+              --body "$(cat <<EOF
+          ## Synapse Upload Failures Detected
+
+          **Workflow run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          **Triggered by**: push to \`${{ github.ref_name }}\` (${{ github.sha }})
+
+          $([ -n "$STEP_FAILURES" ] && printf '### Step exits\n%s\n' "$STEP_FAILURES" || true)
+          $([ -n "$FAILURES" ] && printf '### Errors from upload logs\n\`\`\`\n%s\n\`\`\`' "$FAILURES" || true)
+
+          Please review the run log and fix any schema mismatches, missing columns, or Synapse API errors before re-triggering.
+          EOF
+          )"
+            echo "❌ GitHub issue created for upload failures"
+          else
+            echo "✅ No upload failures detected"
+          fi
 
       - name: Regenerate coverage report
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
