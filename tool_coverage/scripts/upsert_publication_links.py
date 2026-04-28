@@ -101,7 +101,7 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
     Upsert development links from submission_dev_links.csv to syn26486807.
 
     Resolves resourceId from syn51730943 using (_toolName, _toolType).
-    Skips rows already present (by publicationDevelopmentId) or unresolvable.
+    Skips rows already present (by resourceId+publicationId+funderId) or unresolvable.
     """
     df = pd.read_csv(dev_csv)
 
@@ -116,12 +116,15 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
         rtype = row.get("resourceType", "")
         res_map[(rname.lower(), rtype)] = row["resourceId"]
 
-    # Fetch existing development link IDs to avoid duplicates
+    # Fetch existing links to avoid duplicates — use (resourceId, publicationId)
     existing_dev = syn.tableQuery(
-        f"SELECT publicationDevelopmentId FROM {DEV_TABLE}"
+        f"SELECT resourceId, publicationId FROM {DEV_TABLE}"
     ).asDataFrame()
-    existing_ids = (
-        set(existing_dev["publicationDevelopmentId"].dropna())
+    existing_keys = (
+        set(zip(
+            existing_dev["resourceId"].fillna(""),
+            existing_dev["publicationId"].fillna(""),
+        ))
         if len(existing_dev) > 0 else set()
     )
 
@@ -130,11 +133,6 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
     skipped_no_res = []
 
     for _, row in df.iterrows():
-        dev_id = row.get("publicationDevelopmentId", "")
-        if dev_id in existing_ids:
-            skipped_dup.append(dev_id)
-            continue
-
         tool_name = (row.get("_toolName") or "").strip()
         ttype = row.get("_toolType", "")
         rtype = _TTYPE_TO_RTYPE.get(ttype, "")
@@ -144,15 +142,21 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
 
+        pub_id = row.get("publicationId", "") or ""
+        funder_id = row.get("funderId") or ""
+        key = (resource_id, pub_id)
+        if key in existing_keys:
+            skipped_dup.append(key)
+            continue
+
         rows_to_add.append({
-            "publicationDevelopmentId": dev_id,
-            "publicationId": row["publicationId"],
+            "publicationId": pub_id,
             "resourceId": resource_id,
-            "funderId": row.get("funderId") or "",
+            "funderId": funder_id,
             "investigatorId": row.get("investigatorId") or "",
         })
 
-    print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
+    print(f"  {len(df)} in CSV | {len(existing_keys)} existing (resourceId,publicationId) pairs "
           f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved "
           f"| {len(skipped_dup)} duplicate")
 
@@ -166,7 +170,7 @@ def upsert_development_links(syn, dev_csv: str, dry_run: bool) -> int:
 
     if dry_run:
         for r in rows_to_add:
-            print(f"    + devId={r['publicationDevelopmentId'][:8]}… "
+            print(f"    + pubId={r['publicationId'][:8]}… "
                   f"resId={r['resourceId'][:8]}… funder={r['funderId'][:8] if r['funderId'] else '—'}")
         return len(rows_to_add)
 
