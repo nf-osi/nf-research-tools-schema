@@ -976,15 +976,19 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
 # Resources CSV generation
 # ---------------------------------------------------------------------------
 
-def _generate_resources_csv(csv_dir: Path, dry_run: bool) -> None:
-    """Build ACCEPTED_resources.csv from all type-specific ACCEPTED_*.csv files.
+def _generate_resources_csv(
+    csv_dir: Path, dry_run: bool, json_files: list | None = None
+) -> None:
+    """Build ACCEPTED_resources.csv covering all known resources.
 
-    One row per unique resource (by resourceId).  The type-specific FK column
-    (e.g. cellLineId) is populated; all other FK columns are blank.  Existing
-    rows are preserved; new rows are appended.
+    Two passes:
+    1. Type-specific ACCEPTED_*.csv files (resources compiled this run).
+    2. All raw submission JSON files (same scope as _collect_pub_and_dev_rows),
+       so that dev-link targets for previously-submitted resources that are not
+       yet in Synapse are also resolvable.
 
-    This feeds clean_submission_csvs.py → syn26450069 so that
-    upsert_publication_links.py can resolve resourceId via syn51730943.
+    One row per unique resource (by resourceId).  Existing rows are preserved;
+    new rows are appended.
     """
     resources_path = csv_dir / "ACCEPTED_resources.csv"
 
@@ -999,6 +1003,32 @@ def _generate_resources_csv(csv_dir: Path, dry_run: bool) -> None:
 
     new_rows: list = []
 
+    def _add_resource(resource_name: str, ttype: str) -> None:
+        if not resource_name or ttype not in _TTYPE_ID_INFO:
+            return
+        rtype_label, id_col, ttype_plural = _TTYPE_ID_INFO[ttype]
+        resource_id = _make_resource_id(resource_name, ttype_plural)
+        if resource_id in existing_ids:
+            return
+        fk_row = {col: "" for col in _RESOURCE_FK_COLS}
+        fk_row[id_col] = resource_id
+        new_rows.append({
+            "resourceId":        resource_id,
+            "resourceName":      resource_name,
+            "resourceType":      rtype_label,
+            **fk_row,
+            "rrid":              "",
+            "description":       "",
+            "synonyms":          "",
+            "usageRequirements": "",
+            "howToAcquire":      "",
+            "dateAdded":         "",
+            "dateModified":      "",
+            "aiSummary":         "",
+        })
+        existing_ids.add(resource_id)
+
+    # Pass 1: type-specific ACCEPTED_*.csv files (compiled this run, IDs already set)
     for ttype, (rtype_label, id_col, ttype_plural) in _TTYPE_ID_INFO.items():
         csv_key, _ = _BUILDERS.get(ttype, (None, None))
         if csv_key is None:
@@ -1012,17 +1042,12 @@ def _generate_resources_csv(csv_dir: Path, dry_run: bool) -> None:
                 resource_name = row.get("_resourceName", "").strip()
                 if not resource_name:
                     continue
-
-                resource_id = row.get(id_col, "").strip()
-                if not resource_id:
-                    resource_id = _make_resource_id(resource_name, ttype_plural)
-
+                resource_id = row.get(id_col, "").strip() or \
+                              _make_resource_id(resource_name, ttype_plural)
                 if resource_id in existing_ids:
                     continue
-
                 fk_row = {col: "" for col in _RESOURCE_FK_COLS}
                 fk_row[id_col] = resource_id
-
                 new_rows.append({
                     "resourceId":        resource_id,
                     "resourceName":      resource_name,
@@ -1038,6 +1063,24 @@ def _generate_resources_csv(csv_dir: Path, dry_run: bool) -> None:
                     "aiSummary":         "",
                 })
                 existing_ids.add(resource_id)
+
+    # Pass 2: raw JSON files — catches resources from submissions not compiled
+    # this run (e.g. --files-list mode) that still appear in dev links.
+    for json_path in (json_files or []):
+        try:
+            with open(json_path, encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        ttype = _tool_type_from_json(data)
+        if not ttype or ttype not in _BUILDERS:
+            continue
+        _, builder_fn = _BUILDERS[ttype]
+        try:
+            row = builder_fn(_flatten_publications(data))
+        except Exception:
+            continue
+        _add_resource(row.get("_resourceName", "").strip(), ttype)
 
     if dry_run:
         print(f"  [dry-run] resources: {len(new_rows)} new record(s)")
@@ -1188,7 +1231,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
 
     # --- Resources table (syn26450069 feed) ---
     print("\n--- Generating resources records ---")
-    _generate_resources_csv(csv_dir, dry_run)
+    _generate_resources_csv(csv_dir, dry_run, json_files=scan_files)
 
 
 def main():

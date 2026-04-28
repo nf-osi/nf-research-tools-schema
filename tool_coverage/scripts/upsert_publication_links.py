@@ -194,12 +194,15 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
 
+        def _str(val) -> str:
+            return "" if val is None or (isinstance(val, float) and pd.isna(val)) else str(val)
+
         rows_to_add.append({
             "publicationDevelopmentId": dev_id,
-            "publicationId": row.get("publicationId", "") or "",
+            "publicationId": _str(row.get("publicationId")),
             "resourceId": resource_id,
-            "funderId": row.get("funderId") or "",
-            "investigatorId": row.get("investigatorId") or "",
+            "funderId": _str(row.get("funderId")),
+            "investigatorId": _str(row.get("investigatorId")),
         })
 
     print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
