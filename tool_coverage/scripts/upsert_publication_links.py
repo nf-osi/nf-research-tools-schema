@@ -61,8 +61,9 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
     """Upsert new publications from submission_publications.csv to syn26486839."""
     df = pd.read_csv(pubs_csv)
 
-    # Strip internal tracking columns
-    pub_cols = [c for c in df.columns if not c.startswith("_")]
+    # Strip internal tracking columns and local-only columns not in the Synapse schema
+    _LOCAL_ONLY = {"year"}
+    pub_cols = [c for c in df.columns if not c.startswith("_") and c not in _LOCAL_ONLY]
     df_clean = df[pub_cols].drop_duplicates(subset="pmid", keep="first").copy()
     df_clean = df_clean[df_clean["pmid"].notna() & (df_clean["pmid"] != "")]
 
