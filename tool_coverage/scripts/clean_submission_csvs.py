@@ -16,6 +16,8 @@ import synapseclient
 from synapseclient import Table
 from typing import List, Dict, Tuple
 
+SYN_RESOURCES_TABLE = "syn26450069"
+
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
     # Existing tool types (v1.0)
@@ -295,6 +297,35 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         print(f"      ℹ️  Serialized STRING_LIST columns: {present_sl}")
 
     try:
+        # For the Resources table, skip rows whose (resourceName, resourceType) pair is
+        # already in Synapse to prevent duplicate name+type entries.  We check by name+type
+        # (not resourceId) because that is the lookup key used by upsert_publication_links.py
+        # and because ID format may differ between pipeline runs.  Real metadata updates to
+        # existing resources should go through generate_review_csv.py, which preserves
+        # curated fields; uploading here would blank them out.
+        if table_id == SYN_RESOURCES_TABLE and "resourceName" in df_clean.columns:
+            existing_res = syn.tableQuery(
+                f"SELECT resourceName, resourceType FROM {SYN_RESOURCES_TABLE}"
+            ).asDataFrame()
+            existing_keys = set(
+                zip(
+                    existing_res["resourceName"].str.lower().fillna(""),
+                    existing_res["resourceType"].fillna(""),
+                )
+            ) if len(existing_res) > 0 else set()
+            before = len(df_clean)
+            mask = df_clean.apply(
+                lambda r: (str(r["resourceName"]).lower(), str(r.get("resourceType", ""))) not in existing_keys,
+                axis=1,
+            )
+            df_clean = df_clean[mask].copy()
+            skipped = before - len(df_clean)
+            if skipped:
+                print(f"      ℹ️  Skipped {skipped} resource(s) already registered in Synapse")
+            if df_clean.empty:
+                print(f"      ✅ No new resources to upload to {table_id}")
+                return True
+
         table = Table(table_id, df_clean)
         table = syn.store(table)
 

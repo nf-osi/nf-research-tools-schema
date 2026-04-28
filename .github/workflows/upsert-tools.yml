@@ -6,16 +6,22 @@ on:
       - main
     paths:
       - 'submissions/*/*.json'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:
     inputs:
       dry_run:
         description: 'Run in dry-run mode (validate and preview, but do not upsert to Synapse)'
         required: false
         type: boolean
         default: false
+      force:
+        description: 'Process all submission JSON files, ignoring last-run state'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: read
   issues: write
 
 jobs:
@@ -40,31 +46,51 @@ jobs:
 
       - name: Identify changed JSON files
         id: changed_files
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "=========================================="
           echo "IDENTIFYING changed submissions/*/*.json"
           echo "=========================================="
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "workflow_dispatch — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            echo "Initial push to main — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          else
-            git diff --name-only --diff-filter=AM \
-              "${{ github.event.before }}" "${{ github.sha }}" \
+          _diff_submissions() {
+            local base_sha="$1"
+            git diff --name-only --diff-filter=AM "$base_sha" "${{ github.sha }}" \
               -- 'submissions/' \
               | grep -v '/observations/' \
               | grep '\.json$' > changed_json_files.txt || true
-
             COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
-            echo "Found ${COUNT} changed JSON file(s):"
+            echo "Found ${COUNT} changed JSON file(s) since ${base_sha:0:8}:"
             cat changed_json_files.txt
             echo "changed_count=${COUNT}" >> $GITHUB_OUTPUT
             echo "use_all=false" >> $GITHUB_OUTPUT
+          }
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "workflow_dispatch (force=true) — processing all submission JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — checking for changes since last successful run"
+            LAST_SHA=$(gh api \
+              "repos/${{ github.repository }}/actions/workflows/upsert-tools.yml/runs?status=success&per_page=5" \
+              --jq --arg cur "${{ github.sha }}" \
+              '[.workflow_runs[] | select(.head_sha != $cur)] | .[0].head_sha // empty' \
+              2>/dev/null || echo "")
+            if [ -z "$LAST_SHA" ] || [ "$LAST_SHA" = "null" ]; then
+              echo "No previous successful run found — processing all files"
+              echo "use_all=true" >> $GITHUB_OUTPUT
+            else
+              echo "Last successful run SHA: ${LAST_SHA}"
+              _diff_submissions "$LAST_SHA"
+            fi
+
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "Initial push to main — processing all submission JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          else
+            _diff_submissions "${{ github.event.before }}"
           fi
 
       - name: Compile changed JSON submissions into ACCEPTED_*.csv
