@@ -55,16 +55,28 @@ _STRIP_BEFORE_UPLOAD = {
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     # developerContactEmail → no schema home; dropped
     # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
+    # Columns after transplantationDonorId not yet in syn26486808 — remove once schema updated:
     'CLEAN_animal_models.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
+        'alleleType', 'affectedGeneSymbol', 'inducedVsDevelopmental', 'bbbIntegrityStatus',
+        'routeOfAdministration', 'pkpdCapabilities', 'mechanismOfActionValidation',
+        'pediatricSuitability', 'timelineToResults', 'modelLimitations',
+        'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
+        'ngnriRepositoryStatus',
     ],
     # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
     'CLEAN_antibodies.csv': [
         'vendor', 'catalogNumber', 'catalogURL',
     ],
     # rrid → resource table (syn26450069); developer fields same as animal models
+    # licenseDetails not yet in syn73709226 with sufficient length — remove once schema updated:
     'CLEAN_computational_tools.csv': [
         'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
+        'licenseDetails',
+    ],
+    # organoidProtocolId not yet added to syn73709227 — remove once schema updated:
+    'CLEAN_organoid_protocols.csv': [
+        'organoidProtocolId',
     ],
 }
 
@@ -86,11 +98,34 @@ def _get_string_list_columns(syn: synapseclient.Synapse, table_id: str) -> List[
         return []
 
 
+def _smart_split(val: str, sep: str = ',') -> List[str]:
+    """Split on sep but not inside parentheses or brackets."""
+    parts: List[str] = []
+    depth = 0
+    current: List[str] = []
+    for ch in val:
+        if ch in '([':
+            depth += 1
+            current.append(ch)
+        elif ch in ')]':
+            depth -= 1
+            current.append(ch)
+        elif ch == sep and depth == 0:
+            parts.append(''.join(current).strip())
+            current = []
+        else:
+            current.append(ch)
+    if current:
+        parts.append(''.join(current).strip())
+    return [p for p in parts if p]
+
+
 def _serialize_string_lists(df: pd.DataFrame, string_list_cols: List[str]) -> pd.DataFrame:
     """Convert STRING_LIST columns from plain comma-separated strings to JSON arrays.
 
     compile_accepted_submissions._fmt_list() produces comma-joined strings
     (e.g. "French, English").  Synapse requires JSON arrays (["French","English"]).
+    Commas inside parentheses (e.g. "IHC (S100, CD34)") are not treated as delimiters.
     """
     if not string_list_cols:
         return df
@@ -106,7 +141,7 @@ def _serialize_string_lists(df: pd.DataFrame, string_list_cols: List[str]) -> pd
                     return val  # already a valid JSON array
             except (json.JSONDecodeError, ValueError):
                 pass
-            items = [v.strip() for v in val.split(',') if v.strip()]
+            items = _smart_split(val)
             return json.dumps(items)
         if isinstance(val, list):
             return json.dumps([str(v) for v in val if v])
@@ -156,14 +191,13 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'observations': ['resourceId', 'resourceType', 'resourceName', 'observationType', 'details']
     }
 
-    # Extract file type from filename
-    for key in required_columns.keys():
-        if key in file_type:
-            req_cols = required_columns[key]
-            break
-    else:
-        # Unknown type, skip validation
+    # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
+    import re as _re
+    m = _re.search(r'(?:ACCEPTED|CLEAN|SUBMIT)_(\w+)\.csv', os.path.basename(file_type))
+    file_stem = m.group(1) if m else ''
+    if file_stem not in required_columns:
         return True, []
+    req_cols = required_columns[file_stem]
 
     # Check for required columns
     missing_cols = [col for col in req_cols if col not in df.columns]
@@ -361,8 +395,11 @@ Examples:
 
         # Upsert if requested
         if args.upsert and not args.dry_run:
-            success = upsert_to_synapse(syn, clean_file, df_clean)
-            upload_summary.append((clean_file, len(df_clean), success))
+            if not get_synapse_table_id(clean_file):
+                print(f"      ⏭️  {os.path.basename(clean_file)} — no Synapse table mapping (handled elsewhere)")
+            else:
+                success = upsert_to_synapse(syn, clean_file, df_clean)
+                upload_summary.append((clean_file, len(df_clean), success))
         elif args.dry_run:
             table_id = get_synapse_table_id(clean_file)
             if table_id:
