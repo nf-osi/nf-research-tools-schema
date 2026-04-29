@@ -667,7 +667,6 @@ def update_materialized_view(syn: synapseclient.Synapse, view_id: str, scores_ta
     BB.specimenFormat AS specimenFormat,
     BB.specimenType AS specimenType,
     BB.contact AS contact,
-    D_F.funderName AS funderName,
     AM_CL_R_DON.race AS race,
     AM_CL_R_DON.sex AS sex,
     AM_CL_R_DON.age AS age,
@@ -701,8 +700,6 @@ LEFT JOIN
     syn26486821 BB ON (R.resourceId = BB.resourceId)
 LEFT JOIN
     syn51734029 D_I ON (R.resourceId = D_I.resourceId)
-LEFT JOIN
-    syn51734076 D_F ON (R.resourceId = D_F.resourceId)
 LEFT JOIN
     syn51735419 AM_CL_R_DON ON (R.resourceId = AM_CL_R_DON.resourceId)
 LEFT JOIN
