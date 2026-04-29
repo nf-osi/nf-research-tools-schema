@@ -29,6 +29,8 @@ _DETAIL_TABLE_PK = {
     "syn73709227": "organoidProtocolId",
     "syn73709228": "patientDerivedModelId",
     "syn73709229": "clinicalAssessmentToolId",
+    "syn26486829": "donorId",
+    "syn26486850": "vendorId",
 }
 
 
