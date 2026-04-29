@@ -57,7 +57,6 @@ jobs:
             local base_sha="$1"
             git diff --name-only --diff-filter=AM "$base_sha" "${{ github.sha }}" \
               -- 'submissions/' \
-              | grep -v '/observations/' \
               | grep '\.json$' > changed_json_files.txt || true
             COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
             echo "Found ${COUNT} changed JSON file(s) since ${base_sha:0:8}:"
@@ -102,7 +101,7 @@ jobs:
 
           if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
             # workflow_dispatch or initial push — process all submission files
-            if find submissions -maxdepth 2 -name "*.json" ! -path "*/observations/*" | grep -q .; then
+            if find submissions -maxdepth 3 -name "*.json" | grep -q .; then
               python tool_coverage/scripts/compile_accepted_submissions.py \
                 --accepted-dir submissions \
                 --csv-dir tool_coverage/outputs

@@ -539,6 +539,9 @@ def _build_patient_derived_model(d: dict) -> dict:
         "humanizationMethod": _get(bi, "humanizationMethod"),
         "immuneSystemComponents": _fmt_list(_get(bi, "immuneSystemComponents")),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
+        "itemAcquisition": _get(d, "itemAcquisition"),
+        "developerName": _get(bi, "developerName"),
+        "developerAffiliation": _get(bi, "developerAffiliation"),
         "_resourceName": unique_name,
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
@@ -606,6 +609,8 @@ def _build_organoid_protocol(d: dict) -> dict:
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _fmt_list(_get(bi, "qualityControlMetrics")),
+        "developerName": _get(bi, "developerName") or _get(d, "developerName"),
+        "developerContactEmail": _get(d, "developerContactEmail"),
         "_resourceName": _get(bi, "resourceName") or _get(d, "_resourceName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
@@ -635,6 +640,8 @@ def _build_clinical_assessment_tool(d: dict) -> dict:
         "availabilityStatus": _get(bi, "availabilityStatus"),
         "licensingRequirements": _get(bi, "licensingRequirements"),
         "digitalVersion": _get(bi, "digitalVersion"),
+        "developerName": _get(bi, "developerName") or _get(d, "developerName"),
+        "developerContactEmail": _get(d, "developerContactEmail"),
         "_resourceName": _get(bi, "assessmentName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
@@ -649,24 +656,38 @@ def _build_clinical_assessment_tool(d: dict) -> dict:
 
 def _build_observation(d: dict) -> dict:
     obs = d.get("observationsSection", {}).get("observations", [d])[0] if "observationsSection" in d else d
-    pub = d.get("publication", {})
+    # Observation JSONs store publication metadata in _publications array
+    pubs = d.get("_publications", [])
+    first_pub = pubs[0] if pubs else {}
+    pmid = (first_pub.get("_pmid") or _get(d, "_pmid") or "").strip()
+    doi = (first_pub.get("_doi") or _get(d, "_doi") or "").strip()
+    pub_title = first_pub.get("_publicationTitle") or _get(d, "_publicationTitle") or ""
+    year = first_pub.get("_year") or _get(d, "_year") or ""
+
+    resource_name = _get(obs, "resourceName")
+    obs_type = _get(obs, "observationType")
+    details = _get(obs, "details")
+
+    obs_key = f"{resource_name}|{obs_type}|{(details or '')[:200]}|{pmid or doi}"
+    obs_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"observation:{obs_key}"))
+
     return {
-        "observationId": "",
+        "observationId": obs_id,
         "resourceType": _get(obs, "resourceType"),
-        "resourceName": _get(obs, "resourceName"),
-        "observationType": _get(obs, "observationType"),
-        "details": _get(obs, "details"),
+        "resourceName": resource_name,
+        "observationType": obs_type,
+        "details": details,
         "observationTypeOntologyId": _get(obs, "observationTypeOntologyId"),
         "observationPhase": _get(obs, "observationPhase"),
         "observationTime": _get(obs, "observationTime"),
         "observationTimeUnits": _get(obs, "observationTimeUnits"),
         "reliabilityRating": _get(obs, "reliabilityRating"),
         "easeOfUseRating": _get(obs, "easeOfUseRating"),
-        "observationLink": _get(obs, "observationLink"),
-        "_pmid": _get(d, "_pmid"),
-        "_doi": _get(d, "_doi") or _get(pub, "doi"),
-        "_publicationTitle": _get(d, "_publicationTitle"),
-        "_year": _get(d, "_year"),
+        "observationLink": _get(obs, "observationLink") or _get(d, "referencePublication"),
+        "_pmid": pmid,
+        "_doi": doi,
+        "_publicationTitle": pub_title,
+        "_year": year,
         "_source": _get(d, "_source", default="formspark"),
     }
 
@@ -980,18 +1001,60 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
 # Resources CSV generation
 # ---------------------------------------------------------------------------
 
+_TRIVIAL_ACQ = {"", "n/a", "unknown", "other", "na"}
+
+
 def _compute_how_to_acquire(ttype: str, row: dict) -> str:
-    """Generate howToAcquire string from submission fields for tool types that have no vendor."""
+    """Generate howToAcquire string from submission fields."""
+    def _acq(key: str) -> str:
+        return (row.get(key) or "").strip()
+
     if ttype == "computational_tool":
-        src = (row.get("sourceRepository") or "").strip()
-        acq = (row.get("itemAcquisition") or "").strip()
-        dev = (row.get("developerName") or "").strip()
+        src = _acq("sourceRepository")
+        acq = _acq("itemAcquisition")
+        dev = _acq("developerName")
         if src:
             return f"Available at: {src}"
-        if acq and acq.lower() not in ("", "n/a", "unknown", "other"):
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
             return acq
         if dev:
             return f"Contact developer: {dev}"
+
+    elif ttype in ("organoid_protocol", "clinical_assessment_tool"):
+        avail = _acq("availabilityStatus")  # CAT only
+        email = _acq("developerContactEmail")
+        dev = _acq("developerName")
+        if avail and avail.lower() not in _TRIVIAL_ACQ | {"contact developer"}:
+            return avail
+        if email:
+            return f"Contact developer: {email}"
+        if dev:
+            return f"Contact developer: {dev}"
+
+    elif ttype == "patient_derived_model":
+        acq = _acq("itemAcquisition")
+        dev = _acq("developerName")
+        aff = _acq("developerAffiliation")
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            if acq.lower() == "contact developer":
+                if dev:
+                    return f"Contact developer: {dev}" + (f" ({aff})" if aff else "")
+                if aff:
+                    return f"Contact: {aff}"
+            else:
+                return acq
+
+    elif ttype == "animal_model":
+        ngnri = _acq("ngnriRepositoryStatus")
+        acq = _acq("itemAcquisition")
+        email = _acq("developerContactEmail")
+        if ngnri and ngnri.lower() not in _TRIVIAL_ACQ | {"not deposited"}:
+            return "Available from NGNRI repository"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return acq
+        if email:
+            return f"Contact developer: {email}"
+
     return ""
 
 
@@ -1175,8 +1238,9 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         csv_path = csv_dir / CSV_FILES[csv_key]
         columns = COLUMNS[csv_key]
 
-        # Load existing names to deduplicate
-        name_col = "_resourceName" if csv_key != "observations" else "resourceName"
+        # Load existing entries to deduplicate.
+        # Observations dedup by stable observationId; all other types by resource name.
+        name_col = "_resourceName" if csv_key != "observations" else "observationId"
         existing = _load_existing_names(csv_path, name_col)
 
         rows = []
@@ -1218,7 +1282,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
     all_sub_files = sorted(
         p for p in ACCEPTED_DIR_DEFAULT.glob("*/*.json")
         if "observations" not in p.parts
-    )
+    ) + sorted(ACCEPTED_DIR_DEFAULT.glob("*/observations/*.json"))
     scan_files = all_sub_files if all_sub_files else json_files
     pub_rows, dev_rows = _collect_pub_and_dev_rows(scan_files)
 
@@ -1302,7 +1366,7 @@ def main():
         json_files = sorted(
             p for p in args.accepted_dir.glob("*/*.json")
             if "observations" not in p.parts
-        )
+        ) + sorted(args.accepted_dir.glob("*/observations/*.json"))
 
     compile_accepted(json_files, args.csv_dir, args.dry_run)
 

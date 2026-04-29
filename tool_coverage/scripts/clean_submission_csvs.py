@@ -24,6 +24,7 @@ _DETAIL_TABLE_PK = {
     "syn26486811": "antibodyId",
     "syn26486823": "cellLineId",
     "syn26486832": "geneticReagentId",
+    "syn26486836": "observationId",
     "syn73709226": "computationalToolId",
     "syn73709227": "organoidProtocolId",
     "syn73709228": "patientDerivedModelId",
@@ -97,12 +98,18 @@ _STRIP_BEFORE_UPLOAD = {
         'licenseDetails',
     ],
     # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
+    # developerName/developerContactEmail used only for howToAcquire in resources table
     'CLEAN_organoid_protocols.csv': [
-        'qualityControlMetrics',
+        'qualityControlMetrics', 'developerName', 'developerContactEmail',
+    ],
+    # developerName/developerContactEmail used only for howToAcquire in resources table
+    'CLEAN_clinical_assessment_tools.csv': [
+        'developerName', 'developerContactEmail',
     ],
     # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
+    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table
     'CLEAN_patient_derived_models.csv': [
-        'validationMethods',
+        'validationMethods', 'itemAcquisition', 'developerName', 'developerAffiliation',
     ],
 }
 
