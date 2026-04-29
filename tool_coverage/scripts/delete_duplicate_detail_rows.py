@@ -9,6 +9,7 @@ rows inserted before the FK column existed in the target table.
 Tables targeted:
   syn26486808  AnimalModelDetails
   syn26486811  AntibodyDetails
+  syn26486823  CellLineDetails
   syn73709226  ComputationalToolDetails
   syn73709227  OrganoidProtocolDetails
   syn73709228  PatientDerivedModelDetails
@@ -28,6 +29,7 @@ from synapseclient.models import Table as SynapseTable
 TABLES = {
     "syn26486808": "animalModelId",
     "syn26486811": "antibodyId",
+    "syn26486823": "cellLineId",
     "syn73709226": "computationalToolId",
     "syn73709227": "organoidProtocolId",
     "syn73709228": "patientDerivedModelId",
