@@ -264,11 +264,11 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
             continue
 
         for _, row in df.iterrows():
-            dev_name = (row.get("developerName") or "").strip()
+            dev_name = _str(row.get("developerName"))
             if not dev_name:
                 continue
-            dev_affil = (row.get("developerAffiliation") or "").strip()
-            tool_name = (row.get("_resourceName") or "").strip()
+            dev_affil = _str(row.get("developerAffiliation"))
+            tool_name = _str(row.get("_resourceName"))
             resource_id = res_map.get((tool_name.lower(), rtype))
             if not resource_id:
                 continue
