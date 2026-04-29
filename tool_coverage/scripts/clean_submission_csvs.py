@@ -366,7 +366,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                 for _, prow in df_existing.iterrows():
                     key = (str(prow["resourceName"]).lower(), str(prow.get("resourceType", "")))
                     row_id, row_ver, cur_val = existing_map.get(key, (None, None, ""))
-                    new_val = str(prow.get("howToAcquire") or "")
+                    raw = prow.get("howToAcquire")
+                    new_val = "" if (raw is None or (isinstance(raw, float) and pd.isna(raw))) else str(raw).strip()
                     if row_id and new_val and new_val != cur_val:
                         patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, "howToAcquire": new_val})
                 if patch_rows:
