@@ -521,7 +521,10 @@ def _build_patient_derived_model(d: dict) -> dict:
     model_system_type = _get(bi, "modelSystemType")
     # PDX and 3D culture variants of the same base name are distinct resources;
     # append the modelSystemType so every downstream key (dedup, ID, lookup) is unique.
-    unique_name = f"{resource_name} ({model_system_type})" if model_system_type else resource_name
+    # Use short labels for verbose modelSystemType values (e.g. "PDX (Patient-Derived Xenograft)" → "PDX").
+    _MST_SHORT = {"PDX (Patient-Derived Xenograft)": "PDX"}
+    short_mst = _MST_SHORT.get(model_system_type, model_system_type)
+    unique_name = f"{resource_name} ({short_mst})" if short_mst else resource_name
     species = _get(bi, "species")
     return {
         "patientDerivedModelId": "",
