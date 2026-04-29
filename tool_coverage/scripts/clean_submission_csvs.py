@@ -221,7 +221,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
-        'observations': ['resourceId', 'resourceType', 'resourceName', 'observationType', 'details']
+        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'details']
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
