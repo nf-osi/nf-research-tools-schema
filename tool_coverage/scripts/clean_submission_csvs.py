@@ -226,7 +226,6 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         # Common tables
         'publications': ['publicationId', 'pmid'],
         'usage': ['usageId', 'publicationId', 'resourceId'],
-        'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
         'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText']

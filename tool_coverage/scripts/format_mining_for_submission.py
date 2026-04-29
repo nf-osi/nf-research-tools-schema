@@ -783,59 +783,6 @@ def format_resources(tool_csvs):
     return pd.DataFrame(resource_rows)
 
 
-def format_development_links(tool_csvs, publication_ids_map):
-    """
-    Format Development table entries (syn26486807) for publications where
-    tools were DEVELOPED (not just used).
-
-    Args:
-        tool_csvs: Dictionary of tool type DataFrames with _is_development flag
-        publication_ids_map: Dict mapping PMID to publicationId from publications table
-
-    Returns:
-        DataFrame with Development table entries
-    """
-    development_rows = []
-
-    # Process each tool type
-    for tool_type, tool_df in tool_csvs.items():
-        if tool_df.empty:
-            continue
-
-        for idx, tool_row in tool_df.iterrows():
-            # Only include tools where is_development is True
-            is_dev = tool_row.get('_is_development', False)
-            if not is_dev:
-                continue
-
-            pmid = tool_row.get('_pmid', '')
-            if not pmid or pmid not in publication_ids_map:
-                continue
-
-            # Get the resource ID for this tool
-            resource_id = (tool_row.get('animalModelId') or
-                          tool_row.get('antibodyId') or
-                          tool_row.get('cellLineId') or
-                          tool_row.get('geneticReagentId'))
-
-            if not resource_id:
-                continue
-
-            development_rows.append({
-                'publicationDevelopmentId': generate_uuid(),
-                'publicationId': publication_ids_map[pmid],
-                'resourceId': resource_id,
-                # Extra tracking fields
-                '_pmid': pmid,
-                '_resourceType': tool_type,
-                '_fundingAgency': tool_row.get('_fundingAgency', ''),
-                '_source': 'Automated full-text mining - development context detected',
-                '_notes': tool_row.get('_methods_context', '')
-            })
-
-    return pd.DataFrame(development_rows)
-
-
 def match_observation_to_resource(resource_name, resource_type, syn):
     """
     Match observation to existing resource by name and type.
@@ -1096,16 +1043,6 @@ def main():
     else:
         print("   (no usage links found)")
 
-    # Development Links (tools that were DEVELOPED)
-    print("\n6. Formatting Development table (syn26486807)...")
-    development_df = format_development_links(tool_csvs, publication_ids_map)
-    if not development_df.empty:
-        output_file = 'tool_coverage/outputs/SUBMIT_development.csv'
-        development_df.to_csv(output_file, index=False)
-        print(f"   ✓ {len(development_df)} development links → {output_file}")
-    else:
-        print("   (no development links found)")
-
     # Summary
     print("\n" + "=" * 80)
     print("SUMMARY")
@@ -1113,24 +1050,10 @@ def main():
     total_novel_tools = sum(len(df) for df in tool_csvs.values())
     total_publications = len(publications_df) if not publications_df.empty else 0
     total_usage = len(usage_df) if not usage_df.empty else 0
-    total_development = len(development_df) if not development_df.empty else 0
 
     print(f"\nNovel tool suggestions: {total_novel_tools}")
     print(f"Publications: {total_publications}")
     print(f"Usage links: {total_usage}")
-    print(f"Development links: {total_development}")
-
-    # Count development vs usage
-    dev_count = 0
-    usage_count = 0
-    for name, df in tool_csvs.items():
-        if '_is_development' in df.columns:
-            dev_count += df['_is_development'].sum()
-            usage_count += len(df) - df['_is_development'].sum()
-
-    print(f"\n🔬 Development vs Usage breakdown:")
-    print(f"   - Development: {dev_count} tools")
-    print(f"   - Usage: {usage_count} tools")
 
     print("\n📋 Submission Files Created (NEW ROWS only - to be appended after verification):")
     print("\n   Core Tables:")
@@ -1150,8 +1073,6 @@ def main():
         print(f"   - SUBMIT_publications.csv ({len(publications_df)} publications) → syn26486839")
     if not usage_df.empty:
         print(f"   - SUBMIT_usage.csv ({len(usage_df)} usage links) → syn26486841")
-    if not development_df.empty:
-        print(f"   - SUBMIT_development.csv ({len(development_df)} development links) → syn26486807")
 
     # Format observations (from AI validation)
     observations_df, unmatched_obs_df = format_observations()
