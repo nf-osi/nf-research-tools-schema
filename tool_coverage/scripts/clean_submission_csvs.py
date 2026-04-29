@@ -111,6 +111,14 @@ _STRIP_BEFORE_UPLOAD = {
     'CLEAN_patient_derived_models.csv': [
         'validationMethods', 'itemAcquisition', 'developerName', 'developerAffiliation',
     ],
+    # v2.0 type-specific FK columns not yet added to syn26450069 schema
+    'CLEAN_resources.csv': [
+        'computationalToolId', 'organoidProtocolId', 'patientDerivedModelId',
+        'clinicalAssessmentToolId',
+    ],
+    # resourceType/resourceName kept in ACCEPTED for review; strip before Synapse upload.
+    # observationTypeOntologyId not in syn26486836 schema.
+    'CLEAN_observations.csv': ['resourceType', 'resourceName', 'observationTypeOntologyId'],
 }
 
 
@@ -221,7 +229,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
-        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'details']
+        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText']
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")

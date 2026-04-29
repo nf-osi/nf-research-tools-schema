@@ -123,8 +123,8 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "observations": [
-        "observationId", "resourceType", "resourceName", "observationType",
-        "details", "observationTypeOntologyId", "observationPhase",
+        "observationId", "resourceId", "resourceType", "resourceName", "observationType",
+        "observationText", "observationTypeOntologyId", "observationPhase",
         "observationTime", "observationTimeUnits", "reliabilityRating",
         "easeOfUseRating", "observationLink",
         "_pmid", "_doi", "_publicationTitle", "_year", "_source",
@@ -290,6 +290,9 @@ _TTYPE_ID_INFO: dict = {
     "organoid_protocol":       ("Organoid Protocol",      "organoidProtocolId",      "organoid_protocols"),
     "clinical_assessment_tool":("Clinical Assessment Tool","clinicalAssessmentToolId","clinical_assessment_tools"),
 }
+
+# Reverse map: Synapse resourceType label → ttype_plural (for observations resourceId)
+_RTYPE_TO_TTYPE_P = {rtype: tp for _, (rtype, _, tp) in _TTYPE_ID_INFO.items()}
 
 # All FK columns that appear in the Resources table (syn26450069)
 _RESOURCE_FK_COLS = [
@@ -679,18 +682,23 @@ def _build_observation(d: dict) -> dict:
     year = first_pub.get("_year") or _get(d, "_year") or ""
 
     resource_name = _get(obs, "resourceName")
+    resource_type = _get(obs, "resourceType")
     obs_type = _get(obs, "observationType")
     details = _get(obs, "details")
 
     obs_key = f"{resource_name}|{obs_type}|{(details or '')[:200]}|{pmid or doi}"
     obs_id = str(uuid.uuid5(_PROJECT_NAMESPACE, f"observation:{obs_key}"))
 
+    ttype_plural = _RTYPE_TO_TTYPE_P.get(resource_type, "")
+    resource_id = _make_resource_id(resource_name, ttype_plural) if ttype_plural else ""
+
     return {
         "observationId": obs_id,
-        "resourceType": _get(obs, "resourceType"),
+        "resourceId": resource_id,
+        "resourceType": resource_type,
         "resourceName": resource_name,
         "observationType": obs_type,
-        "details": details,
+        "observationText": details,
         "observationTypeOntologyId": _get(obs, "observationTypeOntologyId"),
         "observationPhase": _get(obs, "observationPhase"),
         "observationTime": _get(obs, "observationTime"),
