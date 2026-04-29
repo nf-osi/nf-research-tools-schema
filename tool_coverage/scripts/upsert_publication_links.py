@@ -255,9 +255,17 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
     in clean_submission_csvs.py and routed here instead.  Investigator is a person-level
     entity; the investigator↔resource link lives in the dev-links table (syn26486807).
     Also patches any existing dev-link rows that still have a blank investigatorId.
+
+    Handles:
+    - Semicolon-joined multi-investigator fields ("Alice; Bob") → split into separate rows
+    - Within-batch name dedup: prefers entry with institution over blank for same name
+    - Cross-Synapse name dedup: if a name already exists in syn26486833 under any UUID,
+      reuses that UUID rather than inserting a duplicate (covers affiliation-string drift)
     """
-    inv_rows: dict = {}              # investigatorId → row dict (dedup within batch)
-    inv_id_for_resource: dict = {}   # resourceId → investigatorId
+    # name_lower → {"inv_id", "investigatorName", "institution", ...}
+    # Keyed by name so within-batch dedup is natural: prefer entry with institution.
+    by_name: dict = {}
+    inv_id_for_resource: dict = {}   # resourceId → investigatorId (primary investigator)
 
     for csv_name, rtype in _DEVELOPER_CSV_RTYPES.items():
         csv_path = os.path.join(csv_dir, csv_name)
@@ -268,49 +276,89 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
             continue
 
         for _, row in df.iterrows():
-            dev_name = _str(row.get("developerName"))
-            if not dev_name:
+            raw_name = _str(row.get("developerName"))
+            if not raw_name:
                 continue
-            dev_affil = _str(row.get("developerAffiliation"))
+            raw_affil = _str(row.get("developerAffiliation"))
             tool_name = _str(row.get("_resourceName"))
             resource_id = res_map.get((tool_name.lower(), rtype))
             if not resource_id:
                 continue  # skip if resource not yet in Synapse
 
-            inv_id = str(uuid.uuid5(
-                _PROJECT_NAMESPACE,
-                f"investigator:{dev_name}:{dev_affil}",
-            ))
-            inv_rows[inv_id] = {
-                "investigatorId":        inv_id,
-                "investigatorName":      dev_name,
-                "institution":           dev_affil,
-                "orcid":                 "",
-                "investigatorSynapseId": "",
-            }
-            inv_id_for_resource[resource_id] = inv_id
+            # Split on ";" to handle multiple investigators listed in one field
+            names = [n.strip() for n in raw_name.split(";") if n.strip()]
+            affils = [a.strip() for a in raw_affil.split(";") if a.strip()]
+            affils += [""] * (len(names) - len(affils))  # pad if fewer affiliations
 
-    if not inv_rows:
+            primary_inv_id = None
+            for i, (name, affil) in enumerate(zip(names, affils)):
+                key = name.lower()
+                existing = by_name.get(key)
+                if existing is None or (not existing["institution"] and affil):
+                    # New name, or upgrading a blank-institution entry with a real one
+                    inv_id = str(uuid.uuid5(
+                        _PROJECT_NAMESPACE,
+                        f"investigator:{name}:{affil}",
+                    ))
+                    by_name[key] = {
+                        "investigatorId":        inv_id,
+                        "investigatorName":      name,
+                        "institution":           affil,
+                        "orcid":                 "",
+                        "investigatorSynapseId": "",
+                    }
+                if i == 0:
+                    primary_inv_id = by_name[key]["investigatorId"]
+
+            if primary_inv_id and resource_id:
+                inv_id_for_resource[resource_id] = primary_inv_id
+
+    if not by_name:
         print("  No investigator records found in CSVs")
         return 0
 
+    # Fetch existing investigators by both UUID and name for cross-Synapse dedup
     existing_inv = syn.tableQuery(
-        f"SELECT investigatorId FROM {INVESTIGATOR_TABLE}"
+        f"SELECT investigatorId, investigatorName FROM {INVESTIGATOR_TABLE}"
     ).asDataFrame()
-    existing_ids = (
+    existing_ids: set = (
         set(existing_inv["investigatorId"].dropna())
         if len(existing_inv) > 0 else set()
     )
+    # name_lower → existing investigatorId (handles affiliation-string drift)
+    existing_by_name: dict = {}
+    for _, er in existing_inv.iterrows():
+        ename = _str(er.get("investigatorName")).lower()
+        if ename:
+            existing_by_name[ename] = _str(er["investigatorId"])
 
-    new_rows = [r for inv_id, r in inv_rows.items() if inv_id not in existing_ids]
+    # Remap inv_id_for_resource: if a name already exists in Synapse under a different
+    # UUID, point resources to the existing UUID so dev-link patches are correct.
+    for resource_id, inv_id in list(inv_id_for_resource.items()):
+        row = next((r for r in by_name.values() if r["investigatorId"] == inv_id), None)
+        if row:
+            synapse_id = existing_by_name.get(row["investigatorName"].lower())
+            if synapse_id and synapse_id != inv_id:
+                inv_id_for_resource[resource_id] = synapse_id
 
-    print(f"  {len(inv_rows)} in CSVs | {len(existing_ids)} already in Synapse "
-          f"| {len(new_rows)} to add")
+    # New rows: not matched by UUID and not matched by name
+    new_rows = [
+        r for r in by_name.values()
+        if r["investigatorId"] not in existing_ids
+        and r["investigatorName"].lower() not in existing_by_name
+    ]
+    skipped_name = sum(
+        1 for r in by_name.values()
+        if r["investigatorId"] not in existing_ids
+        and r["investigatorName"].lower() in existing_by_name
+    )
+
+    print(f"  {len(by_name)} in CSVs | {len(existing_ids)} already in Synapse "
+          f"| {len(new_rows)} to add | {skipped_name} matched by name (skipped)")
 
     if dry_run:
         for r in new_rows:
             print(f"    + {r['investigatorName']} ({r['institution'] or '—'})")
-        # Also report how many dev links would be patched
         _patch_dev_link_investigator_ids(syn, inv_id_for_resource, dry_run=True)
         return len(new_rows)
 
@@ -321,7 +369,6 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
     else:
         print("  ✅ No new investigators to add")
 
-    # Patch dev-link rows that previously had blank investigatorId
     _patch_dev_link_investigator_ids(syn, inv_id_for_resource, dry_run=False)
 
     return len(new_rows)
