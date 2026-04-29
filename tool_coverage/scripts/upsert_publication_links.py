@@ -179,15 +179,15 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
     Upsert development links from submission_dev_links.csv to syn26486807.
 
     Resolves resourceId from res_map using (_toolName, _toolType).
-    Skips rows already present (by publicationDevelopmentId) or unresolvable.
+    Skips rows already present (by developmentId) or unresolvable.
     """
     df = pd.read_csv(dev_csv)
 
     existing_dev = syn.tableQuery(
-        f"SELECT publicationDevelopmentId FROM {DEV_TABLE}"
+        f"SELECT developmentId FROM {DEV_TABLE}"
     ).asDataFrame()
     existing_ids = (
-        set(existing_dev["publicationDevelopmentId"].dropna())
+        set(existing_dev["developmentId"].dropna())
         if len(existing_dev) > 0 else set()
     )
 
@@ -196,7 +196,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
     skipped_no_res = []
 
     for _, row in df.iterrows():
-        dev_id = row.get("publicationDevelopmentId", "")
+        dev_id = row.get("developmentId", "")
         if dev_id in existing_ids:
             skipped_dup.append(dev_id)
             continue
@@ -211,7 +211,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
             continue
 
         rows_to_add.append({
-            "publicationDevelopmentId": dev_id,
+            "developmentId": dev_id,
             "publicationId": _str(row.get("publicationId")),
             "resourceId": resource_id,
             "funderId": _str(row.get("funderId")),
@@ -232,7 +232,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
     if dry_run:
         for r in rows_to_add:
-            dev_id = r['publicationDevelopmentId']
+            dev_id = r['developmentId']
             print(f"    + devId={dev_id[:8]}… resId={r['resourceId'][:8]}… "
                   f"funder={r['funderId'][:8] if r['funderId'] else '—'}")
         return len(rows_to_add)

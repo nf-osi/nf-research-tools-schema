@@ -803,7 +803,7 @@ def _collect_pub_and_dev_rows(json_files: list) -> tuple:
                         f"dev:{pmid or doi}:{resource_name}:{ttype}:{funder_id}",
                     ))
                     dev_rows.append({
-                        "publicationDevelopmentId": dev_id,
+                        "developmentId": dev_id,
                         "publicationId": _make_pub_id(pmid or doi),
                         "resourceId": "",  # resolved at upsert time from syn51730943
                         "funderId": funder_id,
@@ -1317,7 +1317,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         "_fundingAgency", "_toolName", "_toolType", "_usageType",
     ]
     dev_cols = [
-        "publicationDevelopmentId", "publicationId", "resourceId",
+        "developmentId", "publicationId", "resourceId",
         "funderId", "investigatorId", "_pmid", "_toolName", "_toolType",
     ]
     pub_csv = csv_dir / "submission_publications.csv"
