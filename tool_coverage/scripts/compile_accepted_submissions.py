@@ -78,6 +78,7 @@ COLUMNS = {
         "establishmentRate", "molecularCharacterization", "clinicalData",
         "validationMethods",
         "donorId",
+        "itemAcquisition", "developerName", "developerAffiliation",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex", "_age", "_race",
@@ -108,6 +109,7 @@ COLUMNS = {
         "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics",
+        "developerName", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
     ],
@@ -116,6 +118,7 @@ COLUMNS = {
         "targetPopulation", "diseaseSpecific", "numberOfItems", "scoringMethod",
         "validatedLanguages", "psychometricProperties", "administrationTime",
         "availabilityStatus", "licensingRequirements", "digitalVersion",
+        "developerName", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -170,6 +173,9 @@ _CONJUGATE_MAP = {
 _PROJECT_NAMESPACE = uuid.uuid5(
     uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools"
 )
+
+# Short labels for verbose modelSystemType values used in PDM resource names.
+_MST_SHORT = {"PDX (Patient-Derived Xenograft)": "PDX"}
 
 # Known NF funders — mirrors generate_review_csv.py _KNOWN_FUNDERS.
 _KNOWN_FUNDERS = [
@@ -308,7 +314,8 @@ def _resource_name_from_data(data: dict, ttype: str) -> str:
     if ttype == "patient_derived_model":
         base = _get(bi, "resourceName") or _get(data, "_resourceName")
         mst = _get(bi, "modelSystemType")
-        return f"{base} ({mst})" if mst else base
+        short_mst = _MST_SHORT.get(mst, mst)
+        return f"{base} ({short_mst})" if short_mst else base
     if ttype == "organoid_protocol":
         return _get(bi, "resourceName") or _get(data, "_resourceName")
     if ttype == "computational_tool":
@@ -521,8 +528,6 @@ def _build_patient_derived_model(d: dict) -> dict:
     model_system_type = _get(bi, "modelSystemType")
     # PDX and 3D culture variants of the same base name are distinct resources;
     # append the modelSystemType so every downstream key (dedup, ID, lookup) is unique.
-    # Use short labels for verbose modelSystemType values (e.g. "PDX (Patient-Derived Xenograft)" → "PDX").
-    _MST_SHORT = {"PDX (Patient-Derived Xenograft)": "PDX"}
     short_mst = _MST_SHORT.get(model_system_type, model_system_type)
     unique_name = f"{resource_name} ({short_mst})" if short_mst else resource_name
     species = _get(bi, "species")

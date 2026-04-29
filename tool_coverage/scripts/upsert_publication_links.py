@@ -76,8 +76,11 @@ _TTYPE_TO_RTYPE = {
 # ACCEPTED_*.csv files that carry developerName/developerAffiliation fields,
 # mapped to the Synapse resourceType used for resourceId lookup.
 _DEVELOPER_CSV_RTYPES = {
-    "ACCEPTED_animal_models.csv":       "Animal Model",
-    "ACCEPTED_computational_tools.csv": "Computational Tool",
+    "ACCEPTED_animal_models.csv":            "Animal Model",
+    "ACCEPTED_computational_tools.csv":      "Computational Tool",
+    "ACCEPTED_patient_derived_models.csv":   "Patient-Derived Model",
+    "ACCEPTED_organoid_protocols.csv":       "Organoid Protocol",
+    "ACCEPTED_clinical_assessment_tools.csv":"Clinical Assessment Tool",
 }
 
 
