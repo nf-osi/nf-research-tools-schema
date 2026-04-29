@@ -254,8 +254,10 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
     developerName and developerAffiliation are stripped from the detail-table upload
     in clean_submission_csvs.py and routed here instead.  Investigator is a person-level
     entity; the investigator↔resource link lives in the dev-links table (syn26486807).
+    Also patches any existing dev-link rows that still have a blank investigatorId.
     """
-    inv_rows: dict = {}  # investigatorId → row dict (dedup within batch)
+    inv_rows: dict = {}              # investigatorId → row dict (dedup within batch)
+    inv_id_for_resource: dict = {}   # resourceId → investigatorId
 
     for csv_name, rtype in _DEVELOPER_CSV_RTYPES.items():
         csv_path = os.path.join(csv_dir, csv_name)
@@ -271,7 +273,8 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
                 continue
             dev_affil = _str(row.get("developerAffiliation"))
             tool_name = _str(row.get("_resourceName"))
-            if not res_map.get((tool_name.lower(), rtype)):
+            resource_id = res_map.get((tool_name.lower(), rtype))
+            if not resource_id:
                 continue  # skip if resource not yet in Synapse
 
             inv_id = str(uuid.uuid5(
@@ -285,6 +288,7 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
                 "orcid":                 "",
                 "investigatorSynapseId": "",
             }
+            inv_id_for_resource[resource_id] = inv_id
 
     if not inv_rows:
         print("  No investigator records found in CSVs")
@@ -306,6 +310,8 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
     if dry_run:
         for r in new_rows:
             print(f"    + {r['investigatorName']} ({r['institution'] or '—'})")
+        # Also report how many dev links would be patched
+        _patch_dev_link_investigator_ids(syn, inv_id_for_resource, dry_run=True)
         return len(new_rows)
 
     if new_rows:
@@ -315,7 +321,50 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
     else:
         print("  ✅ No new investigators to add")
 
+    # Patch dev-link rows that previously had blank investigatorId
+    _patch_dev_link_investigator_ids(syn, inv_id_for_resource, dry_run=False)
+
     return len(new_rows)
+
+
+def _patch_dev_link_investigator_ids(
+    syn, inv_id_for_resource: dict, dry_run: bool
+) -> None:
+    """Update dev-link rows in syn26486807 that have a blank investigatorId."""
+    if not inv_id_for_resource:
+        return
+
+    existing_dev = syn.tableQuery(
+        f"SELECT resourceId, investigatorId FROM {DEV_TABLE}"
+    ).asDataFrame()
+    if existing_dev.empty:
+        return
+
+    patch_rows = []
+    for idx, drow in existing_dev.iterrows():
+        if _str(drow.get("investigatorId")):
+            continue  # already set
+        resource_id = _str(drow.get("resourceId"))
+        inv_id = inv_id_for_resource.get(resource_id)
+        if not inv_id:
+            continue
+        parts = str(idx).split("_")
+        patch_rows.append({
+            "ROW_ID":        int(parts[0]),
+            "ROW_VERSION":   int(parts[1]),
+            "investigatorId": inv_id,
+        })
+
+    if not patch_rows:
+        print("  ℹ️  No dev-link rows need investigatorId patched")
+        return
+
+    if dry_run:
+        print(f"  [dry-run] Would patch investigatorId for {len(patch_rows)} dev-link row(s)")
+        return
+
+    syn.store(Table(DEV_TABLE, pd.DataFrame(patch_rows)))
+    print(f"  ✅ Patched investigatorId for {len(patch_rows)} dev-link row(s) in {DEV_TABLE}")
 
 
 def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool) -> int:

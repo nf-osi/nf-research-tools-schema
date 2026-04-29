@@ -338,23 +338,41 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         # curated fields; uploading here would blank them out.
         if table_id == SYN_RESOURCES_TABLE and "resourceName" in df_clean.columns:
             existing_res = syn.tableQuery(
-                f"SELECT resourceName, resourceType FROM {SYN_RESOURCES_TABLE}"
+                f"SELECT resourceName, resourceType, howToAcquire FROM {SYN_RESOURCES_TABLE}"
             ).asDataFrame()
-            existing_keys = set(
-                zip(
-                    existing_res["resourceName"].str.lower().fillna(""),
-                    existing_res["resourceType"].fillna(""),
-                )
-            ) if len(existing_res) > 0 else set()
+
+            # Build lookup: (name.lower(), type) → (ROW_ID, ROW_VERSION, current_howToAcquire)
+            existing_map: dict = {}
+            for idx, erow in existing_res.iterrows():
+                key = (str(erow["resourceName"]).lower(), str(erow.get("resourceType", "")))
+                parts = str(idx).split("_")
+                existing_map[key] = (int(parts[0]), int(parts[1]), erow.get("howToAcquire") or "")
+
+            existing_keys = set(existing_map.keys())
             before = len(df_clean)
             mask = df_clean.apply(
                 lambda r: (str(r["resourceName"]).lower(), str(r.get("resourceType", ""))) not in existing_keys,
                 axis=1,
             )
+            df_existing = df_clean[~mask].copy()
             df_clean = df_clean[mask].copy()
             skipped = before - len(df_clean)
             if skipped:
-                print(f"      ℹ️  Skipped {skipped} resource(s) already registered in Synapse")
+                print(f"      ℹ️  {skipped} resource(s) already in Synapse")
+
+            # Patch howToAcquire for existing rows where it was previously blank
+            if "howToAcquire" in df_existing.columns:
+                patch_rows = []
+                for _, prow in df_existing.iterrows():
+                    key = (str(prow["resourceName"]).lower(), str(prow.get("resourceType", "")))
+                    row_id, row_ver, cur_val = existing_map.get(key, (None, None, ""))
+                    new_val = str(prow.get("howToAcquire") or "")
+                    if row_id and new_val and new_val != cur_val:
+                        patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, "howToAcquire": new_val})
+                if patch_rows:
+                    syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                    print(f"      ✅ Patched howToAcquire for {len(patch_rows)} existing resource(s)")
+
             if df_clean.empty:
                 print(f"      ✅ No new resources to upload to {table_id}")
                 return True
