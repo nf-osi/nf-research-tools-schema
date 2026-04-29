@@ -634,19 +634,22 @@ def _build_observation(d: dict) -> dict:
 
 def _collect_pub_and_dev_rows(json_files: list) -> tuple:
     """
-    Scan submission JSONs and collect publication and development-link rows.
+    Scan submission JSONs and collect publication, development-link, and usage-link rows.
 
     Publications are deduplicated by PMID (or ``doi:<doi>`` key when no PMID).
     Development links: one row per (tool, development-publication) pair, with
     ``funderId`` resolved from any ``_fundingAgency`` annotation in the JSON.
+    Usage links: one row per (tool, usage-publication) pair for existing tools.
 
     Returns:
-        (pub_rows, dev_rows) — lists of dicts for submission_publications.csv
-        and submission_dev_links.csv.
+        (pub_rows, dev_rows, usage_rows) — lists of dicts for
+        submission_publications.csv, submission_dev_links.csv, and
+        submission_usage_links.csv.
     """
     seen_pub_keys: set = set()
     pub_rows: list = []
     dev_rows: list = []
+    usage_rows: list = []
 
     for path in sorted(json_files):
         try:
@@ -731,7 +734,21 @@ def _collect_pub_and_dev_rows(json_files: list) -> tuple:
                         "_toolType": ttype,
                     })
 
-    return pub_rows, dev_rows
+            elif usage_type.lower() == "usage" and resource_name:
+                usage_id = str(uuid.uuid5(
+                    _PROJECT_NAMESPACE,
+                    f"usage:{pmid or doi}:{resource_name}:{ttype}",
+                ))
+                usage_rows.append({
+                    "usageId": usage_id,
+                    "publicationId": _make_pub_id(pmid or doi),
+                    "resourceId": "",  # resolved at upsert time from syn51730943
+                    "_pmid": pmid,
+                    "_toolName": resource_name,
+                    "_toolType": ttype,
+                })
+
+    return pub_rows, dev_rows, usage_rows
 
 
 _BUILDERS = {
@@ -1022,7 +1039,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         if "observations" not in p.parts
     )
     scan_files = all_sub_files if all_sub_files else json_files
-    pub_rows, dev_rows = _collect_pub_and_dev_rows(scan_files)
+    pub_rows, dev_rows, usage_rows = _collect_pub_and_dev_rows(scan_files)
 
     pub_cols = [
         "publicationId", "pmid", "doi", "publicationTitle", "year",
@@ -1032,12 +1049,18 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         "publicationDevelopmentId", "publicationId", "resourceId",
         "funderId", "investigatorId", "_pmid", "_toolName", "_toolType",
     ]
+    usage_cols = [
+        "usageId", "publicationId", "resourceId",
+        "_pmid", "_toolName", "_toolType",
+    ]
     pub_csv = csv_dir / "submission_publications.csv"
     dev_csv = csv_dir / "submission_dev_links.csv"
+    usage_csv = csv_dir / "submission_usage_links.csv"
 
     if dry_run:
         print(f"\n  [dry-run] publications: {len(pub_rows)} records")
         print(f"  [dry-run] development links: {len(dev_rows)} records")
+        print(f"  [dry-run] usage links: {len(usage_rows)} records")
     else:
         with open(pub_csv, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=pub_cols, extrasaction="ignore")
@@ -1050,6 +1073,12 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
             w.writeheader()
             w.writerows(dev_rows)
         print(f"  development links: {len(dev_rows)} records → {dev_csv.name}")
+
+        with open(usage_csv, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=usage_cols, extrasaction="ignore")
+            w.writeheader()
+            w.writerows(usage_rows)
+        print(f"  usage links: {len(usage_rows)} records → {usage_csv.name}")
 
     # --- Vendor / VendorItem / Donor ---
     print("\n--- Generating vendor / donor records ---")

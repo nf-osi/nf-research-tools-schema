@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Upsert publication records, development links, and vendor items from submission CSVs to Synapse.
+Upsert publication records, development links, usage links, and vendor items from submission CSVs to Synapse.
 
 Sources (produced by compile_accepted_submissions.py):
   tool_coverage/outputs/submission_publications.csv
   tool_coverage/outputs/submission_dev_links.csv
+  tool_coverage/outputs/submission_usage_links.csv
   tool_coverage/outputs/ACCEPTED_vendorItem.csv
 
 Targets:
   syn26486839  NF Tool Publications (base publication table)
   syn26486807  Tool Development links (tool ↔ development publication)
+  syn26486841  Tool Usage links (tool ↔ usage publication)
   syn26486843  VendorItem (vendor ↔ resource catalog links; needs resourceId resolution)
 
 FK resolution:
@@ -29,6 +31,7 @@ from synapseclient import Table
 
 PUB_TABLE = "syn26486839"
 DEV_TABLE = "syn26486807"
+USAGE_TABLE = "syn26486841"
 RES_TABLE = "syn51730943"
 VENDOR_ITEM_TABLE = "syn26486843"
 
@@ -270,14 +273,102 @@ def upsert_vendor_items(syn, vendor_item_csv: str, dry_run: bool) -> int:
     return len(rows_to_add)
 
 
+def upsert_usage_links(syn, usage_csv: str, dry_run: bool) -> int:
+    """
+    Upsert usage link records from submission_usage_links.csv to syn26486841.
+
+    Resolves resourceId from syn51730943 using (_toolName, _toolType).
+    Skips rows already present (by resourceId+publicationId) or unresolvable.
+    """
+    df = pd.read_csv(usage_csv)
+    if df.empty:
+        print("  No usage link rows to process")
+        return 0
+
+    print(f"  Fetching resource registry from {RES_TABLE}...")
+    res_df = syn.tableQuery(
+        f"SELECT resourceId, resourceName, resourceType FROM {RES_TABLE}"
+    ).asDataFrame()
+    res_map: dict = {}
+    for _, row in res_df.iterrows():
+        rname = (row.get("resourceName") or "").strip()
+        rtype = row.get("resourceType", "")
+        res_map[(rname.lower(), rtype)] = row["resourceId"]
+
+    existing_usage = syn.tableQuery(
+        f"SELECT resourceId, publicationId FROM {USAGE_TABLE}"
+    ).asDataFrame()
+    existing_keys = (
+        set(zip(
+            existing_usage["resourceId"].fillna(""),
+            existing_usage["publicationId"].fillna(""),
+        ))
+        if len(existing_usage) > 0 else set()
+    )
+
+    rows_to_add = []
+    skipped_dup = []
+    skipped_no_res = []
+
+    for _, row in df.iterrows():
+        tool_name = (row.get("_toolName") or "").strip()
+        ttype = row.get("_toolType", "")
+        rtype = _TTYPE_TO_RTYPE.get(ttype, "")
+        resource_id = res_map.get((tool_name.lower(), rtype))
+
+        if not resource_id:
+            skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
+            continue
+
+        pub_id = row.get("publicationId", "") or ""
+        key = (resource_id, pub_id)
+        if key in existing_keys:
+            skipped_dup.append(key)
+            continue
+
+        rows_to_add.append({
+            "usageId": row.get("usageId", ""),
+            "publicationId": pub_id,
+            "resourceId": resource_id,
+        })
+
+    print(f"  {len(df)} in CSV | {len(existing_keys)} existing (resourceId,publicationId) pairs "
+          f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved "
+          f"| {len(skipped_dup)} duplicate")
+
+    if skipped_no_res:
+        print(f"  ⚠️  Could not resolve resourceId for {len(skipped_no_res)} row(s):")
+        for name in skipped_no_res[:10]:
+            print(f"    - {name}")
+        if len(skipped_no_res) > 10:
+            print(f"    ... and {len(skipped_no_res) - 10} more")
+        print("  (Tool may not yet be in syn51730943 — run upsert-tools first)")
+
+    if dry_run:
+        for r in rows_to_add:
+            print(f"    + usageId={r['usageId'][:8]}… "
+                  f"pubId={r['publicationId'][:8]}… resId={r['resourceId'][:8]}…")
+        return len(rows_to_add)
+
+    if rows_to_add:
+        df_clean = pd.DataFrame(rows_to_add)
+        syn.store(Table(USAGE_TABLE, df_clean))
+        syn.create_snapshot_version(USAGE_TABLE)
+        print(f"  ✅ Added {len(rows_to_add)} usage links to {USAGE_TABLE}")
+    else:
+        print("  ✅ No new usage links to add")
+
+    return len(rows_to_add)
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Upsert publication records, development links, and vendor items to Synapse."
+        description="Upsert publication records, development links, usage links, and vendor items to Synapse."
     )
     parser.add_argument(
         "--csv-dir", default=CSV_DIR_DEFAULT,
-        help=f"Directory with submission_publications.csv and submission_dev_links.csv "
-             f"(default: {CSV_DIR_DEFAULT})"
+        help=f"Directory with submission_publications.csv, submission_dev_links.csv, "
+             f"and submission_usage_links.csv (default: {CSV_DIR_DEFAULT})"
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -290,6 +381,10 @@ def main():
     parser.add_argument(
         "--skip-development", action="store_true",
         help=f"Skip upserting to the development links table ({DEV_TABLE})"
+    )
+    parser.add_argument(
+        "--skip-usage", action="store_true",
+        help=f"Skip upserting to the usage links table ({USAGE_TABLE})"
     )
     parser.add_argument(
         "--skip-vendor-items", action="store_true",
@@ -305,18 +400,25 @@ def main():
     syn = _login()
     print("✅ Logged in to Synapse\n")
 
-    pub_csv = os.path.join(args.csv_dir, "submission_publications.csv")
-    dev_csv = os.path.join(args.csv_dir, "submission_dev_links.csv")
-    vi_csv  = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
+    pub_csv    = os.path.join(args.csv_dir, "submission_publications.csv")
+    dev_csv    = os.path.join(args.csv_dir, "submission_dev_links.csv")
+    usage_csv  = os.path.join(args.csv_dir, "submission_usage_links.csv")
+    vi_csv     = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
 
     total_added = 0
     step = 1
+    total_steps = sum([
+        not args.skip_publications,
+        not args.skip_development,
+        not args.skip_usage,
+        not args.skip_vendor_items,
+    ])
 
     if not args.skip_publications:
         if not os.path.exists(pub_csv):
             print(f"⚠️  {pub_csv} not found — skipping publication upsert")
         else:
-            print(f"[{step}/3] Publications → {PUB_TABLE}")
+            print(f"[{step}/{total_steps}] Publications → {PUB_TABLE}")
             total_added += upsert_publications(syn, pub_csv, args.dry_run)
             print()
         step += 1
@@ -325,8 +427,17 @@ def main():
         if not os.path.exists(dev_csv):
             print(f"⚠️  {dev_csv} not found — skipping development link upsert")
         else:
-            print(f"[{step}/3] Development links → {DEV_TABLE}")
+            print(f"[{step}/{total_steps}] Development links → {DEV_TABLE}")
             total_added += upsert_development_links(syn, dev_csv, args.dry_run)
+            print()
+        step += 1
+
+    if not args.skip_usage:
+        if not os.path.exists(usage_csv):
+            print(f"⚠️  {usage_csv} not found — skipping usage link upsert")
+        else:
+            print(f"[{step}/{total_steps}] Usage links → {USAGE_TABLE}")
+            total_added += upsert_usage_links(syn, usage_csv, args.dry_run)
             print()
         step += 1
 
@@ -334,7 +445,7 @@ def main():
         if not os.path.exists(vi_csv):
             print(f"⚠️  {vi_csv} not found — skipping vendor item upsert")
         else:
-            print(f"[{step}/3] Vendor items → {VENDOR_ITEM_TABLE}")
+            print(f"[{step}/{total_steps}] Vendor items → {VENDOR_ITEM_TABLE}")
             total_added += upsert_vendor_items(syn, vi_csv, args.dry_run)
             print()
 

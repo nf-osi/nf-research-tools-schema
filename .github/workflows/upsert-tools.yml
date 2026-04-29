@@ -145,20 +145,20 @@ jobs:
           echo "=========================================="
           python tool_coverage/scripts/clean_submission_csvs.py --upsert --dry-run
 
-      - name: Dry-run preview - publications and development links
+      - name: Dry-run preview - publications, development links, and usage links
         if: steps.check_files.outputs.has_files == 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "=========================================="
-          echo "DRY-RUN: Preview of publication/dev link uploads"
+          echo "DRY-RUN: Preview of publication/dev/usage link uploads"
           echo "=========================================="
-          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ] || [ -f "tool_coverage/outputs/submission_usage_links.csv" ]; then
             python tool_coverage/scripts/upsert_publication_links.py \
               --csv-dir tool_coverage/outputs \
               --dry-run
           else
-            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+            echo "No submission CSVs found — skipping"
           fi
 
       - name: Confirm and upload to Synapse
@@ -174,21 +174,21 @@ jobs:
           echo ""
           echo "✅ Upload completed successfully"
 
-      - name: Upsert publications and development links to Synapse
+      - name: Upsert publications, development links, and usage links to Synapse
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           echo "=========================================="
-          echo "UPSERTING Publications + Development Links"
+          echo "UPSERTING Publications + Development Links + Usage Links"
           echo "=========================================="
-          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
+          if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ] || [ -f "tool_coverage/outputs/submission_usage_links.csv" ]; then
             python tool_coverage/scripts/upsert_publication_links.py \
               --csv-dir tool_coverage/outputs
             echo ""
-            echo "✅ Publication and development link upsert complete"
+            echo "✅ Publication, development link, and usage link upsert complete"
           else
-            echo "No submission_publications.csv or submission_dev_links.csv found — skipping"
+            echo "No submission CSVs found — skipping"
           fi
 
       - name: Dry-run mode - skip upload
