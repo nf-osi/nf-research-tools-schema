@@ -701,8 +701,11 @@ LEFT JOIN
     syn26486821 BB ON (R.resourceId = BB.resourceId)
 LEFT JOIN
     syn51734029 D_I ON (R.resourceId = D_I.resourceId)
-LEFT JOIN
-    syn51734076 D_F ON (R.resourceId = D_F.resourceId)
+LEFT JOIN (
+    SELECT D_F0.resourceId, MIN(D_F0.funderName) AS funderName
+    FROM syn51734076 D_F0
+    GROUP BY D_F0.resourceId
+) D_F ON (R.resourceId = D_F.resourceId)
 LEFT JOIN
     syn51735419 AM_CL_R_DON ON (R.resourceId = AM_CL_R_DON.resourceId)
 LEFT JOIN
