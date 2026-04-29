@@ -255,9 +255,18 @@ def _make_vendor_item_id(vendor_name: str, catalog_number: str) -> str:
     return str(uuid.uuid5(_PROJECT_NAMESPACE, key))
 
 
+_CELL_LINE_VARIANT_RE = re.compile(r"\s*\((?:pNF|MPNST)\)\s*$", re.IGNORECASE)
+
+
+def _donor_key(name: str) -> str:
+    """Strip cell-line variant suffixes so pNF/MPNST variants share one donor."""
+    return _CELL_LINE_VARIANT_RE.sub("", name).strip()
+
+
 def _make_donor_id(resource_name: str) -> str:
     """Deterministic UUID5 for a donor record (one per resource)."""
     return str(uuid.uuid5(_PROJECT_NAMESPACE, f"donor:{resource_name.strip()}"))
+
 
 
 def _make_resource_id(resource_name: str, ttype_plural: str) -> str:
@@ -388,7 +397,7 @@ def _build_cell_line(d: dict) -> dict:
         "cellLineManifestation": _get(d, "cellLineManifestation"),
         "cellLineGeneticDisorder": _get(d, "cellLineGeneticDisorder"),
         "cellLineCategory": _get(d, "category", "cellLineCategory"),
-        "donorId": _make_donor_id(resource_name) if species else "",
+        "donorId": _make_donor_id(_donor_key(resource_name)) if species else "",
         "originYear": _get(d, "originYear"),
         "strProfile": _get(d, "strProfile"),
         "resistance": _get(d, "resistance"),
@@ -934,8 +943,12 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
                 species = (row.get("_species") or "").strip()
                 resource_name = (row.get("_resourceName") or "").strip()
                 if species and resource_name:
-                    donor_id = _make_donor_id(resource_name)
-                    if not row.get("donorId"):
+                    # Prefer a donorId already set by the builder (which knows
+                    # the correct base key, e.g. PDMs use the plain patient name
+                    # rather than the "(PDX)"-suffixed resource name).
+                    existing = (row.get("donorId") or "").strip()
+                    donor_id = existing or _make_donor_id(resource_name)
+                    if not existing:
                         row["donorId"] = donor_id
                         rewrite_needed = True
                     donor_rows.append({
