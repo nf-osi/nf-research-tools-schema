@@ -20,6 +20,7 @@ import csv
 import json
 import re
 import sys
+import time
 from pathlib import Path
 
 try:
@@ -30,6 +31,122 @@ except ImportError:
     import json as _json_yaml
     def _load_yaml(path):
         raise ImportError("PyYAML is required for observation YAML support — pip install pyyaml")
+
+# ---------------------------------------------------------------------------
+# PubMed author lookup
+# ---------------------------------------------------------------------------
+
+_author_cache: dict = {}  # pmid_num → (name, affil)
+
+
+def _fetch_corresponding_author(pmid: str) -> tuple:
+    """
+    Fetch the corresponding author name, affiliation, and email from PubMed.
+
+    Heuristic: prefer the author whose affiliation contains an email address
+    (common journal convention for corresponding authors); fall back to the
+    last named author.
+
+    Returns (name, affiliation, email) — all empty strings on any failure.
+    """
+    pmid_num = pmid.replace("PMID:", "").strip()
+    if not pmid_num:
+        return "", "", ""
+    if pmid_num in _author_cache:
+        return _author_cache[pmid_num]
+
+    try:
+        from Bio import Entrez
+        Entrez.email = "nf-tools@sagebase.org"
+        time.sleep(0.35)  # respect NCBI rate limit (3 req/s without API key)
+        handle = Entrez.efetch(db="pubmed", id=pmid_num, rettype="xml", retmode="xml")
+        records = Entrez.read(handle)
+        handle.close()
+
+        articles = records.get("PubmedArticle", [])
+        if not articles:
+            _author_cache[pmid_num] = ("", "", "")
+            return "", "", ""
+
+        author_list = (
+            articles[0]
+            .get("MedlineCitation", {})
+            .get("Article", {})
+            .get("AuthorList", [])
+        )
+
+        # Prefer author whose affiliation contains an email (corresponding author marker)
+        corr = None
+        last_named = None
+        for author in author_list:
+            if "LastName" not in author:
+                continue
+            last_named = author
+            for af in author.get("AffiliationInfo", []):
+                if "@" in af.get("Affiliation", ""):
+                    corr = author
+                    break
+            if corr:
+                break
+
+        author = corr or last_named
+        if not author:
+            _author_cache[pmid_num] = ("", "", "")
+            return "", "", ""
+
+        fore = author.get("ForeName", "")
+        last = author.get("LastName", "")
+        name = f"{fore} {last}".strip() if fore else last
+
+        affil = ""
+        email = ""
+        affil_list = author.get("AffiliationInfo", [])
+        if affil_list:
+            raw = affil_list[0].get("Affiliation", "")
+            # Extract email before stripping it
+            m = re.search(r"[\w.+\-]+@[\w.\-]+\.[a-z]{2,}", raw)
+            if m:
+                email = m.group(0)
+            affil = re.sub(r"[\w.+\-]+@[\w.\-]+\.[a-z]{2,}", "", raw).strip().rstrip(".,;")
+
+        _author_cache[pmid_num] = (name, affil, email)
+        return name, affil, email
+
+    except Exception:
+        _author_cache[pmid_num] = ("", "", "")
+        return "", "", ""
+
+
+def _dev_author(row: dict) -> dict:
+    """Return {developerName, developerAffiliation} from PubMed for basicInfo.
+
+    Only fetches for Development usageType; returns empty strings otherwise.
+    """
+    usage_type = row.get("_usageType", "")
+    if usage_type.lower() != "development":
+        return {"developerName": "", "developerAffiliation": ""}
+    pmids = [p.strip() for p in row.get("_pmid", "").split(" | ") if p.strip()]
+    if not pmids:
+        return {"developerName": "", "developerAffiliation": ""}
+    name, affil, _ = _fetch_corresponding_author(pmids[0])
+    return {"developerName": name, "developerAffiliation": affil}
+
+
+def _dev_contact_email(row: dict) -> str:
+    """Return corresponding author email from PubMed for developerContactEmail (top-level field).
+
+    Only fetches for Development usageType; returns empty string otherwise.
+    Result is cached by _fetch_corresponding_author so no extra API call is made.
+    """
+    usage_type = row.get("_usageType", "")
+    if usage_type.lower() != "development":
+        return ""
+    pmids = [p.strip() for p in row.get("_pmid", "").split(" | ") if p.strip()]
+    if not pmids:
+        return ""
+    _, _, email = _fetch_corresponding_author(pmids[0])
+    return email
+
 
 # ---------------------------------------------------------------------------
 # Reverse value maps (Synapse → form enum values)
@@ -203,6 +320,7 @@ def _animal_model(row: dict) -> dict:
             "description": "",
             "synonyms": "",
             "species": "",
+            **_dev_author(row),
         },
         "strainNomenclature": row.get("strainNomenclature", ""),
         "backgroundStrain": row.get("backgroundStrain", ""),
@@ -212,6 +330,7 @@ def _animal_model(row: dict) -> dict:
         "transplantationType": row.get("transplantationType", ""),
         "animalState": row.get("animalState", ""),
         "generation": row.get("generation", ""),
+        "developerContactEmail": _dev_contact_email(row),
         "developmentPublicationDOI": _first_doi(row),
         "usagePublicationDOIs": _usage_dois(row),
         "itemAcquisition": "",
@@ -302,6 +421,7 @@ def _patient_derived_model(row: dict) -> dict:
             "immuneSystemComponents": [],
             "validationMethods": [],
             "howToAcquire": "",
+            **_dev_author(row),
         },
         "developmentPublicationDOI": _first_doi(row),
         "usagePublicationDOIs": _usage_dois(row),
@@ -328,6 +448,7 @@ def _computational_tool(row: dict) -> dict:
             "systemRequirements": row.get("systemRequirements", ""),
             "lastUpdate": row.get("lastUpdate", ""),
             "maintainer": row.get("maintainer", ""),
+            **_dev_author(row),
         },
         "developmentPublicationDOI": _first_doi(row),
         "usagePublicationDOIs": _usage_dois(row),
@@ -356,7 +477,9 @@ def _organoid_protocol(row: dict) -> dict:
             "passageNumber": row.get("passageNumber", ""),
             "cryopreservationProtocol": row.get("cryopreservationProtocol", ""),
             "qualityControlMetrics": row.get("qualityControlMetrics", ""),
+            **_dev_author(row),
         },
+        "developerContactEmail": _dev_contact_email(row),
         "developmentPublicationDOI": _first_doi(row),
         "usagePublicationDOIs": _usage_dois(row),
     }
@@ -383,7 +506,9 @@ def _clinical_assessment_tool(row: dict) -> dict:
             "availabilityStatus": row.get("availabilityStatus", ""),
             "licensingRequirements": row.get("licensingRequirements", ""),
             "digitalVersion": row.get("digitalVersion", ""),
+            **_dev_author(row),
         },
+        "developerContactEmail": _dev_contact_email(row),
         "developmentPublicationDOI": _first_doi(row),
         "usagePublicationDOIs": _usage_dois(row),
     }
