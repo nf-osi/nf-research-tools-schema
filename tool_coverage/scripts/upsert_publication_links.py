@@ -84,6 +84,11 @@ _DEVELOPER_CSV_RTYPES = {
 }
 
 
+def _str(val) -> str:
+    """Return string, coercing None/NaN to empty string."""
+    return "" if val is None or (isinstance(val, float) and pd.isna(val)) else str(val)
+
+
 def _login() -> synapseclient.Synapse:
     token = os.getenv("SYNAPSE_AUTH_TOKEN")
     if not token:
@@ -204,9 +209,6 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
         if not resource_id:
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
-
-        def _str(val) -> str:
-            return "" if val is None or (isinstance(val, float) and pd.isna(val)) else str(val)
 
         rows_to_add.append({
             "publicationDevelopmentId": dev_id,
