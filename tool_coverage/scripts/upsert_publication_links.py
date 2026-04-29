@@ -249,11 +249,11 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
 def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int:
     """
-    Upsert investigator records to syn51734029 from developer fields in tool CSVs.
+    Upsert investigator records to syn26486833 from developer fields in tool CSVs.
 
     developerName and developerAffiliation are stripped from the detail-table upload
-    in clean_submission_csvs.py and routed here instead.  Covers animal models and
-    computational tools (the two types that carry developer info).
+    in clean_submission_csvs.py and routed here instead.  Investigator is a person-level
+    entity; the investigator↔resource link lives in the dev-links table (syn26486807).
     """
     inv_rows: dict = {}  # investigatorId → row dict (dedup within batch)
 
@@ -271,20 +271,18 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
                 continue
             dev_affil = _str(row.get("developerAffiliation"))
             tool_name = _str(row.get("_resourceName"))
-            resource_id = res_map.get((tool_name.lower(), rtype))
-            if not resource_id:
-                continue
+            if not res_map.get((tool_name.lower(), rtype)):
+                continue  # skip if resource not yet in Synapse
 
             inv_id = str(uuid.uuid5(
                 _PROJECT_NAMESPACE,
-                f"investigator:{dev_name}:{dev_affil}:{resource_id}",
+                f"investigator:{dev_name}:{dev_affil}",
             ))
             inv_rows[inv_id] = {
-                "investigatorId":       inv_id,
-                "resourceId":           resource_id,
-                "investigatorName":     dev_name,
-                "institution":          dev_affil,
-                "orcid":                "",
+                "investigatorId":        inv_id,
+                "investigatorName":      dev_name,
+                "institution":           dev_affil,
+                "orcid":                 "",
                 "investigatorSynapseId": "",
             }
 
@@ -307,8 +305,7 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
 
     if dry_run:
         for r in new_rows:
-            print(f"    + {r['investigatorName']} ({r['institution'] or '—'}) "
-                  f"→ resId={r['resourceId'][:8]}…")
+            print(f"    + {r['investigatorName']} ({r['institution'] or '—'})")
         return len(new_rows)
 
     if new_rows:
