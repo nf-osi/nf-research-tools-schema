@@ -36,7 +36,7 @@ PUB_TABLE          = "syn26486839"
 DEV_TABLE          = "syn26486807"
 RES_TABLE          = "syn51730943"
 VENDOR_ITEM_TABLE  = "syn26486843"
-INVESTIGATOR_TABLE = "syn51734029"
+INVESTIGATOR_TABLE = "syn26486833"
 
 CSV_DIR_DEFAULT = "tool_coverage/outputs"
 

@@ -980,6 +980,21 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
 # Resources CSV generation
 # ---------------------------------------------------------------------------
 
+def _compute_how_to_acquire(ttype: str, row: dict) -> str:
+    """Generate howToAcquire string from submission fields for tool types that have no vendor."""
+    if ttype == "computational_tool":
+        src = (row.get("sourceRepository") or "").strip()
+        acq = (row.get("itemAcquisition") or "").strip()
+        dev = (row.get("developerName") or "").strip()
+        if src:
+            return f"Available at: {src}"
+        if acq and acq.lower() not in ("", "n/a", "unknown", "other"):
+            return acq
+        if dev:
+            return f"Contact developer: {dev}"
+    return ""
+
+
 def _generate_resources_csv(
     csv_dir: Path, dry_run: bool, json_files: list | None = None
 ) -> None:
@@ -1007,7 +1022,7 @@ def _generate_resources_csv(
 
     new_rows: list = []
 
-    def _add_resource(resource_name: str, ttype: str) -> None:
+    def _add_resource(resource_name: str, ttype: str, how_to_acquire: str = "") -> None:
         if not resource_name or ttype not in _TTYPE_ID_INFO:
             return
         rtype_label, id_col, ttype_plural = _TTYPE_ID_INFO[ttype]
@@ -1025,7 +1040,7 @@ def _generate_resources_csv(
             "description":       "",
             "synonyms":          "",
             "usageRequirements": "",
-            "howToAcquire":      "",
+            "howToAcquire":      how_to_acquire,
             "dateAdded":         "",
             "dateModified":      "",
             "aiSummary":         "",
@@ -1052,6 +1067,7 @@ def _generate_resources_csv(
                     continue
                 fk_row = {col: "" for col in _RESOURCE_FK_COLS}
                 fk_row[id_col] = resource_id
+                how_to_acquire = _compute_how_to_acquire(ttype, row)
                 new_rows.append({
                     "resourceId":        resource_id,
                     "resourceName":      resource_name,
@@ -1061,7 +1077,7 @@ def _generate_resources_csv(
                     "description":       "",
                     "synonyms":          "",
                     "usageRequirements": "",
-                    "howToAcquire":      "",
+                    "howToAcquire":      how_to_acquire,
                     "dateAdded":         "",
                     "dateModified":      "",
                     "aiSummary":         "",
@@ -1084,7 +1100,11 @@ def _generate_resources_csv(
             row = builder_fn(_flatten_publications(data))
         except Exception:
             continue
-        _add_resource(row.get("_resourceName", "").strip(), ttype)
+        _add_resource(
+            row.get("_resourceName", "").strip(),
+            ttype,
+            how_to_acquire=_compute_how_to_acquire(ttype, row),
+        )
 
     if dry_run:
         print(f"  [dry-run] resources: {len(new_rows)} new record(s)")

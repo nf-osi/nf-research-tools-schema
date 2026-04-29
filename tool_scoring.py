@@ -764,14 +764,8 @@ def main():
     # Store results to Synapse
     scores_table_id = store_results_to_synapse(syn, all_scores, summary_by_type)
 
-    # Update materialized view
-    update_success = update_materialized_view(syn, "syn51730943", scores_table_id)
-
-    if update_success:
-        print("\n✓ All tasks completed successfully!")
-    else:
-        print("\n⚠ Materialized view update failed. Please update manually.")
-        print(f"  Need to join {scores_table_id} with syn51730943 on resourceId column.")
+    print(f"\n✓ Scores stored in {scores_table_id}.")
+    print(f"  To display alongside search results, join {scores_table_id} with the search MV on resourceId.")
 
 
 if __name__ == "__main__":

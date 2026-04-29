@@ -18,6 +18,18 @@ from typing import List, Dict, Tuple
 
 SYN_RESOURCES_TABLE = "syn26450069"
 
+# Primary-key column for each detail table — used to skip rows already in Synapse.
+_DETAIL_TABLE_PK = {
+    "syn26486808": "animalModelId",
+    "syn26486811": "antibodyId",
+    "syn26486823": "cellLineId",
+    "syn26486832": "geneticReagentId",
+    "syn73709226": "computationalToolId",
+    "syn73709227": "organoidProtocolId",
+    "syn73709228": "patientDerivedModelId",
+    "syn73709229": "clinicalAssessmentToolId",
+}
+
 
 def _run_url_comment() -> str:
     """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
@@ -84,10 +96,8 @@ _STRIP_BEFORE_UPLOAD = {
         'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
         'licenseDetails',
     ],
-    # organoidProtocolId not yet added to syn73709227 — remove once schema updated
     # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
     'CLEAN_organoid_protocols.csv': [
-        'organoidProtocolId',
         'qualityControlMetrics',
     ],
     # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
@@ -333,6 +343,25 @@ def upsert_to_synapse(syn, clean_file, df_clean):
             if df_clean.empty:
                 print(f"      ✅ No new resources to upload to {table_id}")
                 return True
+
+        elif table_id in _DETAIL_TABLE_PK:
+            pk_col = _DETAIL_TABLE_PK[table_id]
+            if pk_col in df_clean.columns:
+                try:
+                    existing = syn.tableQuery(
+                        f"SELECT {pk_col} FROM {table_id}"
+                    ).asDataFrame()
+                    existing_pks = set(existing[pk_col].dropna())
+                    before = len(df_clean)
+                    df_clean = df_clean[~df_clean[pk_col].isin(existing_pks)].copy()
+                    skipped = before - len(df_clean)
+                    if skipped:
+                        print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+                    if df_clean.empty:
+                        print(f"      ✅ No new rows to upload to {table_id}")
+                        return True
+                except Exception as e:
+                    print(f"      ⚠️  Could not check existing {pk_col}s in {table_id}: {e} — uploading without dedup")
 
         table = Table(table_id, df_clean)
         table = syn.store(table)
