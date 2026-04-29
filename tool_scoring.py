@@ -727,34 +727,6 @@ LEFT JOIN
         return False
 
 
-def _update_development_funder_view(syn: synapseclient.Synapse, view_id: str = "syn51734076") -> bool:
-    """
-    Redefine syn51734076 to return one row per resourceId (MIN funderName).
-
-    The original view has one row per (resource, funder) triple, which causes
-    fan-out when the main search MV joins it. Replacing the defining SQL with a
-    GROUP BY collapses duplicates so the main view's simple LEFT JOIN is 1:1.
-    """
-    try:
-        print(f"\nUpdating Development_Funder view {view_id} to deduplicate funders...")
-        mv = syn.get(view_id)
-        new_sql = (
-            "SELECT D.resourceId, MIN(F.funderName) AS funderName"
-            " FROM syn26486807 D"
-            " LEFT JOIN syn26486830 F ON (D.funderId = F.funderId)"
-            " WHERE D.resourceId IS NOT NULL AND D.resourceId <> ''"
-            " GROUP BY D.resourceId"
-        )
-        print(f"New defining SQL: {new_sql}")
-        mv.properties['definingSQL'] = new_sql
-        syn.store(mv)
-        print(f"✓ {view_id} updated — now returns 1 row per resourceId")
-        return True
-    except Exception as e:
-        print(f"✗ Error updating Development_Funder view: {e}")
-        return False
-
-
 def main():
     """Main execution function"""
     # Login to Synapse
@@ -794,12 +766,6 @@ def main():
 
     print(f"\n✓ Scores stored in {scores_table_id}.")
     print(f"  To display alongside search results, join {scores_table_id} with the search MV on resourceId.")
-
-    # Fix funder fan-out: collapse syn51734076 to 1 row per resourceId
-    _update_development_funder_view(syn)
-
-    # Update the main search materialized view to include completeness scores
-    update_materialized_view(syn, "syn51730943", scores_table_id)
 
 
 if __name__ == "__main__":
