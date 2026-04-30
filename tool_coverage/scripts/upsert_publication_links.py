@@ -301,7 +301,7 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
             if not raw_name:
                 continue
             raw_affil = _str(row.get("developerAffiliation"))
-            tool_name = _str(row.get("_resourceName"))
+            tool_name = _str(row.get("_resourceName")) or _str(row.get("_toolName"))
             resource_id = res_map.get((tool_name.lower(), rtype))
             if not resource_id:
                 continue  # skip if resource not yet in Synapse
