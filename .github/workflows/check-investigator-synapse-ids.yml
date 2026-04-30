@@ -1,6 +1,8 @@
 name: Check Investigator Synapse IDs
 
 on:
+  schedule:
+    - cron: '0 9 1 * *'  # 1st of every month at 09:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -8,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write
 
     steps:
       - name: Checkout repository
@@ -20,12 +23,14 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install synapseclient pandas
+        run: pip install --quiet requests
 
-      - name: Check for missing Synapse user IDs
-        env:
-          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
-        run: python tool_coverage/scripts/check_investigator_synapse_ids.py
+      - name: Search Synapse profiles for each developer name
+        id: check
+        run: |
+          python tool_coverage/scripts/check_investigator_synapse_ids.py
+          echo "missing=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
       - name: Upload report as artifact
         if: always()
@@ -34,3 +39,23 @@ jobs:
           name: investigator-synapse-id-report
           path: tool_coverage/outputs/investigator_synapse_id_report.csv
           retention-days: 90
+
+      - name: Create or update GitHub issue for missing IDs
+        if: steps.check.outputs.missing == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Investigators missing Synapse profile link"
+          EXISTING=$(gh issue list --label "data-quality" --state open \
+            --search "$TITLE" --json number --jq '.[0].number // ""')
+
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --body-file investigator_issue_body.md
+            echo "Updated issue #$EXISTING"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body-file investigator_issue_body.md \
+              --label "data-quality"
+            echo "Created new issue"
+          fi
