@@ -42,6 +42,16 @@ INVESTIGATOR_TABLE = "syn26486833"
 CSV_DIR_DEFAULT = "tool_coverage/outputs"
 
 
+def _doi_url(doi: str) -> str:
+    """Return doi as a full https://www.doi.org/ URL; no-op if already a URL or empty."""
+    if not doi:
+        return doi
+    doi = doi.strip()
+    if doi.startswith("http"):
+        return doi
+    return f"https://www.doi.org/{doi}"
+
+
 def _run_url_comment() -> str:
     """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
     server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
@@ -228,6 +238,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
     # Build PMID → actual Synapse publicationId lookup to fix UUID mismatches.
     # Index both "32561749" and "PMID:32561749" forms so either format in the CSV matches.
+    # DOIs are keyed as full URLs so bare DOIs from CSVs are normalized before lookup.
     pub_df = syn.tableQuery(
         f"SELECT publicationId, pmid, doi FROM {PUB_TABLE}"
     ).asDataFrame()
@@ -240,7 +251,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
             pmid_to_pub_id[norm] = pub_id
             pmid_to_pub_id[f"PMID:{norm}"] = pub_id
     doi_to_pub_id = {
-        _str(r["doi"]): _str(r["publicationId"])
+        _doi_url(_str(r["doi"])): _str(r["publicationId"])
         for _, r in pub_df.iterrows() if _str(r["doi"])
     }
 
@@ -266,7 +277,7 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
         csv_pmid = _str(row.get("_pmid"))
         csv_pub_id = _str(row.get("publicationId"))
-        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(csv_pub_id) or csv_pub_id
+        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(_doi_url(csv_pub_id)) or csv_pub_id
 
         funder_id = _str(row.get("funderId"))
         rf = (resource_id, funder_id)
@@ -356,7 +367,7 @@ def upsert_usage_links(syn, usage_csv: str, res_map: dict, dry_run: bool) -> int
             pmid_to_pub_id[norm] = pub_id
             pmid_to_pub_id[f"PMID:{norm}"] = pub_id
     doi_to_pub_id = {
-        _str(r["doi"]): _str(r["publicationId"])
+        _doi_url(_str(r["doi"])): _str(r["publicationId"])
         for _, r in pub_df.iterrows() if _str(r["doi"])
     }
 
@@ -382,7 +393,7 @@ def upsert_usage_links(syn, usage_csv: str, res_map: dict, dry_run: bool) -> int
 
         csv_pmid = _str(row.get("_pmid"))
         csv_doi  = _str(row.get("_doi"))
-        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(csv_doi)
+        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(_doi_url(csv_doi))
 
         if not pub_id:
             skipped_no_pub.append(f"{tool_name} pmid={csv_pmid!r}")

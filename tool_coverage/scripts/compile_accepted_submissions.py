@@ -126,7 +126,7 @@ COLUMNS = {
         "observationId", "resourceId", "resourceType", "resourceName", "observationType",
         "observationText", "observationTypeOntologyId", "observationPhase",
         "observationTime", "observationTimeUnits", "reliabilityRating",
-        "easeOfUseRating", "observationLink",
+        "easeOfUseRating", "observationLink", "observationSubmitterName",
         "_pmid", "_doi", "_publicationTitle", "_year", "_source",
     ],
 }
@@ -694,6 +694,14 @@ def _build_observation(d: dict) -> dict:
     ttype_plural = _RTYPE_TO_TTYPE_P.get(resource_type, "")
     resource_id = _make_resource_id(resource_name, ttype_plural) if ttype_plural else ""
 
+    # Only keep observationLink if it's genuinely different from the publication DOI.
+    # Publication-linked observations don't need the link repeated; external/non-publication
+    # submissions may have a distinct URL (e.g. a protocol page or form).
+    raw_link = (_get(obs, "observationLink") or _get(d, "referencePublication") or "").strip()
+    doi_bare = doi.replace("https://doi.org/", "").replace("https://www.doi.org/", "").strip()
+    link_bare = raw_link.replace("https://doi.org/", "").replace("https://www.doi.org/", "").strip()
+    observation_link = raw_link if (raw_link and link_bare != doi_bare) else ""
+
     return {
         "observationId": obs_id,
         "resourceId": resource_id,
@@ -707,7 +715,8 @@ def _build_observation(d: dict) -> dict:
         "observationTimeUnits": _get(obs, "observationTimeUnits"),
         "reliabilityRating": _get(obs, "reliabilityRating"),
         "easeOfUseRating": _get(obs, "easeOfUseRating"),
-        "observationLink": _get(obs, "observationLink") or _get(d, "referencePublication"),
+        "observationLink": observation_link,
+        "observationSubmitterName": "🤖 AI-extracted",
         "_pmid": pmid,
         "_doi": doi,
         "_publicationTitle": pub_title,
