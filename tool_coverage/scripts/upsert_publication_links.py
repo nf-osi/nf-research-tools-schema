@@ -34,6 +34,7 @@ from synapseclient import Table
 
 PUB_TABLE          = "syn26486839"
 DEV_TABLE          = "syn26486807"
+USAGE_TABLE        = "syn26486841"
 RES_TABLE          = "syn51730943"
 VENDOR_ITEM_TABLE  = "syn26486843"
 INVESTIGATOR_TABLE = "syn26486833"
@@ -144,16 +145,18 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
     # Strip internal tracking columns; year is a real column now (added to syn26486839)
     pub_cols = [c for c in df.columns if not c.startswith("_")]
     df_clean = df[pub_cols].drop_duplicates(subset="pmid", keep="first").copy()
+    # Normalise pmid: strip "PMID:" prefix so bare numeric IDs match what Synapse stores
+    df_clean["pmid"] = df_clean["pmid"].str.replace("PMID:", "", regex=False).str.strip()
     df_clean = df_clean[df_clean["pmid"].notna() & (df_clean["pmid"] != "")]
 
     existing = syn.tableQuery(f"SELECT pmid FROM {PUB_TABLE}").asDataFrame()
     existing_pmids = (
-        set(existing["pmid"].dropna().str.strip().str.upper())
+        set(existing["pmid"].dropna().str.replace("PMID:", "", regex=False).str.strip())
         if len(existing) > 0 else set()
     )
 
     new_pubs = df_clean[
-        ~df_clean["pmid"].str.strip().str.upper().isin(existing_pmids)
+        ~df_clean["pmid"].isin(existing_pmids)
     ].copy()
 
     print(f"  {len(df_clean)} in CSV | {len(existing_pmids)} already in Synapse "
@@ -194,14 +197,19 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
         if len(existing_dev) > 0 else set()
     )
 
-    # Build PMID → actual Synapse publicationId lookup to fix UUID mismatches
+    # Build PMID → actual Synapse publicationId lookup to fix UUID mismatches.
+    # Index both "32561749" and "PMID:32561749" forms so either format in the CSV matches.
     pub_df = syn.tableQuery(
         f"SELECT publicationId, pmid, doi FROM {PUB_TABLE}"
     ).asDataFrame()
-    pmid_to_pub_id = {
-        _str(r["pmid"]): _str(r["publicationId"])
-        for _, r in pub_df.iterrows() if _str(r["pmid"])
-    }
+    pmid_to_pub_id: dict = {}
+    for _, r in pub_df.iterrows():
+        raw = _str(r["pmid"])
+        if raw:
+            norm = raw.replace("PMID:", "").strip()
+            pub_id = _str(r["publicationId"])
+            pmid_to_pub_id[norm] = pub_id
+            pmid_to_pub_id[f"PMID:{norm}"] = pub_id
     doi_to_pub_id = {
         _str(r["doi"]): _str(r["publicationId"])
         for _, r in pub_df.iterrows() if _str(r["doi"])
@@ -264,6 +272,103 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
         print(f"  ✅ Added {len(rows_to_add)} development links to {DEV_TABLE}")
     else:
         print("  ✅ No new development links to add")
+
+    return len(rows_to_add)
+
+
+def upsert_usage_links(syn, usage_csv: str, res_map: dict, dry_run: bool) -> int:
+    """
+    Upsert usage links from submission_usage_links.csv to syn26486841.
+
+    Resolves resourceId from res_map using (_toolName, _toolType).
+    Resolves publicationId from syn26486839 by PMID (handles "PMID:" prefix variants).
+    Skips rows already present (by usageId) or unresolvable.
+    """
+    df = pd.read_csv(usage_csv)
+    if df.empty:
+        print("  No usage link rows to process")
+        return 0
+
+    existing_usage = syn.tableQuery(f"SELECT usageId FROM {USAGE_TABLE}").asDataFrame()
+    existing_ids = (
+        set(existing_usage["usageId"].dropna())
+        if len(existing_usage) > 0 else set()
+    )
+
+    pub_df = syn.tableQuery(
+        f"SELECT publicationId, pmid, doi FROM {PUB_TABLE}"
+    ).asDataFrame()
+    pmid_to_pub_id: dict = {}
+    for _, r in pub_df.iterrows():
+        raw = _str(r["pmid"])
+        if raw:
+            norm = raw.replace("PMID:", "").strip()
+            pub_id = _str(r["publicationId"])
+            pmid_to_pub_id[norm] = pub_id
+            pmid_to_pub_id[f"PMID:{norm}"] = pub_id
+    doi_to_pub_id = {
+        _str(r["doi"]): _str(r["publicationId"])
+        for _, r in pub_df.iterrows() if _str(r["doi"])
+    }
+
+    rows_to_add = []
+    skipped_dup = []
+    skipped_no_res = []
+    skipped_no_pub = []
+
+    for _, row in df.iterrows():
+        use_id = _str(row.get("usageId"))
+        if use_id in existing_ids:
+            skipped_dup.append(use_id)
+            continue
+
+        tool_name = _str(row.get("_toolName"))
+        ttype     = _str(row.get("_toolType"))
+        rtype     = _TTYPE_TO_RTYPE.get(ttype, "")
+        resource_id = res_map.get((tool_name.lower(), rtype))
+
+        if not resource_id:
+            skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
+            continue
+
+        csv_pmid = _str(row.get("_pmid"))
+        csv_doi  = _str(row.get("_doi"))
+        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(csv_doi)
+
+        if not pub_id:
+            skipped_no_pub.append(f"{tool_name} pmid={csv_pmid!r}")
+            continue
+
+        rows_to_add.append({
+            "usageId":       use_id,
+            "publicationId": pub_id,
+            "resourceId":    resource_id,
+        })
+
+    print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
+          f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved resource "
+          f"| {len(skipped_no_pub)} unresolved pub | {len(skipped_dup)} duplicate")
+
+    if skipped_no_res:
+        print(f"  ⚠️  Could not resolve resourceId for {len(skipped_no_res)} row(s):")
+        for name in skipped_no_res[:10]:
+            print(f"    - {name}")
+    if skipped_no_pub:
+        print(f"  ⚠️  Could not resolve publicationId for {len(skipped_no_pub)} row(s):")
+        for name in skipped_no_pub[:10]:
+            print(f"    - {name}")
+
+    if dry_run:
+        for r in rows_to_add[:10]:
+            print(f"    + {r['usageId'][:8]}… res={r['resourceId'][:8]}… pub={r['publicationId'][:8]}…")
+        return len(rows_to_add)
+
+    if rows_to_add:
+        syn.store(Table(USAGE_TABLE, pd.DataFrame(rows_to_add)))
+        _snapshot(syn, USAGE_TABLE)
+        print(f"  ✅ Added {len(rows_to_add)} usage links to {USAGE_TABLE}")
+    else:
+        print("  ✅ No new usage links to add")
 
     return len(rows_to_add)
 
@@ -525,6 +630,8 @@ def main():
                         help=f"Skip {PUB_TABLE}")
     parser.add_argument("--skip-development", action="store_true",
                         help=f"Skip {DEV_TABLE}")
+    parser.add_argument("--skip-usage", action="store_true",
+                        help=f"Skip {USAGE_TABLE}")
     parser.add_argument("--skip-vendor-items", action="store_true",
                         help=f"Skip {VENDOR_ITEM_TABLE}")
     parser.add_argument("--skip-investigators", action="store_true",
@@ -539,9 +646,10 @@ def main():
     syn = _login()
     print("✅ Logged in to Synapse\n")
 
-    pub_csv = os.path.join(args.csv_dir, "submission_publications.csv")
-    dev_csv = os.path.join(args.csv_dir, "submission_dev_links.csv")
-    vi_csv  = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
+    pub_csv   = os.path.join(args.csv_dir, "submission_publications.csv")
+    dev_csv   = os.path.join(args.csv_dir, "submission_dev_links.csv")
+    usage_csv = os.path.join(args.csv_dir, "submission_usage_links.csv")
+    vi_csv    = os.path.join(args.csv_dir, "ACCEPTED_vendorItem.csv")
 
     # Build shared resource map once — reused by dev links, vendor items, investigators
     print(f"Fetching resource registry from {RES_TABLE}...")
@@ -553,6 +661,7 @@ def main():
     total_steps = sum([
         not args.skip_publications,
         not args.skip_development,
+        not args.skip_usage,
         not args.skip_vendor_items,
         not args.skip_investigators,
     ])
@@ -572,6 +681,15 @@ def main():
         else:
             print(f"[{step}/{total_steps}] Development links → {DEV_TABLE}")
             total_added += upsert_development_links(syn, dev_csv, res_map, args.dry_run)
+            print()
+        step += 1
+
+    if not args.skip_usage:
+        if not os.path.exists(usage_csv):
+            print(f"⚠️  {usage_csv} not found — skipping usage link upsert")
+        else:
+            print(f"[{step}/{total_steps}] Usage links → {USAGE_TABLE}")
+            total_added += upsert_usage_links(syn, usage_csv, res_map, args.dry_run)
             print()
         step += 1
 
