@@ -22,6 +22,24 @@ except ImportError:
     USE_NEW_API = False
 
 
+def _doi_url(doi: str) -> str:
+    """Return doi as a full https://www.doi.org/ URL; no-op if already a URL or empty."""
+    if not doi:
+        return doi
+    doi = doi.strip()
+    if doi.startswith("http"):
+        return doi
+    return f"https://www.doi.org/{doi}"
+
+
+def _run_url_comment() -> str:
+    """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
+    server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
+    repo   = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Upsert PubMed publications to Synapse'
@@ -141,6 +159,11 @@ def main():
                      'publicationDate', 'citation', 'publicationDateUnix',
                      'authors', 'publicationTitle']
 
+    # Normalize DOIs to full URL format
+    if "doi" in new_pubs.columns:
+        new_pubs = new_pubs.copy()
+        new_pubs["doi"] = new_pubs["doi"].fillna("").apply(_doi_url)
+
     # Only include columns that exist in both dataframe and table schema
     valid_cols = [col for col in expected_cols if col in new_pubs.columns and col in schema_col_names]
 
@@ -166,7 +189,7 @@ def main():
 
         # Create snapshot version for tracking
         print("   Creating snapshot version...")
-        syn.create_snapshot_version(table_id)
+        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
         print("   ✅ Snapshot version created")
 
     # Log the PMIDs

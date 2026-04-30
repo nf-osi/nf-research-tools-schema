@@ -7,6 +7,7 @@ These columns are for manual review only and must be removed before
 uploading to Synapse.
 """
 
+import json
 import pandas as pd
 import os
 import glob
@@ -14,6 +15,31 @@ import argparse
 import synapseclient
 from synapseclient import Table
 from typing import List, Dict, Tuple
+
+SYN_RESOURCES_TABLE = "syn26450069"
+
+# Primary-key column for each detail table — used to skip rows already in Synapse.
+_DETAIL_TABLE_PK = {
+    "syn26486808": "animalModelId",
+    "syn26486811": "antibodyId",
+    "syn26486823": "cellLineId",
+    "syn26486832": "geneticReagentId",
+    "syn26486836": "observationId",
+    "syn73709226": "computationalToolId",
+    "syn73709227": "organoidProtocolId",
+    "syn73709228": "patientDerivedModelId",
+    "syn73709229": "clinicalAssessmentToolId",
+    "syn26486829": "donorId",
+    "syn26486850": "vendorId",
+}
+
+
+def _run_url_comment() -> str:
+    """Return the GitHub Actions run URL for use as a snapshot comment, or '' locally."""
+    server = os.getenv("GITHUB_SERVER_URL", "").rstrip("/")
+    repo   = os.getenv("GITHUB_REPOSITORY", "")
+    run_id = os.getenv("GITHUB_RUN_ID", "")
+    return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
 
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
@@ -47,10 +73,127 @@ SYNAPSE_TABLE_MAP = {
     # Note: syn51735450 is a materialized view that auto-updates from usage + resources
 }
 
+# Columns that exist in ACCEPTED_*.csv for routing/tracking purposes but do NOT belong
+# in the corresponding Synapse detail table.  They are either stored in a different table
+# by upsert_publication_links.py or are handled elsewhere in the pipeline.
+_STRIP_BEFORE_UPLOAD = {
+    # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
+    # developerContactEmail → no schema home; dropped
+    # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
+    # Columns after transplantationDonorId not yet in syn26486808 — remove once schema updated:
+    'CLEAN_animal_models.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
+        'alleleType', 'affectedGeneSymbol', 'inducedVsDevelopmental', 'bbbIntegrityStatus',
+        'routeOfAdministration', 'pkpdCapabilities', 'mechanismOfActionValidation',
+        'pediatricSuitability', 'timelineToResults', 'modelLimitations',
+        'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
+        'ngnriRepositoryStatus',
+    ],
+    # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
+    'CLEAN_antibodies.csv': [
+        'vendor', 'catalogNumber', 'catalogURL',
+    ],
+    # rrid → resource table (syn26450069); developer fields same as animal models
+    # licenseDetails not yet in syn73709226 with sufficient length — remove once schema updated:
+    'CLEAN_computational_tools.csv': [
+        'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
+        'licenseDetails',
+    ],
+    # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
+    # developerName/developerContactEmail used only for howToAcquire in resources table
+    'CLEAN_organoid_protocols.csv': [
+        'qualityControlMetrics', 'developerName', 'developerContactEmail',
+    ],
+    # developerName/developerContactEmail used only for howToAcquire in resources table
+    'CLEAN_clinical_assessment_tools.csv': [
+        'developerName', 'developerContactEmail',
+    ],
+    # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
+    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table
+    'CLEAN_patient_derived_models.csv': [
+        'validationMethods', 'itemAcquisition', 'developerName', 'developerAffiliation',
+    ],
+    # v2.0 type-specific FK columns not yet added to syn26450069 schema
+    'CLEAN_resources.csv': [
+        'computationalToolId', 'organoidProtocolId', 'patientDerivedModelId',
+        'clinicalAssessmentToolId',
+    ],
+    # resourceType/resourceName kept in ACCEPTED for review; strip before Synapse upload.
+    # observationTypeOntologyId not in syn26486836 schema.
+    'CLEAN_observations.csv': ['resourceType', 'resourceName', 'observationTypeOntologyId'],
+}
+
+
 def get_synapse_table_id(filename):
     """Get Synapse table ID for a given cleaned CSV file."""
     basename = os.path.basename(filename)
     return SYNAPSE_TABLE_MAP.get(basename)
+
+
+def _get_string_list_columns(syn: synapseclient.Synapse, table_id: str) -> List[str]:
+    """Return the names of STRING_LIST columns in a Synapse table."""
+    try:
+        schema = syn.get(table_id)
+        cols = list(syn.getColumns(schema))
+        return [c.name for c in cols if getattr(c, 'columnType', '') == 'STRING_LIST']
+    except Exception as e:
+        print(f"      ⚠️  Could not fetch schema for {table_id}: {e}")
+        return []
+
+
+def _smart_split(val: str, sep: str = ',') -> List[str]:
+    """Split on sep but not inside parentheses or brackets."""
+    parts: List[str] = []
+    depth = 0
+    current: List[str] = []
+    for ch in val:
+        if ch in '([':
+            depth += 1
+            current.append(ch)
+        elif ch in ')]':
+            depth -= 1
+            current.append(ch)
+        elif ch == sep and depth == 0:
+            parts.append(''.join(current).strip())
+            current = []
+        else:
+            current.append(ch)
+    if current:
+        parts.append(''.join(current).strip())
+    return [p for p in parts if p]
+
+
+def _serialize_string_lists(df: pd.DataFrame, string_list_cols: List[str]) -> pd.DataFrame:
+    """Convert STRING_LIST columns from plain comma-separated strings to JSON arrays.
+
+    compile_accepted_submissions._fmt_list() produces comma-joined strings
+    (e.g. "French, English").  Synapse requires JSON arrays (["French","English"]).
+    Commas inside parentheses (e.g. "IHC (S100, CD34)") are not treated as delimiters.
+    """
+    if not string_list_cols:
+        return df
+    df = df.copy()
+
+    def _to_json_array(val):
+        if pd.isna(val) or val == '' or val == 'NULL':
+            return None
+        if isinstance(val, str):
+            try:
+                parsed = json.loads(val)
+                if isinstance(parsed, list):
+                    return val  # already a valid JSON array
+            except (json.JSONDecodeError, ValueError):
+                pass
+            items = _smart_split(val)
+            return json.dumps(items)
+        if isinstance(val, list):
+            return json.dumps([str(v) for v in val if v])
+        return json.dumps([str(val)])
+
+    for col in string_list_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(_to_json_array)
+    return df
 
 def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[str]]:
     """Validate CSV against expected schema requirements.
@@ -85,20 +228,18 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         # Common tables
         'publications': ['publicationId', 'pmid'],
         'usage': ['usageId', 'publicationId', 'resourceId'],
-        'development': ['publicationDevelopmentId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
-        'observations': ['resourceId', 'resourceType', 'resourceName', 'observationType', 'details']
+        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText']
     }
 
-    # Extract file type from filename
-    for key in required_columns.keys():
-        if key in file_type:
-            req_cols = required_columns[key]
-            break
-    else:
-        # Unknown type, skip validation
+    # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
+    import re as _re
+    m = _re.search(r'(?:ACCEPTED|CLEAN|SUBMIT)_(\w+)\.csv', os.path.basename(file_type))
+    file_stem = m.group(1) if m else ''
+    if file_stem not in required_columns:
         return True, []
+    req_cols = required_columns[file_stem]
 
     # Check for required columns
     missing_cols = [col for col in req_cols if col not in df.columns]
@@ -141,7 +282,7 @@ def clean_csv(input_file):
     df_clean = df.drop(columns=tracking_cols)
 
     # Save to CLEAN_ prefixed file
-    output_file = input_file.replace('SUBMIT_', 'CLEAN_')
+    output_file = input_file.replace('ACCEPTED_', 'CLEAN_')
     df_clean.to_csv(output_file, index=False)
 
     print(f"   {input_file}: Removed {len(tracking_cols)} columns → {output_file}")
@@ -152,11 +293,9 @@ def clean_csv(input_file):
 def upsert_to_synapse(syn, clean_file, df_clean):
     """Upsert cleaned data to Synapse table.
 
-    This function appends new rows to the Synapse table. Since we're working with
-    new tool discoveries and publication links, we're always adding new rows rather
-    than updating existing ones.
-
-    After uploading, creates a snapshot version of the table to track this update.
+    Strips routing columns (those belonging to other Synapse tables), serializes
+    STRING_LIST columns to JSON arrays, then appends new rows.  Creates a snapshot
+    version after each successful upload.
 
     Args:
         syn: Synapse client
@@ -166,7 +305,6 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     Returns:
         bool: True if successful, False otherwise
     """
-    # Get Synapse table ID for this file
     table_id = get_synapse_table_id(clean_file)
 
     if not table_id:
@@ -177,16 +315,114 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         print(f"      ⚠️  Empty DataFrame, skipping upload")
         return False
 
+    basename = os.path.basename(clean_file)
+
+    # Strip columns that belong to other tables
+    cols_to_strip = [c for c in _STRIP_BEFORE_UPLOAD.get(basename, []) if c in df_clean.columns]
+    if cols_to_strip:
+        df_clean = df_clean.drop(columns=cols_to_strip)
+        print(f"      ℹ️  Stripped {cols_to_strip} (routed to other tables)")
+
+    # Serialize STRING_LIST columns to JSON arrays
+    string_list_cols = _get_string_list_columns(syn, table_id)
+    present_sl = [c for c in string_list_cols if c in df_clean.columns]
+    if present_sl:
+        df_clean = _serialize_string_lists(df_clean, present_sl)
+        print(f"      ℹ️  Serialized STRING_LIST columns: {present_sl}")
+
     try:
-        # Store the DataFrame to Synapse table
-        # This appends new rows to the existing table
+        # For observations: resolve publicationId from _pmid (stripped by clean_csv) before upload
+        if table_id == "syn26486836":
+            accepted_path = clean_file.replace("CLEAN_", "ACCEPTED_")
+            if os.path.exists(accepted_path):
+                try:
+                    acc_df = pd.read_csv(accepted_path, usecols=lambda c: c in ("observationId", "_pmid"))
+                    if "_pmid" in acc_df.columns:
+                        obs_to_pmid = dict(zip(acc_df["observationId"].astype(str), acc_df["_pmid"].astype(str)))
+                        pub_df = syn.tableQuery("SELECT publicationId, pmid FROM syn26486839").asDataFrame()
+                        pmid_to_pub_id = dict(zip(pub_df["pmid"].astype(str), pub_df["publicationId"]))
+                        df_clean = df_clean.copy()
+                        df_clean["publicationId"] = (
+                            df_clean["observationId"].astype(str).map(obs_to_pmid).map(pmid_to_pub_id)
+                        )
+                        resolved = df_clean["publicationId"].notna().sum()
+                        print(f"      ℹ️  Resolved publicationId for {resolved}/{len(df_clean)} observation rows via _pmid")
+                except Exception as e:
+                    print(f"      ⚠️  Could not resolve observation publicationIds: {e}")
+
+        # For the Resources table, skip rows whose (resourceName, resourceType) pair is
+        # already in Synapse to prevent duplicate name+type entries.  We check by name+type
+        # (not resourceId) because that is the lookup key used by upsert_publication_links.py
+        # and because ID format may differ between pipeline runs.  Real metadata updates to
+        # existing resources should go through generate_review_csv.py, which preserves
+        # curated fields; uploading here would blank them out.
+        if table_id == SYN_RESOURCES_TABLE and "resourceName" in df_clean.columns:
+            existing_res = syn.tableQuery(
+                f"SELECT resourceName, resourceType, howToAcquire FROM {SYN_RESOURCES_TABLE}"
+            ).asDataFrame()
+
+            # Build lookup: (name.lower(), type) → (ROW_ID, ROW_VERSION, current_howToAcquire)
+            existing_map: dict = {}
+            for idx, erow in existing_res.iterrows():
+                key = (str(erow["resourceName"]).lower(), str(erow.get("resourceType", "")))
+                parts = str(idx).split("_")
+                existing_map[key] = (int(parts[0]), int(parts[1]), erow.get("howToAcquire") or "")
+
+            existing_keys = set(existing_map.keys())
+            before = len(df_clean)
+            mask = df_clean.apply(
+                lambda r: (str(r["resourceName"]).lower(), str(r.get("resourceType", ""))) not in existing_keys,
+                axis=1,
+            )
+            df_existing = df_clean[~mask].copy()
+            df_clean = df_clean[mask].copy()
+            skipped = before - len(df_clean)
+            if skipped:
+                print(f"      ℹ️  {skipped} resource(s) already in Synapse")
+
+            # Patch howToAcquire for existing rows where it was previously blank
+            if "howToAcquire" in df_existing.columns:
+                patch_rows = []
+                for _, prow in df_existing.iterrows():
+                    key = (str(prow["resourceName"]).lower(), str(prow.get("resourceType", "")))
+                    row_id, row_ver, cur_val = existing_map.get(key, (None, None, ""))
+                    raw = prow.get("howToAcquire")
+                    new_val = "" if (raw is None or (isinstance(raw, float) and pd.isna(raw))) else str(raw).strip()
+                    if row_id and new_val and new_val != cur_val:
+                        patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, "howToAcquire": new_val})
+                if patch_rows:
+                    syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                    print(f"      ✅ Patched howToAcquire for {len(patch_rows)} existing resource(s)")
+
+            if df_clean.empty:
+                print(f"      ✅ No new resources to upload to {table_id}")
+                return True
+
+        elif table_id in _DETAIL_TABLE_PK:
+            pk_col = _DETAIL_TABLE_PK[table_id]
+            if pk_col in df_clean.columns:
+                try:
+                    existing = syn.tableQuery(
+                        f"SELECT {pk_col} FROM {table_id}"
+                    ).asDataFrame()
+                    existing_pks = set(existing[pk_col].dropna())
+                    before = len(df_clean)
+                    df_clean = df_clean[~df_clean[pk_col].isin(existing_pks)].copy()
+                    skipped = before - len(df_clean)
+                    if skipped:
+                        print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+                    if df_clean.empty:
+                        print(f"      ✅ No new rows to upload to {table_id}")
+                        return True
+                except Exception as e:
+                    print(f"      ⚠️  Could not check existing {pk_col}s in {table_id}: {e} — uploading without dedup")
+
         table = Table(table_id, df_clean)
         table = syn.store(table)
 
-        # Create a snapshot version to track this update
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
         print(f"         Creating snapshot version...")
-        syn.create_snapshot_version(table_id)
+        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
         print(f"         ✅ Snapshot version created")
 
         return True
@@ -287,8 +523,11 @@ Examples:
 
         # Upsert if requested
         if args.upsert and not args.dry_run:
-            success = upsert_to_synapse(syn, clean_file, df_clean)
-            upload_summary.append((clean_file, len(df_clean), success))
+            if not get_synapse_table_id(clean_file):
+                print(f"      ⏭️  {os.path.basename(clean_file)} — no Synapse table mapping (handled elsewhere)")
+            else:
+                success = upsert_to_synapse(syn, clean_file, df_clean)
+                upload_summary.append((clean_file, len(df_clean), success))
         elif args.dry_run:
             table_id = get_synapse_table_id(clean_file)
             if table_id:

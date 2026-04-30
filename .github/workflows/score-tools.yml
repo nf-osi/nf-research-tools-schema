@@ -1,18 +1,12 @@
 name: Calculate Tool Completeness Scores
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Manual trigger only
 
 jobs:
   calculate-scores:
     runs-on: ubuntu-latest
-    # Only run if: (1) manual trigger, OR (2) PR with tool-submissions label was merged
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'tool-submissions'))
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,19 +22,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r tool_coverage/requirements.txt
 
-      - name: Run completeness scoring script
+      - name: Calculate tool completeness scores
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
+          echo "=========================================="
+          echo "CALCULATING Tool Completeness Scores"
+          echo "=========================================="
           python tool_scoring.py
 
-      - name: Generate PDF report
+          echo ""
+          echo "✅ Completeness scores updated"
+
+      - name: Generate completeness report
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
-          python tool_scoring_report.py
+          python tool_scoring_report.py || echo "⚠️  PDF report generation failed (non-fatal)"
 
-      - name: Upload PDF report as artifact
+      - name: Upload scoring report artifact
         uses: actions/upload-artifact@v4
         with:
           name: tool-scoring-report

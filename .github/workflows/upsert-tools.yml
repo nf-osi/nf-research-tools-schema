@@ -6,16 +6,23 @@ on:
       - main
     paths:
       - 'submissions/*/*.json'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:
     inputs:
       dry_run:
         description: 'Run in dry-run mode (validate and preview, but do not upsert to Synapse)'
         required: false
         type: boolean
         default: false
+      force:
+        description: 'Process all submission JSON files, ignoring last-run state'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: read
+  issues: write
 
 jobs:
   upsert-to-synapse:
@@ -39,31 +46,50 @@ jobs:
 
       - name: Identify changed JSON files
         id: changed_files
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "=========================================="
           echo "IDENTIFYING changed submissions/*/*.json"
           echo "=========================================="
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "workflow_dispatch — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
-            echo "Initial push to main — will process all accepted JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          else
-            git diff --name-only --diff-filter=AM \
-              "${{ github.event.before }}" "${{ github.sha }}" \
+          _diff_submissions() {
+            local base_sha="$1"
+            git diff --name-only --diff-filter=AM "$base_sha" "${{ github.sha }}" \
               -- 'submissions/' \
-              | grep -v '/observations/' \
               | grep '\.json$' > changed_json_files.txt || true
-
             COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
-            echo "Found ${COUNT} changed JSON file(s):"
+            echo "Found ${COUNT} changed JSON file(s) since ${base_sha:0:8}:"
             cat changed_json_files.txt
             echo "changed_count=${COUNT}" >> $GITHUB_OUTPUT
             echo "use_all=false" >> $GITHUB_OUTPUT
+          }
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "workflow_dispatch (force=true) — processing all submission JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — checking for changes since last successful run"
+            LAST_SHA=$(gh api \
+              "repos/${{ github.repository }}/actions/workflows/upsert-tools.yml/runs?status=success&per_page=5" \
+              --jq --arg cur "${{ github.sha }}" \
+              '[.workflow_runs[] | select(.head_sha != $cur)] | .[0].head_sha // empty' \
+              2>/dev/null || echo "")
+            if [ -z "$LAST_SHA" ] || [ "$LAST_SHA" = "null" ]; then
+              echo "No previous successful run found — processing all files"
+              echo "use_all=true" >> $GITHUB_OUTPUT
+            else
+              echo "Last successful run SHA: ${LAST_SHA}"
+              _diff_submissions "$LAST_SHA"
+            fi
+
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "Initial push to main — processing all submission JSON files"
+            echo "use_all=true" >> $GITHUB_OUTPUT
+
+          else
+            _diff_submissions "${{ github.event.before }}"
           fi
 
       - name: Compile changed JSON submissions into ACCEPTED_*.csv
@@ -75,7 +101,7 @@ jobs:
 
           if [ "${{ steps.changed_files.outputs.use_all }}" = "true" ]; then
             # workflow_dispatch or initial push — process all submission files
-            if find submissions -maxdepth 2 -name "*.json" ! -path "*/observations/*" | grep -q .; then
+            if find submissions -maxdepth 3 -name "*.json" | grep -q .; then
               python tool_coverage/scripts/compile_accepted_submissions.py \
                 --accepted-dir submissions \
                 --csv-dir tool_coverage/outputs
@@ -162,29 +188,33 @@ jobs:
           fi
 
       - name: Confirm and upload to Synapse
+        id: upload_clean
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
+          set -o pipefail
           echo "=========================================="
           echo "UPLOADING to Synapse"
           echo "=========================================="
-          python tool_coverage/scripts/clean_submission_csvs.py --upsert
+          python tool_coverage/scripts/clean_submission_csvs.py --upsert 2>&1 | tee /tmp/clean_upload.log
 
           echo ""
           echo "✅ Upload completed successfully"
 
       - name: Upsert publications and development links to Synapse
+        id: upload_pub_links
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
+          set -o pipefail
           echo "=========================================="
           echo "UPSERTING Publications + Development Links"
           echo "=========================================="
           if [ -f "tool_coverage/outputs/submission_publications.csv" ] || [ -f "tool_coverage/outputs/submission_dev_links.csv" ]; then
             python tool_coverage/scripts/upsert_publication_links.py \
-              --csv-dir tool_coverage/outputs
+              --csv-dir tool_coverage/outputs 2>&1 | tee /tmp/pub_upload.log
             echo ""
             echo "✅ Publication and development link upsert complete"
           else
@@ -199,6 +229,56 @@ jobs:
           echo "=========================================="
           echo "✅ Validation passed, files are ready for upload"
           echo "⚠️  Run workflow without dry_run option to actually upload"
+
+      - name: Report upload failures
+        if: always() && steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILURES=""
+
+          # Collect ❌ lines from upload logs (silent Python-level failures)
+          for log in /tmp/clean_upload.log /tmp/pub_upload.log; do
+            if [ -f "$log" ]; then
+              ERRS=$(grep "❌" "$log" || true)
+              if [ -n "$ERRS" ]; then
+                FAILURES="$FAILURES
+          $ERRS"
+              fi
+            fi
+          done
+
+          # Also flag if either upload step itself exited non-zero
+          STEP_FAILURES=""
+          if [ "${{ steps.upload_clean.outcome }}" = "failure" ]; then
+            STEP_FAILURES="$STEP_FAILURES
+          - clean_submission_csvs.py exited non-zero"
+          fi
+          if [ "${{ steps.upload_pub_links.outcome }}" = "failure" ]; then
+            STEP_FAILURES="$STEP_FAILURES
+          - upsert_publication_links.py exited non-zero"
+          fi
+
+          if [ -n "$FAILURES" ] || [ -n "$STEP_FAILURES" ]; then
+            gh issue create \
+              --title "Synapse upload failures — run ${{ github.run_id }}" \
+              --label "bug" \
+              --body "$(cat <<EOF
+          ## Synapse Upload Failures Detected
+
+          **Workflow run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          **Triggered by**: push to \`${{ github.ref_name }}\` (${{ github.sha }})
+
+          $([ -n "$STEP_FAILURES" ] && printf '### Step exits\n%s\n' "$STEP_FAILURES" || true)
+          $([ -n "$FAILURES" ] && printf '### Errors from upload logs\n\`\`\`\n%s\n\`\`\`' "$FAILURES" || true)
+
+          Please review the run log and fix any schema mismatches, missing columns, or Synapse API errors before re-triggering.
+          EOF
+          )"
+            echo "❌ GitHub issue created for upload failures"
+          else
+            echo "✅ No upload failures detected"
+          fi
 
       - name: Regenerate coverage report
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
@@ -285,6 +365,6 @@ jobs:
           path: |
             CLEAN_*.csv
             tool_coverage/outputs/CLEAN_*.csv
-            GFF_Tool_Coverage_Report.pdf
+            tool_coverage/outputs/GFF_Tool_Coverage_Report.pdf
             tool_scoring_report.pdf
           retention-days: 30
