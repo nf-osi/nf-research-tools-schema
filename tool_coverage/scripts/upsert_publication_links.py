@@ -186,17 +186,45 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
     Resolves resourceId from res_map using (_toolName, _toolType).
     Resolves publicationId from syn26486839 by PMID — the local UUID5 from
     _make_pub_id may differ from the Synapse-assigned ID for pre-existing pubs.
-    Skips rows already present (by developmentId) or unresolvable.
+
+    Dedup strategy (two-pass):
+      1. Skip rows whose developmentId already exists in Synapse.
+      2. For remaining rows, check existing (resourceId, funderId) pairs.
+         Original-import rows with null publicationId share the same
+         (resourceId, funderId) but have a different developmentId, so they
+         slip through pass 1.  Pass 2 catches them: if the existing row has a
+         null publicationId, patch it in place; either way, skip inserting a
+         duplicate row.  This prevents the same funder appearing twice on the
+         portal for a single-development-publication tool.
     """
     df = pd.read_csv(dev_csv)
 
+    # Fetch full existing dev-link table for both dedup passes
     existing_dev = syn.tableQuery(
-        f"SELECT developmentId FROM {DEV_TABLE}"
+        f"SELECT developmentId, resourceId, funderId, publicationId FROM {DEV_TABLE}"
     ).asDataFrame()
+
     existing_ids = (
         set(existing_dev["developmentId"].dropna())
         if len(existing_dev) > 0 else set()
     )
+
+    # (resourceId, funderId) → (ROW_ID, ROW_VERSION) for rows with null publicationId
+    null_pub_rf: dict = {}
+    # (resourceId, funderId) pairs that already have a publicationId
+    filled_rf: set = set()
+    for idx, drow in existing_dev.iterrows():
+        rid = _str(drow.get("resourceId"))
+        fid = _str(drow.get("funderId"))
+        pub = _str(drow.get("publicationId"))
+        if not rid:
+            continue
+        rf = (rid, fid)
+        if pub:
+            filled_rf.add(rf)
+        else:
+            parts = str(idx).split("_")
+            null_pub_rf[rf] = (int(parts[0]), int(parts[1]))
 
     # Build PMID → actual Synapse publicationId lookup to fix UUID mismatches.
     # Index both "32561749" and "PMID:32561749" forms so either format in the CSV matches.
@@ -217,17 +245,18 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
     }
 
     rows_to_add = []
+    pub_id_patches = []   # patch publicationId into original-import null-pub rows
     skipped_dup = []
     skipped_no_res = []
 
     for _, row in df.iterrows():
-        dev_id = row.get("developmentId", "")
+        dev_id = _str(row.get("developmentId"))
         if dev_id in existing_ids:
             skipped_dup.append(dev_id)
             continue
 
         tool_name = (row.get("_toolName") or "").strip()
-        ttype = row.get("_toolType", "")
+        ttype = _str(row.get("_toolType"))
         rtype = _TTYPE_TO_RTYPE.get(ttype, "")
         resource_id = res_map.get((tool_name.lower(), rtype))
 
@@ -235,22 +264,36 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
 
-        # Prefer actual Synapse publicationId over the locally-generated UUID5
         csv_pmid = _str(row.get("_pmid"))
         csv_pub_id = _str(row.get("publicationId"))
         pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(csv_pub_id) or csv_pub_id
 
+        funder_id = _str(row.get("funderId"))
+        rf = (resource_id, funder_id)
+
+        # Pass 2: (resourceId, funderId) already exists — would create a duplicate funder
+        if rf in filled_rf or rf in null_pub_rf:
+            if rf in null_pub_rf and pub_id:
+                row_id, row_ver = null_pub_rf[rf]
+                pub_id_patches.append({
+                    "ROW_ID":        row_id,
+                    "ROW_VERSION":   row_ver,
+                    "publicationId": pub_id,
+                })
+            skipped_dup.append(dev_id)
+            continue
+
         rows_to_add.append({
             "developmentId": dev_id,
             "publicationId": pub_id,
-            "resourceId": resource_id,
-            "funderId": _str(row.get("funderId")),
+            "resourceId":    resource_id,
+            "funderId":      funder_id,
             "investigatorId": _str(row.get("investigatorId")),
         })
 
     print(f"  {len(df)} in CSV | {len(existing_ids)} already in Synapse "
-          f"| {len(rows_to_add)} to add | {len(skipped_no_res)} unresolved "
-          f"| {len(skipped_dup)} duplicate")
+          f"| {len(rows_to_add)} to add | {len(pub_id_patches)} null-pub patches "
+          f"| {len(skipped_no_res)} unresolved | {len(skipped_dup)} duplicate")
 
     if skipped_no_res:
         print(f"  ⚠️  Could not resolve resourceId for {len(skipped_no_res)} row(s):")
@@ -262,10 +305,15 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
 
     if dry_run:
         for r in rows_to_add:
-            dev_id = r['developmentId']
-            print(f"    + devId={dev_id[:8]}… resId={r['resourceId'][:8]}… "
+            print(f"    + devId={r['developmentId'][:8]}… resId={r['resourceId'][:8]}… "
                   f"funder={r['funderId'][:8] if r['funderId'] else '—'}")
+        if pub_id_patches:
+            print(f"    ~ would patch publicationId for {len(pub_id_patches)} original-import row(s)")
         return len(rows_to_add)
+
+    if pub_id_patches:
+        syn.store(Table(DEV_TABLE, pd.DataFrame(pub_id_patches)))
+        print(f"  ✅ Patched publicationId for {len(pub_id_patches)} original-import row(s)")
 
     if rows_to_add:
         syn.store(Table(DEV_TABLE, pd.DataFrame(rows_to_add)))
