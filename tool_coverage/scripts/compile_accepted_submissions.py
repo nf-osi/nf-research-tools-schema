@@ -673,6 +673,22 @@ def _build_clinical_assessment_tool(d: dict) -> dict:
     }
 
 
+def _observation_submitter_name(d: dict) -> str:
+    """Return the submitter name for an observation.
+
+    Formspark submissions (SubmitObservationSchema.json) include first_name/last_name.
+    AI-extracted observations have neither field, so they get the AI label.
+    """
+    first = (_get(d, "first_name") or "").strip()
+    last  = (_get(d, "last_name")  or "").strip()
+    name  = " ".join(filter(None, [first, last]))
+    if name:
+        return name
+    if "first_name" in d or "last_name" in d:
+        return "Anonymous"
+    return "🤖 AI-extracted"
+
+
 def _build_observation(d: dict) -> dict:
     obs = d.get("observationsSection", {}).get("observations", [d])[0] if "observationsSection" in d else d
     # Observation JSONs store publication metadata in _publications array
@@ -716,7 +732,7 @@ def _build_observation(d: dict) -> dict:
         "reliabilityRating": _get(obs, "reliabilityRating"),
         "easeOfUseRating": _get(obs, "easeOfUseRating"),
         "observationLink": observation_link,
-        "observationSubmitterName": "🤖 AI-extracted",
+        "observationSubmitterName": _observation_submitter_name(d),
         "_pmid": pmid,
         "_doi": doi,
         "_publicationTitle": pub_title,
