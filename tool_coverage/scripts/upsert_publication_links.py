@@ -145,13 +145,14 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
     # Strip internal tracking columns; year is a real column now (added to syn26486839)
     pub_cols = [c for c in df.columns if not c.startswith("_")]
     df_clean = df[pub_cols].drop_duplicates(subset="pmid", keep="first").copy()
-    # Normalise pmid: strip "PMID:" prefix so bare numeric IDs match what Synapse stores
-    df_clean["pmid"] = df_clean["pmid"].str.replace("PMID:", "", regex=False).str.strip()
-    df_clean = df_clean[df_clean["pmid"].notna() & (df_clean["pmid"] != "")]
+    # Normalise pmid: cast to str then strip "PMID:" prefix so bare numerics and
+    # "PMID:"-prefixed strings both match what Synapse stores.
+    df_clean["pmid"] = df_clean["pmid"].astype(str).str.replace("PMID:", "", regex=False).str.strip()
+    df_clean = df_clean[df_clean["pmid"].notna() & (df_clean["pmid"] != "") & (df_clean["pmid"] != "nan")]
 
     existing = syn.tableQuery(f"SELECT pmid FROM {PUB_TABLE}").asDataFrame()
     existing_pmids = (
-        set(existing["pmid"].dropna().str.replace("PMID:", "", regex=False).str.strip())
+        set(existing["pmid"].dropna().astype(str).str.replace("PMID:", "", regex=False).str.strip())
         if len(existing) > 0 else set()
     )
 
