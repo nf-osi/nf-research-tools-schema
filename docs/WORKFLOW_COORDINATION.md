@@ -71,7 +71,7 @@ Mines NF Portal and PubMed publications for novel tools:
 **Trigger**: Push to main with files in `submissions/*/accepted/`
 **Creates PR**: No (uploads directly to Synapse)
 
-Compiles accepted JSON submissions and uploads to Synapse tables.
+Compiles accepted JSON submissions into `ACCEPTED_*.csv` and generates `submission_publications.csv`, `submission_dev_links.csv`, and `submission_usage_links.csv`. Uploads tools to type-specific Synapse tables, publications to syn26486839 (DOIs stored as full `https://www.doi.org/` URLs), development links to syn26486807, and usage links (non-development publications) to syn26486841. Resolves `publicationId` for observation rows before uploading to syn26486836.
 
 ---
 
@@ -155,9 +155,10 @@ submissions/
 ```
 
 When `submissions/*/accepted/**/*.json` is pushed to main, `upsert-tools.yml` triggers:
-1. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv`
-2. Validates CSV schemas
-3. Uploads to Synapse tables
+1. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+2. Validates CSV schemas (resolves `publicationId` for observations via syn26486839)
+3. Uploads tool data to Synapse type-specific tables
+4. Upserts publications (syn26486839), development links (syn26486807), and usage links (syn26486841)
 
 ## Manual Trigger Guide
 
