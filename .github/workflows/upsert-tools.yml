@@ -357,6 +357,32 @@ jobs:
         run: |
           python tool_scoring_report.py || echo "⚠️  PDF report generation failed (non-fatal)"
 
+      - name: Check investigators for missing Synapse profile links
+        if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
+        id: check_investigator_ids
+        run: |
+          python tool_coverage/scripts/check_investigator_synapse_ids.py
+          echo "missing=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Create or update GitHub issue for missing investigator IDs
+        if: steps.check_investigator_ids.outputs.missing == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Investigators missing Synapse profile link"
+          EXISTING=$(gh issue list --label "data-quality" --state open \
+            --search "$TITLE" --json number --jq '.[0].number // ""')
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --body-file investigator_issue_body.md
+            echo "Updated issue #$EXISTING"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body-file investigator_issue_body.md \
+              --label "data-quality"
+          fi
+
       - name: Upload summary artifacts
         if: steps.check_files.outputs.has_files == 'true'
         uses: actions/upload-artifact@v4

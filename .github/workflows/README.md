@@ -181,8 +181,8 @@ These workflows support the main sequence but run independently:
 
 **What it does**:
 1. Diffs changed files — only processes JSON files that changed in the push (diff-based compile)
-2. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv`
-3. Validates CSV schemas
+2. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+3. Validates CSV schemas (including `publicationId` resolution for observations)
 4. Cleans tracking columns (prefixed with `_`)
 5. Uploads to corresponding Synapse tables:
    - syn26486808 (animal models)
@@ -190,6 +190,9 @@ These workflows support the main sequence but run independently:
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
    - syn26450069 (resources)
+   - syn26486839 (publications)
+   - syn26486807 (development links)
+   - syn26486841 (usage links — non-development publications)
 6. Regenerates coverage report
 
 **Review flow**:

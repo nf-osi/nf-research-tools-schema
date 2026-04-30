@@ -48,7 +48,7 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 
 
 **Supporting Workflows:**
-- **upsert-tools.yml** - Uploads validated tool data to Synapse (triggered by CSV files on main)
+- **upsert-tools.yml** - Compiles accepted JSONs, uploads tool data + publications (syn26486839), development links (syn26486807), and usage links (syn26486841) to Synapse (triggered by JSON files pushed to `submissions/*/`)
 - **upsert-tool-datasets.yml** - Uploads tool-dataset linkages to Synapse
 - **publish-schema-viz.yml** - Generates interactive schema visualization
 - **schematic-schema-convert.yml** - Converts schema between CSV and JSON-LD formats

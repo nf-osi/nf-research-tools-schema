@@ -347,6 +347,7 @@ python tool_coverage/scripts/run_publication_reviews.py --mining-file processed_
 Prepares SUBMIT_*.csv files for Synapse upload:
 - **Validates CSV schema** against required columns and non-null constraints
 - **Removes tracking columns** (prefixed with '_') used for manual review
+- **Resolves `publicationId`** for observation rows by joining against syn26486839 via `_pmid`
 - **Saves cleaned versions** as CLEAN_*.csv files
 - **Optionally uploads** cleaned data to Synapse tables via --upsert flag
 - **Dry-run mode** (--dry-run) previews uploads without making changes
@@ -429,14 +430,16 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 1. Checkout repository
 2. Set up Python 3.11 with pip cache
 3. Install dependencies from requirements.txt
-4. Check for validated or submit CSV files
-5. **Validate CSV schema** against required columns and constraints
-6. Clean submission files (remove tracking columns)
-7. **Dry-run preview** of Synapse uploads (safety check)
-8. **Upload cleaned data** to Synapse tables (skipped if `dry_run=true`)
-9. **Regenerate coverage report** (shows updated metrics after upload)
-10. Create upload summary with table links
-11. Upload cleaned CSVs and updated PDF as artifacts (30-day retention)
+4. Diff changed JSON files — only processes submissions that changed in the push
+5. **Compile changed JSONs** → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+6. **Validate CSV schema** against required columns and constraints (resolves `publicationId` for observations)
+7. Clean submission files (remove tracking columns prefixed with `_`)
+8. **Dry-run preview** of Synapse uploads (safety check)
+9. **Upload cleaned data** to Synapse tables (skipped if `dry_run=true`)
+10. **Upsert publications, development links, and usage links** to Synapse (skipped if `dry_run=true`)
+11. **Regenerate coverage report** (shows updated metrics after upload)
+12. Create upload summary with table links
+13. Upload cleaned CSVs and updated PDF as artifacts (30-day retention)
 
 **Safety Features:**
 - **Schema validation** checks required fields before upload
@@ -462,9 +465,9 @@ python tool_coverage/scripts/clean_submission_csvs.py --upsert
 
 **Common Tables:**
 - Resources: syn26450069
-- Publications: syn26486839
-- Usage: syn26486841 (where tools were USED)
-- Development: syn26486807 (where tools were DEVELOPED)
+- Publications: syn26486839 (base publication info; DOIs stored as full `https://www.doi.org/` URLs)
+- Usage: syn26486841 (publications where tools were USED — non-development publications)
+- Development: syn26486807 (publications where tools were DEVELOPED)
 - Observations: syn26486836 (scientific observations about tools)
 
 ## Recent Improvements
@@ -772,11 +775,11 @@ The AI validation also extracts **scientific observations** about tools from Res
 2. Links observations to validated tools (via resourceName)
 3. `format_mining_for_submission.py` matches observations to resourceIds via syn51730943
 4. Creates `SUBMIT_observations.csv` (matched) and `SUBMIT_observations_UNMATCHED.csv` (unmatched)
-5. `clean_submission_csvs.py` validates schema (same as all other entities):
+5. `clean_submission_csvs.py` validates schema and resolves `publicationId` from `_pmid` (same as all other entities):
    - Required fields: resourceId, resourceType, resourceName, observationType, details
    - No null values in required fields
    - No empty rows
-6. Creates `CLEAN_observations.csv` ready for Synapse upload
+6. Creates `CLEAN_observations.csv` ready for Synapse upload (syn26486836)
 
 **Consistent with all SUBMIT files** - observations validated the same way as tools, publications, and links.
 
@@ -880,20 +883,22 @@ Once you've validated the results and completed any necessary edits:
 
 **What happens automatically:**
 1. The upsert workflow detects the CSV files
-2. Cleans submission files (removes tracking columns)
-3. Runs a dry-run preview of uploads
-4. Uploads data to Synapse tables:
+2. Compiles JSONs → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+3. Cleans submission files (removes tracking columns; resolves `publicationId` for observations)
+4. Runs a dry-run preview of uploads
+5. Uploads data to Synapse tables:
    - **Resources:** syn26450069
    - **Animal Models:** syn26486808
    - **Antibodies:** syn26486811
    - **Cell Lines:** syn26486823
    - **Genetic Reagents:** syn26486832
-   - **Publications:** syn26486839
-   - **Usage:** syn26486841 (tools that were USED)
-   - **Development:** syn26486807 (tools that were DEVELOPED)
-5. Creates snapshot versions for all updated tables (audit trail)
-6. **Regenerates coverage report PDF** with updated metrics
-7. Creates upload summary in GitHub Actions
+   - **Publications:** syn26486839 (DOIs stored as full `https://www.doi.org/` URLs)
+   - **Usage:** syn26486841 (non-development publications where tools were USED)
+   - **Development:** syn26486807 (publications where tools were DEVELOPED)
+   - **Observations:** syn26486836
+6. Creates snapshot versions for all updated tables (audit trail)
+7. **Regenerates coverage report PDF** with updated metrics
+8. Creates upload summary in GitHub Actions
 
 **IMPORTANT:** The CSV files contain NEW ROWS only - they are **appended** to existing Synapse tables, not used as replacements.
 

@@ -22,7 +22,7 @@ Tool types: `animal_models`, `antibodies`, `cell_lines`, `genetic_reagents`,
 
 **Internal manual submissions:** Team members and collaborators can add tools directly by opening a pull request (see below).
 
-**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are processed separately via `upsert-tools.yml`.
+**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are exported and processed via `process_formspark_export.py`, which writes JSON files into `submissions/{type}/`. After manual review and moving accepted files to `submissions/{type}/accepted/`, `upsert-tools.yml` uploads them to Synapse.
 
 ## Internal manual submission instructions
 
@@ -60,6 +60,6 @@ PRs with the `tool-submissions` label will be reviewed by a maintainer. During r
 ### Tips
 
 - One JSON file per tool. Multiple tools can be in the same PR.
-- Observation JSONs (`observations/` subfolder) are optional but helpful context; they are uploaded separately to the observations table.
+- Observation JSONs (`observations/` subfolder) are optional but helpful context; they are uploaded to the observations table (syn26486836). Pipeline-extracted observations set `observationSubmitterName` to '🤖 AI-extracted'; Formspark observations use `first_name`/`last_name` or 'Anonymous'.
 - If you're unsure about a field value, leave it blank — curators will fill it in.
 - RRIDs can be looked up after submission via `lookup_rrids.py`.
