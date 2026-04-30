@@ -331,6 +331,25 @@ def upsert_to_synapse(syn, clean_file, df_clean):
         print(f"      ℹ️  Serialized STRING_LIST columns: {present_sl}")
 
     try:
+        # For observations: resolve publicationId from _pmid (stripped by clean_csv) before upload
+        if table_id == "syn26486836":
+            accepted_path = clean_file.replace("CLEAN_", "ACCEPTED_")
+            if os.path.exists(accepted_path):
+                try:
+                    acc_df = pd.read_csv(accepted_path, usecols=lambda c: c in ("observationId", "_pmid"))
+                    if "_pmid" in acc_df.columns:
+                        obs_to_pmid = dict(zip(acc_df["observationId"].astype(str), acc_df["_pmid"].astype(str)))
+                        pub_df = syn.tableQuery("SELECT publicationId, pmid FROM syn26486839").asDataFrame()
+                        pmid_to_pub_id = dict(zip(pub_df["pmid"].astype(str), pub_df["publicationId"]))
+                        df_clean = df_clean.copy()
+                        df_clean["publicationId"] = (
+                            df_clean["observationId"].astype(str).map(obs_to_pmid).map(pmid_to_pub_id)
+                        )
+                        resolved = df_clean["publicationId"].notna().sum()
+                        print(f"      ℹ️  Resolved publicationId for {resolved}/{len(df_clean)} observation rows via _pmid")
+                except Exception as e:
+                    print(f"      ⚠️  Could not resolve observation publicationIds: {e}")
+
         # For the Resources table, skip rows whose (resourceName, resourceType) pair is
         # already in Synapse to prevent duplicate name+type entries.  We check by name+type
         # (not resourceId) because that is the lookup key used by upsert_publication_links.py
