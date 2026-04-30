@@ -58,11 +58,18 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_patient_derived_models.csv': 'syn73709228',  # PatientDerivedModelDetails table
     'CLEAN_clinical_assessment_tools.csv': 'syn73709229',  # ClinicalAssessmentToolDetails table
 
+<<<<<<< HEAD
     # Vendor / donor tables — syn26486850, syn26486843, syn26486829
     'CLEAN_vendor.csv': 'syn26486850',        # Vendor table
     'CLEAN_donor.csv': 'syn26486829',         # Donor table
     # Note: CLEAN_vendorItem.csv is NOT uploaded here — it needs resourceId resolution
     # via upsert_publication_links.py (run after resources are in Synapse)
+
+=======
+>>>>>>> f03a456a747316bf6dc219cb06292a35b3141315
+    # Mutation tables (v2.0)
+    'CLEAN_mutation_details.csv': 'syn26486835',  # MutationDetails table
+    'CLEAN_mutation.csv': 'syn26486834',           # Mutation junction table
 
     # Common tables
     'CLEAN_resources.csv': 'syn26450069',
@@ -230,7 +237,13 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'usage': ['usageId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
-        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText']
+<<<<<<< HEAD
+        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText'],
+=======
+        'observations': ['resourceId', 'resourceType', 'resourceName', 'observationType', 'details'],
+>>>>>>> f03a456a747316bf6dc219cb06292a35b3141315
+        'mutation_details': ['mutationDetailsId'],
+        'mutation': ['mutationId', 'mutationDetailsId', 'animalModelId'],
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
