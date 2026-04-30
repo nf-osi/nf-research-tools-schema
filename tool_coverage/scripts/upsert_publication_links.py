@@ -77,6 +77,7 @@ _TTYPE_TO_RTYPE = {
 # mapped to the Synapse resourceType used for resourceId lookup.
 _DEVELOPER_CSV_RTYPES = {
     "ACCEPTED_animal_models.csv":            "Animal Model",
+    "ACCEPTED_cell_lines.csv":               "Cell Line",
     "ACCEPTED_computational_tools.csv":      "Computational Tool",
     "ACCEPTED_patient_derived_models.csv":   "Patient-Derived Model",
     "ACCEPTED_organoid_protocols.csv":       "Organoid Protocol",
@@ -179,6 +180,8 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
     Upsert development links from submission_dev_links.csv to syn26486807.
 
     Resolves resourceId from res_map using (_toolName, _toolType).
+    Resolves publicationId from syn26486839 by PMID — the local UUID5 from
+    _make_pub_id may differ from the Synapse-assigned ID for pre-existing pubs.
     Skips rows already present (by developmentId) or unresolvable.
     """
     df = pd.read_csv(dev_csv)
@@ -190,6 +193,19 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
         set(existing_dev["developmentId"].dropna())
         if len(existing_dev) > 0 else set()
     )
+
+    # Build PMID → actual Synapse publicationId lookup to fix UUID mismatches
+    pub_df = syn.tableQuery(
+        f"SELECT publicationId, pmid, doi FROM {PUB_TABLE}"
+    ).asDataFrame()
+    pmid_to_pub_id = {
+        _str(r["pmid"]): _str(r["publicationId"])
+        for _, r in pub_df.iterrows() if _str(r["pmid"])
+    }
+    doi_to_pub_id = {
+        _str(r["doi"]): _str(r["publicationId"])
+        for _, r in pub_df.iterrows() if _str(r["doi"])
+    }
 
     rows_to_add = []
     skipped_dup = []
@@ -210,9 +226,14 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
             skipped_no_res.append(f"{tool_name} ({rtype or ttype})")
             continue
 
+        # Prefer actual Synapse publicationId over the locally-generated UUID5
+        csv_pmid = _str(row.get("_pmid"))
+        csv_pub_id = _str(row.get("publicationId"))
+        pub_id = pmid_to_pub_id.get(csv_pmid) or doi_to_pub_id.get(csv_pub_id) or csv_pub_id
+
         rows_to_add.append({
             "developmentId": dev_id,
-            "publicationId": _str(row.get("publicationId")),
+            "publicationId": pub_id,
             "resourceId": resource_id,
             "funderId": _str(row.get("funderId")),
             "investigatorId": _str(row.get("investigatorId")),

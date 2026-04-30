@@ -1059,6 +1059,19 @@ def _compute_how_to_acquire(ttype: str, row: dict) -> str:
         if dev:
             return f"Contact developer: {dev}"
 
+    elif ttype == "cell_line":
+        acq = _acq("itemAcquisition")
+        dev = _acq("developerName")
+        aff = _acq("developerAffiliation")
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            if acq.lower() == "contact developer":
+                if dev:
+                    return f"Contact developer: {dev}" + (f" ({aff})" if aff else "")
+                if aff:
+                    return f"Contact: {aff}"
+            else:
+                return acq
+
     elif ttype == "patient_derived_model":
         acq = _acq("itemAcquisition")
         dev = _acq("developerName")
