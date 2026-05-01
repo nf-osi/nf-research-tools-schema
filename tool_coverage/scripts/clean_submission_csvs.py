@@ -448,18 +448,22 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                                     existing_map[pk_val] = (int(parts[0]), int(parts[1]), erow)
                                 except ValueError:
                                     pass
+                        print(f"      ℹ️  [patch] existing_map: {len(existing_map)} row(s), idx sample: {str(next(iter(existing.index), 'n/a'))!r}")
                         patch_rows = []
                         for _, prow in df_existing.iterrows():
                             pk_val = prow[pk_col]
                             if pk_val not in existing_map:
+                                print(f"      ℹ️  [patch] {pk_val[:8]}… not in existing_map — skipping")
                                 continue
                             row_id, row_ver, erow = existing_map[pk_val]
                             updates = {}
                             for field in patch_field_names:
                                 if field not in prow:
+                                    print(f"      ℹ️  [patch] field {field!r} not in prow — skipping")
                                     continue
                                 new_val = str(prow.get(field, "") or "").strip()
                                 cur_val = str(erow.get(field, "") or "").strip()
+                                print(f"      ℹ️  [patch] {field}: new={new_val[:20]!r} cur={cur_val[:20]!r}")
                                 if new_val and not cur_val:
                                     updates[field] = new_val
                             if updates:
