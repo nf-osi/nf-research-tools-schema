@@ -461,8 +461,10 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                                 if field not in prow:
                                     print(f"      ℹ️  [patch] field {field!r} not in prow — skipping")
                                     continue
-                                new_val = str(prow.get(field, "") or "").strip()
-                                cur_val = str(erow.get(field, "") or "").strip()
+                                raw_new = prow.get(field, "")
+                                new_val = "" if (raw_new is None or (isinstance(raw_new, float) and pd.isna(raw_new))) else str(raw_new).strip()
+                                raw_cur = erow.get(field)
+                                cur_val = "" if (raw_cur is None or (isinstance(raw_cur, float) and pd.isna(raw_cur))) else str(raw_cur).strip()
                                 print(f"      ℹ️  [patch] {field}: new={new_val[:20]!r} cur={cur_val[:20]!r}")
                                 if new_val and not cur_val:
                                     updates[field] = new_val
