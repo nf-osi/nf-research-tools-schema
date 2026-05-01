@@ -1092,8 +1092,9 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
                         "_resourceName": resource_name,
                     })
 
-    # ── DONOR (from cell lines + PDMs) ────────────────────────────────────────
+    # ── DONOR (from cell lines + PDMs + animal models) ───────────────────────
     donor_rows: list[dict] = []
+    seen_donor_ids: set[str] = set()  # dedup across sources within this run
 
     donor_sources = [
         (CSV_FILES["cell_lines"],              ""),
@@ -1124,16 +1125,18 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
                     if not existing:
                         row["donorId"] = donor_id
                         rewrite_needed = True
-                    donor_rows.append({
-                        "donorId": donor_id,
-                        "parentDonorId": "",
-                        "transplantationDonorId": "",
-                        "species": species,
-                        "sex": (row.get("_sex") or "").strip(),
-                        "age": (row.get("_age") or "").strip(),
-                        "race": (row.get("_race") or "").strip(),
-                        "_resourceName": resource_name,
-                    })
+                    if donor_id not in seen_donor_ids:
+                        seen_donor_ids.add(donor_id)
+                        donor_rows.append({
+                            "donorId": donor_id,
+                            "parentDonorId": "",
+                            "transplantationDonorId": "",
+                            "species": species,
+                            "sex": (row.get("_sex") or "").strip(),
+                            "age": (row.get("_age") or "").strip(),
+                            "race": (row.get("_race") or "").strip(),
+                            "_resourceName": resource_name,
+                        })
                 updated_rows.append(row)
 
         if rewrite_needed and not dry_run:
