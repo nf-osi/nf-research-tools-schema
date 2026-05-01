@@ -1273,14 +1273,22 @@ def _generate_resources_csv(
     """
     resources_path = csv_dir / "ACCEPTED_resources.csv"
 
-    # Load resource IDs already present to avoid duplicates
+    # Load resource IDs and name+type pairs already present to avoid duplicates.
+    # Both checks are needed: ID alone misses cases where Pass 1 uses the
+    # detail-table ID (e.g. animalModelId) while Pass 2 uses _make_resource_id,
+    # producing two different IDs for the same (name, type) pair.
     existing_ids: set = set()
+    existing_name_types: set = set()  # (name.lower(), rtype_label)
     if resources_path.exists():
         with open(resources_path, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 rid = row.get("resourceId", "").strip()
                 if rid:
                     existing_ids.add(rid)
+                rname = row.get("resourceName", "").strip().lower()
+                rtype = row.get("resourceType", "").strip()
+                if rname and rtype:
+                    existing_name_types.add((rname, rtype))
 
     new_rows: list = []
 
@@ -1288,6 +1296,9 @@ def _generate_resources_csv(
         if not resource_name or ttype not in _TTYPE_ID_INFO:
             return
         rtype_label, id_col, ttype_plural = _TTYPE_ID_INFO[ttype]
+        name_type_key = (resource_name.strip().lower(), rtype_label)
+        if name_type_key in existing_name_types:
+            return
         resource_id = _make_resource_id(resource_name, ttype_plural)
         if resource_id in existing_ids:
             return
@@ -1308,6 +1319,7 @@ def _generate_resources_csv(
             "aiSummary":         "",
         })
         existing_ids.add(resource_id)
+        existing_name_types.add(name_type_key)
 
     # Pass 1: type-specific ACCEPTED_*.csv files (compiled this run, IDs already set)
     for ttype, (rtype_label, id_col, ttype_plural) in _TTYPE_ID_INFO.items():
@@ -1322,6 +1334,9 @@ def _generate_resources_csv(
             for row in csv.DictReader(f):
                 resource_name = row.get("_resourceName", "").strip()
                 if not resource_name:
+                    continue
+                name_type_key = (resource_name.lower(), rtype_label)
+                if name_type_key in existing_name_types:
                     continue
                 resource_id = row.get(id_col, "").strip() or \
                               _make_resource_id(resource_name, ttype_plural)
@@ -1345,6 +1360,7 @@ def _generate_resources_csv(
                     "aiSummary":         "",
                 })
                 existing_ids.add(resource_id)
+                existing_name_types.add(name_type_key)
 
     # Pass 2: raw JSON files — catches resources from submissions not compiled
     # this run (e.g. --files-list mode) that still appear in dev links.
