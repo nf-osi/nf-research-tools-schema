@@ -31,6 +31,13 @@ _DETAIL_TABLE_PK = {
     "syn73709229": "clinicalAssessmentToolId",
     "syn26486829": "donorId",
     "syn26486850": "vendorId",
+    "syn26486835": "mutationDetailsId",
+    "syn26486834": "mutationId",
+}
+
+# Fields to patch on existing rows when blank in Synapse (backfill for newly-added columns)
+_PATCH_FIELDS = {
+    "syn26486808": ["species"],  # species added to pipeline after initial upload
 }
 
 
@@ -410,17 +417,49 @@ def upsert_to_synapse(syn, clean_file, df_clean):
 
         elif table_id in _DETAIL_TABLE_PK:
             pk_col = _DETAIL_TABLE_PK[table_id]
+            patch_field_names = _PATCH_FIELDS.get(table_id, [])
             if pk_col in df_clean.columns:
                 try:
+                    select_cols = ", ".join([pk_col] + patch_field_names)
                     existing = syn.tableQuery(
-                        f"SELECT {pk_col} FROM {table_id}"
+                        f"SELECT {select_cols} FROM {table_id}"
                     ).asDataFrame()
                     existing_pks = set(existing[pk_col].dropna())
                     before = len(df_clean)
+                    df_existing = df_clean[df_clean[pk_col].isin(existing_pks)].copy()
                     df_clean = df_clean[~df_clean[pk_col].isin(existing_pks)].copy()
                     skipped = before - len(df_clean)
                     if skipped:
                         print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+
+                    # Patch newly-added fields on existing rows where blank in Synapse
+                    if patch_field_names and not df_existing.empty:
+                        patch_rows = []
+                        existing_idx = existing.set_index(pk_col)
+                        for _, prow in df_existing.iterrows():
+                            pk_val = prow[pk_col]
+                            if pk_val not in existing_idx.index:
+                                continue
+                            erow = existing_idx.loc[pk_val]
+                            updates = {}
+                            for field in patch_field_names:
+                                if field not in df_clean.columns and field not in prow:
+                                    continue
+                                new_val = str(prow.get(field, "") or "").strip()
+                                cur_val = str(erow.get(field, "") or "").strip() if field in existing.columns else ""
+                                if new_val and not cur_val:
+                                    updates[field] = new_val
+                            if updates:
+                                idx_str = str(existing_idx.index.get_loc(pk_val))
+                                row_meta = existing.index[existing[pk_col] == pk_val]
+                                if not row_meta.empty:
+                                    parts = str(row_meta[0]).split("_")
+                                    if len(parts) == 2:
+                                        patch_rows.append({"ROW_ID": int(parts[0]), "ROW_VERSION": int(parts[1]), **updates})
+                        if patch_rows:
+                            syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                            print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
+
                     if df_clean.empty:
                         print(f"      ✅ No new rows to upload to {table_id}")
                         return True
