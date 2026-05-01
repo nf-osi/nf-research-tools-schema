@@ -433,32 +433,37 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                     if skipped:
                         print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
 
-                    # Patch newly-added fields on existing rows where blank in Synapse
+                    # Patch newly-added fields on existing rows where blank in Synapse.
+                    # synapseclient sets the DataFrame index to "ROW_ID_ROW_VERSION" strings
+                    # (e.g. "12345_0") — same pattern as the resources howToAcquire patch above.
                     if patch_field_names and not df_existing.empty:
+                        existing_map: dict = {}
+                        for idx, erow in existing.iterrows():
+                            pk_val = erow.get(pk_col)
+                            if not pk_val:
+                                continue
+                            parts = str(idx).split("_")
+                            if len(parts) == 2:
+                                try:
+                                    existing_map[pk_val] = (int(parts[0]), int(parts[1]), erow)
+                                except ValueError:
+                                    pass
                         patch_rows = []
-                        existing_idx = existing.set_index(pk_col)
                         for _, prow in df_existing.iterrows():
                             pk_val = prow[pk_col]
-                            if pk_val not in existing_idx.index:
+                            if pk_val not in existing_map:
                                 continue
-                            erow = existing_idx.loc[pk_val]
+                            row_id, row_ver, erow = existing_map[pk_val]
                             updates = {}
                             for field in patch_field_names:
                                 if field not in prow:
                                     continue
                                 new_val = str(prow.get(field, "") or "").strip()
-                                cur_val = str(erow.get(field, "") or "").strip() if field in existing_idx.columns else ""
+                                cur_val = str(erow.get(field, "") or "").strip()
                                 if new_val and not cur_val:
                                     updates[field] = new_val
                             if updates:
-                                try:
-                                    patch_rows.append({
-                                        "ROW_ID": int(erow["ROW_ID"]),
-                                        "ROW_VERSION": int(erow["ROW_VERSION"]),
-                                        **updates,
-                                    })
-                                except (KeyError, ValueError):
-                                    print(f"      ⚠️  Could not extract ROW_ID/ROW_VERSION for {pk_val} — skipping patch")
+                                patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, **updates})
                         if patch_rows:
                             syn.store(Table(table_id, pd.DataFrame(patch_rows)))
                             print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
