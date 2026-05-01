@@ -443,7 +443,7 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                             if not pk_val:
                                 continue
                             parts = str(idx).split("_")
-                            if len(parts) == 2:
+                            if len(parts) >= 2:
                                 try:
                                     existing_map[pk_val] = (int(parts[0]), int(parts[1]), erow)
                                 except ValueError:
