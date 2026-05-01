@@ -61,7 +61,6 @@ COLUMNS = {
         "backgroundSubstrain", "animalModelGeneticDisorder",
         "animalModelOfManifestation", "transplantationType", "animalState",
         "generation", "donorId", "transplantationDonorId",
-        "species",
         "alleleType", "affectedGeneSymbol", "inducedVsDevelopmental",
         "bbbIntegrityStatus", "routeOfAdministration", "pkpdCapabilities",
         "mechanismOfActionValidation", "pediatricSuitability", "timelineToResults",
@@ -69,7 +68,7 @@ COLUMNS = {
         "mtaRequired", "ngnriRepositoryStatus",
         "itemAcquisition", "developerName", "developerAffiliation", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
-        "_context", "_confidence", "_verdict", "_usageType",
+        "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
     "genetic_reagents": [
         "geneticReagentId", "insertName", "vectorType", "vectorBackbone",
@@ -482,6 +481,8 @@ def _build_animal_model(d: dict) -> dict:
     disease_raw = _get(d, "animalModelGeneticDisorder")
     bi = d.get("basicInfo", {})
     resource_name = _get(d, "basicInfo.animalModelName", "animalModelName")
+    species_raw = _get(bi, "species") or _get(d, "species")
+    species = _SPECIES_MAP.get(species_raw, species_raw)
     return {
         "animalModelId": _make_id("animal_model", resource_name),
         "strainNomenclature": _get(d, "strainNomenclature"),
@@ -492,9 +493,9 @@ def _build_animal_model(d: dict) -> dict:
         "transplantationType": _get(d, "transplantationType"),
         "animalState": _get(d, "animalState"),
         "generation": _get(d, "generation"),
-        "donorId": "",
+        "donorId": _make_donor_id(resource_name) if species else "",
         "transplantationDonorId": "",
-        "species": _SPECIES_MAP.get(_get(bi, "species") or _get(d, "species"), _get(bi, "species") or _get(d, "species")),
+        "_species": species,
         "alleleType": _get(d, "alleleType"),
         "affectedGeneSymbol": _get(d, "affectedGeneSymbol"),
         "inducedVsDevelopmental": _get(d, "inducedVsDevelopmental"),
@@ -1097,6 +1098,7 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
     donor_sources = [
         (CSV_FILES["cell_lines"],              ""),
         (CSV_FILES["patient_derived_models"],  ""),
+        (CSV_FILES["animal_models"],           ""),
     ]
 
     for csv_filename, _ in donor_sources:

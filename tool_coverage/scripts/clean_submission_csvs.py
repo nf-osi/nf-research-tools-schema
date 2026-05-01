@@ -36,9 +36,7 @@ _DETAIL_TABLE_PK = {
 }
 
 # Fields to patch on existing rows when blank in Synapse (backfill for newly-added columns)
-_PATCH_FIELDS = {
-    "syn26486808": ["species"],  # species added to pipeline after initial upload
-}
+_PATCH_FIELDS: dict[str, list[str]] = {}
 
 
 def _run_url_comment() -> str:
