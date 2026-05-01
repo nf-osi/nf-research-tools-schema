@@ -44,6 +44,7 @@ COLUMNS = {
         "cellLineGeneticDisorder", "cellLineCategory", "donorId", "originYear",
         "strProfile", "resistance",
         "populationDoublingTime", "cultureMedia",
+        "developerName", "developerAffiliation", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex",
@@ -412,6 +413,7 @@ def _tool_type_from_json(data: dict) -> str | None:
 # ---------------------------------------------------------------------------
 
 def _build_cell_line(d: dict) -> dict:
+    bi = d.get("basicInfo", {})
     tissue = _get(d, "tissue")
     resource_name = _get(d, "basicInfo.cellLineName", "cellLineName")
     species = _get(d, "basicInfo.species", "species")
@@ -428,6 +430,9 @@ def _build_cell_line(d: dict) -> dict:
         "resistance": _get(d, "resistance"),
         "populationDoublingTime": _get(d, "populationDoublingTime"),
         "cultureMedia": _get(d, "cultureMedia"),
+        "developerName": _get(bi, "developerName") or _get(d, "developerName"),
+        "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
+        "developerContactEmail": _get(d, "developerContactEmail"),
         "_resourceName": resource_name,
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),

@@ -93,6 +93,10 @@ _STRIP_BEFORE_UPLOAD = {
         'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
         'ngnriRepositoryStatus',
     ],
+    # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
+    'CLEAN_cell_lines.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail',
+    ],
     # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
     'CLEAN_antibodies.csv': [
         'vendor', 'catalogNumber', 'catalogURL',
