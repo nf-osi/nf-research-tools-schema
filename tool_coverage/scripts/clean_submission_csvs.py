@@ -36,7 +36,10 @@ _DETAIL_TABLE_PK = {
 }
 
 # Fields to patch on existing rows when blank in Synapse (backfill for newly-added columns)
-_PATCH_FIELDS: dict[str, list[str]] = {}
+_PATCH_FIELDS: dict[str, list[str]] = {
+    # donorId was added after initial upload; patch it onto existing rows where blank
+    "syn26486808": ["donorId"],
+}
 
 
 def _run_url_comment() -> str:
@@ -441,19 +444,21 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                             erow = existing_idx.loc[pk_val]
                             updates = {}
                             for field in patch_field_names:
-                                if field not in df_clean.columns and field not in prow:
+                                if field not in prow:
                                     continue
                                 new_val = str(prow.get(field, "") or "").strip()
-                                cur_val = str(erow.get(field, "") or "").strip() if field in existing.columns else ""
+                                cur_val = str(erow.get(field, "") or "").strip() if field in existing_idx.columns else ""
                                 if new_val and not cur_val:
                                     updates[field] = new_val
                             if updates:
-                                idx_str = str(existing_idx.index.get_loc(pk_val))
-                                row_meta = existing.index[existing[pk_col] == pk_val]
-                                if not row_meta.empty:
-                                    parts = str(row_meta[0]).split("_")
-                                    if len(parts) == 2:
-                                        patch_rows.append({"ROW_ID": int(parts[0]), "ROW_VERSION": int(parts[1]), **updates})
+                                try:
+                                    patch_rows.append({
+                                        "ROW_ID": int(erow["ROW_ID"]),
+                                        "ROW_VERSION": int(erow["ROW_VERSION"]),
+                                        **updates,
+                                    })
+                                except (KeyError, ValueError):
+                                    print(f"      ⚠️  Could not extract ROW_ID/ROW_VERSION for {pk_val} — skipping patch")
                         if patch_rows:
                             syn.store(Table(table_id, pd.DataFrame(patch_rows)))
                             print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
