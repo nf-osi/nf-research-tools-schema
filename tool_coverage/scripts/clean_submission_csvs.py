@@ -31,6 +31,14 @@ _DETAIL_TABLE_PK = {
     "syn73709229": "clinicalAssessmentToolId",
     "syn26486829": "donorId",
     "syn26486850": "vendorId",
+    "syn26486835": "mutationDetailsId",
+    "syn26486834": "mutationId",
+}
+
+# Fields to patch on existing rows when blank in Synapse (backfill for newly-added columns)
+_PATCH_FIELDS: dict[str, list[str]] = {
+    # donorId was added after initial upload; patch it onto existing rows where blank
+    "syn26486808": ["donorId"],
 }
 
 
@@ -64,6 +72,10 @@ SYNAPSE_TABLE_MAP = {
     # Note: CLEAN_vendorItem.csv is NOT uploaded here — it needs resourceId resolution
     # via upsert_publication_links.py (run after resources are in Synapse)
 
+    # Mutation tables (v2.0)
+    'CLEAN_mutation_details.csv': 'syn26486835',  # MutationDetails table
+    'CLEAN_mutation.csv': 'syn26486834',           # Mutation junction table
+
     # Common tables
     'CLEAN_resources.csv': 'syn26450069',
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
@@ -88,6 +100,10 @@ _STRIP_BEFORE_UPLOAD = {
         'pediatricSuitability', 'timelineToResults', 'modelLimitations',
         'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
         'ngnriRepositoryStatus',
+    ],
+    # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
+    'CLEAN_cell_lines.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail',
     ],
     # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
     'CLEAN_antibodies.csv': [
@@ -230,7 +246,9 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'usage': ['usageId', 'publicationId', 'resourceId'],
         'publication_links': ['resourceId'],  # Existing tool links (materialized view)
         'resources': ['resourceName', 'resourceType'],
-        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText']
+        'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText'],
+        'mutation_details': ['mutationDetailsId'],
+        'mutation': ['mutationId', 'mutationDetailsId', 'animalModelId'],
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
@@ -400,17 +418,58 @@ def upsert_to_synapse(syn, clean_file, df_clean):
 
         elif table_id in _DETAIL_TABLE_PK:
             pk_col = _DETAIL_TABLE_PK[table_id]
+            patch_field_names = _PATCH_FIELDS.get(table_id, [])
             if pk_col in df_clean.columns:
                 try:
+                    select_cols = ", ".join([pk_col] + patch_field_names)
                     existing = syn.tableQuery(
-                        f"SELECT {pk_col} FROM {table_id}"
+                        f"SELECT {select_cols} FROM {table_id}"
                     ).asDataFrame()
                     existing_pks = set(existing[pk_col].dropna())
                     before = len(df_clean)
+                    df_existing = df_clean[df_clean[pk_col].isin(existing_pks)].copy()
                     df_clean = df_clean[~df_clean[pk_col].isin(existing_pks)].copy()
                     skipped = before - len(df_clean)
                     if skipped:
                         print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+
+                    # Patch newly-added fields on existing rows where blank in Synapse.
+                    # synapseclient sets the DataFrame index to "ROW_ID_ROW_VERSION" strings
+                    # (e.g. "12345_0") — same pattern as the resources howToAcquire patch above.
+                    if patch_field_names and not df_existing.empty:
+                        existing_map: dict = {}
+                        for idx, erow in existing.iterrows():
+                            pk_val = erow.get(pk_col)
+                            if not pk_val:
+                                continue
+                            parts = str(idx).split("_")
+                            if len(parts) >= 2:
+                                try:
+                                    existing_map[pk_val] = (int(parts[0]), int(parts[1]), erow)
+                                except ValueError:
+                                    pass
+                        patch_rows = []
+                        for _, prow in df_existing.iterrows():
+                            pk_val = prow[pk_col]
+                            if pk_val not in existing_map:
+                                continue
+                            row_id, row_ver, erow = existing_map[pk_val]
+                            updates = {}
+                            for field in patch_field_names:
+                                if field not in prow:
+                                    continue
+                                raw_new = prow.get(field, "")
+                                new_val = "" if (raw_new is None or (isinstance(raw_new, float) and pd.isna(raw_new))) else str(raw_new).strip()
+                                raw_cur = erow.get(field)
+                                cur_val = "" if (raw_cur is None or (isinstance(raw_cur, float) and pd.isna(raw_cur))) else str(raw_cur).strip()
+                                if new_val and not cur_val:
+                                    updates[field] = new_val
+                            if updates:
+                                patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, **updates})
+                        if patch_rows:
+                            syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                            print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
+
                     if df_clean.empty:
                         print(f"      ✅ No new rows to upload to {table_id}")
                         return True
