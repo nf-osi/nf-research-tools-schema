@@ -183,11 +183,13 @@ _DISEASE_MAP = {
     "Schwannomatosis": "Schwannomatosis",
     "No known disease": "None",
 }
-_INSERT_SPECIES_MAP = {
+_SPECIES_MAP = {
     "Human": "Homo sapiens",
     "Mouse": "Mus musculus",
     "Rat": "Rattus norvegicus",
+    "Zebrafish": "Danio rerio",
 }
+_INSERT_SPECIES_MAP = _SPECIES_MAP  # alias used by _build_genetic_reagent
 _CONJUGATE_MAP = {
     "Yes": "Conjugated",
     "Non-conjugated": "Nonconjugated",
@@ -492,7 +494,7 @@ def _build_animal_model(d: dict) -> dict:
         "generation": _get(d, "generation"),
         "donorId": "",
         "transplantationDonorId": "",
-        "species": _get(bi, "species") or _get(d, "species"),
+        "species": _SPECIES_MAP.get(_get(bi, "species") or _get(d, "species"), _get(bi, "species") or _get(d, "species")),
         "alleleType": _get(d, "alleleType"),
         "affectedGeneSymbol": _get(d, "affectedGeneSymbol"),
         "inducedVsDevelopmental": _get(d, "inducedVsDevelopmental"),
