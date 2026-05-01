@@ -516,28 +516,33 @@ def _build_animal_model(d: dict) -> dict:
     }
 
 
-def _build_mutation_details(d: dict) -> dict | None:
-    """Build a MutationDetails row (syn26486835). Returns None if no mutation data present."""
+def _strip_mutation_type_parens(s: str) -> str:
+    """Strip trailing parenthetical from a mutation type string, e.g. 'Loss-of-function (null alleles)' → 'Loss-of-function'."""
+    import re as _re
+    return _re.sub(r"\s*\(.*\)\s*$", "", s).strip()
+
+
+def _build_mutation_details(d: dict) -> list[dict] | None:
+    """Build MutationDetails rows (syn26486835), one per affected gene. Returns None if no mutation data present."""
     resource_name = _get(d, "basicInfo.animalModelName", "animalModelName")
     allele_type = _get(d, "alleleType")
     mutation_types_raw = _get(d, "mutationTypes")
-    affected_gene = _get(d, "affectedGeneSymbol")
+    affected_gene_raw = _get(d, "affectedGeneSymbol")
     seq_var = _get(d, "sequenceVariation")
     protein_var = _get(d, "proteinVariation")
 
-    if not any([allele_type, mutation_types_raw, affected_gene, seq_var, protein_var]):
+    if not any([allele_type, mutation_types_raw, affected_gene_raw, seq_var, protein_var]):
         return None
 
-    mutation_type = (
-        _fmt_bool_obj(mutation_types_raw)
-        if isinstance(mutation_types_raw, dict)
-        else (mutation_types_raw or "")
-    )
-    return {
-        "mutationDetailsId": _make_id("mutation", resource_name),
+    if isinstance(mutation_types_raw, dict):
+        mutation_type = _fmt_bool_obj(mutation_types_raw)
+    else:
+        mutation_type = _strip_mutation_type_parens(mutation_types_raw or "")
+
+    genes = [g.strip() for g in (affected_gene_raw or "").split(";") if g.strip()] or [""]
+    shared = {
         "alleleType": allele_type,
         "mutationType": mutation_type,
-        "affectedGeneSymbol": affected_gene,
         "sequenceVariation": seq_var,
         "proteinVariation": protein_var,
         "_resourceName": resource_name,
@@ -549,10 +554,18 @@ def _build_mutation_details(d: dict) -> dict | None:
         "_confidence": _get(d, "_confidence"),
         "_verdict": _get(d, "_verdict", default="include"),
     }
+    return [
+        {
+            "mutationDetailsId": _make_id("mutation", f"{resource_name}_{gene}" if gene else resource_name),
+            "affectedGeneSymbol": gene,
+            **shared,
+        }
+        for gene in genes
+    ]
 
 
-def _build_mutation(d: dict) -> dict | None:
-    """Build a Mutation junction row (syn26486834). Returns None if no mutation data present."""
+def _build_mutation(d: dict) -> list[dict] | None:
+    """Build Mutation junction rows (syn26486834), one per affected gene. Returns None if no mutation data present."""
     resource_name = _get(d, "basicInfo.animalModelName", "animalModelName")
     if not any([
         _get(d, "alleleType"), _get(d, "mutationTypes"),
@@ -561,13 +574,19 @@ def _build_mutation(d: dict) -> dict | None:
     ]):
         return None
 
-    return {
-        "mutationId": _make_id("mutation_link", resource_name),
-        "mutationDetailsId": _make_id("mutation", resource_name),
-        "animalModelId": _make_id("animal_model", resource_name),
-        "cellLineId": "",
-        "_resourceName": resource_name,
-    }
+    affected_gene_raw = _get(d, "affectedGeneSymbol")
+    genes = [g.strip() for g in (affected_gene_raw or "").split(";") if g.strip()] or [""]
+    animal_model_id = _make_id("animal_model", resource_name)
+    return [
+        {
+            "mutationId": _make_id("mutation_link", f"{resource_name}_{gene}" if gene else resource_name),
+            "mutationDetailsId": _make_id("mutation", f"{resource_name}_{gene}" if gene else resource_name),
+            "animalModelId": animal_model_id,
+            "cellLineId": "",
+            "_resourceName": resource_name,
+        }
+        for gene in genes
+    ]
 
 
 def _build_genetic_reagent(d: dict) -> dict:
@@ -1441,16 +1460,20 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         for sec_csv_key, sec_builder_fn in _SECONDARY_BUILDERS.get(ttype, []):
             sec_csv_path = csv_dir / CSV_FILES[sec_csv_key]
             sec_columns = COLUMNS[sec_csv_key]
-            sec_existing = _load_existing_names(sec_csv_path, "_resourceName")
+            # Use primary ID column as dedup key (falls back to _resourceName)
+            _id_col = next((c for c in sec_columns if c.endswith("Id") and not c.startswith("_")), "_resourceName")
+            sec_existing = _load_existing_names(sec_csv_path, _id_col)
             sec_rows = []
             for item in items:
-                sec_row = sec_builder_fn(item)
-                if sec_row is None:
+                result = sec_builder_fn(item)
+                if result is None:
                     continue
-                sec_name = sec_row.get("_resourceName", "")
-                if sec_name not in sec_existing:
-                    sec_rows.append(sec_row)
-                    sec_existing.add(sec_name)
+                row_list = result if isinstance(result, list) else [result]
+                for sec_row in row_list:
+                    dedup_key = sec_row.get(_id_col) or sec_row.get("_resourceName", "")
+                    if dedup_key not in sec_existing:
+                        sec_rows.append(sec_row)
+                        sec_existing.add(dedup_key)
             if dry_run:
                 print(f"  [dry-run] {sec_csv_key}: {len(sec_rows)} new row(s)")
                 _append_rows(sec_csv_path, sec_columns, sec_rows, dry_run=True)
