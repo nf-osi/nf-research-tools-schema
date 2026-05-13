@@ -1,0 +1,236 @@
+<!doctype html>
+<!--
+  NF Tools Portal — category-specific filters mockup (landscape 16:9)
+  Edit this file, then re-render the PNGs from the repo root:
+
+    chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    "$chrome" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
+      --screenshot=mockups/nf-category-filters.png \
+      file://$(pwd)/mockups/filters.html
+    "$chrome" --headless --disable-gpu --hide-scrollbars --window-size=1600,900 \
+      --force-device-scale-factor=2 \
+      --screenshot=mockups/nf-category-filters@2x.png \
+      file://$(pwd)/mockups/filters.html
+
+  The body is sized to exactly 1600x900px — keep that fixed for the slide deck.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NF Tools — Filters by resourceType</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --ink:#1a2236; --muted:#5b6478; --line:#e3e7ef;
+    --brand:#2b4f9e; --chip:#eef2fb; --chip-ink:#2b4f9e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);}
+  body{width:1600px;height:900px;overflow:hidden;padding:40px 56px;}
+
+  h1{font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+  .panes{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;height:760px}
+  .pane{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .pane-h{padding:18px 22px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+  .ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;flex-shrink:0}
+  .ico.cl{background:#2b4f9e}
+  .ico.am{background:#7a3aa6}
+  .ico.ct{background:#0f7a6a}
+  .pane-h .ttl{font-weight:700;font-size:17px}
+  .pane-h .typ{font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600;margin-top:1px}
+
+  .body{padding:16px 22px 18px;overflow:hidden;flex:1}
+  .group{margin-bottom:14px}
+  .group h4{margin:0 0 7px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .opt{display:flex;align-items:center;gap:9px;font-size:13.5px;padding:3px 0;color:var(--ink)}
+  .opt .cb{width:14px;height:14px;border:1.5px solid #b6c0d4;border-radius:3px;display:inline-block;background:#fff;flex-shrink:0}
+  .opt.on .cb{background:var(--brand);border-color:var(--brand);position:relative}
+  .opt.on .cb::after{content:"";position:absolute;left:3px;top:0px;width:4px;height:9px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg)}
+  .opt .n{margin-left:auto;color:var(--muted);font-size:12px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--chip-ink);font-weight:600}
+  .chip.off{background:#fff;border:1px solid var(--line);color:var(--muted);font-weight:500}
+
+  .range{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-top:3px}
+  .track{flex:1;height:5px;background:#e6ebf5;border-radius:3px;position:relative}
+  .track i{position:absolute;top:0;height:100%;background:var(--brand);border-radius:3px}
+  .h{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--brand);position:absolute;top:-4px}
+</style>
+</head>
+<body>
+  <h1>Filters by resourceType</h1>
+  <div class="sub">Each tool category exposes its own filter set, tailored to that resource's schema fields</div>
+
+  <div class="panes">
+
+    <!-- Cell Lines -->
+    <div class="pane">
+      <div class="pane-h">
+        <div class="ico cl">🧫</div>
+        <div>
+          <div class="ttl">Cell Lines</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="group">
+          <h4>NF subtype</h4>
+          <div class="chips">
+            <span class="chip">NF1</span>
+            <span class="chip">NF2</span>
+            <span class="chip">Schwannomatosis</span>
+            <span class="chip off">None</span>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Tumor type</h4>
+          <div class="opt on"><span class="cb"></span> MPNST <span class="n">23</span></div>
+          <div class="opt on"><span class="cb"></span> Plexiform neurofibroma <span class="n">14</span></div>
+          <div class="opt"><span class="cb"></span> Cutaneous neurofibroma <span class="n">11</span></div>
+          <div class="opt"><span class="cb"></span> Schwannoma <span class="n">9</span></div>
+        </div>
+        <div class="group">
+          <h4>Tissue / organ</h4>
+          <div class="opt on"><span class="cb"></span> Sciatic nerve <span class="n">18</span></div>
+          <div class="opt"><span class="cb"></span> Dorsal root ganglion <span class="n">7</span></div>
+          <div class="opt"><span class="cb"></span> Optic nerve <span class="n">4</span></div>
+          <div class="opt"><span class="cb"></span> Skin <span class="n">12</span></div>
+        </div>
+        <div class="group">
+          <h4>Cell line category</h4>
+          <div class="opt on"><span class="cb"></span> Cancer cell line <span class="n">31</span></div>
+          <div class="opt"><span class="cb"></span> iPSC <span class="n">9</span></div>
+          <div class="opt"><span class="cb"></span> Immortalized <span class="n">14</span></div>
+        </div>
+        <div class="group">
+          <h4>Culture media</h4>
+          <div class="opt on"><span class="cb"></span> DMEM/F12 <span class="n">19</span></div>
+          <div class="opt on"><span class="cb"></span> RPMI-1640 <span class="n">15</span></div>
+          <div class="opt"><span class="cb"></span> DMEM <span class="n">22</span></div>
+        </div>
+        <div class="group">
+          <h4>Doubling time (h)</h4>
+          <div class="range">
+            <span>20</span>
+            <div class="track"><i style="left:18%;width:55%"></i><span class="h" style="left:16%"></span><span class="h" style="left:71%"></span></div>
+            <span>72</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animal Models -->
+    <div class="pane">
+      <div class="pane-h">
+        <div class="ico am">🐭</div>
+        <div>
+          <div class="ttl">Animal Models</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="group">
+          <h4>Species</h4>
+          <div class="opt on"><span class="cb"></span> Mus musculus <span class="n">48</span></div>
+          <div class="opt on"><span class="cb"></span> Danio rerio <span class="n">14</span></div>
+          <div class="opt"><span class="cb"></span> Rattus norvegicus <span class="n">5</span></div>
+          <div class="opt"><span class="cb"></span> Drosophila melanogaster <span class="n">4</span></div>
+        </div>
+        <div class="group">
+          <h4>Background strain</h4>
+          <div class="opt on"><span class="cb"></span> C57BL/6J <span class="n">23</span></div>
+          <div class="opt"><span class="cb"></span> C57BL/6N <span class="n">9</span></div>
+          <div class="opt on"><span class="cb"></span> 129/Sv <span class="n">7</span></div>
+          <div class="opt"><span class="cb"></span> FVB/N <span class="n">5</span></div>
+          <div class="opt"><span class="cb"></span> AB (zebrafish) <span class="n">11</span></div>
+        </div>
+        <div class="group">
+          <h4>Genotype</h4>
+          <div class="chips">
+            <span class="chip">Nf1<sup>fl/fl</sup></span>
+            <span class="chip">Nf1<sup>+/−</sup></span>
+            <span class="chip off">Nf2<sup>fl/fl</sup></span>
+            <span class="chip">nf1a<sup>−/−</sup>;nf1b<sup>−/−</sup></span>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Cre driver</h4>
+          <div class="opt on"><span class="cb"></span> DhhCre <span class="n">8</span></div>
+          <div class="opt"><span class="cb"></span> P0-Cre <span class="n">5</span></div>
+          <div class="opt"><span class="cb"></span> GFAP-Cre <span class="n">7</span></div>
+          <div class="opt"><span class="cb"></span> hGFAP-Cre <span class="n">4</span></div>
+        </div>
+        <div class="group">
+          <h4>Transplantation type</h4>
+          <div class="opt"><span class="cb"></span> None (GEMM) <span class="n">42</span></div>
+          <div class="opt on"><span class="cb"></span> Orthotopic <span class="n">14</span></div>
+          <div class="opt"><span class="cb"></span> Subcutaneous <span class="n">11</span></div>
+        </div>
+        <div class="group">
+          <h4>Manifestation modeled</h4>
+          <div class="opt on"><span class="cb"></span> Plexiform neurofibroma <span class="n">19</span></div>
+          <div class="opt on"><span class="cb"></span> MPNST <span class="n">17</span></div>
+          <div class="opt"><span class="cb"></span> Optic nerve glioma <span class="n">9</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Computational Tools -->
+    <div class="pane">
+      <div class="pane-h">
+        <div class="ico ct">💻</div>
+        <div>
+          <div class="ttl">Computational Tools</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="group">
+          <h4>Software type</h4>
+          <div class="opt on"><span class="cb"></span> Analysis pipeline <span class="n">14</span></div>
+          <div class="opt on"><span class="cb"></span> ML / AI model <span class="n">9</span></div>
+          <div class="opt"><span class="cb"></span> Visualization <span class="n">5</span></div>
+          <div class="opt"><span class="cb"></span> Database / portal <span class="n">6</span></div>
+          <div class="opt"><span class="cb"></span> Library / package <span class="n">12</span></div>
+        </div>
+        <div class="group">
+          <h4>Programming language</h4>
+          <div class="opt on"><span class="cb"></span> Python <span class="n">22</span></div>
+          <div class="opt on"><span class="cb"></span> R <span class="n">14</span></div>
+          <div class="opt"><span class="cb"></span> Nextflow <span class="n">7</span></div>
+          <div class="opt"><span class="cb"></span> JavaScript <span class="n">5</span></div>
+          <div class="opt"><span class="cb"></span> Julia <span class="n">2</span></div>
+        </div>
+        <div class="group">
+          <h4>License</h4>
+          <div class="chips">
+            <span class="chip">MIT</span>
+            <span class="chip">Apache-2.0</span>
+            <span class="chip">BSD-3</span>
+            <span class="chip off">GPL-3</span>
+            <span class="chip off">Proprietary</span>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Containerized</h4>
+          <div class="opt on"><span class="cb"></span> Docker / Singularity <span class="n">19</span></div>
+          <div class="opt"><span class="cb"></span> Conda env <span class="n">14</span></div>
+          <div class="opt"><span class="cb"></span> Bare install <span class="n">5</span></div>
+        </div>
+        <div class="group">
+          <h4>Last updated</h4>
+          <div class="range">
+            <span>2018</span>
+            <div class="track"><i style="left:55%;width:45%"></i><span class="h" style="left:53%"></span><span class="h" style="left:98%"></span></div>
+            <span>now</span>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Source available</h4>
+          <div class="opt on"><span class="cb"></span> GitHub / GitLab <span class="n">34</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
