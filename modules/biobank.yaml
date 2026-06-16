@@ -1,0 +1,108 @@
+id: https://w3id.org/nf-research-tools/biobank
+name: nf_research_tools_biobank
+title: Biobank
+description: Biobanks housing NF-relevant biological specimens.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - tool_base
+  - mixins
+
+classes:
+
+  Biobank:
+    is_a: Tool
+    mixins:
+      - HasTumorType
+      - HasGeneticDisorder
+    description: >-
+      A large collection of biological or medical data and tissue
+      samples, amassed for research purposes.
+    attributes:
+      biobankName:
+        description: The name of the biobank.
+        required: true
+      biobankURL:
+        description: A URL for the biobank landing page.
+        range: uri
+        required: true
+      contact:
+        description: >-
+          Guidance on where to find additional information about the biobank.
+      specimenType:
+        description: The types of specimens that are banked.
+        range: SpecimenTypeEnum
+        multivalued: true
+        required: true
+      specimenTissueType:
+        description: The types of tissues that are banked.
+        range: SpecimenTissueTypeEnum
+        multivalued: true
+        required: true
+      specimenPreparationMethod:
+        description: The preservation methods used by the biobank.
+        range: SpecimenPreparationMethodEnum
+        multivalued: true
+        required: true
+      specimenFormat:
+        description: >-
+          How specimens have been processed in preparation for distribution.
+        range: SpecimenFormatEnum
+        multivalued: true
+        required: true
+    slot_usage:
+      resourceType:
+        ifabsent: string(Biobank)
+      geneticDisorder:
+        required: true
+      tumorType:
+        required: true
+
+enums:
+
+  SpecimenTypeEnum:
+    description: Types of banked specimens.
+    permissible_values:
+      human tissue: {}
+      xenograft tumors: {}
+      cell lines: {}
+
+  SpecimenTissueTypeEnum:
+    description: Types of banked tissues.
+    permissible_values:
+      Blood: {}
+      Tumor: {}
+      Cerebrospinal Fluid: {}
+      Nerve: {}
+      Skin: {}
+      Bone: {}
+      Brain: {}
+
+  SpecimenPreparationMethodEnum:
+    description: Specimen preservation methods.
+    permissible_values:
+      Fresh collected: {}
+      Flash frozen: {}
+      FFPE: {}
+      Cryopreserved: {}
+      OCT: {}
+      RNA later: {}
+      Formalin-fixed: {}
+      Ethanol: {}
+
+  SpecimenFormatEnum:
+    description: Specimen processing formats.
+    permissible_values:
+      whole tumor: {}
+      slide: {}
+      cells: {}
+      whole cell lysate: {}
+      DNA: {}
+      RNA: {}

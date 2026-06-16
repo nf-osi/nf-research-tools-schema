@@ -1,0 +1,111 @@
+id: https://w3id.org/nf-research-tools/clinical_assessment_tool
+name: nf_research_tools_clinical_assessment_tool
+title: Clinical Assessment Tool
+description: Clinical assessment tools including questionnaires and scales.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - tool_base
+
+classes:
+
+  ClinicalAssessmentTool:
+    is_a: Tool
+    description: >-
+      Clinical assessment tools including questionnaires, quality of
+      life instruments, and patient-reported outcome measures.
+    attributes:
+      assessmentName:
+        description: Name of the assessment tool or instrument.
+        required: true
+      assessmentType:
+        description: Type of clinical assessment.
+        range: AssessmentTypeEnum
+        required: true
+      targetPopulation:
+        description: Intended population for the assessment.
+        range: TargetPopulationEnum
+        required: true
+      diseaseSpecific:
+        description: >-
+          Whether the assessment is specific to NF or general.
+        range: DiseaseSpecificEnum
+      numberOfItems:
+        description: Number of items or questions in the assessment.
+        range: integer
+      scoringMethod:
+        description: Description of scoring methodology.
+      validatedLanguages:
+        description: Languages in which the tool has been validated.
+        multivalued: true
+      psychometricProperties:
+        description: >-
+          Validated psychometric properties (reliability, validity).
+      administrationTime:
+        description: Typical time required to complete the assessment.
+      availabilityStatus:
+        description: Availability status of the tool.
+        range: AvailabilityStatusEnum
+      licensingRequirements:
+        description: Licensing or permission requirements.
+      digitalVersion:
+        description: Whether a digital/electronic version is available.
+        range: DigitalVersionEnum
+    slot_usage:
+      resourceType:
+        ifabsent: string(Clinical Assessment Tool)
+
+enums:
+
+  AssessmentTypeEnum:
+    description: Types of clinical assessments.
+    permissible_values:
+      Quality of Life: {}
+      Pain Assessment: {}
+      Functional Assessment: {}
+      Cognitive Assessment: {}
+      Symptom Scale: {}
+      Psychological Assessment: {}
+      Patient-Reported Outcome: {}
+      Other: {}
+
+  TargetPopulationEnum:
+    description: Target populations for assessments.
+    permissible_values:
+      Pediatric: {}
+      Adult: {}
+      Elderly: {}
+      General: {}
+      Disease-Specific: {}
+
+  DiseaseSpecificEnum:
+    description: Whether an assessment is NF-specific.
+    permissible_values:
+      Yes - NF-specific: {}
+      No - General: {}
+      Adapted for NF: {}
+
+  AvailabilityStatusEnum:
+    description: Availability status of assessment tools.
+    permissible_values:
+      Freely Available: {}
+      License Required: {}
+      Permission Required: {}
+      Proprietary: {}
+      Unknown: {}
+
+  DigitalVersionEnum:
+    description: Digital version availability.
+    permissible_values:
+      "Yes": {}
+      "No": {}
+      In Development: {}
+      Unknown: {}

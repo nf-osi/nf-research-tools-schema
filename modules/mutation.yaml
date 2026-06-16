@@ -1,0 +1,166 @@
+id: https://w3id.org/nf-research-tools/mutation
+name: nf_research_tools_mutation
+title: Mutation Details
+description: Genetic mutation details associated with research tools.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  MutationDetails:
+    description: >-
+      Details of a genetic mutation, including type, method,
+      affected gene, and sequence-level information.
+    slots:
+      - mutationDetailsId
+      - externalMutationId
+      - alleleType
+      - mutationType
+      - mutationMethod
+      - affectedGeneSymbol
+      - affectedGeneName
+      - sequenceVariation
+      - proteinVariation
+      - animalModelMutation
+      - humanClinVarMutation
+      - chromosome
+
+slots:
+
+  mutationDetailsId:
+    identifier: true
+    description: A unique identifier for the mutation.
+
+  externalMutationId:
+    description: >-
+      An identifier from an organism database such as MGI or other
+      curated variant resource, if available.
+
+  alleleType:
+    description: >-
+      The type of genetic alteration, vocabulary aligned with MGI
+      allele subtypes.
+    range: AlleleTypeEnum
+    multivalued: true
+
+  mutationType:
+    description: >-
+      The type of mutation, vocabulary aligned with MGI mutation types.
+    range: MutationTypeEnum
+    multivalued: true
+
+  mutationMethod:
+    description: >-
+      The method used to alter the resource, vocabulary aligned with
+      MGI allele origin types.
+    range: MutationMethodEnum
+    multivalued: true
+
+  affectedGeneSymbol:
+    description: >-
+      The gene symbol for the mutated gene (e.g. NF1, SUZ12, SMARCB1).
+
+  affectedGeneName:
+    description: >-
+      Gene name for the affected gene (e.g. neurofibromin 1).
+
+  sequenceVariation:
+    description: >-
+      Important sequence variations in HGVS notation (e.g. g.123_127del).
+      See http://varnomen.hgvs.org/ for nomenclature.
+
+  proteinVariation:
+    description: >-
+      The protein consequence of the mutation (e.g. p.Asn58fs).
+      See http://varnomen.hgvs.org/recommendations/protein/ for nomenclature.
+
+  animalModelMutation:
+    description: >-
+      A description of the specific mutation(s) created in the genome.
+
+  humanClinVarMutation:
+    description: >-
+      The human equivalent of the mutation in ClinVar/HGVS notation.
+      Used to link animal model mutations to human disease mutations.
+
+  chromosome:
+    description: Chromosome number of the affected gene (e.g. 11).
+
+enums:
+
+  AlleleTypeEnum:
+    description: >-
+      Type of genetic alteration, aligned with MGI allele subtypes.
+    permissible_values:
+      Conditional ready: {}
+      Constitutively active: {}
+      Dominant negative: {}
+      Humanized sequence: {}
+      Hypomorph: {}
+      Inducible: {}
+      Inserted expressed sequence: {}
+      Knockdown: {}
+      Modified isoform(s): {}
+      No functional change: {}
+      Null/knockout: {}
+      Recombinase: {}
+      Reporter: {}
+      RMCE-Ready: {}
+      Transactivator: {}
+      Transposase: {}
+      Transposon concatemer: {}
+
+  MutationTypeEnum:
+    description: >-
+      Type of mutation, aligned with MGI mutation types.
+    permissible_values:
+      Disruption caused by insertion of vector: {}
+      Duplication: {}
+      Insertion: {}
+      Insertion of gene trap vector: {}
+      Intergenic deletion: {}
+      Intragenic deletion: {}
+      Inversion: {}
+      Loss of heterozygosity (unspecified mechanism): {}
+      Not Applicable: {}
+      Not Specified: {}
+      Nucleotide repeat expansion: {}
+      Nucleotide substitutions: {}
+      Other: {}
+      Single point mutation: {}
+      Translocation: {}
+      Transposon insertion: {}
+      Undefined: {}
+      Viral insertion: {}
+      Microdeletion: {}
+      Homozygous deletion: {}
+      Loss of heterozygosity (mitotic recombination): {}
+      Loss of heterozygosity (deletion): {}
+      Stable knockdown: {}
+      Exogenous DNA expression: {}
+
+  MutationMethodEnum:
+    description: >-
+      Method used to alter the resource, aligned with MGI allele origin types.
+    permissible_values:
+      Chemically induced (ENU): {}
+      Chemically induced (other): {}
+      Chemically and radiation induced: {}
+      Endonuclease-mediated (CRISPR): {}
+      Endonuclease-mediated (TALEN): {}
+      Gene trapped: {}
+      QTL: {}
+      Radiation induced: {}
+      Spontaneous: {}
+      Targeted: {}
+      Transgenic: {}
+      Transposon induced: {}
+      Unknown: {}

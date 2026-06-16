@@ -1,0 +1,106 @@
+id: https://w3id.org/nf-research-tools/computational_tool
+name: nf_research_tools_computational_tool
+title: Computational Tool
+description: Software and analysis pipelines for NF research.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - tool_base
+
+classes:
+
+  ComputationalTool:
+    is_a: Tool
+    description: >-
+      Computational tools including software and analysis pipelines
+      used in NF research.
+    attributes:
+      softwareName:
+        description: The name of the software or computational tool.
+        required: true
+      softwareType:
+        description: Type of computational tool.
+        range: SoftwareTypeEnum
+        required: true
+      softwareVersion:
+        description: Version number or identifier of the software.
+      programmingLanguage:
+        description: Primary programming language(s) used.
+        range: ProgrammingLanguageEnum
+        multivalued: true
+      sourceRepository:
+        description: >-
+          URL to source code repository (e.g. GitHub, GitLab).
+        range: uri
+      documentation:
+        description: URL to documentation or user manual.
+        range: uri
+      licenseType:
+        description: Software license type.
+        range: LicenseTypeEnum
+      containerized:
+        description: >-
+          Whether containerized versions (Docker, Singularity) are available.
+        range: YesNoUnknownEnum
+      dependencies:
+        description: Key software dependencies or requirements.
+        multivalued: true
+      systemRequirements:
+        description: System requirements (OS, memory, compute).
+      lastUpdate:
+        description: Date of last software update or release.
+        range: date
+      maintainer:
+        description: Name or organization maintaining the software.
+    slot_usage:
+      resourceType:
+        ifabsent: string(Computational Tool)
+
+enums:
+
+  SoftwareTypeEnum:
+    description: Types of computational tools.
+    permissible_values:
+      Analysis Software: {}
+      Pipeline: {}
+      Package/Library: {}
+      Workflow: {}
+      Database: {}
+      Web Application: {}
+      Command-line Tool: {}
+      Plugin: {}
+      Other: {}
+
+  ProgrammingLanguageEnum:
+    description: Programming languages.
+    permissible_values:
+      Python: {}
+      R: {}
+      Java: {}
+      C++: {}
+      MATLAB: {}
+      Julia: {}
+      Perl: {}
+      Shell Script: {}
+      JavaScript: {}
+      Other: {}
+
+  LicenseTypeEnum:
+    description: Software license types.
+    permissible_values:
+      MIT: {}
+      Apache 2.0: {}
+      GPL: {}
+      BSD: {}
+      Creative Commons: {}
+      Proprietary: {}
+      Other: {}
+      Unknown: {}

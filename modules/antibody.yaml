@@ -1,0 +1,114 @@
+id: https://w3id.org/nf-research-tools/antibody
+name: nf_research_tools_antibody
+title: Antibody
+description: Antibody reagents used in NF research.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - tool_base
+
+classes:
+
+  Antibody:
+    is_a: Tool
+    description: >-
+      A blood protein produced in response to and counteracting a
+      specific antigen. Antibodies combine chemically with substances
+      which the body recognizes as alien, such as bacteria, viruses,
+      and foreign substances in the blood.
+    attributes:
+      uniprotId:
+        description: >-
+          The UniProt ID of the protein targeted by the antibody.
+      targetAntigen:
+        description: >-
+          Antigen that is targeted by antibody (e.g. Neurofibromin 1 human).
+        required: true
+      clonality:
+        description: The type of clonality of the antibody.
+        range: ClonalityEnum
+        required: true
+      cloneId:
+        description: Identification of clone (e.g. 2D1).
+      reactiveSpecies:
+        description: >-
+          Species the antibody has been shown to crossreact with
+          the target protein.
+        range: ReactiveSpeciesEnum
+        multivalued: true
+        required: true
+      conjugate:
+        description: Whether the antibody is conjugated or nonconjugated.
+        range: ConjugateEnum
+        required: true
+      hostOrganism:
+        description: >-
+          The species of the organism that hosts the antibody.
+        range: HostOrganismEnum
+        required: true
+    slot_usage:
+      resourceType:
+        ifabsent: string(Antibody)
+
+enums:
+
+  ClonalityEnum:
+    description: Antibody clonality types.
+    permissible_values:
+      Unknown: {}
+      Cocktail: {}
+      Control: {}
+      Isotype Control: {}
+      Monoclonal: {}
+      Monoclonal Secondary: {}
+      Polyclonal: {}
+      Polyclonal Secondary: {}
+      OligoClonal: {}
+      Recombinant: {}
+      Recombinant Monoclonal: {}
+      Recombinant Monoclonal Secondary: {}
+      Recombinant Polyclonal: {}
+      Recombinant Polyclonal Secondary: {}
+
+  ReactiveSpeciesEnum:
+    description: Species the antibody crossreacts with.
+    permissible_values:
+      Human: {}
+      Mouse: {}
+      Rat: {}
+      Chicken: {}
+      Rabbit: {}
+      Pig: {}
+      Dog: {}
+      Zebrafish: {}
+      Fish: {}
+      Non-human primate: {}
+      Guinea pig: {}
+      Hamster: {}
+      Cow: {}
+      Monkey: {}
+      Avian: {}
+      Horse: {}
+      Rodent: {}
+      Drosophila: {}
+      Unknown: {}
+
+  ConjugateEnum:
+    description: Antibody conjugation status.
+    permissible_values:
+      Conjugated: {}
+      Nonconjugated: {}
+
+  HostOrganismEnum:
+    description: Antibody host organism species.
+    permissible_values:
+      Mouse: {}
+      Rabbit: {}
+      Unknown: {}

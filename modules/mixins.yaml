@@ -1,0 +1,108 @@
+id: https://w3id.org/nf-research-tools/mixins
+name: nf_research_tools_mixins
+title: Mixins
+description: >-
+  Mixin classes for cross-cutting concerns shared across tool types.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - donor
+  - mutation
+
+classes:
+
+  HasDonor:
+    mixin: true
+    description: >-
+      Mixin for tool types derived from a biological donor.
+    slots:
+      - donor
+
+  HasTransplantationDonor:
+    mixin: true
+    description: >-
+      Mixin for tool types that involve transplantation from a donor.
+    slots:
+      - transplantationDonor
+      - transplantationType
+
+  HasMutations:
+    mixin: true
+    description: >-
+      Mixin for tool types that have characterized genetic mutations.
+    slots:
+      - mutations
+
+  HasGeneticDisorder:
+    mixin: true
+    description: >-
+      Mixin for tool types associated with a genetic disorder and
+      its manifestations.
+    slots:
+      - geneticDisorder
+      - manifestation
+
+  HasTumorType:
+    mixin: true
+    description: >-
+      Mixin for tool types that model or bank specific tumor types.
+    slots:
+      - tumorType
+
+  HasPassageNumber:
+    mixin: true
+    description: >-
+      Mixin for tool types that track passage number.
+    slots:
+      - passageNumber
+
+slots:
+
+  donor:
+    description: The biological donor from which the resource was derived.
+    range: Donor
+    inlined: true
+
+  transplantationDonor:
+    description: >-
+      The donor for transplantation experiments.
+    range: Donor
+    inlined: true
+
+  transplantationType:
+    description: Type of transplantation involved.
+    range: TransplantationTypeEnum
+
+  mutations:
+    description: Characterized genetic mutations in the resource.
+    range: MutationDetails
+    multivalued: true
+    inlined_as_list: true
+
+  geneticDisorder:
+    description: >-
+      Genetic disorders associated with the resource.
+    range: GeneticDisorderEnum
+    multivalued: true
+
+  manifestation:
+    description: >-
+      Manifestations or symptoms that this resource is used to model
+      (e.g. tumor type, behavioral phenotype).
+    multivalued: true
+
+  tumorType:
+    description: Tumor types associated with the resource.
+    range: TumorTypeEnum
+    multivalued: true
+
+  passageNumber:
+    description: Current passage number, if applicable.

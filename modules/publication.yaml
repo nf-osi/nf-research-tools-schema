@@ -1,0 +1,80 @@
+id: https://w3id.org/nf-research-tools/publication
+name: nf_research_tools_publication
+title: Publication
+description: Publications associated with research tools.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  Publication:
+    description: >-
+      A publication associated with the development or usage of a resource.
+    class_uri: schema:ScholarlyArticle
+    slots:
+      - publicationId
+      - publicationTitle
+      - authors
+      - abstract
+      - journal
+      - publicationDate
+      - pmid
+      - doi
+      - citation
+      - publicationDateUnix
+
+slots:
+
+  publicationId:
+    identifier: true
+    description: A unique identifier for the publication.
+
+  publicationTitle:
+    description: The title of the publication.
+    required: true
+    slot_uri: schema:headline
+
+  authors:
+    description: Writers of the publication.
+    multivalued: true
+    slot_uri: schema:author
+
+  abstract:
+    description: >-
+      A brief, comprehensive summary of the contents of the publication.
+
+  journal:
+    description: >-
+      The name of the periodical publication in which the paper was published.
+
+  publicationDate:
+    description: The date of the paper's publication.
+    range: date
+
+  pmid:
+    description: The PubMed Identifier associated with the publication.
+
+  doi:
+    description: >-
+      The digital object identifier in the form https://www.doi.org/{doi},
+      per CrossRef DOI display guidelines.
+    slot_uri: schema:identifier
+
+  citation:
+    description: >-
+      A merged citation string for the publication, used to render
+      citation on details pages.
+    required: true
+
+  publicationDateUnix:
+    description: The date of the paper's publication in UNIX time.
+    range: integer

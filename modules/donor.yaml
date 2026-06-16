@@ -1,0 +1,59 @@
+id: https://w3id.org/nf-research-tools/donor
+name: nf_research_tools_donor
+title: Donor
+description: Biological donor from which a resource was derived.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+
+classes:
+
+  Donor:
+    description: >-
+      A person, animal, or other organism that is the contributor
+      of the resource.
+    slots:
+      - donorId
+      - parentDonorId
+      - species
+      - sex
+      - age
+      - race
+
+slots:
+
+  donorId:
+    identifier: true
+    description: A unique identifier for the donor.
+    required: true
+
+  parentDonorId:
+    description: The ID of the parent donor.
+
+  species:
+    description: >-
+      The species of the individual the resource was derived from.
+    range: SpeciesEnum
+    multivalued: true
+    required: true
+
+  sex:
+    description: >-
+      The sex of the individual from which the resource was derived.
+    range: SexEnum
+
+  age:
+    description: >-
+      The age of the individual from which the resource was derived.
+
+  race:
+    description: >-
+      The ethnicity of the individual the resource was derived from.

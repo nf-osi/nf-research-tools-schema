@@ -1,0 +1,157 @@
+id: https://w3id.org/nf-research-tools/observation
+name: nf_research_tools_observation
+title: Observation
+description: Observations and comments about research tools.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+  MP: http://purl.obolibrary.org/obo/MP_
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - publication
+
+classes:
+
+  Observation:
+    description: >-
+      A remark, statement, or comment based on the resource.
+    slots:
+      - observationId
+      - observationPublication
+      - observationSubmitterName
+      - observationSynapseId
+      - observationText
+      - observationType
+      - observationTypeOntologyId
+      - observationPhase
+      - observationTime
+      - observationTimeUnits
+      - reliabilityRating
+      - easeOfUseRating
+      - observationLink
+
+slots:
+
+  observationId:
+    identifier: true
+    description: A unique identifier for the observation.
+    required: true
+
+  observationPublication:
+    description: Publication associated with this observation.
+    range: Publication
+    inlined: true
+
+  observationSubmitterName:
+    description: The name of the person submitting the observation.
+    required: true
+
+  observationSynapseId:
+    description: >-
+      The Synapse identifier for the person submitting the observation.
+
+  observationText:
+    description: Free text observation about the resource.
+    required: true
+
+  observationType:
+    description: >-
+      Type of observation. Valid values depend on the resource type.
+    range: ObservationTypeEnum
+    multivalued: true
+    required: true
+
+  observationTypeOntologyId:
+    description: Mammalian Phenotype Ontology (MP) term identifier.
+
+  observationPhase:
+    description: >-
+      What t=0 for the observation time is (life stage or phase).
+    range: ObservationPhaseEnum
+
+  observationTime:
+    description: When the observation was made.
+
+  observationTimeUnits:
+    description: The unit of time pertaining to the observation.
+    range: TimeUnitEnum
+
+  reliabilityRating:
+    description: >-
+      A 1-5 rating of reliability: does the resource produce consistent
+      results and reasonably recapitulate human disease?
+    range: RatingEnum
+
+  easeOfUseRating:
+    description: >-
+      A 1-5 rating of ease of use: how easy is it to obtain the
+      resource, comply with agreements, etc?
+    range: RatingEnum
+
+  observationLink:
+    description: >-
+      A link/reference related to the observation. If the reference
+      has a DOI or PubMed ID, use the publication field instead.
+    range: uri
+
+enums:
+
+  ObservationTypeEnum:
+    description: >-
+      Types of observations, organized by resource type context.
+    permissible_values:
+      # Animal Model observations
+      Tumor Growth/Burden: {}
+      Survival/Lifespan: {}
+      Body Weight/Growth: {}
+      Behavioral: {}
+      Nervous System: {}
+      Cardiovascular System: {}
+      Immune Response: {}
+      Metabolic: {}
+      Developmental: {}
+      Cellular/Molecular: {}
+      Coat Color: {}
+      Drug Efficacy: {}
+      # Cell Line / Organoid / Patient-Derived Model observations
+      Drug Response/Efficacy: {}
+      Viability/Proliferation: {}
+      Migration/Invasion: {}
+      Gene/Protein Expression: {}
+      Morphological: {}
+      Molecular/Biochemical: {}
+      # Antibody observations
+      Specificity: {}
+      Sensitivity: {}
+      Application Performance: {}
+      Cross-reactivity: {}
+      # Genetic Reagent observations
+      Editing/Knockdown Efficiency: {}
+      Off-target Effects: {}
+      Expression Level: {}
+      # Computational Tool observations
+      Accuracy/Performance: {}
+      Usability: {}
+      Scalability/Compatibility: {}
+      Reproducibility: {}
+      # Clinical Assessment Tool observations
+      Reliability: {}
+      Validity: {}
+      Clinical Utility: {}
+      Sensitivity/Specificity: {}
+      # Biobank observations
+      Sample Quality: {}
+      Availability: {}
+      Collection Completeness: {}
+      # Universal observations
+      General Comment or Review: {}
+      Usage Instructions: {}
+      Depositor Comment: {}
+      Issue: {}
+      Other: {}

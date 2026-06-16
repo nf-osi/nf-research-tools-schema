@@ -1,0 +1,56 @@
+id: https://w3id.org/nf-research-tools/animal_model
+name: nf_research_tools_animal_model
+title: Animal Model
+description: Animal models used in NF research.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - tool_base
+  - mixins
+
+classes:
+
+  AnimalModel:
+    is_a: Tool
+    mixins:
+      - HasDonor
+      - HasTransplantationDonor
+      - HasMutations
+      - HasGeneticDisorder
+    description: >-
+      An animal sufficiently like humans in its anatomy, physiology,
+      or response to a pathogen to be used in medical research in
+      order to obtain results that can be extrapolated to human medicine.
+    attributes:
+      animalState:
+        description: >-
+          State the animal is in according to the vendor/developer
+          (e.g. embryo, sperm, live).
+      backgroundStrain:
+        description: >-
+          The genetic background strain name. Correct strain nomenclature
+          indicates what a mutant strain's background is.
+      backgroundSubstrain:
+        description: >-
+          The substrain variety of a strain (e.g. C57BL/6J, C57BL/6Tac).
+      strainNomenclature:
+        description: >-
+          The standard nomenclature for the strain (e.g. B6.129S2-NF1tm1Tyj/J).
+          Set by the International Committee on Standardized Genetic
+          Nomenclature for Mice.
+      generation:
+        description: The generation of the animal model (e.g. 13).
+    slot_usage:
+      resourceType:
+        ifabsent: string(Animal Model)
+      geneticDisorder:
+        required: true
+      manifestation:
+        required: true
