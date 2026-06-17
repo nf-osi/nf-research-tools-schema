@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NF Research Tools Schema</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #fff;
+      --border: #dee2e6;
+      --text: #212529;
+      --muted: #6c757d;
+      --accent: #4361ee;
+      --accent-light: #eef0fb;
+      --tool-bg: #e8f4f8;
+      --mixin-bg: #fef3e2;
+      --support-bg: #e8f8e8;
+      --enum-bg: #f3e8f8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: #fff;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    header p { color: #adb5bd; font-size: 0.95rem; max-width: 700px; margin: 0 auto; }
+    header .version {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.25rem 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    nav a:hover, nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    section { margin-bottom: 3rem; }
+    section > h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      color: var(--accent);
+    }
+    .diagram-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    .diagram-container h3 {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .card p { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
+    .card.tool { border-left: 4px solid #4361ee; }
+    .card.mixin { border-left: 4px solid #f0932b; }
+    .card.support { border-left: 4px solid #2ecc71; }
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge.tool { background: var(--tool-bg); color: #1a6985; }
+    .badge.mixin { background: var(--mixin-bg); color: #8a5a00; }
+    .badge.support { background: var(--support-bg); color: #1a7a3a; }
+    .badge.abstract { background: #f8d7da; color: #842029; }
+    .badge.enum { background: var(--enum-bg); color: #6a3a8a; }
+    .slot-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+    .slot-tag {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+    }
+    .slot-tag.required { background: #fff3cd; border-color: #ffc107; }
+    .slot-tag.inherited { color: var(--muted); font-style: italic; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--bg);
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    .enum-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    .enum-val {
+      background: var(--bg);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      white-space: nowrap;
+    }
+    .collapsible { cursor: pointer; user-select: none; }
+    .collapsible::before { content: '▸ '; font-size: 0.8rem; }
+    .collapsible.open::before { content: '▾ '; }
+    .collapsible-content { display: none; }
+    .collapsible-content.open { display: block; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent); }
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>NF Research Tools Central Schema</h1>
+  <p>Data model for the NF Research Tools Central registry — 9 resource types, supporting entities, and controlled vocabularies for NF research.</p>
+  <span class="version">v2.0.0 · LinkML</span>
+</header>
+
+<nav>
+  <a href="#hierarchy">Hierarchy</a>
+  <a href="#er-diagram">ER Diagram</a>
+  <a href="#tool-types">Tool Types</a>
+  <a href="#mixins">Mixins</a>
+  <a href="#supporting">Supporting Entities</a>
+  <a href="#enums">Enumerations</a>
+</nav>
+
+<main>
+
+<!-- HIERARCHY -->
+<section id="hierarchy">
+  <h2>Class Hierarchy</h2>
+  <div class="diagram-container">
+    <h3>Inheritance &amp; Mixin Diagram</h3>
+    <pre class="mermaid">
+classDiagram
+    direction TB
+
+    class Tool {
+        &lt;&lt;abstract&gt;&gt;
+        resourceId
+        resourceName
+        rrid
+        resourceType
+        description
+        howToAcquire
+        dateAdded
+        dateModified
+    }
+
+    class HasDonor {
+        &lt;&lt;mixin&gt;&gt;
+        donor : Donor
+    }
+    class HasTransplantationDonor {
+        &lt;&lt;mixin&gt;&gt;
+        transplantationDonor : Donor
+        transplantationType
+    }
+    class HasMutations {
+        &lt;&lt;mixin&gt;&gt;
+        mutations : MutationDetails[]
+    }
+    class HasGeneticDisorder {
+        &lt;&lt;mixin&gt;&gt;
+        geneticDisorder
+        manifestation
+    }
+    class HasTumorType {
+        &lt;&lt;mixin&gt;&gt;
+        tumorType
+    }
+    class HasPassageNumber {
+        &lt;&lt;mixin&gt;&gt;
+        passageNumber
+    }
+
+    class AnimalModel {
+        backgroundStrain
+        backgroundSubstrain
+        strainNomenclature
+        animalState
+        generation
+    }
+    class CellLine {
+        organ
+        tissue
+        cellLineCategory
+        originYear
+        cultureMedia
+    }
+    class Antibody {
+        targetAntigen
+        clonality
+        reactiveSpecies
+        conjugate
+        hostOrganism
+    }
+    class GeneticReagent {
+        insertName
+        insertSpecies
+        vectorType
+        cloningMethod
+        hazardous
+    }
+    class Biobank {
+        biobankName
+        biobankURL
+        specimenType
+        specimenFormat
+    }
+    class ComputationalTool {
+        softwareName
+        softwareType
+        programmingLanguage
+        sourceRepository
+        licenseType
+    }
+    class OrganoidProtocol {
+        modelType
+        derivationSource
+        cellTypes
+        cultureSystem
+    }
+    class PatientDerivedModel {
+        modelSystemType
+        patientDiagnosis
+        hostStrain
+        engraftmentSite
+    }
+    class ClinicalAssessmentTool {
+        assessmentName
+        assessmentType
+        targetPopulation
+        numberOfItems
+    }
+
+    Tool <|-- AnimalModel
+    Tool <|-- CellLine
+    Tool <|-- Antibody
+    Tool <|-- GeneticReagent
+    Tool <|-- Biobank
+    Tool <|-- ComputationalTool
+    Tool <|-- OrganoidProtocol
+    Tool <|-- PatientDerivedModel
+    Tool <|-- ClinicalAssessmentTool
+
+    HasDonor <|.. AnimalModel
+    HasTransplantationDonor <|.. AnimalModel
+    HasMutations <|.. AnimalModel
+    HasGeneticDisorder <|.. AnimalModel
+
+    HasDonor <|.. CellLine
+    HasMutations <|.. CellLine
+    HasGeneticDisorder <|.. CellLine
+
+    HasTumorType <|.. Biobank
+    HasGeneticDisorder <|.. Biobank
+
+    HasPassageNumber <|.. OrganoidProtocol
+
+    HasTumorType <|.. PatientDerivedModel
+    HasPassageNumber <|.. PatientDerivedModel
+
+    style Tool fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style HasDonor fill:#fff3e0,stroke:#e65100
+    style HasTransplantationDonor fill:#fff3e0,stroke:#e65100
+    style HasMutations fill:#fff3e0,stroke:#e65100
+    style HasGeneticDisorder fill:#fff3e0,stroke:#e65100
+    style HasTumorType fill:#fff3e0,stroke:#e65100
+    style HasPassageNumber fill:#fff3e0,stroke:#e65100
+    </pre>
+  </div>
+</section>
+
+<!-- ER DIAGRAM -->
+<section id="er-diagram">
+  <h2>Entity Relationships</h2>
+  <div class="diagram-container">
+    <h3>How entities connect</h3>
+    <pre class="mermaid">
+erDiagram
+    Tool ||--}o VendorItem : vendors
+    Tool ||--}o Observation : observations
+    Tool ||--}o ResourceApplication : applications
+    Tool ||--}o DevelopmentRecord : developmentInfo
+    Tool ||--}o Publication : usagePublications
+
+    VendorItem ||--|o Vendor : vendor
+    Observation ||--|o Publication : observationPublication
+    DevelopmentRecord ||--|o Investigator : investigator
+    DevelopmentRecord ||--|o Publication : publication
+    DevelopmentRecord ||--|o Funder : funder
+
+    AnimalModel ||--|o Donor : donor
+    AnimalModel ||--|o Donor : transplantationDonor
+    AnimalModel ||--}o MutationDetails : mutations
+    CellLine ||--|o Donor : donor
+    CellLine ||--}o MutationDetails : mutations
+
+    Tool {
+        string resourceId PK
+        string resourceName
+        string rrid
+        enum resourceType
+        date dateAdded
+    }
+    Donor {
+        string donorId PK
+        enum species
+        enum sex
+    }
+    MutationDetails {
+        string mutationDetailsId PK
+        string affectedGeneSymbol
+        enum mutationType
+    }
+    Publication {
+        string publicationId PK
+        string publicationTitle
+        string doi
+    }
+    Investigator {
+        string investigatorId PK
+        string investigatorName
+        string orcid
+    }
+    Funder {
+        string funderId PK
+        string funderName
+    }
+    Vendor {
+        string vendorId PK
+        string vendorName
+    }
+    VendorItem {
+        string vendorItemId PK
+        string catalogNumber
+    }
+    Observation {
+        string observationId PK
+        string observationText
+        enum observationType
+    }
+    ResourceApplication {
+        string resourceApplicationId PK
+        enum applicationTypes
+    }
+    DevelopmentRecord {
+        ref investigator
+        ref publication
+        ref funder
+    }
+    AnimalModel {
+        string backgroundStrain
+        string strainNomenclature
+    }
+    CellLine {
+        enum organ
+        enum tissue
+    }
+    </pre>
+  </div>
+</section>
+
+<!-- TOOL TYPES -->
+<section id="tool-types">
+  <h2>Tool Types</h2>
+  <p style="color: var(--muted); margin-bottom: 1rem;">All types inherit from the abstract <strong>Tool</strong> base class: <code>resourceId</code>, <code>rrid</code>, <code>resourceName</code>, <code>synonyms</code>, <code>resourceType</code>, <code>description</code>, <code>aiSummary</code>, <code>usageRequirements</code>, <code>howToAcquire</code>, <code>dateAdded</code>, <code>dateModified</code>, plus relationships to vendors, observations, applications, development records, and usage publications.</p>
+  <div class="cards">
+
+    <div class="card tool">
+      <h3>AnimalModel</h3>
+      <p>Animal models used in NF research — xenografts, transgenic, and knockout models.</p>
+      <span class="badge mixin">HasDonor</span>
+      <span class="badge mixin">HasTransplantationDonor</span>
+      <span class="badge mixin">HasMutations</span>
+      <span class="badge mixin">HasGeneticDisorder</span>
+      <div class="slot-list">
+        <span class="slot-tag">animalState</span>
+        <span class="slot-tag">backgroundStrain</span>
+        <span class="slot-tag">backgroundSubstrain</span>
+        <span class="slot-tag">strainNomenclature</span>
+        <span class="slot-tag">generation</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>CellLine</h3>
+      <p>Cell cultures derived from homogeneous tissue sources for NF research.</p>
+      <span class="badge mixin">HasDonor</span>
+      <span class="badge mixin">HasMutations</span>
+      <span class="badge mixin">HasGeneticDisorder</span>
+      <div class="slot-list">
+        <span class="slot-tag">organ</span>
+        <span class="slot-tag">tissue</span>
+        <span class="slot-tag">cellLineCategory</span>
+        <span class="slot-tag">originYear</span>
+        <span class="slot-tag">strProfile</span>
+        <span class="slot-tag">populationDoublingTime</span>
+        <span class="slot-tag">resistance</span>
+        <span class="slot-tag">cultureMedia</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>Antibody</h3>
+      <p>Antibody reagents for detecting NF-related antigens.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">targetAntigen</span>
+        <span class="slot-tag required">clonality</span>
+        <span class="slot-tag">cloneId</span>
+        <span class="slot-tag required">reactiveSpecies</span>
+        <span class="slot-tag required">conjugate</span>
+        <span class="slot-tag required">hostOrganism</span>
+        <span class="slot-tag">uniprotId</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>GeneticReagent</h3>
+      <p>Plasmids, viral vectors, CRISPR constructs, and other molecular tools.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">insertName</span>
+        <span class="slot-tag required">insertSpecies</span>
+        <span class="slot-tag">insertSize</span>
+        <span class="slot-tag">cloningMethod</span>
+        <span class="slot-tag">vectorType</span>
+        <span class="slot-tag">vectorBackbone</span>
+        <span class="slot-tag">promoter</span>
+        <span class="slot-tag">bacterialResistance</span>
+        <span class="slot-tag">selectableMarker</span>
+        <span class="slot-tag required">hazardous</span>
+        <span class="slot-tag">+13 more</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>Biobank</h3>
+      <p>Collections of biological specimens and data for NF research.</p>
+      <span class="badge mixin">HasTumorType</span>
+      <span class="badge mixin">HasGeneticDisorder</span>
+      <div class="slot-list">
+        <span class="slot-tag required">biobankName</span>
+        <span class="slot-tag required">biobankURL</span>
+        <span class="slot-tag">contact</span>
+        <span class="slot-tag required">specimenType</span>
+        <span class="slot-tag required">specimenTissueType</span>
+        <span class="slot-tag required">specimenPreparationMethod</span>
+        <span class="slot-tag required">specimenFormat</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>ComputationalTool</h3>
+      <p>Software, pipelines, and analysis tools for NF research.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">softwareName</span>
+        <span class="slot-tag required">softwareType</span>
+        <span class="slot-tag">softwareVersion</span>
+        <span class="slot-tag">programmingLanguage</span>
+        <span class="slot-tag">sourceRepository</span>
+        <span class="slot-tag">documentation</span>
+        <span class="slot-tag">licenseType</span>
+        <span class="slot-tag">containerized</span>
+        <span class="slot-tag">dependencies</span>
+        <span class="slot-tag">lastUpdate</span>
+        <span class="slot-tag">maintainer</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>OrganoidProtocol</h3>
+      <p>Organoids, assembloids, spheroids, and other 3D culture systems.</p>
+      <span class="badge mixin">HasPassageNumber</span>
+      <div class="slot-list">
+        <span class="slot-tag required">modelType</span>
+        <span class="slot-tag required">derivationSource</span>
+        <span class="slot-tag required">cellTypes</span>
+        <span class="slot-tag">organoidType</span>
+        <span class="slot-tag">matrixType</span>
+        <span class="slot-tag">cultureSystem</span>
+        <span class="slot-tag">maturationTime</span>
+        <span class="slot-tag">characterizationMethods</span>
+        <span class="slot-tag">cryopreservationProtocol</span>
+        <span class="slot-tag">qualityControlMetrics</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>PatientDerivedModel</h3>
+      <p>PDX, humanized mice, patient-derived organoids and cell lines.</p>
+      <span class="badge mixin">HasTumorType</span>
+      <span class="badge mixin">HasPassageNumber</span>
+      <div class="slot-list">
+        <span class="slot-tag required">modelSystemType</span>
+        <span class="slot-tag required">patientDiagnosis</span>
+        <span class="slot-tag">hostStrain</span>
+        <span class="slot-tag">engraftmentSite</span>
+        <span class="slot-tag">establishmentRate</span>
+        <span class="slot-tag">molecularCharacterization</span>
+        <span class="slot-tag">clinicalData</span>
+        <span class="slot-tag">validationMethods</span>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3>ClinicalAssessmentTool</h3>
+      <p>Questionnaires, scales, and patient-reported outcome measures.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">assessmentName</span>
+        <span class="slot-tag required">assessmentType</span>
+        <span class="slot-tag required">targetPopulation</span>
+        <span class="slot-tag">diseaseSpecific</span>
+        <span class="slot-tag">numberOfItems</span>
+        <span class="slot-tag">scoringMethod</span>
+        <span class="slot-tag">validatedLanguages</span>
+        <span class="slot-tag">availabilityStatus</span>
+        <span class="slot-tag">licensingRequirements</span>
+        <span class="slot-tag">digitalVersion</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MIXINS -->
+<section id="mixins">
+  <h2>Mixins</h2>
+  <p style="color: var(--muted); margin-bottom: 1rem;">Cross-cutting concerns shared across tool types via mixin inheritance.</p>
+  <div class="cards">
+    <div class="card mixin">
+      <h3>HasDonor</h3>
+      <p>Biological donor origin. Used by: AnimalModel, CellLine</p>
+      <div class="slot-list"><span class="slot-tag">donor → Donor</span></div>
+    </div>
+    <div class="card mixin">
+      <h3>HasTransplantationDonor</h3>
+      <p>Transplantation donor info. Used by: AnimalModel</p>
+      <div class="slot-list">
+        <span class="slot-tag">transplantationDonor → Donor</span>
+        <span class="slot-tag">transplantationType</span>
+      </div>
+    </div>
+    <div class="card mixin">
+      <h3>HasMutations</h3>
+      <p>Genetic mutations. Used by: AnimalModel, CellLine</p>
+      <div class="slot-list"><span class="slot-tag">mutations → MutationDetails[]</span></div>
+    </div>
+    <div class="card mixin">
+      <h3>HasGeneticDisorder</h3>
+      <p>NF-related genetic disorders. Used by: AnimalModel, CellLine, Biobank</p>
+      <div class="slot-list">
+        <span class="slot-tag">geneticDisorder</span>
+        <span class="slot-tag">manifestation</span>
+      </div>
+    </div>
+    <div class="card mixin">
+      <h3>HasTumorType</h3>
+      <p>Tumor type classification. Used by: Biobank, PatientDerivedModel</p>
+      <div class="slot-list"><span class="slot-tag">tumorType</span></div>
+    </div>
+    <div class="card mixin">
+      <h3>HasPassageNumber</h3>
+      <p>Passage tracking. Used by: OrganoidProtocol, PatientDerivedModel</p>
+      <div class="slot-list"><span class="slot-tag">passageNumber</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORTING ENTITIES -->
+<section id="supporting">
+  <h2>Supporting Entities</h2>
+  <div class="cards">
+    <div class="card support">
+      <h3>Donor</h3>
+      <p>Biological donor from which a resource was derived.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">donorId</span>
+        <span class="slot-tag">parentDonorId</span>
+        <span class="slot-tag required">species</span>
+        <span class="slot-tag">sex</span>
+        <span class="slot-tag">age</span>
+        <span class="slot-tag">race</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>MutationDetails</h3>
+      <p>Genetic mutation characterization, aligned with MGI vocabulary.</p>
+      <div class="slot-list">
+        <span class="slot-tag">mutationDetailsId</span>
+        <span class="slot-tag">affectedGeneSymbol</span>
+        <span class="slot-tag">mutationType</span>
+        <span class="slot-tag">mutationMethod</span>
+        <span class="slot-tag">sequenceVariation</span>
+        <span class="slot-tag">+7 more</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Publication</h3>
+      <p>Publications associated with resource development or usage.</p>
+      <div class="slot-list">
+        <span class="slot-tag">publicationId</span>
+        <span class="slot-tag required">publicationTitle</span>
+        <span class="slot-tag">authors</span>
+        <span class="slot-tag">doi</span>
+        <span class="slot-tag">pmid</span>
+        <span class="slot-tag required">citation</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Investigator</h3>
+      <p>Researchers who developed the resource.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">investigatorId</span>
+        <span class="slot-tag required">investigatorName</span>
+        <span class="slot-tag">orcid</span>
+        <span class="slot-tag">institution</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Funder</h3>
+      <p>Organizations funding resource development.</p>
+      <div class="slot-list">
+        <span class="slot-tag">funderId</span>
+        <span class="slot-tag">funderName</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Vendor / VendorItem</h3>
+      <p>Vendors and their catalog listings for resources.</p>
+      <div class="slot-list">
+        <span class="slot-tag">vendorName</span>
+        <span class="slot-tag">vendorUrl</span>
+        <span class="slot-tag required">catalogNumber</span>
+        <span class="slot-tag">catalogNumberURL</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Observation</h3>
+      <p>User-submitted observations, ratings, and comments about resources.</p>
+      <div class="slot-list">
+        <span class="slot-tag required">observationText</span>
+        <span class="slot-tag required">observationType</span>
+        <span class="slot-tag">reliabilityRating</span>
+        <span class="slot-tag">easeOfUseRating</span>
+        <span class="slot-tag">observationPhase</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>ResourceApplication</h3>
+      <p>Applications and uses for a resource (e.g. Western Blot, ELISA).</p>
+      <div class="slot-list">
+        <span class="slot-tag required">applicationSource</span>
+        <span class="slot-tag required">applicationTypes</span>
+        <span class="slot-tag">applicationLinks</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>DevelopmentRecord</h3>
+      <p>Links investigators, publications, and funders to a resource.</p>
+      <div class="slot-list">
+        <span class="slot-tag">investigator → Investigator</span>
+        <span class="slot-tag">publication → Publication</span>
+        <span class="slot-tag">funder → Funder</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENUMERATIONS -->
+<section id="enums">
+  <h2>Enumerations</h2>
+  <p style="color: var(--muted); margin-bottom: 1rem;">53 controlled vocabularies. Click to expand values.</p>
+
+  <div id="enum-tables"></div>
+</section>
+
+</main>
+
+<footer>
+  <p>Generated from <a href="https://linkml.io">LinkML</a> schema · <a href="https://github.com/nf-osi/nf-research-tools-schema">nf-osi/nf-research-tools-schema</a></p>
+</footer>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'neutral',
+  flowchart: { useMaxWidth: true },
+  er: { useMaxWidth: true }
+});
+
+// Enum data (shared + type-specific)
+const enums = {
+  // --- Shared ---
+  "ResourceTypeEnum": ["Animal Model","Cell Line","Antibody","Genetic Reagent","Biobank","Computational Tool","Organoid Protocol","Patient-Derived Model","Clinical Assessment Tool"],
+  "GeneticDisorderEnum": ["Neurofibromatosis type 1","Neurofibromatosis type 2","Schwannomatosis","No known genetic disorder"],
+  "TumorTypeEnum": ["cutaneous neurofibroma","plexiform neurofibroma","atypical neurofibroma","schwannoma","meningioma","malignant peripheral nerve sheath tumor","low grade glioma","high grade glioma","pheochromocytoma","optic nerve glioma","neurofibroma NOS","diffuse infiltrating neurofibroma","brain NOS","Other"],
+  "SpeciesEnum": ["Homo sapiens","Mus musculus","Mus musculus (humanized)","Rattus norvegicus","Drosophila melanogaster","Saccharomyces cerevisiae","Rhesus macaque","Cricetulus griseus","Xenopus laevis","Canis lupus familiaris","Pan troglodytes","Gallus gallus","Sus scrofa","Oryctolagus cuniculus","Danio rerio","Escherichia coli"],
+  "SexEnum": ["Male","Female","Unknown"],
+  "YesNoUnknownEnum": ["Yes","No","Unknown"],
+  "UsageRequirementEnum": ["data sharing required","non-commercial use only","re-distribution not permitted","generation of germ line transmitting chimeras not permitted","creation of functional gametes not permitted","generation of interspecies chimeras not permitted","human cloning not permitted","cannot be used for treatment purposes","IRB documentation required","special licencing restrictions (see vendor for more information)","unknown"],
+  "TransplantationTypeEnum": ["allograft","xenograft","autograft","isograft"],
+  "RatingEnum": ["1","2","3","4","5"],
+  "TimeUnitEnum": ["days","weeks","months","years","hours","minutes","seconds","milliseconds"],
+  "ObservationPhaseEnum": ["adolescent","adult","death phase","embryo","juvenile","larval","log phase","neonatal","postnatal","prenatal","pupal","stationary phase","weanling"],
+  // --- Mutation ---
+  "AlleleTypeEnum": ["Conditional ready","Constitutively active","Dominant negative","Humanized sequence","Hypomorph","Inducible","Inserted expressed sequence","Knockdown","Modified isoform(s)","No functional change","Null/knockout","Recombinase","Reporter","RMCE-Ready","Transactivator","Transposase","Transposon concatemer"],
+  "MutationTypeEnum": ["Disruption caused by insertion of vector","Duplication","Insertion","Insertion of gene trap vector","Intergenic deletion","Intragenic deletion","Inversion","Loss of heterozygosity (unspecified mechanism)","Not Applicable","Not Specified","Nucleotide repeat expansion","Nucleotide substitutions","Other","Single point mutation","Translocation","Transposon insertion","Undefined","Viral insertion","Microdeletion","Homozygous deletion","Loss of heterozygosity (mitotic recombination)","Loss of heterozygosity (deletion)","Stable knockdown","Exogenous DNA expression"],
+  "MutationMethodEnum": ["Chemically induced (ENU)","Chemically induced (other)","Chemically and radiation induced","Endonuclease-mediated (CRISPR)","Endonuclease-mediated (TALEN)","Gene trapped","QTL","Radiation induced","Spontaneous","Targeted","Transgenic","Transposon induced","Unknown"],
+  // --- Observation ---
+  "ObservationTypeEnum": ["Tumor Growth/Burden","Survival/Lifespan","Body Weight/Growth","Behavioral","Nervous System","Cardiovascular System","Immune Response","Metabolic","Developmental","Cellular/Molecular","Coat Color","Drug Efficacy","Drug Response/Efficacy","Viability/Proliferation","Migration/Invasion","Gene/Protein Expression","Morphological","Molecular/Biochemical","Specificity","Sensitivity","Application Performance","Cross-reactivity","Editing/Knockdown Efficiency","Off-target Effects","Expression Level","Accuracy/Performance","Usability","Scalability/Compatibility","Reproducibility","Reliability","Validity","Clinical Utility","Sensitivity/Specificity","Sample Quality","Availability","Collection Completeness","General Comment or Review","Usage Instructions","Depositor Comment","Issue","Other"],
+  // --- Cell Line ---
+  "OrganEnum": ["Biliary Tract","Bladder","Bone Marrow","Brain","Breast","Bronchial Tree","Duct","Epididymis","Esophagus","Fallopian Tube","Gallbladder","Gland","Gonad","Heart","Intestine","Kidney","Liver","Lung","Lymph Node","Ear","Eye","Nose","Tongue","Pancreas","Penis","Seminal Vesicle","Skin","Spermatic Cord","Spinal Cord","Spleen","Stomach","Thymus Gland","Thyroid Gland","Tonsil","Trachea","Tracheobronchial Tree","Ureter","Urethra","Uterus","Vagina","Vulva"],
+  "TissueEnum": ["Blood","Bone marrow","Buccal mucosa","Buffy coat","Cerebral cortex","Dorsal root ganglion","Embryonic tissue","Meninges","Nerve tissue","Optic nerve","Plasma","Primary tumor","Sciatic nerve","Serum","Splenocyte","Unspecified","Urine","Whole brain"],
+  "CellLineCategoryEnum": ["Cancer cell line","Conditionally immortalized cell line","Embryonic stem cell","Factor-dependent cell line","Finite cell line","Hybridoma","Hybrid cell line","Induced pluripotent stem cell","Somatic stem cell","Spontaneously immortalized cell line","Stromal cell line","Telomerase immortalized cell line","Transformed cell line","Undefined cell line type"],
+  // --- Antibody ---
+  "ClonalityEnum": ["Unknown","Cocktail","Control","Isotype Control","Monoclonal","Monoclonal Secondary","Polyclonal","Polyclonal Secondary","OligoClonal","Recombinant","Recombinant Monoclonal","Recombinant Monoclonal Secondary","Recombinant Polyclonal","Recombinant Polyclonal Secondary"],
+  "ReactiveSpeciesEnum": ["Human","Mouse","Rat","Chicken","Rabbit","Pig","Dog","Zebrafish","Fish","Non-human primate","Guinea pig","Hamster","Cow","Monkey","Avian","Horse","Rodent","Drosophila","Unknown"],
+  "ConjugateEnum": ["Conjugated","Nonconjugated"],
+  "HostOrganismEnum": ["Mouse","Rabbit","Unknown"],
+  // --- Genetic Reagent ---
+  "CloningMethodEnum": ["Restriction Enzyme","TOPO cloning","Gateway Cloning","Ligation Independent Cloning","Gibson Cloning","Unknown"],
+  "VectorTypeEnum": ["Mammalian Expression","Bacterial Expression","Gateway Entry Clone","Lentiviral","Adenoviral","AAV","RNAi","Luciferase","Cre/Lox","Yeast Expression","Worm Expression","Insect Expression","Plant Expression","Mouse Targeting","CRISPR","TALEN","Synthetic Biology","Transfer Vector","Transposon Vector","Unspecified","Other"],
+  "BacterialResistanceEnum": ["Ampicillin","Kanamycin","Chloramphenicol","Tetracycline","Spectinomycin","Hygromycin","Bleocin(Zeocin)","Gentamycin","Streptomycin","Nourseothricin(clonNat)","Ampicillin and Bleocin (Zeocin)","Ampicillin and Kanamycin","Ampicillin and Tetracycline","Ampicillin and Streptomycin","Ampicillin and Spectinomycin","Chloramphenicol and Ampicillin","Chloramphenicol and Bleocin (Zeocin)","Chloramphenicol and Tetracycline","Chloramphenicol and Kanamycin","Chloramphenicol and Spectinomycin","Chloramphenicol and Gentamycin","Spectinomycin and Streptomycin","Other"],
+  "SelectableMarkerEnum": ["Neomycin","Puromycin","Hygromycin","Kanamycin","Chloramphenicol","Zeocin","Blasticidin","Gentamicin","TRP1","LEU1","LEU2","URA3","HIS3","Basta","Other"],
+  "CopyNumberEnum": ["High Copy","Low Copy","Unknown"],
+  "GrowthTempEnum": ["37 C","30 C","Room Temperature"],
+  "GrowthStrainEnum": ["DH5alpha","DH10B","NEB Stable","ccdb Survival","Pir1","Other"],
+  // --- Biobank ---
+  "SpecimenTypeEnum": ["human tissue","xenograft tumors","cell lines"],
+  "SpecimenTissueTypeEnum": ["Blood","Tumor","Cerebrospinal Fluid","Nerve","Skin","Bone","Brain"],
+  "SpecimenPreparationMethodEnum": ["Fresh collected","Flash frozen","FFPE","Cryopreserved","OCT","RNA later","Formalin-fixed","Ethanol"],
+  "SpecimenFormatEnum": ["whole tumor","slide","cells","whole cell lysate","DNA","RNA"],
+  // --- Computational Tool ---
+  "SoftwareTypeEnum": ["Analysis Software","Pipeline","Package/Library","Workflow","Database","Web Application","Command-line Tool","Plugin","Other"],
+  "ProgrammingLanguageEnum": ["Python","R","Java","C++","MATLAB","Julia","Perl","Shell Script","JavaScript","Other"],
+  "LicenseTypeEnum": ["MIT","Apache 2.0","GPL","BSD","Creative Commons","Proprietary","Other","Unknown"],
+  // --- Organoid ---
+  "OrganoidModelTypeEnum": ["Organoid","Assembloid","Spheroid","3D Culture","Other"],
+  "DerivationSourceEnum": ["iPSC","ESC","Primary Tissue","Cell Line","Patient-Derived","Other"],
+  "OrganoidTypeEnum": ["Cerebral","Intestinal","Liver","Kidney","Cardiac","Retinal","Lung","Pancreatic","Other"],
+  "MatrixTypeEnum": ["Matrigel","BME","Hydrogel","Synthetic Matrix","Scaffold-Free","Other"],
+  "CultureSystemEnum": ["Static","Spinning Bioreactor","Microfluidic","Air-Liquid Interface","Other"],
+  "CharacterizationMethodEnum": ["Immunofluorescence","RNA-seq","scRNA-seq","Electrophysiology","Imaging","Other"],
+  // --- Patient-Derived Model ---
+  "ModelSystemTypeEnum": ["PDX (Patient-Derived Xenograft)","Humanized Mouse","Patient-Derived Organoid","Patient-Derived Cell Line","Other"],
+  "HostStrainEnum": ["NSG","NOD-SCID","nude","SCID","Other"],
+  "EngraftmentSiteEnum": ["Subcutaneous","Orthotopic","Intracranial","Mammary Fat Pad","Other"],
+  "MolecularCharacterizationEnum": ["Genomic Sequencing","RNA-seq","Proteomics","Immunohistochemistry","Other"],
+  // --- Clinical Assessment Tool ---
+  "AssessmentTypeEnum": ["Quality of Life","Pain Assessment","Functional Assessment","Cognitive Assessment","Symptom Scale","Psychological Assessment","Patient-Reported Outcome","Other"],
+  "TargetPopulationEnum": ["Pediatric","Adult","Elderly","General","Disease-Specific"],
+  "DiseaseSpecificEnum": ["Yes - NF-specific","No - General","Adapted for NF"],
+  "AvailabilityStatusEnum": ["Freely Available","License Required","Permission Required","Proprietary","Unknown"],
+  "DigitalVersionEnum": ["Yes","No","In Development","Unknown"],
+  // --- Resource Application ---
+  "ApplicationSourceEnum": ["Community-reported","Investigator-reported","Vendor-reported"],
+  "ApplicationTypeEnum": ["Western Blot","Immunofluorescence","ELISA","Immunohistochemistry","Immunoprecipitation","Immunochromatography","Tumor Growth Studies","Gold Immunochromatographic Assay","Immunoelectron Microscopy","Immunogold Silver Staining","Immunohistochemistry (Paraffin-Embedded)","Immunocytochemistry","Immunohistochemistry (Frozen Sections)","Flow Cytometry","Affinity Purification","Microarray"]
+};
+
+// Render enum tables
+const container = document.getElementById('enum-tables');
+let html = '<table><thead><tr><th>Enum</th><th style="text-align:right">#</th><th>Permissible Values</th></tr></thead><tbody>';
+for (const [name, values] of Object.entries(enums)) {
+  html += `<tr>
+    <td><strong>${name}</strong></td>
+    <td style="text-align:right">${values.length}</td>
+    <td><div class="enum-values">${values.map(v => `<span class="enum-val">${v}</span>`).join('')}</div></td>
+  </tr>`;
+}
+html += '</tbody></table>';
+container.innerHTML = html;
+</script>
+
+</body>
+</html>
