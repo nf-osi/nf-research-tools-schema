@@ -21,7 +21,7 @@ This documents the migration path from the flat CSV data model
 |---|---|---|
 | Resource | syn26450069 | Fields absorbed into tool-type tables |
 
-**Synapse storage options for many-to-many relationships:**
+**Synapse storage options for OpenSearch-indexable tables:**
 
 Synapse SQL does not support joining on LIST columns to another table
 (`UNNEST` expands rows within a single table only, `HAS()` filters within
@@ -42,9 +42,8 @@ a single table only — neither can be used in a JOIN condition). Two options:
    ```
 
 2. **JSON columns** (alternative): Store related data as JSON directly on
-   the tool-type row. Synapse supports JSON storage and querying. Aligns
-   with LinkML's inlined representation. Enables searching without extra
-   views. **Tradeoffs:** introduces data duplication (same mutation details
+   the tool-type row (e.g. `mutations` as array `[{"mutationDetailsId": "...", "affectedGeneSymbol": "NF1"}]`). 
+   Enables searching without extra views. **Tradeoffs:** introduces data duplication (same mutation details
    embedded across multiple tool rows, updates must be applied to each);
    Synapse cannot join a LIST/JSON column to another table; LinkML's
    `gen-sqltables` does not produce JSON columns (needs custom logic).
