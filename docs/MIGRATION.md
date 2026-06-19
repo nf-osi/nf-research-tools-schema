@@ -21,15 +21,45 @@ This documents the migration path from the flat CSV data model
 |---|---|---|
 | Resource | syn26450069 | Fields absorbed into tool-type tables |
 
-**Synapse constraint:** Synapse SQL does not support `UNNEST`, array joins,
-or splitting list columns. Many-to-many relationships **must** use junction
-tables — there is no way to join on a comma-separated multivalued column.
-This means all three junction tables — `Mutation` (syn26486834),
-`Development` (syn26486807), and `Usage` (syn26486841) — cannot be retired.
-The LinkML model represents these as multivalued slots or inlined records
-for conceptual clarity, but the Synapse storage must retain the junction
-tables to support queries like "which models carry mutation X?",
-"who developed tool Y?", or "which tools are cited in publication Z?".
+**Synapse storage options for many-to-many relationships:**
+
+Synapse SQL does not support joining on LIST columns to another table
+(`UNNEST` expands rows within a single table only, `HAS()` filters within
+a single table only — neither can be used in a JOIN condition). Two options:
+
+1. **MaterializedViews with JOINs via junction tables** (recommended): 
+   Keep data normalized in junction tables. Create MaterializedViews that JOIN tool-type tables
+   through junction tables to related entities. MVs are indexed by
+   OpenSearch, so the flattened result is searchable — e.g. finding an
+   AnimalModel by `affectedGeneSymbol`. This requires **new MVs** for each
+   relationship that needs to be searchable. Tested and confirmed working:
+   ```sql
+   -- Example: AnimalModel with mutation details (via junction)
+   SELECT am.*, md.affectedGeneSymbol, md.mutationType
+   FROM syn26486808 am
+   JOIN syn26486834 mut ON am.animalModelId = mut.animalModelId
+   JOIN syn26486835 md ON mut.mutationDetailsId = md.mutationDetailsId
+   ```
+
+2. **JSON columns** (alternative): Store related data as JSON directly on
+   the tool-type row. Synapse supports JSON storage and querying. Aligns
+   with LinkML's inlined representation. Enables searching without extra
+   views. **Tradeoffs:** introduces data duplication (same mutation details
+   embedded across multiple tool rows, updates must be applied to each);
+   Synapse cannot join a LIST/JSON column to another table; LinkML's
+   `gen-sqltables` does not produce JSON columns (needs custom logic).
+
+**Current plan:** option 1 — keep junction tables, create new
+MaterializedViews for searchability.
+
+**New MaterializedViews to create:**
+
+| MV | Joins | Purpose |
+|---|---|---|
+| AnimalModel + Mutations | AnimalModel → Mutation → MutationDetails | Search models by gene symbol, mutation type |
+| CellLine + Mutations | CellLine → Mutation → MutationDetails | Search cell lines by gene symbol, mutation type |
+| Tool + Development | Tool-type → Development → Investigator, Publication, Funder | Search tools by developer, funder, or publication |
+| Tool + Usage | Tool-type → Usage → Publication | Search tools by citing publication |
 
 ## Migration steps
 
