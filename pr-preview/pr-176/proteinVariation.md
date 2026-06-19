@@ -1,0 +1,96 @@
+---
+search:
+  boost: 5.0
+---
+
+# Slot: proteinVariation 
+
+
+_The protein consequence of the mutation (e.g. p.Asn58fs). See http://varnomen.hgvs.org/recommendations/protein/ for nomenclature._
+
+
+
+<div data-search-exclude markdown="1">
+
+
+
+URI: [nftools:proteinVariation](https://w3id.org/nf-research-tools/proteinVariation)
+<!-- no inheritance hierarchy -->
+
+
+
+
+
+## Applicable Classes
+
+| Name | Description | Modifies Slot |
+| --- | --- | --- |
+| [MutationDetails](MutationDetails.md) | Details of a genetic mutation, including type, method, affected gene, and seq... |  no  |
+
+
+
+
+
+
+## Properties
+
+### Type and Range
+
+| Property | Value |
+| --- | --- |
+| Range | [String](String.md) |
+| Domain Of | [MutationDetails](MutationDetails.md) |
+
+### Cardinality and Requirements
+
+| Property | Value |
+| --- | --- |
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/nf-research-tools
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | nftools:proteinVariation |
+| native | nftools:proteinVariation |
+
+
+
+
+## LinkML Source
+
+<details>
+```yaml
+name: proteinVariation
+description: The protein consequence of the mutation (e.g. p.Asn58fs). See http://varnomen.hgvs.org/recommendations/protein/
+  for nomenclature.
+from_schema: https://w3id.org/nf-research-tools
+rank: 1000
+domain_of:
+- MutationDetails
+range: string
+
+```
+</details></div>
