@@ -14,32 +14,8 @@ default_range: string
 imports:
   - linkml:types
   - enums
-  - donor
-  - mutation
 
 classes:
-
-  HasDonor:
-    mixin: true
-    description: >-
-      Mixin for tool types derived from a biological donor.
-    slots:
-      - donor
-
-  HasTransplantationDonor:
-    mixin: true
-    description: >-
-      Mixin for tool types that involve transplantation from a donor.
-    slots:
-      - transplantationDonor
-      - transplantationType
-
-  HasMutations:
-    mixin: true
-    description: >-
-      Mixin for tool types that have characterized genetic mutations.
-    slots:
-      - mutations
 
   HasGeneticDisorder:
     mixin: true
@@ -65,27 +41,6 @@ classes:
       - passageNumber
 
 slots:
-
-  donor:
-    description: The biological donor from which the resource was derived.
-    range: Donor
-    inlined: true
-
-  transplantationDonor:
-    description: >-
-      The donor for transplantation experiments.
-    range: Donor
-    inlined: true
-
-  transplantationType:
-    description: Type of transplantation involved.
-    range: TransplantationTypeEnum
-
-  mutations:
-    description: Characterized genetic mutations in the resource.
-    range: MutationDetails
-    multivalued: true
-    inlined_as_list: true
 
   geneticDisorder:
     description: >-

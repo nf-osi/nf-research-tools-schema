@@ -15,6 +15,30 @@ imports:
 
 classes:
 
+  Mutation:
+    annotations:
+      synapse_table_id: syn26486834
+    description: >-
+      Junction table linking tool-type resources (AnimalModel, CellLine)
+      to their MutationDetails records.
+    attributes:
+      mutationId:
+        identifier: true
+        description: A unique identifier for this junction record.
+        required: true
+      mutationDetailsId:
+        description: >-
+          Foreign key to MutationDetails (mutationDetailsId).
+        required: true
+      animalModelId:
+        description: >-
+          Foreign key to AnimalModel (resourceId). Null if this
+          mutation is linked to a CellLine instead.
+      cellLineId:
+        description: >-
+          Foreign key to CellLine (resourceId). Null if this
+          mutation is linked to an AnimalModel instead.
+
   MutationDetails:
     annotations:
       synapse_table_id: syn26486835

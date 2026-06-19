@@ -52,31 +52,48 @@ classes:
       - howToAcquire
       - dateAdded
       - dateModified
-      - vendors
-      - observations
-      - applications
-      - developmentInfo
-      - usagePublications
 
   DevelopmentRecord:
     annotations:
       synapse_table_id: syn26486807
     description: >-
-      Records the development provenance of a resource, linking
-      investigators, publications, and funders.
+      Junction table linking a resource to its investigators,
+      publications, and funders. Stored as a separate Synapse table;
+      searchable via MaterializedView JOINs.
     attributes:
-      investigator:
-        description: The investigator who developed the resource.
-        range: Investigator
-        inlined: true
-      publication:
-        description: The publication associated with the development.
-        range: Publication
-        inlined: true
-      funder:
-        description: The funder of the resource development.
-        range: Funder
-        inlined: true
+      resourceId:
+        description: >-
+          Foreign key to a tool-type table (resourceId).
+        required: true
+      investigatorId:
+        description: >-
+          Foreign key to Investigator (investigatorId).
+      publicationId:
+        description: >-
+          Foreign key to Publication (publicationId).
+      funderId:
+        description: >-
+          Foreign key to Funder (funderId).
+
+  Usage:
+    annotations:
+      synapse_table_id: syn26486841
+    description: >-
+      Junction table linking a resource to publications that
+      cite or use it.
+    attributes:
+      usageId:
+        identifier: true
+        description: A unique identifier for this usage record.
+        required: true
+      resourceId:
+        description: >-
+          Foreign key to a tool-type table (resourceId).
+        required: true
+      publicationId:
+        description: >-
+          Foreign key to Publication (publicationId).
+        required: true
 
 slots:
 
@@ -133,32 +150,3 @@ slots:
     range: date
     required: true
 
-  vendors:
-    description: Vendor listings for this resource.
-    range: VendorItem
-    multivalued: true
-    inlined_as_list: true
-
-  observations:
-    description: Observations recorded about this resource.
-    range: Observation
-    multivalued: true
-    inlined_as_list: true
-
-  applications:
-    description: Known applications or uses for this resource.
-    range: ResourceApplication
-    multivalued: true
-    inlined_as_list: true
-
-  developmentInfo:
-    description: Development provenance linking investigators, publications, and funders.
-    range: DevelopmentRecord
-    multivalued: true
-    inlined_as_list: true
-
-  usagePublications:
-    description: Publications referencing the resource's use.
-    range: Publication
-    multivalued: true
-    inlined_as_list: true
