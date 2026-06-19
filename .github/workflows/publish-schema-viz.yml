@@ -36,8 +36,41 @@ jobs:
       - name: Generate markdown reference docs
         run: gen-doc modules/nf_research_tools.yaml -d _site --include-top-level-diagram --diagram-type mermaid_class_diagram
 
-      - name: Copy static overview page
-        run: cp docs/schema/index.html _site/index.html
+      - name: Install mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Pre-render mermaid diagrams
+        run: |
+          python - docs/schema/index.html _site/index.html <<'PYEOF'
+          import sys, re, subprocess, tempfile, os
+
+          src, dst = sys.argv[1], sys.argv[2]
+          html = open(src).read()
+
+          def render(match):
+              code = match.group(1)
+              with tempfile.NamedTemporaryFile(mode='w', suffix='.mmd', delete=False) as f:
+                  f.write(code)
+                  mmd = f.name
+              svg = mmd.replace('.mmd', '.svg')
+              subprocess.run(['mmdc', '-i', mmd, '-o', svg, '-b', 'transparent', '-p', '.github/puppeteer.json'], check=True)
+              svg_content = open(svg).read()
+              # Strip XML declaration if present
+              svg_content = re.sub(r'<\?xml[^?]*\?>\s*', '', svg_content)
+              os.unlink(mmd)
+              os.unlink(svg)
+              return f'<div class="mermaid-rendered">{svg_content}</div>'
+
+          html = re.sub(
+              r'<pre\s+class="mermaid">\s*(.*?)\s*</pre>',
+              render,
+              html,
+              flags=re.DOTALL,
+          )
+          # Remove mermaid script tag — no longer needed
+          html = re.sub(r'\s*<script[^>]*mermaid[^>]*></script>', '', html)
+          open(dst, 'w').write(html)
+          PYEOF
 
       - name: Upload site artifact
         uses: actions/upload-artifact@v4
