@@ -45,151 +45,26 @@ gen-doc modules/nf_research_tools.yaml -d docs/schema \
 
 ## Validation: Referential integrity
 
-The LinkML schema defines relationships between entities (e.g., an AnimalModel
-references a Donor, a DevelopmentRecord references an Investigator). Synapse
-tables don't enforce foreign keys, so referential integrity must be checked
-separately.
-
-### Option A: Load into SQLite (recommended)
-
-LinkML can generate SQL DDL with real foreign key constraints. Load Synapse
-data into a local SQLite database and let the db engine enforce integrity for free:
+Synapse tables don't enforce foreign keys. LinkML's `gen-sqltables` generates
+SQL DDL with real FK constraints from the schema. The script
+[`scripts/check_referential_integrity.py`](../scripts/check_referential_integrity.py)
+uses this to download Synapse data into a local SQLite database where the
+engine enforces referential integrity on insert; any orphaned FK reference
+raises `IntegrityError`. Class-to-table mappings are read from
+`synapse_table_id` annotations on the schema.
 
 ```bash
-# 1. Generate DDL from the schema
-gen-sqltables modules/nf_research_tools.yaml --dialect sqlite > ddl.sql
+# Generate DDL + load Synapse data into SQLite with FK enforcement
+python scripts/check_referential_integrity.py --mode sqlite
 
-# 2. Create the database
-sqlite3 nf_tools.db < ddl.sql
-```
+# Quick alternative: query Synapse directly for orphaned references
+python scripts/check_referential_integrity.py --mode synapse
 
-Then export Synapse tables as CSV and load them:
+# Check enum values in Synapse match schema permissible values
+python scripts/check_referential_integrity.py --check-enums
 
-```python
-"""
-Download Synapse tables and load into SQLite for FK validation.
-
-Requires: pip install synapseclient
-"""
-import synapseclient
-import sqlite3
-import pandas as pd
-
-syn = synapseclient.login()
-db = sqlite3.connect("nf_tools.db")
-db.execute("PRAGMA foreign_keys = ON")
-
-# Map LinkML class names to their Synapse table IDs
-TABLES = {
-    "AnimalModel":            "syn26486808",
-    "CellLine":               "syn26486823",
-    "Antibody":               "syn26486811",
-    "GeneticReagent":         "syn26486832",
-    "Biobank":                "syn26486821",
-    "ComputationalTool":      "syn73709226",
-    "OrganoidProtocol":       "syn73709227",
-    "PatientDerivedModel":    "syn73709228",
-    "ClinicalAssessmentTool": "syn73709229",
-    "Donor":                  "syn26486829",
-    "MutationDetails":        "syn26486835",
-    "Publication":            "syn26486839",
-    "Investigator":           "syn26486833",
-    "Funder":                 "syn26486830",
-    "Vendor":                 "syn26486850",
-    "VendorItem":             "syn26486843",
-    "Observation":            "syn26486836",
-    "DevelopmentRecord":      "syn26486807",
-}
-
-# Load parent tables first, then children (order matters for FK checks)
-load_order = [
-    "Donor", "Funder", "Investigator", "Publication", "Vendor",
-    "MutationDetails",
-    "AnimalModel", "CellLine", "Antibody", "GeneticReagent",
-    "Biobank", "ComputationalTool", "OrganoidProtocol",
-    "PatientDerivedModel", "ClinicalAssessmentTool",
-    "VendorItem", "Observation", "DevelopmentRecord",
-]
-
-for table_name in load_order:
-    syn_id = TABLES[table_name]
-    df = syn.tableQuery(f"SELECT * FROM {syn_id}").asDataFrame()
-    try:
-        df.to_sql(table_name, db, if_exists="append", index=False)
-        print(f"  OK {table_name} ({len(df)} rows)")
-    except sqlite3.IntegrityError as e:
-        print(f"FAIL {table_name}: {e}")
-
-db.close()
-```
-
-Any FK violation will raise `sqlite3.IntegrityError` on insert, pinpointing
-the exact orphaned reference.
-
-### Option B: Query Synapse directly
-
-For a quick spot-check without a local database:
-
-```python
-import synapseclient
-syn = synapseclient.login()
-
-FK_CHECKS = [
-    # (source_table, source_column, target_table, target_column, description)
-    ("syn26486808", "donorId",         "syn26486829", "donorId",         "AnimalModel → Donor"),
-    ("syn26486823", "donorId",         "syn26486829", "donorId",         "CellLine → Donor"),
-    ("syn26486807", "investigatorId",  "syn26486833", "investigatorId",  "Development → Investigator"),
-    ("syn26486807", "publicationId",   "syn26486839", "publicationId",   "Development → Publication"),
-    ("syn26486807", "funderId",        "syn26486830", "funderId",        "Development → Funder"),
-    ("syn26486843", "vendorId",        "syn26486850", "vendorId",        "VendorItem → Vendor"),
-    ("syn26486836", "publicationId",   "syn26486839", "publicationId",   "Observation → Publication"),
-]
-
-for src_table, src_col, tgt_table, tgt_col, desc in FK_CHECKS:
-    query = f"""
-        SELECT DISTINCT t1.{src_col}
-        FROM {src_table} t1
-        WHERE t1.{src_col} IS NOT NULL
-          AND t1.{src_col} NOT IN (SELECT {tgt_col} FROM {tgt_table})
-    """
-    try:
-        orphans = syn.tableQuery(query).asDataFrame()
-        if len(orphans) > 0:
-            print(f"FAIL {desc}: {len(orphans)} orphaned reference(s)")
-            print(f"     Missing IDs: {orphans[src_col].tolist()[:5]}")
-        else:
-            print(f"  OK {desc}")
-    except Exception as e:
-        print(f"SKIP {desc}: {e}")
-```
-
-### Checking enum consistency
-
-Verify that values in Synapse tables match the schema's permissible values:
-
-```python
-from linkml_runtime import SchemaView
-
-sv = SchemaView("modules/nf_research_tools.yaml")
-
-# Get all permissible values for an enum
-enum_def = sv.get_enum("GeneticDisorderEnum")
-valid = set(enum_def.permissible_values.keys())
-print(f"GeneticDisorderEnum: {valid}")
-
-# Compare against actual Synapse data
-import synapseclient
-syn = synapseclient.login()
-
-df = syn.tableQuery("SELECT geneticDisorder FROM syn26486808").asDataFrame()
-actual = set()
-for val in df["geneticDisorder"].dropna():
-    # Handle multivalued (comma-separated in Synapse)
-    actual.update(v.strip() for v in val.split(","))
-
-invalid = actual - valid
-if invalid:
-    print(f"Invalid values in AnimalModel.geneticDisorder: {invalid}")
+# Both FK and enum checks
+python scripts/check_referential_integrity.py --mode sqlite --check-enums
 ```
 
 ## Validation: Instance data
