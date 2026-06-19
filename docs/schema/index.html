@@ -259,19 +259,6 @@ classDiagram
         dateModified
     }
 
-    class HasDonor {
-        &lt;&lt;mixin&gt;&gt;
-        donor : Donor
-    }
-    class HasTransplantationDonor {
-        &lt;&lt;mixin&gt;&gt;
-        transplantationDonor : Donor
-        transplantationType
-    }
-    class HasMutations {
-        &lt;&lt;mixin&gt;&gt;
-        mutations : MutationDetails[]
-    }
     class HasGeneticDisorder {
         &lt;&lt;mixin&gt;&gt;
         geneticDisorder
@@ -287,6 +274,9 @@ classDiagram
     }
 
     class AnimalModel {
+        donor : Donor
+        transplantationDonor : Donor
+        transplantationType
         backgroundStrain
         backgroundSubstrain
         strainNomenclature
@@ -294,6 +284,7 @@ classDiagram
         generation
     }
     class CellLine {
+        donor : Donor
         organ
         tissue
         cellLineCategory
@@ -356,13 +347,8 @@ classDiagram
     Tool <|-- PatientDerivedModel
     Tool <|-- ClinicalAssessmentTool
 
-    HasDonor <|.. AnimalModel
-    HasTransplantationDonor <|.. AnimalModel
-    HasMutations <|.. AnimalModel
     HasGeneticDisorder <|.. AnimalModel
 
-    HasDonor <|.. CellLine
-    HasMutations <|.. CellLine
     HasGeneticDisorder <|.. CellLine
 
     HasTumorType <|.. Biobank
@@ -374,9 +360,6 @@ classDiagram
     HasPassageNumber <|.. PatientDerivedModel
 
     style Tool fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-    style HasDonor fill:#fff3e0,stroke:#e65100
-    style HasTransplantationDonor fill:#fff3e0,stroke:#e65100
-    style HasMutations fill:#fff3e0,stroke:#e65100
     style HasGeneticDisorder fill:#fff3e0,stroke:#e65100
     style HasTumorType fill:#fff3e0,stroke:#e65100
     style HasPassageNumber fill:#fff3e0,stroke:#e65100
@@ -391,23 +374,27 @@ classDiagram
     <h3>How entities connect</h3>
     <pre class="mermaid">
 erDiagram
-    Tool ||--}o VendorItem : vendors
-    Tool ||--}o Observation : observations
-    Tool ||--}o ResourceApplication : applications
-    Tool ||--}o DevelopmentRecord : developmentInfo
-    Tool ||--}o Publication : usagePublications
-
-    VendorItem ||--|o Vendor : vendor
-    Observation ||--|o Publication : observationPublication
-    DevelopmentRecord ||--|o Investigator : investigator
-    DevelopmentRecord ||--|o Publication : publication
-    DevelopmentRecord ||--|o Funder : funder
-
     AnimalModel ||--|o Donor : donor
     AnimalModel ||--|o Donor : transplantationDonor
-    AnimalModel ||--}o MutationDetails : mutations
     CellLine ||--|o Donor : donor
-    CellLine ||--}o MutationDetails : mutations
+
+    Mutation }o--|| AnimalModel : animalModelId
+    Mutation }o--|| CellLine : cellLineId
+    Mutation }o--|| MutationDetails : mutationDetailsId
+
+    DevelopmentRecord }o--|| Tool : resourceId
+    DevelopmentRecord }o--|o Investigator : investigatorId
+    DevelopmentRecord }o--|o Publication : publicationId
+    DevelopmentRecord }o--|o Funder : funderId
+
+    Usage }o--|| Tool : resourceId
+    Usage }o--|| Publication : publicationId
+
+    VendorItem }o--|| Tool : resourceId
+    VendorItem }o--|| Vendor : vendorId
+
+    Observation }o--|| Tool : resourceId
+    Observation }o--|o Publication : publicationId
 
     Tool {
         string resourceId PK
@@ -425,6 +412,12 @@ erDiagram
         string mutationDetailsId PK
         string affectedGeneSymbol
         enum mutationType
+    }
+    Mutation {
+        string mutationId PK
+        string mutationDetailsId FK
+        string animalModelId FK
+        string cellLineId FK
     }
     Publication {
         string publicationId PK
@@ -446,21 +439,24 @@ erDiagram
     }
     VendorItem {
         string vendorItemId PK
+        string resourceId FK
         string catalogNumber
     }
     Observation {
         string observationId PK
-        string observationText
+        string resourceId FK
         enum observationType
     }
-    ResourceApplication {
-        string resourceApplicationId PK
-        enum applicationTypes
-    }
     DevelopmentRecord {
-        ref investigator
-        ref publication
-        ref funder
+        string resourceId FK
+        string investigatorId FK
+        string publicationId FK
+        string funderId FK
+    }
+    Usage {
+        string usageId PK
+        string resourceId FK
+        string publicationId FK
     }
     AnimalModel {
         string backgroundStrain
@@ -477,17 +473,17 @@ erDiagram
 <!-- TOOL TYPES -->
 <section id="tool-types">
   <h2>Tool Types</h2>
-  <p style="color: var(--muted); margin-bottom: 1rem;">All types inherit from the abstract <strong>Tool</strong> base class: <code>resourceId</code>, <code>rrid</code>, <code>resourceName</code>, <code>synonyms</code>, <code>resourceType</code>, <code>description</code>, <code>aiSummary</code>, <code>usageRequirements</code>, <code>howToAcquire</code>, <code>dateAdded</code>, <code>dateModified</code>, plus relationships to vendors, observations, applications, development records, and usage publications.</p>
+  <p style="color: var(--muted); margin-bottom: 1rem;">All types inherit from the abstract <strong>Tool</strong> base class: <code>resourceId</code>, <code>rrid</code>, <code>resourceName</code>, <code>synonyms</code>, <code>resourceType</code>, <code>description</code>, <code>aiSummary</code>, <code>usageRequirements</code>, <code>howToAcquire</code>, <code>dateAdded</code>, <code>dateModified</code>. Related entities (vendors, observations, mutations, development records, usage publications) are in separate tables linked by FK.</p>
   <div class="cards">
 
     <div class="card tool">
       <h3>AnimalModel</h3>
       <p>Animal models used in NF research — xenografts, transgenic, and knockout models.</p>
-      <span class="badge mixin">HasDonor</span>
-      <span class="badge mixin">HasTransplantationDonor</span>
-      <span class="badge mixin">HasMutations</span>
       <span class="badge mixin">HasGeneticDisorder</span>
       <div class="slot-list">
+        <span class="slot-tag">donor</span>
+        <span class="slot-tag">transplantationDonor</span>
+        <span class="slot-tag">transplantationType</span>
         <span class="slot-tag">animalState</span>
         <span class="slot-tag">backgroundStrain</span>
         <span class="slot-tag">backgroundSubstrain</span>
@@ -499,10 +495,9 @@ erDiagram
     <div class="card tool">
       <h3>CellLine</h3>
       <p>Cell cultures derived from homogeneous tissue sources for NF research.</p>
-      <span class="badge mixin">HasDonor</span>
-      <span class="badge mixin">HasMutations</span>
       <span class="badge mixin">HasGeneticDisorder</span>
       <div class="slot-list">
+        <span class="slot-tag">donor</span>
         <span class="slot-tag">organ</span>
         <span class="slot-tag">tissue</span>
         <span class="slot-tag">cellLineCategory</span>
@@ -641,24 +636,6 @@ erDiagram
   <p style="color: var(--muted); margin-bottom: 1rem;">Cross-cutting concerns shared across tool types via mixin inheritance.</p>
   <div class="cards">
     <div class="card mixin">
-      <h3>HasDonor</h3>
-      <p>Biological donor origin. Used by: AnimalModel, CellLine</p>
-      <div class="slot-list"><span class="slot-tag">donor → Donor</span></div>
-    </div>
-    <div class="card mixin">
-      <h3>HasTransplantationDonor</h3>
-      <p>Transplantation donor info. Used by: AnimalModel</p>
-      <div class="slot-list">
-        <span class="slot-tag">transplantationDonor → Donor</span>
-        <span class="slot-tag">transplantationType</span>
-      </div>
-    </div>
-    <div class="card mixin">
-      <h3>HasMutations</h3>
-      <p>Genetic mutations. Used by: AnimalModel, CellLine</p>
-      <div class="slot-list"><span class="slot-tag">mutations → MutationDetails[]</span></div>
-    </div>
-    <div class="card mixin">
       <h3>HasGeneticDisorder</h3>
       <p>NF-related genetic disorders. Used by: AnimalModel, CellLine, Biobank</p>
       <div class="slot-list">
@@ -769,11 +746,31 @@ erDiagram
     </div>
     <div class="card support">
       <h3>DevelopmentRecord</h3>
-      <p>Links investigators, publications, and funders to a resource.</p>
+      <p>Junction table linking tools to investigators, publications, and funders.</p>
       <div class="slot-list">
-        <span class="slot-tag">investigator → Investigator</span>
-        <span class="slot-tag">publication → Publication</span>
-        <span class="slot-tag">funder → Funder</span>
+        <span class="slot-tag">resourceId</span>
+        <span class="slot-tag">investigatorId</span>
+        <span class="slot-tag">publicationId</span>
+        <span class="slot-tag">funderId</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Mutation</h3>
+      <p>Junction table linking AnimalModel/CellLine to MutationDetails.</p>
+      <div class="slot-list">
+        <span class="slot-tag">mutationId</span>
+        <span class="slot-tag">mutationDetailsId</span>
+        <span class="slot-tag">animalModelId</span>
+        <span class="slot-tag">cellLineId</span>
+      </div>
+    </div>
+    <div class="card support">
+      <h3>Usage</h3>
+      <p>Junction table linking tools to publications that cite their use.</p>
+      <div class="slot-list">
+        <span class="slot-tag">usageId</span>
+        <span class="slot-tag">resourceId</span>
+        <span class="slot-tag">publicationId</span>
       </div>
     </div>
   </div>
