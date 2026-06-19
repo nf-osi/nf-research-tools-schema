@@ -28,7 +28,18 @@ classes:
     description: >-
       A research tool or resource used in the NF research process.
       Abstract base class for all 9 resource types.
+    comments:
+      - >-
+        Synapse storage: core Tool slots are denormalized into each
+        tool-type table (e.g. AnimalModel syn26486808 carries resourceName,
+        rrid, description, etc. directly). There is no separate Resource
+        join table. This matches the LinkML inheritance — gen-json-schema
+        materializes all inherited slots into each subclass.
     class_uri: schema:Thing
+    annotations:
+      synapse_table_id: syn26450069
+      synapse_view_id: syn51730943
+      synapse_project_id: syn26338068
     slots:
       - resourceId
       - rrid
@@ -48,6 +59,8 @@ classes:
       - usagePublications
 
   DevelopmentRecord:
+    annotations:
+      synapse_table_id: syn26486807
     description: >-
       Records the development provenance of a resource, linking
       investigators, publications, and funders.
