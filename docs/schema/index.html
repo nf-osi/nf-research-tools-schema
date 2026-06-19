@@ -93,14 +93,14 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1.25rem;
-      transition: box-shadow 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .card h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
     .card p { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
-    .card.tool { border-left: 4px solid #4361ee; }
-    .card.mixin { border-left: 4px solid #f0932b; }
-    .card.support { border-left: 4px solid #2ecc71; }
+    .card.tool:hover { border-color: #4361ee; }
+    .card.mixin:hover { border-color: #f0932b; }
+    .card.support:hover { border-color: #2ecc71; }
     .badge {
       display: inline-block;
       padding: 0.1rem 0.5rem;
@@ -127,7 +127,7 @@
       font-size: 0.75rem;
       font-family: 'SFMono-Regular', Consolas, monospace;
     }
-    .slot-tag.required { background: #fff3cd; border-color: #ffc107; }
+    .slot-tag.required::after { content: ' *'; color: #dc3545; font-weight: 700; }
     .slot-tag.inherited { color: var(--muted); font-style: italic; }
     table {
       width: 100%;
@@ -164,6 +164,42 @@
       font-family: 'SFMono-Regular', Consolas, monospace;
       white-space: nowrap;
     }
+    .enum-list { display: flex; flex-direction: column; gap: 0; }
+    .enum-item {
+      border: 1px solid var(--border);
+      border-bottom: none;
+      background: var(--surface);
+    }
+    .enum-item:first-child { border-radius: 8px 8px 0 0; }
+    .enum-item:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; }
+    .enum-item:only-child { border-radius: 8px; }
+    .enum-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .enum-header:hover { background: var(--bg); }
+    .enum-toggle {
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .enum-item.open .enum-toggle { transform: rotate(90deg); }
+    .enum-name { font-weight: 600; font-size: 0.9rem; }
+    .enum-count {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-left: auto;
+    }
+    .enum-body {
+      display: none;
+      padding: 0.25rem 0.75rem 0.75rem 1.75rem;
+    }
+    .enum-item.open .enum-body { display: block; }
     .collapsible { cursor: pointer; user-select: none; }
     .collapsible::before { content: '▸ '; font-size: 0.8rem; }
     .collapsible.open::before { content: '▾ '; }
@@ -834,17 +870,22 @@ const enums = {
   "ApplicationTypeEnum": ["Western Blot","Immunofluorescence","ELISA","Immunohistochemistry","Immunoprecipitation","Immunochromatography","Tumor Growth Studies","Gold Immunochromatographic Assay","Immunoelectron Microscopy","Immunogold Silver Staining","Immunohistochemistry (Paraffin-Embedded)","Immunocytochemistry","Immunohistochemistry (Frozen Sections)","Flow Cytometry","Affinity Purification","Microarray"]
 };
 
-// Render enum tables
+// Render enum accordion
 const container = document.getElementById('enum-tables');
-let html = '<table><thead><tr><th>Enum</th><th style="text-align:right">#</th><th>Permissible Values</th></tr></thead><tbody>';
+let html = '<div class="enum-list">';
 for (const [name, values] of Object.entries(enums)) {
-  html += `<tr>
-    <td><strong>${name}</strong></td>
-    <td style="text-align:right">${values.length}</td>
-    <td><div class="enum-values">${values.map(v => `<span class="enum-val">${v}</span>`).join('')}</div></td>
-  </tr>`;
+  html += `<div class="enum-item" onclick="this.classList.toggle('open')">
+    <div class="enum-header">
+      <span class="enum-toggle">&#9656;</span>
+      <span class="enum-name">${name}</span>
+      <span class="enum-count">${values.length} values</span>
+    </div>
+    <div class="enum-body">
+      <div class="enum-values">${values.map(v => `<span class="enum-val">${v}</span>`).join('')}</div>
+    </div>
+  </div>`;
 }
-html += '</tbody></table>';
+html += '</div>';
 container.innerHTML = html;
 </script>
 
