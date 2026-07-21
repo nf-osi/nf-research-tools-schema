@@ -1,0 +1,152 @@
+id: https://w3id.org/nf-research-tools/tool_base
+name: nf_research_tools_tool_base
+title: Tool Base Class
+description: Abstract base class for all NF research tool types.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - vendor
+  - observation
+  - resource_application
+  - publication
+  - investigator
+  - funder
+
+classes:
+
+  Tool:
+    abstract: true
+    description: >-
+      A research tool or resource used in the NF research process.
+      Abstract base class for all 9 resource types.
+    comments:
+      - >-
+        Synapse storage: core Tool slots are denormalized into each
+        tool-type table (e.g. AnimalModel syn26486808 carries resourceName,
+        rrid, description, etc. directly). There is no separate Resource
+        join table. This matches the LinkML inheritance — gen-json-schema
+        materializes all inherited slots into each subclass.
+    class_uri: schema:Thing
+    annotations:
+      synapse_table_id: syn26450069
+      synapse_view_id: syn51730943
+      synapse_project_id: syn26338068
+    slots:
+      - resourceId
+      - rrid
+      - resourceName
+      - synonyms
+      - resourceType
+      - description
+      - aiSummary
+      - usageRequirements
+      - howToAcquire
+      - dateAdded
+      - dateModified
+
+  DevelopmentRecord:
+    annotations:
+      synapse_table_id: syn26486807
+    description: >-
+      Junction table linking a resource to its investigators,
+      publications, and funders. Stored as a separate Synapse table;
+      searchable via MaterializedView JOINs.
+    attributes:
+      resourceId:
+        description: >-
+          Foreign key to a tool-type table (resourceId).
+        required: true
+      investigatorId:
+        description: >-
+          Foreign key to Investigator (investigatorId).
+      publicationId:
+        description: >-
+          Foreign key to Publication (publicationId).
+      funderId:
+        description: >-
+          Foreign key to Funder (funderId).
+
+  Usage:
+    annotations:
+      synapse_table_id: syn26486841
+    description: >-
+      Junction table linking a resource to publications that
+      cite or use it.
+    attributes:
+      usageId:
+        identifier: true
+        description: A unique identifier for this usage record.
+        required: true
+      resourceId:
+        description: >-
+          Foreign key to a tool-type table (resourceId).
+        required: true
+      publicationId:
+        description: >-
+          Foreign key to Publication (publicationId).
+        required: true
+
+slots:
+
+  resourceId:
+    identifier: true
+    description: A unique identifier for the resource.
+    required: true
+    slot_uri: schema:identifier
+
+  rrid:
+    description: >-
+      The RRID, a standard resource identifier for interoperability
+      with other databases. Must include the lowercase 'rrid:' prefix.
+    pattern: "^rrid:[a-zA-Z]+.+$"
+
+  resourceName:
+    description: The canonical name of the resource.
+    required: true
+    slot_uri: schema:name
+
+  synonyms:
+    description: Synonyms of the resource.
+    multivalued: true
+
+  resourceType:
+    description: Type of resource.
+    range: ResourceTypeEnum
+    required: true
+
+  description:
+    description: Free text description, summary, or purpose of the resource.
+    slot_uri: schema:description
+
+  aiSummary:
+    description: >-
+      A large language model-generated summary of the resource.
+
+  usageRequirements:
+    description: Any known restrictions on use of the resource.
+    range: UsageRequirementEnum
+    multivalued: true
+
+  howToAcquire:
+    description: How to acquire a particular resource.
+    required: true
+
+  dateAdded:
+    description: The date that the resource was originally added.
+    range: date
+    required: true
+
+  dateModified:
+    description: The last update of the resource metadata.
+    range: date
+    required: true
+

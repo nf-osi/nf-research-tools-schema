@@ -1,0 +1,96 @@
+id: https://w3id.org/nf-research-tools/patient_derived_model
+name: nf_research_tools_patient_derived_model
+title: Patient-Derived Model
+description: Patient-derived models including PDX and humanized systems.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - tool_base
+  - mixins
+
+classes:
+
+  PatientDerivedModel:
+    annotations:
+      synapse_table_id: syn73709228
+    is_a: Tool
+    mixins:
+      - HasTumorType
+      - HasPassageNumber
+    description: >-
+      Patient-derived models including patient-derived xenografts (PDX),
+      humanized mice, patient-derived organoids, and patient-derived
+      cell lines.
+    attributes:
+      modelSystemType:
+        description: Type of patient-derived model system.
+        range: ModelSystemTypeEnum
+        required: true
+      patientDiagnosis:
+        description: Original patient diagnosis or condition.
+        required: true
+      hostStrain:
+        description: Host organism strain for xenografts.
+        range: HostStrainEnum
+      engraftmentSite:
+        description: Site of engraftment in host organism.
+        range: EngraftmentSiteEnum
+      establishmentRate:
+        description: Success rate of model establishment.
+      molecularCharacterization:
+        description: Molecular characterization performed.
+        range: MolecularCharacterizationEnum
+        multivalued: true
+      clinicalData:
+        description: Available clinical data from the patient.
+      validationMethods:
+        description: Methods used to validate model fidelity to patient.
+        multivalued: true
+    slot_usage:
+      resourceType:
+        ifabsent: string(Patient-Derived Model)
+
+enums:
+
+  ModelSystemTypeEnum:
+    description: Types of patient-derived model systems.
+    permissible_values:
+      PDX (Patient-Derived Xenograft): {}
+      Humanized Mouse: {}
+      Patient-Derived Organoid: {}
+      Patient-Derived Cell Line: {}
+      Other: {}
+
+  HostStrainEnum:
+    description: Host organism strains for xenografts.
+    permissible_values:
+      NSG: {}
+      NOD-SCID: {}
+      nude: {}
+      SCID: {}
+      Other: {}
+
+  EngraftmentSiteEnum:
+    description: Engraftment sites in host organisms.
+    permissible_values:
+      Subcutaneous: {}
+      Orthotopic: {}
+      Intracranial: {}
+      Mammary Fat Pad: {}
+      Other: {}
+
+  MolecularCharacterizationEnum:
+    description: Molecular characterization methods.
+    permissible_values:
+      Genomic Sequencing: {}
+      RNA-seq: {}
+      Proteomics: {}
+      Immunohistochemistry: {}
+      Other: {}

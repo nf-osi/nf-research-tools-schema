@@ -1,40 +1,162 @@
-# Publish schema-viz static site files using GitHub workflow artifacts
-name: Publish static schema viz to GH Pages
+# Generate LinkML schema docs and deploy to GitHub Pages
+name: Schema docs
 
 on:
   push:
-    branches: 
+    branches:
       - main
+    paths:
+      - 'modules/**'
+      - 'docs/schema/index.html'
+      - '.github/workflows/publish-schema-viz.yml'
+  pull_request:
+    paths:
+      - 'modules/**'
+      - 'docs/schema/index.html'
+      - '.github/workflows/publish-schema-viz.yml'
 
 jobs:
-
-  # rebuild:
-
-  publish:
+  build:
     runs-on: ubuntu-latest
-    # needs: rebuild
-    
-    permissions:
-      contents: read
-      pages: write     
-      id-token: write 
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install linkml
+        run: pip install linkml
+
+      - name: Validate schema
+        run: gen-yaml modules/nf_research_tools.yaml > /dev/null
+
+      - name: Generate markdown reference docs
+        run: gen-doc modules/nf_research_tools.yaml -d _site --include-top-level-diagram --diagram-type mermaid_class_diagram
+
+      - name: Install mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Pre-render mermaid diagrams
+        run: |
+          python - docs/schema/index.html _site/index.html <<'PYEOF'
+          import sys, re, subprocess, tempfile, os
+
+          src, dst = sys.argv[1], sys.argv[2]
+          html = open(src).read()
+
+          def render(match):
+              code = match.group(1)
+              with tempfile.NamedTemporaryFile(mode='w', suffix='.mmd', delete=False) as f:
+                  f.write(code)
+                  mmd = f.name
+              svg = mmd.replace('.mmd', '.svg')
+              subprocess.run(['mmdc', '-i', mmd, '-o', svg, '-b', 'transparent', '-p', '.github/puppeteer.json'], check=True)
+              svg_content = open(svg).read()
+              # Strip XML declaration if present
+              svg_content = re.sub(r'<\?xml[^?]*\?>\s*', '', svg_content)
+              os.unlink(mmd)
+              os.unlink(svg)
+              return f'<div class="mermaid-rendered">{svg_content}</div>'
+
+          html = re.sub(
+              r'<pre\s+class="mermaid">\s*(.*?)\s*</pre>',
+              render,
+              html,
+              flags=re.DOTALL,
+          )
+          # Remove mermaid script tag — no longer needed
+          html = re.sub(r'\s*<script[^>]*mermaid[^>]*></script>', '', html)
+          open(dst, 'w').write(html)
+          PYEOF
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-docs
+          path: _site
+          retention-days: 14
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: schema-docs
+          path: _site
+
       - name: Setup GH Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: schema-viz
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  preview:
+    if: github.event_name == 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      pull-requests: write
+
+    steps:
+      - name: Post preview comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            const artifact = artifacts.find(a => a.name === 'schema-docs');
+            const artifactUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${artifact.id}`;
+            const body = [
+              '### Schema docs preview',
+              '',
+              `Built from \`${context.sha.slice(0, 7)}\`. [**Download preview**](${artifactUrl}) and open \`index.html\` locally.`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('Schema docs preview'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

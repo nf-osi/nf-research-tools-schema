@@ -1,0 +1,81 @@
+id: https://w3id.org/nf-research-tools/resource_application
+name: nf_research_tools_resource_application
+title: Resource Application
+description: Applications and uses for research tools.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  ResourceApplication:
+    description: >-
+      Applications the resource can be used for, such as western blot,
+      immunofluorescence, etc.
+    slots:
+      - resourceApplicationId
+      - applicationSource
+      - applicationTypes
+      - applicationLinks
+
+slots:
+
+  resourceApplicationId:
+    identifier: true
+    description: A unique identifier for the resource application record.
+    required: true
+
+  applicationSource:
+    description: >-
+      The source of resource application information.
+    range: ApplicationSourceEnum
+    required: true
+
+  applicationTypes:
+    description: >-
+      One or more uses for the resource (e.g. western blot,
+      immunofluorescence).
+    range: ApplicationTypeEnum
+    multivalued: true
+    required: true
+
+  applicationLinks:
+    description: Shareable links related to the resource application.
+    multivalued: true
+    range: uri
+
+enums:
+
+  ApplicationSourceEnum:
+    description: Source of application information.
+    permissible_values:
+      Community-reported: {}
+      Investigator-reported: {}
+      Vendor-reported: {}
+
+  ApplicationTypeEnum:
+    description: Types of resource applications.
+    permissible_values:
+      Western Blot: {}
+      Immunofluorescence: {}
+      ELISA: {}
+      Immunohistochemistry: {}
+      Immunoprecipitation: {}
+      Immunochromatography: {}
+      Tumor Growth Studies: {}
+      Gold Immunochromatographic Assay: {}
+      Immunoelectron Microscopy: {}
+      Immunogold Silver Staining: {}
+      Immunohistochemistry (Paraffin-Embedded): {}
+      Immunocytochemistry: {}
+      Immunohistochemistry (Frozen Sections): {}
+      Flow Cytometry: {}
+      Affinity Purification: {}
+      Microarray: {}

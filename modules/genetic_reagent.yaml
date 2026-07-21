@@ -1,0 +1,231 @@
+id: https://w3id.org/nf-research-tools/genetic_reagent
+name: nf_research_tools_genetic_reagent
+title: Genetic Reagent
+description: Genetic reagents including plasmids, constructs, and CRISPR reagents.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+  - tool_base
+
+classes:
+
+  GeneticReagent:
+    is_a: Tool
+    annotations:
+      synapse_table_id: syn26486832
+    description: >-
+      Genetic reagents including plasmids, viral vectors, CRISPR
+      constructs, and other molecular biology tools.
+    attributes:
+      insertName:
+        description: Name of the main gene insert in the plasmid.
+        required: true
+      insertEntrezId:
+        description: The Entrez Gene ID for the gene insert.
+      gRNAshRNASequence:
+        description: >-
+          The sequence of the gRNA or shRNA for the gene insert,
+          if present.
+      insertSize:
+        description: Size, in bp, of the gene insert as it is in the plasmid.
+        range: integer
+      insertSpecies:
+        description: Species of the insert.
+        range: SpeciesEnum
+        multivalued: true
+        required: true
+      nTerminalTag:
+        description: >-
+          Tags on the N terminal 5' end of the gene insert.
+          Only tags that are in frame.
+        multivalued: true
+      cTerminalTag:
+        description: >-
+          Tags on the C terminal 3' end of the gene insert.
+          Only tags that are in frame.
+        multivalued: true
+      cloningMethod:
+        description: How the vector was constructed.
+        range: CloningMethodEnum
+      5primeCloningSite:
+        description: >-
+          If Restriction Enzyme was selected as the cloning method,
+          the enzyme used on the 5' (N-terminal) end.
+      5primeSiteDestroyed:
+        description: Whether 5' site was destroyed during cloning.
+        range: YesNoUnknownEnum
+      3primeCloningSite:
+        description: >-
+          If Restriction Enzyme was selected as the cloning method,
+          the enzyme used on the 3' (C-terminal) end.
+      3primeSiteDestroyed:
+        description: Whether 3' site was destroyed during cloning.
+        range: YesNoUnknownEnum
+      promoter:
+        description: >-
+          Promoter driving the expression of the insert in the plasmid.
+      5primer:
+        description: Primer to sequence the 5' end (N-terminal) of the insert.
+      3primer:
+        description: Primer to sequence the 3' end (C-terminal) of the insert.
+      vectorBackbone:
+        description: >-
+          Name of the backbone the plasmid is built on (e.g. pGBT9).
+      vectorType:
+        description: Primary function of the plasmid.
+        range: VectorTypeEnum
+        multivalued: true
+      backboneSize:
+        description: Size in bp of the backbone without the insert.
+        range: integer
+      totalSize:
+        description: >-
+          Size of vector with insert. Derived from insertSize and
+          backboneSize.
+        range: integer
+      bacterialResistance:
+        description: >-
+          Antibiotic(s) for selection in bacteria.
+        range: BacterialResistanceEnum
+      selectableMarker:
+        description: >-
+          Additional selection markers, such as mammalian selection
+          markers or fluorescent proteins.
+        range: SelectableMarkerEnum
+      copyNumber:
+        description: >-
+          Whether the plasmid produces sufficient DNA from a normal
+          miniprep or requires special conditions.
+        range: CopyNumberEnum
+      growthTemp:
+        description: >-
+          Temperature for growing the bacteria hosting the plasmid.
+        range: GrowthTempEnum
+      growthStrain:
+        description: >-
+          The E. coli strain for distributing the plasmid.
+        range: GrowthStrainEnum
+      hazardous:
+        description: >-
+          Whether the unmodified plasmid DNA requires handling at
+          Biosafety Level 2 or higher.
+        range: YesNoUnknownEnum
+        required: true
+    slot_usage:
+      resourceType:
+        ifabsent: string(Genetic Reagent)
+
+enums:
+
+  CloningMethodEnum:
+    description: Methods for constructing vectors.
+    permissible_values:
+      Restriction Enzyme: {}
+      TOPO cloning: {}
+      Gateway Cloning: {}
+      Ligation Independent Cloning: {}
+      Gibson Cloning: {}
+      Unknown: {}
+
+  VectorTypeEnum:
+    description: Primary functions of plasmids.
+    permissible_values:
+      Mammalian Expression: {}
+      Bacterial Expression: {}
+      Gateway Entry Clone: {}
+      Lentiviral: {}
+      Adenoviral: {}
+      AAV: {}
+      RNAi: {}
+      Luciferase: {}
+      Cre/Lox: {}
+      Yeast Expression: {}
+      Worm Expression: {}
+      Insect Expression: {}
+      Plant Expression: {}
+      Mouse Targeting: {}
+      CRISPR: {}
+      TALEN: {}
+      Synthetic Biology: {}
+      Transfer Vector: {}
+      Transposon Vector: {}
+      Unspecified: {}
+      Other: {}
+
+  BacterialResistanceEnum:
+    description: Antibiotics for bacterial selection.
+    permissible_values:
+      Ampicillin: {}
+      Kanamycin: {}
+      Chloramphenicol: {}
+      Tetracycline: {}
+      Spectinomycin: {}
+      Hygromycin: {}
+      Bleocin(Zeocin): {}
+      Gentamycin: {}
+      Streptomycin: {}
+      Nourseothricin(clonNat): {}
+      Ampicillin and Bleocin (Zeocin): {}
+      Ampicillin and Kanamycin: {}
+      Ampicillin and Tetracycline: {}
+      Ampicillin and Streptomycin: {}
+      Ampicillin and Spectinomycin: {}
+      Chloramphenicol and Ampicillin: {}
+      Chloramphenicol and Bleocin (Zeocin): {}
+      Chloramphenicol and Tetracycline: {}
+      Chloramphenicol and Kanamycin: {}
+      Chloramphenicol and Spectinomycin: {}
+      Chloramphenicol and Gentamycin: {}
+      Spectinomycin and Streptomycin: {}
+      Other: {}
+
+  SelectableMarkerEnum:
+    description: Selectable markers on plasmids.
+    permissible_values:
+      Neomycin: {}
+      Puromycin: {}
+      Hygromycin: {}
+      Kanamycin: {}
+      Chloramphenicol: {}
+      Zeocin: {}
+      Blasticidin: {}
+      Gentamicin: {}
+      TRP1: {}
+      LEU1: {}
+      LEU2: {}
+      URA3: {}
+      HIS3: {}
+      Basta: {}
+      Other: {}
+
+  CopyNumberEnum:
+    description: Plasmid copy number.
+    permissible_values:
+      High Copy: {}
+      Low Copy: {}
+      Unknown: {}
+
+  GrowthTempEnum:
+    description: Bacterial growth temperature.
+    permissible_values:
+      37 C: {}
+      30 C: {}
+      Room Temperature: {}
+
+  GrowthStrainEnum:
+    description: E. coli strains for plasmid distribution.
+    permissible_values:
+      DH5alpha: {}
+      DH10B: {}
+      NEB Stable: {}
+      ccdb Survival: {}
+      Pir1: {}
+      Other: {}

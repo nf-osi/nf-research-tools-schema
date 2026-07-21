@@ -1,0 +1,63 @@
+id: https://w3id.org/nf-research-tools/mixins
+name: nf_research_tools_mixins
+title: Mixins
+description: >-
+  Mixin classes for cross-cutting concerns shared across tool types.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - enums
+
+classes:
+
+  HasGeneticDisorder:
+    mixin: true
+    description: >-
+      Mixin for tool types associated with a genetic disorder and
+      its manifestations.
+    slots:
+      - geneticDisorder
+      - manifestation
+
+  HasTumorType:
+    mixin: true
+    description: >-
+      Mixin for tool types that model or bank specific tumor types.
+    slots:
+      - tumorType
+
+  HasPassageNumber:
+    mixin: true
+    description: >-
+      Mixin for tool types that track passage number.
+    slots:
+      - passageNumber
+
+slots:
+
+  geneticDisorder:
+    description: >-
+      Genetic disorders associated with the resource.
+    range: GeneticDisorderEnum
+    multivalued: true
+
+  manifestation:
+    description: >-
+      Manifestations or symptoms that this resource is used to model
+      (e.g. tumor type, behavioral phenotype).
+    multivalued: true
+
+  tumorType:
+    description: Tumor types associated with the resource.
+    range: TumorTypeEnum
+    multivalued: true
+
+  passageNumber:
+    description: Current passage number, if applicable.

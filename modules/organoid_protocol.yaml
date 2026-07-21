@@ -1,0 +1,127 @@
+id: https://w3id.org/nf-research-tools/organoid_protocol
+name: nf_research_tools_organoid_protocol
+title: Organoid Protocol
+description: Advanced 3D cellular models including organoids and assembloids.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+  - tool_base
+  - mixins
+
+classes:
+
+  OrganoidProtocol:
+    annotations:
+      synapse_table_id: syn73709227
+    is_a: Tool
+    mixins:
+      - HasPassageNumber
+    description: >-
+      Advanced 3D cellular models including organoids, assembloids,
+      spheroids, and other 3D culture systems.
+    attributes:
+      modelType:
+        description: Type of 3D cellular model.
+        range: OrganoidModelTypeEnum
+        required: true
+      derivationSource:
+        description: Source of cells used to generate the model.
+        range: DerivationSourceEnum
+        required: true
+      cellTypes:
+        description: Cell types present in the model.
+        multivalued: true
+        required: true
+      organoidType:
+        description: Specific type of organoid, if applicable.
+        range: OrganoidTypeEnum
+      matrixType:
+        description: Extracellular matrix or scaffold used.
+        range: MatrixTypeEnum
+      cultureSystem:
+        description: Culture system used for maintenance.
+        range: CultureSystemEnum
+      maturationTime:
+        description: Time required for model maturation.
+      characterizationMethods:
+        description: Methods used to characterize the model.
+        range: CharacterizationMethodEnum
+        multivalued: true
+      cryopreservationProtocol:
+        description: Protocol for freezing/thawing, if available.
+      qualityControlMetrics:
+        description: Quality control metrics used.
+        multivalued: true
+    slot_usage:
+      resourceType:
+        ifabsent: string(Organoid Protocol)
+
+enums:
+
+  OrganoidModelTypeEnum:
+    description: Types of 3D cellular models.
+    permissible_values:
+      Organoid: {}
+      Assembloid: {}
+      Spheroid: {}
+      3D Culture: {}
+      Other: {}
+
+  DerivationSourceEnum:
+    description: Sources of cells for model generation.
+    permissible_values:
+      iPSC: {}
+      ESC: {}
+      Primary Tissue: {}
+      Cell Line: {}
+      Patient-Derived: {}
+      Other: {}
+
+  OrganoidTypeEnum:
+    description: Specific types of organoids.
+    permissible_values:
+      Cerebral: {}
+      Intestinal: {}
+      Liver: {}
+      Kidney: {}
+      Cardiac: {}
+      Retinal: {}
+      Lung: {}
+      Pancreatic: {}
+      Other: {}
+
+  MatrixTypeEnum:
+    description: Extracellular matrix or scaffold types.
+    permissible_values:
+      Matrigel: {}
+      BME: {}
+      Hydrogel: {}
+      Synthetic Matrix: {}
+      Scaffold-Free: {}
+      Other: {}
+
+  CultureSystemEnum:
+    description: Culture systems for model maintenance.
+    permissible_values:
+      Static: {}
+      Spinning Bioreactor: {}
+      Microfluidic: {}
+      Air-Liquid Interface: {}
+      Other: {}
+
+  CharacterizationMethodEnum:
+    description: Methods for model characterization.
+    permissible_values:
+      Immunofluorescence: {}
+      RNA-seq: {}
+      scRNA-seq: {}
+      Electrophysiology: {}
+      Imaging: {}
+      Other: {}

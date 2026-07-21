@@ -1,0 +1,77 @@
+id: https://w3id.org/nf-research-tools/vendor
+name: nf_research_tools_vendor
+title: Vendor
+description: Vendors and vendor item listings for research tools.
+
+prefixes:
+  nftools: https://w3id.org/nf-research-tools/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+
+default_prefix: nftools
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+
+  Vendor:
+    annotations:
+      synapse_table_id: syn26486850
+    description: >-
+      A person or company offering the resource for sale.
+    class_uri: schema:Organization
+    slots:
+      - vendorId
+      - vendorName
+      - vendorUrl
+
+  VendorItem:
+    annotations:
+      synapse_table_id: syn26486843
+    description: >-
+      A resource listing from a specific vendor, including catalog
+      information and purchase URL.
+    slots:
+      - vendorItemId
+      - vendor
+      - catalogNumber
+      - catalogNumberURL
+
+slots:
+
+  vendorId:
+    identifier: true
+    description: A unique identifier for the vendor.
+    required: true
+
+  vendorName:
+    description: The name of the vendor.
+    slot_uri: schema:name
+
+  vendorUrl:
+    description: The vendor website URL.
+    range: uri
+    slot_uri: schema:url
+
+  vendorItemId:
+    identifier: true
+    description: A unique identifier for the vendor item listing.
+    required: true
+
+  vendor:
+    description: The vendor offering this item.
+    range: Vendor
+    inlined: true
+
+  catalogNumber:
+    description: >-
+      The catalog number associated with the resource pertaining
+      to the vendor.
+    required: true
+
+  catalogNumberURL:
+    description: >-
+      The URL linking to the resource on the vendor's website.
+    range: uri
