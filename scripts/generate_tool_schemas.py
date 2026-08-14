@@ -5,8 +5,7 @@ type from the LinkML modules.
 
 For every tool listed in ``scripts/tool_schema_config.yaml`` this runs
 ``gen-json-schema -t <Class>`` and post-processes the LinkML output into the
-shape Synapse's schema registry and Record Sets expect (see wes.json):
-
+shape Synapse's schema registry and Record Sets expect (see docs/SCHEMA_PIPELINE.md):
   * ``$schema`` rewritten to draft-07
   * ``$id`` set to the registered Synapse URI (no version; the register step
     appends the version)
