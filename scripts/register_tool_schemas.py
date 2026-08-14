@@ -123,7 +123,9 @@ def main() -> int:
     if args.only:
         wanted = set(args.only)
         tools = [t for t in tools if t["class"] in wanted]
-
+        missing = wanted - {t["class"] for t in tools}
+        if missing:
+            parser.error(f"Unknown tool class(es): {', '.join(sorted(missing))}")
     record_sets = load_record_sets()
 
     print(f"Organization: {organization}")
