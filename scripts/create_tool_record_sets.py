@@ -37,7 +37,12 @@ from pathlib import Path
 import yaml
 from synapseclient import Synapse
 from synapseclient.models import Folder
-from synapseclient.extensions.curator import create_record_based_metadata_task
+try:
+    from synapseclient.extensions.curator import create_record_based_metadata_task
+except ImportError as e:
+    raise ImportError(
+        "create_tool_record_sets.py requires synapseclient curator extensions (synapseclient.extensions.curator). Install a synapseclient build that includes these extensions."
+    ) from e
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = REPO_ROOT / "scripts" / "tool_schema_config.yaml"
