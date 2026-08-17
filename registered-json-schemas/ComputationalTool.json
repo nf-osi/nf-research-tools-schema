@@ -9,6 +9,25 @@
       "description": "A large language model-generated summary of the resource.",
       "type": "string"
     },
+    "analyticalPlatformSupport": {
+      "description": "Experimental data types or analytical platforms this tool is designed to process or integrate.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Mass spectrometry / proteomics",
+          "Metabolomics",
+          "RNA-seq / transcriptomics",
+          "Whole genome / exome sequencing",
+          "Single-cell RNA-seq",
+          "Imaging / pathology",
+          "Pharmacokinetics / PK modeling",
+          "Pharmacodynamics / PD modeling",
+          "Clinical / EHR data",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
     "containerized": {
       "type": "string",
       "enum": [
@@ -44,6 +63,10 @@
       "format": "uri",
       "type": "string"
     },
+    "downloadURL": {
+      "description": "A URL to download the tool or access its repository.",
+      "type": "string"
+    },
     "howToAcquire": {
       "description": "How to acquire a particular resource.",
       "type": "string"
@@ -51,6 +74,10 @@
     "lastUpdate": {
       "description": "Date of last software update or release.",
       "format": "date",
+      "type": "string"
+    },
+    "licenseDetails": {
+      "description": "Free-text clarification for non-standard licenses (e.g. non-commercial clauses, third-party tool requirements, or contact info for commercial use). Most relevant when licenseType is \"Other\" or \"Proprietary\".",
       "type": "string"
     },
     "licenseType": {
