@@ -10,8 +10,13 @@
       "type": "string"
     },
     "animalState": {
-      "description": "State the animal is in according to the vendor/developer (e.g. embryo, sperm, live).",
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "Alive",
+        "Deceased",
+        "Unknown"
+      ],
+      "description": "State the animal is in according to the vendor/developer (e.g. embryo, sperm, live)."
     },
     "backgroundStrain": {
       "description": "The genetic background strain name. Correct strain nomenclature indicates what a mutant strain's background is.",
@@ -63,7 +68,24 @@
     "manifestation": {
       "description": "Manifestations or symptoms that this resource is used to model (e.g. tumor type, behavioral phenotype).",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "No Symptoms",
+          "Acute Myeloid Leukemia",
+          "Astrocytoma",
+          "Cognition",
+          "Growth",
+          "Heart Malformation",
+          "High Grade Glioma",
+          "Low Grade Glioma",
+          "Malignant Peripheral Nerve Sheath Tumor",
+          "Metabolic Function",
+          "Neural Crest Hyperplasia",
+          "Optic Nerve Glioma",
+          "Plexiform Neurofibroma",
+          "Spinal Development",
+          "Other"
+        ]
       },
       "type": "array"
     },
@@ -116,7 +138,9 @@
         "allograft",
         "xenograft",
         "autograft",
-        "isograft"
+        "isograft",
+        "syngraft",
+        "none"
       ],
       "description": "Type of transplantation involved."
     },
