@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsPatientDerivedModel",
+  "title": "NF Research Tools - Patient Derived Model",
+  "description": "Patient-derived models including patient-derived xenografts (PDX), humanized mice, patient-derived organoids, and patient-derived cell lines.",
+  "type": "object",
+  "properties": {
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "clinicalData": {
+      "description": "Available clinical data from the patient.",
+      "type": "string"
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "engraftmentSite": {
+      "type": "string",
+      "enum": [
+        "Subcutaneous",
+        "Orthotopic",
+        "Intracranial",
+        "Mammary Fat Pad",
+        "Other"
+      ],
+      "description": "Site of engraftment in host organism."
+    },
+    "establishmentRate": {
+      "description": "Success rate of model establishment.",
+      "type": "string"
+    },
+    "hostStrain": {
+      "type": "string",
+      "enum": [
+        "NSG",
+        "NOD-SCID",
+        "nude",
+        "SCID",
+        "Other"
+      ],
+      "description": "Host organism strain for xenografts."
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "modelSystemType": {
+      "type": "string",
+      "enum": [
+        "PDX (Patient-Derived Xenograft)",
+        "Humanized Mouse",
+        "Patient-Derived Organoid",
+        "Patient-Derived Cell Line",
+        "Other"
+      ],
+      "description": "Type of patient-derived model system."
+    },
+    "molecularCharacterization": {
+      "description": "Molecular characterization performed.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Genomic Sequencing",
+          "RNA-seq",
+          "Proteomics",
+          "Immunohistochemistry",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "passageNumber": {
+      "description": "Current passage number, if applicable.",
+      "type": "string"
+    },
+    "patientDiagnosis": {
+      "description": "Original patient diagnosis or condition.",
+      "type": "string"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "tumorType": {
+      "description": "Tumor types associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "cutaneous neurofibroma",
+          "plexiform neurofibroma",
+          "atypical neurofibroma",
+          "schwannoma",
+          "meningioma",
+          "malignant peripheral nerve sheath tumor",
+          "low grade glioma",
+          "high grade glioma",
+          "pheochromocytoma",
+          "optic nerve glioma",
+          "neurofibroma NOS",
+          "diffuse infiltrating neurofibroma",
+          "brain NOS",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    },
+    "validationMethods": {
+      "description": "Methods used to validate model fidelity to patient.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "modelSystemType",
+    "patientDiagnosis",
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "howToAcquire",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}

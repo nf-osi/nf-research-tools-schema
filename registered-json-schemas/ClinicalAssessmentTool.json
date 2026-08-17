@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsClinicalAssessmentTool",
+  "title": "NF Research Tools - Clinical Assessment Tool",
+  "description": "Clinical assessment tools including questionnaires, quality of life instruments, and patient-reported outcome measures.",
+  "type": "object",
+  "properties": {
+    "administrationTime": {
+      "description": "Typical time required to complete the assessment.",
+      "type": "string"
+    },
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "assessmentName": {
+      "description": "Name of the assessment tool or instrument.",
+      "type": "string"
+    },
+    "assessmentType": {
+      "type": "string",
+      "enum": [
+        "Quality of Life",
+        "Pain Assessment",
+        "Functional Assessment",
+        "Cognitive Assessment",
+        "Symptom Scale",
+        "Psychological Assessment",
+        "Patient-Reported Outcome",
+        "Other"
+      ],
+      "description": "Type of clinical assessment."
+    },
+    "availabilityStatus": {
+      "type": "string",
+      "enum": [
+        "Freely Available",
+        "License Required",
+        "Permission Required",
+        "Proprietary",
+        "Unknown"
+      ],
+      "description": "Availability status of the tool."
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "digitalVersion": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No",
+        "In Development",
+        "Unknown"
+      ],
+      "description": "Whether a digital/electronic version is available."
+    },
+    "diseaseSpecific": {
+      "type": "string",
+      "enum": [
+        "Yes - NF-specific",
+        "No - General",
+        "Adapted for NF"
+      ],
+      "description": "Whether the assessment is specific to NF or general."
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "licensingRequirements": {
+      "description": "Licensing or permission requirements.",
+      "type": "string"
+    },
+    "numberOfItems": {
+      "description": "Number of items or questions in the assessment.",
+      "type": "integer"
+    },
+    "psychometricProperties": {
+      "description": "Validated psychometric properties (reliability, validity).",
+      "type": "string"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "scoringMethod": {
+      "description": "Description of scoring methodology.",
+      "type": "string"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "targetPopulation": {
+      "type": "string",
+      "enum": [
+        "Pediatric",
+        "Adult",
+        "Elderly",
+        "General",
+        "Disease-Specific"
+      ],
+      "description": "Intended population for the assessment."
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    },
+    "validatedLanguages": {
+      "description": "Languages in which the tool has been validated.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "assessmentName",
+    "assessmentType",
+    "targetPopulation",
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "howToAcquire",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}

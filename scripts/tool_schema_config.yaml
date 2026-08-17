@@ -1,0 +1,85 @@
+# Configuration for the tool JSON Schema pipeline.
+#
+# This is the single source of truth shared by:
+#   - scripts/generate_tool_schemas.py   (LinkML class -> flat draft-07 JSON Schema)
+#   - scripts/register_tool_schemas.py   (register versioned schemas to Synapse)
+#   - scripts/create_tool_record_sets.py (bootstrap Synapse Record Sets)
+#
+# To add a new tool type: add a module under modules/, wire it into
+# modules/nf_research_tools.yaml imports, then add an entry here.
+
+# LinkML schema that imports every module (the "-s" argument to gen-json-schema).
+source_schema: modules/nf_research_tools.yaml
+
+# Where generated flat JSON Schemas are written (one <key>.json per tool).
+output_dir: registered-json-schemas
+
+# Synapse organization the schemas are registered under. The service account
+# must have CREATE permission on this organization. org.synapse.nf is the
+# existing NF organization (also used by nf-metadata-dictionary), so no new
+# organization/ACL setup is required. Change this only if you create a
+# dedicated organization in Synapse first.
+organization: org.synapse.nf
+
+# Synapse project that owns the Record Sets (Neurofibromatosis Research Tools
+# Central, alias "nftools").
+project_id: syn26338068
+
+# Name of the shared folder the bootstrap creates under project_id to hold all
+# Record Sets. Created only if it does not already exist.
+record_set_folder_name: Tool Record Sets
+
+# JSON Schema draft the registered schemas declare. Synapse's registry targets
+# draft-07; LinkML emits draft 2019-09, so the generator rewrites this.
+json_schema_dialect: "http://json-schema.org/draft-07/schema#"
+
+# One entry per tool type.
+#   class        LinkML class name passed to gen-json-schema -t
+#   schema_name  Synapse schema name; full URI is "<organization>-<schema_name>"
+#   title        Human-readable schema title
+#   upsert_keys  Fields that uniquely identify a record for upsert on the Record Set
+tools:
+  - class: AnimalModel
+    schema_name: researchToolsAnimalModel
+    title: NF Research Tools - Animal Model
+    upsert_keys: [resourceId]
+
+  - class: CellLine
+    schema_name: researchToolsCellLine
+    title: NF Research Tools - Cell Line
+    upsert_keys: [resourceId]
+
+  - class: Antibody
+    schema_name: researchToolsAntibody
+    title: NF Research Tools - Antibody
+    upsert_keys: [resourceId]
+
+  - class: GeneticReagent
+    schema_name: researchToolsGeneticReagent
+    title: NF Research Tools - Genetic Reagent
+    upsert_keys: [resourceId]
+
+  - class: Biobank
+    schema_name: researchToolsBiobank
+    title: NF Research Tools - Biobank
+    upsert_keys: [resourceId]
+
+  - class: ComputationalTool
+    schema_name: researchToolsComputationalTool
+    title: NF Research Tools - Computational Tool
+    upsert_keys: [resourceId]
+
+  - class: OrganoidProtocol
+    schema_name: researchToolsOrganoidProtocol
+    title: NF Research Tools - Organoid Protocol
+    upsert_keys: [resourceId]
+
+  - class: PatientDerivedModel
+    schema_name: researchToolsPatientDerivedModel
+    title: NF Research Tools - Patient Derived Model
+    upsert_keys: [resourceId]
+
+  - class: ClinicalAssessmentTool
+    schema_name: researchToolsClinicalAssessmentTool
+    title: NF Research Tools - Clinical Assessment Tool
+    upsert_keys: [resourceId]

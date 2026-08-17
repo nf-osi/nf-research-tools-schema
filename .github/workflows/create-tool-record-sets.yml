@@ -1,0 +1,68 @@
+name: Create Tool Record Sets (manual)
+
+# Manual control for Record Sets. The register-tool-schemas.yml pipeline already
+# creates any MISSING record sets automatically on merge, so you normally do not
+# need this. Use it to:
+#   - recreate an existing record set (replace: true), or
+#   - target specific tool types (only: "CellLine AnimalModel").
+#
+# Creates a shared "Tool Record Sets" folder under the tools project
+# (syn26338068) if needed, (re)creates the requested Record Sets binding the
+# registered schema, and commits scripts/record_sets.json.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Registered schema version to bind (e.g. 2.0.57). Leave blank to bind the latest.'
+        type: string
+        required: false
+      only:
+        description: 'Space-separated tool classes to create (blank = all). e.g. "CellLine AnimalModel"'
+        type: string
+        required: false
+      replace:
+        description: 'Recreate record sets that already exist in record_sets.json'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml "git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop"
+
+      - name: Create record sets
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python scripts/create_tool_record_sets.py \
+            ${{ inputs.version && format('--version {0}', inputs.version) || '' }} \
+            ${{ inputs.only && format('--only {0}', inputs.only) || '' }} \
+            ${{ inputs.replace && '--replace' || '' }}
+
+      - name: Commit record set map
+        run: |
+          git config --local user.email "nf-osi@sagebionetworks.org"
+          git config --local user.name "nf-osi[bot]"
+          if ! git diff --quiet -- scripts/record_sets.json; then
+            git add scripts/record_sets.json
+            git commit -m "chore: update tool record set map [skip ci]"
+            git push
+          else
+            echo "No record set map changes to commit."
+          fi

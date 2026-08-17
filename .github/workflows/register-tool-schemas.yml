@@ -1,0 +1,104 @@
+name: Register Tool Schemas to Synapse
+
+# When a PR that changes the LinkML modules is merged to main (or on manual
+# dispatch), this workflow:
+#   1. regenerates the per-tool JSON Schemas from the LinkML modules,
+#   2. registers a new version of each with the Synapse schema registry,
+#   3. re-binds the new version to any Record Sets that already exist,
+#   4. creates a Record Set for any tool type that does NOT yet have one
+#      (idempotent create-if-missing — a no-op once all types exist),
+#   5. commits the regenerated schemas and updated record-set map back to main.
+#
+# The separate create-tool-record-sets.yml workflow is still available for
+# manual control (e.g. --replace an existing set, or target specific types).
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'modules/**'
+      - 'scripts/tool_schema_config.yaml'
+      - 'scripts/generate_tool_schemas.py'
+      - 'scripts/register_tool_schemas.py'
+      - 'scripts/create_tool_record_sets.py'
+  workflow_dispatch:
+    inputs:
+      rebind:
+        description: 'Rebind new versions to existing record sets'
+        type: boolean
+        default: true
+      create_missing:
+        description: 'Create record sets for tool types that do not have one yet'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install linkml pyyaml "git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop"
+      - name: Compute schema version
+        id: version
+        run: |
+          V=$(python -c "import yaml,os; p=yaml.safe_load(open('modules/nf_research_tools.yaml'))['version'].split('.'); print(f\"{p[0]}.{p[1]}.{os.environ['GITHUB_RUN_NUMBER']}\")")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Registering version $V"
+
+      - name: Generate tool JSON Schemas from LinkML
+        run: |
+          python scripts/generate_tool_schemas.py
+
+      - name: Register versioned schemas with Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python scripts/register_tool_schemas.py \
+            --version ${{ steps.version.outputs.version }} \
+            ${{ (github.event_name != 'workflow_dispatch' || inputs.rebind) && '--rebind' || '' }} \
+            --log-file schema-registration-log.md
+
+      - name: Create record sets for any new tool types
+        if: github.event_name != 'workflow_dispatch' || inputs.create_missing
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          # Idempotent: only creates record sets not already in record_sets.json,
+          # binding the version registered above. Existing sets were rebound in
+          # the previous step.
+          python scripts/create_tool_record_sets.py \
+            --version ${{ steps.version.outputs.version }}
+
+      - name: Upload registration log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-registration-log
+          path: schema-registration-log.md
+
+      - name: Commit regenerated schemas and record-set map
+        run: |
+          git config --local user.email "nf-osi@sagebionetworks.org"
+          git config --local user.name "nf-osi[bot]"
+          git add registered-json-schemas/
+          [ -f scripts/record_sets.json ] && git add scripts/record_sets.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: regenerate tool schemas + record-set map [skip ci]"
+            git push
+          else
+            echo "Nothing to commit."
+          fi

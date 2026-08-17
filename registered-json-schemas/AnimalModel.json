@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsAnimalModel",
+  "title": "NF Research Tools - Animal Model",
+  "description": "An animal sufficiently like humans in its anatomy, physiology, or response to a pathogen to be used in medical research in order to obtain results that can be extrapolated to human medicine.",
+  "type": "object",
+  "properties": {
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "animalState": {
+      "description": "State the animal is in according to the vendor/developer (e.g. embryo, sperm, live).",
+      "type": "string"
+    },
+    "backgroundStrain": {
+      "description": "The genetic background strain name. Correct strain nomenclature indicates what a mutant strain's background is.",
+      "type": "string"
+    },
+    "backgroundSubstrain": {
+      "description": "The substrain variety of a strain (e.g. C57BL/6J, C57BL/6Tac).",
+      "type": "string"
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "donor": {
+      "description": "Foreign key to Donor (donorId). The biological donor from which the resource was derived.",
+      "type": "string"
+    },
+    "generation": {
+      "description": "The generation of the animal model (e.g. 13).",
+      "type": "string"
+    },
+    "geneticDisorder": {
+      "description": "Genetic disorders associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Neurofibromatosis type 1",
+          "Neurofibromatosis type 2",
+          "Schwannomatosis",
+          "No known genetic disorder"
+        ]
+      },
+      "type": "array"
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "manifestation": {
+      "description": "Manifestations or symptoms that this resource is used to model (e.g. tumor type, behavioral phenotype).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "strainNomenclature": {
+      "description": "The standard nomenclature for the strain (e.g. B6.129S2-NF1tm1Tyj/J). Set by the International Committee on Standardized Genetic Nomenclature for Mice.",
+      "type": "string"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "transplantationDonor": {
+      "description": "Foreign key to Donor (donorId). The donor used in transplantation experiments.",
+      "type": "string"
+    },
+    "transplantationType": {
+      "type": "string",
+      "enum": [
+        "allograft",
+        "xenograft",
+        "autograft",
+        "isograft"
+      ],
+      "description": "Type of transplantation involved."
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "geneticDisorder",
+    "manifestation",
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "howToAcquire",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}

@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsCellLine",
+  "title": "NF Research Tools - Cell Line",
+  "description": "A cell culture selected for uniformity from a cell population derived from a usually homogeneous tissue source.",
+  "type": "object",
+  "properties": {
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "cellLineCategory": {
+      "type": "string",
+      "enum": [
+        "Cancer cell line",
+        "Conditionally immortalized cell line",
+        "Embryonic stem cell",
+        "Factor-dependent cell line",
+        "Finite cell line",
+        "Hybridoma",
+        "Hybrid cell line",
+        "Induced pluripotent stem cell",
+        "Somatic stem cell",
+        "Spontaneously immortalized cell line",
+        "Stromal cell line",
+        "Telomerase immortalized cell line",
+        "Transformed cell line",
+        "Undefined cell line type"
+      ],
+      "description": "The category to which the cell line belongs."
+    },
+    "cultureMedia": {
+      "description": "The base culture medium and supplements used to maintain the cell line (e.g. RPMI supplemented with 10% FBS).",
+      "type": "string"
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "donor": {
+      "description": "Foreign key to Donor (donorId). The biological donor from which the resource was derived.",
+      "type": "string"
+    },
+    "geneticDisorder": {
+      "description": "Genetic disorders associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Neurofibromatosis type 1",
+          "Neurofibromatosis type 2",
+          "Schwannomatosis",
+          "No known genetic disorder"
+        ]
+      },
+      "type": "array"
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "manifestation": {
+      "description": "Manifestations or symptoms that this resource is used to model (e.g. tumor type, behavioral phenotype).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "organ": {
+      "type": "string",
+      "enum": [
+        "Biliary Tract",
+        "Bladder",
+        "Bone Marrow",
+        "Brain",
+        "Breast",
+        "Bronchial Tree",
+        "Duct",
+        "Epididymis",
+        "Esophagus",
+        "Fallopian Tube",
+        "Gallbladder",
+        "Gland",
+        "Gonad",
+        "Heart",
+        "Intestine",
+        "Kidney",
+        "Liver",
+        "Lung",
+        "Lymph Node",
+        "Ear",
+        "Eye",
+        "Nose",
+        "Tongue",
+        "Pancreas",
+        "Penis",
+        "Seminal Vesicle",
+        "Skin",
+        "Spermatic Cord",
+        "Spinal Cord",
+        "Spleen",
+        "Stomach",
+        "Thymus Gland",
+        "Thyroid Gland",
+        "Tonsil",
+        "Trachea",
+        "Tracheobronchial Tree",
+        "Ureter",
+        "Urethra",
+        "Uterus",
+        "Vagina",
+        "Vulva"
+      ],
+      "description": "The organ the cell line is derived from."
+    },
+    "originYear": {
+      "description": "The year the cell line originated.",
+      "type": "integer"
+    },
+    "populationDoublingTime": {
+      "description": "Time for cell line to double.",
+      "type": "string"
+    },
+    "resistance": {
+      "description": "List of compounds the cell line has been selected for.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "strProfile": {
+      "description": "Short tandem repeat profile information.",
+      "type": "string"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "tissue": {
+      "type": "string",
+      "enum": [
+        "Blood",
+        "Bone marrow",
+        "Buccal mucosa",
+        "Buffy coat",
+        "Cerebral cortex",
+        "Dorsal root ganglion",
+        "Embryonic tissue",
+        "Meninges",
+        "Nerve tissue",
+        "Optic nerve",
+        "Plasma",
+        "Primary tumor",
+        "Sciatic nerve",
+        "Serum",
+        "Splenocyte",
+        "Unspecified",
+        "Urine",
+        "Whole brain"
+      ],
+      "description": "The tissue the cell line is derived from."
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "howToAcquire",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}
