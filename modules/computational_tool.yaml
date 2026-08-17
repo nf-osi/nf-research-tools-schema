@@ -62,6 +62,21 @@ classes:
         range: date
       maintainer:
         description: Name or organization maintaining the software.
+      analyticalPlatformSupport:
+        description: >-
+          Experimental data types or analytical platforms this tool is
+          designed to process or integrate.
+        range: AnalyticalPlatformSupportEnum
+        multivalued: true
+      downloadURL:
+        description: A URL to download the tool or access its repository.
+        range: uri
+      licenseDetails:
+        description: >-
+          Free-text clarification for non-standard licenses (e.g.
+          non-commercial clauses, third-party tool requirements, or
+          contact info for commercial use). Most relevant when
+          licenseType is "Other" or "Proprietary".
     slot_usage:
       resourceType:
         ifabsent: string(Computational Tool)
@@ -106,3 +121,19 @@ enums:
       Proprietary: {}
       Other: {}
       Unknown: {}
+
+  AnalyticalPlatformSupportEnum:
+    description: >-
+      Experimental data types or analytical platforms a computational
+      tool is designed to process or integrate.
+    permissible_values:
+      Mass spectrometry / proteomics: {}
+      Metabolomics: {}
+      RNA-seq / transcriptomics: {}
+      Whole genome / exome sequencing: {}
+      Single-cell RNA-seq: {}
+      Imaging / pathology: {}
+      Pharmacokinetics / PK modeling: {}
+      Pharmacodynamics / PD modeling: {}
+      Clinical / EHR data: {}
+      Other: {}

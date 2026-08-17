@@ -61,6 +61,20 @@ classes:
       digitalVersion:
         description: Whether a digital/electronic version is available.
         range: DigitalVersionEnum
+      cognitiveAndBehavioralDomains:
+        description: >-
+          Specific cognitive or behavioral outcome domains captured by
+          this tool (relevant for NF-related brain tumor and CNS
+          manifestations).
+        range: CognitiveBehavioralDomainEnum
+        multivalued: true
+      regulatoryAcceptanceHistory:
+        description: >-
+          Known FDA/EMA endorsement or acceptance of this tool as a
+          clinical outcome assessment (COA) for trials.
+      toolURL:
+        description: A URL for the assessment tool, if available.
+        range: uri
     slot_usage:
       resourceType:
         ifabsent: string(Clinical Assessment Tool)
@@ -111,3 +125,21 @@ enums:
       "No": {}
       In Development: {}
       Unknown: {}
+
+  CognitiveBehavioralDomainEnum:
+    description: >-
+      Cognitive or behavioral outcome domains a clinical assessment
+      tool can capture.
+    permissible_values:
+      Attention / ADHD: {}
+      Executive function: {}
+      Memory: {}
+      Learning disabilities: {}
+      Language / communication: {}
+      Anxiety: {}
+      Depression / mood: {}
+      Social cognition: {}
+      Academic achievement: {}
+      Adaptive behavior: {}
+      Global cognitive ability: {}
+      Other: {}
