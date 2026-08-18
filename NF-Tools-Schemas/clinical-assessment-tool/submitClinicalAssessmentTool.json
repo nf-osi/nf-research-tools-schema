@@ -11,14 +11,6 @@
           "type": "string",
           "title": "Name of Assessment Tool"
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms or Abbreviations"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
         "assessmentType": {
           "type": "string",
           "title": "Type of Assessment",
@@ -43,6 +35,14 @@
             "General",
             "Disease-Specific"
           ]
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Abbreviations"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
         },
         "diseaseSpecific": {
           "type": "string",
@@ -148,6 +148,11 @@
         "targetPopulation"
       ]
     },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
+    },
     "developmentPublicationDOI": {
       "type": "string",
       "title": "Development Publication DOI (where tool was first described)",
@@ -242,61 +247,6 @@
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "assessmentType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "assessmentType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "assessmentTypeOther": {
-                "type": "string",
-                "title": "Please specify assessment type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "cognitiveAndBehavioralDomains": {
-                "contains": {
-                  "const": "Other"
-                }
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "otherCognitiveAndBehavioralDomains": {
-                "type": "string",
-                "title": "Please specify cognitive/behavioral domain(s)"
-              }
-            }
-          }
-        }
       }
     }
   ]

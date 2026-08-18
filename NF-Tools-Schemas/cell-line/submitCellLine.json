@@ -22,11 +22,6 @@
             "maxLength": "Cell line name should not exceed 100 characters."
           }
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms",
-          "description": "Add one or more synonyms for the cell line."
-        },
         "description": {
           "type": "string",
           "title": "Description (~20 words)",
@@ -42,6 +37,11 @@
             "Chinese Hamster",
             "E. Coli"
           ]
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms",
+          "description": "Add one or more synonyms for the cell line."
         },
         "sex": {
           "type": "string",
@@ -88,62 +88,6 @@
         "description",
         "species"
       ]
-    },
-    "cellLineCategory": {
-      "type": "string",
-      "title": "Cell Line Category",
-      "enum": [
-        "Cancer cell line",
-        "Embryonic stem cell",
-        "Finite cell line",
-        "Hybrid cell line",
-        "Hybridoma",
-        "Induced pluripotent stem cell",
-        "Spontaneously immortalized cell line",
-        "Telomerase immortalized cell line",
-        "Transformed cell line",
-        "Undefined cell line type"
-      ]
-    },
-    "organ": {
-      "type": "string",
-      "title": "Organ",
-      "enum": [
-        "Adrenal Gland",
-        "Blood",
-        "Bone Marrow",
-        "Brain",
-        "Breast",
-        "Cervix",
-        "Colon",
-        "Intestine",
-        "Liver",
-        "Lung",
-        "Lymph Node",
-        "Nerve",
-        "Ovary",
-        "Pancreas",
-        "Peripheral Nervous System",
-        "Prostate",
-        "Skin",
-        "Spinal Cord",
-        "Stomach",
-        "Thyroid Gland",
-        "Uterus",
-        "Other"
-      ]
-    },
-    "strProfile": {
-      "type": "string",
-      "title": "Short Tandem Repeat (STR) Profile"
-    },
-    "resistance": {
-      "type": "string",
-      "title": "Drug Resistance (if any)"
-    },
-    "originYear": {
-      "type": "integer",
-      "title": "Year of Establishment"
     },
     "cellLineGeneticDisorder": {
       "type": "string",
@@ -220,6 +164,62 @@
         "Thyroid Gland Follicular Carcinoma",
         "Unaffected Nerve"
       ]
+    },
+    "cellLineCategory": {
+      "type": "string",
+      "title": "Cell Line Category",
+      "enum": [
+        "Cancer cell line",
+        "Embryonic stem cell",
+        "Finite cell line",
+        "Hybrid cell line",
+        "Hybridoma",
+        "Induced pluripotent stem cell",
+        "Spontaneously immortalized cell line",
+        "Telomerase immortalized cell line",
+        "Transformed cell line",
+        "Undefined cell line type"
+      ]
+    },
+    "organ": {
+      "type": "string",
+      "title": "Organ",
+      "enum": [
+        "Adrenal Gland",
+        "Blood",
+        "Bone Marrow",
+        "Brain",
+        "Breast",
+        "Cervix",
+        "Colon",
+        "Intestine",
+        "Liver",
+        "Lung",
+        "Lymph Node",
+        "Nerve",
+        "Ovary",
+        "Pancreas",
+        "Peripheral Nervous System",
+        "Prostate",
+        "Skin",
+        "Spinal Cord",
+        "Stomach",
+        "Thyroid Gland",
+        "Uterus",
+        "Other"
+      ]
+    },
+    "strProfile": {
+      "type": "string",
+      "title": "Short Tandem Repeat (STR) Profile"
+    },
+    "resistance": {
+      "type": "string",
+      "title": "Drug Resistance (if any)"
+    },
+    "originYear": {
+      "type": "integer",
+      "title": "Year of Establishment"
     },
     "tissue": {
       "type": "string",
@@ -327,6 +327,11 @@
       "title": "Deposited in NGNRI Repository?",
       "description": "Whether this cell line is deposited in the Nick Gilbert Neurofibromatosis Research Institute repository for equitable access."
     },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
+    },
     "developmentPublicationDOI": {
       "type": "string",
       "title": "Development Publication DOI (where tool was first described)",
@@ -431,89 +436,6 @@
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "race": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "race"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "raceOther": {
-                "type": "string",
-                "title": "Please specify race/ethnicity"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "organ": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "organOther": {
-            "type": "string",
-            "title": "Please specify organ"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "pkpdCapabilities": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherPkpdCapabilities": {
-            "type": "string",
-            "title": "Please specify PK/PD capability/capabilities"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "mechanismOfActionValidation": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherMechanismOfActionValidation": {
-            "type": "string",
-            "title": "Please specify mechanism(s) of action"
-          }
-        }
       }
     }
   ]

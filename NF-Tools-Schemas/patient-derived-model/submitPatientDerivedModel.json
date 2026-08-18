@@ -11,14 +11,6 @@
           "type": "string",
           "title": "Name of Patient-Derived Model"
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
         "modelSystemType": {
           "type": "string",
           "title": "Model System Type",
@@ -31,6 +23,34 @@
         "patientDiagnosis": {
           "type": "string",
           "title": "Patient Diagnosis/Condition"
+        },
+        "species": {
+          "type": "string",
+          "title": "Species",
+          "enum": [
+            "Human",
+            "Mouse",
+            "Other"
+          ]
+        },
+        "nfGeneticDisorder": {
+          "type": "string",
+          "title": "NF Genetic Disorder",
+          "enum": [
+            "Neurofibromatosis Type 1",
+            "Neurofibromatosis Type 2",
+            "Schwannomatosis",
+            "NF1 Spontaneous Mutation",
+            "None"
+          ]
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
         },
         "hostStrain": {
           "type": "string",
@@ -109,15 +129,6 @@
             "type": "string"
           }
         },
-        "species": {
-          "type": "string",
-          "title": "Species",
-          "enum": [
-            "Human",
-            "Mouse",
-            "Other"
-          ]
-        },
         "sex": {
           "type": "string",
           "title": "Sex",
@@ -148,17 +159,6 @@
           "title": "Patient Age at Collection (years)",
           "minimum": 0,
           "maximum": 120
-        },
-        "nfGeneticDisorder": {
-          "type": "string",
-          "title": "NF Genetic Disorder",
-          "enum": [
-            "Neurofibromatosis Type 1",
-            "Neurofibromatosis Type 2",
-            "Schwannomatosis",
-            "NF1 Spontaneous Mutation",
-            "None"
-          ]
         },
         "rrid": {
           "type": "string",
@@ -306,6 +306,11 @@
       "title": "Deposited in NGNRI Repository?",
       "description": "Whether this model is deposited in the NF Gene Network Research Initiative repository for equitable access."
     },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
+    },
     "developmentPublicationDOI": {
       "type": "string",
       "title": "Development Publication DOI (where tool was first described)",
@@ -408,239 +413,6 @@
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "modelSystemType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "modelSystemType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "modelSystemTypeOther": {
-                "type": "string",
-                "title": "Please specify model system type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "hostStrain": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "hostStrain"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "hostStrainOther": {
-                "type": "string",
-                "title": "Please specify host strain"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "tumorType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "tumorType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "tumorTypeOther": {
-                "type": "string",
-                "title": "Please specify tumor type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "engraftmentSite": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "engraftmentSite"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "engraftmentSiteOther": {
-                "type": "string",
-                "title": "Please specify engraftment site"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "species": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "species"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "speciesOther": {
-                "type": "string",
-                "title": "Please specify species"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "race": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "race"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "raceOther": {
-                "type": "string",
-                "title": "Please specify race/ethnicity"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "molecularCharacterization": {
-                "contains": {
-                  "const": "Other"
-                }
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "otherMolecularCharacterization": {
-                "type": "string",
-                "title": "Please specify other molecular characterization method(s)"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "routeOfAdministration": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherRouteOfAdministration": {
-            "type": "string",
-            "title": "Please specify other route(s) of administration"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "mechanismOfActionValidation": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherMechanismOfActionValidation": {
-            "type": "string",
-            "title": "Please specify other mechanism(s) of action"
-          }
-        }
       }
     }
   ]

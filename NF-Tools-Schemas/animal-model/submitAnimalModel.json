@@ -11,10 +11,6 @@
           "type": "string",
           "title": "Name of Animal Model"
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
         "description": {
           "type": "string",
           "title": "Description (~20 words)"
@@ -31,6 +27,10 @@
             "Other"
           ]
         },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
         "developerName": {
           "type": "string",
           "title": "Developer Name"
@@ -45,24 +45,6 @@
         "description",
         "species"
       ]
-    },
-    "backgroundStrain": {
-      "type": "string",
-      "title": "Background Strain",
-      "examples": [
-        "C57BL/6"
-      ]
-    },
-    "backgroundSubstrain": {
-      "type": "string",
-      "title": "Background Substrain",
-      "examples": [
-        "C57BL/6J"
-      ]
-    },
-    "strainNomenclature": {
-      "type": "string",
-      "title": "Strain Nomenclature"
     },
     "animalModelGeneticDisorder": {
       "type": "string",
@@ -94,6 +76,24 @@
         "Spinal Development",
         "Other"
       ]
+    },
+    "backgroundStrain": {
+      "type": "string",
+      "title": "Background Strain",
+      "examples": [
+        "C57BL/6"
+      ]
+    },
+    "backgroundSubstrain": {
+      "type": "string",
+      "title": "Background Substrain",
+      "examples": [
+        "C57BL/6J"
+      ]
+    },
+    "strainNomenclature": {
+      "type": "string",
+      "title": "Strain Nomenclature"
     },
     "transplantationType": {
       "type": "string",
@@ -359,6 +359,11 @@
       "title": "Deposited in NGNRI Repository?",
       "description": "Whether this model is deposited in the NF Gene Network Research Initiative repository for equitable access."
     },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
+    },
     "developmentPublicationDOI": {
       "type": "string",
       "title": "Development Publication DOI (where tool was first described)",
@@ -402,31 +407,6 @@
     "animalModelOfManifestation"
   ],
   "allOf": [
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "species": {
-                "const": "Other"
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "otherSpecies": {
-                "type": "string",
-                "title": "Other species name"
-              }
-            }
-          }
-        }
-      }
-    },
     {
       "if": {
         "properties": {
@@ -488,78 +468,6 @@
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "animalModelOfManifestation": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "animalModelOfManifestationOther": {
-            "type": "string",
-            "title": "Please specify manifestation"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "alleleType": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "alleleTypeOther": {
-            "type": "string",
-            "title": "Please specify allele type"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "routeOfAdministration": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherRouteOfAdministration": {
-            "type": "string",
-            "title": "Please specify other route(s) of administration"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "mechanismOfActionValidation": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherMechanismOfActionValidation": {
-            "type": "string",
-            "title": "Please specify other mechanism(s) of action"
-          }
-        }
       }
     }
   ]
