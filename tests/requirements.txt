@@ -1,0 +1,10 @@
+# Dependencies for the offline tool-schema pipeline tests (tests/).
+# Kept in sync with what register-tool-schemas.yml installs, plus test tooling.
+pytest
+jsonschema
+pyyaml
+linkml
+pandas
+# register_tool_schemas.py imports synapseclient at module load; the --dry-run
+# path never contacts Synapse, but the import must succeed. Match the pipeline.
+git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop

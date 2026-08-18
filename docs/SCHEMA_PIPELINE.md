@@ -110,6 +110,29 @@ python scripts/create_tool_record_sets.py --version 2.0.1
 python scripts/create_tool_record_sets.py --version 2.0.1 --only CellLine
 ```
 
+## Testing
+
+Offline pipeline tests live in `tests/test_tool_schema_pipeline.py` and run on
+every PR that touches the pipeline (workflow: `test-tool-schema-pipeline.yml`).
+They use **no Synapse access and no secrets**, and verify that the committed
+schemas will register and that Record Sets can be built from them:
+
+- committed `registered-json-schemas/*.json` are not stale (`generate --check`);
+- each schema is valid draft-07 and fully self-contained (no `$ref` / `$defs`);
+- every tool's `upsert_keys` and `required` entries are real schema properties;
+- `register_tool_schemas.py --dry-run` resolves versions and finds every file.
+
+```bash
+pip install -r tests/requirements.txt
+pytest tests/test_tool_schema_pipeline.py -v
+```
+
+These are the deterministic guardrails. A full round-trip against Synapse (real
+registration + record-set creation) is **not** part of PR CI — it needs network,
+`SYNAPSE_AUTH_TOKEN`, CREATE permission on the org, and creates persistent
+objects. That live smoke test is left as an opt-in follow-up (manual dispatch /
+scheduled), not a PR gate.
+
 ## Adding a new tool type
 
 1. Add the module under `modules/` and wire it into `modules/nf_research_tools.yaml`.
