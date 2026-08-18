@@ -56,32 +56,49 @@ def update_schema(schema_path: Path, resource_types: list, mapping: dict) -> boo
     # Check if there are changes
     current_types = items_schema['properties']['resourceType'].get('enum', [])
 
+    # The allOf array also carries per-resourceType observationType conditionals
+    # (added for issue #102) that this script doesn't own. Only touch the
+    # resourceName conditions here, and preserve everything else as-is —
+    # otherwise this script both crashes on conditions with no 'resourceName'
+    # key and, if it didn't crash, would silently wipe out the observationType
+    # conditionals when it rewrites allOf. See issue #200.
+    existing_allof = items_schema.get('allOf', [])
+    resource_name_conditions = [
+        c for c in existing_allof
+        if 'resourceName' in c.get('then', {}).get('properties', {})
+    ]
+    other_conditions = [
+        c for c in existing_allof
+        if 'resourceName' not in c.get('then', {}).get('properties', {})
+    ]
+    current_names_by_type = {
+        c['if']['properties']['resourceType']['const']:
+            set(c['then']['properties']['resourceName'].get('enum', []))
+        for c in resource_name_conditions
+    }
+
     # Compare resource types
     if set(current_types) != set(resource_types):
         print(f"Resource types changed: {set(resource_types) - set(current_types)} added, "
               f"{set(current_types) - set(resource_types)} removed")
         changes_made = True
     else:
-        # Check if resourceName mappings changed
         changes_made = False
-        if 'allOf' in items_schema:
-            for condition in items_schema['allOf']:
-                resource_type = condition['if']['properties']['resourceType']['const']
-                current_names = set(condition['then']['properties']['resourceName']['enum'])
-                new_names = set(mapping.get(resource_type, []))
 
-                if current_names != new_names:
-                    added = new_names - current_names
-                    removed = current_names - new_names
-                    if added or removed:
-                        print(f"Changes in '{resource_type}':")
-                        if added:
-                            print(f"  Added: {list(added)[:5]}{'...' if len(added) > 5 else ''} ({len(added)} total)")
-                        if removed:
-                            print(f"  Removed: {list(removed)[:5]}{'...' if len(removed) > 5 else ''} ({len(removed)} total)")
-                        changes_made = True
-        else:
-            # First time adding conditional logic
+    # Check if resourceName mappings changed, including resource types that
+    # don't have a resourceName condition at all yet.
+    for resource_type in resource_types:
+        current_names = current_names_by_type.get(resource_type, set())
+        new_names = set(mapping.get(resource_type, []))
+
+        if current_names != new_names:
+            added = new_names - current_names
+            removed = current_names - new_names
+            print(f"Changes in '{resource_type}':")
+            if added:
+                print(f"  Added: {list(added)[:5]}{'...' if len(added) > 5 else ''} ({len(added)} total)")
+            if removed:
+                print(f"  Removed: {list(removed)[:5]}{'...' if len(removed) > 5 else ''} ({len(removed)} total)")
             changes_made = True
 
     if not changes_made:
@@ -99,7 +116,8 @@ def update_schema(schema_path: Path, resource_types: list, mapping: dict) -> boo
         "title": "Name of the Resource"
     }
 
-    # Build conditional logic using allOf
+    # Build conditional logic using allOf, keeping the observationType (and any
+    # other non-resourceName) conditions this script doesn't own untouched.
     conditional_schemas = []
     for resource_type in resource_types:
         condition = {
@@ -120,7 +138,7 @@ def update_schema(schema_path: Path, resource_types: list, mapping: dict) -> boo
         }
         conditional_schemas.append(condition)
 
-    items_schema['allOf'] = conditional_schemas
+    items_schema['allOf'] = conditional_schemas + other_conditions
 
     # Write back to file
     with open(schema_path, 'w') as f:
