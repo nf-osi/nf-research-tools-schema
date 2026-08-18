@@ -205,7 +205,17 @@ def test_dry_run_registration_resolves():
     assert "Failed: 0" in result.stdout, (
         f"register --dry-run reported failures:\n{result.stdout}"
     )
+
+    # Dry-run output prints schema URIs (<org>-<schema_name>-<version>), not tool classes.
+    version_line = next(
+        (line for line in result.stdout.splitlines() if line.strip().startswith("Version:")),
+        "",
+    )
+    version = version_line.split()[-1] if version_line else ""
+    assert version, f"Could not parse resolved version from output:\n{result.stdout}"
+
     for tool in TOOLS:
-        assert tool["class"] in result.stdout, (
-            f"{tool['class']} absent from dry-run output:\n{result.stdout}"
+        expected_uri = f"{ORGANIZATION}-{tool['schema_name']}-{version}"
+        assert expected_uri in result.stdout, (
+            f"{expected_uri} absent from dry-run output:\n{result.stdout}"
         )
