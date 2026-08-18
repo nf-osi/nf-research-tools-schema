@@ -51,7 +51,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install linkml pyyaml pandas "git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop"
+          # linkml is pinned: gen-json-schema output changes between versions
+          # (e.g. 1.11 added "format": "uri"), which would silently change what
+          # gets registered. Keep this in sync with tests/requirements.txt.
+          pip install linkml==1.11.1 pyyaml pandas "git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop"
       - name: Compute schema version
         id: version
         run: |

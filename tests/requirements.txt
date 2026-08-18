@@ -3,7 +3,10 @@
 pytest
 jsonschema
 pyyaml
-linkml
+# Pinned: gen-json-schema output varies by linkml version, so an unpinned
+# linkml makes the "committed schemas up to date" check drift. Keep in sync
+# with the pin in .github/workflows/register-tool-schemas.yml.
+linkml==1.11.1
 pandas
 # register_tool_schemas.py imports synapseclient at module load; the --dry-run
 # path never contacts Synapse, but the import must succeed. Match the pipeline.

@@ -94,7 +94,8 @@ generator rewrites the dialect, inlines enums as `{"type": "string", "enum":
 ## Local usage
 
 ```bash
-pip install linkml "synapseclient>=4.13.0" pyyaml
+# linkml is pinned so gen-json-schema output is reproducible (matches CI).
+pip install linkml==1.11.1 "synapseclient>=4.13.0" pyyaml
 
 # 1. Generate (writes registered-json-schemas/*.json)
 python scripts/generate_tool_schemas.py
