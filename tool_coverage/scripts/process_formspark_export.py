@@ -11,9 +11,10 @@ using the same format as mined tools. Reviewer moves accepted files to submissio
 before merging the PR. Merging triggers upsert-tools.yml which compiles
 submissions/accepted/**/*.json → ACCEPTED_*.csv → Synapse.
 
-Submitter contact info (userInfo) and vendor/acquisition details are printed
-but stripped from the output JSON so they are never committed to the repo.
-Descriptions and synonyms must be manually added to ACCEPTED_resources.csv.
+Submitter contact info (userInfo), vendor/acquisition details, and any
+"otherInformation" catch-all note are printed but stripped from the output
+JSON so they are never committed to the repo. Descriptions and synonyms
+must be manually added to ACCEPTED_resources.csv.
 """
 
 import argparse
@@ -41,7 +42,7 @@ _STRIP_KEYS = {"userInfo", "firstandlastName", "email", "institution", "isDevelo
                "developerName", "developerAffiliation"}
 
 # Fields to print separately (need manual handling) but not store
-_PRINT_ONLY_KEYS = {"vendor", "catalogNumber", "catalogURL", "additionalDetails"}
+_PRINT_ONLY_KEYS = {"vendor", "catalogNumber", "catalogURL", "additionalDetails", "otherInformation"}
 
 
 def _get(d: dict, *keys, default=""):
@@ -172,6 +173,10 @@ def process_export(export_path: Path, submissions_dir: Path, dry_run: bool) -> N
             for k, v in vendor.items():
                 if v:
                     print(f"    {k}: {v}")
+
+        other_info = _get(submission, "otherInformation")
+        if other_info:
+            print(f"  Other information (submitter note — review for new enum values): {other_info}")
 
         # Build output JSON: strip private fields, add metadata
         out_data = _strip_private(submission)
