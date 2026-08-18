@@ -1,0 +1,13 @@
+# Dependencies for the offline tool-schema pipeline tests (tests/).
+# Kept in sync with what register-tool-schemas.yml installs, plus test tooling.
+pytest
+jsonschema
+pyyaml
+# Pinned: gen-json-schema output varies by linkml version, so an unpinned
+# linkml makes the "committed schemas up to date" check drift. Keep in sync
+# with the pin in .github/workflows/register-tool-schemas.yml.
+linkml==1.11.1
+pandas
+# register_tool_schemas.py imports synapseclient at module load; the --dry-run
+# path never contacts Synapse, but the import must succeed. Match the pipeline.
+git+https://github.com/Sage-Bionetworks/synapsePythonClient.git@develop
