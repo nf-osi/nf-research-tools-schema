@@ -419,7 +419,7 @@ def _patient_derived_model(row: dict) -> dict:
             "clinicalData": row.get("clinicalData", ""),
             "humanizationMethod": row.get("humanizationMethod", ""),
             "immuneSystemComponents": [],
-            "validationMethods": [],
+            "validationMethods": "",
             "howToAcquire": "",
             **_dev_author(row),
         },
@@ -457,7 +457,6 @@ def _computational_tool(row: dict) -> dict:
 
 def _organoid_protocol(row: dict) -> dict:
     char_raw = row.get("characterizationMethods", "")
-    cell_raw = row.get("cellTypes", "")
     return {
         **_meta(row),
         "toolType": "organoid_protocol",
@@ -468,7 +467,7 @@ def _organoid_protocol(row: dict) -> dict:
             "synonyms": "",
             "modelType": row.get("modelType", ""),
             "derivationSource": row.get("derivationSource", ""),
-            "cellTypes": [s.strip() for s in cell_raw.split(",") if s.strip()],
+            "cellTypes": row.get("cellTypes", ""),
             "organoidType": row.get("organoidType", ""),
             "matrixType": row.get("matrixType", ""),
             "cultureSystem": row.get("cultureSystem", ""),
