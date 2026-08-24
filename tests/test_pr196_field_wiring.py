@@ -256,3 +256,34 @@ def test_strip_before_upload_no_longer_drops_live_columns():
         stripped = set(ccs._STRIP_BEFORE_UPLOAD.get(csv_name, []))
         overlap = stripped & fields
         assert not overlap, f"{csv_name}: still stripping live-column field(s) {overlap}"
+
+
+def test_build_patient_derived_model_maps_organ_and_tumor_type():
+    """PatientDerivedModel.tumorType was migrated to the shared, multivalued
+    Synapse column (same Column ID as Biobank.tumorType, unifying the facet
+    the way geneticDisorder/manifestation already are). The submission form
+    is still single-select Title Case, so it must be mapped to the canonical
+    lowercase TumorTypeEnum value and wrapped in a one-item list. organ was
+    a real column (shared with CellLine) that the builder never read at all."""
+    submission = {
+        "basicInfo": {
+            "resourceName": "Test PDX 2",
+            "modelSystemType": "PDX (Patient-Derived Xenograft)",
+            "organ": "Skin",
+            "tumorType": "Malignant Peripheral Nerve Sheath Tumor",
+        },
+    }
+    row = cas._build_patient_derived_model(submission)
+    assert row["organ"] == "Skin"
+    assert row["tumorType"] == "malignant peripheral nerve sheath tumor"
+
+    # Unmapped/no value -> empty list string, not a crash
+    empty_row = cas._build_patient_derived_model({
+        "basicInfo": {"resourceName": "No Tumor Type", "modelSystemType": "Humanized Mouse"},
+    })
+    assert empty_row["tumorType"] == ""
+    assert empty_row["organ"] is None or empty_row["organ"] == ""
+
+
+def test_patient_derived_models_columns_include_organ():
+    assert "organ" in cas.COLUMNS["patient_derived_models"]
