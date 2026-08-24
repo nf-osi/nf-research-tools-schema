@@ -46,16 +46,19 @@ def _find_resourcename_duplicates(df_clean: pd.DataFrame, existing_names) -> pd.
     return df_clean["resourceName"].apply(lambda n: _normalize_name(n) in existing_norm_names)
 
 # Primary-key column for each detail table — used to skip rows already in Synapse.
+# All 9 tool-type detail tables now key off the unified `resourceId` -- the
+# LinkML migration dropped every type-specific `<type>Id` column in favor of it.
 _DETAIL_TABLE_PK = {
-    "syn26486808": "animalModelId",
-    "syn26486811": "antibodyId",
-    "syn26486823": "cellLineId",
-    "syn26486832": "geneticReagentId",
+    "syn26486808": "resourceId",  # AnimalModelDetails (was animalModelId)
+    "syn26486811": "resourceId",  # AntibodyDetails (was antibodyId)
+    "syn26486821": "resourceId",  # BiobankDetails (was biobankId)
+    "syn26486823": "resourceId",  # CellLineDetails (was cellLineId)
+    "syn26486832": "resourceId",  # GeneticReagentDetails (was geneticReagentId)
+    "syn73709226": "resourceId",  # ComputationalToolDetails (was computationalToolId)
+    "syn73709227": "resourceId",  # OrganoidProtocolDetails (was organoidProtocolId)
+    "syn73709228": "resourceId",  # PatientDerivedModelDetails (was patientDerivedModelId)
+    "syn73709229": "resourceId",  # ClinicalAssessmentToolDetails (was clinicalAssessmentToolId)
     "syn26486836": "observationId",
-    "syn73709226": "computationalToolId",
-    "syn73709227": "organoidProtocolId",
-    "syn73709228": "patientDerivedModelId",
-    "syn73709229": "clinicalAssessmentToolId",
     "syn26486829": "donorId",
     "syn26486850": "vendorId",
     "syn26486835": "mutationDetailsId",
@@ -119,14 +122,16 @@ _STRIP_BEFORE_UPLOAD = {
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     # developerContactEmail → no schema home; dropped
     # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
-    # Columns after transplantationDonorId not yet in syn26486808 — remove once schema updated:
+    #
+    # NOTE: alleleType/affectedGeneSymbol/inducedVsDevelopmental/bbbIntegrityStatus/
+    # routeOfAdministration/pkpdCapabilities/mechanismOfActionValidation/
+    # pediatricSuitability/timelineToResults/modelLimitations/clinicalTranslationHistory/
+    # regulatoryAcceptanceHistory/mtaRequired/ngnriRepositoryStatus used to be stripped
+    # here with a "not yet in syn26486808 — remove once schema updated" comment. That
+    # schema update happened; these columns exist on syn26486808 now, so stripping them
+    # was silently discarding real submission data on every upload. Un-stripped.
     'CLEAN_animal_models.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
-        'alleleType', 'affectedGeneSymbol', 'inducedVsDevelopmental', 'bbbIntegrityStatus',
-        'routeOfAdministration', 'pkpdCapabilities', 'mechanismOfActionValidation',
-        'pediatricSuitability', 'timelineToResults', 'modelLimitations',
-        'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
-        'ngnriRepositoryStatus',
     ],
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     'CLEAN_cell_lines.csv': [
@@ -136,25 +141,34 @@ _STRIP_BEFORE_UPLOAD = {
     'CLEAN_antibodies.csv': [
         'vendor', 'catalogNumber', 'catalogURL',
     ],
-    # rrid → resource table (syn26450069); developer fields same as animal models
-    # licenseDetails not yet in syn73709226 with sufficient length — remove once schema updated:
+    # developer fields same as animal models.
+    # NOTE: rrid and licenseDetails used to be stripped here too ("not yet in
+    # syn73709226" / "not yet ... with sufficient length") -- both columns exist on
+    # syn73709226 now. Un-stripped.
     'CLEAN_computational_tools.csv': [
-        'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
-        'licenseDetails',
+        'developerName', 'developerAffiliation', 'itemAcquisition',
     ],
-    # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
-    # developerName/developerContactEmail used only for howToAcquire in resources table
+    # developerName/developerAffiliation/developerContactEmail → investigator table
+    'CLEAN_biobanks.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail',
+    ],
+    # developerName/developerContactEmail used only for howToAcquire in resources table.
+    # NOTE: qualityControlMetrics used to be stripped here too ("items up to 118
+    # chars — increase maximumStringLength to ≥200 in syn73709227") -- the column's
+    # maximumSize is already 200. Un-stripped.
     'CLEAN_organoid_protocols.csv': [
-        'qualityControlMetrics', 'developerName', 'developerContactEmail',
+        'developerName', 'developerContactEmail',
     ],
     # developerName/developerContactEmail used only for howToAcquire in resources table
     'CLEAN_clinical_assessment_tools.csv': [
         'developerName', 'developerContactEmail',
     ],
-    # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
-    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table
+    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table.
+    # NOTE: validationMethods used to be stripped here too ("items are 70 chars —
+    # increase maximumStringLength to ≥100 in syn73709228") -- the column's
+    # maximumSize is already 100. Un-stripped.
     'CLEAN_patient_derived_models.csv': [
-        'validationMethods', 'itemAcquisition', 'developerName', 'developerAffiliation',
+        'itemAcquisition', 'developerName', 'developerAffiliation',
     ],
     # v2.0 type-specific FK columns not yet added to syn26450069 schema
     'CLEAN_resources.csv': [
