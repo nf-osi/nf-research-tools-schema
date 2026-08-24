@@ -153,6 +153,30 @@ def test_build_organoid_and_patient_derived_model_map_nf_genetic_disorder():
     assert "nfGeneticDisorder" not in pdm_row
 
 
+def test_map_genetic_disorder_handles_list_valued_input():
+    """geneticDisorder is multivalued (modules/mixins.yaml), and real
+    organoid/patient-derived-model submissions return a list from
+    Formspark's multi-select nfGeneticDisorder field -- a plain dict.get()
+    on a list crashed with 'unhashable type: list' against live submission
+    data. Each element must be mapped and re-joined instead."""
+    assert cas._map_genetic_disorder(["Neurofibromatosis Type 1", "None"]) == (
+        "Neurofibromatosis type 1, No known genetic disorder"
+    )
+    assert cas._map_genetic_disorder([]) == ""
+
+    organoid_row = cas._build_organoid_protocol({
+        "basicInfo": {
+            "resourceName": "Test Organoid 2",
+            "modelType": "Tumor organoid",
+            "derivationSource": "Patient biopsy",
+            "nfGeneticDisorder": ["Neurofibromatosis Type 1", "Schwannomatosis"],
+        },
+    })
+    assert organoid_row["geneticDisorder"] == (
+        "Neurofibromatosis type 1, Schwannomatosis"
+    )
+
+
 def test_build_biobank_exists_and_produces_expected_columns():
     """Biobank had no builder at all before this fix -- submissions from
     submitBiobank.json could not reach Synapse through this pipeline."""

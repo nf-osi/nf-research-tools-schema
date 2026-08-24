@@ -226,6 +226,22 @@ _GENETIC_DISORDER_MAP = {
     "No known disease": "No known genetic disorder",
     "None": "No known genetic disorder",
 }
+
+
+def _map_genetic_disorder(raw):
+    """Map a raw disease value through _GENETIC_DISORDER_MAP.
+
+    The shared `geneticDisorder` slot (modules/mixins.yaml) is
+    multivalued, and Formspark returns a list rather than a scalar
+    string whenever the underlying field is a multi-select -- map each
+    element individually and re-join with _fmt_list rather than doing a
+    dict .get() directly on a (potentially unhashable) list.
+    """
+    if isinstance(raw, list):
+        return _fmt_list([_GENETIC_DISORDER_MAP.get(v, v) for v in raw])
+    return _GENETIC_DISORDER_MAP.get(raw, raw)
+
+
 _SPECIES_MAP = {
     "Human": "Homo sapiens",
     "Mouse": "Mus musculus",
@@ -478,7 +494,7 @@ def _build_cell_line(d: dict) -> dict:
         "organ": _get(d, "organ"),
         "tissue": tissue,
         "manifestation": _get(d, "cellLineManifestation"),
-        "geneticDisorder": _GENETIC_DISORDER_MAP.get(disease_raw, disease_raw),
+        "geneticDisorder": _map_genetic_disorder(disease_raw),
         "cellLineCategory": _get(d, "category", "cellLineCategory"),
         "donorId": _make_donor_id(_donor_key(resource_name)) if species else "",
         "originYear": _get(d, "originYear"),
@@ -551,7 +567,7 @@ def _build_animal_model(d: dict) -> dict:
         "strainNomenclature": _get(d, "strainNomenclature"),
         "backgroundStrain": _get(d, "backgroundStrain"),
         "backgroundSubstrain": _get(d, "backgroundSubstrain"),
-        "geneticDisorder": _GENETIC_DISORDER_MAP.get(disease_raw, disease_raw),
+        "geneticDisorder": _map_genetic_disorder(disease_raw),
         "manifestation": _get(d, "animalModelOfManifestation"),
         "transplantationType": _get(d, "transplantationType"),
         "animalState": _get(d, "animalState"),
@@ -728,7 +744,7 @@ def _build_patient_derived_model(d: dict) -> dict:
         "molecularCharacterization": _fmt_list(_get(bi, "molecularCharacterization")),
         "clinicalData": _get(bi, "clinicalData"),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
-        "geneticDisorder": _GENETIC_DISORDER_MAP.get(_get(bi, "nfGeneticDisorder"), _get(bi, "nfGeneticDisorder")),
+        "geneticDisorder": _map_genetic_disorder(_get(bi, "nfGeneticDisorder")),
         "bbbIntegrityStatus": _get(d, "bbbIntegrityStatus"),
         "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
         "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
@@ -811,7 +827,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _fmt_list(_get(bi, "qualityControlMetrics")),
-        "geneticDisorder": _GENETIC_DISORDER_MAP.get(_get(bi, "nfGeneticDisorder"), _get(bi, "nfGeneticDisorder")),
+        "geneticDisorder": _map_genetic_disorder(_get(bi, "nfGeneticDisorder")),
         "nfManifestation": _fmt_list(_get(bi, "nfManifestation")),
         "bbbModelCapability": _get(d, "bbbModelCapability"),
         "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
