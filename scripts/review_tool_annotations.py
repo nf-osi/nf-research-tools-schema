@@ -19,6 +19,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -148,23 +149,43 @@ def query_existing_tool_study_links(syn: Synapse) -> Set[tuple]:
         return set()
 
 
+def _strip_disambiguation_suffix(name: str) -> str:
+    """Strip a single trailing parenthetical, e.g. 'JH-2-002 (MPNST)' ->
+    'JH-2-002'. Used only to build a best-effort fallback match key below --
+    never to rewrite an actual resourceName/synonym."""
+    return re.sub(r"\s*\([^)]*\)\s*$", "", name).strip()
+
+
 def find_tool_study_links(
     occurrences: "pd.DataFrame",
     tools_data: List[Dict],
     existing_links: Set[tuple],
 ) -> List[Dict]:
     """
-    For each individualID that exactly matches a known tool's resourceName or
+    For each individualID that matches a known tool's resourceName or
     synonym, collect the (resourceId, studyId) pairs it co-occurs with in
     file annotations, filtered down to ones not already in
     TOOL_STUDY_LINKS_TABLE_ID.
 
-    Matching is exact-string only, same standard as existing_exact/
-    existing_synonyms in analyze_individual_ids -- fuzzy matches aren't
-    reliable enough to auto-link without human review.
+    Matching is exact-string against resourceName/synonym first. As a third,
+    lower-confidence tier, we also try the resourceName with a trailing
+    disambiguation parenthetical stripped (e.g. an individualID of
+    "JH-2-002" against a resourceName of "JH-2-002 (MPNST)") -- this is
+    common for Cell Line/Patient-Derived Model/Antibody/Genetic Reagent/
+    Animal Model resources that share a parent specimen or clone ID but are
+    registered as distinct resources per tumor type, epitope, etc.
+
+    That stripped-name tier is ONLY trusted when it resolves to exactly one
+    resourceId. Several base names are genuinely shared by more than one
+    resourceId (e.g. "JH-2-002 (MPNST)" and "JH-2-002 (pNF)" are two
+    different sublines of the same specimen) -- an individualID of
+    "JH-2-002" in that case is truly ambiguous between them, and must not be
+    auto-linked to either.
     """
     resource_by_name: Dict[str, Dict] = {}
     resource_by_synonym: Dict[str, Dict] = {}
+    stripped_candidates: Dict[str, Set[str]] = {}
+    stripped_lookup: Dict[str, Dict] = {}
     for tool in tools_data:
         name = tool.get('resourceName')
         rid = tool.get('resourceId')
@@ -177,6 +198,22 @@ def find_tool_study_links(
                 if syn_name:
                     resource_by_synonym[syn_name] = tool
 
+        stripped = _strip_disambiguation_suffix(name)
+        if stripped and stripped != name:
+            stripped_candidates.setdefault(stripped, set()).add(rid)
+            stripped_lookup[stripped] = tool
+
+    ambiguous_stripped = {s for s, rids in stripped_candidates.items() if len(rids) > 1}
+    for s in ambiguous_stripped:
+        stripped_lookup.pop(s, None)
+    if ambiguous_stripped:
+        example = ', '.join(sorted(ambiguous_stripped)[:3])
+        logger.info(
+            f"Skipping {len(ambiguous_stripped)} ambiguous disambiguation-suffix "
+            f"base name(s) shared by >1 resourceId -- not safe to auto-link "
+            f"(e.g. {example}...)"
+        )
+
     new_links: Dict[tuple, Dict] = {}
     for row in occurrences.itertuples():
         individual_id = str(row.individualID).strip()
@@ -184,7 +221,11 @@ def find_tool_study_links(
         if not individual_id or not study_id:
             continue
 
-        tool = resource_by_name.get(individual_id) or resource_by_synonym.get(individual_id)
+        tool = (
+            resource_by_name.get(individual_id)
+            or resource_by_synonym.get(individual_id)
+            or stripped_lookup.get(individual_id)
+        )
         if not tool:
             continue
 
