@@ -152,6 +152,47 @@ def test_find_tool_study_links_skips_ambiguous_stripped_suffix():
     assert links == []
 
 
+def test_find_tool_study_links_skips_ambiguous_exact_resource_name():
+    """Two distinct resourceIds can legitimately share the exact same
+    resourceName (e.g. two vendor SKUs of the same catalog product,
+    confirmed live on nf-osi/nf-research-tools-schema#246 -- 25+ such
+    collisions exist in production data). An individualID matching that
+    name must NOT be silently auto-linked to whichever tool happened to be
+    seen last while building the lookup."""
+    tools_data = [
+        _tool("res-9a", "CPTC-NF1-1"),
+        _tool("res-9b", "CPTC-NF1-1"),
+    ]
+    occurrences = pd.DataFrame(
+        {
+            "individualID": ["CPTC-NF1-1"],
+            "studyId": ["syn777"],
+            "studyName": ["Study T"],
+        }
+    )
+    links = rta.find_tool_study_links(occurrences, tools_data, existing_links=set())
+    assert links == []
+
+
+def test_find_tool_study_links_skips_ambiguous_exact_synonym():
+    """Same as the exact-resourceName case, but for a synonym shared across
+    distinct resourceIds (e.g. a common accession number like NM_001042492
+    listed as a synonym for more than one tool, confirmed live on #246)."""
+    tools_data = [
+        _tool("res-10a", "Tool A", synonyms="NM_001042492"),
+        _tool("res-10b", "Tool B", synonyms="NM_001042492"),
+    ]
+    occurrences = pd.DataFrame(
+        {
+            "individualID": ["NM_001042492"],
+            "studyId": ["syn888"],
+            "studyName": ["Study S"],
+        }
+    )
+    links = rta.find_tool_study_links(occurrences, tools_data, existing_links=set())
+    assert links == []
+
+
 def test_find_tool_study_links_requires_both_resource_id_and_name():
     """A tool record missing resourceId or resourceName must not crash the
     lookup construction or be matchable -- mirrors real ACCEPTED data where

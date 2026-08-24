@@ -213,6 +213,30 @@ def _strip_disambiguation_suffix(name: str) -> str:
     return re.sub(r"\s*\([^)]*\)\s*$", "", name).strip()
 
 
+def _exclude_ambiguous_keys(
+    lookup: Dict[str, Dict],
+    candidates: Dict[str, Set[str]],
+    tier_label: str,
+) -> None:
+    """
+    Drop any key from `lookup` that `candidates` shows resolves to more than
+    one distinct resourceId -- mutates `lookup` in place. Shared by all three
+    matching tiers in _build_resource_match_lookups (see its docstring for
+    why this matters): a key that's genuinely ambiguous between two or more
+    resources must not silently resolve to whichever tool happened to be
+    seen last while building the lookup.
+    """
+    ambiguous = {key for key, rids in candidates.items() if len(rids) > 1}
+    for key in ambiguous:
+        lookup.pop(key, None)
+    if ambiguous:
+        example = ', '.join(sorted(ambiguous)[:3])
+        logger.info(
+            f"Skipping {len(ambiguous)} ambiguous {tier_label} value(s) shared "
+            f"by >1 resourceId -- not safe to auto-link (e.g. {example}...)"
+        )
+
+
 def _build_resource_match_lookups(
     tools_data: List[Dict],
 ) -> Tuple[Dict[str, Dict], Dict[str, Dict], Dict[str, Dict]]:
@@ -226,46 +250,55 @@ def _build_resource_match_lookups(
     specimen or clone ID but are registered as distinct resources per tumor
     type, epitope, etc.
 
-    The stripped-name tier is ONLY trusted when it resolves to exactly one
-    resourceId. Several base names are genuinely shared by more than one
-    resourceId (e.g. "JH-2-002 (MPNST)" and "JH-2-002 (pNF)" are two
-    different sublines of the same specimen) -- an individualID of
-    "JH-2-002" in that case is truly ambiguous between them, and must not be
-    auto-linked to either.
+    ALL THREE tiers are only trusted when a given key (exact resourceName,
+    exact synonym, or stripped base name) resolves to exactly one
+    resourceId. This matters beyond the stripped-suffix case the tier was
+    originally built for: live registry data has 25+ resourceNames and 11+
+    synonyms that are each reused verbatim across multiple distinct
+    resourceIds (e.g. "CPTC-NF1-1", "NM_001042492") -- almost always
+    unrelated resources that happen to share a common name/RRID/accession
+    string, not a disambiguation-suffix pair. Without this check, a plain
+    dict keyed by that string would silently keep whichever tool was seen
+    last while iterating tools_data and silently drop the others -- e.g.
+    risking a file's data being linked to "JH-2-002 (MPNST)" when it might
+    equally well belong to "JH-2-002 (pNF)" (nf-osi/nf-research-tools-schema
+    #246 review). An ambiguous key must not be auto-linked to any of its
+    candidates.
 
     Returns (resource_by_name, resource_by_synonym, stripped_lookup).
     """
     resource_by_name: Dict[str, Dict] = {}
     resource_by_synonym: Dict[str, Dict] = {}
-    stripped_candidates: Dict[str, Set[str]] = {}
     stripped_lookup: Dict[str, Dict] = {}
+
+    name_candidates: Dict[str, Set[str]] = {}
+    synonym_candidates: Dict[str, Set[str]] = {}
+    stripped_candidates: Dict[str, Set[str]] = {}
+
     for tool in tools_data:
         name = tool.get('resourceName')
         rid = tool.get('resourceId')
         if not name or not rid:
             continue
+
         resource_by_name[name] = tool
+        name_candidates.setdefault(name, set()).add(rid)
+
         synonyms_str = tool.get('synonyms', '')
         if synonyms_str and isinstance(synonyms_str, str):
             for syn_name in (s.strip() for s in synonyms_str.split(',')):
                 if syn_name:
                     resource_by_synonym[syn_name] = tool
+                    synonym_candidates.setdefault(syn_name, set()).add(rid)
 
         stripped = _strip_disambiguation_suffix(name)
         if stripped and stripped != name:
-            stripped_candidates.setdefault(stripped, set()).add(rid)
             stripped_lookup[stripped] = tool
+            stripped_candidates.setdefault(stripped, set()).add(rid)
 
-    ambiguous_stripped = {s for s, rids in stripped_candidates.items() if len(rids) > 1}
-    for s in ambiguous_stripped:
-        stripped_lookup.pop(s, None)
-    if ambiguous_stripped:
-        example = ', '.join(sorted(ambiguous_stripped)[:3])
-        logger.info(
-            f"Skipping {len(ambiguous_stripped)} ambiguous disambiguation-suffix "
-            f"base name(s) shared by >1 resourceId -- not safe to auto-link "
-            f"(e.g. {example}...)"
-        )
+    _exclude_ambiguous_keys(resource_by_name, name_candidates, 'resourceName')
+    _exclude_ambiguous_keys(resource_by_synonym, synonym_candidates, 'synonym')
+    _exclude_ambiguous_keys(stripped_lookup, stripped_candidates, 'disambiguation-suffix base name')
 
     return resource_by_name, resource_by_synonym, stripped_lookup
 
