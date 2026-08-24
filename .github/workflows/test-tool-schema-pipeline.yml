@@ -1,9 +1,11 @@
 name: Test Tool Schema Pipeline
 
-# Offline PR gate for the tool-schema pipeline. No Synapse access, no secrets.
-# Validates that the committed JSON Schemas will register and that Record Sets
-# can be built from them, before register-tool-schemas.yml runs live on merge.
-# See tests/test_tool_schema_pipeline.py for what each check catches.
+# Offline PR gate for the tool-schema and submission pipelines. No Synapse
+# access, no secrets. Runs every test under tests/ -- see
+# tests/test_tool_schema_pipeline.py (JSON Schema / Record Set validation,
+# before register-tool-schemas.yml runs live on merge) and
+# tests/test_compile_accepted_submissions.py (submission-dedup/ID-hashing
+# regression tests) for what each check catches.
 
 on:
   pull_request:
@@ -14,6 +16,7 @@ on:
       - 'scripts/generate_tool_schemas.py'
       - 'scripts/register_tool_schemas.py'
       - 'scripts/create_tool_record_sets.py'
+      - 'tool_coverage/scripts/**'
       - 'tests/**'
       - '.github/workflows/test-tool-schema-pipeline.yml'
   workflow_dispatch:
@@ -38,4 +41,4 @@ jobs:
 
       - name: Run pipeline tests
         run: |
-          pytest tests/test_tool_schema_pipeline.py -v
+          pytest tests/ -v
