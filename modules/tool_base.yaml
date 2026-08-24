@@ -37,7 +37,12 @@ classes:
         materializes all inherited slots into each subclass.
     class_uri: schema:Thing
     annotations:
-      synapse_table_id: syn26450069
+      # No synapse_table_id: Tool is abstract and, since Phase 7 of the
+      # LinkML migration (docs/MIGRATION.md) retired the legacy Resource
+      # table (syn26450069), is no longer backed by any single table --
+      # every Tool row lives in one of the 9 concrete subclass tables.
+      # synapse_view_id below is the live, unified read-only view over all
+      # of them.
       synapse_view_id: syn51730943
       synapse_project_id: syn26338068
     slots:
