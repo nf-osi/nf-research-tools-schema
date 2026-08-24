@@ -55,11 +55,35 @@ NF1"). Per Belinda's request:
   No investigatorSynapseId or ORCID is set -- neither was confirmable from
   the publication, and both are left null rather than guessed.
 
-  "add synonyms (non-abbreviated versions)" was also requested for
-  computational tools generally (not just CAVS-NF1) -- NOT done for the
-  other 2 (DINs, RENOVO-NF1) here: their non-abbreviated names aren't in
-  any data already queried, and guessing an expansion without a citable
-  source would be fabrication. Left as a follow-up needing a source.
+  Per Belinda's 2026-08-24 follow-up on #250 ("synonyms (full-length names)
+  can be obtained from their dev publications"), re-checked DINs and
+  RENOVO-NF1 against their dev publications:
+  - DINs (resourceId 4f81d5af-7c02-536b-a0df-c26e2c9d58c8): its dev paper
+    (arXiv:2106.03388 / PMC8855964, Zhang et al.) is titled "DINs: Deep
+    Interactive Networks for Neurofibroma Segmentation in Neurofibromatosis
+    Type 1 on Whole-Body MRI" -- the acronym is explicitly spelled out in
+    the title itself. Adding "Deep Interactive Networks" as a synonym.
+  - RENOVO-NF1 (resourceId 7784733d-dfe2-5c21-a831-a49b0b95f4e5): checked
+    its dev paper (PMC12400616 / DOI:10.1186/s40246-025-00803-z), the
+    original 2021 RENOVO algorithm paper it's built on
+    (DOI:10.1016/j.ajhg.2021.03.014, only abstract accessible), and the
+    tool's own GitHub README (mazzalab-ieo/renovo) -- none of the three
+    spell out what "RENOVO" stands for; it appears to be used as a proper
+    name, not an abbreviation of a longer phrase. NOT adding a synonym --
+    same "no citable source, won't guess" rule as before. Flagging for
+    Belinda in case she has a source (e.g. a non-English source, grant
+    documentation) that resolves this.
+
+  Belinda's follow-up also asked whether synonyms (and other fields) might
+  not have been properly backfilled during the LinkML migration (#228,
+  Phase 3). Checked: queried the retired legacy Resource table's own
+  pre-migration data (syn26450069, still readable) for DINs, RENOVO-NF1,
+  and CAVS-NF1 -- all three already had `synonyms = []` and `description =
+  NULL` there too, before the migration ran. So the empty synonyms aren't a
+  migration/backfill bug for these three tools; they were simply never
+  populated. (Not a claim this holds for every resource/field the migration
+  touched -- only checked these three tools' synonyms/description, since
+  that's what's in scope here.)
 
 Actions taken:
   1. Snapshot every affected table BEFORE any changes.
@@ -67,7 +91,8 @@ Actions taken:
   3. Fix the Human/Mouse species rows in Donor.
   4. Fix the 2 orphaned-resourceId rows and 1 mislabeled row in Observations.
   5. Rename CAVS-NF1, add its Publication/Investigator/Development rows.
-  6. Snapshot every affected table AFTER changes.
+  6. Add DINs' "Deep Interactive Networks" synonym.
+  7. Snapshot every affected table AFTER changes.
 """
 
 import os
@@ -145,6 +170,18 @@ CAVS_NF1_INVESTIGATOR = {
     # investigatorSynapseId and orcid intentionally left null -- not
     # confirmable from the publication, not guessed.
 }
+
+# DINs synonym: acronym is spelled out in its dev paper's own title
+# (arXiv:2106.03388 / PMC8855964) -- "DINs: Deep Interactive Networks for
+# Neurofibroma Segmentation in Neurofibromatosis Type 1 on Whole-Body MRI".
+DINS_RESOURCE_ID = '4f81d5af-7c02-536b-a0df-c26e2c9d58c8'
+DINS_SYNONYM = 'Deep Interactive Networks'
+
+# RENOVO-NF1 (resourceId 7784733d-dfe2-5c21-a831-a49b0b95f4e5) intentionally
+# NOT given a synonym: neither its dev paper (PMC12400616), the original
+# RENOVO paper it extends (DOI:10.1016/j.ajhg.2021.03.014), nor its GitHub
+# README spell out what "RENOVO" stands for -- no citable source, so not
+# guessing an expansion.
 
 
 def fix_genetic_disorder(syn, dry_run: bool) -> int:
@@ -338,6 +375,41 @@ def fix_cavs_nf1(syn, dry_run: bool) -> bool:
     return True
 
 
+def fix_dins_synonym(syn, dry_run: bool) -> bool:
+    print('\n=== #250 follow-up: DINs non-abbreviated-name synonym ===')
+    tool_df = syn.tableQuery(
+        f"SELECT resourceId, resourceName, synonyms FROM {COMPUTATIONAL_TOOL_DETAILS} "
+        f"WHERE resourceId = '{DINS_RESOURCE_ID}'"
+    ).asDataFrame(rowIdAndVersionInIndex=True)
+    if tool_df.empty:
+        print(f'  resourceId {DINS_RESOURCE_ID} not found -- nothing to do.')
+        return False
+
+    existing_synonyms = tool_df.iloc[0]['synonyms']
+    if DINS_SYNONYM in existing_synonyms:
+        print(f'  {DINS_SYNONYM!r} already in synonyms -- nothing to do (idempotent skip).')
+        return False
+
+    print(f'  Current: resourceName={tool_df.iloc[0]["resourceName"]!r}, synonyms={existing_synonyms}')
+    print(f'  Adding synonym: {DINS_SYNONYM!r} (source: dev paper title, PMC8855964)')
+    print(
+        "  Not adding a synonym for RENOVO-NF1 -- no source (dev paper, "
+        "original RENOVO paper, or GitHub README) spells out what "
+        "'RENOVO' stands for. See module docstring/comments."
+    )
+
+    if dry_run:
+        print('  Dry run -- not writing.')
+        return True
+
+    snapshot_table(syn, COMPUTATIONAL_TOOL_DETAILS, 'Before DINs synonym addition')
+    tool_df.loc[:, 'synonyms'] = tool_df['synonyms'].apply(lambda existing: list(existing) + [DINS_SYNONYM])
+    syn.store(Table(COMPUTATIONAL_TOOL_DETAILS, tool_df[['synonyms']]))
+    print(f'  Added synonym {DINS_SYNONYM!r} to {DINS_RESOURCE_ID}.')
+    snapshot_table(syn, COMPUTATIONAL_TOOL_DETAILS, 'After DINs synonym addition')
+    return True
+
+
 def main():
     dry_run = '--dry-run' in sys.argv
 
@@ -348,12 +420,15 @@ def main():
     n_species = fix_species(syn, dry_run)
     n_observations = fix_observations(syn, dry_run)
     cavs_nf1_done = fix_cavs_nf1(syn, dry_run)
+    dins_synonym_done = fix_dins_synonym(syn, dry_run)
 
     print('\n=== Summary ===')
     print(f'  #192 geneticDisorder rows {"would be" if dry_run else ""} fixed: {n_genetic_disorder}')
     print(f'  #209 species rows {"would be" if dry_run else ""} fixed: {n_species}')
     print(f'  #248 Observations rows {"would be" if dry_run else ""} fixed: {n_observations}')
     print(f'  #250 CAVS-NF1 curation {"would be" if dry_run else ""} applied: {cavs_nf1_done}')
+    print(f'  #250 DINs synonym {"would be" if dry_run else ""} added: {dins_synonym_done}')
+    print('  #250 RENOVO-NF1 synonym: no change (no citable source for the acronym -- see docstring)')
     print('  #218 reactiveSpecies: no change (no confirming evidence per-resourceId -- see docstring)')
 
 
