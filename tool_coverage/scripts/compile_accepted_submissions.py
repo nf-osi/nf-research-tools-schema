@@ -102,7 +102,7 @@ COLUMNS = {
     ],
     "patient_derived_models": [
         "resourceId", "modelSystemType", "patientDiagnosis",
-        "hostStrain", "tumorType", "engraftmentSite", "passageNumber",
+        "hostStrain", "organ", "tumorType", "engraftmentSite", "passageNumber",
         "establishmentRate", "molecularCharacterization", "clinicalData",
         "validationMethods", "geneticDisorder",
         "bbbIntegrityStatus", "routeOfAdministration", "pkpdCapabilities",
@@ -225,6 +225,23 @@ _GENETIC_DISORDER_MAP = {
     "Neurofibromatosis Type 2": "Neurofibromatosis type 2",
     "No known disease": "No known genetic disorder",
     "None": "No known genetic disorder",
+}
+
+_TUMOR_TYPE_MAP = {
+    # submitPatientDerivedModel.json's tumorType is Title Case; TumorTypeEnum
+    # (modules/enums.yaml) is lowercase, matching Biobank's diseaseType/tumorType
+    # convention (that form already submits lowercase, no map needed there).
+    # "Other" already matches the enum unchanged.
+    "Cutaneous Neurofibroma": "cutaneous neurofibroma",
+    "Plexiform Neurofibroma": "plexiform neurofibroma",
+    "Atypical Neurofibroma": "atypical neurofibroma",
+    "Schwannoma": "schwannoma",
+    "Meningioma": "meningioma",
+    "Malignant Peripheral Nerve Sheath Tumor": "malignant peripheral nerve sheath tumor",
+    "Low Grade Glioma": "low grade glioma",
+    "High Grade Glioma": "high grade glioma",
+    "Pheochromocytoma": "pheochromocytoma",
+    "Optic Nerve Glioma": "optic nerve glioma",
 }
 
 
@@ -737,7 +754,11 @@ def _build_patient_derived_model(d: dict) -> dict:
         "modelSystemType": model_system_type,
         "patientDiagnosis": _get(bi, "patientDiagnosis"),
         "hostStrain": _get(bi, "hostStrain"),
-        "tumorType": _get(bi, "tumorType"),
+        "organ": _get(bi, "organ"),
+        # tumorType is now the shared, multivalued slot (unified with Biobank's
+        # column in Synapse -- see docs/MIGRATION.md); the form itself is still
+        # single-select, so wrap the mapped value in a one-item list.
+        "tumorType": _fmt_list([_TUMOR_TYPE_MAP.get(v, v) for v in [_get(bi, "tumorType")] if v]),
         "engraftmentSite": _get(bi, "engraftmentSite"),
         "passageNumber": _get(bi, "passageNumber"),
         "establishmentRate": _get(bi, "establishmentRate"),
