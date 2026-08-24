@@ -67,7 +67,7 @@ def test_find_resource_id_annotations_appends_to_existing_list():
         [("syn111", "NCC-MPNST1-C1", ["some-other-resource-id"])],
         index=["111_2"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert len(updates) == 1
     assert updates.iloc[0]["id"] == "syn111"
     assert updates.iloc[0]["Resource_id"] == ["some-other-resource-id", "res-1"]
@@ -82,7 +82,7 @@ def test_find_resource_id_annotations_preserves_row_index():
         [("syn222", "Known Tool", None)],
         index=["222_5"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert list(updates.index) == ["222_5"]
 
 
@@ -92,7 +92,7 @@ def test_find_resource_id_annotations_handles_null_existing_value():
         [("syn333", "Fresh Tool", None)],
         index=["333_0"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert len(updates) == 1
     assert updates.iloc[0]["Resource_id"] == ["res-3"]
 
@@ -103,19 +103,27 @@ def test_find_resource_id_annotations_skips_when_already_present():
         [("syn444", "Already Tagged Tool", ["res-4"])],
         index=["444_1"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert updates.empty
 
 
 def test_find_resource_id_annotations_skips_when_list_at_max_length():
+    """A file already at the list-length cap must not be silently dropped --
+    it should surface in skipped_full with enough detail (id, resourceId,
+    existingCount) to act on, per feedback on #246."""
     tools_data = [_tool("res-5", "Full List Tool")]
     full_list = [f"other-{i}" for i in range(rta.RESOURCE_ID_MAX_LIST_LENGTH)]
     occurrences = _file_occurrences(
         [("syn555", "Full List Tool", full_list)],
         index=["555_0"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert updates.empty
+    assert skipped_full == [{
+        "id": "syn555",
+        "resourceId": "res-5",
+        "existingCount": rta.RESOURCE_ID_MAX_LIST_LENGTH,
+    }]
 
 
 def test_find_resource_id_annotations_ignores_unmatched_individual_ids():
@@ -124,7 +132,7 @@ def test_find_resource_id_annotations_ignores_unmatched_individual_ids():
         [("syn666", "Totally Unrelated Sample", None)],
         index=["666_0"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert updates.empty
 
 
@@ -137,7 +145,7 @@ def test_find_resource_id_annotations_skips_ambiguous_stripped_suffix():
         [("syn777", "JH-2-002", None)],
         index=["777_0"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert updates.empty
 
 
@@ -151,7 +159,7 @@ def test_find_resource_id_annotations_only_returns_files_needing_change():
         ],
         index=["888_0", "889_0", "890_0"],
     )
-    updates = rta.find_resource_id_annotations(occurrences, tools_data)
+    updates, skipped_full = rta.find_resource_id_annotations(occurrences, tools_data)
     assert len(updates) == 1
     assert updates.iloc[0]["id"] == "syn888"
     assert list(updates.index) == ["888_0"]

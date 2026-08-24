@@ -334,13 +334,19 @@ def find_tool_study_links(
     return list(new_links.values())
 
 
-RESOURCE_ID_MAX_LIST_LENGTH = 10  # matches the Resource_id column's maxListLength on syn52702673
+# NOT a Synapse platform hard cap -- this is just ANNOTATIONS_FILEVIEW_ID's
+# Resource_id column's current `maximumListLength` (confirmed live: 10,
+# maximumSize=36 per value). It's a per-column setting and can be raised via
+# the same swap-and-backfill pattern used elsewhere this session (create a
+# new ColumnModel with a higher maximumListLength, swap columnIds, backfill)
+# if the skip counts below ever become a real problem.
+RESOURCE_ID_MAX_LIST_LENGTH = 10
 
 
 def find_resource_id_annotations(
     file_occurrences: "pd.DataFrame",
     tools_data: List[Dict],
-) -> "pd.DataFrame":
+) -> Tuple["pd.DataFrame", List[Dict]]:
     """
     For each file whose individualID matches a known tool (same tiered
     matching as find_tool_study_links -- see _build_resource_match_lookups),
@@ -349,8 +355,8 @@ def find_resource_id_annotations(
 
     Additive only: an existing Resource_id value is never removed, and a
     resourceId already present is left alone. Files where appending would
-    exceed RESOURCE_ID_MAX_LIST_LENGTH are skipped and logged rather than
-    silently truncated or left to fail on write.
+    exceed RESOURCE_ID_MAX_LIST_LENGTH are skipped rather than silently
+    truncated or left to fail on write -- see the second return value.
 
     IMPORTANT: file_occurrences must be the DataFrame returned directly by
     query_individual_id_file_occurrences (or another syn.tableQuery(...)
@@ -363,15 +369,22 @@ def find_resource_id_annotations(
     entity scope). Rebuilding a plain DataFrame from scratch here would lose
     that and break the write in upsert_resource_id_annotations.
 
-    Returns a DataFrame with columns [id, Resource_id], index preserved from
-    file_occurrences -- ready to upsert via upsert_resource_id_annotations
-    -- containing only files that actually need a change.
+    Returns:
+        (updates, skipped_full) where:
+        - updates: DataFrame with columns [id, Resource_id], index preserved
+          from file_occurrences -- ready to upsert via
+          upsert_resource_id_annotations -- containing only files that
+          actually need a change.
+        - skipped_full: list of {id, resourceId, existingCount} dicts, one
+          per file that would need a change but is already at
+          RESOURCE_ID_MAX_LIST_LENGTH -- so this doesn't disappear into a
+          single count in the logs (per feedback on #246).
     """
     resource_by_name, resource_by_synonym, stripped_lookup = _build_resource_match_lookups(tools_data)
 
     updates = []
     row_labels = []
-    skipped_full = 0
+    skipped_full = []
     for row_label, row in zip(file_occurrences.index, file_occurrences.itertuples()):
         file_id = row.id
         individual_id = str(row.individualID).strip() if row.individualID else ''
@@ -392,20 +405,27 @@ def find_resource_id_annotations(
             continue
 
         if len(existing_list) >= RESOURCE_ID_MAX_LIST_LENGTH:
-            skipped_full += 1
+            skipped_full.append({
+                'id': file_id,
+                'resourceId': tool['resourceId'],
+                'existingCount': len(existing_list),
+            })
             continue
 
         updates.append({'id': file_id, 'Resource_id': existing_list + [tool['resourceId']]})
         row_labels.append(row_label)
 
     if skipped_full:
-        logger.info(
-            f"Skipping Resource_id update on {skipped_full} file(s) already at "
-            f"the {RESOURCE_ID_MAX_LIST_LENGTH}-value list limit"
+        affected_resource_ids = sorted({r['resourceId'] for r in skipped_full})
+        logger.warning(
+            f"Skipping Resource_id update on {len(skipped_full)} file(s) already at "
+            f"the {RESOURCE_ID_MAX_LIST_LENGTH}-value list limit, across "
+            f"{len(affected_resource_ids)} resourceId(s): {affected_resource_ids[:10]}"
+            f"{'...' if len(affected_resource_ids) > 10 else ''}"
         )
 
     logger.info(f"Found {len(updates)} file(s) needing a new Resource_id annotation")
-    return pd.DataFrame(updates, columns=['id', 'Resource_id'], index=row_labels)
+    return pd.DataFrame(updates, columns=['id', 'Resource_id'], index=row_labels), skipped_full
 
 
 def upsert_resource_id_annotations(syn: Synapse, updates: "pd.DataFrame") -> None:
@@ -978,11 +998,19 @@ def main():
         # off Resource_id -- picks up files without any frontend change.
         logger.info("\n=== Mining Resource_id File Annotations ===")
         file_occurrences = query_individual_id_file_occurrences(syn, limit=args.limit)
-        resource_id_updates = find_resource_id_annotations(file_occurrences, tools_data)
+        resource_id_updates, resource_id_skipped_full = find_resource_id_annotations(file_occurrences, tools_data)
         if not resource_id_updates.empty and not args.dry_run:
             upsert_resource_id_annotations(syn, resource_id_updates)
         elif not resource_id_updates.empty:
             logger.info(f"Dry run -- would upsert Resource_id on {len(resource_id_updates)} file(s)")
+
+        # Write skipped-full detail as a run artifact (per feedback on #246: a
+        # single count in the log isn't enough to act on) -- one row per file,
+        # not silently collapsed into the resourceId total.
+        if resource_id_skipped_full:
+            skipped_full_path = 'resource_id_skipped_full.csv'
+            pd.DataFrame(resource_id_skipped_full).to_csv(skipped_full_path, index=False)
+            logger.info(f"Wrote {len(resource_id_skipped_full)} skipped-full file record(s) to {skipped_full_path}")
 
         # Analyze facet configuration
         logger.info("\n=== Analyzing Facet Configuration ===")
@@ -1022,6 +1050,8 @@ def main():
         logger.info(f"    - {len(new_tool_study_links)} new association(s) {'upserted' if not args.dry_run else '(dry run, not upserted)'}")
         logger.info(f"  Resource_id File Annotations:")
         logger.info(f"    - {len(resource_id_updates)} file(s) {'updated' if not args.dry_run else '(dry run, not updated)'}")
+        if resource_id_skipped_full:
+            logger.info(f"    - {len(resource_id_skipped_full)} file(s) skipped (list-length cap) -- see resource_id_skipped_full.csv")
         logger.info(f"  Facet Analysis:")
         logger.info(f"    - {len(facet_analysis.get('existing_facets', {}))} existing facets")
         logger.info(f"    - {len(facet_analysis.get('suggested_new_facets', {}))} suggested new facets")

@@ -46,6 +46,22 @@ jobs:
           TOOL_STUDY_LINK_COUNT=$(grep -oP 'Found \K\d+(?= new tool<->study association)' annotation_output.log | tail -1 || echo 0)
           echo "tool_study_link_count=${TOOL_STUDY_LINK_COUNT:-0}" >> $GITHUB_OUTPUT
 
+          # Resource_id file-annotation backfill (nf-research-tools-schema#154,
+          # https://github.com/nf-osi/nf-research-tools-schema/issues/154#issuecomment-5394955094)
+          # -- same additive-only, unattended-write pattern as the tool<->study
+          # links above.
+          RESOURCE_ID_COUNT=$(grep -oP 'Found \K\d+(?= file\(s\) needing a new Resource_id)' annotation_output.log | tail -1 || echo 0)
+          echo "resource_id_count=${RESOURCE_ID_COUNT:-0}" >> $GITHUB_OUTPUT
+
+          # Files skipped for already being at the Resource_id list-length cap
+          # (see RESOURCE_ID_MAX_LIST_LENGTH) -- surfaced as a full per-file
+          # CSV artifact, not just a count, per feedback on #246.
+          RESOURCE_ID_SKIPPED_COUNT=0
+          if [ -f resource_id_skipped_full.csv ]; then
+            RESOURCE_ID_SKIPPED_COUNT=$(($(wc -l < resource_id_skipped_full.csv) - 1))
+          fi
+          echo "resource_id_skipped_count=${RESOURCE_ID_SKIPPED_COUNT:-0}" >> $GITHUB_OUTPUT
+
           if [ ! -f tool_annotation_suggestions.json ]; then
             echo "⚠️  review_tool_annotations.py produced no output file"
             echo "has_new=false" >> $GITHUB_OUTPUT
@@ -67,6 +83,14 @@ jobs:
             echo "has_new=false" >> $GITHUB_OUTPUT
             echo "ℹ️  No new cell line suggestions this month"
           fi
+
+      - name: Upload Resource_id skipped-full artifact
+        if: steps.annotation.outputs.resource_id_skipped_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-id-skipped-full
+          path: resource_id_skipped_full.csv
+          retention-days: 90
 
       - name: Convert annotation suggestions to submission JSON
         id: format
@@ -193,6 +217,8 @@ jobs:
             const hasNew = '${{ steps.annotation.outputs.has_new }}' === 'true';
             const newCount = '${{ steps.annotation.outputs.new_count }}' || '0';
             const toolStudyLinkCount = '${{ steps.annotation.outputs.tool_study_link_count }}' || '0';
+            const resourceIdCount = '${{ steps.annotation.outputs.resource_id_count }}' || '0';
+            const resourceIdSkippedCount = '${{ steps.annotation.outputs.resource_id_skipped_count }}' || '0';
             const prNumber = '${{ steps.annotation_pr.outputs.pull-request-number }}';
             const prUrl = '${{ steps.annotation_pr.outputs.pull-request-url }}';
 
@@ -231,6 +257,21 @@ jobs:
               ? `✅ Mined and upserted **${toolStudyLinkCount}** new tool<->study association(s) to \`syn26461958\` (matched via exact \`individualID\` == resourceName/synonym).`
               : 'ℹ️  No new tool<->study associations found this month.';
 
+            // Resource_id file-annotation backfill (nf-research-tools-schema#154)
+            // -- same additive-only, already-upserted-by-the-script pattern.
+            const resourceIdLines = [
+              Number(resourceIdCount) > 0
+                ? `✅ Backfilled **${resourceIdCount}** new \`Resource_id\` file annotation(s) on \`syn16858331\` (matched via the same rules as the tool<->study links above).`
+                : 'ℹ️  No new Resource_id file annotations found this month.',
+            ];
+            if (Number(resourceIdSkippedCount) > 0) {
+              resourceIdLines.push(
+                '',
+                `⚠️  **${resourceIdSkippedCount}** file(s) matched but were skipped -- already at the Resource_id list-length cap (currently 10). See the \`resource-id-skipped-full\` run artifact for the exact file/resourceId pairs.`,
+              );
+            }
+            const resourceIdSection = resourceIdLines.join('\n');
+
             const body = [
               '## Monthly Tool Submission Check',
               '',
@@ -243,6 +284,10 @@ jobs:
               '### Tool<->Study Links',
               '',
               toolStudyLinkSection,
+              '',
+              '### Resource_id File Annotations',
+              '',
+              resourceIdSection,
               '',
               '---',
               '',
