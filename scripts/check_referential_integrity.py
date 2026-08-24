@@ -94,10 +94,27 @@ def check_sqlite(sv, tables):
             print(f"  SKIP {table_name} ({syn_id}): {e}")
             continue
 
+        # gen-sqltables normalizes multivalued slots (e.g. Donor.species,
+        # range SpeciesEnum, multivalued: true) into a separate side table
+        # rather than a flat column -- Synapse stores them as a native
+        # STRING_LIST column instead, so the live dataframe has a column the
+        # generated DDL's main table doesn't. Multivalued fields aren't FK
+        # targets, so drop anything the DDL table doesn't actually have
+        # rather than trying to reconcile the two representations.
+        ddl_columns = {row[1] for row in db.execute(f"PRAGMA table_info({table_name})")}
+        extra = set(df.columns) - ddl_columns
+        if extra:
+            print(f"    (dropping multivalued/unmapped column(s) {sorted(extra)} for {table_name})")
+            df = df[[c for c in df.columns if c in ddl_columns]]
+
         try:
             df.to_sql(table_name, db, if_exists="append", index=False)
             print(f"    OK {table_name}: {len(df)} rows")
-        except sqlite3.IntegrityError as e:
+        except (sqlite3.IntegrityError, sqlite3.ProgrammingError, sqlite3.OperationalError) as e:
+            # ProgrammingError/OperationalError here are schema/type mismatches
+            # (e.g. a list-valued cell hitting a scalar column) rather than a
+            # true FK/uniqueness violation, but either way one table's problem
+            # shouldn't stop every later table in the loop from being checked.
             print(f"  FAIL {table_name}: {e}")
             failures.append((table_name, str(e)))
 
@@ -196,7 +213,17 @@ def check_enums(sv, tables):
 
             actual = set()
             for val in df[slot.name].dropna():
-                actual.update(v.strip() for v in str(val).split(","))
+                # STRING_LIST (multivalued) columns come back from Synapse as
+                # real Python lists, not comma-joined strings. str(val) on a
+                # list produces its repr (e.g. "['a', 'b']"), and splitting
+                # that on "," shreds it into bogus fragments like "['a'" and
+                # "'b']" -- so handle list-valued cells by iterating their
+                # actual elements, and treat an empty list as no value rather
+                # than the literal string "[]".
+                if isinstance(val, (list, tuple)):
+                    actual.update(str(v).strip() for v in val if str(v).strip())
+                else:
+                    actual.update(v.strip() for v in str(val).split(",") if v.strip())
 
             invalid = actual - valid
             if invalid:
