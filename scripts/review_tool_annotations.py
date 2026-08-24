@@ -34,6 +34,12 @@ except ImportError:
     print("Error: Required packages not installed. Install with: pip install synapseclient pandas")
     sys.exit(1)
 
+# Ensure this script's own directory is importable regardless of how this
+# module was loaded (run directly, or exec'd via importlib from a test in a
+# different cwd) so the sibling synapse_safety module resolves either way.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from synapse_safety import snapshot_table  # noqa: E402 -- shared before/after-snapshot policy
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -179,26 +185,6 @@ def query_individual_id_file_occurrences(syn: Synapse, limit: int = None) -> "pd
     except Exception as e:
         logger.error(f"Error querying individualID/Resource_id file occurrences: {e}")
         raise
-
-
-def snapshot_table(syn: Synapse, table_id: str, comment: str) -> Optional[int]:
-    """
-    Create a snapshot version of a table/view before or after an automated
-    write, so every change this script makes is recoverable independent of
-    Synapse's trash can (per standing policy: snapshot before AND after any
-    write, not just one or the other).
-
-    Best-effort: a snapshot failure is logged but does not raise, so a
-    snapshotting hiccup never blocks (or gets blocked by) the write itself
-    being wrapped.
-    """
-    try:
-        version = syn.create_snapshot_version(table_id, comment=comment)
-        logger.info(f"Snapshotted {table_id} as version {version} ({comment})")
-        return version
-    except Exception as e:
-        logger.warning(f"Could not snapshot {table_id}: {e}")
-        return None
 
 
 def query_existing_tool_study_links(syn: Synapse) -> Set[tuple]:
