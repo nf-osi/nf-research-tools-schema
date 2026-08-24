@@ -29,9 +29,25 @@ ACCEPTED_DIR_DEFAULT = Path("submissions")
 _PROJECT_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools")
 
 
+def _normalize_name(name: str) -> str:
+    """Normalize a name for stable deduplication/ID-hashing.
+
+    Collapses internal whitespace and folds case so that incidental
+    formatting differences between processing runs of the *same* submission
+    (capitalization, extra spaces — e.g. two mining passes over the same
+    publication) don't produce a "new" resource with a fresh ID instead of
+    being recognized as a duplicate. This was the root cause of the
+    duplicate-row bug tracked in #213 (and its sub-issues #220-#222): IDs
+    are a deterministic hash of the raw resourceName, and dedup compared
+    raw strings, so any incidental formatting drift between runs both
+    dodged the dedup check *and* produced a different hash.
+    """
+    return re.sub(r"\s+", " ", (name or "").strip()).casefold()
+
+
 def _make_id(prefix: str, resource_name: str) -> str:
-    """Deterministic UUID5 — same prefix+name always yields the same UUID."""
-    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"{prefix}:{resource_name.strip()}"))
+    """Deterministic UUID5 — same prefix+name (after normalization) always yields the same UUID."""
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"{prefix}:{_normalize_name(resource_name)}"))
 
 
 # ---------------------------------------------------------------------------
@@ -271,12 +287,12 @@ def _make_pub_id(pmid_or_doi: str) -> str:
 
 def _make_vendor_id(vendor_name: str) -> str:
     """Deterministic UUID5 for a vendor."""
-    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"vendor:{vendor_name.strip().lower()}"))
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"vendor:{_normalize_name(vendor_name)}"))
 
 
 def _make_vendor_item_id(vendor_name: str, catalog_number: str) -> str:
     """Deterministic UUID5 for a vendor–catalog pair."""
-    key = f"vendorItem:{vendor_name.strip().lower()}:{catalog_number.strip()}"
+    key = f"vendorItem:{_normalize_name(vendor_name)}:{catalog_number.strip()}"
     return str(uuid.uuid5(_PROJECT_NAMESPACE, key))
 
 
@@ -290,7 +306,7 @@ def _donor_key(name: str) -> str:
 
 def _make_donor_id(resource_name: str) -> str:
     """Deterministic UUID5 for a donor record (one per resource)."""
-    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"donor:{resource_name.strip()}"))
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"donor:{_normalize_name(resource_name)}"))
 
 
 
@@ -301,7 +317,7 @@ def _make_resource_id(resource_name: str, ttype_plural: str) -> str:
     is a stable local placeholder; generate_review_csv.py will replace it with
     the real Synapse UUID once the resource is mirrored in syn51730943.
     """
-    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"resource:{ttype_plural}:{resource_name.strip()}"))
+    return str(uuid.uuid5(_PROJECT_NAMESPACE, f"resource:{ttype_plural}:{_normalize_name(resource_name)}"))
 
 
 # Maps ttype (singular) → (Synapse resourceType label, detail-table ID column, ttype plural key)
@@ -998,12 +1014,17 @@ _SECONDARY_BUILDERS: dict[str, list[tuple]] = {
 # ---------------------------------------------------------------------------
 
 def _load_existing_names(csv_path: Path, name_col: str) -> set:
-    """Load existing _resourceName values to avoid duplicates."""
+    """Load existing _resourceName values to avoid duplicates.
+
+    Values are normalized (see _normalize_name) so a lookup against this set
+    must also normalize its key — this alone doesn't dedupe anything unless
+    callers compare normalized values too.
+    """
     if not csv_path.exists():
         return set()
     try:
         with open(csv_path, newline="", encoding="utf-8") as f:
-            return {r.get(name_col, "") for r in csv.DictReader(f) if r.get(name_col)}
+            return {_normalize_name(r.get(name_col, "")) for r in csv.DictReader(f) if r.get(name_col)}
     except Exception:
         return set()
 
@@ -1285,7 +1306,7 @@ def _generate_resources_csv(
                 rid = row.get("resourceId", "").strip()
                 if rid:
                     existing_ids.add(rid)
-                rname = row.get("resourceName", "").strip().lower()
+                rname = _normalize_name(row.get("resourceName", ""))
                 rtype = row.get("resourceType", "").strip()
                 if rname and rtype:
                     existing_name_types.add((rname, rtype))
@@ -1296,7 +1317,7 @@ def _generate_resources_csv(
         if not resource_name or ttype not in _TTYPE_ID_INFO:
             return
         rtype_label, id_col, ttype_plural = _TTYPE_ID_INFO[ttype]
-        name_type_key = (resource_name.strip().lower(), rtype_label)
+        name_type_key = (_normalize_name(resource_name), rtype_label)
         if name_type_key in existing_name_types:
             return
         resource_id = _make_resource_id(resource_name, ttype_plural)
@@ -1335,7 +1356,7 @@ def _generate_resources_csv(
                 resource_name = row.get("_resourceName", "").strip()
                 if not resource_name:
                     continue
-                name_type_key = (resource_name.lower(), rtype_label)
+                name_type_key = (_normalize_name(resource_name), rtype_label)
                 if name_type_key in existing_name_types:
                     continue
                 resource_id = row.get(id_col, "").strip() or \
@@ -1464,7 +1485,8 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         for item in items:
             row = builder_fn(item)
             name = row.get(name_col, "")
-            if name in existing:
+            norm_name = _normalize_name(name)
+            if norm_name in existing:
                 dupes.append(name)
             else:
                 # Assign stable UUID to the type-specific ID column if not already set.
@@ -1473,7 +1495,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
                     if not row.get(id_col):
                         row[id_col] = _make_resource_id(name, ttype_plural)
                 rows.append(row)
-                existing.add(name)
+                existing.add(norm_name)
 
         if dry_run:
             print(f"  [dry-run] {ttype}: {len(rows)} new, {len(dupes)} duplicate(s)")
@@ -1500,7 +1522,7 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
                     continue
                 row_list = result if isinstance(result, list) else [result]
                 for sec_row in row_list:
-                    dedup_key = sec_row.get(_id_col) or sec_row.get("_resourceName", "")
+                    dedup_key = _normalize_name(sec_row.get(_id_col) or sec_row.get("_resourceName", ""))
                     if dedup_key not in sec_existing:
                         sec_rows.append(sec_row)
                         sec_existing.add(dedup_key)

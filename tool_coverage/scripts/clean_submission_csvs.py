@@ -8,6 +8,7 @@ uploading to Synapse.
 """
 
 import json
+import re
 import pandas as pd
 import os
 import glob
@@ -17,6 +18,32 @@ from synapseclient import Table
 from typing import List, Dict, Tuple
 
 SYN_RESOURCES_TABLE = "syn26450069"
+
+
+def _normalize_name(name) -> str:
+    """Normalize a name for duplicate detection.
+
+    Mirrors compile_accepted_submissions.py's _normalize_name — see that
+    module's docstring for why this exists: the #213/#220-#222 duplicate-row
+    bug was caused by comparing raw, unnormalized resourceName strings, so
+    incidental formatting drift (capitalization, extra whitespace) between
+    two processing runs of the same tool dodged dedup entirely.
+    """
+    if name is None or (isinstance(name, float) and pd.isna(name)):
+        return ""
+    return re.sub(r"\s+", " ", str(name).strip()).casefold()
+
+
+def _find_resourcename_duplicates(df_clean: pd.DataFrame, existing_names) -> pd.Series:
+    """Return a boolean mask of df_clean rows whose (normalized) resourceName
+    already exists in the target table.
+
+    ``existing_names`` is any iterable of resourceName strings already in
+    Synapse (raw, unnormalized). Rows that match are ones the PK-based dedup
+    missed -- see _normalize_name's docstring for why that happens.
+    """
+    existing_norm_names = {_normalize_name(n) for n in existing_names}
+    return df_clean["resourceName"].apply(lambda n: _normalize_name(n) in existing_norm_names)
 
 # Primary-key column for each detail table — used to skip rows already in Synapse.
 _DETAIL_TABLE_PK = {
@@ -432,6 +459,34 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                     skipped = before - len(df_clean)
                     if skipped:
                         print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+
+                    # Safety net for the #213/#220-#222 duplicate-row bug: pk_col is a
+                    # deterministic hash of resourceName, so a "new" pk_col can still be
+                    # the *same* underlying tool reprocessed with slightly different name
+                    # formatting. Cross-check remaining rows against existing resourceName
+                    # values in this table (available directly on every detail table since
+                    # the LinkML migration) before uploading, rather than silently inserting
+                    # a duplicate for a human to find later.
+                    if "resourceName" in df_clean.columns and not df_clean.empty:
+                        try:
+                            existing_names_df = syn.tableQuery(
+                                f"SELECT resourceName FROM {table_id} WHERE resourceName IS NOT NULL"
+                            ).asDataFrame()
+                            suspect_mask = _find_resourcename_duplicates(df_clean, existing_names_df["resourceName"])
+                            n_suspect = int(suspect_mask.sum())
+                            if n_suspect:
+                                print(f"      ⚠️  {n_suspect} row(s) have a new {pk_col} but a resourceName matching "
+                                      f"an existing row in {table_id} — likely duplicates, NOT uploading:")
+                                for name in df_clean.loc[suspect_mask, "resourceName"]:
+                                    print(f"           - {name!r}")
+                                print(f"         Review manually and, if genuinely new, resubmit with a distinct name.")
+                                df_clean = df_clean[~suspect_mask].copy()
+                        except Exception as e:
+                            print(f"      ⚠️  Could not run resourceName duplicate safety-check for {table_id}: {e} — continuing")
+
+                    if df_clean.empty:
+                        print(f"      ✅ No new rows to upload to {table_id} (all were duplicates)")
+                        return True
 
                     # Patch newly-added fields on existing rows where blank in Synapse.
                     # synapseclient sets the DataFrame index to "ROW_ID_ROW_VERSION" strings
