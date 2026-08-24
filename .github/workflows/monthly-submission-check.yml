@@ -37,6 +37,15 @@ jobs:
         run: |
           python scripts/review_tool_annotations.py 2>&1 | tee annotation_output.log
 
+          # Tool<->study links (nf-osi/nf-research-tools-schema#132, #154) are
+          # mined and upserted directly to syn26461958 within the script itself
+          # (additive-only, exact-match-only -- see upsert_tool_study_links'
+          # docstring for why this doesn't go through the PR review flow like
+          # new-resource suggestions do). Surface the count for the monthly
+          # issue from the script's own log line rather than a second file.
+          TOOL_STUDY_LINK_COUNT=$(grep -oP 'Found \K\d+(?= new tool<->study association)' annotation_output.log | tail -1 || echo 0)
+          echo "tool_study_link_count=${TOOL_STUDY_LINK_COUNT:-0}" >> $GITHUB_OUTPUT
+
           if [ ! -f tool_annotation_suggestions.json ]; then
             echo "⚠️  review_tool_annotations.py produced no output file"
             echo "has_new=false" >> $GITHUB_OUTPUT
@@ -183,6 +192,7 @@ jobs:
 
             const hasNew = '${{ steps.annotation.outputs.has_new }}' === 'true';
             const newCount = '${{ steps.annotation.outputs.new_count }}' || '0';
+            const toolStudyLinkCount = '${{ steps.annotation.outputs.tool_study_link_count }}' || '0';
             const prNumber = '${{ steps.annotation_pr.outputs.pull-request-number }}';
             const prUrl = '${{ steps.annotation_pr.outputs.pull-request-url }}';
 
@@ -214,6 +224,13 @@ jobs:
               ].join('\n');
             }
 
+            // Tool<->study link mining (nf-osi/nf-research-tools-schema#132, #154)
+            // -- upserted directly to syn26461958 within the script itself, so
+            // this is a report of what already happened, not an action item.
+            const toolStudyLinkSection = Number(toolStudyLinkCount) > 0
+              ? `✅ Mined and upserted **${toolStudyLinkCount}** new tool<->study association(s) to \`syn26461958\` (matched via exact \`individualID\` == resourceName/synonym).`
+              : 'ℹ️  No new tool<->study associations found this month.';
+
             const body = [
               '## Monthly Tool Submission Check',
               '',
@@ -222,6 +239,10 @@ jobs:
               '---',
               '',
               annotationSection,
+              '',
+              '### Tool<->Study Links',
+              '',
+              toolStudyLinkSection,
               '',
               '---',
               '',
