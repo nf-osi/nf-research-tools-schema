@@ -9,8 +9,21 @@
       "description": "A large language model-generated summary of the resource.",
       "type": "string"
     },
+    "bbbIntegrityStatus": {
+      "type": "string",
+      "enum": [
+        "Intact",
+        "Compromised",
+        "Not Applicable",
+        "Unknown"
+      ]
+    },
     "clinicalData": {
       "description": "Available clinical data from the patient.",
+      "type": "string"
+    },
+    "clinicalTranslationHistory": {
+      "description": "Known instances where findings from this model did or did not translate to human clinical outcomes.",
       "type": "string"
     },
     "dateAdded": {
@@ -42,6 +55,21 @@
       "description": "Success rate of model establishment.",
       "type": "string"
     },
+    "geneticDisorder": {
+      "description": "Genetic disorders associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Neurofibromatosis type 1",
+          "Neurofibromatosis type 2",
+          "Schwannomatosis",
+          "NF1 Spontaneous Mutation",
+          "No known genetic disorder",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
     "hostStrain": {
       "type": "string",
       "enum": [
@@ -55,6 +83,29 @@
     },
     "howToAcquire": {
       "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "mechanismOfActionValidation": {
+      "description": "Drug mechanisms of action that have been successfully tested in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "MEK inhibitors",
+          "RAS pathway (non-MEK)",
+          "mTOR inhibitors",
+          "VEGF/angiogenesis",
+          "CDK inhibitors",
+          "HDAC inhibitors",
+          "Other kinase inhibitors",
+          "Immunotherapy",
+          "Chemotherapy",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "modelLimitations": {
+      "description": "Explicit description of what this model does NOT recapitulate or where it may produce false positive/negative results.",
       "type": "string"
     },
     "modelSystemType": {
@@ -83,6 +134,14 @@
         ]
       },
       "type": "array"
+    },
+    "mtaRequired": {
+      "description": "Whether a Material Transfer Agreement is required to access this model.",
+      "type": "boolean"
+    },
+    "ngnriRepositoryStatus": {
+      "description": "Whether this model is deposited in the Nick Gilbert Neurofibromatosis Research Institute (NGNRI) repository for equitable access.",
+      "type": "boolean"
     },
     "organ": {
       "type": "string",
@@ -140,12 +199,54 @@
       ],
       "description": "The organ the patient-derived model is derived from."
     },
+    "otherMechanismOfActionValidation": {
+      "description": "Free-text specification when mechanismOfActionValidation includes \"Other\".",
+      "type": "string"
+    },
+    "otherRouteOfAdministration": {
+      "description": "Free-text specification when routeOfAdministration includes \"Other\".",
+      "type": "string"
+    },
     "passageNumber": {
       "description": "Current passage number, if applicable.",
       "type": "string"
     },
     "patientDiagnosis": {
       "description": "Original patient diagnosis or condition.",
+      "type": "string"
+    },
+    "pediatricSuitability": {
+      "type": "string",
+      "enum": [
+        "Pediatric",
+        "Adult",
+        "Both",
+        "Unknown"
+      ],
+      "description": "Whether this model is suitable for studying pediatric, adult, or both age groups."
+    },
+    "pkpdCapabilities": {
+      "description": "Pharmacokinetic and pharmacodynamic measurements that can be performed in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Drug concentration in plasma",
+          "Drug concentration in brain/CNS tissue",
+          "Drug concentration in tumor",
+          "Drug concentration in CSF",
+          "Target engagement measurement",
+          "Pathway modulation (e.g., pERK, pAKT)",
+          "Biomarker response",
+          "Metabolite profiling",
+          "Metabolic pathway flux analysis",
+          "Drug-drug interaction assessment",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "regulatoryAcceptanceHistory": {
+      "description": "Known FDA/EMA precedents where data from this model type supported a regulatory submission or approval.",
       "type": "string"
     },
     "resourceId": {
@@ -171,6 +272,23 @@
       ],
       "description": "Type of resource."
     },
+    "routeOfAdministration": {
+      "description": "Drug delivery routes that have been validated or are feasible in this model.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Oral",
+          "Intravenous (IV)",
+          "Intraperitoneal (IP)",
+          "Intracranial",
+          "Subcutaneous",
+          "Topical",
+          "Intranasal",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
     "rrid": {
       "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
       "pattern": "^rrid:[a-zA-Z]+.+$",
@@ -182,6 +300,18 @@
         "type": "string"
       },
       "type": "array"
+    },
+    "timelineToResults": {
+      "type": "string",
+      "enum": [
+        "Less than 1 month",
+        "1–3 months",
+        "3–6 months",
+        "6–12 months",
+        "More than 12 months",
+        "Unknown"
+      ],
+      "description": "Estimated time from experiment start to primary endpoint readout."
     },
     "tumorType": {
       "description": "Tumor types associated with the resource.",

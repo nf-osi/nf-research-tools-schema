@@ -24,6 +24,8 @@ classes:
     mixins:
       - HasTumorType
       - HasPassageNumber
+    slots:
+      - geneticDisorder
     description: >-
       Patient-derived models including patient-derived xenografts (PDX),
       humanized mice, patient-derived organoids, and patient-derived
@@ -56,6 +58,65 @@ classes:
       validationMethods:
         description: Methods used to validate model fidelity to patient.
         multivalued: true
+      bbbIntegrityStatus:
+        range: BbbIntegrityStatusEnum
+      clinicalTranslationHistory:
+        description: >-
+          Known instances where findings from this model did or did not
+          translate to human clinical outcomes.
+      routeOfAdministration:
+        description: >-
+          Drug delivery routes that have been validated or are feasible
+          in this model.
+        range: RouteOfAdministrationEnum
+        multivalued: true
+      otherRouteOfAdministration:
+        description: >-
+          Free-text specification when routeOfAdministration includes "Other".
+      pkpdCapabilities:
+        description: >-
+          Pharmacokinetic and pharmacodynamic measurements that can be
+          performed in this model.
+        range: PkpdCapabilitiesEnum
+        multivalued: true
+      mechanismOfActionValidation:
+        description: >-
+          Drug mechanisms of action that have been successfully tested
+          in this model.
+        range: MechanismOfActionEnum
+        multivalued: true
+      otherMechanismOfActionValidation:
+        description: >-
+          Free-text specification when mechanismOfActionValidation
+          includes "Other".
+      pediatricSuitability:
+        description: >-
+          Whether this model is suitable for studying pediatric, adult,
+          or both age groups.
+        range: PediatricSuitabilityEnum
+      timelineToResults:
+        description: >-
+          Estimated time from experiment start to primary endpoint readout.
+        range: TimelineToResultsEnum
+      modelLimitations:
+        description: >-
+          Explicit description of what this model does NOT recapitulate
+          or where it may produce false positive/negative results.
+      regulatoryAcceptanceHistory:
+        description: >-
+          Known FDA/EMA precedents where data from this model type
+          supported a regulatory submission or approval.
+      mtaRequired:
+        description: >-
+          Whether a Material Transfer Agreement is required to access
+          this model.
+        range: boolean
+      ngnriRepositoryStatus:
+        description: >-
+          Whether this model is deposited in the Nick Gilbert
+          Neurofibromatosis Research Institute (NGNRI) repository for
+          equitable access.
+        range: boolean
     slot_usage:
       resourceType:
         ifabsent: string(Patient-Derived Model)

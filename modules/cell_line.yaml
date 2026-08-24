@@ -53,6 +53,48 @@ classes:
         description: >-
           The base culture medium and supplements used to maintain
           the cell line (e.g. RPMI supplemented with 10% FBS).
+      organOther:
+        description: Free-text specification when organ is "Other".
+      mechanismOfActionValidation:
+        description: >-
+          Drug mechanisms of action that have been successfully tested
+          in this cell line.
+        range: MechanismOfActionEnum
+        multivalued: true
+      otherMechanismOfActionValidation:
+        description: >-
+          Free-text specification when mechanismOfActionValidation
+          includes "Other".
+      pediatricSuitability:
+        description: >-
+          Whether this cell line was derived from or is relevant to
+          pediatric, adult, or both age groups.
+        range: PediatricSuitabilityEnum
+      pkpdCapabilities:
+        description: >-
+          Pharmacokinetic and pharmacodynamic measurements that can be
+          performed using this cell line.
+        range: CellLinePkpdCapabilitiesEnum
+        multivalued: true
+      otherPkpdCapabilities:
+        description: >-
+          Free-text specification when pkpdCapabilities includes "Other".
+      timelineToResults:
+        description: >-
+          Estimated time from plating/passage to primary assay
+          endpoint readout.
+        range: CellLineTimelineToResultsEnum
+      mtaRequired:
+        description: >-
+          Whether a Material Transfer Agreement is required to access
+          this cell line.
+        range: boolean
+      ngnriRepositoryStatus:
+        description: >-
+          Whether this cell line is deposited in the Nick Gilbert
+          Neurofibromatosis Research Institute (NGNRI) repository for
+          equitable access.
+        range: boolean
     slot_usage:
       resourceType:
         ifabsent: string(Cell Line)
@@ -100,6 +142,30 @@ enums:
       Telomerase immortalized cell line: {}
       Transformed cell line: {}
       Undefined cell line type: {}
+
+  CellLinePkpdCapabilitiesEnum:
+    description: >-
+      Pharmacokinetic and pharmacodynamic measurements that can be
+      performed using a cell line.
+    permissible_values:
+      Drug concentration in cell lysate/media: {}
+      Target engagement measurement: {}
+      Pathway modulation (e.g., pERK, pAKT): {}
+      Biomarker response: {}
+      Metabolite profiling: {}
+      Drug-drug interaction assessment: {}
+      Other: {}
+
+  CellLineTimelineToResultsEnum:
+    description: >-
+      Estimated time from plating/passage to primary assay endpoint
+      readout for a cell line.
+    permissible_values:
+      Less than 1 week: {}
+      1–4 weeks: {}
+      1–3 months: {}
+      More than 3 months: {}
+      Unknown: {}
 
   CellLineManifestationEnum:
     description: >-
