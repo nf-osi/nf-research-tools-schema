@@ -140,32 +140,86 @@ When new cell lines are found, `monthly-submission-check.yml` creates a PR with:
 Before merging the annotation PR:
 
 - [ ] Verify suggested cell lines are legitimate NF-relevant cell lines (not typos, sample IDs, or errors)
-- [ ] For each valid cell line: move to `submissions/accepted/`:
-  ```bash
-  git mv submissions/cell_lines/annotation_<name>.json submissions/cell_lines/accepted/
-  ```
-- [ ] Fill in known fields (tissue, disease, species, etc.) in the JSON
-- [ ] Delete files that are not real cell lines
+- [ ] Fill in known fields (tissue, disease, species, etc.) directly in the JSON
+- [ ] If not a real cell line or a duplicate, **delete the file** (no `accepted/` subdirectory move needed post-LinkML-migration -- see below)
 - [ ] Check suggested synonyms in `tool_annotation_suggestions.md` (informational; update manually if needed)
 - [ ] Ensure no duplicate entries
 
 ### What Happens After Merge
 
-When the annotation PR (or any PR touching `submissions/accepted/`) is merged:
+**Post-LinkML-migration correction**: there is no `submissions/accepted/` subdirectory step anymore. Everything remaining in `submissions/cell_lines/` (with `_source: annotation_review`) at merge time is uploaded automatically -- editing a file in place or deleting it is the whole review action, no `git mv` required.
+
+When the annotation PR is merged:
 
 1. **Immediate**: `upsert-tools.yml` triggers automatically
-   - Compiles `submissions/*/accepted/**/*.json` → appends new rows to `ACCEPTED_cell_lines.csv`
-   - Validates CSV schemas
+   - Compiles `submissions/cell_lines/*.json` remaining at merge
    - Cleans tracking columns (prefixed with `_`)
-   - Uploads to Synapse:
-     - syn26486823 (cell lines table)
-     - syn26450069 (resources table)
+   - Uploads to `syn26486823` (`CellLineDetails`) -- still the current, live per-resourceType detail table post-migration, **not** retired; it feeds into the tools materialized view `syn51730943` alongside the other resourceType detail tables
+
+**Correction to an earlier draft of this doc**: only the old flat `Resource` table (`syn26450069`) was retired by the LinkML migration (fields absorbed into the per-resourceType detail tables -- see `docs/MIGRATION.md` for the full before/after). `syn26486823` was never retired and is still the correct upload target above.
 
 ### What Happens If No New Cell Lines Found
 
 - No annotation PR is created
 - Monthly issue still created with annotation results section:
   > ✅ No new cell lines found in `individualID` annotations this month — nothing to do.
+
+## Tool<->Study Links and Resource_id Backfill (#132, #154)
+
+The same script also mines two additional, lower-risk automations that write
+directly to Synapse rather than going through the submissions/PR flow --
+both are additive-only, so nothing existing is ever modified or removed.
+
+### Why these skip PR review
+
+An exact match of a file's `individualID` against a known tool's
+`resourceName`/synonym (or, as a third tier, against a `resourceName` with
+its trailing disambiguation suffix stripped -- e.g. `JH-2-002` matching
+`JH-2-002 (MPNST)`, but **only** when that stripped base name isn't shared
+by more than one resourceId) is a high-confidence, mechanical signal that
+doesn't need the human curation judgment a brand-new resource suggestion
+does. See `_build_resource_match_lookups`'s docstring in
+`review_tool_annotations.py` for the exact matching tiers.
+
+### Tool<->study links
+
+Writes `(resourceId, studyId)` pairs to `syn26461958` for every matched
+individualID/study co-occurrence not already recorded there. Reported in
+the monthly issue under "Tool<->Study Links".
+
+### Resource_id file-annotation backfill
+
+The Tool Details "Data > Files" tab in synapse-web-monorepo renders off a
+`Resource_id` annotation set directly on files -- historically only ever
+set manually (779 of ~82k individualID-tagged files as of 2026-08). This
+backfill appends the matched resourceId to that file's `Resource_id` list
+wherever a match is found and the value isn't already present, so the
+existing tab picks up more files with **no frontend change needed**.
+
+### Every write is snapshotted
+
+`snapshot_table()` is called immediately before and immediately after each
+of these writes (and the tool<->study link write above), independent of
+Synapse's trash can, per standing policy.
+
+## Cross-Project Table Dependencies (#249)
+
+Not everything this script reads from or writes to lives in this repo's
+own Synapse project. Two different projects are involved:
+
+| Table | Project | Role |
+|---|---|---|
+| `syn51730943` | **Neurofibromatosis Research Tools Central** (`syn26338068`) -- this repo's project | Tools materialized view: resourceName, synonyms, all tool fields |
+| `syn52702673` ("Portal - MV Files") | **NF Data Portal (backend)** (`syn26451327`) | MaterializedView joining file annotations -- **read-only**, has no writable row-to-entity mapping of its own |
+| `syn16858331` ("Portal - Files") | **NF Data Portal (backend)** (`syn26451327`) | The real, writable EntityView `syn52702673` is built from. `individualID` and `Resource_id` both live here; **all writes must target this table, not the MV** |
+| `syn26461958` ("Study - Resource") | **NF Data Portal (backend)** (`syn26451327`) | Tool<->study junction table |
+
+The practical implication: three of the four tables this script's
+tool<->study/Resource_id mining depends on are owned by the NF Data Portal
+project, not this repo's own NFRTC project. Anyone maintaining this script
+who only has NFRTC-project permissions may not be able to write to
+`syn16858331` or `syn26461958` without separately requesting NF Data Portal
+access.
 
 ## Configuration
 
@@ -178,15 +232,24 @@ When the annotation PR (or any PR touching `submissions/accepted/`) is merged:
 
 ### Data Sources
 
-**Annotations**: `syn52702673`
-- File annotations view
-- Contains individualID field
+**Annotations (read)**: `syn52702673`
+- File annotations MaterializedView, joined for convenience
+- Contains individualID, studyId/studyName, Resource_id
 - Public access
+- See "Cross-Project Table Dependencies" above -- this is read-only; annotation writes target `syn16858331` instead
+
+**Annotations (write target for Resource_id backfill)**: `syn16858331`
+- The writable EntityView `syn52702673` is built from
+- Public read, requires NF Data Portal project write access
 
 **Tools**: `syn51730943`
 - Tools materialized view
 - Contains resourceName, synonyms, all tool fields
 - Public access
+
+**Tool<->Study Links**: `syn26461958`
+- Junction table, additive-only writes
+- Requires NF Data Portal project write access
 
 ## Example Output
 
