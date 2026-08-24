@@ -23,7 +23,7 @@ import sys
 from collections import defaultdict
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Dict, List, Set, Optional
+from typing import Dict, List, Set, Optional, Tuple
 
 try:
     import synapseclient
@@ -43,6 +43,7 @@ logger = logging.getLogger(__name__)
 # Constants
 ANNOTATIONS_VIEW_ID = "syn52702673"  # File annotations view (for individualID)
 TOOLS_VIEW_ID = "syn51730943"  # Tools materialized view (for resourceName, synonyms, facets)
+TOOL_STUDY_LINKS_TABLE_ID = "syn26461958"  # tool<->study junction table (nf-research-tools-schema#132)
 
 # Minimum frequency threshold for suggesting new individualID values
 MIN_FREQUENCY = 2
@@ -90,6 +91,152 @@ def query_individual_ids(syn: Synapse, limit: int = None) -> List[str]:
     except Exception as e:
         logger.error(f"Error querying Synapse annotations: {e}")
         raise
+
+
+def query_individual_id_study_occurrences(syn: Synapse, limit: int = None) -> "pd.DataFrame":
+    """
+    Query the file annotations view for individualID values together with the
+    study each occurrence belongs to (syn52702673 already carries studyId/
+    studyName per file -- no extra join needed).
+
+    Used to trace an individualID that exactly matches a known tool back to
+    the study/studies whose files reference it, for automated tool<->study
+    linking (nf-osi/nf-research-tools-schema#132, #154).
+
+    Args:
+        syn: Synapse client
+        limit: Optional limit on number of rows to retrieve
+
+    Returns:
+        DataFrame with columns [individualID, studyId, studyName], one row
+        per (individualID, studyId) occurrence (not deduplicated).
+    """
+    logger.info(f"Querying {ANNOTATIONS_VIEW_ID} for individualID/studyId occurrences...")
+
+    query = (
+        f"SELECT individualID, studyId, studyName FROM {ANNOTATIONS_VIEW_ID} "
+        f"WHERE individualID IS NOT NULL AND studyId IS NOT NULL"
+    )
+    if limit:
+        query += f" LIMIT {limit}"
+
+    try:
+        df = syn.tableQuery(query).asDataFrame()
+        logger.info(f"Retrieved {len(df)} individualID/studyId occurrence row(s)")
+        return df
+    except Exception as e:
+        logger.error(f"Error querying individualID/studyId occurrences: {e}")
+        raise
+
+
+def query_existing_tool_study_links(syn: Synapse) -> Set[tuple]:
+    """
+    Query the existing tool<->study junction table for (resourceId, studyId)
+    pairs already recorded, so newly-mined associations can be de-duplicated
+    against it.
+    """
+    logger.info(f"Querying existing links from {TOOL_STUDY_LINKS_TABLE_ID}...")
+    try:
+        df = syn.tableQuery(
+            f"SELECT resourceId, studyId FROM {TOOL_STUDY_LINKS_TABLE_ID}"
+        ).asDataFrame()
+        existing = {(row.resourceId, row.studyId) for row in df.itertuples()}
+        logger.info(f"Found {len(existing)} existing tool<->study link(s)")
+        return existing
+    except Exception as e:
+        logger.warning(f"Could not query existing tool<->study links, treating as empty: {e}")
+        return set()
+
+
+def find_tool_study_links(
+    occurrences: "pd.DataFrame",
+    tools_data: List[Dict],
+    existing_links: Set[tuple],
+) -> List[Dict]:
+    """
+    For each individualID that exactly matches a known tool's resourceName or
+    synonym, collect the (resourceId, studyId) pairs it co-occurs with in
+    file annotations, filtered down to ones not already in
+    TOOL_STUDY_LINKS_TABLE_ID.
+
+    Matching is exact-string only, same standard as existing_exact/
+    existing_synonyms in analyze_individual_ids -- fuzzy matches aren't
+    reliable enough to auto-link without human review.
+    """
+    resource_by_name: Dict[str, Dict] = {}
+    resource_by_synonym: Dict[str, Dict] = {}
+    for tool in tools_data:
+        name = tool.get('resourceName')
+        rid = tool.get('resourceId')
+        if not name or not rid:
+            continue
+        resource_by_name[name] = tool
+        synonyms_str = tool.get('synonyms', '')
+        if synonyms_str and isinstance(synonyms_str, str):
+            for syn_name in (s.strip() for s in synonyms_str.split(',')):
+                if syn_name:
+                    resource_by_synonym[syn_name] = tool
+
+    new_links: Dict[tuple, Dict] = {}
+    for row in occurrences.itertuples():
+        individual_id = str(row.individualID).strip()
+        study_id = row.studyId
+        if not individual_id or not study_id:
+            continue
+
+        tool = resource_by_name.get(individual_id) or resource_by_synonym.get(individual_id)
+        if not tool:
+            continue
+
+        key = (tool['resourceId'], study_id)
+        if key in existing_links or key in new_links:
+            continue
+
+        new_links[key] = {
+            'resourceId': tool['resourceId'],
+            'resourceName': tool.get('resourceName'),
+            'resourceType': tool.get('resourceType'),
+            'rrid': tool.get('rrid'),
+            'description': tool.get('description'),
+            'synonyms': tool.get('synonyms'),
+            'studyId': study_id,
+            'studyName': getattr(row, 'studyName', None),
+            'matchedVia': individual_id,
+        }
+
+    logger.info(f"Found {len(new_links)} new tool<->study association(s) not already in {TOOL_STUDY_LINKS_TABLE_ID}")
+    return list(new_links.values())
+
+
+def upsert_tool_study_links(syn: Synapse, links: List[Dict]) -> None:
+    """
+    Upsert newly-mined tool<->study associations directly into
+    TOOL_STUDY_LINKS_TABLE_ID. Additive only -- never modifies or removes any
+    existing row, so this is safe to run unattended even though it writes to
+    Synapse without a review step (unlike new-resource suggestions, which
+    still go through the PR-based submission flow since those require human
+    curation judgment; an exact individualID<->resourceName/synonym match is
+    a high-confidence, mechanical signal that doesn't).
+    """
+    if not links:
+        logger.info("No new tool<->study links to upsert")
+        return
+
+    rows = [
+        {
+            'studyId': link['studyId'],
+            'resourceId': link['resourceId'],
+            'resourceName': link['resourceName'],
+            'resourceType': link['resourceType'],
+            'rrid': link['rrid'],
+            'description': link['description'],
+            'synonyms': link['synonyms'],
+        }
+        for link in links
+    ]
+    df = pd.DataFrame(rows)
+    syn.store(synapseclient.Table(TOOL_STUDY_LINKS_TABLE_ID, df))
+    logger.info(f"Upserted {len(rows)} new tool<->study link(s) to {TOOL_STUDY_LINKS_TABLE_ID}")
 
 
 def query_tools_data(syn: Synapse, limit: int = None) -> List[Dict]:
@@ -577,6 +724,16 @@ def main():
         logger.info("\n=== Analyzing IndividualID Values ===")
         individual_id_suggestions = analyze_individual_ids(individual_ids, tools_data)
 
+        # Mine tool<->study associations (nf-osi/nf-research-tools-schema#132, #154)
+        logger.info("\n=== Mining Tool<->Study Associations ===")
+        occurrences = query_individual_id_study_occurrences(syn, limit=args.limit)
+        existing_links = query_existing_tool_study_links(syn)
+        new_tool_study_links = find_tool_study_links(occurrences, tools_data, existing_links)
+        if new_tool_study_links and not args.dry_run:
+            upsert_tool_study_links(syn, new_tool_study_links)
+        elif new_tool_study_links:
+            logger.info(f"Dry run -- would upsert {len(new_tool_study_links)} new tool<->study link(s)")
+
         # Analyze facet configuration
         logger.info("\n=== Analyzing Facet Configuration ===")
         facet_analysis = analyze_facets(tools_data, existing_facets)
@@ -611,6 +768,8 @@ def main():
         logger.info(f"    - {len(individual_id_suggestions.get('new_synonyms', []))} synonyms to add")
         logger.info(f"    - {len(individual_id_suggestions.get('existing_exact', []))} exact matches")
         logger.info(f"    - {len(individual_id_suggestions.get('existing_synonyms', []))} synonym matches")
+        logger.info(f"  Tool<->Study Links:")
+        logger.info(f"    - {len(new_tool_study_links)} new association(s) {'upserted' if not args.dry_run else '(dry run, not upserted)'}")
         logger.info(f"  Facet Analysis:")
         logger.info(f"    - {len(facet_analysis.get('existing_facets', {}))} existing facets")
         logger.info(f"    - {len(facet_analysis.get('suggested_new_facets', {}))} suggested new facets")
