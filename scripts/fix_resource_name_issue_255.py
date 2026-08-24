@@ -22,14 +22,28 @@ Only the 3 "(pNF)"-suffixed rows are touched. No deletions -- pure rename,
 old name moved to synonyms, snapshotted before and after.
 """
 
-import os
+import logging
 import sys
 
 import synapseclient
 from synapseclient import Table
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from synapse_safety import snapshot_table
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+def snapshot_table(syn, table_id: str, comment: str):
+    """Local copy of the shared snapshot helper (scripts/synapse_safety.py,
+    not yet on main as of this script -- see #246). Best-effort: a snapshot
+    failure is logged, not raised."""
+    try:
+        v = syn.create_snapshot_version(table_id, comment=comment)
+        version = v.get('snapshotVersionNumber', v) if isinstance(v, dict) else v
+        logger.info(f"Snapshotted {table_id} as version {version} ({comment})")
+        return version
+    except Exception as e:
+        logger.warning(f"Could not snapshot {table_id}: {e}")
+        return None
 
 CELL_LINE_DETAILS = 'syn26486823'
 
