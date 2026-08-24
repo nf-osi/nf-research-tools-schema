@@ -17,9 +17,6 @@ import synapseclient
 from synapseclient import Table
 from typing import List, Dict, Tuple
 
-SYN_RESOURCES_TABLE = "syn26450069"
-
-
 def _normalize_name(name) -> str:
     """Normalize a name for duplicate detection.
 
@@ -107,7 +104,12 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_mutation.csv': 'syn26486834',           # Mutation junction table
 
     # Common tables
-    'CLEAN_resources.csv': 'syn26450069',
+    # Note: CLEAN_resources.csv is intentionally NOT mapped here -- the legacy
+    # Resource table (syn26450069) was retired in Phase 7 of the LinkML
+    # migration (docs/MIGRATION.md). Every tool-type table now carries its own
+    # resourceId/resourceName/etc. directly, so there is no longer a central
+    # table to upload to. The Phase 1 snapshot of syn26450069 is kept for
+    # reference only.
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
     'CLEAN_usage.csv': 'syn26486841',  # Publications where tools were USED
     'CLEAN_development.csv': 'syn26486807',  # Publications where tools were DEVELOPED
@@ -169,11 +171,6 @@ _STRIP_BEFORE_UPLOAD = {
     # maximumSize is already 100. Un-stripped.
     'CLEAN_patient_derived_models.csv': [
         'itemAcquisition', 'developerName', 'developerAffiliation',
-    ],
-    # v2.0 type-specific FK columns not yet added to syn26450069 schema
-    'CLEAN_resources.csv': [
-        'computationalToolId', 'organoidProtocolId', 'patientDerivedModelId',
-        'clinicalAssessmentToolId',
     ],
     # resourceType/resourceName kept in ACCEPTED for review; strip before Synapse upload.
     # observationTypeOntologyId not in syn26486836 schema.
@@ -409,55 +406,13 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                 except Exception as e:
                     print(f"      ⚠️  Could not resolve observation publicationIds: {e}")
 
-        # For the Resources table, skip rows whose (resourceName, resourceType) pair is
-        # already in Synapse to prevent duplicate name+type entries.  We check by name+type
-        # (not resourceId) because that is the lookup key used by upsert_publication_links.py
-        # and because ID format may differ between pipeline runs.  Real metadata updates to
-        # existing resources should go through generate_review_csv.py, which preserves
-        # curated fields; uploading here would blank them out.
-        if table_id == SYN_RESOURCES_TABLE and "resourceName" in df_clean.columns:
-            existing_res = syn.tableQuery(
-                f"SELECT resourceName, resourceType, howToAcquire FROM {SYN_RESOURCES_TABLE}"
-            ).asDataFrame()
-
-            # Build lookup: (name.lower(), type) → (ROW_ID, ROW_VERSION, current_howToAcquire)
-            existing_map: dict = {}
-            for idx, erow in existing_res.iterrows():
-                key = (str(erow["resourceName"]).lower(), str(erow.get("resourceType", "")))
-                parts = str(idx).split("_")
-                existing_map[key] = (int(parts[0]), int(parts[1]), erow.get("howToAcquire") or "")
-
-            existing_keys = set(existing_map.keys())
-            before = len(df_clean)
-            mask = df_clean.apply(
-                lambda r: (str(r["resourceName"]).lower(), str(r.get("resourceType", ""))) not in existing_keys,
-                axis=1,
-            )
-            df_existing = df_clean[~mask].copy()
-            df_clean = df_clean[mask].copy()
-            skipped = before - len(df_clean)
-            if skipped:
-                print(f"      ℹ️  {skipped} resource(s) already in Synapse")
-
-            # Patch howToAcquire for existing rows where it was previously blank
-            if "howToAcquire" in df_existing.columns:
-                patch_rows = []
-                for _, prow in df_existing.iterrows():
-                    key = (str(prow["resourceName"]).lower(), str(prow.get("resourceType", "")))
-                    row_id, row_ver, cur_val = existing_map.get(key, (None, None, ""))
-                    raw = prow.get("howToAcquire")
-                    new_val = "" if (raw is None or (isinstance(raw, float) and pd.isna(raw))) else str(raw).strip()
-                    if row_id and new_val and new_val != cur_val:
-                        patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, "howToAcquire": new_val})
-                if patch_rows:
-                    syn.store(Table(table_id, pd.DataFrame(patch_rows)))
-                    print(f"      ✅ Patched howToAcquire for {len(patch_rows)} existing resource(s)")
-
-            if df_clean.empty:
-                print(f"      ✅ No new resources to upload to {table_id}")
-                return True
-
-        elif table_id in _DETAIL_TABLE_PK:
+        # Note: this used to have a special-cased branch here for uploading to
+        # the legacy Resource table (syn26450069) by (resourceName, resourceType)
+        # lookup. That table was retired in Phase 7 of the LinkML migration
+        # (docs/MIGRATION.md) -- every tool-type table now carries its own
+        # resourceId/resourceName/etc. directly and is handled by the
+        # resourceId-based dedup below like every other detail table.
+        if table_id in _DETAIL_TABLE_PK:
             pk_col = _DETAIL_TABLE_PK[table_id]
             patch_field_names = _PATCH_FIELDS.get(table_id, [])
             if pk_col in df_clean.columns:
