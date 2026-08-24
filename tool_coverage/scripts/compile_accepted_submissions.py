@@ -56,28 +56,31 @@ def _make_id(prefix: str, resource_name: str) -> str:
 
 COLUMNS = {
     "cell_lines": [
-        "cellLineId", "organ", "tissue", "cellLineManifestation",
-        "cellLineGeneticDisorder", "cellLineCategory", "donorId", "originYear",
+        "resourceId", "organ", "tissue", "manifestation",
+        "geneticDisorder", "cellLineCategory", "donorId", "originYear",
         "strProfile", "resistance",
         "populationDoublingTime", "cultureMedia",
+        "mechanismOfActionValidation", "pediatricSuitability", "pkpdCapabilities",
+        "timelineToResults", "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex",
     ],
     "antibodies": [
-        "antibodyId", "targetAntigen", "hostOrganism", "clonality", "cloneId",
+        "resourceId", "targetAntigen", "hostOrganism", "clonality", "cloneId",
         "uniprotId", "reactiveSpecies", "conjugate",
         "vendor", "catalogNumber", "catalogURL",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "animal_models": [
-        "animalModelId", "strainNomenclature", "backgroundStrain",
-        "backgroundSubstrain", "animalModelGeneticDisorder",
-        "animalModelOfManifestation", "transplantationType", "animalState",
+        "resourceId", "strainNomenclature", "backgroundStrain",
+        "backgroundSubstrain", "geneticDisorder",
+        "manifestation", "transplantationType", "animalState",
         "generation", "donorId", "transplantationDonorId",
         "alleleType", "affectedGeneSymbol", "inducedVsDevelopmental",
+        "humanizationMethod", "immuneSystemComponents",
         "bbbIntegrityStatus", "routeOfAdministration", "pkpdCapabilities",
         "mechanismOfActionValidation", "pediatricSuitability", "timelineToResults",
         "modelLimitations", "clinicalTranslationHistory", "regulatoryAcceptanceHistory",
@@ -87,7 +90,7 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
     "genetic_reagents": [
-        "geneticReagentId", "insertName", "vectorType", "vectorBackbone",
+        "resourceId", "insertName", "vectorType", "vectorBackbone",
         "promoter", "insertSpecies", "insertEntrezId", "selectableMarker",
         "copyNumber", "gRNAshRNASequence", "bacterialResistance", "hazardous",
         "nTerminalTag", "cTerminalTag", "totalSize", "backboneSize", "insertSize",
@@ -98,10 +101,14 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "patient_derived_models": [
-        "patientDerivedModelId", "modelSystemType", "patientDiagnosis",
+        "resourceId", "modelSystemType", "patientDiagnosis",
         "hostStrain", "tumorType", "engraftmentSite", "passageNumber",
         "establishmentRate", "molecularCharacterization", "clinicalData",
-        "validationMethods",
+        "validationMethods", "geneticDisorder",
+        "bbbIntegrityStatus", "routeOfAdministration", "pkpdCapabilities",
+        "mechanismOfActionValidation", "pediatricSuitability", "timelineToResults",
+        "modelLimitations", "clinicalTranslationHistory", "regulatoryAcceptanceHistory",
+        "mtaRequired", "ngnriRepositoryStatus",
         "donorId",
         "itemAcquisition", "developerName", "developerAffiliation",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -121,28 +128,42 @@ COLUMNS = {
         "_resourceName",
     ],
     "computational_tools": [
-        "computationalToolId", "softwareName", "softwareType", "softwareVersion",
+        "resourceId", "softwareName", "softwareType", "softwareVersion",
         "programmingLanguage", "sourceRepository", "documentation", "licenseType",
         "licenseDetails", "containerized", "dependencies", "systemRequirements",
-        "lastUpdate", "maintainer", "analyticalPlatformSupport", "rrid",
+        "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "rrid",
         "developerName", "developerAffiliation", "itemAcquisition",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "organoid_protocols": [
-        "organoidProtocolId", "modelType", "derivationSource", "cellTypes",
+        "resourceId", "modelType", "derivationSource", "cellTypes",
         "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
-        "qualityControlMetrics",
+        "qualityControlMetrics", "geneticDisorder", "nfManifestation",
+        "bbbModelCapability", "routeOfAdministration", "pkpdCapabilities",
+        "mechanismOfActionValidation", "pediatricSuitability", "timelineToResults",
+        "modelLimitations", "regulatoryAcceptanceHistory", "suitableForRegulatoryPackage",
+        "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
     ],
     "clinical_assessment_tools": [
-        "clinicalAssessmentToolId", "assessmentName", "assessmentType",
+        "resourceId", "assessmentName", "assessmentType",
         "targetPopulation", "diseaseSpecific", "numberOfItems", "scoringMethod",
         "validatedLanguages", "psychometricProperties", "administrationTime",
         "availabilityStatus", "licensingRequirements", "digitalVersion",
+        "cognitiveAndBehavioralDomains", "regulatoryAcceptanceHistory", "toolURL",
+        "developerName", "developerAffiliation", "developerContactEmail",
+        "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
+        "_context", "_confidence", "_verdict", "_usageType",
+    ],
+    "biobanks": [
+        "resourceId", "biobankURL", "biobankName", "geneticDisorder",
+        "specimenType", "specimenTissueType", "tumorType",
+        "specimenPreparationMethod", "specimenFormat", "contact", "rrid",
+        "mtaRequired", "ngnriRepositoryStatus", "requestFormURL",
         "developerName", "developerAffiliation", "developerContactEmail",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
@@ -161,9 +182,10 @@ COLUMNS = {
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict",
     ],
-    # Mutation junction table (syn26486834) — links mutationDetailsId to animalModelId
+    # Mutation junction table (syn26486834) — links mutationDetailsId to resourceId
+    # (unified single FK since the LinkML migration collapsed animalModelId/cellLineId)
     "mutation": [
-        "mutationId", "mutationDetailsId", "animalModelId", "cellLineId",
+        "mutationId", "mutationDetailsId", "resourceId",
         "_resourceName",
     ],
 }
@@ -177,6 +199,7 @@ CSV_FILES = {
     "computational_tools":      "ACCEPTED_computational_tools.csv",
     "organoid_protocols":       "ACCEPTED_organoid_protocols.csv",
     "clinical_assessment_tools":"ACCEPTED_clinical_assessment_tools.csv",
+    "biobanks":                 "ACCEPTED_biobanks.csv",
     "observations":             "ACCEPTED_observations.csv",
     # Derived tables (generated by _generate_vendor_and_donor_csvs)
     "vendor":                   "ACCEPTED_vendor.csv",
@@ -192,11 +215,16 @@ CSV_FILES = {
 # Value maps
 # ---------------------------------------------------------------------------
 
-_DISEASE_MAP = {
-    "Neurofibromatosis type 1": "Neurofibromatosis Type 1",
-    "Neurofibromatosis type 2": "Neurofibromatosis Type 2",
-    "Schwannomatosis": "Schwannomatosis",
-    "No known disease": "None",
+_GENETIC_DISORDER_MAP = {
+    # Formspark's raw values (Title Case "Type N", "No known disease"/"None") ->
+    # the canonical GeneticDisorderEnum values used by the shared `geneticDisorder`
+    # slot (modules/enums.yaml) since the LinkML/Synapse consolidation -- lowercase
+    # "type N", "No known genetic disorder". Unmapped values (Schwannomatosis,
+    # NF1 Spontaneous Mutation, Other) already match and pass through unchanged.
+    "Neurofibromatosis Type 1": "Neurofibromatosis type 1",
+    "Neurofibromatosis Type 2": "Neurofibromatosis type 2",
+    "No known disease": "No known genetic disorder",
+    "None": "No known genetic disorder",
 }
 _SPECIES_MAP = {
     "Human": "Homo sapiens",
@@ -330,10 +358,18 @@ _TTYPE_ID_INFO: dict = {
     "computational_tool":      ("Computational Tool",     "computationalToolId",     "computational_tools"),
     "organoid_protocol":       ("Organoid Protocol",      "organoidProtocolId",      "organoid_protocols"),
     "clinical_assessment_tool":("Clinical Assessment Tool","clinicalAssessmentToolId","clinical_assessment_tools"),
+    "biobank":                 ("Biobank",                "biobankId",               "biobanks"),
 }
 
 # Reverse map: Synapse resourceType label → ttype_plural (for observations resourceId)
 _RTYPE_TO_TTYPE_P = {rtype: tp for _, (rtype, _, tp) in _TTYPE_ID_INFO.items()}
+
+# Primary key column on every tool-type detail table (syn268...*/syn737...*) since the
+# LinkML migration collapsed all 9 type-specific `<type>Id` columns into one unified
+# `resourceId`. This is intentionally separate from _TTYPE_ID_INFO's `id_col`, which
+# is still the old type-specific name -- that one is only used below for the legacy
+# Resource table's (syn26450069) own FK columns, which the migration hasn't touched.
+_DETAIL_TABLE_ID_COL = "resourceId"
 
 # All FK columns that appear in the Resources table (syn26450069)
 _RESOURCE_FK_COLS = [
@@ -418,6 +454,7 @@ def _tool_type_from_json(data: dict) -> str | None:
         ("computational_tool",     ["basicInfo.softwareName", "softwareType"]),
         ("organoid_protocol",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "basicInfo.assessmentType"]),
+        ("biobank",                ["basicInfo.biobankName", "basicInfo.biobankURL"]),
         ("observation",            ["resourceType", "observationType"]),
     ]
     for t, fields in checks:
@@ -435,12 +472,13 @@ def _build_cell_line(d: dict) -> dict:
     tissue = _get(d, "tissue")
     resource_name = _get(d, "basicInfo.cellLineName", "cellLineName")
     species = _get(d, "basicInfo.species", "species")
+    disease_raw = _get(d, "cellLineGeneticDisorder")
     return {
-        "cellLineId": "",
+        "resourceId": "",
         "organ": _get(d, "organ"),
         "tissue": tissue,
-        "cellLineManifestation": _get(d, "cellLineManifestation"),
-        "cellLineGeneticDisorder": _get(d, "cellLineGeneticDisorder"),
+        "manifestation": _get(d, "cellLineManifestation"),
+        "geneticDisorder": _GENETIC_DISORDER_MAP.get(disease_raw, disease_raw),
         "cellLineCategory": _get(d, "category", "cellLineCategory"),
         "donorId": _make_donor_id(_donor_key(resource_name)) if species else "",
         "originYear": _get(d, "originYear"),
@@ -448,6 +486,12 @@ def _build_cell_line(d: dict) -> dict:
         "resistance": _get(d, "resistance"),
         "populationDoublingTime": _get(d, "populationDoublingTime"),
         "cultureMedia": _get(d, "cultureMedia"),
+        "mechanismOfActionValidation": _fmt_list(_get(d, "mechanismOfActionValidation")),
+        "pediatricSuitability": _get(d, "pediatricSuitability"),
+        "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
+        "timelineToResults": _get(d, "timelineToResults"),
+        "mtaRequired": _get(d, "mtaRequired"),
+        "ngnriRepositoryStatus": _get(d, "ngnriRepositoryStatus"),
         "developerName": _get(bi, "developerName") or _get(d, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
@@ -470,7 +514,7 @@ def _build_antibody(d: dict) -> dict:
     reactive = _get(d, "basicInfo.reactiveSpecies", "reactiveSpecies")
     conj_raw = _get(d, "conjugate")
     return {
-        "antibodyId": "",
+        "resourceId": "",
         "targetAntigen": _get(d, "targetAntigen"),
         "hostOrganism": _get(d, "basicInfo.hostOrganism", "hostOrganism"),
         "clonality": _get(d, "clonality"),
@@ -500,12 +544,15 @@ def _build_animal_model(d: dict) -> dict:
     species_raw = _get(bi, "species") or _get(d, "species")
     species = _SPECIES_MAP.get(species_raw, species_raw)
     return {
-        "animalModelId": _make_id("animal_model", resource_name),
+        # left blank -- filled centrally with _make_resource_id() to match the
+        # deterministic ID every other type gets (and what _build_mutation
+        # independently recomputes for its FK)
+        "resourceId": "",
         "strainNomenclature": _get(d, "strainNomenclature"),
         "backgroundStrain": _get(d, "backgroundStrain"),
         "backgroundSubstrain": _get(d, "backgroundSubstrain"),
-        "animalModelGeneticDisorder": _DISEASE_MAP.get(disease_raw, disease_raw),
-        "animalModelOfManifestation": _get(d, "animalModelOfManifestation"),
+        "geneticDisorder": _GENETIC_DISORDER_MAP.get(disease_raw, disease_raw),
+        "manifestation": _get(d, "animalModelOfManifestation"),
         "transplantationType": _get(d, "transplantationType"),
         "animalState": _get(d, "animalState"),
         "generation": _get(d, "generation"),
@@ -515,6 +562,8 @@ def _build_animal_model(d: dict) -> dict:
         "alleleType": _get(d, "alleleType"),
         "affectedGeneSymbol": _get(d, "affectedGeneSymbol"),
         "inducedVsDevelopmental": _get(d, "inducedVsDevelopmental"),
+        "humanizationMethod": _get(d, "humanizationMethod"),
+        "immuneSystemComponents": _fmt_list(_get(d, "immuneSystemComponents")),
         "bbbIntegrityStatus": _get(d, "bbbIntegrityStatus"),
         "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
         "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
@@ -602,13 +651,14 @@ def _build_mutation(d: dict) -> list[dict] | None:
 
     affected_gene_raw = _get(d, "affectedGeneSymbol")
     genes = [g.strip() for g in (affected_gene_raw or "").split(";") if g.strip()] or [""]
-    animal_model_id = _make_id("animal_model", resource_name)
+    # Must match what the central per-type loop assigns to the AnimalModel row's
+    # own resourceId (_make_resource_id, not _make_id) so this FK actually resolves.
+    animal_model_id = _make_resource_id(resource_name, "animal_models")
     return [
         {
             "mutationId": _make_id("mutation_link", f"{resource_name}_{gene}" if gene else resource_name),
             "mutationDetailsId": _make_id("mutation", f"{resource_name}_{gene}" if gene else resource_name),
-            "animalModelId": animal_model_id,
-            "cellLineId": "",
+            "resourceId": animal_model_id,
             "_resourceName": resource_name,
         }
         for gene in genes
@@ -618,7 +668,7 @@ def _build_mutation(d: dict) -> list[dict] | None:
 def _build_genetic_reagent(d: dict) -> dict:
     species_raw = _get(d, "insertSpecies")
     return {
-        "geneticReagentId": "",
+        "resourceId": "",
         "insertName": _get(d, "insertName"),
         "vectorType": _get(d, "vectorType"),
         "vectorBackbone": _get(d, "vectorBackbone"),
@@ -666,7 +716,7 @@ def _build_patient_derived_model(d: dict) -> dict:
     unique_name = f"{resource_name} ({short_mst})" if short_mst else resource_name
     species = _get(bi, "species")
     return {
-        "patientDerivedModelId": "",
+        "resourceId": "",
         "donorId": _make_donor_id(resource_name) if species else "",
         "modelSystemType": model_system_type,
         "patientDiagnosis": _get(bi, "patientDiagnosis"),
@@ -678,6 +728,18 @@ def _build_patient_derived_model(d: dict) -> dict:
         "molecularCharacterization": _fmt_list(_get(bi, "molecularCharacterization")),
         "clinicalData": _get(bi, "clinicalData"),
         "validationMethods": _fmt_list(_get(bi, "validationMethods")),
+        "geneticDisorder": _GENETIC_DISORDER_MAP.get(_get(bi, "nfGeneticDisorder"), _get(bi, "nfGeneticDisorder")),
+        "bbbIntegrityStatus": _get(d, "bbbIntegrityStatus"),
+        "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
+        "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
+        "mechanismOfActionValidation": _fmt_list(_get(d, "mechanismOfActionValidation")),
+        "pediatricSuitability": _get(d, "pediatricSuitability"),
+        "timelineToResults": _get(d, "timelineToResults"),
+        "modelLimitations": _get(d, "modelLimitations"),
+        "clinicalTranslationHistory": _get(d, "clinicalTranslationHistory"),
+        "regulatoryAcceptanceHistory": _get(d, "regulatoryAcceptanceHistory"),
+        "mtaRequired": _get(d, "mtaRequired"),
+        "ngnriRepositoryStatus": _get(d, "ngnriRepositoryStatus"),
         "itemAcquisition": _get(d, "itemAcquisition"),
         "developerName": _get(bi, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation"),
@@ -701,7 +763,7 @@ def _build_patient_derived_model(d: dict) -> dict:
 def _build_computational_tool(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     return {
-        "computationalToolId": "",
+        "resourceId": "",
         "softwareName": _get(bi, "softwareName"),
         "softwareType": _get(bi, "softwareType"),
         "softwareVersion": _get(bi, "softwareVersion"),
@@ -716,6 +778,7 @@ def _build_computational_tool(d: dict) -> dict:
         "lastUpdate": _get(bi, "lastUpdate"),
         "maintainer": _get(bi, "maintainer"),
         "analyticalPlatformSupport": _fmt_list(_get(bi, "analyticalPlatformSupport")),
+        "downloadURL": _get(d, "downloadURL"),
         "rrid": _get(bi, "rrid"),
         "developerName": _get(bi, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation"),
@@ -735,7 +798,7 @@ def _build_computational_tool(d: dict) -> dict:
 def _build_organoid_protocol(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     return {
-        "organoidProtocolId": "",
+        "resourceId": "",
         "modelType": _get(bi, "modelType"),
         "derivationSource": _get(bi, "derivationSource"),
         "cellTypes": _fmt_list(_get(bi, "cellTypes")),
@@ -748,6 +811,19 @@ def _build_organoid_protocol(d: dict) -> dict:
         "passageNumber": _get(bi, "passageNumber"),
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _fmt_list(_get(bi, "qualityControlMetrics")),
+        "geneticDisorder": _GENETIC_DISORDER_MAP.get(_get(bi, "nfGeneticDisorder"), _get(bi, "nfGeneticDisorder")),
+        "nfManifestation": _fmt_list(_get(bi, "nfManifestation")),
+        "bbbModelCapability": _get(d, "bbbModelCapability"),
+        "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
+        "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
+        "mechanismOfActionValidation": _fmt_list(_get(d, "mechanismOfActionValidation")),
+        "pediatricSuitability": _get(d, "pediatricSuitability"),
+        "timelineToResults": _get(d, "timelineToResults"),
+        "modelLimitations": _get(d, "modelLimitations"),
+        "regulatoryAcceptanceHistory": _get(d, "regulatoryAcceptanceHistory"),
+        "suitableForRegulatoryPackage": _get(d, "suitableForRegulatoryPackage"),
+        "mtaRequired": _get(d, "mtaRequired"),
+        "ngnriRepositoryStatus": _get(d, "ngnriRepositoryStatus"),
         "developerName": _get(bi, "developerName") or _get(d, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
@@ -767,7 +843,7 @@ def _build_organoid_protocol(d: dict) -> dict:
 def _build_clinical_assessment_tool(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     return {
-        "clinicalAssessmentToolId": "",
+        "resourceId": "",
         "assessmentName": _get(bi, "assessmentName"),
         "assessmentType": _get(bi, "assessmentType"),
         "targetPopulation": _get(bi, "targetPopulation"),
@@ -780,10 +856,50 @@ def _build_clinical_assessment_tool(d: dict) -> dict:
         "availabilityStatus": _get(bi, "availabilityStatus"),
         "licensingRequirements": _get(bi, "licensingRequirements"),
         "digitalVersion": _get(bi, "digitalVersion"),
+        "cognitiveAndBehavioralDomains": _fmt_list(_get(bi, "cognitiveAndBehavioralDomains")),
+        "regulatoryAcceptanceHistory": _get(bi, "regulatoryAcceptanceHistory"),
+        "toolURL": _get(d, "toolURL"),
         "developerName": _get(bi, "developerName") or _get(d, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
         "_resourceName": _get(bi, "assessmentName"),
+        "_pmid": _get(d, "_pmid"),
+        "_doi": _get(d, "_doi", "publicationDOI"),
+        "_publicationTitle": _get(d, "_publicationTitle"),
+        "_year": _get(d, "_year"),
+        "_context": _get(d, "_context"),
+        "_confidence": _get(d, "_confidence"),
+        "_verdict": _get(d, "_verdict", default="include"),
+        "_usageType": _get(d, "_usageType", default="novel"),
+    }
+
+
+def _build_biobank(d: dict) -> dict:
+    """Build a Biobank row (syn26486821). No builder existed for this type before --
+    submitBiobank.json submissions had no path into the pipeline at all."""
+    bi = d.get("basicInfo", d)
+    return {
+        "resourceId": "",
+        "biobankURL": _get(bi, "biobankURL"),
+        "biobankName": _get(bi, "biobankName"),
+        # This form's diseaseType values are already lowercase ("Neurofibromatosis
+        # type 1", etc.), matching GeneticDisorderEnum -- no translation needed,
+        # unlike animalModelGeneticDisorder/cellLineGeneticDisorder/nfGeneticDisorder.
+        "geneticDisorder": _fmt_list(_get(bi, "diseaseType")),
+        "specimenType": _fmt_list(_get(bi, "specimenType")),
+        "specimenTissueType": _fmt_list(_get(bi, "specimenTissueType")),
+        "tumorType": _fmt_list(_get(bi, "tumorType")),
+        "specimenPreparationMethod": _fmt_list(_get(bi, "specimenPreparationMethod")),
+        "specimenFormat": _fmt_list(_get(bi, "specimenFormat")),
+        "contact": _get(bi, "contact"),
+        "rrid": _get(bi, "rrid"),
+        "mtaRequired": _get(bi, "mtaRequired"),
+        "ngnriRepositoryStatus": _get(bi, "ngnriRepositoryStatus"),
+        "requestFormURL": _get(d, "requestFormURL"),
+        "developerName": _get(bi, "developerName"),
+        "developerAffiliation": _get(bi, "developerAffiliation"),
+        "developerContactEmail": _get(d, "developerContactEmail"),
+        "_resourceName": _get(bi, "biobankName"),
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
         "_publicationTitle": _get(d, "_publicationTitle"),
@@ -996,6 +1112,7 @@ _BUILDERS = {
     "computational_tool":      ("computational_tools",      _build_computational_tool),
     "organoid_protocol": ("organoid_protocols", _build_organoid_protocol),
     "clinical_assessment_tool":("clinical_assessment_tools",_build_clinical_assessment_tool),
+    "biobank":                 ("biobanks",                 _build_biobank),
     "observation":             ("observations",             _build_observation),
 }
 
@@ -1359,7 +1476,11 @@ def _generate_resources_csv(
                 name_type_key = (_normalize_name(resource_name), rtype_label)
                 if name_type_key in existing_name_types:
                     continue
-                resource_id = row.get(id_col, "").strip() or \
+                # The detail-table CSV's own PK is now `resourceId` (see
+                # _DETAIL_TABLE_ID_COL), not the old type-specific `id_col` --
+                # check both so this stays correct whichever a given CSV has.
+                resource_id = row.get(_DETAIL_TABLE_ID_COL, "").strip() or \
+                              row.get(id_col, "").strip() or \
                               _make_resource_id(resource_name, ttype_plural)
                 if resource_id in existing_ids:
                     continue
@@ -1489,11 +1610,16 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
             if norm_name in existing:
                 dupes.append(name)
             else:
-                # Assign stable UUID to the type-specific ID column if not already set.
+                # Assign a stable UUID to the detail table's own PK column if not
+                # already set. This is *always* `resourceId` now (the LinkML
+                # migration dropped every type-specific `<type>Id` column in favor
+                # of a single unified resourceId) -- NOT the `id_col` from
+                # _TTYPE_ID_INFO, which is a different, still-type-specific name
+                # used only for the legacy Resource table's FK columns below.
                 if id_info:
-                    rtype_label, id_col, ttype_plural = id_info
-                    if not row.get(id_col):
-                        row[id_col] = _make_resource_id(name, ttype_plural)
+                    _, _, ttype_plural = id_info
+                    if not row.get(_DETAIL_TABLE_ID_COL):
+                        row[_DETAIL_TABLE_ID_COL] = _make_resource_id(name, ttype_plural)
                 rows.append(row)
                 existing.add(norm_name)
 
