@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import ast
 import json
 import logging
 import os
@@ -114,21 +115,29 @@ def query_individual_id_study_occurrences(syn: Synapse, limit: int = None) -> "p
     studyName per file -- no extra join needed).
 
     Used to trace an individualID that exactly matches a known tool back to
-    the study/studies whose files reference it, for automated tool<->study
-    linking (nf-osi/nf-research-tools-schema#132, #154).
+    the study/studies whose files reference it, for tool<->study link mining
+    (nf-osi/nf-research-tools-schema#132, #154). Also pulls tumorType/
+    diagnosis/tissue -- not used by the matching logic itself, but carried
+    through to the review CSV (see save_tool_study_links_for_review) so a
+    human reviewer can judge a candidate without a separate Synapse lookup;
+    per review on #246, a shared individualID/donor sample can span more
+    than one downstream resource, so this extra context matters even for an
+    "unambiguous" match.
 
     Args:
         syn: Synapse client
         limit: Optional limit on number of rows to retrieve
 
     Returns:
-        DataFrame with columns [individualID, studyId, studyName], one row
-        per (individualID, studyId) occurrence (not deduplicated).
+        DataFrame with columns [individualID, studyId, studyName, tumorType,
+        diagnosis, tissue], one row per (individualID, studyId) occurrence
+        (not deduplicated).
     """
     logger.info(f"Querying {ANNOTATIONS_VIEW_ID} for individualID/studyId occurrences...")
 
     query = (
-        f"SELECT individualID, studyId, studyName FROM {ANNOTATIONS_VIEW_ID} "
+        f"SELECT individualID, studyId, studyName, tumorType, diagnosis, tissue "
+        f"FROM {ANNOTATIONS_VIEW_ID} "
         f"WHERE individualID IS NOT NULL AND studyId IS NOT NULL"
     )
     if limit:
@@ -158,21 +167,26 @@ def query_individual_id_file_occurrences(syn: Synapse, limit: int = None) -> "pd
     Used to backfill Resource_id directly onto files whose individualID
     matches a known tool, so the existing Tool Details "Data > Files" tab
     (which already renders based on Resource_id) picks them up without any
-    frontend change -- nf-osi/nf-research-tools-schema#154.
+    frontend change -- nf-osi/nf-research-tools-schema#154. Also pulls
+    tumorType/diagnosis/tissue/specimenID -- not used by the matching logic
+    itself, but carried through to the review CSV (see
+    save_resource_id_annotations_for_review) for the same reason described
+    in query_individual_id_study_occurrences' docstring.
 
     Args:
         syn: Synapse client
         limit: Optional limit on number of rows to retrieve
 
     Returns:
-        DataFrame with columns [id, individualID, Resource_id], one row per
-        file. Resource_id is a list (possibly empty/NaN) since it's a
-        STRING_LIST column.
+        DataFrame with columns [id, individualID, Resource_id, tumorType,
+        diagnosis, tissue, specimenID], one row per file. Resource_id is a
+        list (possibly empty/NaN) since it's a STRING_LIST column.
     """
     logger.info(f"Querying {ANNOTATIONS_FILEVIEW_ID} for individualID/Resource_id per file...")
 
     query = (
-        f"SELECT id, individualID, Resource_id FROM {ANNOTATIONS_FILEVIEW_ID} "
+        f"SELECT id, individualID, Resource_id, tumorType, diagnosis, tissue, specimenID "
+        f"FROM {ANNOTATIONS_FILEVIEW_ID} "
         f"WHERE individualID IS NOT NULL"
     )
     if limit:
@@ -347,6 +361,13 @@ def find_tool_study_links(
             'studyId': study_id,
             'studyName': getattr(row, 'studyName', None),
             'matchedVia': individual_id,
+            # Review context only (per #246 review) -- not used by the matching
+            # logic above. Lets a human judge a candidate (e.g. does this file's
+            # own tumorType agree with the matched resource?) without a separate
+            # Synapse lookup. Absent on synthetic test DataFrames, hence getattr.
+            'tumorType': getattr(row, 'tumorType', None),
+            'diagnosis': getattr(row, 'diagnosis', None),
+            'tissue': getattr(row, 'tissue', None),
         }
 
     logger.info(f"Found {len(new_links)} new tool<->study association(s) not already in {TOOL_STUDY_LINKS_TABLE_ID}")
@@ -453,10 +474,17 @@ def upsert_resource_id_annotations(syn: Synapse, updates: "pd.DataFrame") -> Non
     ANNOTATIONS_FILEVIEW_ID (the writable EntityView -- NOT
     ANNOTATIONS_VIEW_ID, which is a read-only MaterializedView built on top
     of it and has no writable row-to-entity mapping of its own). Additive
-    only (see find_resource_id_annotations) -- safe to run unattended for
-    the same reason upsert_tool_study_links is: an exact
-    individualID<->resourceName/synonym match, or an unambiguous
-    stripped-suffix match, is a high-confidence, mechanical signal.
+    only (see find_resource_id_annotations), but NOT safe to run
+    unattended: per review on nf-osi/nf-research-tools-schema#246, a single
+    individualID/donor sample can legitimately span more than one
+    downstream resource (e.g. JH-2-002 has files whose own tumorType
+    annotation splits between MPNST and Plexiform Neurofibroma -- confirmed
+    live), so even an "unambiguous within the tools registry" match --
+    exact or stripped-suffix -- isn't a safe signal to write without a
+    human confirming it first. This function is only ever invoked from
+    main() via --apply-resource-id-annotations-csv, against a CSV a human
+    has reviewed (and possibly trimmed) -- see
+    save_resource_id_annotations_for_review / load_resource_id_annotations_from_review.
 
     `updates` must carry the rowId_rowVersion index from the original query
     against ANNOTATIONS_FILEVIEW_ID (see find_resource_id_annotations) --
@@ -483,11 +511,17 @@ def upsert_tool_study_links(syn: Synapse, links: List[Dict]) -> None:
     """
     Upsert newly-mined tool<->study associations directly into
     TOOL_STUDY_LINKS_TABLE_ID. Additive only -- never modifies or removes any
-    existing row, so this is safe to run unattended even though it writes to
-    Synapse without a review step (unlike new-resource suggestions, which
-    still go through the PR-based submission flow since those require human
-    curation judgment; an exact individualID<->resourceName/synonym match is
-    a high-confidence, mechanical signal that doesn't).
+    existing row -- but NOT safe to run unattended: per review on
+    nf-osi/nf-research-tools-schema#246, a single individualID/donor sample
+    can legitimately span more than one downstream resource (e.g. JH-2-002
+    has files whose own tumorType annotation splits between MPNST and
+    Plexiform Neurofibroma -- confirmed live), so even an "unambiguous
+    within the tools registry" individualID<->resourceName/synonym match
+    isn't a safe signal to write without a human confirming it first. This
+    function is only ever invoked from main() via
+    --apply-tool-study-links-csv, against a CSV a human has reviewed (and
+    possibly trimmed) -- see save_tool_study_links_for_review /
+    load_tool_study_links_from_review.
 
     Snapshots TOOL_STUDY_LINKS_TABLE_ID immediately before and after the
     write (standing policy: every automated table/view write is bracketed
@@ -514,6 +548,88 @@ def upsert_tool_study_links(syn: Synapse, links: List[Dict]) -> None:
     syn.store(synapseclient.Table(TOOL_STUDY_LINKS_TABLE_ID, df))
     logger.info(f"Upserted {len(rows)} new tool<->study link(s) to {TOOL_STUDY_LINKS_TABLE_ID}")
     snapshot_table(syn, TOOL_STUDY_LINKS_TABLE_ID, f"After upserting {len(rows)} new tool<->study link(s) (nf-research-tools-schema#132, #154)")
+
+
+# ---------------------------------------------------------------------------
+# Human-review CSVs for the two mining functions above (nf-research-tools-
+# schema#246 review: neither an exact nor a stripped-suffix individualID
+# match is safe to write to Synapse unattended, since a single donor/
+# specimen individualID can legitimately span more than one downstream
+# resource -- e.g. JH-2-002 splits MPNST vs. Plexiform Neurofibroma via each
+# file's own tumorType annotation, confirmed live, even though the base name
+# "looks" unambiguous within the tools registry). The functions below are
+# how a human turns a mining result into an actual write: review the CSV
+# (delete rows that don't hold up), then re-run this script with
+# --apply-tool-study-links-csv / --apply-resource-id-annotations-csv.
+# ---------------------------------------------------------------------------
+
+def save_tool_study_links_for_review(links: List[Dict], path: Path) -> None:
+    """
+    Write mined tool<->study link candidates (as returned by
+    find_tool_study_links -- includes tumorType/diagnosis/tissue review
+    context) to a CSV. Not upserted; see module note above.
+    """
+    if not links:
+        return
+    pd.DataFrame(links).to_csv(path, index=False)
+    logger.info(f"Wrote {len(links)} tool<->study link candidate(s) to {path} for manual review")
+
+
+def load_tool_study_links_from_review(path: Path) -> List[Dict]:
+    """
+    Read a (human-reviewed, possibly row-deleted) CSV written by
+    save_tool_study_links_for_review back into the list-of-dicts shape
+    upsert_tool_study_links expects.
+    """
+    df = pd.read_csv(path)
+    return df.to_dict('records')
+
+
+def save_resource_id_annotations_for_review(
+    updates: "pd.DataFrame",
+    file_occurrences: "pd.DataFrame",
+    path: Path,
+) -> None:
+    """
+    Write mined Resource_id backfill candidates (as returned by
+    find_resource_id_annotations) to a CSV. Not upserted; see module note
+    above.
+
+    Enriches `updates` (columns [id, Resource_id]) with:
+    - row_label: updates' own rowId_rowVersion index, saved as a column
+      since a plain CSV round-trip has no index of its own -- restored by
+      load_resource_id_annotations_from_review.
+    - individualID/tumorType/diagnosis/tissue: looked up from
+      file_occurrences by file id, so a reviewer can judge each candidate
+      without a separate Synapse query.
+    - addedResourceId: the specific resourceId this row would append --
+      always the last element of Resource_id, since find_resource_id_annotations
+      only ever appends one at a time.
+    """
+    if updates.empty:
+        return
+    context_cols = ['individualID', 'tumorType', 'diagnosis', 'tissue']
+    context_by_file = file_occurrences.set_index('id')[context_cols]
+    review = updates.join(context_by_file, on='id')
+    review.insert(0, 'row_label', updates.index)
+    review['addedResourceId'] = review['Resource_id'].apply(lambda lst: lst[-1])
+    review.to_csv(path, index=False)
+    logger.info(f"Wrote {len(review)} Resource_id annotation candidate(s) to {path} for manual review")
+
+
+def load_resource_id_annotations_from_review(path: Path) -> "pd.DataFrame":
+    """
+    Read a (human-reviewed, possibly row-deleted) CSV written by
+    save_resource_id_annotations_for_review back into the DataFrame shape
+    upsert_resource_id_annotations expects -- restoring the original
+    rowId_rowVersion index from the row_label column and parsing Resource_id
+    back from its CSV string form into an actual list.
+    """
+    df = pd.read_csv(path)
+    df['Resource_id'] = df['Resource_id'].apply(ast.literal_eval)
+    df = df.set_index('row_label')
+    df.index.name = None
+    return df[['id', 'Resource_id']]
 
 
 def query_tools_data(syn: Synapse, limit: int = None) -> List[Dict]:
@@ -970,6 +1086,26 @@ def main():
         type=int,
         help='Limit number of records to query (for testing)'
     )
+    parser.add_argument(
+        '--apply-tool-study-links-csv',
+        type=Path,
+        help=(
+            'Upsert tool<->study links from a human-reviewed CSV (see '
+            'save_tool_study_links_for_review) instead of running the mining pipeline. '
+            'Per nf-research-tools-schema#246 review, matches are never auto-upserted -- '
+            'this is the only way these get written to Synapse.'
+        ),
+    )
+    parser.add_argument(
+        '--apply-resource-id-annotations-csv',
+        type=Path,
+        help=(
+            'Upsert Resource_id file annotations from a human-reviewed CSV (see '
+            'save_resource_id_annotations_for_review) instead of running the mining '
+            'pipeline. Per nf-research-tools-schema#246 review, matches are never '
+            'auto-upserted -- this is the only way these get written to Synapse.'
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -984,6 +1120,21 @@ def main():
         syn = Synapse()
         syn.login(authToken=auth_token)
         logger.info("Logged into Synapse")
+
+        # Apply mode: write a human-reviewed CSV to Synapse and exit -- skips the
+        # entire mining pipeline below. This is the ONLY path that writes
+        # tool<->study links or Resource_id annotations (see the module note above
+        # save_tool_study_links_for_review for why they're never auto-upserted).
+        if args.apply_tool_study_links_csv or args.apply_resource_id_annotations_csv:
+            if args.apply_tool_study_links_csv:
+                logger.info(f"\n=== Applying reviewed tool<->study links from {args.apply_tool_study_links_csv} ===")
+                links = load_tool_study_links_from_review(args.apply_tool_study_links_csv)
+                upsert_tool_study_links(syn, links)
+            if args.apply_resource_id_annotations_csv:
+                logger.info(f"\n=== Applying reviewed Resource_id annotations from {args.apply_resource_id_annotations_csv} ===")
+                updates = load_resource_id_annotations_from_review(args.apply_resource_id_annotations_csv)
+                upsert_resource_id_annotations(syn, updates)
+            return
 
         # Query individualID from annotations
         logger.info("\n=== Querying Annotations ===")
@@ -1006,10 +1157,14 @@ def main():
         occurrences = query_individual_id_study_occurrences(syn, limit=args.limit)
         existing_links = query_existing_tool_study_links(syn)
         new_tool_study_links = find_tool_study_links(occurrences, tools_data, existing_links)
+        # Never auto-upserted -- per #246 review, write a review CSV instead; a
+        # human applies survivors via --apply-tool-study-links-csv (see the module
+        # note above save_tool_study_links_for_review).
+        tool_study_links_review_path = Path('tool_study_links_for_review.csv')
         if new_tool_study_links and not args.dry_run:
-            upsert_tool_study_links(syn, new_tool_study_links)
+            save_tool_study_links_for_review(new_tool_study_links, tool_study_links_review_path)
         elif new_tool_study_links:
-            logger.info(f"Dry run -- would upsert {len(new_tool_study_links)} new tool<->study link(s)")
+            logger.info(f"Dry run -- found {len(new_tool_study_links)} new tool<->study link candidate(s) (not written)")
 
         # Backfill Resource_id file annotations (nf-osi/nf-research-tools-schema#154,
         # https://github.com/nf-osi/nf-research-tools-schema/issues/154#issuecomment-5394955094)
@@ -1018,10 +1173,13 @@ def main():
         logger.info("\n=== Mining Resource_id File Annotations ===")
         file_occurrences = query_individual_id_file_occurrences(syn, limit=args.limit)
         resource_id_updates, resource_id_skipped_full = find_resource_id_annotations(file_occurrences, tools_data)
+        # Never auto-upserted -- same review-CSV-then-apply flow as tool<->study
+        # links above; see --apply-resource-id-annotations-csv.
+        resource_id_review_path = Path('resource_id_annotations_for_review.csv')
         if not resource_id_updates.empty and not args.dry_run:
-            upsert_resource_id_annotations(syn, resource_id_updates)
+            save_resource_id_annotations_for_review(resource_id_updates, file_occurrences, resource_id_review_path)
         elif not resource_id_updates.empty:
-            logger.info(f"Dry run -- would upsert Resource_id on {len(resource_id_updates)} file(s)")
+            logger.info(f"Dry run -- found {len(resource_id_updates)} Resource_id annotation candidate(s) (not written)")
 
         # Write skipped-full detail as a run artifact (per feedback on #246: a
         # single count in the log isn't enough to act on) -- one row per file,
@@ -1066,9 +1224,15 @@ def main():
         logger.info(f"    - {len(individual_id_suggestions.get('existing_exact', []))} exact matches")
         logger.info(f"    - {len(individual_id_suggestions.get('existing_synonyms', []))} synonym matches")
         logger.info(f"  Tool<->Study Links:")
-        logger.info(f"    - {len(new_tool_study_links)} new association(s) {'upserted' if not args.dry_run else '(dry run, not upserted)'}")
+        if new_tool_study_links and not args.dry_run:
+            logger.info(f"    - {len(new_tool_study_links)} new candidate(s) written to {tool_study_links_review_path} -- review, then re-run with --apply-tool-study-links-csv")
+        else:
+            logger.info(f"    - {len(new_tool_study_links)} new candidate(s) found{' (dry run, not written)' if new_tool_study_links else ''}")
         logger.info(f"  Resource_id File Annotations:")
-        logger.info(f"    - {len(resource_id_updates)} file(s) {'updated' if not args.dry_run else '(dry run, not updated)'}")
+        if not resource_id_updates.empty and not args.dry_run:
+            logger.info(f"    - {len(resource_id_updates)} candidate(s) written to {resource_id_review_path} -- review, then re-run with --apply-resource-id-annotations-csv")
+        else:
+            logger.info(f"    - {len(resource_id_updates)} candidate(s) found{' (dry run, not written)' if not resource_id_updates.empty else ''}")
         if resource_id_skipped_full:
             logger.info(f"    - {len(resource_id_skipped_full)} file(s) skipped (list-length cap) -- see resource_id_skipped_full.csv")
         logger.info(f"  Facet Analysis:")
