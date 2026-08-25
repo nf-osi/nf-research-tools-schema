@@ -448,15 +448,23 @@ def main():
     )
     args = parser.parse_args()
 
+    # All of this script's read path (tools view, dataset collection, and each
+    # individual Dataset entity's own item table) is public -- confirmed live,
+    # anonymous tableQuery succeeds against all of them. A SYNAPSE_AUTH_TOKEN is
+    # only required for --apply-tool-dataset-links-csv, which writes to
+    # syn16859448 and needs write permission on the NFRTC project.
     auth_token = os.environ.get("SYNAPSE_AUTH_TOKEN")
-    if not auth_token:
-        logger.error("SYNAPSE_AUTH_TOKEN environment variable not set")
+    if args.apply_tool_dataset_links_csv and not auth_token:
+        logger.error("SYNAPSE_AUTH_TOKEN environment variable not set -- required to write to Synapse")
         sys.exit(1)
 
     try:
         syn = Synapse()
-        syn.login(authToken=auth_token)
-        logger.info("Logged into Synapse")
+        if auth_token:
+            syn.login(authToken=auth_token, silent=True)
+            logger.info("Logged into Synapse")
+        else:
+            logger.info("No SYNAPSE_AUTH_TOKEN set -- querying anonymously (all source tables are public)")
 
         if args.apply_tool_dataset_links_csv:
             logger.info(f"\n=== Applying reviewed tool<->dataset links from {args.apply_tool_dataset_links_csv} ===")
