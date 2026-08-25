@@ -313,6 +313,30 @@ def test_call_with_rate_limit_retry_does_not_retry_other_errors(monkeypatch):
     assert attempts["count"] == 1
 
 
+def test_query_datasets_filters_by_dataset_ids():
+    captured_query = {}
+
+    class FakeSyn:
+        def tableQuery(self, query):
+            captured_query["value"] = query
+            return _FakeResults(pd.DataFrame({"id": ["syn1", "syn2"]}))
+
+    result = mtdl.query_datasets(FakeSyn(), dataset_ids=["syn1", "syn2"])
+    assert "AND id IN ('syn1', 'syn2')" in captured_query["value"]
+    assert len(result) == 2
+
+
+def test_query_datasets_warns_on_missing_requested_ids():
+    class FakeSyn:
+        def tableQuery(self, query):
+            return _FakeResults(pd.DataFrame({"id": ["syn1"]}))
+
+    # syn999 was requested but isn't in the collection -- should log a warning,
+    # not raise, and still return whatever was found.
+    result = mtdl.query_datasets(FakeSyn(), dataset_ids=["syn1", "syn999"])
+    assert list(result["id"]) == ["syn1"]
+
+
 def test_save_and_load_tool_dataset_links_round_trip(tmp_path):
     links = [
         {

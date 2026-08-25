@@ -55,6 +55,7 @@ live once getTableColumns was removed.
 
 Usage:
     python mine_tool_dataset_links.py [--dry-run] [--limit LIMIT] [--workers N]
+    python mine_tool_dataset_links.py --dataset-id syn123 --dataset-id syn456  # newly-added datasets only
     python mine_tool_dataset_links.py --apply-tool-dataset-links-csv tool_dataset_links_for_review.csv
 """
 
@@ -108,10 +109,15 @@ RATE_LIMIT_MAX_RETRIES = 4
 RATE_LIMIT_BASE_DELAY_SECONDS = 1.0
 
 
-def query_datasets(syn: Synapse, limit: int = None) -> "pd.DataFrame":
+def query_datasets(syn: Synapse, limit: int = None, dataset_ids: List[str] = None) -> "pd.DataFrame":
     """
     Query the Portal Dataset Collection for the per-dataset metadata that
     gets mirrored straight into Tool_Dataset rows once a match is found.
+
+    If dataset_ids is given, restricts to just those dataset(s) instead of
+    the full collection -- e.g. for reviewing newly-added datasets without
+    re-mining ones that have already been reviewed and either matched or
+    ruled out.
     """
     logger.info(f"Querying dataset collection {DATASET_COLLECTION_ID}...")
 
@@ -119,12 +125,19 @@ def query_datasets(syn: Synapse, limit: int = None) -> "pd.DataFrame":
         f"SELECT id, title, description, studyId, dataType, diseaseFocus "
         f"FROM {DATASET_COLLECTION_ID} WHERE id IS NOT NULL"
     )
+    if dataset_ids:
+        ids_clause = ", ".join(f"'{d}'" for d in dataset_ids)
+        query += f" AND id IN ({ids_clause})"
     if limit:
         query += f" LIMIT {limit}"
 
     try:
         df = syn.tableQuery(query).asDataFrame()
         logger.info(f"Retrieved {len(df)} dataset(s) from {DATASET_COLLECTION_ID}")
+        if dataset_ids and len(df) < len(set(dataset_ids)):
+            found = set(df["id"]) if "id" in df.columns else set()
+            missing = sorted(set(dataset_ids) - found)
+            logger.warning(f"{len(missing)} requested dataset id(s) not found in {DATASET_COLLECTION_ID}: {missing}")
         return df
     except Exception as e:
         logger.error(f"Error querying dataset collection: {e}")
@@ -461,6 +474,16 @@ def main():
         help=f"Concurrent threads for per-dataset Synapse queries (default: {DEFAULT_MAX_WORKERS})",
     )
     parser.add_argument(
+        "--dataset-id",
+        action="append",
+        dest="dataset_ids",
+        help=(
+            "Limit mining to specific dataset id(s) (repeatable), e.g. to review "
+            "newly-added datasets without re-scanning the whole collection. "
+            "Default: scan the full Portal Dataset Collection."
+        ),
+    )
+    parser.add_argument(
         "--apply-tool-dataset-links-csv",
         type=Path,
         help=(
@@ -499,7 +522,7 @@ def main():
         tools_data = rta.query_tools_data(syn, limit=args.limit)
 
         logger.info("\n=== Querying Dataset Collection ===")
-        datasets = query_datasets(syn, limit=args.limit)
+        datasets = query_datasets(syn, limit=args.limit, dataset_ids=args.dataset_ids)
 
         logger.info("\n=== Mining Per-Dataset individualID/modelSystemName Values ===")
         match_values, failed_datasets = query_dataset_match_values(
