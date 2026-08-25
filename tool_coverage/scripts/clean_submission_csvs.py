@@ -134,10 +134,12 @@ _STRIP_BEFORE_UPLOAD = {
     # was silently discarding real submission data on every upload. Un-stripped.
     'CLEAN_animal_models.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
+        'vendor', 'catalogNumber', 'catalogURL',
     ],
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     'CLEAN_cell_lines.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail',
+        'vendor', 'catalogNumber', 'catalogURL',
     ],
     # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
     'CLEAN_antibodies.csv': [
@@ -286,7 +288,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'resources': ['resourceName', 'resourceType'],
         'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText'],
         'mutation_details': ['mutationDetailsId'],
-        'mutation': ['mutationId', 'mutationDetailsId', 'animalModelId'],
+        'mutation': ['mutationId', 'mutationDetailsId', 'resourceId'],  # was animalModelId pre-migration (see line ~49)
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
