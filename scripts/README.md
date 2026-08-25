@@ -42,6 +42,14 @@ This directory contains scripts for workflow automation and data management.
 - The mining/dry-run path doesn't need `SYNAPSE_AUTH_TOKEN` -- all of its
   source tables (tools view, dataset collection, each Dataset entity) are
   public. Only `--apply-tool-dataset-links-csv` (the write step) requires it.
+- Per-dataset queries run concurrently (`--workers`, default 8) via a thread
+  pool -- confirmed live, this is ~7x faster than sequential (~87s vs. ~590s
+  across the full collection) with no throttling, as long as it does NOT
+  call `getTableColumns` first (that endpoint has its own much stricter
+  server-side rate limit -- see the module docstring for the full story)
+- `--dataset-id` (repeatable) limits mining to specific dataset(s) instead
+  of the full collection -- e.g. to review newly-added datasets without
+  re-scanning ones already reviewed
 
 **`upsert_tool_datasets.py`**
 - Legacy script from the pre-submission-based, PMID-keyed tool-publications
@@ -98,6 +106,9 @@ python scripts/mine_tool_dataset_links.py --limit 1000
 
 # After reviewing the CSV, upsert survivors to syn16859448
 python scripts/mine_tool_dataset_links.py --apply-tool-dataset-links-csv tool_dataset_links_for_review.csv
+
+# Review specific (e.g. newly-added) datasets only, skipping the full collection scan
+python scripts/mine_tool_dataset_links.py --dataset-id syn123 --dataset-id syn456
 ```
 
 ### Update Observation Schema
