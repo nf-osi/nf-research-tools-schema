@@ -191,9 +191,10 @@ def test_query_dataset_match_values_skips_datasets_without_match_columns():
                 raise Exception("400 Client Error: \nUnknown column modelSystemName")
             raise AssertionError(f"Unexpected query: {query}")
 
-    result = mtdl.query_dataset_match_values(FakeSyn(), ["syn11"])
+    result, failed = mtdl.query_dataset_match_values(FakeSyn(), ["syn11"])
     assert result.empty
     assert list(result.columns) == ["datasetId", "field", "value"]
+    assert failed == []  # neither field existing is not a query failure
 
 
 def test_query_one_dataset_narrows_select_on_unknown_column_error():
@@ -207,8 +208,39 @@ def test_query_one_dataset_narrows_select_on_unknown_column_error():
             assert query == "SELECT DISTINCT individualID FROM syn12 WHERE individualID IS NOT NULL"
             return _FakeResults(pd.DataFrame({"individualID": ["JH-2-002"]}))
 
-    rows = mtdl._query_one_dataset(FakeSyn(), "syn12")
+    rows, error = mtdl._query_one_dataset(FakeSyn(), "syn12")
     assert rows == [{"datasetId": "syn12", "field": "individualID", "value": "JH-2-002"}]
+    assert error is None
+
+
+def test_query_one_dataset_reports_genuine_query_failures():
+    """A dataset that fails for a reason other than a missing column (e.g.
+    a stale column-size declaration blocking the whole query, confirmed
+    live) should be reported as a failure, not silently treated as
+    "neither field present."""
+
+    class FakeSyn:
+        def tableQuery(self, query):
+            raise Exception(
+                "400 Client Error: \nThe size of the column 'accessType' is too small.  "
+                "The column size needs to be at least 13 characters."
+            )
+
+    rows, error = mtdl._query_one_dataset(FakeSyn(), "syn13")
+    assert rows == []
+    assert "accessType" in error
+
+
+def test_query_dataset_match_values_collects_failed_datasets():
+    class FakeSyn:
+        def tableQuery(self, query):
+            if "syn14" in query:
+                raise Exception("400 Client Error: \nThe size of the column 'accessType' is too small.")
+            return _FakeResults(pd.DataFrame({"individualID": ["JH-2-002"]}))
+
+    result, failed = mtdl.query_dataset_match_values(FakeSyn(), ["syn14", "syn15"], max_workers=2)
+    assert len(result) == 1
+    assert failed == [{"datasetId": "syn14", "error": "The size of the column 'accessType' is too small."}]
 
 
 def test_query_dataset_match_values_runs_multiple_datasets_concurrently():
@@ -216,26 +248,25 @@ def test_query_dataset_match_values_runs_multiple_datasets_concurrently():
     collect every dataset's rows correctly, regardless of completion order."""
 
     class FakeSyn:
-        def getTableColumns(self, dataset_id):
-            if dataset_id == "syn20":
-                return [{"name": "individualID"}]
-            if dataset_id == "syn21":
-                return [{"name": "modelSystemName"}]
-            return [{"name": "assay"}]
-
         def tableQuery(self, query):
             if "syn20" in query:
                 return _FakeResults(pd.DataFrame({"individualID": ["JH-2-002", None]}))
             if "syn21" in query:
                 return _FakeResults(pd.DataFrame({"modelSystemName": ["NSG"]}))
+            if "syn22" in query:
+                # neither field exists on syn22 -- narrows away via "Unknown column" on both
+                if "individualID" in query:
+                    raise Exception("400 Client Error: \nUnknown column individualID")
+                raise Exception("400 Client Error: \nUnknown column modelSystemName")
             raise AssertionError(f"Unexpected query: {query}")
 
-    result = mtdl.query_dataset_match_values(FakeSyn(), ["syn20", "syn21", "syn22"], max_workers=4)
+    result, failed = mtdl.query_dataset_match_values(FakeSyn(), ["syn20", "syn21", "syn22"], max_workers=4)
     rows = {(r.datasetId, r.field, r.value) for r in result.itertuples()}
     assert rows == {
         ("syn20", "individualID", "JH-2-002"),
         ("syn21", "modelSystemName", "NSG"),
     }
+    assert failed == []
 
 
 class _FakeResults:

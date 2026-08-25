@@ -170,7 +170,7 @@ def _unknown_column_from_error(exc: Exception, candidate_fields: List[str]) -> "
     return None
 
 
-def _query_one_dataset(syn: Synapse, dataset_id: str, limit: int = None) -> List[Dict]:
+def _query_one_dataset(syn: Synapse, dataset_id: str, limit: int = None) -> Tuple[List[Dict], "str | None"]:
     """
     Query a single Dataset entity's own item table (a Dataset is itself
     queryable like any other Synapse table, over its constituent file
@@ -202,7 +202,12 @@ def _query_one_dataset(syn: Synapse, dataset_id: str, limit: int = None) -> List
     has no side effects on shared state beyond issuing read-only Synapse
     queries, so it's safe to run concurrently across datasets.
 
-    Returns a list of {datasetId, field, value} dicts (possibly empty).
+    Returns (rows, error): rows is a list of {datasetId, field, value}
+    dicts (possibly empty); error is None on success, or a short string
+    describing why this dataset couldn't be queried at all (a genuine query
+    failure unrelated to a missing column -- e.g. a stale column-size
+    declaration on the dataset itself, confirmed live to affect whole
+    batches of datasets sharing a schema, not just isolated one-offs).
     """
     remaining_fields = list(FIELD_TO_RESOURCE_TYPE)
 
@@ -220,8 +225,9 @@ def _query_one_dataset(syn: Synapse, dataset_id: str, limit: int = None) -> List
             if missing_field:
                 remaining_fields = [f for f in remaining_fields if f != missing_field]
                 continue
-            logger.warning(f"Could not query dataset {dataset_id} for {remaining_fields}: {e}")
-            return []
+            error = str(e).strip().splitlines()[-1] if str(e).strip() else str(e)
+            logger.warning(f"Could not query dataset {dataset_id} for {remaining_fields}: {error}")
+            return [], error
 
         rows = []
         for field in remaining_fields:
@@ -231,9 +237,9 @@ def _query_one_dataset(syn: Synapse, dataset_id: str, limit: int = None) -> List
                 value = str(value).strip()
                 if value:
                     rows.append({"datasetId": dataset_id, "field": field, "value": value})
-        return rows
+        return rows, None
 
-    return []
+    return [], None
 
 
 def query_dataset_match_values(
@@ -241,16 +247,25 @@ def query_dataset_match_values(
     dataset_ids: List[str],
     limit: int = None,
     max_workers: int = DEFAULT_MAX_WORKERS,
-) -> "pd.DataFrame":
+) -> Tuple["pd.DataFrame", List[Dict]]:
     """
     Fan _query_one_dataset out across a thread pool -- see module docstring
     for why this is safe and worthwhile (independent, read-only, I/O-bound
     per-dataset calls).
 
-    Returns a DataFrame with columns [datasetId, field, value], one row per
-    distinct (dataset, field, value) triple.
+    Returns (match_values, failed_datasets):
+    - match_values: a DataFrame with columns [datasetId, field, value], one
+      row per distinct (dataset, field, value) triple.
+    - failed_datasets: a list of {datasetId, error} dicts, one per dataset
+      that couldn't be queried at all (as opposed to one that queried fine
+      but simply had neither field) -- collected here rather than left as
+      scattered per-dataset warnings, since these tend to cluster (e.g. a
+      whole batch of datasets sharing the same stale column-size
+      declaration, confirmed live) and a caller needs the full list to
+      decide whether a schema fix is warranted.
     """
     rows = []
+    failed_datasets = []
     total = len(dataset_ids)
     completed = 0
 
@@ -262,9 +277,13 @@ def query_dataset_match_values(
         for future in as_completed(future_to_dataset):
             dataset_id = future_to_dataset[future]
             try:
-                rows.extend(future.result())
+                dataset_rows, error = future.result()
+                rows.extend(dataset_rows)
+                if error:
+                    failed_datasets.append({"datasetId": dataset_id, "error": error})
             except Exception as e:
                 logger.warning(f"Unexpected error mining dataset {dataset_id}: {e}")
+                failed_datasets.append({"datasetId": dataset_id, "error": str(e)})
 
             completed += 1
             if completed % 25 == 0 or completed == total:
@@ -272,7 +291,11 @@ def query_dataset_match_values(
 
     result = pd.DataFrame(rows, columns=["datasetId", "field", "value"])
     logger.info(f"Found {len(result)} distinct (dataset, field, value) occurrence(s) across {total} dataset(s)")
-    return result
+    if failed_datasets:
+        logger.warning(f"{len(failed_datasets)}/{total} dataset(s) could not be queried at all -- see below")
+        for failure in failed_datasets:
+            logger.warning(f"  {failure['datasetId']}: {failure['error']}")
+    return result, failed_datasets
 
 
 def query_existing_tool_dataset_links(syn: Synapse) -> Set[tuple]:
@@ -479,7 +502,9 @@ def main():
         datasets = query_datasets(syn, limit=args.limit)
 
         logger.info("\n=== Mining Per-Dataset individualID/modelSystemName Values ===")
-        match_values = query_dataset_match_values(syn, datasets["id"].tolist(), limit=args.limit, max_workers=args.workers)
+        match_values, failed_datasets = query_dataset_match_values(
+            syn, datasets["id"].tolist(), limit=args.limit, max_workers=args.workers
+        )
 
         existing_links = query_existing_tool_dataset_links(syn)
         new_links = find_tool_dataset_links(match_values, datasets, tools_data, existing_links)
@@ -490,8 +515,17 @@ def main():
         elif new_links:
             logger.info(f"Dry run -- found {len(new_links)} new tool<->dataset link candidate(s) (not written)")
 
+        # Written unconditionally (even on --dry-run) since this is diagnostic
+        # output about Synapse-side data quality, not a mining result -- per
+        # feedback, a single count in the log isn't enough to act on (same
+        # reasoning as review_tool_annotations.py's resource_id_skipped_full.csv).
+        failed_datasets_path = Path("dataset_query_failures.csv")
+        if failed_datasets:
+            pd.DataFrame(failed_datasets).to_csv(failed_datasets_path, index=False)
+
         logger.info("\n=== Summary ===")
         logger.info(f"  Datasets scanned: {len(datasets)}")
+        logger.info(f"  Datasets with query failures: {len(failed_datasets)}/{len(datasets)}" + (f" -- see {failed_datasets_path}" if failed_datasets else ""))
         logger.info(f"  individualID/modelSystemName occurrences found: {len(match_values)}")
         if new_links and not args.dry_run:
             logger.info(f"  {len(new_links)} new candidate(s) written to {review_path} -- review, then re-run with --apply-tool-dataset-links-csv")
