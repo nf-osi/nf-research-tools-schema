@@ -176,18 +176,110 @@ def test_find_tool_dataset_links_ignores_unknown_field():
 
 def test_query_dataset_match_values_skips_datasets_without_match_columns():
     """A dataset whose own item table has neither individualID nor
-    modelSystemName should be skipped without an extra query."""
+    modelSystemName should narrow the SELECT down via Synapse's "Unknown
+    column" error on each field in turn, then give up cleanly (no
+    getTableColumns call -- see _query_one_dataset's docstring for why)."""
 
     class FakeSyn:
         def getTableColumns(self, dataset_id):
-            return [{"name": "assay"}, {"name": "fileFormat"}]
+            raise AssertionError("getTableColumns should never be called -- see _query_one_dataset docstring")
 
         def tableQuery(self, query):
-            raise AssertionError("tableQuery should not be called when no match columns exist")
+            if "individualID" in query:
+                raise Exception("400 Client Error: \nUnknown column individualID")
+            if "modelSystemName" in query:
+                raise Exception("400 Client Error: \nUnknown column modelSystemName")
+            raise AssertionError(f"Unexpected query: {query}")
 
     result = mtdl.query_dataset_match_values(FakeSyn(), ["syn11"])
     assert result.empty
     assert list(result.columns) == ["datasetId", "field", "value"]
+
+
+def test_query_one_dataset_narrows_select_on_unknown_column_error():
+    """A dataset missing only modelSystemName should retry with just
+    individualID rather than giving up on the whole dataset."""
+
+    class FakeSyn:
+        def tableQuery(self, query):
+            if "individualID, modelSystemName" in query or "modelSystemName, individualID" in query:
+                raise Exception("400 Client Error: \nUnknown column modelSystemName")
+            assert query == "SELECT DISTINCT individualID FROM syn12 WHERE individualID IS NOT NULL"
+            return _FakeResults(pd.DataFrame({"individualID": ["JH-2-002"]}))
+
+    rows = mtdl._query_one_dataset(FakeSyn(), "syn12")
+    assert rows == [{"datasetId": "syn12", "field": "individualID", "value": "JH-2-002"}]
+
+
+def test_query_dataset_match_values_runs_multiple_datasets_concurrently():
+    """The thread-pool fan-out in query_dataset_match_values must still
+    collect every dataset's rows correctly, regardless of completion order."""
+
+    class FakeSyn:
+        def getTableColumns(self, dataset_id):
+            if dataset_id == "syn20":
+                return [{"name": "individualID"}]
+            if dataset_id == "syn21":
+                return [{"name": "modelSystemName"}]
+            return [{"name": "assay"}]
+
+        def tableQuery(self, query):
+            if "syn20" in query:
+                return _FakeResults(pd.DataFrame({"individualID": ["JH-2-002", None]}))
+            if "syn21" in query:
+                return _FakeResults(pd.DataFrame({"modelSystemName": ["NSG"]}))
+            raise AssertionError(f"Unexpected query: {query}")
+
+    result = mtdl.query_dataset_match_values(FakeSyn(), ["syn20", "syn21", "syn22"], max_workers=4)
+    rows = {(r.datasetId, r.field, r.value) for r in result.itertuples()}
+    assert rows == {
+        ("syn20", "individualID", "JH-2-002"),
+        ("syn21", "modelSystemName", "NSG"),
+    }
+
+
+class _FakeResults:
+    """Minimal stand-in for synapseclient's tableQuery() return value."""
+
+    def __init__(self, df):
+        self._df = df
+
+    def asDataFrame(self):
+        return self._df
+
+
+def test_call_with_rate_limit_retry_retries_on_429(monkeypatch):
+    monkeypatch.setattr(mtdl.time, "sleep", lambda seconds: None)
+
+    class RateLimitError(Exception):
+        def __init__(self):
+            self.response = type("Response", (), {"status_code": 429})()
+
+    attempts = {"count": 0}
+
+    def flaky():
+        attempts["count"] += 1
+        if attempts["count"] < 3:
+            raise RateLimitError()
+        return "success"
+
+    assert mtdl._call_with_rate_limit_retry(flaky) == "success"
+    assert attempts["count"] == 3
+
+
+def test_call_with_rate_limit_retry_does_not_retry_other_errors(monkeypatch):
+    monkeypatch.setattr(mtdl.time, "sleep", lambda seconds: None)
+
+    attempts = {"count": 0}
+
+    def always_fails():
+        attempts["count"] += 1
+        raise ValueError("not a rate limit")
+
+    import pytest
+    with pytest.raises(ValueError):
+        mtdl._call_with_rate_limit_retry(always_fails)
+    assert attempts["count"] == 1
 
 
 def test_save_and_load_tool_dataset_links_round_trip(tmp_path):
