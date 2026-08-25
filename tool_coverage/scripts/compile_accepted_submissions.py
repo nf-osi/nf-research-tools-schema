@@ -63,6 +63,7 @@ COLUMNS = {
         "mechanismOfActionValidation", "pediatricSuitability", "pkpdCapabilities",
         "timelineToResults", "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "vendor", "catalogNumber", "catalogURL",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex",
@@ -86,6 +87,7 @@ COLUMNS = {
         "modelLimitations", "clinicalTranslationHistory", "regulatoryAcceptanceHistory",
         "mtaRequired", "ngnriRepositoryStatus",
         "itemAcquisition", "developerName", "developerAffiliation", "developerContactEmail",
+        "vendor", "catalogNumber", "catalogURL",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
@@ -528,6 +530,9 @@ def _build_cell_line(d: dict) -> dict:
         "developerName": _get(bi, "developerName") or _get(d, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
+        "vendor": _get(d, "vendor"),
+        "catalogNumber": _get(d, "catalogNumber"),
+        "catalogURL": _get(d, "catalogURL"),
         "_resourceName": resource_name,
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
@@ -612,6 +617,9 @@ def _build_animal_model(d: dict) -> dict:
         "developerName": _get(bi, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
+        "vendor": _get(d, "vendor"),
+        "catalogNumber": _get(d, "catalogNumber"),
+        "catalogURL": _get(d, "catalogURL"),
         "_resourceName": resource_name,
         "_pmid": _get(d, "_pmid"),
         "_doi": _get(d, "_doi", "publicationDOI"),
@@ -1242,13 +1250,26 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
     Also back-fills donorId into ACCEPTED_cell_lines.csv and
     ACCEPTED_patient_derived_models.csv if a matching _species field is found.
     """
-    # ── VENDOR / VENDOR ITEM (from antibodies) ────────────────────────────────
-    antibody_csv = csv_dir / CSV_FILES["antibodies"]
+    # ── VENDOR / VENDOR ITEM ────────────────────────────────────────────────
+    # Antibody was the only type wired up here originally; cell_line and
+    # animal_model submissions also carry vendor/catalogNumber/catalogURL
+    # (via the "Purchase from Vendor" itemAcquisition branch) but were never
+    # scanned, so that data silently never reached Vendor/VendorItem. Other
+    # types with the same form fields (genetic_reagent, organoid_protocol,
+    # patient_derived_model) aren't wired up in their _build_* functions yet
+    # either -- tracked separately, not fixed here.
+    vendor_source_csvs = [
+        csv_dir / CSV_FILES["antibodies"],
+        csv_dir / CSV_FILES["cell_lines"],
+        csv_dir / CSV_FILES["animal_models"],
+    ]
     vendors: dict[str, dict] = {}       # vendorId → row
     vendor_items: list[dict] = []
 
-    if antibody_csv.exists():
-        with open(antibody_csv, newline="", encoding="utf-8") as f:
+    for source_csv in vendor_source_csvs:
+        if not source_csv.exists():
+            continue
+        with open(source_csv, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
                 vendor_name = (row.get("vendor") or "").strip()
                 catalog_num = (row.get("catalogNumber") or "").strip()
