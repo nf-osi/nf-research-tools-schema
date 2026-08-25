@@ -12,6 +12,13 @@ This directory contains scripts for workflow automation and data management.
 - Suggests new cell lines and synonyms using fuzzy matching
 - Analyzes facet configuration for search improvements
 - Outputs JSON suggestions and markdown reports
+- Also mines two further automations -- additive-only, but requiring manual
+  CSV review before either is applied (nf-research-tools-schema#132, #154,
+  #246): tool<->study links to syn26461958, and a Resource_id
+  file-annotation backfill on syn16858331. See `--apply-tool-study-links-csv`
+  / `--apply-resource-id-annotations-csv` and the "Tool<->Study Links and
+  Resource_id Backfill" and "Cross-Project Table Dependencies" sections of
+  [`docs/TOOL_ANNOTATION_REVIEW.md`](../docs/TOOL_ANNOTATION_REVIEW.md)
 
 **Used by**: `review-tool-annotations.yml` workflow
 

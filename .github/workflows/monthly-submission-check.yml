@@ -37,14 +37,30 @@ jobs:
         run: |
           python scripts/review_tool_annotations.py 2>&1 | tee annotation_output.log
 
-          # Tool<->study links (nf-osi/nf-research-tools-schema#132, #154) are
-          # mined and upserted directly to syn26461958 within the script itself
-          # (additive-only, exact-match-only -- see upsert_tool_study_links'
-          # docstring for why this doesn't go through the PR review flow like
-          # new-resource suggestions do). Surface the count for the monthly
-          # issue from the script's own log line rather than a second file.
+          # Tool<->study links (nf-osi/nf-research-tools-schema#132, #154, #246) are
+          # mined into tool_study_links_for_review.csv -- NOT auto-upserted (per
+          # #246 review, no individualID match is safe to write unattended; see
+          # docs/TOOL_ANNOTATION_REVIEW.md). A human reviews the CSV artifact and
+          # applies survivors with --apply-tool-study-links-csv. Surface the
+          # candidate count for the monthly issue from the script's own log line.
           TOOL_STUDY_LINK_COUNT=$(grep -oP 'Found \K\d+(?= new tool<->study association)' annotation_output.log | tail -1 || echo 0)
           echo "tool_study_link_count=${TOOL_STUDY_LINK_COUNT:-0}" >> $GITHUB_OUTPUT
+
+          # Resource_id file-annotation backfill (nf-research-tools-schema#154,
+          # https://github.com/nf-osi/nf-research-tools-schema/issues/154#issuecomment-5394955094)
+          # -- same mine-to-CSV-then-manual-review pattern as the tool<->study
+          # links above (nf-research-tools-schema#246).
+          RESOURCE_ID_COUNT=$(grep -oP 'Found \K\d+(?= file\(s\) needing a new Resource_id)' annotation_output.log | tail -1 || echo 0)
+          echo "resource_id_count=${RESOURCE_ID_COUNT:-0}" >> $GITHUB_OUTPUT
+
+          # Files skipped for already being at the Resource_id list-length cap
+          # (see RESOURCE_ID_MAX_LIST_LENGTH) -- surfaced as a full per-file
+          # CSV artifact, not just a count, per feedback on #246.
+          RESOURCE_ID_SKIPPED_COUNT=0
+          if [ -f resource_id_skipped_full.csv ]; then
+            RESOURCE_ID_SKIPPED_COUNT=$(($(wc -l < resource_id_skipped_full.csv) - 1))
+          fi
+          echo "resource_id_skipped_count=${RESOURCE_ID_SKIPPED_COUNT:-0}" >> $GITHUB_OUTPUT
 
           if [ ! -f tool_annotation_suggestions.json ]; then
             echo "⚠️  review_tool_annotations.py produced no output file"
@@ -67,6 +83,34 @@ jobs:
             echo "has_new=false" >> $GITHUB_OUTPUT
             echo "ℹ️  No new cell line suggestions this month"
           fi
+
+      - name: Upload Resource_id skipped-full artifact
+        if: steps.annotation.outputs.resource_id_skipped_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-id-skipped-full
+          path: resource_id_skipped_full.csv
+          retention-days: 90
+
+      # Neither of these is auto-upserted (nf-research-tools-schema#246 review) --
+      # a human reviews the CSV, deletes any row that isn't clearly correct, then
+      # runs `python scripts/review_tool_annotations.py --apply-tool-study-links-csv`
+      # / `--apply-resource-id-annotations-csv` locally to write the survivors.
+      - name: Upload tool<->study links review artifact
+        if: steps.annotation.outputs.tool_study_link_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-study-links-for-review
+          path: tool_study_links_for_review.csv
+          retention-days: 90
+
+      - name: Upload Resource_id annotations review artifact
+        if: steps.annotation.outputs.resource_id_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-id-annotations-for-review
+          path: resource_id_annotations_for_review.csv
+          retention-days: 90
 
       - name: Convert annotation suggestions to submission JSON
         id: format
@@ -193,6 +237,8 @@ jobs:
             const hasNew = '${{ steps.annotation.outputs.has_new }}' === 'true';
             const newCount = '${{ steps.annotation.outputs.new_count }}' || '0';
             const toolStudyLinkCount = '${{ steps.annotation.outputs.tool_study_link_count }}' || '0';
+            const resourceIdCount = '${{ steps.annotation.outputs.resource_id_count }}' || '0';
+            const resourceIdSkippedCount = '${{ steps.annotation.outputs.resource_id_skipped_count }}' || '0';
             const prNumber = '${{ steps.annotation_pr.outputs.pull-request-number }}';
             const prUrl = '${{ steps.annotation_pr.outputs.pull-request-url }}';
 
@@ -224,12 +270,29 @@ jobs:
               ].join('\n');
             }
 
-            // Tool<->study link mining (nf-osi/nf-research-tools-schema#132, #154)
-            // -- upserted directly to syn26461958 within the script itself, so
-            // this is a report of what already happened, not an action item.
+            // Tool<->study link mining (nf-osi/nf-research-tools-schema#132, #154, #246)
+            // -- NOT auto-upserted (per #246 review, no individualID match is safe
+            // to write unattended -- see docs/TOOL_ANNOTATION_REVIEW.md). This is an
+            // action item: review the CSV artifact, then apply survivors.
             const toolStudyLinkSection = Number(toolStudyLinkCount) > 0
-              ? `✅ Mined and upserted **${toolStudyLinkCount}** new tool<->study association(s) to \`syn26461958\` (matched via exact \`individualID\` == resourceName/synonym).`
+              ? `⚠️  **Action required**: Found **${toolStudyLinkCount}** tool<->study link candidate(s) (matched via \`individualID\` against resourceName/synonym). Download the \`tool-study-links-for-review\` run artifact, delete any row that isn't clearly correct, then run:\n\`\`\`bash\npython scripts/review_tool_annotations.py --apply-tool-study-links-csv tool_study_links_for_review.csv\n\`\`\``
               : 'ℹ️  No new tool<->study associations found this month.';
+
+            // Resource_id file-annotation backfill (nf-research-tools-schema#154, #246)
+            // -- same mine-to-CSV-then-manual-review pattern as the tool<->study
+            // links above.
+            const resourceIdLines = [
+              Number(resourceIdCount) > 0
+                ? `⚠️  **Action required**: Found **${resourceIdCount}** \`Resource_id\` annotation candidate(s) for \`syn16858331\` (matched via the same rules as the tool<->study links above). Download the \`resource-id-annotations-for-review\` run artifact -- each row includes the file's own \`tumorType\`/\`diagnosis\`/\`tissue\` for context -- delete any row that isn't clearly correct, then run:\n\`\`\`bash\npython scripts/review_tool_annotations.py --apply-resource-id-annotations-csv resource_id_annotations_for_review.csv\n\`\`\``
+                : 'ℹ️  No new Resource_id file annotations found this month.',
+            ];
+            if (Number(resourceIdSkippedCount) > 0) {
+              resourceIdLines.push(
+                '',
+                `⚠️  **${resourceIdSkippedCount}** file(s) matched but were skipped -- already at the Resource_id list-length cap (currently 10). See the \`resource-id-skipped-full\` run artifact for the exact file/resourceId pairs.`,
+              );
+            }
+            const resourceIdSection = resourceIdLines.join('\n');
 
             const body = [
               '## Monthly Tool Submission Check',
@@ -243,6 +306,10 @@ jobs:
               '### Tool<->Study Links',
               '',
               toolStudyLinkSection,
+              '',
+              '### Resource_id File Annotations',
+              '',
+              resourceIdSection,
               '',
               '---',
               '',

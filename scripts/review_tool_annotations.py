@@ -16,9 +16,11 @@ Usage:
 """
 
 import argparse
+import ast
 import json
 import logging
 import os
+import re
 import sys
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -33,6 +35,12 @@ except ImportError:
     print("Error: Required packages not installed. Install with: pip install synapseclient pandas")
     sys.exit(1)
 
+# Ensure this script's own directory is importable regardless of how this
+# module was loaded (run directly, or exec'd via importlib from a test in a
+# different cwd) so the sibling synapse_safety module resolves either way.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from synapse_safety import snapshot_table  # noqa: E402 -- shared before/after-snapshot policy
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -41,7 +49,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Constants
-ANNOTATIONS_VIEW_ID = "syn52702673"  # File annotations view (for individualID)
+ANNOTATIONS_VIEW_ID = "syn52702673"  # "Portal - MV Files": a MaterializedView (read-only query
+    # result, joined from ANNOTATIONS_FILEVIEW_ID) -- fine for reads (individualID, studyId, etc.)
+    # but Resource_id writes must NOT target this; a MaterializedView has no writable row-to-entity
+    # mapping of its own.
+ANNOTATIONS_FILEVIEW_ID = "syn16858331"  # "Portal - Files": the real, writable EntityView backing
+    # ANNOTATIONS_VIEW_ID above. Resource_id annotation writes (nf-research-tools-schema#154) go
+    # here, and must be read from here too, so the rowId_rowVersion identity used to target the
+    # write matches this table, not the MV's.
 TOOLS_VIEW_ID = "syn51730943"  # Tools materialized view (for resourceName, synonyms, facets)
 TOOL_STUDY_LINKS_TABLE_ID = "syn26461958"  # tool<->study junction table (nf-research-tools-schema#132)
 
@@ -100,21 +115,29 @@ def query_individual_id_study_occurrences(syn: Synapse, limit: int = None) -> "p
     studyName per file -- no extra join needed).
 
     Used to trace an individualID that exactly matches a known tool back to
-    the study/studies whose files reference it, for automated tool<->study
-    linking (nf-osi/nf-research-tools-schema#132, #154).
+    the study/studies whose files reference it, for tool<->study link mining
+    (nf-osi/nf-research-tools-schema#132, #154). Also pulls tumorType/
+    diagnosis/tissue -- not used by the matching logic itself, but carried
+    through to the review CSV (see save_tool_study_links_for_review) so a
+    human reviewer can judge a candidate without a separate Synapse lookup;
+    per review on #246, a shared individualID/donor sample can span more
+    than one downstream resource, so this extra context matters even for an
+    "unambiguous" match.
 
     Args:
         syn: Synapse client
         limit: Optional limit on number of rows to retrieve
 
     Returns:
-        DataFrame with columns [individualID, studyId, studyName], one row
-        per (individualID, studyId) occurrence (not deduplicated).
+        DataFrame with columns [individualID, studyId, studyName, tumorType,
+        diagnosis, tissue], one row per (individualID, studyId) occurrence
+        (not deduplicated).
     """
     logger.info(f"Querying {ANNOTATIONS_VIEW_ID} for individualID/studyId occurrences...")
 
     query = (
-        f"SELECT individualID, studyId, studyName FROM {ANNOTATIONS_VIEW_ID} "
+        f"SELECT individualID, studyId, studyName, tumorType, diagnosis, tissue "
+        f"FROM {ANNOTATIONS_VIEW_ID} "
         f"WHERE individualID IS NOT NULL AND studyId IS NOT NULL"
     )
     if limit:
@@ -126,6 +149,55 @@ def query_individual_id_study_occurrences(syn: Synapse, limit: int = None) -> "p
         return df
     except Exception as e:
         logger.error(f"Error querying individualID/studyId occurrences: {e}")
+        raise
+
+
+def query_individual_id_file_occurrences(syn: Synapse, limit: int = None) -> "pd.DataFrame":
+    """
+    Query the writable file annotations EntityView (ANNOTATIONS_FILEVIEW_ID,
+    NOT the ANNOTATIONS_VIEW_ID MaterializedView -- see the constants'
+    comments) for each file's individualID together with its own id and
+    existing Resource_id annotation.
+
+    Deliberately reads from the same table that upsert_resource_id_annotations
+    writes to: the rowId_rowVersion identity a write targets (see that
+    function's docstring) has to come from the table actually being written
+    to, not a MaterializedView built on top of it.
+
+    Used to backfill Resource_id directly onto files whose individualID
+    matches a known tool, so the existing Tool Details "Data > Files" tab
+    (which already renders based on Resource_id) picks them up without any
+    frontend change -- nf-osi/nf-research-tools-schema#154. Also pulls
+    tumorType/diagnosis/tissue/specimenID -- not used by the matching logic
+    itself, but carried through to the review CSV (see
+    save_resource_id_annotations_for_review) for the same reason described
+    in query_individual_id_study_occurrences' docstring.
+
+    Args:
+        syn: Synapse client
+        limit: Optional limit on number of rows to retrieve
+
+    Returns:
+        DataFrame with columns [id, individualID, Resource_id, tumorType,
+        diagnosis, tissue, specimenID], one row per file. Resource_id is a
+        list (possibly empty/NaN) since it's a STRING_LIST column.
+    """
+    logger.info(f"Querying {ANNOTATIONS_FILEVIEW_ID} for individualID/Resource_id per file...")
+
+    query = (
+        f"SELECT id, individualID, Resource_id, tumorType, diagnosis, tissue, specimenID "
+        f"FROM {ANNOTATIONS_FILEVIEW_ID} "
+        f"WHERE individualID IS NOT NULL"
+    )
+    if limit:
+        query += f" LIMIT {limit}"
+
+    try:
+        df = syn.tableQuery(query).asDataFrame()
+        logger.info(f"Retrieved {len(df)} file/individualID row(s)")
+        return df
+    except Exception as e:
+        logger.error(f"Error querying individualID/Resource_id file occurrences: {e}")
         raise
 
 
@@ -148,34 +220,117 @@ def query_existing_tool_study_links(syn: Synapse) -> Set[tuple]:
         return set()
 
 
+def _strip_disambiguation_suffix(name: str) -> str:
+    """Strip a single trailing parenthetical, e.g. 'JH-2-002 (MPNST)' ->
+    'JH-2-002'. Used only to build a best-effort fallback match key below --
+    never to rewrite an actual resourceName/synonym."""
+    return re.sub(r"\s*\([^)]*\)\s*$", "", name).strip()
+
+
+def _exclude_ambiguous_keys(
+    lookup: Dict[str, Dict],
+    candidates: Dict[str, Set[str]],
+    tier_label: str,
+) -> None:
+    """
+    Drop any key from `lookup` that `candidates` shows resolves to more than
+    one distinct resourceId -- mutates `lookup` in place. Shared by all three
+    matching tiers in _build_resource_match_lookups (see its docstring for
+    why this matters): a key that's genuinely ambiguous between two or more
+    resources must not silently resolve to whichever tool happened to be
+    seen last while building the lookup.
+    """
+    ambiguous = {key for key, rids in candidates.items() if len(rids) > 1}
+    for key in ambiguous:
+        lookup.pop(key, None)
+    if ambiguous:
+        example = ', '.join(sorted(ambiguous)[:3])
+        logger.info(
+            f"Skipping {len(ambiguous)} ambiguous {tier_label} value(s) shared "
+            f"by >1 resourceId -- not safe to auto-link (e.g. {example}...)"
+        )
+
+
+def _build_resource_match_lookups(
+    tools_data: List[Dict],
+) -> Tuple[Dict[str, Dict], Dict[str, Dict], Dict[str, Dict]]:
+    """
+    Build the three matching tiers shared by find_tool_study_links and
+    find_resource_id_annotations: exact resourceName, exact synonym, and a
+    lower-confidence stripped-disambiguation-suffix fallback (e.g. an
+    individualID of "JH-2-002" against a resourceName of
+    "JH-2-002 (MPNST)") -- common for Cell Line/Patient-Derived Model/
+    Antibody/Genetic Reagent/Animal Model resources that share a parent
+    specimen or clone ID but are registered as distinct resources per tumor
+    type, epitope, etc.
+
+    ALL THREE tiers are only trusted when a given key (exact resourceName,
+    exact synonym, or stripped base name) resolves to exactly one
+    resourceId. This matters beyond the stripped-suffix case the tier was
+    originally built for: live registry data has 25+ resourceNames and 11+
+    synonyms that are each reused verbatim across multiple distinct
+    resourceIds (e.g. "CPTC-NF1-1", "NM_001042492") -- almost always
+    unrelated resources that happen to share a common name/RRID/accession
+    string, not a disambiguation-suffix pair. Without this check, a plain
+    dict keyed by that string would silently keep whichever tool was seen
+    last while iterating tools_data and silently drop the others -- e.g.
+    risking a file's data being linked to "JH-2-002 (MPNST)" when it might
+    equally well belong to "JH-2-002 (pNF)" (nf-osi/nf-research-tools-schema
+    #246 review). An ambiguous key must not be auto-linked to any of its
+    candidates.
+
+    Returns (resource_by_name, resource_by_synonym, stripped_lookup).
+    """
+    resource_by_name: Dict[str, Dict] = {}
+    resource_by_synonym: Dict[str, Dict] = {}
+    stripped_lookup: Dict[str, Dict] = {}
+
+    name_candidates: Dict[str, Set[str]] = {}
+    synonym_candidates: Dict[str, Set[str]] = {}
+    stripped_candidates: Dict[str, Set[str]] = {}
+
+    for tool in tools_data:
+        name = tool.get('resourceName')
+        rid = tool.get('resourceId')
+        if not name or not rid:
+            continue
+
+        resource_by_name[name] = tool
+        name_candidates.setdefault(name, set()).add(rid)
+
+        synonyms_str = tool.get('synonyms', '')
+        if synonyms_str and isinstance(synonyms_str, str):
+            for syn_name in (s.strip() for s in synonyms_str.split(',')):
+                if syn_name:
+                    resource_by_synonym[syn_name] = tool
+                    synonym_candidates.setdefault(syn_name, set()).add(rid)
+
+        stripped = _strip_disambiguation_suffix(name)
+        if stripped and stripped != name:
+            stripped_lookup[stripped] = tool
+            stripped_candidates.setdefault(stripped, set()).add(rid)
+
+    _exclude_ambiguous_keys(resource_by_name, name_candidates, 'resourceName')
+    _exclude_ambiguous_keys(resource_by_synonym, synonym_candidates, 'synonym')
+    _exclude_ambiguous_keys(stripped_lookup, stripped_candidates, 'disambiguation-suffix base name')
+
+    return resource_by_name, resource_by_synonym, stripped_lookup
+
+
 def find_tool_study_links(
     occurrences: "pd.DataFrame",
     tools_data: List[Dict],
     existing_links: Set[tuple],
 ) -> List[Dict]:
     """
-    For each individualID that exactly matches a known tool's resourceName or
+    For each individualID that matches a known tool's resourceName or
     synonym, collect the (resourceId, studyId) pairs it co-occurs with in
     file annotations, filtered down to ones not already in
     TOOL_STUDY_LINKS_TABLE_ID.
 
-    Matching is exact-string only, same standard as existing_exact/
-    existing_synonyms in analyze_individual_ids -- fuzzy matches aren't
-    reliable enough to auto-link without human review.
+    See _build_resource_match_lookups for the matching tiers used.
     """
-    resource_by_name: Dict[str, Dict] = {}
-    resource_by_synonym: Dict[str, Dict] = {}
-    for tool in tools_data:
-        name = tool.get('resourceName')
-        rid = tool.get('resourceId')
-        if not name or not rid:
-            continue
-        resource_by_name[name] = tool
-        synonyms_str = tool.get('synonyms', '')
-        if synonyms_str and isinstance(synonyms_str, str):
-            for syn_name in (s.strip() for s in synonyms_str.split(',')):
-                if syn_name:
-                    resource_by_synonym[syn_name] = tool
+    resource_by_name, resource_by_synonym, stripped_lookup = _build_resource_match_lookups(tools_data)
 
     new_links: Dict[tuple, Dict] = {}
     for row in occurrences.itertuples():
@@ -184,7 +339,11 @@ def find_tool_study_links(
         if not individual_id or not study_id:
             continue
 
-        tool = resource_by_name.get(individual_id) or resource_by_synonym.get(individual_id)
+        tool = (
+            resource_by_name.get(individual_id)
+            or resource_by_synonym.get(individual_id)
+            or stripped_lookup.get(individual_id)
+        )
         if not tool:
             continue
 
@@ -202,21 +361,171 @@ def find_tool_study_links(
             'studyId': study_id,
             'studyName': getattr(row, 'studyName', None),
             'matchedVia': individual_id,
+            # Review context only (per #246 review) -- not used by the matching
+            # logic above. Lets a human judge a candidate (e.g. does this file's
+            # own tumorType agree with the matched resource?) without a separate
+            # Synapse lookup. Absent on synthetic test DataFrames, hence getattr.
+            'tumorType': getattr(row, 'tumorType', None),
+            'diagnosis': getattr(row, 'diagnosis', None),
+            'tissue': getattr(row, 'tissue', None),
         }
 
     logger.info(f"Found {len(new_links)} new tool<->study association(s) not already in {TOOL_STUDY_LINKS_TABLE_ID}")
     return list(new_links.values())
 
 
+# NOT a Synapse platform hard cap -- this is just ANNOTATIONS_FILEVIEW_ID's
+# Resource_id column's current `maximumListLength` (confirmed live: 10,
+# maximumSize=36 per value). It's a per-column setting and can be raised via
+# the same swap-and-backfill pattern used elsewhere this session (create a
+# new ColumnModel with a higher maximumListLength, swap columnIds, backfill)
+# if the skip counts below ever become a real problem.
+RESOURCE_ID_MAX_LIST_LENGTH = 10
+
+
+def find_resource_id_annotations(
+    file_occurrences: "pd.DataFrame",
+    tools_data: List[Dict],
+) -> Tuple["pd.DataFrame", List[Dict]]:
+    """
+    For each file whose individualID matches a known tool (same tiered
+    matching as find_tool_study_links -- see _build_resource_match_lookups),
+    determine whether its existing Resource_id annotation needs the matched
+    resourceId appended.
+
+    Additive only: an existing Resource_id value is never removed, and a
+    resourceId already present is left alone. Files where appending would
+    exceed RESOURCE_ID_MAX_LIST_LENGTH are skipped rather than silently
+    truncated or left to fail on write -- see the second return value.
+
+    IMPORTANT: file_occurrences must be the DataFrame returned directly by
+    query_individual_id_file_occurrences (or another syn.tableQuery(...)
+    .asDataFrame() call against ANNOTATIONS_FILEVIEW_ID -- NOT the
+    ANNOTATIONS_VIEW_ID MaterializedView) -- its pandas index encodes
+    Synapse's rowId_rowVersion for each row, which is preserved on
+    the returned DataFrame and is what tells Synapse to UPDATE those
+    specific existing file rows rather than attempt to insert new ones (a
+    fileview's rows can't be inserted directly; membership is derived from
+    entity scope). Rebuilding a plain DataFrame from scratch here would lose
+    that and break the write in upsert_resource_id_annotations.
+
+    Returns:
+        (updates, skipped_full) where:
+        - updates: DataFrame with columns [id, Resource_id], index preserved
+          from file_occurrences -- ready to upsert via
+          upsert_resource_id_annotations -- containing only files that
+          actually need a change.
+        - skipped_full: list of {id, resourceId, existingCount} dicts, one
+          per file that would need a change but is already at
+          RESOURCE_ID_MAX_LIST_LENGTH -- so this doesn't disappear into a
+          single count in the logs (per feedback on #246).
+    """
+    resource_by_name, resource_by_synonym, stripped_lookup = _build_resource_match_lookups(tools_data)
+
+    updates = []
+    row_labels = []
+    skipped_full = []
+    for row_label, row in zip(file_occurrences.index, file_occurrences.itertuples()):
+        file_id = row.id
+        individual_id = str(row.individualID).strip() if row.individualID else ''
+        if not file_id or not individual_id:
+            continue
+
+        tool = (
+            resource_by_name.get(individual_id)
+            or resource_by_synonym.get(individual_id)
+            or stripped_lookup.get(individual_id)
+        )
+        if not tool:
+            continue
+
+        existing = row.Resource_id
+        existing_list = list(existing) if isinstance(existing, list) else []
+        if tool['resourceId'] in existing_list:
+            continue
+
+        if len(existing_list) >= RESOURCE_ID_MAX_LIST_LENGTH:
+            skipped_full.append({
+                'id': file_id,
+                'resourceId': tool['resourceId'],
+                'existingCount': len(existing_list),
+            })
+            continue
+
+        updates.append({'id': file_id, 'Resource_id': existing_list + [tool['resourceId']]})
+        row_labels.append(row_label)
+
+    if skipped_full:
+        affected_resource_ids = sorted({r['resourceId'] for r in skipped_full})
+        logger.warning(
+            f"Skipping Resource_id update on {len(skipped_full)} file(s) already at "
+            f"the {RESOURCE_ID_MAX_LIST_LENGTH}-value list limit, across "
+            f"{len(affected_resource_ids)} resourceId(s): {affected_resource_ids[:10]}"
+            f"{'...' if len(affected_resource_ids) > 10 else ''}"
+        )
+
+    logger.info(f"Found {len(updates)} file(s) needing a new Resource_id annotation")
+    return pd.DataFrame(updates, columns=['id', 'Resource_id'], index=row_labels), skipped_full
+
+
+def upsert_resource_id_annotations(syn: Synapse, updates: "pd.DataFrame") -> None:
+    """
+    Write the mined Resource_id values back onto their files via
+    ANNOTATIONS_FILEVIEW_ID (the writable EntityView -- NOT
+    ANNOTATIONS_VIEW_ID, which is a read-only MaterializedView built on top
+    of it and has no writable row-to-entity mapping of its own). Additive
+    only (see find_resource_id_annotations), but NOT safe to run
+    unattended: per review on nf-osi/nf-research-tools-schema#246, a single
+    individualID/donor sample can legitimately span more than one
+    downstream resource (e.g. JH-2-002 has files whose own tumorType
+    annotation splits between MPNST and Plexiform Neurofibroma -- confirmed
+    live), so even an "unambiguous within the tools registry" match --
+    exact or stripped-suffix -- isn't a safe signal to write without a
+    human confirming it first. This function is only ever invoked from
+    main() via --apply-resource-id-annotations-csv, against a CSV a human
+    has reviewed (and possibly trimmed) -- see
+    save_resource_id_annotations_for_review / load_resource_id_annotations_from_review.
+
+    `updates` must carry the rowId_rowVersion index from the original query
+    against ANNOTATIONS_FILEVIEW_ID (see find_resource_id_annotations) --
+    that's what makes this an UPDATE of the named files' existing
+    Resource_id annotation rather than an attempted insert. It does not
+    touch any other annotation or create a new file version, only the
+    Resource_id value.
+
+    Snapshots ANNOTATIONS_FILEVIEW_ID immediately before and after the write
+    (standing policy: every automated table/view write is bracketed by a
+    snapshot on both sides, not just one).
+    """
+    if updates.empty:
+        logger.info("No new Resource_id annotations to upsert")
+        return
+
+    snapshot_table(syn, ANNOTATIONS_FILEVIEW_ID, f"Before Resource_id backfill of {len(updates)} file(s) (nf-research-tools-schema#154)")
+    syn.store(synapseclient.Table(ANNOTATIONS_FILEVIEW_ID, updates))
+    logger.info(f"Upserted Resource_id annotation on {len(updates)} file(s) via {ANNOTATIONS_FILEVIEW_ID}")
+    snapshot_table(syn, ANNOTATIONS_FILEVIEW_ID, f"After Resource_id backfill of {len(updates)} file(s) (nf-research-tools-schema#154)")
+
+
 def upsert_tool_study_links(syn: Synapse, links: List[Dict]) -> None:
     """
     Upsert newly-mined tool<->study associations directly into
     TOOL_STUDY_LINKS_TABLE_ID. Additive only -- never modifies or removes any
-    existing row, so this is safe to run unattended even though it writes to
-    Synapse without a review step (unlike new-resource suggestions, which
-    still go through the PR-based submission flow since those require human
-    curation judgment; an exact individualID<->resourceName/synonym match is
-    a high-confidence, mechanical signal that doesn't).
+    existing row -- but NOT safe to run unattended: per review on
+    nf-osi/nf-research-tools-schema#246, a single individualID/donor sample
+    can legitimately span more than one downstream resource (e.g. JH-2-002
+    has files whose own tumorType annotation splits between MPNST and
+    Plexiform Neurofibroma -- confirmed live), so even an "unambiguous
+    within the tools registry" individualID<->resourceName/synonym match
+    isn't a safe signal to write without a human confirming it first. This
+    function is only ever invoked from main() via
+    --apply-tool-study-links-csv, against a CSV a human has reviewed (and
+    possibly trimmed) -- see save_tool_study_links_for_review /
+    load_tool_study_links_from_review.
+
+    Snapshots TOOL_STUDY_LINKS_TABLE_ID immediately before and after the
+    write (standing policy: every automated table/view write is bracketed
+    by a snapshot on both sides, not just one).
     """
     if not links:
         logger.info("No new tool<->study links to upsert")
@@ -235,8 +544,92 @@ def upsert_tool_study_links(syn: Synapse, links: List[Dict]) -> None:
         for link in links
     ]
     df = pd.DataFrame(rows)
+    snapshot_table(syn, TOOL_STUDY_LINKS_TABLE_ID, f"Before upserting {len(rows)} new tool<->study link(s) (nf-research-tools-schema#132, #154)")
     syn.store(synapseclient.Table(TOOL_STUDY_LINKS_TABLE_ID, df))
     logger.info(f"Upserted {len(rows)} new tool<->study link(s) to {TOOL_STUDY_LINKS_TABLE_ID}")
+    snapshot_table(syn, TOOL_STUDY_LINKS_TABLE_ID, f"After upserting {len(rows)} new tool<->study link(s) (nf-research-tools-schema#132, #154)")
+
+
+# ---------------------------------------------------------------------------
+# Human-review CSVs for the two mining functions above (nf-research-tools-
+# schema#246 review: neither an exact nor a stripped-suffix individualID
+# match is safe to write to Synapse unattended, since a single donor/
+# specimen individualID can legitimately span more than one downstream
+# resource -- e.g. JH-2-002 splits MPNST vs. Plexiform Neurofibroma via each
+# file's own tumorType annotation, confirmed live, even though the base name
+# "looks" unambiguous within the tools registry). The functions below are
+# how a human turns a mining result into an actual write: review the CSV
+# (delete rows that don't hold up), then re-run this script with
+# --apply-tool-study-links-csv / --apply-resource-id-annotations-csv.
+# ---------------------------------------------------------------------------
+
+def save_tool_study_links_for_review(links: List[Dict], path: Path) -> None:
+    """
+    Write mined tool<->study link candidates (as returned by
+    find_tool_study_links -- includes tumorType/diagnosis/tissue review
+    context) to a CSV. Not upserted; see module note above.
+    """
+    if not links:
+        return
+    pd.DataFrame(links).to_csv(path, index=False)
+    logger.info(f"Wrote {len(links)} tool<->study link candidate(s) to {path} for manual review")
+
+
+def load_tool_study_links_from_review(path: Path) -> List[Dict]:
+    """
+    Read a (human-reviewed, possibly row-deleted) CSV written by
+    save_tool_study_links_for_review back into the list-of-dicts shape
+    upsert_tool_study_links expects.
+    """
+    df = pd.read_csv(path)
+    return df.to_dict('records')
+
+
+def save_resource_id_annotations_for_review(
+    updates: "pd.DataFrame",
+    file_occurrences: "pd.DataFrame",
+    path: Path,
+) -> None:
+    """
+    Write mined Resource_id backfill candidates (as returned by
+    find_resource_id_annotations) to a CSV. Not upserted; see module note
+    above.
+
+    Enriches `updates` (columns [id, Resource_id]) with:
+    - row_label: updates' own rowId_rowVersion index, saved as a column
+      since a plain CSV round-trip has no index of its own -- restored by
+      load_resource_id_annotations_from_review.
+    - individualID/tumorType/diagnosis/tissue: looked up from
+      file_occurrences by file id, so a reviewer can judge each candidate
+      without a separate Synapse query.
+    - addedResourceId: the specific resourceId this row would append --
+      always the last element of Resource_id, since find_resource_id_annotations
+      only ever appends one at a time.
+    """
+    if updates.empty:
+        return
+    context_cols = ['individualID', 'tumorType', 'diagnosis', 'tissue']
+    context_by_file = file_occurrences.set_index('id')[context_cols]
+    review = updates.join(context_by_file, on='id')
+    review.insert(0, 'row_label', updates.index)
+    review['addedResourceId'] = review['Resource_id'].apply(lambda lst: lst[-1])
+    review.to_csv(path, index=False)
+    logger.info(f"Wrote {len(review)} Resource_id annotation candidate(s) to {path} for manual review")
+
+
+def load_resource_id_annotations_from_review(path: Path) -> "pd.DataFrame":
+    """
+    Read a (human-reviewed, possibly row-deleted) CSV written by
+    save_resource_id_annotations_for_review back into the DataFrame shape
+    upsert_resource_id_annotations expects -- restoring the original
+    rowId_rowVersion index from the row_label column and parsing Resource_id
+    back from its CSV string form into an actual list.
+    """
+    df = pd.read_csv(path)
+    df['Resource_id'] = df['Resource_id'].apply(ast.literal_eval)
+    df = df.set_index('row_label')
+    df.index.name = None
+    return df[['id', 'Resource_id']]
 
 
 def query_tools_data(syn: Synapse, limit: int = None) -> List[Dict]:
@@ -693,6 +1086,26 @@ def main():
         type=int,
         help='Limit number of records to query (for testing)'
     )
+    parser.add_argument(
+        '--apply-tool-study-links-csv',
+        type=Path,
+        help=(
+            'Upsert tool<->study links from a human-reviewed CSV (see '
+            'save_tool_study_links_for_review) instead of running the mining pipeline. '
+            'Per nf-research-tools-schema#246 review, matches are never auto-upserted -- '
+            'this is the only way these get written to Synapse.'
+        ),
+    )
+    parser.add_argument(
+        '--apply-resource-id-annotations-csv',
+        type=Path,
+        help=(
+            'Upsert Resource_id file annotations from a human-reviewed CSV (see '
+            'save_resource_id_annotations_for_review) instead of running the mining '
+            'pipeline. Per nf-research-tools-schema#246 review, matches are never '
+            'auto-upserted -- this is the only way these get written to Synapse.'
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -707,6 +1120,21 @@ def main():
         syn = Synapse()
         syn.login(authToken=auth_token)
         logger.info("Logged into Synapse")
+
+        # Apply mode: write a human-reviewed CSV to Synapse and exit -- skips the
+        # entire mining pipeline below. This is the ONLY path that writes
+        # tool<->study links or Resource_id annotations (see the module note above
+        # save_tool_study_links_for_review for why they're never auto-upserted).
+        if args.apply_tool_study_links_csv or args.apply_resource_id_annotations_csv:
+            if args.apply_tool_study_links_csv:
+                logger.info(f"\n=== Applying reviewed tool<->study links from {args.apply_tool_study_links_csv} ===")
+                links = load_tool_study_links_from_review(args.apply_tool_study_links_csv)
+                upsert_tool_study_links(syn, links)
+            if args.apply_resource_id_annotations_csv:
+                logger.info(f"\n=== Applying reviewed Resource_id annotations from {args.apply_resource_id_annotations_csv} ===")
+                updates = load_resource_id_annotations_from_review(args.apply_resource_id_annotations_csv)
+                upsert_resource_id_annotations(syn, updates)
+            return
 
         # Query individualID from annotations
         logger.info("\n=== Querying Annotations ===")
@@ -729,10 +1157,37 @@ def main():
         occurrences = query_individual_id_study_occurrences(syn, limit=args.limit)
         existing_links = query_existing_tool_study_links(syn)
         new_tool_study_links = find_tool_study_links(occurrences, tools_data, existing_links)
+        # Never auto-upserted -- per #246 review, write a review CSV instead; a
+        # human applies survivors via --apply-tool-study-links-csv (see the module
+        # note above save_tool_study_links_for_review).
+        tool_study_links_review_path = Path('tool_study_links_for_review.csv')
         if new_tool_study_links and not args.dry_run:
-            upsert_tool_study_links(syn, new_tool_study_links)
+            save_tool_study_links_for_review(new_tool_study_links, tool_study_links_review_path)
         elif new_tool_study_links:
-            logger.info(f"Dry run -- would upsert {len(new_tool_study_links)} new tool<->study link(s)")
+            logger.info(f"Dry run -- found {len(new_tool_study_links)} new tool<->study link candidate(s) (not written)")
+
+        # Backfill Resource_id file annotations (nf-osi/nf-research-tools-schema#154,
+        # https://github.com/nf-osi/nf-research-tools-schema/issues/154#issuecomment-5394955094)
+        # so the existing Tool Details "Data > Files" tab -- which already renders
+        # off Resource_id -- picks up files without any frontend change.
+        logger.info("\n=== Mining Resource_id File Annotations ===")
+        file_occurrences = query_individual_id_file_occurrences(syn, limit=args.limit)
+        resource_id_updates, resource_id_skipped_full = find_resource_id_annotations(file_occurrences, tools_data)
+        # Never auto-upserted -- same review-CSV-then-apply flow as tool<->study
+        # links above; see --apply-resource-id-annotations-csv.
+        resource_id_review_path = Path('resource_id_annotations_for_review.csv')
+        if not resource_id_updates.empty and not args.dry_run:
+            save_resource_id_annotations_for_review(resource_id_updates, file_occurrences, resource_id_review_path)
+        elif not resource_id_updates.empty:
+            logger.info(f"Dry run -- found {len(resource_id_updates)} Resource_id annotation candidate(s) (not written)")
+
+        # Write skipped-full detail as a run artifact (per feedback on #246: a
+        # single count in the log isn't enough to act on) -- one row per file,
+        # not silently collapsed into the resourceId total.
+        if resource_id_skipped_full:
+            skipped_full_path = 'resource_id_skipped_full.csv'
+            pd.DataFrame(resource_id_skipped_full).to_csv(skipped_full_path, index=False)
+            logger.info(f"Wrote {len(resource_id_skipped_full)} skipped-full file record(s) to {skipped_full_path}")
 
         # Analyze facet configuration
         logger.info("\n=== Analyzing Facet Configuration ===")
@@ -769,7 +1224,17 @@ def main():
         logger.info(f"    - {len(individual_id_suggestions.get('existing_exact', []))} exact matches")
         logger.info(f"    - {len(individual_id_suggestions.get('existing_synonyms', []))} synonym matches")
         logger.info(f"  Tool<->Study Links:")
-        logger.info(f"    - {len(new_tool_study_links)} new association(s) {'upserted' if not args.dry_run else '(dry run, not upserted)'}")
+        if new_tool_study_links and not args.dry_run:
+            logger.info(f"    - {len(new_tool_study_links)} new candidate(s) written to {tool_study_links_review_path} -- review, then re-run with --apply-tool-study-links-csv")
+        else:
+            logger.info(f"    - {len(new_tool_study_links)} new candidate(s) found{' (dry run, not written)' if new_tool_study_links else ''}")
+        logger.info(f"  Resource_id File Annotations:")
+        if not resource_id_updates.empty and not args.dry_run:
+            logger.info(f"    - {len(resource_id_updates)} candidate(s) written to {resource_id_review_path} -- review, then re-run with --apply-resource-id-annotations-csv")
+        else:
+            logger.info(f"    - {len(resource_id_updates)} candidate(s) found{' (dry run, not written)' if not resource_id_updates.empty else ''}")
+        if resource_id_skipped_full:
+            logger.info(f"    - {len(resource_id_skipped_full)} file(s) skipped (list-length cap) -- see resource_id_skipped_full.csv")
         logger.info(f"  Facet Analysis:")
         logger.info(f"    - {len(facet_analysis.get('existing_facets', {}))} existing facets")
         logger.info(f"    - {len(facet_analysis.get('suggested_new_facets', {}))} suggested new facets")
