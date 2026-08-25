@@ -39,6 +39,9 @@ This directory contains scripts for workflow automation and data management.
   `review_tool_annotations.py`'s tool<->study link mining
 - Additive-only, but **not auto-upserted** -- same review-then-apply policy
   as `review_tool_annotations.py` (see `--apply-tool-dataset-links-csv`)
+- The mining/dry-run path doesn't need `SYNAPSE_AUTH_TOKEN` -- all of its
+  source tables (tools view, dataset collection, each Dataset entity) are
+  public. Only `--apply-tool-dataset-links-csv` (the write step) requires it.
 
 **`upsert_tool_datasets.py`**
 - Legacy script from the pre-submission-based, PMID-keyed tool-publications
