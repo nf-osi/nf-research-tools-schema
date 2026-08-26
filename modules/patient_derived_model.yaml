@@ -26,15 +26,25 @@ classes:
       - HasPassageNumber
     slots:
       - geneticDisorder
+      - manifestation
     description: >-
       Patient-derived models including patient-derived xenografts (PDX),
       humanized mice, patient-derived organoids, and patient-derived
       cell lines.
     attributes:
+      modelType:
+        description: Type of patient-derived model system.
+        range: ModelTypeEnum
+        required: true
       modelSystemType:
         description: Type of patient-derived model system.
         range: ModelSystemTypeEnum
-        required: true
+        deprecated: >-
+          Use modelType instead (nf-research-tools-schema#262) --
+          unified with OrganoidProtocol's modelType field/enum,
+          disambiguated by resourceType rather than by prefixing
+          values with "Patient-Derived". Kept populated for backward
+          compatibility until nothing reads it.
       patientDiagnosis:
         description: Original patient diagnosis or condition.
         required: true
@@ -120,6 +130,8 @@ classes:
     slot_usage:
       resourceType:
         ifabsent: string(Patient-Derived Model)
+      manifestation:
+        required: true
 
 enums:
 

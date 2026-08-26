@@ -25,13 +25,14 @@ classes:
       - HasPassageNumber
     slots:
       - geneticDisorder
+      - manifestation
     description: >-
       Advanced 3D cellular models including organoids, assembloids,
       spheroids, and other 3D culture systems.
     attributes:
       modelType:
         description: Type of 3D cellular model.
-        range: OrganoidModelTypeEnum
+        range: ModelTypeEnum
         required: true
       derivationSource:
         description: Source of cells used to generate the model.
@@ -74,6 +75,13 @@ classes:
       nfManifestation:
         description: NF manifestation this model is used to study.
         range: OrganoidNfManifestationEnum
+        deprecated: >-
+          Use manifestation instead (nf-research-tools-schema#262) --
+          same concept, unified with CellLine/AnimalModel/Biobank/
+          PatientDerivedModel's manifestation field/enum. Kept for
+          backward compatibility until nothing reads it; the live
+          Synapse column is empty (no submissions have used it yet),
+          so nothing is lost.
       routeOfAdministration:
         description: >-
           Drug delivery routes that have been validated or are feasible
@@ -132,15 +140,6 @@ classes:
         ifabsent: string(Organoid Protocol)
 
 enums:
-
-  OrganoidModelTypeEnum:
-    description: Types of 3D cellular models.
-    permissible_values:
-      Organoid: {}
-      Assembloid: {}
-      Spheroid: {}
-      3D Culture: {}
-      Other: {}
 
   DerivationSourceEnum:
     description: Sources of cells for model generation.
