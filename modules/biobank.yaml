@@ -43,11 +43,19 @@ classes:
         range: SpecimenTypeEnum
         multivalued: true
         required: true
+      tissue:
+        description: The types of tissues that are banked.
+        range: TissueEnum
+        multivalued: true
+        required: true
       specimenTissueType:
         description: The types of tissues that are banked.
         range: SpecimenTissueTypeEnum
         multivalued: true
-        required: true
+        deprecated: >-
+          Use tissue instead (nf-research-tools-schema#262) -- same
+          concept, unified with CellLine's tissue field/enum. Kept
+          populated for backward compatibility until nothing reads it.
       specimenPreparationMethod:
         description: The preservation methods used by the biobank.
         range: SpecimenPreparationMethodEnum
