@@ -25,6 +25,7 @@ classes:
       - HasPassageNumber
     slots:
       - geneticDisorder
+      - manifestation
     description: >-
       Advanced 3D cellular models including organoids, assembloids,
       spheroids, and other 3D culture systems.
@@ -74,6 +75,13 @@ classes:
       nfManifestation:
         description: NF manifestation this model is used to study.
         range: OrganoidNfManifestationEnum
+        deprecated: >-
+          Use manifestation instead (nf-research-tools-schema#262) --
+          same concept, unified with CellLine/AnimalModel/Biobank/
+          PatientDerivedModel's manifestation field/enum. Kept for
+          backward compatibility until nothing reads it; the live
+          Synapse column is empty (no submissions have used it yet),
+          so nothing is lost.
       routeOfAdministration:
         description: >-
           Drug delivery routes that have been validated or are feasible
