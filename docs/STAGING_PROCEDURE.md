@@ -53,7 +53,9 @@ column ID — not an in-place edit.
      independently version-pinned: `syn77130552` (`tissue`, from
      Biobank + CellLine's `tissueList` mirror — see gotcha 5),
      `syn77130553` (`manifestation`, from CellLine/AnimalModel/
-     Biobank/PatientDerivedModel), `syn77130554` (`modelType`, from
+     Biobank/PatientDerivedModel/OrganoidProtocol — the OrganoidProtocol
+     branch was added in #301, after OrganoidProtocol.manifestation
+     finally got a live column of its own), `syn77130554` (`modelType`, from
      OrganoidProtocol/PatientDerivedModel), `syn77130555`
      (`availability`, from all 9 detail tables).
 
