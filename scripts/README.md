@@ -70,6 +70,28 @@ This directory contains scripts for workflow automation and data management.
 
 ---
 
+### Staging a live table/MV change
+
+**`snapshot_synapse_tables.py`**
+- Creates versioned snapshots of a set of Synapse tables/views and writes a
+  JSON rollback manifest (entity id, name, `versionNumber`, `etag`,
+  `columnIds`, and `definingSQL` where present) plus a markdown summary
+  table for pasting into a tracking issue
+- Table selection: `--table-id` (repeatable, explicit ids), `--from-schema`
+  (every `synapse_table_id`-annotated class in the LinkML schema), or
+  `--class-name` (repeatable, specific schema classes only) — reuses
+  `check_referential_integrity.py`'s schema-driven table map as the single
+  source of truth rather than hardcoding a duplicate id list
+- `--dry-run` resolves and prints the table list with no Synapse access
+- Step 1 of the staging procedure documented in
+  [`docs/STAGING_PROCEDURE.md`](../docs/STAGING_PROCEDURE.md) (formalizes
+  the ad hoc snapshot-then-record-fallback-plan work done in #261)
+
+**Used by**: the staging procedure in `docs/STAGING_PROCEDURE.md`, manually
+invoked before any live change to the tools search MV chain
+
+---
+
 ## Tool Coverage Scripts
 
 More complex mining and validation scripts are in `tool_coverage/scripts/`:
@@ -114,6 +136,22 @@ python scripts/mine_tool_dataset_links.py --dataset-id syn123 --dataset-id syn45
 ### Update Observation Schema
 ```bash
 python scripts/update_observation_schema.py
+```
+
+### Snapshot Tables Before a Staged Change
+```bash
+# See what would be snapshotted, no Synapse access
+python scripts/snapshot_synapse_tables.py --from-schema --comment "x" --dry-run
+
+# Snapshot every schema-mapped detail table
+python scripts/snapshot_synapse_tables.py --from-schema \
+    --comment "pre-migration snapshot for #262"
+
+# Snapshot specific classes, or arbitrary non-schema-mapped entities (e.g. MVs)
+python scripts/snapshot_synapse_tables.py --class-name CellLine --class-name AnimalModel \
+    --comment "pre-migration snapshot for #262"
+python scripts/snapshot_synapse_tables.py --table-id syn77019684 --table-id syn51730943 \
+    --comment "pre-migration snapshot for #262"
 ```
 
 ## Requirements

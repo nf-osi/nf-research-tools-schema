@@ -60,6 +60,7 @@ This repository uses automated GitHub Actions workflows that run in a coordinate
 - **Comprehensive workflow guide:** [`.github/workflows/README.md`](.github/workflows/README.md)
 - **Workflow coordination details:** [`docs/WORKFLOW_COORDINATION.md`](docs/WORKFLOW_COORDINATION.md)
 - **Tool annotation review:** [`docs/TOOL_ANNOTATION_REVIEW.md`](docs/TOOL_ANNOTATION_REVIEW.md)
+- **Staging a live table/MV change:** [`docs/STAGING_PROCEDURE.md`](docs/STAGING_PROCEDURE.md)
 - **Tool coverage system:** [`tool_coverage/README.md`](tool_coverage/README.md)
 
 # Contributing
