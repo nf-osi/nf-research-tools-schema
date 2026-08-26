@@ -524,11 +524,11 @@ def format_patient_derived_models(mining_df):
 
             model_rows.append({
                 'patientDerivedModelId': generate_uuid(),
-                'modelSystemType': metadata.get('subtype', ''),  # PDX/Humanized Mouse
+                'modelType': metadata.get('subtype', ''),  # PDX/Humanized Mouse
                 'patientDiagnosis': '',
                 'hostStrain': '',
                 'passageNumber': '',
-                'tumorType': '',
+                'manifestation': '',
                 'engraftmentSite': '',
                 'establishmentRate': '',
                 'molecularCharacterization': [],
