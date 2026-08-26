@@ -272,7 +272,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         # New tool types (v2.0) — syn73709226-syn73709229
         'computational_tools': ['softwareName', 'softwareType'],
         'organoid_protocols': ['modelType', 'derivationSource'],
-        'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
+        'patient_derived_models': ['modelType', 'patientDiagnosis'],
         'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation'],
 
         # Vendor / donor tables

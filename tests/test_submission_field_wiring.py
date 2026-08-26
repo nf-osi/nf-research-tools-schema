@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Regression tests for wiring up PR #196's new fields end-to-end, and for fixing
-the primary-key/geneticDisorder/manifestation column names that the LinkML
-migration (unifying all 9 tool-type tables onto `resourceId`, and AnimalModel/
-CellLine/Biobank onto shared `geneticDisorder`/`manifestation`) left stale in
-compile_accepted_submissions.py and clean_submission_csvs.py.
+Regression tests for field-name wiring between the submission forms
+(NF-Tools-Schemas/), compile_accepted_submissions.py, and
+clean_submission_csvs.py -- catches the class of bug where a LinkML schema
+rename (unifying per-type column names onto shared slots like `resourceId`,
+`geneticDisorder`/`manifestation`, `modelType`) leaves the pipeline scripts
+reading/writing stale field names. Originally added for PR #196's new
+fields; reusable and expected to grow with future renames (e.g.
+nf-research-tools-schema#262's tissue/modelType/manifestation unification).
 
 These tests run offline with no Synapse access.
 """
@@ -144,7 +147,7 @@ def test_build_organoid_and_patient_derived_model_map_nf_genetic_disorder():
     pdm_submission = {
         "basicInfo": {
             "resourceName": "Test PDX",
-            "modelSystemType": "PDX (Patient-Derived Xenograft)",
+            "modelType": "Xenograft",
             "nfGeneticDisorder": "NF1 Spontaneous Mutation",
         },
     }
@@ -258,30 +261,34 @@ def test_strip_before_upload_no_longer_drops_live_columns():
         assert not overlap, f"{csv_name}: still stripping live-column field(s) {overlap}"
 
 
-def test_build_patient_derived_model_maps_organ_and_tumor_type():
-    """PatientDerivedModel.tumorType was migrated to the shared, multivalued
-    Synapse column (same Column ID as Biobank.tumorType, unifying the facet
-    the way geneticDisorder/manifestation already are). The submission form
-    is still single-select Title Case, so it must be mapped to the canonical
-    lowercase TumorTypeEnum value and wrapped in a one-item list. organ was
-    a real column (shared with CellLine) that the builder never read at all."""
+def test_build_patient_derived_model_maps_organ_and_manifestation():
+    """PatientDerivedModel.tumorType/modelSystemType were unified with
+    Biobank/CellLine/AnimalModel/OrganoidProtocol's manifestation/modelType
+    fields (nf-research-tools-schema#262) -- same Column ID as
+    Biobank.manifestation, one shared facet across all 5 tool types. Both
+    submitPatientDerivedModel.json fields are Title Case, matching
+    ManifestationEnum/ModelTypeEnum directly -- no casing translation needed
+    (unlike the old tumorType->TumorTypeEnum lowercase mapping this
+    replaced). organ was a real column (shared with CellLine) that the
+    builder never read at all."""
     submission = {
         "basicInfo": {
             "resourceName": "Test PDX 2",
-            "modelSystemType": "PDX (Patient-Derived Xenograft)",
+            "modelType": "Xenograft",
             "organ": "Skin",
-            "tumorType": "Malignant Peripheral Nerve Sheath Tumor",
+            "manifestation": "Malignant Peripheral Nerve Sheath Tumor",
         },
     }
     row = cas._build_patient_derived_model(submission)
     assert row["organ"] == "Skin"
-    assert row["tumorType"] == "malignant peripheral nerve sheath tumor"
+    assert row["modelType"] == "Xenograft"
+    assert row["manifestation"] == "Malignant Peripheral Nerve Sheath Tumor"
 
     # Unmapped/no value -> empty list string, not a crash
     empty_row = cas._build_patient_derived_model({
-        "basicInfo": {"resourceName": "No Tumor Type", "modelSystemType": "Humanized Mouse"},
+        "basicInfo": {"resourceName": "No Manifestation", "modelType": "Humanized Mouse"},
     })
-    assert empty_row["tumorType"] == ""
+    assert empty_row["manifestation"] == ""
     assert empty_row["organ"] is None or empty_row["organ"] == ""
 
 
