@@ -37,7 +37,7 @@ CRITICAL_FIELDS_BY_TYPE = {
     'Antibody': ['targetAntigen', 'reactiveSpecies', 'hostOrganism', 'clonality'],
     'Genetic Reagent': ['insertName', 'insertSpecies', 'vectorType'],
     'Computational Tool': [],  # No critical fields required (name and type are sufficient)
-    'Patient-Derived Model': ['modelSystemType', 'tumorType'],
+    'Patient-Derived Model': ['modelType', 'manifestation'],
     'Organoid Protocol': ['modelType', 'derivationSource'],
     'Clinical Assessment Tool': ['assessmentType', 'targetPopulation']
 }
@@ -1898,11 +1898,11 @@ def format_patient_derived_models(tools_df):
         # Note: Synapse table does NOT have 'modelName' - name goes in Resource table
         rows.append({
             'patientDerivedModelId': tool_id,
-            'modelSystemType': '',  # PDX, PDO, etc.
+            'modelType': '',  # PDX, PDO, etc.
             'patientDiagnosis': '',
             'hostStrain': '',
             'passageNumber': '',
-            'tumorType': '',
+            'manifestation': '',
             'engraftmentSite': '',
             'establishmentRate': '',
             'molecularCharacterization': '',
