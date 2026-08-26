@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Regression tests for wiring up PR #196's new fields end-to-end, and for fixing
-the primary-key/geneticDisorder/manifestation column names that the LinkML
-migration (unifying all 9 tool-type tables onto `resourceId`, and AnimalModel/
-CellLine/Biobank onto shared `geneticDisorder`/`manifestation`) left stale in
-compile_accepted_submissions.py and clean_submission_csvs.py.
+Regression tests for field-name wiring between the submission forms
+(NF-Tools-Schemas/), compile_accepted_submissions.py, and
+clean_submission_csvs.py -- catches the class of bug where a LinkML schema
+rename (unifying per-type column names onto shared slots like `resourceId`,
+`geneticDisorder`/`manifestation`, `modelType`) leaves the pipeline scripts
+reading/writing stale field names. Originally added for PR #196's new
+fields; reusable and expected to grow with future renames (e.g.
+nf-research-tools-schema#262's tissue/modelType/manifestation unification).
 
 These tests run offline with no Synapse access.
 """
