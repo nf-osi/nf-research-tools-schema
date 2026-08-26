@@ -86,13 +86,33 @@ column ID — not an in-place edit.
    editing** (found 2026-08-26): `CellLine.tissue` (the real, primary
    LinkML slot) and `CellLine.tissueList` (a `STRING_LIST` mirror
    created ad hoc during the #247/#259/#261 facet work, feeding the
-   `syn77130552` helper MV above) are two *different* Synapse columns
-   holding the same information in different shapes. Fixing data on
-   `tissue` does not touch `tissueList`, and vice versa — before
+   `syn77130552` helper MV above) were two *different* Synapse columns
+   holding the same information in different shapes, because
+   `syn77130552`'s `UNION ALL` needs matching column types across
+   branches and `CellLine.tissue` is schema-defined single-valued
+   (correctly — a cell line has one tissue of origin) while
+   `Biobank.tissue` is multivalued (also correctly — a biobank holds
+   specimens from several). Fixing data on `tissue` does not touch a
+   sibling `*List` mirror, and vice versa.
+
+   **Resolved for this specific pair** (2026-08-26): Synapse SQL
+   supports wrapping a scalar into a single-element `STRING_LIST`
+   inline — `CAST(CONCAT('["', col, '"]') AS STRING_LIST)` — verified
+   to produce identical output to the old mirror column across all 666
+   `CellLine` rows (including correct `[]` for `NULL`). `syn77130552`
+   now reads `CellLine.tissue` directly with this cast; the
+   `tissueList` column itself is now orphaned (no remaining reader —
+   confirm before filing a deletion issue for it, same policy as
+   #276/#277/#279).
+
+   **If you find another `*List`-style mirror elsewhere**: before
    declaring a data fix complete, check `getTableColumns()` for every
    table you touched for a same-concept `<field>List`-style sibling
    column, and check every helper MV in gotcha 3 for which literal
-   column name each branch actually reads.
+   column name each branch actually reads. If you find one, prefer
+   this same inline-cast approach over maintaining a second column —
+   confirm parity against live data first (dry-run comparison, not
+   just a few sample rows) before switching a helper MV over.
 
 ## Never delete without explicit per-entity go-ahead
 
