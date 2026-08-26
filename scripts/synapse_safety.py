@@ -83,9 +83,23 @@ def safe_store(syn, table_or_entity, comment: str, table_id: str = None):
             explicitly if that inference might be wrong for your object.
 
     Returns whatever syn.store() returns.
+
+    Note: the pre-write snapshot bumps the target entity's version/etag
+    server-side. For a freshly-constructed Table(table_id, df) or
+    PartialRowset -- no etag baggage -- this is harmless. But if
+    table_or_entity is a *fetched* Schema/Entity object you mutated in
+    place (e.g. syn.get(table_id) then edited .columnIds), its etag is
+    now stale and syn.store() below would fail with "updated since you
+    last fetched" -- so this refreshes .etag from the server after the
+    snapshot, immediately before storing, whenever the object has one.
     """
     resolved_id = table_id or _resolve_table_id(table_or_entity)
     snapshot_table(syn, resolved_id, f"{comment} -- before")
+    if hasattr(table_or_entity, "etag"):
+        try:
+            table_or_entity.etag = syn.get(resolved_id, downloadFile=False).etag
+        except Exception as e:
+            logger.warning(f"Could not refresh etag for {resolved_id} before store: {e}")
     result = syn.store(table_or_entity)
     snapshot_table(syn, resolved_id, f"{comment} -- after")
     return result

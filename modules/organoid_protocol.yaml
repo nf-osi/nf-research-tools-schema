@@ -42,9 +42,21 @@ classes:
         description: Cell types present in the model.
         multivalued: true
         required: true
+      organ:
+        description: The organ the organoid represents or is derived from.
+        range: OrganEnum
       organoidType:
         description: Specific type of organoid, if applicable.
         range: OrganoidTypeEnum
+        deprecated: >-
+          Use organ instead (nf-research-tools-schema#262) -- same
+          concept as organ (shared with CellLine/PatientDerivedModel),
+          phrased adjectivally (e.g. "Cerebral") instead of as an organ
+          noun (e.g. "Brain"). Every OrganoidTypeEnum value maps onto an
+          existing OrganEnum value 1:1 (Cerebral->Brain,
+          Intestinal->Intestine, Cardiac->Heart, Retinal->Eye,
+          Pancreatic->Pancreas; Liver/Kidney/Lung/Other unchanged). Kept
+          populated for backward compatibility until nothing reads it.
       matrixType:
         description: Extracellular matrix or scaffold used.
         range: MatrixTypeEnum

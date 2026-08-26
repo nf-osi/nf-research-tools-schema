@@ -14,6 +14,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -33,12 +34,15 @@ safety = _load_module("synapse_safety")
 
 
 class _FakeSyn:
-    def __init__(self, snapshot_version=7, delete_error=None):
+    def __init__(self, snapshot_version=7, delete_error=None, fresh_etag=None, get_error=None):
         self.snapshot_calls = []
         self.store_calls = []
         self.delete_calls = []
+        self.get_calls = []
         self._snapshot_version = snapshot_version
         self._delete_error = delete_error
+        self._fresh_etag = fresh_etag
+        self._get_error = get_error
 
     def create_snapshot_version(self, table_id, comment=None):
         self.snapshot_calls.append((table_id, comment))
@@ -53,6 +57,12 @@ class _FakeSyn:
             raise self._delete_error
         self.delete_calls.append(entity_id)
 
+    def get(self, entity_id, downloadFile=False):
+        self.get_calls.append(entity_id)
+        if self._get_error:
+            raise self._get_error
+        return SimpleNamespace(etag=self._fresh_etag)
+
 
 class _FakeTableWithTableId:
     def __init__(self, table_id):
@@ -62,6 +72,14 @@ class _FakeTableWithTableId:
 class _FakeTableWithSchema:
     def __init__(self, schema_id):
         self.schema = schema_id
+
+
+class _FakeEntityWithEtag:
+    """Mimics a fetched Schema/Entity object with a stale etag carried
+    over from before a pre-write snapshot bumped the server-side version."""
+    def __init__(self, table_id, etag):
+        self.tableId = table_id
+        self.etag = etag
 
 
 # --- snapshot_table ---------------------------------------------------- #
@@ -123,6 +141,43 @@ def test_safe_store_raises_when_table_id_cannot_be_resolved():
     syn = _FakeSyn()
     with pytest.raises(ValueError):
         safety.safe_store(syn, object(), comment="test write")
+
+
+def test_safe_store_refreshes_stale_etag_before_storing():
+    """The pre-write snapshot bumps the entity's version/etag server-side.
+    For a *fetched* entity object (carries an etag from before the
+    snapshot), storing it unmodified would fail with "updated since you
+    last fetched" -- safe_store must refresh .etag from the server after
+    snapshotting but before the actual store."""
+    syn = _FakeSyn(fresh_etag="etag-after-snapshot")
+    entity = _FakeEntityWithEtag("syn999", etag="etag-before-snapshot")
+    safety.safe_store(syn, entity, comment="test write")
+    assert entity.etag == "etag-after-snapshot"
+    assert syn.get_calls == ["syn999"]
+    assert syn.store_calls == [entity]
+
+
+def test_safe_store_tolerates_etag_refresh_failure():
+    """If the refresh fetch itself fails, safe_store should still attempt
+    the store with whatever etag the caller already had -- not crash."""
+    syn = _FakeSyn(get_error=RuntimeError("network blip"))
+    entity = _FakeEntityWithEtag("syn999", etag="etag-before-snapshot")
+    safety.safe_store(syn, entity, comment="test write")
+    assert entity.etag == "etag-before-snapshot"
+    assert syn.store_calls == [entity]
+
+
+def test_safe_store_skips_etag_refresh_for_objects_without_one():
+    """PartialRowset and similar freshly-constructed objects carry no
+    etag baggage -- no refresh call needed."""
+    class _NoEtag:
+        def __init__(self, table_id):
+            self.tableId = table_id
+
+    syn = _FakeSyn()
+    obj = _NoEtag("syn999")
+    safety.safe_store(syn, obj, comment="test write")
+    assert syn.get_calls == []
 
 
 # --- safe_delete ---------------------------------------------------------- #
