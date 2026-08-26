@@ -144,7 +144,7 @@ COLUMNS = {
     ],
     "organoid_protocols": [
         "resourceId", "modelType", "derivationSource", "cellTypes",
-        "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
+        "organ", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics", "geneticDisorder", "manifestation",
         "bbbModelCapability", "routeOfAdministration", "pkpdCapabilities",
@@ -260,6 +260,24 @@ _INSERT_SPECIES_MAP = _SPECIES_MAP  # alias used by _build_genetic_reagent
 _CONJUGATE_MAP = {
     "Yes": "Conjugated",
     "Non-conjugated": "Nonconjugated",
+}
+
+# submitOrganoidProtocol.json now collects organ (OrganEnum) instead of the
+# deprecated organoidType (nf-research-tools-schema#297) -- the publication-
+# mining pipeline (mine_gff_publications.py etc.) still emits organoidType
+# candidates until #297's mining-pipeline sweep, so fall back to this 1:1
+# mapping (documented in organoid_protocol.yaml's organoidType deprecation
+# note) rather than silently dropping organ data for mined candidates.
+_ORGANOID_TYPE_TO_ORGAN_MAP = {
+    "Cerebral": "Brain",
+    "Intestinal": "Intestine",
+    "Liver": "Liver",
+    "Kidney": "Kidney",
+    "Cardiac": "Heart",
+    "Retinal": "Eye",
+    "Lung": "Lung",
+    "Pancreatic": "Pancreas",
+    "Other": "Other",
 }
 
 # UUID namespace shared with generate_review_csv.py so IDs are consistent.
@@ -827,7 +845,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "modelType": _get(bi, "modelType"),
         "derivationSource": _get(bi, "derivationSource"),
         "cellTypes": _fmt_list(_get(bi, "cellTypes")),
-        "organoidType": _get(bi, "organoidType"),
+        "organ": _get(bi, "organ") or _ORGANOID_TYPE_TO_ORGAN_MAP.get(_get(bi, "organoidType"), ""),
         "matrixType": _get(bi, "matrixType"),
         "cultureSystem": _get(bi, "cultureSystem"),
         "cultureMedia": _get(bi, "cultureMedia"),

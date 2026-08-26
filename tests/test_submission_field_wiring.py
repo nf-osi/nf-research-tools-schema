@@ -360,3 +360,45 @@ def test_compile_accepted_loop_computes_availability_for_tool_types_only():
     assert '_compute_availability' in src
     assert '_compute_how_to_acquire' in src
     assert 'ttype != "observation"' in src
+
+
+# ---------------------------------------------------------------------------
+# OrganoidProtocol organ (replaces deprecated organoidType) -- form now
+# collects organ directly, but the publication-mining pipeline still emits
+# organoidType candidates until #297's mining-pipeline sweep, so the builder
+# must fall back to the documented 1:1 organoidType->organ mapping.
+# ---------------------------------------------------------------------------
+
+def test_build_organoid_protocol_prefers_organ_over_organoid_type():
+    row = cas._build_organoid_protocol({
+        "basicInfo": {"organ": "Skin", "organoidType": "Cerebral"},
+    })
+    assert row["organ"] == "Skin"
+
+
+def test_build_organoid_protocol_falls_back_to_organoid_type_mapping():
+    cases = {
+        "Cerebral": "Brain",
+        "Intestinal": "Intestine",
+        "Liver": "Liver",
+        "Kidney": "Kidney",
+        "Cardiac": "Heart",
+        "Retinal": "Eye",
+        "Lung": "Lung",
+        "Pancreatic": "Pancreas",
+        "Other": "Other",
+    }
+    for organoid_type, expected_organ in cases.items():
+        row = cas._build_organoid_protocol({"basicInfo": {"organoidType": organoid_type}})
+        assert row["organ"] == expected_organ, f"{organoid_type} -> {row['organ']!r}, expected {expected_organ!r}"
+
+
+def test_build_organoid_protocol_no_organ_data_is_empty_not_crash():
+    row = cas._build_organoid_protocol({"basicInfo": {}})
+    assert row["organ"] == ""
+
+
+def test_organoid_protocols_columns_include_organ_not_organoid_type():
+    cols = cas.COLUMNS["organoid_protocols"]
+    assert "organ" in cols
+    assert "organoidType" not in cols
