@@ -63,6 +63,7 @@ COLUMNS = {
         "mechanismOfActionValidation", "pediatricSuitability", "pkpdCapabilities",
         "timelineToResults", "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex",
@@ -71,6 +72,7 @@ COLUMNS = {
         "resourceId", "targetAntigen", "hostOrganism", "clonality", "cloneId",
         "uniprotId", "reactiveSpecies", "conjugate",
         "vendor", "catalogNumber", "catalogURL",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -86,6 +88,7 @@ COLUMNS = {
         "modelLimitations", "clinicalTranslationHistory", "regulatoryAcceptanceHistory",
         "mtaRequired", "ngnriRepositoryStatus",
         "itemAcquisition", "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
@@ -97,6 +100,7 @@ COLUMNS = {
         "growthStrain", "growthTemp", "cloningMethod", "5primer", "3primer",
         "5primeCloningSite", "3primeCloningSite", "5primeSiteDestroyed",
         "3primeSiteDestroyed",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -111,6 +115,7 @@ COLUMNS = {
         "mtaRequired", "ngnriRepositoryStatus",
         "donorId",
         "itemAcquisition", "developerName", "developerAffiliation",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex", "_age", "_race",
@@ -133,6 +138,7 @@ COLUMNS = {
         "licenseDetails", "containerized", "dependencies", "systemRequirements",
         "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "rrid",
         "developerName", "developerAffiliation", "itemAcquisition",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -146,6 +152,7 @@ COLUMNS = {
         "modelLimitations", "regulatoryAcceptanceHistory", "suitableForRegulatoryPackage",
         "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
     ],
@@ -156,6 +163,7 @@ COLUMNS = {
         "availabilityStatus", "licensingRequirements", "digitalVersion",
         "cognitiveAndBehavioralDomains", "regulatoryAcceptanceHistory", "toolURL",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -165,6 +173,7 @@ COLUMNS = {
         "specimenPreparationMethod", "specimenFormat", "contact", "rrid",
         "mtaRequired", "ngnriRepositoryStatus", "requestFormURL",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -1411,6 +1420,80 @@ def _compute_how_to_acquire(ttype: str, row: dict) -> str:
     return ""
 
 
+_AVAILABILITY_STATUS_MAP = {
+    # Fold-in from AvailabilityEnum's simplification (#295) -- "License
+    # Required" is now covered by "Contact Developer".
+    "vendor": "Vendor",
+    "contact developer": "Contact Developer",
+    "license required": "Contact Developer",
+    "freely available": "Freely Available",
+    "unknown": "Unknown",
+}
+
+
+def _compute_availability(ttype: str, row: dict) -> str:
+    """Generate an AvailabilityEnum value (Vendor/Contact Developer/Freely
+    Available/Unknown) from submission fields, mirroring
+    _compute_how_to_acquire()'s per-type source-field logic (#298) so the
+    two fields describe the same underlying acquisition method
+    consistently. Unlike howToAcquire, availability is a controlled
+    vocabulary and required by schema, so this always returns one of the
+    4 enum values -- 'Unknown' rather than '' when nothing is known."""
+    def _acq(key: str) -> str:
+        return (row.get(key) or "").strip()
+
+    if ttype == "computational_tool":
+        if _acq("sourceRepository"):
+            return "Freely Available"
+        acq = _acq("itemAcquisition")
+        if acq.lower() == "contact developer":
+            return "Contact Developer"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Freely Available"
+        if _acq("developerName"):
+            return "Contact Developer"
+
+    elif ttype in ("organoid_protocol", "clinical_assessment_tool"):
+        mapped = _AVAILABILITY_STATUS_MAP.get(_acq("availabilityStatus").lower())
+        if mapped:
+            return mapped
+        if _acq("developerContactEmail") or _acq("developerName"):
+            return "Contact Developer"
+
+    elif ttype == "antibody":
+        if _acq("vendor") or _acq("catalogNumber"):
+            return "Vendor"
+
+    elif ttype == "patient_derived_model":
+        acq = _acq("itemAcquisition")
+        if acq.lower() == "contact developer":
+            return "Contact Developer"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Vendor"
+        if _acq("developerName") or _acq("developerAffiliation"):
+            return "Contact Developer"
+
+    elif ttype == "animal_model":
+        ngnri = _acq("ngnriRepositoryStatus")
+        acq = _acq("itemAcquisition")
+        if ngnri and ngnri.lower() not in _TRIVIAL_ACQ | {"not deposited"}:
+            return "Freely Available"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Vendor" if "vendor" in acq.lower() else "Contact Developer"
+        if _acq("developerContactEmail"):
+            return "Contact Developer"
+
+    elif ttype in ("cell_line", "genetic_reagent"):
+        if _acq("developerName") or _acq("developerAffiliation") or _acq("developerContactEmail"):
+            return "Contact Developer"
+
+    elif ttype == "biobank":
+        if _acq("contact") or _acq("developerContactEmail") or _acq("developerName") or _acq("requestFormURL"):
+            return "Contact Developer"
+
+    return "Unknown"
+
+
 def _generate_resources_csv(
     csv_dir: Path, dry_run: bool, json_files: list | None = None
 ) -> None:
@@ -1621,6 +1704,13 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         id_info = _TTYPE_ID_INFO.get(ttype)
         for item in items:
             row = builder_fn(item)
+            # Every Tool subclass (all of _BUILDERS except the "observation"
+            # junction table) carries howToAcquire/availability (tool_base.yaml)
+            # but no _build_* sets them -- compute here, once, for all 9 types
+            # rather than duplicating this in each builder (#298).
+            if ttype != "observation":
+                row.setdefault("howToAcquire", _compute_how_to_acquire(ttype, row))
+                row.setdefault("availability", _compute_availability(ttype, row))
             name = row.get(name_col, "")
             norm_name = _normalize_name(name)
             if norm_name in existing:

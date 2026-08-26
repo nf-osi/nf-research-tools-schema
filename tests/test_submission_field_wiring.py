@@ -294,3 +294,69 @@ def test_build_patient_derived_model_maps_organ_and_manifestation():
 
 def test_patient_derived_models_columns_include_organ():
     assert "organ" in cas.COLUMNS["patient_derived_models"]
+
+
+# ---------------------------------------------------------------------------
+# availability derivation (#298) -- _build_* never set howToAcquire or
+# availability directly; both are computed once in compile_accepted()'s main
+# loop (not per-builder) and must reach every Tool-subclass CSV's columns.
+# ---------------------------------------------------------------------------
+
+_TOOL_TYPE_CSV_KEYS = {
+    "cell_lines", "antibodies", "animal_models", "genetic_reagents",
+    "patient_derived_models", "computational_tools", "organoid_protocols",
+    "clinical_assessment_tools", "biobanks",
+}
+
+
+def test_all_tool_type_columns_include_availability_and_how_to_acquire():
+    """Every Tool subclass (tool_base.yaml) carries availability (required)
+    and howToAcquire (deprecated but still populated) -- COLUMNS must list
+    both for all 9 types, or compile_accepted()'s computed values get
+    silently dropped by _append_rows before the CSV is ever written."""
+    for csv_key in _TOOL_TYPE_CSV_KEYS:
+        cols = cas.COLUMNS[csv_key]
+        assert "availability" in cols, f"{csv_key}: missing availability column"
+        assert "howToAcquire" in cols, f"{csv_key}: missing howToAcquire column"
+
+
+def test_compute_availability_returns_controlled_vocabulary_only():
+    """availability is required + controlled vocabulary (AvailabilityEnum:
+    Vendor/Contact Developer/Freely Available/Unknown) -- unlike
+    howToAcquire (free text, '' allowed), _compute_availability() must never
+    return '' or an off-enum value, across every known ttype branch."""
+    allowed = {"Vendor", "Contact Developer", "Freely Available", "Unknown"}
+    for ttype in cas._TTYPE_ID_INFO:
+        for row in ({}, {"itemAcquisition": "Unknown"}, {"availabilityStatus": "bogus"}):
+            got = cas._compute_availability(ttype, row)
+            assert got in allowed, f"{ttype}/{row}: _compute_availability returned {got!r}, not in {allowed}"
+
+
+def test_compute_availability_matches_live_backfill_patterns():
+    """Spot-checks against the phrase patterns actually observed in the
+    live availability/howToAcquire columns (one-time #261 backfill) -- new
+    submissions should classify the same way existing rows already do."""
+    assert cas._compute_availability(
+        "clinical_assessment_tool", {"availabilityStatus": "License Required"}
+    ) == "Contact Developer"  # folded in per #295
+    assert cas._compute_availability(
+        "organoid_protocol", {"availabilityStatus": "Contact Developer"}
+    ) == "Contact Developer"
+    assert cas._compute_availability(
+        "computational_tool", {"sourceRepository": "https://github.com/x/y"}
+    ) == "Freely Available"
+    assert cas._compute_availability(
+        "antibody", {"vendor": "Sigma-Aldrich", "catalogNumber": "A1234"}
+    ) == "Vendor"
+    assert cas._compute_availability("animal_model", {}) == "Unknown"
+
+
+def test_compile_accepted_loop_computes_availability_for_tool_types_only():
+    """The wiring in compile_accepted()'s main loop must skip the
+    'observation' junction table (not a Tool subclass -- no
+    availability/howToAcquire slot at all) while covering the other 9."""
+    import inspect
+    src = inspect.getsource(cas.compile_accepted)
+    assert '_compute_availability' in src
+    assert '_compute_how_to_acquire' in src
+    assert 'ttype != "observation"' in src

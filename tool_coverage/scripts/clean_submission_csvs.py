@@ -123,7 +123,10 @@ SYNAPSE_TABLE_MAP = {
 _STRIP_BEFORE_UPLOAD = {
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     # developerContactEmail → no schema home; dropped
-    # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
+    # itemAcquisition/developerContactEmail/etc. themselves have no column on
+    # any detail table; compile_accepted_submissions.py derives howToAcquire
+    # and availability from them (kept, not stripped -- see #298), which is
+    # what actually gets uploaded.
     #
     # NOTE: alleleType/affectedGeneSymbol/inducedVsDevelopmental/bbbIntegrityStatus/
     # routeOfAdministration/pkpdCapabilities/mechanismOfActionValidation/
@@ -154,18 +157,22 @@ _STRIP_BEFORE_UPLOAD = {
     'CLEAN_biobanks.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail',
     ],
-    # developerName/developerContactEmail used only for howToAcquire in resources table.
+    # developerName/developerContactEmail have no column on this table; only
+    # feed the derived howToAcquire/availability (kept -- see #298).
     # NOTE: qualityControlMetrics used to be stripped here too ("items up to 118
     # chars — increase maximumStringLength to ≥200 in syn73709227") -- the column's
     # maximumSize is already 200. Un-stripped.
     'CLEAN_organoid_protocols.csv': [
         'developerName', 'developerContactEmail',
     ],
-    # developerName/developerContactEmail used only for howToAcquire in resources table
+    # developerName/developerContactEmail have no column on this table; only
+    # feed the derived howToAcquire/availability (kept -- see #298).
     'CLEAN_clinical_assessment_tools.csv': [
         'developerName', 'developerContactEmail',
     ],
-    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table.
+    # itemAcquisition/developerName/developerAffiliation have no column on
+    # this table; only feed the derived howToAcquire/availability (kept --
+    # see #298).
     # NOTE: validationMethods used to be stripped here too ("items are 70 chars —
     # increase maximumStringLength to ≥100 in syn73709228") -- the column's
     # maximumSize is already 100. Un-stripped.
