@@ -523,7 +523,7 @@ CRITICAL_FIELDS: dict[str, list[str]] = {
     'genetic_reagents':          ['insertName', 'vectorType'],
     'computational_tools':       ['softwareName', 'softwareType'],
     'organoid_protocols':  ['_toolName', 'modelType', 'derivationSource'],
-    'patient_derived_models':    ['_toolName', 'modelSystemType', 'patientDiagnosis'],
+    'patient_derived_models':    ['_toolName', 'modelType', 'patientDiagnosis'],
     'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation', 'diseaseSpecific'],
 }
 
@@ -585,7 +585,7 @@ TOOL_REVIEW_FIELDS = [
     'insertName', 'vectorType', 'vectorBackbone', 'promoter',
     'softwareName', 'softwareType', 'softwareVersion', 'sourceRepository',
     'modelType', 'derivationSource', 'cellTypes', 'organoidType',
-    'modelSystemType', 'patientDiagnosis', 'hostStrain', 'tumorType',
+    'manifestation', 'patientDiagnosis', 'hostStrain',
     'assessmentName', 'assessmentType', 'targetPopulation', 'diseaseSpecific', 'numberOfItems',
     '_context',
 ]
@@ -891,8 +891,8 @@ _TYPE_SPECIFIC_SYNAPSE_COLS: dict[str, list[str]] = {
         'containerized', 'dependencies', 'systemRequirements', 'lastUpdate', 'maintainer',
     ],
     'patient_derived_models': [
-        'patientDerivedModelId', 'modelSystemType', 'patientDiagnosis', 'hostStrain',
-        'tumorType', 'engraftmentSite', 'passageNumber', 'establishmentRate',
+        'patientDerivedModelId', 'modelType', 'patientDiagnosis', 'hostStrain',
+        'manifestation', 'engraftmentSite', 'passageNumber', 'establishmentRate',
         'molecularCharacterization', 'clinicalData', 'humanizationMethod',
         'immuneSystemComponents', 'validationMethods', 'donorId',
     ],

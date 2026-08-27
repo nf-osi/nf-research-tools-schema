@@ -311,7 +311,7 @@ def extract_patient_derived_model_metadata(model_name, context, reasoning):
         system_types.append('Patient-derived xenoline')
 
     if system_types:
-        metadata['modelSystemType'] = system_types
+        metadata['modelType'] = system_types
 
     # Patient Diagnosis
     diagnoses = []
@@ -341,7 +341,7 @@ def extract_patient_derived_model_metadata(model_name, context, reasoning):
         tumor_types.append('Glioma')
 
     if tumor_types:
-        metadata['tumorType'] = tumor_types
+        metadata['manifestation'] = tumor_types
 
     # Engraftment Site
     sites = []

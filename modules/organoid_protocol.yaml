@@ -25,13 +25,14 @@ classes:
       - HasPassageNumber
     slots:
       - geneticDisorder
+      - manifestation
     description: >-
       Advanced 3D cellular models including organoids, assembloids,
       spheroids, and other 3D culture systems.
     attributes:
       modelType:
         description: Type of 3D cellular model.
-        range: OrganoidModelTypeEnum
+        range: ModelTypeEnum
         required: true
       derivationSource:
         description: Source of cells used to generate the model.
@@ -40,10 +41,21 @@ classes:
       cellTypes:
         description: Cell types present in the model.
         multivalued: true
-        required: true
+      organ:
+        description: The organ the organoid represents or is derived from.
+        range: OrganEnum
       organoidType:
         description: Specific type of organoid, if applicable.
         range: OrganoidTypeEnum
+        deprecated: >-
+          Use organ instead (nf-research-tools-schema#262) -- same
+          concept as organ (shared with CellLine/PatientDerivedModel),
+          phrased adjectivally (e.g. "Cerebral") instead of as an organ
+          noun (e.g. "Brain"). Every OrganoidTypeEnum value maps onto an
+          existing OrganEnum value 1:1 (Cerebral->Brain,
+          Intestinal->Intestine, Cardiac->Heart, Retinal->Eye,
+          Pancreatic->Pancreas; Liver/Kidney/Lung/Other unchanged). Kept
+          populated for backward compatibility until nothing reads it.
       matrixType:
         description: Extracellular matrix or scaffold used.
         range: MatrixTypeEnum
@@ -74,6 +86,13 @@ classes:
       nfManifestation:
         description: NF manifestation this model is used to study.
         range: OrganoidNfManifestationEnum
+        deprecated: >-
+          Use manifestation instead (nf-research-tools-schema#262) --
+          same concept, unified with CellLine/AnimalModel/Biobank/
+          PatientDerivedModel's manifestation field/enum. Kept for
+          backward compatibility until nothing reads it; the live
+          Synapse column is empty (no submissions have used it yet),
+          so nothing is lost.
       routeOfAdministration:
         description: >-
           Drug delivery routes that have been validated or are feasible
@@ -133,23 +152,14 @@ classes:
 
 enums:
 
-  OrganoidModelTypeEnum:
-    description: Types of 3D cellular models.
-    permissible_values:
-      Organoid: {}
-      Assembloid: {}
-      Spheroid: {}
-      3D Culture: {}
-      Other: {}
-
   DerivationSourceEnum:
     description: Sources of cells for model generation.
     permissible_values:
-      iPSC: {}
-      ESC: {}
+      Induced Pluripotent Stem Cell (iPSC): {}
+      Embryonic Stem Cell (ESC): {}
       Primary Tissue: {}
       Cell Line: {}
-      Patient-Derived: {}
+      Unknown: {}
       Other: {}
 
   OrganoidTypeEnum:
@@ -191,7 +201,9 @@ enums:
       RNA-seq: {}
       scRNA-seq: {}
       Electrophysiology: {}
+      Flow Cytometry: {}
       Imaging: {}
+      Methylation: {}
       Other: {}
 
   OrganoidNfManifestationEnum:

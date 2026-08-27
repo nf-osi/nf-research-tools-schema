@@ -89,7 +89,7 @@ toolValidations:
     # genetic_reagent:        insertName*, vectorType, vectorBackbone, promoter, insertSpecies, selectableMarker
     # computational_tool:     softwareType*, softwareVersion, programmingLanguage, sourceRepository
     # organoid_protocol: modelType*, derivationSource*, cellTypes, organoidType, matrixType
-    # patient_derived_model:  modelSystemType*, patientDiagnosis*, hostStrain, tumorType, engraftmentSite
+    # patient_derived_model:  modelType*, patientDiagnosis*, hostStrain, manifestation, engraftmentSite
     # clinical_assessment_tool: assessmentType*, targetPopulation*, diseaseSpecific, numberOfItems
     # (* = critical, fill if at all possible)
   # Repeat for each tool. Use [] if no tools found."""
@@ -587,10 +587,10 @@ def make_detail_row(tool_type: str, tool_name: str, fields: dict) -> dict:
         }
     elif tool_type == 'patient_derived_model':
         return {
-            'modelSystemType': _f(f, 'modelSystemType'),
+            'modelType': _f(f, 'modelType') or _f(f, 'modelSystemType'),
             'patientDiagnosis': _f(f, 'patientDiagnosis'),
             'hostStrain': _f(f, 'hostStrain'),
-            'tumorType': _f(f, 'tumorType'),
+            'manifestation': _f(f, 'manifestation') or _f(f, 'tumorType'),
             'engraftmentSite': _f(f, 'engraftmentSite'),
             'passageNumber': _f(f, 'passageNumber'),
             'establishmentRate': _f(f, 'establishmentRate'),
