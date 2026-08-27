@@ -92,6 +92,44 @@ invoked before any live change to the tools search MV chain
 
 ---
 
+### Renaming a value across a live table
+
+**`rename_synapse_values.py`**
+- Reusable replacement for a one-time value-styling fix script (the
+  pattern used for #262, `scripts/fix_enum_value_styling_262.py`, removed
+  before merge per #272 review since one-time-use scripts shouldn't be
+  committed): given a mapping of `{table_id: {column: {old_value:
+  new_value}}}`, safely renames matching values in a live Synapse table
+- Mapping input: `--mapping-file path.json`, and/or `--set
+  TABLE:COLUMN:OLD=NEW` (repeatable) for one or two ad hoc renames with no
+  file
+- Column type (STRING vs STRING_LIST) is looked up live via
+  `getTableColumns()` — the same mapping shape works for either kind of
+  column without saying which
+- Only rewrites EXACT (case-sensitive) matches — Synapse SQL string
+  comparison is case-insensitive, so the candidate-row query can surface
+  an already-correctly-cased row alongside the real match
+- STRING_LIST columns go through `PartialRowset`/`PartialRow` with native
+  Python list values, not a CSV-based `Table` upload, which breaks
+  faceting for multi-valued columns (#266)
+- Does **not** support filling in a currently-blank value: unlike a
+  specific wrong string, blank/NULL has no distinguishing content, so a
+  mapping keyed on it would match every blank row table-wide with no way
+  to scope it to the row(s) you actually mean (confirmed live while
+  building this — see the tool's module docstring). Backfilling one row's
+  blank value needs a row-scoped filter and belongs in an inline script,
+  the way the AnimalModel fix in #272 was applied inline rather than
+  folded into committed tooling
+- `--dry-run` prints planned changes with no writes
+- Every write goes through `synapse_safety.safe_store_row_patch()` (an
+  ordinary rename patches existing rows by `ROW_ID`/`ROW_VERSION`, which
+  needs the query `RowSet`'s own changeset etag, not the table entity's —
+  see that function's docstring) or `safe_store()` for `STRING_LIST`
+
+**Used by**: ad hoc, in place of a one-time data-fix script
+
+---
+
 ## Tool Coverage Scripts
 
 More complex mining and validation scripts are in `tool_coverage/scripts/`:
@@ -152,6 +190,21 @@ python scripts/snapshot_synapse_tables.py --class-name CellLine --class-name Ani
     --comment "pre-migration snapshot for #262"
 python scripts/snapshot_synapse_tables.py --table-id syn77019684 --table-id syn51730943 \
     --comment "pre-migration snapshot for #262"
+```
+
+### Rename a Value Across a Live Table
+```bash
+# Preview only, no Synapse writes
+python scripts/rename_synapse_values.py --mapping-file fix.json --dry-run
+
+# Apply a mapping file: {"table_id": {"column": {"old_value": "new_value"}}}
+python scripts/rename_synapse_values.py --mapping-file fix.json \
+    --comment "nf-research-tools-schema#274 test"
+
+# One-off inline rename, no file
+python scripts/rename_synapse_values.py \
+    --set syn26486823:tissue:Primary Tumor=Primary tumor \
+    --comment "casing fix"
 ```
 
 ## Requirements

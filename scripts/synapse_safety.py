@@ -92,6 +92,17 @@ def safe_store(syn, table_or_entity, comment: str, table_id: str = None):
     now stale and syn.store() below would fail with "updated since you
     last fetched" -- so this refreshes .etag from the server after the
     snapshot, immediately before storing, whenever the object has one.
+
+    Does NOT correctly handle a row-level patch (a Table(table_id, df)
+    whose df carries ROW_ID/ROW_VERSION, i.e. an update to existing rows
+    rather than an insert): Synapse's row-update endpoint checks
+    `.etag` against the *query RowSet's own changeset etag* (from
+    tableQuery(...).etag), not the table entity's etag -- refreshing to
+    the entity's etag here, as this function does, gets a value the
+    endpoint will reject with "Invalid etag" even though it's genuinely
+    current. Use safe_store_row_patch() for that case instead (confirmed
+    live against nf-research-tools-schema#306's DevelopmentRecord fix,
+    2026-08-27 -- see that function's docstring for the full story).
     """
     resolved_id = table_id or _resolve_table_id(table_or_entity)
     snapshot_table(syn, resolved_id, f"{comment} -- before")
@@ -102,6 +113,57 @@ def safe_store(syn, table_or_entity, comment: str, table_id: str = None):
             logger.warning(f"Could not refresh etag for {resolved_id} before store: {e}")
     result = syn.store(table_or_entity)
     snapshot_table(syn, resolved_id, f"{comment} -- after")
+    return result
+
+
+def safe_store_row_patch(syn, table_id: str, build_patch, comment: str):
+    """
+    Safely apply a row-level patch (a Table(table_id, df) update where df
+    carries ROW_ID/ROW_VERSION for existing rows) -- the case safe_store()
+    above cannot handle correctly.
+
+    Background: synapseclient's row-update path (CsvFileTable._update_self
+    -> Synapse._uploadCsv(updateEtag=...)) requires the etag of the
+    tableQuery() RowSet that read those exact rows, not the table entity's
+    own etag from syn.get(). And ANY entity modification between that read
+    and the store -- including a snapshot -- invalidates that RowSet
+    etag, so "read, then snapshot, then store with the etag you already
+    had" always fails with "Invalid etag", no matter how current the
+    entity's own etag looks at that moment.
+
+    So the order here is deliberately snapshot -> read -> store, not
+    read -> snapshot -> store:
+
+    Args:
+        syn: Synapse client
+        table_id: the table being patched
+        build_patch: callable(syn) -> a synapseclient.Table ready to
+            store, built from a *fresh* tableQuery() run inside this
+            callback (after the before-snapshot below, not before it),
+            with `.etag` set from that query result's own `.etag` --
+            or None if there's nothing to patch (skips the store, but
+            the before-snapshot has already happened, which is harmless)
+        comment: human-readable description, used as the snapshot
+            comment (suffixed with " -- before"/" -- after")
+
+    Returns whatever syn.store() returns, or None if build_patch
+    returned None.
+
+    Confirmed live against nf-research-tools-schema#306's
+    DevelopmentRecord investigatorId/funderId fix (2026-08-27): the
+    entity-etag-refresh path in safe_store() failed with "Invalid etag"
+    on every attempt, including immediately after a fresh snapshot --
+    because it was refreshing to the wrong kind of etag, not because the
+    value was stale. Re-querying after the snapshot and using that
+    query's own .etag fixed it on the first try.
+    """
+    snapshot_table(syn, table_id, f"{comment} -- before")
+    table_or_entity = build_patch(syn)
+    if table_or_entity is None:
+        logger.info(f"{table_id}: build_patch found nothing to patch, skipping store")
+        return None
+    result = syn.store(table_or_entity)
+    snapshot_table(syn, table_id, f"{comment} -- after")
     return result
 
 

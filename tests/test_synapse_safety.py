@@ -200,3 +200,39 @@ def test_safe_delete_proceeds_when_confirmed():
     syn = _FakeSyn()
     safety.safe_delete(syn, "syn123", confirmed=True, reason="orphaned duplicate")
     assert syn.delete_calls == ["syn123"]
+
+
+# --- safe_store_row_patch ------------------------------------------------- #
+
+def test_safe_store_row_patch_snapshots_before_read_and_store():
+    """The build_patch callback must run AFTER the before-snapshot, and
+    the store must happen with no snapshot in between -- that ordering is
+    the whole point of this function (see its docstring)."""
+    syn = _FakeSyn()
+    calls = []
+
+    def build_patch(passed_syn):
+        assert passed_syn is syn
+        calls.append("build_patch")
+        assert syn.snapshot_calls == [("syn999", "test patch -- before")], (
+            "build_patch (the fresh read) must run after the before-snapshot"
+        )
+        return "the-patch-object"
+
+    result = safety.safe_store_row_patch(syn, "syn999", build_patch, comment="test patch")
+    assert result == "the-patch-object"
+    assert calls == ["build_patch"]
+    assert syn.store_calls == ["the-patch-object"]
+    assert syn.snapshot_calls == [
+        ("syn999", "test patch -- before"),
+        ("syn999", "test patch -- after"),
+    ]
+
+
+def test_safe_store_row_patch_skips_store_when_build_patch_returns_none():
+    syn = _FakeSyn()
+    result = safety.safe_store_row_patch(syn, "syn999", lambda s: None, comment="test patch")
+    assert result is None
+    assert syn.store_calls == []
+    # the before-snapshot still happened (harmless) -- only the store/after-snapshot are skipped
+    assert syn.snapshot_calls == [("syn999", "test patch -- before")]
