@@ -66,7 +66,7 @@ def _detect_tool_type(s: dict) -> str | None:
         ("antibody",               ["basicInfo.antibodyName", "antibodyName", "targetAntigen"]),
         ("animal_model",           ["basicInfo.animalModelName", "animalModelName", "animalModelDisease"]),
         ("genetic_reagent",        ["insertName", "vectorType", "vectorBackbone"]),
-        ("patient_derived_model",  ["basicInfo.modelName", "modelName", "basicInfo.modelSystemType"]),
+        ("patient_derived_model",  ["basicInfo.modelName", "modelName", "basicInfo.modelType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareName", "softwareType"]),
         ("organoid_protocol",["basicInfo.modelType", "modelType", "derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "assessmentName", "assessmentType"]),
