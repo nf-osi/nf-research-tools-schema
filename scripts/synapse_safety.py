@@ -193,3 +193,53 @@ def safe_delete(syn, entity_id: str, confirmed: bool = False, reason: str = ""):
         )
     logger.warning(f"Deleting {entity_id} (explicitly confirmed){f' -- {reason}' if reason else ''}")
     syn.delete(entity_id)
+
+
+def safe_delete_rows(syn, table_id: str, query: str, comment: str, confirmed: bool = False, reason: str = ""):
+    """
+    Delete the rows matched by `query` (a SELECT against table_id) from a
+    live Synapse table -- e.g. `syn.delete(syn.tableQuery(query))`'s
+    row-deletion form, per synapseclient's own CsvFileTable._synapse_delete
+    docstring example.
+
+    Refuses to run unless confirmed=True is explicitly passed (policy #2
+    in this module's docstring) -- see DeletionNotConfirmedError's
+    docstring for what "explicitly" means here. Deleting existing rows is
+    just as irreversible-without-a-snapshot as deleting a whole entity,
+    so it gets the same confirmation bar as safe_delete() above, not
+    safe_store()'s no-confirmation bar.
+
+    Args:
+        syn: Synapse client
+        table_id: the table to delete rows from
+        query: a SELECT against table_id identifying exactly the rows to
+            delete -- double-check this matches only the intended rows
+            before calling with confirmed=True
+        comment: human-readable description, used as the snapshot
+            comment (suffixed with " -- before"/" -- after")
+        confirmed: must be True, set only immediately after Belinda has
+            granted permission for deleting THESE SPECIFIC rows in this
+            conversation
+        reason: short note on why these rows are being deleted (logged,
+            not enforced) -- for the audit trail
+
+    Returns the number of rows deleted.
+    """
+    if not confirmed:
+        raise DeletionNotConfirmedError(
+            f"Refusing to delete rows from {table_id}: safe_delete_rows() "
+            f"requires confirmed=True, which must only be set after "
+            f"explicit, individual permission from Belinda for THESE "
+            f"SPECIFIC rows. Never infer this from a general policy or a "
+            f"different entity's approval."
+        )
+    snapshot_table(syn, table_id, f"{comment} -- before")
+    result = syn.tableQuery(query)
+    row_count = len(result.asDataFrame())
+    logger.warning(
+        f"Deleting {row_count} row(s) from {table_id} (explicitly confirmed)"
+        f"{f' -- {reason}' if reason else ''}: {query}"
+    )
+    syn.delete(result)
+    snapshot_table(syn, table_id, f"{comment} -- after")
+    return row_count

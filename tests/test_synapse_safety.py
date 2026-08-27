@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pandas as pd
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -34,15 +35,17 @@ safety = _load_module("synapse_safety")
 
 
 class _FakeSyn:
-    def __init__(self, snapshot_version=7, delete_error=None, fresh_etag=None, get_error=None):
+    def __init__(self, snapshot_version=7, delete_error=None, fresh_etag=None, get_error=None, query_df=None):
         self.snapshot_calls = []
         self.store_calls = []
         self.delete_calls = []
         self.get_calls = []
+        self.query_calls = []
         self._snapshot_version = snapshot_version
         self._delete_error = delete_error
         self._fresh_etag = fresh_etag
         self._get_error = get_error
+        self._query_df = query_df
 
     def create_snapshot_version(self, table_id, comment=None):
         self.snapshot_calls.append((table_id, comment))
@@ -62,6 +65,10 @@ class _FakeSyn:
         if self._get_error:
             raise self._get_error
         return SimpleNamespace(etag=self._fresh_etag)
+
+    def tableQuery(self, query):
+        self.query_calls.append(query)
+        return SimpleNamespace(asDataFrame=lambda: self._query_df)
 
 
 class _FakeTableWithTableId:
@@ -200,6 +207,30 @@ def test_safe_delete_proceeds_when_confirmed():
     syn = _FakeSyn()
     safety.safe_delete(syn, "syn123", confirmed=True, reason="orphaned duplicate")
     assert syn.delete_calls == ["syn123"]
+
+
+# --- safe_delete_rows ------------------------------------------------------ #
+
+def test_safe_delete_rows_refuses_without_confirmation():
+    syn = _FakeSyn(query_df=pd.DataFrame({"a": [1, 2]}))
+    with pytest.raises(safety.DeletionNotConfirmedError):
+        safety.safe_delete_rows(syn, "syn123", "SELECT a FROM syn123", comment="c")
+    assert syn.delete_calls == []
+    assert syn.query_calls == []  # refuses before even querying
+    assert syn.snapshot_calls == []
+
+
+def test_safe_delete_rows_proceeds_when_confirmed():
+    query_result_df = pd.DataFrame({"a": [1, 2, 3]})
+    syn = _FakeSyn(query_df=query_result_df)
+    n = safety.safe_delete_rows(
+        syn, "syn123", "SELECT a FROM syn123 WHERE a > 0", comment="c",
+        confirmed=True, reason="moving to usage",
+    )
+    assert n == 3
+    assert syn.query_calls == ["SELECT a FROM syn123 WHERE a > 0"]
+    assert len(syn.delete_calls) == 1
+    assert syn.snapshot_calls == [("syn123", "c -- before"), ("syn123", "c -- after")]
 
 
 # --- safe_store_row_patch ------------------------------------------------- #
