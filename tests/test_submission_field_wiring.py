@@ -364,33 +364,13 @@ def test_compile_accepted_loop_computes_availability_for_tool_types_only():
 
 # ---------------------------------------------------------------------------
 # OrganoidProtocol organ (replaces deprecated organoidType) -- form now
-# collects organ directly, but the publication-mining pipeline still emits
-# organoidType candidates until #297's mining-pipeline sweep, so the builder
-# must fall back to the documented 1:1 organoidType->organ mapping.
+# collects organ (OrganEnum) directly; the builder just reads it, no mapping
+# needed (review feedback on #304: "just use organ enums, no map needed").
 # ---------------------------------------------------------------------------
 
-def test_build_organoid_protocol_prefers_organ_over_organoid_type():
-    row = cas._build_organoid_protocol({
-        "basicInfo": {"organ": "Skin", "organoidType": "Cerebral"},
-    })
+def test_build_organoid_protocol_reads_organ():
+    row = cas._build_organoid_protocol({"basicInfo": {"organ": "Skin"}})
     assert row["organ"] == "Skin"
-
-
-def test_build_organoid_protocol_falls_back_to_organoid_type_mapping():
-    cases = {
-        "Cerebral": "Brain",
-        "Intestinal": "Intestine",
-        "Liver": "Liver",
-        "Kidney": "Kidney",
-        "Cardiac": "Heart",
-        "Retinal": "Eye",
-        "Lung": "Lung",
-        "Pancreatic": "Pancreas",
-        "Other": "Other",
-    }
-    for organoid_type, expected_organ in cases.items():
-        row = cas._build_organoid_protocol({"basicInfo": {"organoidType": organoid_type}})
-        assert row["organ"] == expected_organ, f"{organoid_type} -> {row['organ']!r}, expected {expected_organ!r}"
 
 
 def test_build_organoid_protocol_no_organ_data_is_empty_not_crash():
