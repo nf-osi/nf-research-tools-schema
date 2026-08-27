@@ -54,6 +54,7 @@ classes:
       - description
       - aiSummary
       - usageRequirements
+      - availability
       - howToAcquire
       - dateAdded
       - dateModified
@@ -141,9 +142,18 @@ slots:
     range: UsageRequirementEnum
     multivalued: true
 
+  availability:
+    description: How this resource can be obtained.
+    range: AvailabilityEnum
+    required: true
+
   howToAcquire:
     description: How to acquire a particular resource.
-    required: true
+    deprecated: >-
+      Use availability instead (nf-research-tools-schema#262) -- same
+      concept (both describe how to obtain the resource), availability
+      is a controlled vocabulary rather than free text. Kept populated
+      for backward compatibility until nothing reads it.
 
   dateAdded:
     description: The date that the resource was originally added.

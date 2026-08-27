@@ -52,12 +52,18 @@ slots:
     description: >-
       Manifestations or symptoms that this resource is used to model
       (e.g. tumor type, behavioral phenotype).
+    range: ManifestationEnum
     multivalued: true
 
   tumorType:
     description: Tumor types associated with the resource.
     range: TumorTypeEnum
     multivalued: true
+    deprecated: >-
+      Use manifestation instead (nf-research-tools-schema#262) -- same
+      concept as manifestation on CellLine/AnimalModel/OrganoidProtocol,
+      unified into one field/enum. Kept populated for backward
+      compatibility until nothing reads it.
 
   passageNumber:
     description: Current passage number, if applicable.

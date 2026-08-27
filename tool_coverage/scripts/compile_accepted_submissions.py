@@ -64,6 +64,7 @@ COLUMNS = {
         "timelineToResults", "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
         "vendor", "catalogNumber", "catalogURL",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex",
@@ -72,6 +73,7 @@ COLUMNS = {
         "resourceId", "targetAntigen", "hostOrganism", "clonality", "cloneId",
         "uniprotId", "reactiveSpecies", "conjugate",
         "vendor", "catalogNumber", "catalogURL",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -88,6 +90,7 @@ COLUMNS = {
         "mtaRequired", "ngnriRepositoryStatus",
         "itemAcquisition", "developerName", "developerAffiliation", "developerContactEmail",
         "vendor", "catalogNumber", "catalogURL",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
@@ -99,12 +102,13 @@ COLUMNS = {
         "growthStrain", "growthTemp", "cloningMethod", "5primer", "3primer",
         "5primeCloningSite", "3primeCloningSite", "5primeSiteDestroyed",
         "3primeSiteDestroyed",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "patient_derived_models": [
-        "resourceId", "modelSystemType", "patientDiagnosis",
-        "hostStrain", "organ", "tumorType", "engraftmentSite", "passageNumber",
+        "resourceId", "modelType", "patientDiagnosis",
+        "hostStrain", "organ", "manifestation", "engraftmentSite", "passageNumber",
         "establishmentRate", "molecularCharacterization", "clinicalData",
         "validationMethods", "geneticDisorder",
         "bbbIntegrityStatus", "routeOfAdministration", "pkpdCapabilities",
@@ -113,6 +117,7 @@ COLUMNS = {
         "mtaRequired", "ngnriRepositoryStatus",
         "donorId",
         "itemAcquisition", "developerName", "developerAffiliation",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
         "_species", "_sex", "_age", "_race",
@@ -135,19 +140,21 @@ COLUMNS = {
         "licenseDetails", "containerized", "dependencies", "systemRequirements",
         "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "rrid",
         "developerName", "developerAffiliation", "itemAcquisition",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "organoid_protocols": [
         "resourceId", "modelType", "derivationSource", "cellTypes",
-        "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
+        "organ", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
-        "qualityControlMetrics", "geneticDisorder", "nfManifestation",
+        "qualityControlMetrics", "geneticDisorder", "manifestation",
         "bbbModelCapability", "routeOfAdministration", "pkpdCapabilities",
         "mechanismOfActionValidation", "pediatricSuitability", "timelineToResults",
         "modelLimitations", "regulatoryAcceptanceHistory", "suitableForRegulatoryPackage",
         "mtaRequired", "ngnriRepositoryStatus",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
     ],
@@ -158,15 +165,17 @@ COLUMNS = {
         "availabilityStatus", "licensingRequirements", "digitalVersion",
         "cognitiveAndBehavioralDomains", "regulatoryAcceptanceHistory", "toolURL",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "biobanks": [
         "resourceId", "biobankURL", "biobankName", "geneticDisorder",
-        "specimenType", "specimenTissueType", "tumorType",
+        "specimenType", "tissue", "manifestation",
         "specimenPreparationMethod", "specimenFormat", "contact", "rrid",
         "mtaRequired", "ngnriRepositoryStatus", "requestFormURL",
         "developerName", "developerAffiliation", "developerContactEmail",
+        "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
@@ -229,24 +238,6 @@ _GENETIC_DISORDER_MAP = {
     "None": "No known genetic disorder",
 }
 
-_TUMOR_TYPE_MAP = {
-    # submitPatientDerivedModel.json's tumorType is Title Case; TumorTypeEnum
-    # (modules/enums.yaml) is lowercase, matching Biobank's diseaseType/tumorType
-    # convention (that form already submits lowercase, no map needed there).
-    # "Other" already matches the enum unchanged.
-    "Cutaneous Neurofibroma": "cutaneous neurofibroma",
-    "Plexiform Neurofibroma": "plexiform neurofibroma",
-    "Atypical Neurofibroma": "atypical neurofibroma",
-    "Schwannoma": "schwannoma",
-    "Meningioma": "meningioma",
-    "Malignant Peripheral Nerve Sheath Tumor": "malignant peripheral nerve sheath tumor",
-    "Low Grade Glioma": "low grade glioma",
-    "High Grade Glioma": "high grade glioma",
-    "Pheochromocytoma": "pheochromocytoma",
-    "Optic Nerve Glioma": "optic nerve glioma",
-}
-
-
 def _map_genetic_disorder(raw):
     """Map a raw disease value through _GENETIC_DISORDER_MAP.
 
@@ -277,9 +268,6 @@ _CONJUGATE_MAP = {
 _PROJECT_NAMESPACE = uuid.uuid5(
     uuid.NAMESPACE_URL, "https://nf.synapse.org/NF-research-tools"
 )
-
-# Short labels for verbose modelSystemType values used in PDM resource names.
-_MST_SHORT = {"PDX (Patient-Derived Xenograft)": "PDX"}
 
 # Known NF funders — mirrors generate_review_csv.py _KNOWN_FUNDERS.
 _KNOWN_FUNDERS = [
@@ -437,9 +425,8 @@ def _resource_name_from_data(data: dict, ttype: str) -> str:
         return _get(data, "insertName")
     if ttype == "patient_derived_model":
         base = _get(bi, "resourceName") or _get(data, "_resourceName")
-        mst = _get(bi, "modelSystemType")
-        short_mst = _MST_SHORT.get(mst, mst)
-        return f"{base} ({short_mst})" if short_mst else base
+        model_type = _get(bi, "modelType")
+        return f"{base} ({model_type})" if model_type else base
     if ttype == "organoid_protocol":
         return _get(bi, "resourceName") or _get(data, "_resourceName")
     if ttype == "computational_tool":
@@ -485,7 +472,7 @@ def _tool_type_from_json(data: dict) -> str | None:
         ("antibody",               ["basicInfo.antibodyName", "targetAntigen"]),
         ("animal_model",           ["basicInfo.animalModelName", "animalModelGeneticDisorder"]),
         ("genetic_reagent",        ["insertName", "vectorType"]),
-        ("patient_derived_model",  ["basicInfo.resourceName", "basicInfo.modelSystemType"]),
+        ("patient_derived_model",  ["basicInfo.resourceName", "basicInfo.modelType"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareType"]),
         ("organoid_protocol",["basicInfo.resourceName", "basicInfo.modelType", "basicInfo.derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "basicInfo.assessmentType"]),
@@ -750,23 +737,24 @@ def _build_genetic_reagent(d: dict) -> dict:
 def _build_patient_derived_model(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     resource_name = _get(bi, "resourceName") or _get(d, "_resourceName")
-    model_system_type = _get(bi, "modelSystemType")
+    model_type = _get(bi, "modelType")
     # PDX and 3D culture variants of the same base name are distinct resources;
-    # append the modelSystemType so every downstream key (dedup, ID, lookup) is unique.
-    short_mst = _MST_SHORT.get(model_system_type, model_system_type)
-    unique_name = f"{resource_name} ({short_mst})" if short_mst else resource_name
+    # append the modelType so every downstream key (dedup, ID, lookup) is unique.
+    unique_name = f"{resource_name} ({model_type})" if model_type else resource_name
     species = _get(bi, "species")
     return {
         "resourceId": "",
         "donorId": _make_donor_id(resource_name) if species else "",
-        "modelSystemType": model_system_type,
+        "modelType": model_type,
         "patientDiagnosis": _get(bi, "patientDiagnosis"),
         "hostStrain": _get(bi, "hostStrain"),
         "organ": _get(bi, "organ"),
-        # tumorType is now the shared, multivalued slot (unified with Biobank's
-        # column in Synapse -- see docs/MIGRATION.md); the form itself is still
-        # single-select, so wrap the mapped value in a one-item list.
-        "tumorType": _fmt_list([_TUMOR_TYPE_MAP.get(v, v) for v in [_get(bi, "tumorType")] if v]),
+        # manifestation is now the shared, multivalued slot (unified with
+        # Biobank's column in Synapse -- see nf-research-tools-schema#262);
+        # the form itself is still single-select, so wrap in a one-item list.
+        # No casing translation needed -- the form already submits Title
+        # Case, matching ManifestationEnum.
+        "manifestation": _fmt_list([v for v in [_get(bi, "manifestation")] if v]),
         "engraftmentSite": _get(bi, "engraftmentSite"),
         "passageNumber": _get(bi, "passageNumber"),
         "establishmentRate": _get(bi, "establishmentRate"),
@@ -847,7 +835,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "modelType": _get(bi, "modelType"),
         "derivationSource": _get(bi, "derivationSource"),
         "cellTypes": _fmt_list(_get(bi, "cellTypes")),
-        "organoidType": _get(bi, "organoidType"),
+        "organ": _get(bi, "organ"),
         "matrixType": _get(bi, "matrixType"),
         "cultureSystem": _get(bi, "cultureSystem"),
         "cultureMedia": _get(bi, "cultureMedia"),
@@ -857,7 +845,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "cryopreservationProtocol": _get(bi, "cryopreservationProtocol"),
         "qualityControlMetrics": _fmt_list(_get(bi, "qualityControlMetrics")),
         "geneticDisorder": _map_genetic_disorder(_get(bi, "nfGeneticDisorder")),
-        "nfManifestation": _fmt_list(_get(bi, "nfManifestation")),
+        "manifestation": _fmt_list(_get(bi, "manifestation")),
         "bbbModelCapability": _get(d, "bbbModelCapability"),
         "routeOfAdministration": _fmt_list(_get(d, "routeOfAdministration")),
         "pkpdCapabilities": _fmt_list(_get(d, "pkpdCapabilities")),
@@ -932,8 +920,8 @@ def _build_biobank(d: dict) -> dict:
         # unlike animalModelGeneticDisorder/cellLineGeneticDisorder/nfGeneticDisorder.
         "geneticDisorder": _fmt_list(_get(bi, "diseaseType")),
         "specimenType": _fmt_list(_get(bi, "specimenType")),
-        "specimenTissueType": _fmt_list(_get(bi, "specimenTissueType")),
-        "tumorType": _fmt_list(_get(bi, "tumorType")),
+        "tissue": _fmt_list(_get(bi, "tissue")),
+        "manifestation": _fmt_list(_get(bi, "manifestation")),
         "specimenPreparationMethod": _fmt_list(_get(bi, "specimenPreparationMethod")),
         "specimenFormat": _fmt_list(_get(bi, "specimenFormat")),
         "contact": _get(bi, "contact"),
@@ -1453,6 +1441,80 @@ def _compute_how_to_acquire(ttype: str, row: dict) -> str:
     return ""
 
 
+_AVAILABILITY_STATUS_MAP = {
+    # Fold-in from AvailabilityEnum's simplification (#295) -- "License
+    # Required" is now covered by "Contact Developer".
+    "vendor": "Vendor",
+    "contact developer": "Contact Developer",
+    "license required": "Contact Developer",
+    "freely available": "Freely Available",
+    "unknown": "Unknown",
+}
+
+
+def _compute_availability(ttype: str, row: dict) -> str:
+    """Generate an AvailabilityEnum value (Vendor/Contact Developer/Freely
+    Available/Unknown) from submission fields, mirroring
+    _compute_how_to_acquire()'s per-type source-field logic (#298) so the
+    two fields describe the same underlying acquisition method
+    consistently. Unlike howToAcquire, availability is a controlled
+    vocabulary and required by schema, so this always returns one of the
+    4 enum values -- 'Unknown' rather than '' when nothing is known."""
+    def _acq(key: str) -> str:
+        return (row.get(key) or "").strip()
+
+    if ttype == "computational_tool":
+        if _acq("sourceRepository"):
+            return "Freely Available"
+        acq = _acq("itemAcquisition")
+        if acq.lower() == "contact developer":
+            return "Contact Developer"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Freely Available"
+        if _acq("developerName"):
+            return "Contact Developer"
+
+    elif ttype in ("organoid_protocol", "clinical_assessment_tool"):
+        mapped = _AVAILABILITY_STATUS_MAP.get(_acq("availabilityStatus").lower())
+        if mapped:
+            return mapped
+        if _acq("developerContactEmail") or _acq("developerName"):
+            return "Contact Developer"
+
+    elif ttype == "antibody":
+        if _acq("vendor") or _acq("catalogNumber"):
+            return "Vendor"
+
+    elif ttype == "patient_derived_model":
+        acq = _acq("itemAcquisition")
+        if acq.lower() == "contact developer":
+            return "Contact Developer"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Vendor"
+        if _acq("developerName") or _acq("developerAffiliation"):
+            return "Contact Developer"
+
+    elif ttype == "animal_model":
+        ngnri = _acq("ngnriRepositoryStatus")
+        acq = _acq("itemAcquisition")
+        if ngnri and ngnri.lower() not in _TRIVIAL_ACQ | {"not deposited"}:
+            return "Freely Available"
+        if acq and acq.lower() not in _TRIVIAL_ACQ:
+            return "Vendor" if "vendor" in acq.lower() else "Contact Developer"
+        if _acq("developerContactEmail"):
+            return "Contact Developer"
+
+    elif ttype in ("cell_line", "genetic_reagent"):
+        if _acq("developerName") or _acq("developerAffiliation") or _acq("developerContactEmail"):
+            return "Contact Developer"
+
+    elif ttype == "biobank":
+        if _acq("contact") or _acq("developerContactEmail") or _acq("developerName") or _acq("requestFormURL"):
+            return "Contact Developer"
+
+    return "Unknown"
+
+
 def _generate_resources_csv(
     csv_dir: Path, dry_run: bool, json_files: list | None = None
 ) -> None:
@@ -1663,6 +1725,13 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
         id_info = _TTYPE_ID_INFO.get(ttype)
         for item in items:
             row = builder_fn(item)
+            # Every Tool subclass (all of _BUILDERS except the "observation"
+            # junction table) carries howToAcquire/availability (tool_base.yaml)
+            # but no _build_* sets them -- compute here, once, for all 9 types
+            # rather than duplicating this in each builder (#298).
+            if ttype != "observation":
+                row.setdefault("howToAcquire", _compute_how_to_acquire(ttype, row))
+                row.setdefault("availability", _compute_availability(ttype, row))
             name = row.get(name_col, "")
             norm_name = _normalize_name(name)
             if norm_name in existing:
