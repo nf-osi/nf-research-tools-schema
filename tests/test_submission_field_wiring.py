@@ -360,3 +360,25 @@ def test_compile_accepted_loop_computes_availability_for_tool_types_only():
     assert '_compute_availability' in src
     assert '_compute_how_to_acquire' in src
     assert 'ttype != "observation"' in src
+
+
+# ---------------------------------------------------------------------------
+# OrganoidProtocol organ (replaces deprecated organoidType) -- form now
+# collects organ (OrganEnum) directly; the builder just reads it, no mapping
+# needed (review feedback on #304: "just use organ enums, no map needed").
+# ---------------------------------------------------------------------------
+
+def test_build_organoid_protocol_reads_organ():
+    row = cas._build_organoid_protocol({"basicInfo": {"organ": "Skin"}})
+    assert row["organ"] == "Skin"
+
+
+def test_build_organoid_protocol_no_organ_data_is_empty_not_crash():
+    row = cas._build_organoid_protocol({"basicInfo": {}})
+    assert row["organ"] == ""
+
+
+def test_organoid_protocols_columns_include_organ_not_organoid_type():
+    cols = cas.COLUMNS["organoid_protocols"]
+    assert "organ" in cols
+    assert "organoidType" not in cols

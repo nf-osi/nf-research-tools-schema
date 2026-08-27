@@ -144,7 +144,7 @@ COLUMNS = {
     ],
     "organoid_protocols": [
         "resourceId", "modelType", "derivationSource", "cellTypes",
-        "organoidType", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
+        "organ", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics", "geneticDisorder", "manifestation",
         "bbbModelCapability", "routeOfAdministration", "pkpdCapabilities",
@@ -827,7 +827,7 @@ def _build_organoid_protocol(d: dict) -> dict:
         "modelType": _get(bi, "modelType"),
         "derivationSource": _get(bi, "derivationSource"),
         "cellTypes": _fmt_list(_get(bi, "cellTypes")),
-        "organoidType": _get(bi, "organoidType"),
+        "organ": _get(bi, "organ"),
         "matrixType": _get(bi, "matrixType"),
         "cultureSystem": _get(bi, "cultureSystem"),
         "cultureMedia": _get(bi, "cultureMedia"),
