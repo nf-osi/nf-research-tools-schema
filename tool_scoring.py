@@ -143,9 +143,9 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
         elif tool_type == "Genetic Reagent":
             fields = ["insertName", "insertSpecies", "vectorType", "insertEntrezId", "vectorBackbone"]
         elif tool_type == "Biobank":
-            fields = ["specimenTissueType", "diseaseType", "tumorType", "specimenFormat", "specimenType"]
+            fields = ["tissue", "diseaseType", "manifestation", "specimenFormat", "specimenType"]
         elif tool_type == "Patient-Derived Model":
-            fields = ["modelSystemType", "patientDiagnosis", "hostStrain", "tumorType"]
+            fields = ["modelType", "patientDiagnosis", "hostStrain", "manifestation"]
         elif tool_type == "Computational Tool":
             fields = ["softwareName", "softwareType", "sourceRepository", "licenseType"]
         elif tool_type == "Organoid Protocol":

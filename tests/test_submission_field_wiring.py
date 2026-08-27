@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Regression tests for wiring up PR #196's new fields end-to-end, and for fixing
-the primary-key/geneticDisorder/manifestation column names that the LinkML
-migration (unifying all 9 tool-type tables onto `resourceId`, and AnimalModel/
-CellLine/Biobank onto shared `geneticDisorder`/`manifestation`) left stale in
-compile_accepted_submissions.py and clean_submission_csvs.py.
+Regression tests for field-name wiring between the submission forms
+(NF-Tools-Schemas/), compile_accepted_submissions.py, and
+clean_submission_csvs.py -- catches the class of bug where a LinkML schema
+rename (unifying per-type column names onto shared slots like `resourceId`,
+`geneticDisorder`/`manifestation`, `modelType`) leaves the pipeline scripts
+reading/writing stale field names. Originally added for PR #196's new
+fields; reusable and expected to grow with future renames (e.g.
+nf-research-tools-schema#262's tissue/modelType/manifestation unification).
 
 These tests run offline with no Synapse access.
 """
@@ -144,7 +147,7 @@ def test_build_organoid_and_patient_derived_model_map_nf_genetic_disorder():
     pdm_submission = {
         "basicInfo": {
             "resourceName": "Test PDX",
-            "modelSystemType": "PDX (Patient-Derived Xenograft)",
+            "modelType": "Xenograft",
             "nfGeneticDisorder": "NF1 Spontaneous Mutation",
         },
     }
@@ -258,32 +261,124 @@ def test_strip_before_upload_no_longer_drops_live_columns():
         assert not overlap, f"{csv_name}: still stripping live-column field(s) {overlap}"
 
 
-def test_build_patient_derived_model_maps_organ_and_tumor_type():
-    """PatientDerivedModel.tumorType was migrated to the shared, multivalued
-    Synapse column (same Column ID as Biobank.tumorType, unifying the facet
-    the way geneticDisorder/manifestation already are). The submission form
-    is still single-select Title Case, so it must be mapped to the canonical
-    lowercase TumorTypeEnum value and wrapped in a one-item list. organ was
-    a real column (shared with CellLine) that the builder never read at all."""
+def test_build_patient_derived_model_maps_organ_and_manifestation():
+    """PatientDerivedModel.tumorType/modelSystemType were unified with
+    Biobank/CellLine/AnimalModel/OrganoidProtocol's manifestation/modelType
+    fields (nf-research-tools-schema#262) -- same Column ID as
+    Biobank.manifestation, one shared facet across all 5 tool types. Both
+    submitPatientDerivedModel.json fields are Title Case, matching
+    ManifestationEnum/ModelTypeEnum directly -- no casing translation needed
+    (unlike the old tumorType->TumorTypeEnum lowercase mapping this
+    replaced). organ was a real column (shared with CellLine) that the
+    builder never read at all."""
     submission = {
         "basicInfo": {
             "resourceName": "Test PDX 2",
-            "modelSystemType": "PDX (Patient-Derived Xenograft)",
+            "modelType": "Xenograft",
             "organ": "Skin",
-            "tumorType": "Malignant Peripheral Nerve Sheath Tumor",
+            "manifestation": "Malignant Peripheral Nerve Sheath Tumor",
         },
     }
     row = cas._build_patient_derived_model(submission)
     assert row["organ"] == "Skin"
-    assert row["tumorType"] == "malignant peripheral nerve sheath tumor"
+    assert row["modelType"] == "Xenograft"
+    assert row["manifestation"] == "Malignant Peripheral Nerve Sheath Tumor"
 
     # Unmapped/no value -> empty list string, not a crash
     empty_row = cas._build_patient_derived_model({
-        "basicInfo": {"resourceName": "No Tumor Type", "modelSystemType": "Humanized Mouse"},
+        "basicInfo": {"resourceName": "No Manifestation", "modelType": "Humanized Mouse"},
     })
-    assert empty_row["tumorType"] == ""
+    assert empty_row["manifestation"] == ""
     assert empty_row["organ"] is None or empty_row["organ"] == ""
 
 
 def test_patient_derived_models_columns_include_organ():
     assert "organ" in cas.COLUMNS["patient_derived_models"]
+
+
+# ---------------------------------------------------------------------------
+# availability derivation (#298) -- _build_* never set howToAcquire or
+# availability directly; both are computed once in compile_accepted()'s main
+# loop (not per-builder) and must reach every Tool-subclass CSV's columns.
+# ---------------------------------------------------------------------------
+
+_TOOL_TYPE_CSV_KEYS = {
+    "cell_lines", "antibodies", "animal_models", "genetic_reagents",
+    "patient_derived_models", "computational_tools", "organoid_protocols",
+    "clinical_assessment_tools", "biobanks",
+}
+
+
+def test_all_tool_type_columns_include_availability_and_how_to_acquire():
+    """Every Tool subclass (tool_base.yaml) carries availability (required)
+    and howToAcquire (deprecated but still populated) -- COLUMNS must list
+    both for all 9 types, or compile_accepted()'s computed values get
+    silently dropped by _append_rows before the CSV is ever written."""
+    for csv_key in _TOOL_TYPE_CSV_KEYS:
+        cols = cas.COLUMNS[csv_key]
+        assert "availability" in cols, f"{csv_key}: missing availability column"
+        assert "howToAcquire" in cols, f"{csv_key}: missing howToAcquire column"
+
+
+def test_compute_availability_returns_controlled_vocabulary_only():
+    """availability is required + controlled vocabulary (AvailabilityEnum:
+    Vendor/Contact Developer/Freely Available/Unknown) -- unlike
+    howToAcquire (free text, '' allowed), _compute_availability() must never
+    return '' or an off-enum value, across every known ttype branch."""
+    allowed = {"Vendor", "Contact Developer", "Freely Available", "Unknown"}
+    for ttype in cas._TTYPE_ID_INFO:
+        for row in ({}, {"itemAcquisition": "Unknown"}, {"availabilityStatus": "bogus"}):
+            got = cas._compute_availability(ttype, row)
+            assert got in allowed, f"{ttype}/{row}: _compute_availability returned {got!r}, not in {allowed}"
+
+
+def test_compute_availability_matches_live_backfill_patterns():
+    """Spot-checks against the phrase patterns actually observed in the
+    live availability/howToAcquire columns (one-time #261 backfill) -- new
+    submissions should classify the same way existing rows already do."""
+    assert cas._compute_availability(
+        "clinical_assessment_tool", {"availabilityStatus": "License Required"}
+    ) == "Contact Developer"  # folded in per #295
+    assert cas._compute_availability(
+        "organoid_protocol", {"availabilityStatus": "Contact Developer"}
+    ) == "Contact Developer"
+    assert cas._compute_availability(
+        "computational_tool", {"sourceRepository": "https://github.com/x/y"}
+    ) == "Freely Available"
+    assert cas._compute_availability(
+        "antibody", {"vendor": "Sigma-Aldrich", "catalogNumber": "A1234"}
+    ) == "Vendor"
+    assert cas._compute_availability("animal_model", {}) == "Unknown"
+
+
+def test_compile_accepted_loop_computes_availability_for_tool_types_only():
+    """The wiring in compile_accepted()'s main loop must skip the
+    'observation' junction table (not a Tool subclass -- no
+    availability/howToAcquire slot at all) while covering the other 9."""
+    import inspect
+    src = inspect.getsource(cas.compile_accepted)
+    assert '_compute_availability' in src
+    assert '_compute_how_to_acquire' in src
+    assert 'ttype != "observation"' in src
+
+
+# ---------------------------------------------------------------------------
+# OrganoidProtocol organ (replaces deprecated organoidType) -- form now
+# collects organ (OrganEnum) directly; the builder just reads it, no mapping
+# needed (review feedback on #304: "just use organ enums, no map needed").
+# ---------------------------------------------------------------------------
+
+def test_build_organoid_protocol_reads_organ():
+    row = cas._build_organoid_protocol({"basicInfo": {"organ": "Skin"}})
+    assert row["organ"] == "Skin"
+
+
+def test_build_organoid_protocol_no_organ_data_is_empty_not_crash():
+    row = cas._build_organoid_protocol({"basicInfo": {}})
+    assert row["organ"] == ""
+
+
+def test_organoid_protocols_columns_include_organ_not_organoid_type():
+    cols = cas.COLUMNS["organoid_protocols"]
+    assert "organ" in cols
+    assert "organoidType" not in cols
