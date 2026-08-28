@@ -59,6 +59,27 @@ column ID — not an in-place edit.
      OrganoidProtocol/PatientDerivedModel), `syn77130555`
      (`availability`, from all 9 detail tables).
 
+   **Renamed 2026-08-27** (dropped the misleading `STAGING_` prefix,
+   after a project-wide MV cleanup nearly deleted these as apparent
+   test/staging leftovers): `syn77130552`/`53`/`54`/`55` were named
+   `STAGING_unified_tissue`/`manifestation`/`modeltype`/`availability`
+   despite being permanent production dependencies of FinalMV — the
+   name implied disposable staging work, not a live join target. Now
+   `unified_tissue`/`manifestation`/`modeltype`/`availability`. Pure
+   entity-name metadata change (Synapse resolves `FROM`/`JOIN` by syn
+   ID, not name) — `definingSQL` on every reader is untouched. If you
+   ever add another helper MV to this list, don't give it a
+   `STAGING_`/`TEST_`/`CLAUDE_TEST_`-style name once it's promoted to
+   production — that naming convention is reserved for genuinely
+   throwaway entities (see the deletion note below).
+
+   **Before deleting anything matching `STAGING_`/`TEST_`/`CLAUDE_TEST_`/
+   `_new` in this project, check what actually reads it** — don't trust
+   the name. Fetch `definingSQL` for every MaterializedView in the
+   project and grep for the candidate's syn ID in every other entity's
+   SQL; only delete what has zero readers. This exact check is what
+   caught these four before they were deleted.
+
    **Every one of these pins needs unpinning in step 2b below, not just
    the 3 `Group*` MVs** — missing any of them means some columns keep
    serving stale data indefinitely while everything else looks fixed.
