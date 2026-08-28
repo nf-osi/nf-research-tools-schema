@@ -9,6 +9,10 @@ detail table (Biobank, CellLine, etc.) that the chain reads from — for
 example the field-unification/rename work in
 [#262](https://github.com/nf-osi/nf-research-tools-schema/issues/262).
 
+**For what each MV in this chain actually does and which base tables it
+reads**, see `MATERIALIZED_VIEWS.md` — this doc is how to change them
+safely, that one is what/why.
+
 Read the gotchas below before starting; all five caused real incidents.
 
 ## Gotchas to design around
