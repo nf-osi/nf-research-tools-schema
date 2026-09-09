@@ -34,6 +34,7 @@ _TYPE_SUBDIRS = {
     "computational_tool":      "computational_tools",
     "organoid_protocol": "organoid_protocols",
     "clinical_assessment_tool":"clinical_assessment_tools",
+    "biobank":                 "biobanks",
     "observation":             "observations",
 }
 
@@ -87,6 +88,7 @@ def _detect_tool_type(s: dict) -> str | None:
         ("computational_tool",     ["basicInfo.softwareName", "softwareName", "softwareType"]),
         ("organoid_protocol",["basicInfo.modelType", "modelType", "derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "assessmentName", "assessmentType"]),
+        ("biobank",                ["basicInfo.biobankName", "biobankName", "basicInfo.biobankURL"]),
         ("observation",            ["observationsSection", "resourceType", "observationType"]),
     ]
     for ttype, fields in checks:
@@ -105,6 +107,7 @@ def _resource_name(s: dict, ttype: str) -> str:
         "computational_tool":      ["basicInfo.softwareName", "softwareName"],
         "organoid_protocol": ["basicInfo.modelName", "modelName"],
         "clinical_assessment_tool":["basicInfo.assessmentName", "assessmentName"],
+        "biobank":                 ["basicInfo.biobankName", "biobankName"],
         "observation":             ["observationsSection.observations.0.resourceName", "resourceName"],
     }
     for field in name_fields.get(ttype, []):
