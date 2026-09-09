@@ -34,15 +34,33 @@ _TYPE_SUBDIRS = {
     "computational_tool":      "computational_tools",
     "organoid_protocol": "organoid_protocols",
     "clinical_assessment_tool":"clinical_assessment_tools",
+    "biobank":                 "biobanks",
     "observation":             "observations",
 }
 
-# Fields to strip from the output JSON (private / not stored in registry)
+# Fields to strip from the output JSON (private / not stored in registry).
+# NOTE: developerName/developerAffiliation are NOT here — they are the tool's
+# public developer credit (used for investigator matching, see
+# check_investigator_synapse_ids.py), not the submitter's private contact info.
 _STRIP_KEYS = {"userInfo", "firstandlastName", "email", "institution", "isDeveloper",
-               "developerName", "developerAffiliation"}
+               "contactEmail", "developerContactEmail"}
 
 # Fields to print separately (need manual handling) but not store
 _PRINT_ONLY_KEYS = {"vendor", "catalogNumber", "catalogURL", "additionalDetails", "otherInformation"}
+
+# Observation resourceType enum (SubmitObservationSchema.json) → submissions/ subdir,
+# matching the layout mined observations already use: submissions/{subdir}/observations/
+_RESOURCE_TYPE_TO_SUBDIR = {
+    "animal model":             "animal_models",
+    "antibody":                 "antibodies",
+    "biobank":                  "biobanks",
+    "cell line":                "cell_lines",
+    "clinical assessment tool": "clinical_assessment_tools",
+    "computational tool":       "computational_tools",
+    "genetic reagent":          "genetic_reagents",
+    "organoid protocol":        "organoid_protocols",
+    "patient-derived model":    "patient_derived_models",
+}
 
 
 def _get(d: dict, *keys, default=""):
@@ -70,6 +88,7 @@ def _detect_tool_type(s: dict) -> str | None:
         ("computational_tool",     ["basicInfo.softwareName", "softwareName", "softwareType"]),
         ("organoid_protocol",["basicInfo.modelType", "modelType", "derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "assessmentName", "assessmentType"]),
+        ("biobank",                ["basicInfo.biobankName", "biobankName", "basicInfo.biobankURL"]),
         ("observation",            ["observationsSection", "resourceType", "observationType"]),
     ]
     for ttype, fields in checks:
@@ -88,6 +107,7 @@ def _resource_name(s: dict, ttype: str) -> str:
         "computational_tool":      ["basicInfo.softwareName", "softwareName"],
         "organoid_protocol": ["basicInfo.modelName", "modelName"],
         "clinical_assessment_tool":["basicInfo.assessmentName", "assessmentName"],
+        "biobank":                 ["basicInfo.biobankName", "biobankName"],
         "observation":             ["observationsSection.observations.0.resourceName", "resourceName"],
     }
     for field in name_fields.get(ttype, []):
@@ -99,6 +119,17 @@ def _resource_name(s: dict, ttype: str) -> str:
 
 def _sanitize(name: str) -> str:
     return re.sub(r"[^\w\-]", "_", str(name))[:80].strip("_") or "unnamed"
+
+
+def _observation_entries(s: dict) -> list[dict]:
+    """Return every observation dict in a submission (a form can submit several)."""
+    obs = s.get("observationsSection", {}).get("observations")
+    if isinstance(obs, list) and obs:
+        return [o for o in obs if isinstance(o, dict)]
+    # Flat/mined-style observation (fields directly on s)
+    if s.get("resourceType") or s.get("observationType"):
+        return [s]
+    return []
 
 
 def _strip_private(data: dict) -> dict:
@@ -136,12 +167,28 @@ def process_export(export_path: Path, submissions_dir: Path, dry_run: bool) -> N
     written = []
     skipped = []
 
-    for i, submission in enumerate(submissions, 1):
-        sid = submission.get("id", submission.get("_id", f"sub{i:03d}"))
+    for i, entry in enumerate(submissions, 1):
+        sid = entry.get("id", entry.get("_id", f"sub{i:03d}")) if isinstance(entry, dict) else f"sub{i:03d}"
+
+        if isinstance(entry, dict) and entry.get("spam"):
+            print(f"\nSubmission {i}  (id: {sid})")
+            print("  🚫 Flagged as spam by Formspark — skipping")
+            skipped.append(sid)
+            continue
+
+        # Raw Formspark exports wrap each submission's actual field answers under
+        # "data" (alongside "id"/"formId"/"createdAt"/"spam"); unwrap it here so
+        # field lookups below (basicInfo.*, userInfo, etc.) work directly.
+        if isinstance(entry, dict) and isinstance(entry.get("data"), dict):
+            submission = entry["data"]
+        else:
+            submission = entry
 
         # Print submitter info (never written to file)
         ui = submission.get("userInfo", {})
-        name = ui.get("firstandlastName", "")
+        name = ui.get("firstandlastName") or " ".join(
+            n for n in (ui.get("first_name"), ui.get("last_name")) if n
+        )
         email = ui.get("email", "")
         institution = ui.get("institution", "")
         is_dev = ui.get("isDeveloper", "")
@@ -154,6 +201,39 @@ def process_export(export_path: Path, submissions_dir: Path, dry_run: bool) -> N
         if ttype is None:
             print("  ⚠️  Could not detect tool type — skipping")
             skipped.append(sid)
+            continue
+
+        if ttype == "observation":
+            entries = _observation_entries(submission)
+            if not entries:
+                print("  ⚠️  Observation section had no entries — skipping")
+                skipped.append(sid)
+                continue
+            # Attribution (first/last name) is public-safe per submissions/README.md
+            # ("Formspark observations use first_name/last_name or 'Anonymous'");
+            # email/institution stay out, same as any other submission.
+            first, last = ui.get("first_name", ""), ui.get("last_name", "")
+            for idx, obs in enumerate(entries):
+                obs_name = obs.get("resourceName") or "unnamed"
+                obs_type = (obs.get("resourceType") or "").strip()
+                obs_subdir = _RESOURCE_TYPE_TO_SUBDIR.get(obs_type.lower(), "observations")
+                out_obs = dict(obs)
+                out_obs["first_name"] = first
+                out_obs["last_name"] = last
+                out_obs["_source"] = "formspark"
+                filename = f"form_{_sanitize(sid)}_{idx}_{_sanitize(obs_name)}.json"
+                out_path = submissions_dir / obs_subdir / "observations" / filename
+                print(f"  Tool type: Observation ({obs_type or 'Unknown resource type'})")
+                print(f"  Resource: {obs_name}")
+                if dry_run:
+                    print(f"  [dry-run] Would write {out_path}")
+                else:
+                    out_path.parent.mkdir(parents=True, exist_ok=True)
+                    with open(out_path, "w", encoding="utf-8") as f:
+                        json.dump(out_obs, f, indent=2, ensure_ascii=False)
+                    print(f"  ✅ Written to {out_path.relative_to(submissions_dir.parent)}")
+                written.append({"id": f"{sid}:{idx}", "type": "observation",
+                                 "name": obs_name, "file": str(out_path)})
             continue
 
         resource_name = _resource_name(submission, ttype)
