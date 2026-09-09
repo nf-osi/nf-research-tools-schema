@@ -7,6 +7,15 @@ on:
       - completed
     branches:
       - main
+  schedule:
+    # Weekly fallback (#336): resourceName can change in Synapse without a
+    # submissions/*.json push -- e.g. a rename/curation fix applied directly
+    # to a live table (AnimalModelDetails, CellLineDetails, etc.) via a
+    # one-time script, per scripts/README.md. Those writes never trigger
+    # upsert-tools.yml, so this workflow's only other trigger (workflow_run
+    # above) would never fire and the schema would silently drift -- this
+    # cron catches that drift within a week regardless of what caused it.
+    - cron: '0 9 * * 1'  # every Monday at 9am UTC
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -40,6 +49,18 @@ jobs:
           python scripts/update_observation_schema.py
           echo "exit_code=$?" >> $GITHUB_OUTPUT
         continue-on-error: true
+
+      - name: Fail loudly if the update script errored
+        # continue-on-error above exists so a script failure doesn't skip the
+        # "Check for changes" step below -- but a silent failure here (e.g.
+        # Synapse unreachable) would otherwise be indistinguishable from a
+        # real "schema is already up to date" result, since a failed run
+        # writes no diff either. Surface it explicitly instead of letting
+        # the workflow report success (#336).
+        if: steps.update.outputs.exit_code != '0'
+        run: |
+          echo "::error::update_observation_schema.py exited ${{ steps.update.outputs.exit_code }} -- schema was NOT checked/updated this run, not confirmed up to date."
+          exit 1
 
       - name: Check for changes
         id: check_changes

@@ -128,6 +128,17 @@ invoked before any live change to the tools search MV chain
 
 **Used by**: ad hoc, in place of a one-time data-fix script
 
+**If your rename touches a `resourceName`** (on any of the type-specific
+detail tables — AnimalModelDetails, CellLineDetails, etc.): this kind of
+write doesn't touch `submissions/*.json`, so it won't trigger
+`upsert-tools.yml` and, transitively, won't trigger
+`update-observation-schema.yml` either — the public observation submission
+form's resource picker will keep offering the old name until that
+workflow's weekly cron fallback catches it (#336), up to a week later. Run
+`python scripts/update_observation_schema.py` yourself right after, or
+manually trigger the `update-observation-schema` workflow, to fix it
+immediately instead of waiting.
+
 ---
 
 ## Tool Coverage Scripts

@@ -6,7 +6,7 @@ The automated workflows in this repository run in a coordinated sequence. The mo
 
 - ✅ Human review gates between steps
 - ✅ Annotation review embedded in monthly workflow (no separate weekly run)
-- ✅ Unified `submissions/{type}/` → `submissions/{type}/accepted/` review flow for all tool sources
+- ✅ Unified `submissions/{type}/` review flow for all tool sources — reviewers edit/delete files in place, no `accepted/` subfolder move (dropped 2026-04)
 - ✅ Clear audit trail of changes
 
 ## Workflow Sequence
@@ -18,9 +18,11 @@ graph TD
     B -->|No| D[Create monthly issue<br/>label: tool-submissions]
     C --> D
     D -->|Reviewer closes issue| E[publication-mining]
-    E -->|Creates PR| F[PR Review & Merge<br/>move submissions/{type}/ → submissions/{type}/accepted/]
+    E -->|Creates PR| F[PR Review & Merge<br/>delete rejected files, no accepted/ move]
     F -->|push triggers| G[upsert-tools]
     F -->|merge triggers| H[score-tools]
+    G -->|completes, triggers| J[update-observation-schema]
+    K[weekly cron<br/>Monday 9 AM UTC] -.->|fallback #336 -- catches renames<br/>done outside submissions/| J
     G -->|Uploads to Synapse| H
     H -->|Uploads scores to Synapse| I[Done]
 ```
@@ -42,7 +44,7 @@ graph TD
 **Manual Action Required**:
 - Review the annotation PR: confirm cell line names are real NF-relevant cell lines
 - Check Formspark dashboard for new form submissions; process with `process_formspark_export.py`
-- Move accepted files: `git mv submissions/{type}/*.json submissions/{type}/accepted/`
+- Delete any rejected files from `submissions/{type}/` (no `accepted/` move — everything left at merge time uploads)
 - Close the monthly issue when done (triggers next step)
 
 **Next Step**: Closing the monthly issue → triggers `publication-mining`
@@ -62,16 +64,27 @@ Mines NF Portal and PubMed publications for novel tools:
 - Formats mined tools as JSON in `submissions/{type}/`
 - Extracts observations into `submissions/{type}/observations/`
 
-**Next Step**: Reviewer moves accepted files to `submissions/{type}/accepted/`, then merges PR → triggers `upsert-tools` (via push) and `score-tools` (via PR merge)
+**Next Step**: Reviewer deletes rejected files from `submissions/{type}/` (no `accepted/` move — dropped 2026-04), then merges PR → triggers `upsert-tools` (via push) and `score-tools` (via PR merge)
 
 ---
 
 ### 3. Upsert Tools to Synapse
 **Workflow**: `upsert-tools.yml`
-**Trigger**: Push to main with files in `submissions/*/accepted/`
+**Trigger**: Push to main with files in `submissions/*/*.json` (observation JSONs under `submissions/*/observations/` don't match this trigger path themselves, but are picked up as part of the same compile once triggered)
 **Creates PR**: No (uploads directly to Synapse)
 
-Compiles accepted JSON submissions into `ACCEPTED_*.csv` and generates `submission_publications.csv`, `submission_dev_links.csv`, and `submission_usage_links.csv`. Uploads tools to type-specific Synapse tables, publications to syn26486839 (DOIs stored as full `https://www.doi.org/` URLs), development links to syn26486807, and usage links (non-development publications) to syn26486841. Resolves `publicationId` for observation rows before uploading to syn26486836.
+Compiles accepted JSON submissions into `ACCEPTED_*.csv` and generates `submission_publications.csv`, `submission_dev_links.csv`, and `submission_usage_links.csv`. Uploads tools to type-specific Synapse tables (each tool type's own detail table carries its `resourceId`/`resourceName` directly — the legacy central `syn26450069` Resources table was retired in the Phase 7 LinkML migration, see `docs/MIGRATION.md`), publications to syn26486839 (DOIs stored as full `https://www.doi.org/` URLs), development links to syn26486807, and usage links (non-development publications) to syn26486841. Resolves `publicationId` for observation rows before uploading to syn26486836.
+
+---
+
+### 3a. Update Observation Schema
+**Workflow**: `update-observation-schema.yml`
+**Trigger**: After `upsert-tools.yml` completes on main, OR weekly (Monday 9 AM UTC, added for #336)
+**Creates PR**: Yes, label `schema-update` (only if the enums actually changed)
+
+Fetches current `resourceType`/`resourceName` values from `syn51730943` and updates the conditional enums in `NF-Tools-Schemas/observations/SubmitObservationSchema.json` — this is what populates the resource-picker in the public observation submission form.
+
+**Why it also runs on a weekly schedule, not just after upsert-tools**: a `resourceName` can change directly in a live Synapse table (a rename/curation fix applied via a one-time script per `scripts/README.md`, not a `submissions/*.json` push), which never triggers `upsert-tools.yml` and so would never trigger this workflow either if that were its only path. The weekly cron re-checks Synapse regardless of what caused a change, so a direct-to-Synapse rename can't leave the form silently offering stale/removed names indefinitely.
 
 ---
 
@@ -131,13 +144,14 @@ jobs:
 |----------|-----------------|----------------------|
 | monthly-submission-check | N/A (entry point - scheduled) | `tool-submissions` (issue), `annotation-submissions` (PR if new cells) |
 | publication-mining | `tool-submissions` (issue closed) | `tool-submissions` |
-| upsert-tools | N/A (path trigger: `submissions/*/accepted/`) | N/A (no PR) |
+| upsert-tools | N/A (path trigger: `submissions/*/*.json`) | N/A (no PR) |
+| update-observation-schema | N/A (workflow_run + weekly cron, see #336) | `schema-update` (only if enums changed) |
 | score-tools | `tool-submissions` | N/A (no PR) |
 
 
-### submissions/{type}/ → submissions/{type}/accepted/ Review Flow
+### submissions/{type}/ Review Flow
 
-All tool sources (mining, form submissions, annotation review) produce JSON files in `submissions/{type}/`:
+All tool sources (mining, form submissions, annotation review) produce JSON files directly in `submissions/{type}/` — there is **no `accepted/` subfolder** (that step was dropped 2026-04; reviewers now edit/delete files in place, and whatever remains at merge time uploads):
 
 ```
 submissions/
@@ -145,20 +159,18 @@ submissions/
     annotation_NF90-8.json        ← from annotation review
     form_abc123_NF90-8.json       ← from Formspark export
     pmid12345678_NF90-8.json      ← from publication mining
-    accepted/                     ← reviewer moves files here
-      annotation_NF90-8.json
     observations/                 ← per-tool observations (read-only, from mining)
   animal_models/
-    accepted/
     observations/
   ...
 ```
 
-When `submissions/*/accepted/**/*.json` is pushed to main, `upsert-tools.yml` triggers:
-1. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+When `submissions/*/*.json` is pushed to main, `upsert-tools.yml` triggers:
+1. Compiles `submissions/{type}/*.json` (+ `submissions/{type}/observations/*.json`) → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
 2. Validates CSV schemas (resolves `publicationId` for observations via syn26486839)
 3. Uploads tool data to Synapse type-specific tables
 4. Upserts publications (syn26486839), development links (syn26486807), and usage links (syn26486841)
+5. Completing on main also triggers `update-observation-schema.yml` (see 3a above), which re-syncs the observation form's `resourceName` options
 
 ## Manual Trigger Guide
 
@@ -172,11 +184,11 @@ All workflows support manual triggers via `workflow_dispatch`:
 
 2. **Review annotation PR** (if created)
    - Confirm cell line names are real NF-relevant cell lines
-   - Move valid files to `submissions/cell_lines/accepted/` or delete if not a cell line
+   - Delete the file if it's not a real cell line — otherwise leave it, no move needed
 
 3. **Review Formspark submissions**
    - Export from dashboard → run `process_formspark_export.py`
-   - Move accepted files to `submissions/{type}/accepted/`
+   - Delete any rejected files from `submissions/{type}/`
 
 4. **Close the monthly issue**
    - Triggers `publication-mining` automatically
@@ -186,8 +198,8 @@ All workflows support manual triggers via `workflow_dispatch`:
    - Creates PR with mined tools in `submissions/{type}/`
 
 6. **Review & merge PR**
-   - Move accepted tools from `submissions/{type}/` → `submissions/{type}/accepted/`
-   - Merging triggers `upsert-tools` (path-based) and `score-tools` (label-based)
+   - Delete rejected tools from `submissions/{type}/`; whatever remains at merge time uploads (no `accepted/` move)
+   - Merging triggers `upsert-tools` (path-based) and `score-tools` (label-based); `upsert-tools` completing also triggers `update-observation-schema`
 
 7. Continue through remaining workflows
 
@@ -213,7 +225,8 @@ If a workflow doesn't trigger:
 
 1. **publication-mining**: Check that the issue has `tool-submissions` label and was closed
 2. **score-tools**: Check PR was merged (not just closed) and has `tool-submissions` label
-3. **Check workflow permissions** in Settings
+3. **update-observation-schema looks stale**: it only re-triggers automatically after `upsert-tools.yml` completes or on its Monday cron (#336) — a resourceName change made directly in Synapse (e.g. via a one-time fix script) won't show up in the form until the next Monday unless you also run `python scripts/update_observation_schema.py` (or trigger the workflow manually) right after
+4. **Check workflow permissions** in Settings
 
 4. **Review Actions logs** for errors
 5. **Verify secrets** are configured correctly
@@ -224,7 +237,7 @@ If a workflow doesn't trigger:
 
 1. **Annotation review**: Verify cell line names are real, NF-relevant (not sample IDs or typos)
 2. **Formspark submissions**: Check for new submissions before closing the monthly issue
-3. **Mining PR**: Inspect `submissions/{type}/` JSON files — move valid tools to `submissions/{type}/accepted/`, delete rejects
+3. **Mining PR**: Inspect `submissions/{type}/` JSON files — delete rejects; valid tools need no move, they upload from wherever they sit at merge time
 4. **Look for anomalies** in suggested values
 5. **Read workflow logs** if something looks wrong
 

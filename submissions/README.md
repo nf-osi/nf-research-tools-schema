@@ -22,7 +22,7 @@ Tool types: `animal_models`, `antibodies`, `cell_lines`, `genetic_reagents`,
 
 **Internal manual submissions:** Team members and collaborators can add tools directly by opening a pull request (see below).
 
-**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are exported and processed via `process_formspark_export.py`, which writes JSON files into `submissions/{type}/`. After manual review and moving accepted files to `submissions/{type}/accepted/`, `upsert-tools.yml` uploads them to Synapse.
+**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are exported and processed via `process_formspark_export.py`, which writes JSON files into `submissions/{type}/`. After manual review — delete rejected files, no `accepted/` subfolder move needed — `upsert-tools.yml` uploads whatever remains to Synapse.
 
 ## Internal manual submission instructions
 
