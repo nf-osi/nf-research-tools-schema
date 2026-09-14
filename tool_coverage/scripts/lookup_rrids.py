@@ -15,6 +15,10 @@ Registries used (all public, no API key required by default):
       → IMSR (International Mouse Strain Resource)
           https://www.findmice.org/summary?gfAccessionIds=&strainsOnly=1&q=
         Returns rrid:IMSR_JAX:XXXXX  (Jackson Laboratory strains)
+        Falls back to MMRRC directly (https://api.mmrrc.org, public getCatalog
+        endpoint) when IMSR has no match — needed for KOMP-derived strains
+        deposited at MMRRC that IMSR's index doesn't always pick up.
+        Returns rrid:MMRRC_XXXXXX-CENTER
   antibody
       → SciCrunch Antibody Registry (requires --api-key or SCICRUNCH_API_KEY)
         Returns rrid:AB_XXXXXX
@@ -174,6 +178,73 @@ def _lookup_imsr(name: str) -> str:
     return ''
 
 
+_MMRRC_CATALOG_CACHE: dict[str, dict] | None = None
+_MMRRC_MAX_PAGES = 800  # catalog empties out around page ~650-700 (checked live); safety cap
+                         # in case pagination never terminates. ~65-70k strains total, so the
+                         # first animal_model lookup in a run is slow (one-time full fetch,
+                         # cached for the rest of the run) — acceptable for this periodic script.
+
+
+def _fetch_mmrrc_catalog() -> dict[str, dict]:
+    """Fetch and cache the full MMRRC catalog (public getCatalog endpoint), keyed by
+    lowercased strain_name. Paginates 100 entries at a time until a page comes back
+    empty. Fetched once per script run and reused for every animal_model lookup,
+    since the public API has no by-name search endpoint (only by-page or by-id).
+    """
+    global _MMRRC_CATALOG_CACHE
+    if _MMRRC_CATALOG_CACHE is not None:
+        return _MMRRC_CATALOG_CACHE
+
+    catalog: dict[str, dict] = {}
+    page = 1  # API is 1-indexed; page 0 returns a "too big/small" error
+    while page <= _MMRRC_MAX_PAGES:
+        data = _get(f'https://api.mmrrc.org/api/v1/catalog/getCatalog/{page}', quiet=True)
+        if not isinstance(data, list) or not data:
+            break
+        for entry in data:
+            strain_name = (entry.get('strain_name') or '').strip().lower()
+            if strain_name:
+                catalog[strain_name] = entry
+            published_name = (entry.get('published_name') or '').strip().lower()
+            if published_name:
+                catalog.setdefault(published_name, entry)
+        page += 1
+
+    _MMRRC_CATALOG_CACHE = catalog
+    return catalog
+
+
+def _lookup_mmrrc(name: str) -> str:
+    """Search the cached MMRRC catalog for a mouse strain by name; return
+    rrid:MMRRC_XXXXXX-<center> (e.g. rrid:MMRRC_000001-UNC) or ''.
+
+    MMRRC's public REST API (https://api.mmrrc.org/files/MMRRC_API.pdf) only
+    supports by-page (getCatalog) or by-id (getCatalogEntry/getStrain) lookups,
+    not by-name search, so the full catalog is cached in memory (see
+    _fetch_mmrrc_catalog) and matched against here. Each catalog entry already
+    carries its own "rrid" field (e.g. "RRID:MMRRC_000001-UNC"), so it's used
+    directly rather than reconstructed from mmrrc_id/center_id.
+    """
+    catalog = _fetch_mmrrc_catalog()
+    if not catalog:
+        return ''
+
+    norm = name.lower().strip()
+    if norm in catalog:
+        entry = catalog[norm]
+    else:
+        entry = None
+        for strain_name, candidate in catalog.items():
+            if _fuzzy_match(norm, strain_name):
+                entry = candidate
+                break
+    if not entry:
+        return ''
+
+    rrid = (entry.get('rrid') or '').strip()
+    return rrid.lower() if rrid else ''
+
+
 def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
     """Search SciCrunch Antibody Registry; return rrid:AB_XXXXXX or ''."""
     params = {
@@ -251,7 +322,11 @@ def _lookup_rrid(name: str, tool_type: str, context: str, api_key: str,
         return _lookup_addgene(name)
 
     if tool_type == 'animal_model':
-        return _lookup_imsr(name)
+        # IMSR aggregates across repositories (JAX, MMRRC, EMMA, ...) but its index
+        # of MMRRC-held strains isn't always complete/matched (see nf-osi/nf-research-
+        # tools-schema#169 — KOMP-derived mice sent to MMRRC weren't found via IMSR).
+        # Query MMRRC directly as a fallback when IMSR comes up empty.
+        return _lookup_imsr(name) or _lookup_mmrrc(name)
 
     if tool_type == 'antibody' and api_key:
         return _lookup_scicrunch_antibody(name, api_key)
