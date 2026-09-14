@@ -1,0 +1,58 @@
+name: Validate Tool Submissions
+
+# Runs general correctness checks (tool_coverage/scripts/validate_submissions.py)
+# against submissions/*/*.json changed in a PR — schema conformance, duplicate
+# name/synonym detection, conditionally-expected fields (e.g. a vendor URL when
+# itemAcquisition is "Purchase from Vendor"), URL syntax, and publication
+# presence. See #182 for why this didn't exist before: upsert-tools.yml only
+# validates on push to main (after merge), not before.
+#
+# Only fails on files this PR actually touches — the pre-existing backlog of
+# violations elsewhere in submissions/ (tracked in #182) is reported but
+# doesn't block unrelated PRs.
+
+on:
+  pull_request:
+    paths:
+      - 'submissions/*/*.json'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'tool-submissions')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r tool_coverage/requirements.txt
+
+      - name: Identify changed submission files
+        id: changed_files
+        run: |
+          git diff --name-only --diff-filter=AM \
+            "origin/${{ github.event.pull_request.base.ref }}" "${{ github.event.pull_request.head.sha }}" \
+            -- 'submissions/*/*.json' > changed_files.txt || true
+          echo "Changed submission files:"
+          cat changed_files.txt
+
+      - name: Validate changed submissions
+        run: |
+          if [ ! -s changed_files.txt ]; then
+            echo "No submissions/*/*.json files changed — nothing to validate."
+            exit 0
+          fi
+          python tool_coverage/scripts/validate_submissions.py --check-urls \
+            --only-files $(cat changed_files.txt)
