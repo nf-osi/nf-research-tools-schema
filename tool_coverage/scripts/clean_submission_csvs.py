@@ -45,6 +45,23 @@ def _find_resourcename_duplicates(df_clean: pd.DataFrame, existing_names) -> pd.
 # Primary-key column for each detail table — used to skip rows already in Synapse.
 # All 9 tool-type detail tables now key off the unified `resourceId` -- the
 # LinkML migration dropped every type-specific `<type>Id` column in favor of it.
+VENDOR_TABLE = "syn26486850"
+
+
+def normalize_vendor_name(name) -> str:
+    """Vendor match key: case/punctuation-insensitive, ignoring a leading
+    "The" ("Jackson Laboratory" == "The Jackson Laboratory").
+
+    Vendor rows created before the UUID5 scheme have unrelated vendorIds, so
+    vendorId alone can't tell a known vendor from a new one.
+    """
+    if not isinstance(name, str):
+        return ""
+    key = re.sub(r"[^a-z0-9 ]+", " ", name.lower())
+    key = re.sub(r"\s+", " ", key).strip()
+    return re.sub(r"^the ", "", key)
+
+
 _DETAIL_TABLE_PK = {
     "syn26486808": "resourceId",  # AnimalModelDetails (was animalModelId)
     "syn26486811": "resourceId",  # AntibodyDetails (was antibodyId)
@@ -461,6 +478,18 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                                 df_clean = df_clean[~suspect_mask].copy()
                         except Exception as e:
                             print(f"      ⚠️  Could not run resourceName duplicate safety-check for {table_id}: {e} — continuing")
+
+                    # Same idea for vendors, matched on vendorName (see normalize_vendor_name).
+                    if table_id == VENDOR_TABLE and "vendorName" in df_clean.columns and not df_clean.empty:
+                        existing_vendor_names = syn.tableQuery(
+                            f"SELECT vendorName FROM {VENDOR_TABLE}"
+                        ).asDataFrame()["vendorName"]
+                        known = {normalize_vendor_name(n) for n in existing_vendor_names}
+                        known_mask = df_clean["vendorName"].apply(normalize_vendor_name).isin(known)
+                        if known_mask.any():
+                            print(f"      ℹ️  Skipped {int(known_mask.sum())} vendor(s) already in {VENDOR_TABLE} by name: "
+                                  f"{list(df_clean.loc[known_mask, 'vendorName'])}")
+                            df_clean = df_clean[~known_mask].copy()
 
                     if df_clean.empty:
                         print(f"      ✅ No new rows to upload to {table_id} (all were duplicates)")

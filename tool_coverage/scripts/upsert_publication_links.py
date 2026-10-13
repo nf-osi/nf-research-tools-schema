@@ -32,6 +32,9 @@ import pandas as pd
 import synapseclient
 from synapseclient import Table
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from clean_submission_csvs import VENDOR_TABLE, normalize_vendor_name  # noqa: E402
+
 PUB_TABLE          = "syn26486839"
 DEV_TABLE          = "syn26486807"
 USAGE_TABLE        = "syn26486841"
@@ -615,6 +618,12 @@ def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool)
     existing_vi = syn.tableQuery(
         f"SELECT vendorItemId FROM {VENDOR_ITEM_TABLE}"
     ).asDataFrame()
+    # Point items at the existing Vendor row when the vendor is already known
+    # by name; older Vendor rows don't use the compiled UUID5 vendorId.
+    vendors = syn.tableQuery(f"SELECT vendorId, vendorName FROM {VENDOR_TABLE}").asDataFrame()
+    vendor_id_by_name: dict = {}
+    for vid, vname in zip(vendors["vendorId"], vendors["vendorName"]):
+        vendor_id_by_name.setdefault(normalize_vendor_name(vname), vid)
     existing_ids = (
         set(existing_vi["vendorItemId"].dropna())
         if len(existing_vi) > 0 else set()
@@ -642,9 +651,12 @@ def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool)
             skipped_no_res.append(resource_name)
             continue
 
+        vendor_id = vendor_id_by_name.get(
+            normalize_vendor_name(row.get("_vendorName")), row.get("vendorId", "")
+        )
         rows_to_add.append({
             "vendorItemId":    vi_id,
-            "vendorId":        row.get("vendorId", ""),
+            "vendorId":        vendor_id,
             "resourceId":      resource_id,
             "catalogNumber":   row.get("catalogNumber", ""),
             "catalogNumberURL": row.get("catalogNumberURL", ""),
