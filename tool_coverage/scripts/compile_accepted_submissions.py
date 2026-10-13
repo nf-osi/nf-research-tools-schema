@@ -139,6 +139,7 @@ COLUMNS = {
         "programmingLanguage", "sourceRepository", "documentation", "licenseType",
         "licenseDetails", "containerized", "dependencies", "systemRequirements",
         "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "rrid",
+        "geneticDisorder", "manifestation",
         "developerName", "developerAffiliation", "itemAcquisition",
         "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -164,6 +165,7 @@ COLUMNS = {
         "validatedLanguages", "psychometricProperties", "administrationTime",
         "availabilityStatus", "licensingRequirements", "digitalVersion",
         "cognitiveAndBehavioralDomains", "regulatoryAcceptanceHistory", "toolURL",
+        "geneticDisorder", "manifestation",
         "developerName", "developerAffiliation", "developerContactEmail",
         "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -412,6 +414,29 @@ def _resolve_funder_id(agency: str) -> str:
     return ""
 
 
+# Pre-#262 patient-derived-model submissions use `modelSystemType` instead of
+# `modelType`. Those resources were uploaded with the legacy name suffix
+# (e.g. "JH-2-002 (PDX)", "NF0001 (Patient-Derived Organoid)"), so the suffix
+# must be reproduced exactly or link resolution falls back to IDs that don't
+# exist in Synapse (nf-research-tools-schema#349).
+_LEGACY_MST_SUFFIX = {"PDX (Patient-Derived Xenograft)": "PDX"}
+_LEGACY_MST_TO_MODEL_TYPE = {
+    "PDX (Patient-Derived Xenograft)": "Xenograft",
+    "Patient-Derived Organoid": "Organoid",
+}
+
+
+def _pdm_model_type_and_suffix(bi: dict) -> tuple[str, str]:
+    """Return (modelType column value, resource-name suffix) for a PDM."""
+    model_type = _get(bi, "modelType")
+    if model_type:
+        return model_type, model_type
+    mst = _get(bi, "modelSystemType")
+    if mst:
+        return _LEGACY_MST_TO_MODEL_TYPE.get(mst, "Other"), _LEGACY_MST_SUFFIX.get(mst, mst)
+    return "", ""
+
+
 def _resource_name_from_data(data: dict, ttype: str) -> str:
     """Extract the canonical resource name for any tool type."""
     bi = data.get("basicInfo", {})
@@ -425,8 +450,8 @@ def _resource_name_from_data(data: dict, ttype: str) -> str:
         return _get(data, "insertName")
     if ttype == "patient_derived_model":
         base = _get(bi, "resourceName") or _get(data, "_resourceName")
-        model_type = _get(bi, "modelType")
-        return f"{base} ({model_type})" if model_type else base
+        _, name_suffix = _pdm_model_type_and_suffix(bi)
+        return f"{base} ({name_suffix})" if name_suffix else base
     if ttype == "organoid_protocol":
         return _get(bi, "resourceName") or _get(data, "_resourceName")
     if ttype == "computational_tool":
@@ -737,10 +762,10 @@ def _build_genetic_reagent(d: dict) -> dict:
 def _build_patient_derived_model(d: dict) -> dict:
     bi = d.get("basicInfo", d)
     resource_name = _get(bi, "resourceName") or _get(d, "_resourceName")
-    model_type = _get(bi, "modelType")
+    model_type, name_suffix = _pdm_model_type_and_suffix(bi)
     # PDX and 3D culture variants of the same base name are distinct resources;
-    # append the modelType so every downstream key (dedup, ID, lookup) is unique.
-    unique_name = f"{resource_name} ({model_type})" if model_type else resource_name
+    # append the model type so every downstream key (dedup, ID, lookup) is unique.
+    unique_name = f"{resource_name} ({name_suffix})" if name_suffix else resource_name
     species = _get(bi, "species")
     return {
         "resourceId": "",
@@ -754,7 +779,8 @@ def _build_patient_derived_model(d: dict) -> dict:
         # the form itself is still single-select, so wrap in a one-item list.
         # No casing translation needed -- the form already submits Title
         # Case, matching ManifestationEnum.
-        "manifestation": _fmt_list([v for v in [_get(bi, "manifestation")] if v]),
+        # Pre-#262 submissions carry this as tumorType (same value set).
+        "manifestation": _fmt_list([v for v in [_get(bi, "manifestation") or _get(bi, "tumorType")] if v]),
         "engraftmentSite": _get(bi, "engraftmentSite"),
         "passageNumber": _get(bi, "passageNumber"),
         "establishmentRate": _get(bi, "establishmentRate"),
@@ -813,6 +839,8 @@ def _build_computational_tool(d: dict) -> dict:
         "analyticalPlatformSupport": _fmt_list(_get(bi, "analyticalPlatformSupport")),
         "downloadURL": _get(d, "downloadURL"),
         "rrid": _get(bi, "rrid"),
+        "geneticDisorder": _map_genetic_disorder(_get(bi, "nfGeneticDisorder")),
+        "manifestation": _fmt_list(_get(bi, "manifestation")),
         "developerName": _get(bi, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation"),
         "itemAcquisition": _get(d, "itemAcquisition"),
@@ -892,6 +920,8 @@ def _build_clinical_assessment_tool(d: dict) -> dict:
         "cognitiveAndBehavioralDomains": _fmt_list(_get(bi, "cognitiveAndBehavioralDomains")),
         "regulatoryAcceptanceHistory": _get(bi, "regulatoryAcceptanceHistory"),
         "toolURL": _get(d, "toolURL"),
+        "geneticDisorder": _map_genetic_disorder(_get(bi, "nfGeneticDisorder")),
+        "manifestation": _fmt_list(_get(bi, "manifestation")),
         "developerName": _get(bi, "developerName") or _get(d, "developerName"),
         "developerAffiliation": _get(bi, "developerAffiliation") or _get(d, "developerAffiliation"),
         "developerContactEmail": _get(d, "developerContactEmail"),
@@ -1522,8 +1552,8 @@ def _generate_resources_csv(
 
     Two passes:
     1. Type-specific ACCEPTED_*.csv files (resources compiled this run).
-    2. All raw submission JSON files (same scope as _collect_pub_and_dev_rows),
-       so that dev-link targets for previously-submitted resources that are not
+    2. The raw submission JSON files compiled this run (same scope as
+       _collect_pub_and_dev_rows), so that dev-link targets that are not
        yet in Synapse are also resolvable.
 
     One row per unique resource (by resourceId).  Existing rows are preserved;
@@ -1624,8 +1654,8 @@ def _generate_resources_csv(
                 existing_ids.add(resource_id)
                 existing_name_types.add(name_type_key)
 
-    # Pass 2: raw JSON files — catches resources from submissions not compiled
-    # this run (e.g. --files-list mode) that still appear in dev links.
+    # Pass 2: raw JSON files — catches resources whose type-specific row was
+    # skipped as a duplicate this run but that still appear in dev links.
     for json_path in (json_files or []):
         try:
             with open(json_path, encoding="utf-8") as f:
@@ -1792,13 +1822,12 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
             print(f"Skipped {len(skipped)} file(s): {skipped}")
 
     # --- Publications & development links ---
-    # Always scan the full submissions dir so these CSVs stay complete even
-    # when compile is called with --files-list (a changed-file subset).
-    all_sub_files = sorted(
-        p for p in ACCEPTED_DIR_DEFAULT.glob("*/*.json")
-        if "observations" not in p.parts
-    ) + sorted(ACCEPTED_DIR_DEFAULT.glob("*/observations/*.json"))
-    scan_files = all_sub_files if all_sub_files else json_files
+    # Scoped to the files being compiled: with --files-list (the push trigger
+    # in upsert-tools.yml) that is just the changed submissions; with
+    # --accepted-dir (workflow_dispatch force=true) it is every submission.
+    # Scanning everything on every push re-sent links for unchanged tools and
+    # wrote orphan links when their names no longer resolved (#349).
+    scan_files = json_files
     pub_rows, dev_rows, usage_rows = _collect_pub_and_dev_rows(scan_files)
 
     pub_cols = [

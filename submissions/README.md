@@ -2,6 +2,8 @@
 
 This folder holds pending tool records awaiting review before upload to the [NF Research Tools registry](https://nf.synapse.org/Explore/Tools) on the NF Data Portal.
 
+It is a **workspace, not an archive**. Once a tool is uploaded, Synapse is the source of truth (curators often edit records there directly), and `upsert-tools.yml` opens a cleanup PR that deletes the uploaded JSON files. The files stay in git history. **To change a tool that's already uploaded, edit it in Synapse** (see `scripts/rename_synapse_values.py`); don't re-add its JSON here.
+
 ## Folder structure
 
 ```
@@ -22,13 +24,13 @@ Tool types: `animal_models`, `antibodies`, `cell_lines`, `genetic_reagents`,
 
 **Internal manual submissions:** Team members and collaborators can add tools directly by opening a pull request (see below).
 
-**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are exported and processed via `process_formspark_export.py`, which writes JSON files into `submissions/{type}/`. After manual review and moving accepted files to `submissions/{type}/accepted/`, `upsert-tools.yml` uploads them to Synapse.
+**External submissions:** External contributors use the [Formspark submission forms](https://nf.synapse.org/Explore/Tools) on the NF Portal. Those are exported and processed via `process_formspark_export.py`, which writes JSON files into `submissions/{type}/`. After manual review — delete rejected files, no `accepted/` subfolder move needed — `upsert-tools.yml` uploads whatever remains to Synapse.
 
 ## Internal manual submission instructions
 
 ### 1. Create a JSON file for the tool
 
-Copy an existing JSON from the appropriate `submissions/{type}/` directory as a template, or use the corresponding schema in `NF-Tools-Schemas/{type}/submit*.json` to understand required fields.
+Use the corresponding schema in `NF-Tools-Schemas/{type}/submit*.json` to understand required fields. Uploaded JSONs are deleted from this folder, so for an example file, copy one from git history or from a pending submission PR.
 
 Minimal required fields vary by type — see the schema for `"required"` annotations. At minimum include:
 - `resourceName` — canonical tool name
@@ -42,7 +44,7 @@ Minimal required fields vary by type — see the schema for `"required"` annotat
 - Open a PR with title format: `Add [tool name] to [type]` (e.g., `Add NF1-/- MEF cell line to cell_lines`)
 - Apply the **`tool-submissions`** label to the PR
 
-On merge, `upsert-tools.yml` automatically compiles the JSON files into the Synapse upload CSVs and uploads them to the registry.
+On merge, `upsert-tools.yml` automatically compiles the JSON files into the Synapse upload CSVs and uploads them to the registry. If the upload has no failures, it then opens a **cleanup PR** (label `submission-cleanup`) that deletes each file whose tool is now found in the Synapse resource registry. Files it can't confirm are kept and listed in that PR. Merging the cleanup PR uploads nothing.
 
 ### 3. Review process
 
