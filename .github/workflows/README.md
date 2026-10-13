@@ -193,7 +193,7 @@ These workflows support the main sequence but run independently:
 
 **Trigger**:
 - When `submissions/*/*.json` files are pushed to main (i.e. when a tool-submissions PR is merged) — `submissions/*/observations/*.json` is excluded from this trigger
-- Manual: workflow_dispatch with optional dry-run
+- Manual: workflow_dispatch with optional dry-run (processes files changed since the last successful push run on main; there is no "process everything" mode)
 
 **What it does**:
 1. Diffs changed files — only processes JSON files that changed in the push (diff-based compile)
@@ -214,13 +214,14 @@ These workflows support the main sequence but run independently:
    - syn26486841 (usage links — non-development publications)
    - syn26486836 (observations)
 6. Regenerates coverage report
+7. **Cleanup PR**: only for push runs with zero upload failures. `cleanup_upserted_submissions.py` deletes each changed JSON whose resource (name + type) is now in syn51730943, retrying while that materialized view catches up, and `peter-evans/create-pull-request` opens a `submission-cleanup` PR with the deletions. Files it can't confirm are kept and listed in the PR body. Synapse is the source of truth once a tool is uploaded, so keeping the JSON would only let it drift (#349). Merging the cleanup PR re-triggers this workflow, but deletions aren't compiled, so nothing is uploaded.
 
 **Review flow** (no `accepted/` subfolder — dropped 2026-04, see `submissions/README.md`):
 - Mined tools are written as JSON directly to `submissions/{type}/`
 - Reviewer edits/deletes files in place in the PR; whatever remains in `submissions/{type}/` at merge time is what gets uploaded — no file move needed
 - Merging the PR pushes the surviving `submissions/*/*.json` files to main → triggers this workflow
 
-**No PR Created**: Uploads directly, creates summary in Actions
+**PRs**: Uploads directly (no PR for the upload itself), creates a summary in Actions, then opens the cleanup PR described in step 7.
 
 ---
 
