@@ -127,7 +127,7 @@ COLUMNS = {
     ],
     "vendorItem": [
         "vendorItemId", "vendorId", "catalogNumber", "catalogNumberURL",
-        "_resourceName",
+        "_resourceName", "_vendorName",
     ],
     "donor": [
         "donorId", "parentDonorId", "transplantationDonorId",
@@ -1304,6 +1304,9 @@ def _generate_vendor_and_donor_csvs(csv_dir: Path, dry_run: bool) -> None:
                         "catalogNumber": catalog_num,
                         "catalogNumberURL": catalog_url,
                         "_resourceName": resource_name,
+                        # Lets upsert_publication_links point the item at an
+                        # existing Vendor row whose vendorId predates the UUID5 scheme.
+                        "_vendorName": vendor_name,
                     })
 
     # ── DONOR (from cell lines + PDMs + animal models) ───────────────────────
