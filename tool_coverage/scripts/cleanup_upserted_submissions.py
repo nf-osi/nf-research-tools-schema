@@ -55,6 +55,16 @@ def resource_key(data: dict) -> tuple[str, str] | None:
     return _norm(name), cas._TTYPE_ID_INFO[ttype][0]
 
 
+def _is_pdm_observation_of_live(data: dict, key: tuple[str, str], live_keys: set) -> bool:
+    """Patient-derived-model observations name the model without the
+    model-type suffix the compile step adds ("NF0001" for
+    "NF0001 (Patient-Derived Organoid)"), so match on that prefix."""
+    name, rtype = key
+    if rtype != "Patient-Derived Model" or cas._tool_type_from_json(data) != "observation":
+        return False
+    return any(t == rtype and n.startswith(f"{name} (") for n, t in live_keys)
+
+
 def plan_cleanup(paths: list[Path], live_keys: set) -> tuple[list[Path], list[tuple[Path, str]]]:
     """Split paths into (delete, keep-with-reason)."""
     delete, keep = [], []
@@ -70,7 +80,7 @@ def plan_cleanup(paths: list[Path], live_keys: set) -> tuple[list[Path], list[tu
         key = resource_key(data)
         if key is None or not key[0]:
             keep.append((path, "could not determine resource name/type"))
-        elif key in live_keys:
+        elif key in live_keys or _is_pdm_observation_of_live(data, key, live_keys):
             delete.append(path)
         else:
             keep.append((path, f"not found in {RES_TABLE} as {key[1]} '{key[0]}'"))

@@ -61,3 +61,23 @@ def test_plan_cleanup_deletes_only_live_resources(tmp_path):
 
     assert delete == [live]
     assert [p for p, _ in keep] == [missing, wrong_type, nameless, gone]
+
+
+def test_pdm_observation_matches_suffixed_model(tmp_path):
+    obs = _write(tmp_path / "patient_derived_models" / "observations" / "NF0001_1.json",
+                 {"resourceName": "NF0001", "resourceType": "Patient-Derived Model",
+                  "observationType": "Growth"})
+    other = _write(tmp_path / "patient_derived_models" / "observations" / "NF0099_1.json",
+                   {"resourceName": "NF0099", "resourceType": "Patient-Derived Model",
+                    "observationType": "Growth"})
+    # Only observations get the prefix match, not tool files themselves.
+    tool = _write(tmp_path / "patient_derived_models" / "NF0001.json",
+                  {"toolType": "patient_derived_model", "basicInfo": {"resourceName": "NF0001"}})
+
+    delete, keep = cleanup.plan_cleanup(
+        [obs, other, tool],
+        live_keys={("nf0001 (patient-derived organoid)", "Patient-Derived Model")},
+    )
+
+    assert delete == [obs]
+    assert [p for p, _ in keep] == [other, tool]
