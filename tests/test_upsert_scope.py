@@ -19,7 +19,9 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PDM_DIR = REPO_ROOT / "submissions" / "patient_derived_models"
+# Real pre-#262 patient-derived-model submissions, kept as fixtures because
+# uploaded submission JSONs are deleted from submissions/ (#352).
+PDM_DIR = REPO_ROOT / "tests" / "fixtures" / "legacy_pdm"
 
 
 def _load_module(name: str):
