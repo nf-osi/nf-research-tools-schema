@@ -121,8 +121,11 @@ def _build_res_map(syn, csv_dir: str | None = None) -> dict:
     ).asDataFrame()
     res_map: dict = {}
     for _, row in res_df.iterrows():
-        rname = (row.get("resourceName") or "").strip()
-        rtype = row.get("resourceType", "")
+        # Blank cells come back as NaN (e.g. a row uploaded without a name).
+        rname = _str(row.get("resourceName")).strip()
+        rtype = _str(row.get("resourceType")).strip()
+        if not rname:
+            continue
         res_map[(rname.lower(), rtype)] = row["resourceId"]
 
     # Supplement with locally compiled resources (not yet in Synapse)
@@ -132,9 +135,9 @@ def _build_res_map(syn, csv_dir: str | None = None) -> dict:
             local_df = pd.read_csv(local_csv)
             added = 0
             for _, row in local_df.iterrows():
-                rname = (row.get("resourceName") or "").strip()
-                rtype = row.get("resourceType", "")
-                rid = (row.get("resourceId") or "").strip()
+                rname = _str(row.get("resourceName")).strip()
+                rtype = _str(row.get("resourceType")).strip()
+                rid = _str(row.get("resourceId")).strip()
                 if rname and rtype and rid:
                     key = (rname.lower(), rtype)
                     if key not in res_map:

@@ -61,3 +61,18 @@ def test_pdm_name_keeps_model_type_suffix():
     assert row["resourceName"] == "JH-2-002 (PDX)"
     assert row["resourceType"] == "Patient-Derived Model"
     assert json.loads(row["synonyms"]) == ["a", "b"]
+
+
+def test_res_map_tolerates_blank_registry_names(monkeypatch):
+    import pandas as pd
+    spec2 = importlib.util.spec_from_file_location("upsert_publication_links", SCRIPTS / "upsert_publication_links.py")
+    upl = importlib.util.module_from_spec(spec2)
+    spec2.loader.exec_module(upl)
+    frame = pd.DataFrame({"resourceId": ["a", "b"], "resourceName": ["MCF-7", float("nan")],
+                          "resourceType": ["Cell Line", float("nan")]})
+
+    class _Syn:
+        def tableQuery(self, q):
+            return type("R", (), {"asDataFrame": lambda _s: frame})()
+
+    assert upl._build_res_map(_Syn()) == {("mcf-7", "Cell Line"): "a"}
