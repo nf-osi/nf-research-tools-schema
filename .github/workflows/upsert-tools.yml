@@ -13,14 +13,10 @@ on:
         required: false
         type: boolean
         default: false
-      force:
-        description: 'Process all submission JSON files, ignoring last-run state'
-        required: false
-        type: boolean
-        default: false
 
 permissions:
-  contents: read
+  contents: write       # cleanup PR branch (deletes upserted submission JSONs)
+  pull-requests: write  # cleanup PR
   actions: read
   issues: write
 
@@ -65,16 +61,16 @@ jobs:
             echo "use_all=false" >> $GITHUB_OUTPUT
           }
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force }}" = "true" ]; then
-            echo "workflow_dispatch (force=true) — processing all submission JSON files"
-            echo "use_all=true" >> $GITHUB_OUTPUT
-
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "workflow_dispatch — checking for changes since last successful run"
+          # No "force / process everything" mode: uploaded submissions are
+          # deleted from main by the cleanup PR below, so Synapse -- not
+          # submissions/ -- is the record for anything already uploaded.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — checking for changes since last successful push run on main"
+            # Only push runs on main: dispatch runs on other branches (e.g. dry
+            # runs) have head SHAs that aren't on main's history.
             LAST_SHA=$(gh api \
-              "repos/${{ github.repository }}/actions/workflows/upsert-tools.yml/runs?status=success&per_page=5" \
-              --jq --arg cur "${{ github.sha }}" \
-              '[.workflow_runs[] | select(.head_sha != $cur)] | .[0].head_sha // empty' \
+              "repos/${{ github.repository }}/actions/workflows/upsert-tools.yml/runs?status=success&event=push&branch=main&per_page=5" \
+              --jq '[.workflow_runs[] | select(.head_sha != "${{ github.sha }}")] | .[0].head_sha // empty' \
               2>/dev/null || echo "")
             if [ -z "$LAST_SHA" ] || [ "$LAST_SHA" = "null" ]; then
               echo "No previous successful run found — processing all files"
@@ -231,6 +227,7 @@ jobs:
           echo "⚠️  Run workflow without dry_run option to actually upload"
 
       - name: Report upload failures
+        id: report_failures
         if: always() && steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -278,7 +275,52 @@ jobs:
             echo "❌ GitHub issue created for upload failures"
           else
             echo "✅ No upload failures detected"
+            echo "clean=true" >> $GITHUB_OUTPUT
           fi
+
+      # ── Remove uploaded submission JSONs (via a cleanup PR) ──────────────
+      # Once uploaded, Synapse is the source of truth (curators edit it
+      # directly), so keeping the JSON on main only lets it drift (#349).
+      # Only after a push-triggered run with zero upload failures, and only
+      # files whose resource is now found in syn51730943; anything else is
+      # kept and listed in the PR. main requires review, so this opens a PR
+      # rather than pushing. Merging it uploads nothing: deletions aren't
+      # compiled (--diff-filter=AM above).
+      - name: Remove uploaded submission files
+        id: cleanup
+        if: >-
+          github.event_name == 'push' &&
+          steps.check_files.outputs.has_files == 'true' &&
+          steps.changed_files.outputs.use_all != 'true' &&
+          steps.upload_clean.outcome == 'success' &&
+          steps.upload_pub_links.outcome == 'success' &&
+          steps.report_failures.outputs.clean == 'true'
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python tool_coverage/scripts/cleanup_upserted_submissions.py \
+            --files-list changed_json_files.txt \
+            --report cleanup_report.md
+
+      - name: Open cleanup PR
+        if: steps.cleanup.outputs.deleted_count != '' && steps.cleanup.outputs.deleted_count != '0'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            Remove ${{ steps.cleanup.outputs.deleted_count }} submission JSON(s) uploaded to Synapse
+
+            Uploaded by upsert-tools run ${{ github.run_id }}; Synapse is now the
+            source of truth for these tools.
+          branch: cleanup/upserted-submissions-${{ github.run_id }}
+          delete-branch: true
+          title: 'Remove ${{ steps.cleanup.outputs.deleted_count }} uploaded submission JSON(s) (run ${{ github.run_id }})'
+          body-path: cleanup_report.md
+          assignees: BelindaBGarana
+          labels: |
+            submission-cleanup
+          add-paths: |
+            submissions/
 
       - name: Regenerate coverage report
         if: steps.check_files.outputs.has_files == 'true' && github.event.inputs.dry_run != 'true'
