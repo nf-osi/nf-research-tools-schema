@@ -80,9 +80,7 @@ def test_vendor_items_use_existing_vendor_id(tmp_path, monkeypatch):
     })
 
     added = []
-    monkeypatch.setattr(upl, "Table", lambda table_id, df: added.append(df))
-    monkeypatch.setattr(upl, "_snapshot", lambda *a, **k: None)
-    syn.store = lambda table: None
+    monkeypatch.setattr(upl, "store_with_snapshots", lambda syn, table_id, df: added.append(df))
 
     upl.upsert_vendor_items(syn, str(csv_path), {("nrg", "Animal Model"): "res-nrg"}, dry_run=False)
 

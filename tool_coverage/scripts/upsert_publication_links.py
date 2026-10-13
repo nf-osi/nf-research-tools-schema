@@ -33,7 +33,9 @@ import synapseclient
 from synapseclient import Table
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from clean_submission_csvs import VENDOR_TABLE, normalize_vendor_name  # noqa: E402
+from clean_submission_csvs import (  # noqa: E402
+    VENDOR_TABLE, normalize_vendor_name, store_with_snapshots,
+)
 
 PUB_TABLE          = "syn26486839"
 DEV_TABLE          = "syn26486807"
@@ -62,13 +64,6 @@ def _run_url_comment() -> str:
     run_id = os.getenv("GITHUB_RUN_ID", "")
     return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
 
-
-def _snapshot(syn, table_id: str) -> None:
-    """Create a snapshot version, ignoring errors on materialized views."""
-    try:
-        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
-    except Exception as e:
-        print(f"  ⚠️  Snapshot skipped for {table_id}: {e}")
 
 # Shared UUID namespace — must match compile_accepted_submissions.py
 _PROJECT_NAMESPACE = uuid.uuid5(
@@ -183,8 +178,7 @@ def upsert_publications(syn, pubs_csv: str, dry_run: bool) -> int:
         return len(new_pubs)
 
     if len(new_pubs) > 0:
-        syn.store(Table(PUB_TABLE, new_pubs))
-        _snapshot(syn, PUB_TABLE)
+        store_with_snapshots(syn, PUB_TABLE, new_pubs)
         print(f"  ✅ Added {len(new_pubs)} publications to {PUB_TABLE}")
     else:
         print("  ✅ No new publications to add")
@@ -326,12 +320,11 @@ def upsert_development_links(syn, dev_csv: str, res_map: dict, dry_run: bool) ->
         return len(rows_to_add)
 
     if pub_id_patches:
-        syn.store(Table(DEV_TABLE, pd.DataFrame(pub_id_patches)))
+        store_with_snapshots(syn, DEV_TABLE, pd.DataFrame(pub_id_patches))
         print(f"  ✅ Patched publicationId for {len(pub_id_patches)} original-import row(s)")
 
     if rows_to_add:
-        syn.store(Table(DEV_TABLE, pd.DataFrame(rows_to_add)))
-        _snapshot(syn, DEV_TABLE)
+        store_with_snapshots(syn, DEV_TABLE, pd.DataFrame(rows_to_add))
         print(f"  ✅ Added {len(rows_to_add)} development links to {DEV_TABLE}")
     else:
         print("  ✅ No new development links to add")
@@ -427,8 +420,7 @@ def upsert_usage_links(syn, usage_csv: str, res_map: dict, dry_run: bool) -> int
         return len(rows_to_add)
 
     if rows_to_add:
-        syn.store(Table(USAGE_TABLE, pd.DataFrame(rows_to_add)))
-        _snapshot(syn, USAGE_TABLE)
+        store_with_snapshots(syn, USAGE_TABLE, pd.DataFrame(rows_to_add))
         print(f"  ✅ Added {len(rows_to_add)} usage links to {USAGE_TABLE}")
     else:
         print("  ✅ No new usage links to add")
@@ -552,8 +544,7 @@ def upsert_investigators(syn, csv_dir: str, res_map: dict, dry_run: bool) -> int
         return len(new_rows)
 
     if new_rows:
-        syn.store(Table(INVESTIGATOR_TABLE, pd.DataFrame(new_rows)))
-        _snapshot(syn, INVESTIGATOR_TABLE)
+        store_with_snapshots(syn, INVESTIGATOR_TABLE, pd.DataFrame(new_rows))
         print(f"  ✅ Added {len(new_rows)} investigators to {INVESTIGATOR_TABLE}")
     else:
         print("  ✅ No new investigators to add")
@@ -599,7 +590,7 @@ def _patch_dev_link_investigator_ids(
         print(f"  [dry-run] Would patch investigatorId for {len(patch_rows)} dev-link row(s)")
         return
 
-    syn.store(Table(DEV_TABLE, pd.DataFrame(patch_rows)))
+    store_with_snapshots(syn, DEV_TABLE, pd.DataFrame(patch_rows))
     print(f"  ✅ Patched investigatorId for {len(patch_rows)} dev-link row(s) in {DEV_TABLE}")
 
 
@@ -679,8 +670,7 @@ def upsert_vendor_items(syn, vendor_item_csv: str, res_map: dict, dry_run: bool)
         return len(rows_to_add)
 
     if rows_to_add:
-        syn.store(Table(VENDOR_ITEM_TABLE, pd.DataFrame(rows_to_add)))
-        _snapshot(syn, VENDOR_ITEM_TABLE)
+        store_with_snapshots(syn, VENDOR_ITEM_TABLE, pd.DataFrame(rows_to_add))
         print(f"  ✅ Added {len(rows_to_add)} vendor items to {VENDOR_ITEM_TABLE}")
     else:
         print("  ✅ No new vendor items to add")
