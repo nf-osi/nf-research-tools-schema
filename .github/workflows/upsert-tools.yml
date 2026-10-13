@@ -54,7 +54,10 @@ jobs:
             git diff --name-only --diff-filter=AM "$base_sha" "${{ github.sha }}" \
               -- 'submissions/' \
               | grep '\.json$' > changed_json_files.txt || true
-            COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || echo 0)
+            # grep -c prints 0 *and* exits 1 on no matches, so `|| echo 0` would
+            # emit "0\n0" and break $GITHUB_OUTPUT (e.g. a deletions-only push).
+            COUNT=$(grep -c . changed_json_files.txt 2>/dev/null || true)
+            COUNT=${COUNT:-0}
             echo "Found ${COUNT} changed JSON file(s) since ${base_sha:0:8}:"
             cat changed_json_files.txt
             echo "changed_count=${COUNT}" >> $GITHUB_OUTPUT

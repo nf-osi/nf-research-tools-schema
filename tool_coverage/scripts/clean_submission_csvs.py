@@ -93,6 +93,38 @@ def _run_url_comment() -> str:
     run_id = os.getenv("GITHUB_RUN_ID", "")
     return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
 
+# Tables already snapshotted before their first write in this process.
+_PRE_SNAPSHOTTED: set = set()
+
+
+def _snapshot(syn, table_id: str, when: str) -> None:
+    run_url = _run_url_comment()
+    syn.create_snapshot_version(
+        table_id, comment=f"{when} upsert-tools: {run_url}" if run_url else f"{when} upsert-tools"
+    )
+
+
+def store_with_snapshots(syn, table_id: str, df: pd.DataFrame):
+    """Write df to a Synapse table, snapshotting it before and after.
+
+    The "before" snapshot is taken once per table per run, ahead of its first
+    write, so a rollback point exists even for edits curators made directly in
+    Synapse since the last snapshot. If it can't be created, nothing is
+    written. A failed "after" snapshot only warns.
+    """
+    if table_id not in _PRE_SNAPSHOTTED:
+        _snapshot(syn, table_id, "before")  # raises -> no write
+        _PRE_SNAPSHOTTED.add(table_id)
+        print(f"         📸 Snapshot of {table_id} taken before writing")
+    result = syn.store(Table(table_id, df))
+    try:
+        _snapshot(syn, table_id, "after")
+        print(f"         📸 Snapshot of {table_id} taken after writing")
+    except Exception as e:
+        print(f"         ⚠️  Post-write snapshot failed for {table_id}: {e}")
+    return result
+
+
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
     # Existing tool types (v1.0)
@@ -376,8 +408,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     """Upsert cleaned data to Synapse table.
 
     Strips routing columns (those belonging to other Synapse tables), serializes
-    STRING_LIST columns to JSON arrays, then appends new rows.  Creates a snapshot
-    version after each successful upload.
+    STRING_LIST columns to JSON arrays, then appends new rows.  Snapshots the
+    table before its first write and after each write (store_with_snapshots).
 
     Args:
         syn: Synapse client
@@ -529,7 +561,7 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                             if updates:
                                 patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, **updates})
                         if patch_rows:
-                            syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                            store_with_snapshots(syn, table_id, pd.DataFrame(patch_rows))
                             print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
 
                     if df_clean.empty:
@@ -538,13 +570,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                 except Exception as e:
                     print(f"      ⚠️  Could not check existing {pk_col}s in {table_id}: {e} — uploading without dedup")
 
-        table = Table(table_id, df_clean)
-        table = syn.store(table)
-
+        store_with_snapshots(syn, table_id, df_clean)
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
-        print(f"         Creating snapshot version...")
-        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
-        print(f"         ✅ Snapshot version created")
 
         return True
 
