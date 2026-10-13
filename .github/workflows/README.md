@@ -261,10 +261,7 @@ These workflows support the main sequence but run independently:
 
 ### Required Secrets
 
-1. **NF_SERVICE_GIT_TOKEN** (required for all workflows that create PRs)
-   - GitHub Personal Access Token with `repo` scope
-   - Used to create pull requests
-   - Configure in: Settings → Secrets and variables → Actions
+1. **No personal access token is needed to open PRs.** Workflows that open PRs (`upsert-tools.yml`, `update-observation-schema.yml`, and others) use the built-in `GITHUB_TOKEN`, with `contents: write` / `pull-requests: write` (plus `issues: write` for labels and assignees). PRs opened this way don't trigger other workflows' CI. `NF_SERVICE_GIT_TOKEN` is no longer used by any workflow and can be deleted from the repo secrets.
 
 2. **SYNAPSE_AUTH_TOKEN** (required for Synapse operations)
    - Synapse Personal Access Token
@@ -343,7 +340,7 @@ Filter PRs by labels:
 **Problem**: Workflow ran but didn't create PR
 
 **Check**:
-- Verify NF_SERVICE_GIT_TOKEN is set correctly
+- Check the job has `contents: write` and `pull-requests: write` (and `issues: write` if it sets labels/assignees)
 - Check workflow logs for errors
 - Confirm there were actually changes to commit
 - Verify repository allows automated PRs

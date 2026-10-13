@@ -135,15 +135,17 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
 
     if pd.notna(tool_type):
         if tool_type == "Animal Model":
-            fields = ["animalModelGeneticDisorder", "backgroundStrain", "animalState", "description"]
+            # geneticDisorder/manifestation were animalModel*/cellLine*-prefixed
+            # before the LinkML unification (#236/#262).
+            fields = ["geneticDisorder", "backgroundStrain", "animalState", "description"]
         elif tool_type == "Cell Line":
-            fields = ["cellLineCategory", "cellLineGeneticDisorder", "cellLineManifestation", "synonyms"]
+            fields = ["cellLineCategory", "geneticDisorder", "manifestation", "synonyms"]
         elif tool_type == "Antibody":
             fields = ["targetAntigen", "reactiveSpecies", "hostOrganism", "clonality", "conjugate"]
         elif tool_type == "Genetic Reagent":
             fields = ["insertName", "insertSpecies", "vectorType", "insertEntrezId", "vectorBackbone"]
         elif tool_type == "Biobank":
-            fields = ["tissue", "diseaseType", "manifestation", "specimenFormat", "specimenType"]
+            fields = ["tissue", "geneticDisorder", "manifestation", "specimenFormat", "specimenType"]  # was diseaseType
         elif tool_type == "Patient-Derived Model":
             fields = ["modelType", "patientDiagnosis", "hostStrain", "manifestation"]
         elif tool_type == "Computational Tool":
@@ -173,7 +175,7 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
 
     if pd.notna(tool_type):
         if tool_type == "Animal Model":
-            fields = ["backgroundSubstrain", "synonyms", "animalModelOfManifestation"]
+            fields = ["backgroundSubstrain", "synonyms", "manifestation"]  # was animalModelOfManifestation
         elif tool_type == "Cell Line":
             fields = ["tissue"]
         elif tool_type == "Antibody":
@@ -241,6 +243,30 @@ def calculate_tool_score(resource_data: pd.Series, observations_data: pd.DataFra
     }
 
 
+TOOLS_UNION_VIEW = "syn77019730"  # AllTools_Union, base of the portal MV syn51730943
+
+
+def join_detail_tables(base_df: pd.DataFrame, detail_by_type: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Attach each tool's own detail-table row, matched on resourceId.
+
+    Joining per type (rather than every detail table onto every row) keeps
+    same-named columns from different types apart -- e.g. Patient-Derived
+    Model and Organoid Protocol both have `modelType`. Where a column exists
+    in both the base view and the detail table, the detail table (the source
+    of truth) wins.
+    """
+    parts = []
+    for rtype, group in base_df.groupby("resourceType", dropna=False, sort=False):
+        detail = detail_by_type.get(rtype)
+        if detail is not None and "resourceId" in detail.columns:
+            shared = [c for c in detail.columns if c in group.columns and c != "resourceId"]
+            group = group.drop(columns=shared).merge(
+                detail.drop_duplicates("resourceId"), on="resourceId", how="left"
+            )
+        parts.append(group)
+    return pd.concat(parts, ignore_index=True) if parts else base_df
+
+
 def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     """
     Score all tools in the database
@@ -251,9 +277,12 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     Returns:
         DataFrame with scores for all resources
     """
-    # Read base Resource table
-    print("Reading base Resource data from Synapse...")
-    resource_df = syn.tableQuery("SELECT * FROM syn26450069").asDataFrame()
+    # Base: every tool, from the same union view the portal MV (syn51730943)
+    # is built on. The legacy Resource table (syn26450069) no longer receives
+    # new tools, and its per-type ID columns don't exist on the detail tables
+    # since the LinkML migration (#236).
+    print("Reading base tool data from Synapse...")
+    resource_df = syn.tableQuery(f"SELECT * FROM {TOOLS_UNION_VIEW}").asDataFrame()
 
     # Read type-specific tables
     print("Reading Animal Model data...")
@@ -283,63 +312,20 @@ def score_all_tools(syn: synapseclient.Synapse) -> pd.DataFrame:
     print("Reading Clinical Assessment Tool data...")
     clinical_assessment_tool_df = syn.tableQuery("SELECT * FROM syn73709229").asDataFrame()
 
-    # Join base resource data with type-specific data
+    # Join each tool only to its own type's detail table (all keyed on
+    # resourceId since the LinkML migration).
     print("Joining resource data with type-specific tables...")
-
-    # Left join with each type-specific table
-    if 'animalModelId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            animal_model_df[animal_model_df['animalModelId'].notna()],
-            on='animalModelId', how='left', suffixes=('', '_animal')
-        )
-
-    if 'antibodyId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            antibody_df[antibody_df['antibodyId'].notna()],
-            on='antibodyId', how='left', suffixes=('', '_antibody')
-        )
-
-    if 'biobankId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            biobank_df[biobank_df['biobankId'].notna()],
-            on='biobankId', how='left', suffixes=('', '_biobank')
-        )
-
-    if 'cellLineId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            cell_line_df[cell_line_df['cellLineId'].notna()],
-            on='cellLineId', how='left', suffixes=('', '_cellline')
-        )
-
-    if 'geneticReagentId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            genetic_reagent_df[genetic_reagent_df['geneticReagentId'].notna()],
-            on='geneticReagentId', how='left', suffixes=('', '_genetic')
-        )
-
-    if 'computationalToolId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            computational_tool_df[computational_tool_df['computationalToolId'].notna()],
-            on='computationalToolId', how='left', suffixes=('', '_comptool')
-        )
-
-    if 'organoidProtocolId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            organoid_protocol_df[organoid_protocol_df['organoidProtocolId'].notna()],
-            on='organoidProtocolId', how='left', suffixes=('', '_organoid')
-        )
-
-    if 'patientDerivedModelId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            patient_derived_model_df[patient_derived_model_df['patientDerivedModelId'].notna()],
-            on='patientDerivedModelId', how='left', suffixes=('', '_pdm')
-        )
-
-    if 'clinicalAssessmentToolId' in resource_df.columns:
-        resource_df = resource_df.merge(
-            clinical_assessment_tool_df[clinical_assessment_tool_df['clinicalAssessmentToolId'].notna()],
-            on='clinicalAssessmentToolId', how='left', suffixes=('', '_cat')
-        )
+    resource_df = join_detail_tables(resource_df, {
+        "Animal Model": animal_model_df,
+        "Antibody": antibody_df,
+        "Biobank": biobank_df,
+        "Cell Line": cell_line_df,
+        "Genetic Reagent": genetic_reagent_df,
+        "Computational Tool": computational_tool_df,
+        "Organoid Protocol": organoid_protocol_df,
+        "Patient-Derived Model": patient_derived_model_df,
+        "Clinical Assessment Tool": clinical_assessment_tool_df,
+    })
 
     # Read observations data
     print("Reading Observation data from Synapse...")
@@ -485,6 +471,9 @@ def store_results_to_synapse(syn: synapseclient.Synapse, all_scores: pd.DataFram
         print(f"Found existing table: {existing_scores_table_id}")
         print("Updating table with new data (this will create a new version)...")
 
+        # Snapshot first: all rows are deleted and rewritten, and the portal
+        # MV (syn51730943) joins these scores. Raises (no delete) if it fails.
+        syn.create_snapshot_version(existing_scores_table_id, comment="before tool_scoring.py rewrite")
         # Delete existing rows
         current_data = syn.tableQuery(f"SELECT * FROM {existing_scores_table_id}")
         syn.delete(current_data)
@@ -542,6 +531,7 @@ def store_results_to_synapse(syn: synapseclient.Synapse, all_scores: pd.DataFram
         print(f"Found existing summary table: {existing_summary_table_id}")
         print("Updating summary table with new data (this will create a new version)...")
 
+        syn.create_snapshot_version(existing_summary_table_id, comment="before tool_scoring.py rewrite")
         # Delete existing rows
         current_summary = syn.tableQuery(f"SELECT * FROM {existing_summary_table_id}")
         syn.delete(current_summary)
