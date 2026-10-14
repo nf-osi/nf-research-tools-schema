@@ -1,0 +1,332 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsClinicalAssessmentTool",
+  "title": "NF Research Tools - Clinical Assessment Tool",
+  "description": "Clinical assessment tools including questionnaires, quality of life instruments, and patient-reported outcome measures.",
+  "type": "object",
+  "properties": {
+    "administrationTime": {
+      "description": "Typical time required to complete the assessment.",
+      "type": "string"
+    },
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "assessmentName": {
+      "description": "Name of the assessment tool or instrument.",
+      "type": "string"
+    },
+    "assessmentType": {
+      "type": "string",
+      "enum": [
+        "Quality of Life",
+        "Pain Assessment",
+        "Functional Assessment",
+        "Cognitive Assessment",
+        "Symptom Scale",
+        "Psychological Assessment",
+        "Patient-Reported Outcome",
+        "Other"
+      ],
+      "description": "Type of clinical assessment."
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "Vendor",
+        "Contact Developer",
+        "Freely Available",
+        "Unknown"
+      ],
+      "description": "How this resource can be obtained."
+    },
+    "availabilityStatus": {
+      "type": "string",
+      "enum": [
+        "Freely Available",
+        "License Required",
+        "Permission Required",
+        "Proprietary",
+        "Unknown"
+      ],
+      "description": "Availability status of the tool."
+    },
+    "cognitiveAndBehavioralDomains": {
+      "description": "Specific cognitive or behavioral outcome domains captured by this tool (relevant for NF-related brain tumor and CNS manifestations).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Attention / ADHD",
+          "Executive function",
+          "Memory",
+          "Learning disabilities",
+          "Language / communication",
+          "Anxiety",
+          "Depression / mood",
+          "Social cognition",
+          "Academic achievement",
+          "Adaptive behavior",
+          "Global cognitive ability",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "digitalVersion": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No",
+        "In Development",
+        "Unknown"
+      ],
+      "description": "Whether a digital/electronic version is available."
+    },
+    "diseaseSpecific": {
+      "type": "string",
+      "enum": [
+        "Yes - NF-specific",
+        "No - General",
+        "Adapted for NF"
+      ],
+      "description": "Whether the assessment is specific to NF or general."
+    },
+    "geneticDisorder": {
+      "description": "Genetic disorders associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Neurofibromatosis type 1",
+          "Neurofibromatosis type 2",
+          "Schwannomatosis",
+          "NF1 Spontaneous Mutation",
+          "No known genetic disorder",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "licensingRequirements": {
+      "description": "Licensing or permission requirements.",
+      "type": "string"
+    },
+    "manifestation": {
+      "description": "Manifestations or symptoms that this resource is used to model (e.g. tumor type, behavioral phenotype).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Acute Lymphocytic Leukemia",
+          "Acute Myeloid Leukemia",
+          "Adult T Acute Lymphoblastic Leukemia",
+          "Amelanotic Cutaneous Melanoma",
+          "Askin Tumor",
+          "Astrocytoma",
+          "Astrogliosis",
+          "Atypical Neurofibroma",
+          "BCR-ABL1 positive",
+          "BRCA2 Syndrome",
+          "Brain NOS",
+          "Cafe-Au-Lait Spots",
+          "Canine Histiocytic Sarcoma",
+          "Canine Lymphoma",
+          "Canine Melanoma",
+          "Canine Soft Tissue Sarcoma",
+          "Cecum Adenocarcinoma",
+          "Cervical Adenocarcinoma",
+          "Chronic Myelogenous Leukemia",
+          "Clinically Affected",
+          "Clinically Asymptomatic (Self-reported)",
+          "Clinically Asymptomatic But At Risk",
+          "Cognition",
+          "Colon Adenocarcinoma",
+          "Colon Carcinoma",
+          "Cutaneous Melanoma",
+          "Cutaneous Neurofibroma",
+          "Cystic Fibrosis",
+          "Diffuse Infiltrating Neurofibroma",
+          "Embryonic Lethal",
+          "General NF1 Deficiency",
+          "Glioblastoma",
+          "Growth",
+          "Heart Malformation",
+          "Hereditary Breast and Ovarian Cancer Syndrome",
+          "High Grade Glioma",
+          "Human Papillomavirus-Related Endocervical Adenocarcinoma",
+          "Invasive Breast Carcinoma",
+          "Juvenile Myelomonocytic Leukemia",
+          "Lipoma",
+          "Low Grade Glioma",
+          "Lung Adenocarcinoma",
+          "Lung Adenosquamous Carcinoma",
+          "Lung Carcinoid Tumor",
+          "Lung Giant Cell Carcinoma",
+          "Lung Large Cell Carcinoma",
+          "Lung Non-Small Cell Carcinoma",
+          "Lung Papillary Adenocarcinoma",
+          "Lung Small Cell Carcinoma",
+          "Lung Squamous Cell Carcinoma",
+          "Malignant Peripheral Nerve Sheath Tumor",
+          "Melanoma",
+          "Meningioma",
+          "Metabolic Function",
+          "Mild Or No Symptoms",
+          "Minimally Invasive Lung Adenocarcinoma",
+          "Mouse Adrenal Gland Pheochromocytoma",
+          "Neural Crest Hyperplasia",
+          "Neuroblastoma",
+          "Neurofibroma",
+          "Neurofibroma NOS",
+          "Neurofibromatosis Type 1 (NF1)-Like Syndrome (NFLS)",
+          "No Symptoms",
+          "None",
+          "Noonan Syndrome",
+          "Optic Nerve Glioma",
+          "Other",
+          "Ovarian Cystadenocarcinoma",
+          "Pancreatic Adenocarcinoma",
+          "Pancreatic Adenosquamous Carcinoma",
+          "Pancreatic Carcinoma",
+          "Pancreatic Ductal Adenocarcinoma",
+          "Pancreatic Somatostatinoma",
+          "Pheochromocytoma",
+          "Pleural Malignant Mesothelioma",
+          "Plexiform Neurofibroma",
+          "Poorly Differentiated Thyroid Gland Carcinoma",
+          "Rectal Adenocarcinoma",
+          "Schwannoma",
+          "Spinal Development",
+          "Thyroid Gland Anaplastic Carcinoma",
+          "Thyroid Gland Follicular Carcinoma",
+          "Unaffected Nerve"
+        ]
+      },
+      "type": "array"
+    },
+    "numberOfItems": {
+      "description": "Number of items or questions in the assessment.",
+      "type": "integer"
+    },
+    "psychometricProperties": {
+      "description": "Validated psychometric properties (reliability, validity).",
+      "type": "string"
+    },
+    "regulatoryAcceptanceHistory": {
+      "description": "Known FDA/EMA endorsement or acceptance of this tool as a clinical outcome assessment (COA) for trials.",
+      "type": "string"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "scoringMethod": {
+      "description": "Description of scoring methodology.",
+      "type": "string"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "targetPopulation": {
+      "type": "string",
+      "enum": [
+        "Pediatric",
+        "Adult",
+        "Elderly",
+        "General",
+        "Disease-Specific",
+        "Other"
+      ],
+      "description": "Intended population for the assessment."
+    },
+    "toolURL": {
+      "description": "A URL for the assessment tool, if available.",
+      "format": "uri",
+      "type": "string"
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    },
+    "validatedLanguages": {
+      "description": "Languages in which the tool has been validated.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "assessmentName",
+    "assessmentType",
+    "targetPopulation",
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "availability",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}

@@ -177,6 +177,6 @@ To share a cross-cutting concern with a new tool type, add the mixin to its
 | `HasDonor` | `donor` | AnimalModel, CellLine |
 | `HasTransplantationDonor` | `transplantationDonor`, `transplantationType` | AnimalModel |
 | `HasMutations` | `mutations` | AnimalModel, CellLine |
-| `HasGeneticDisorder` | `geneticDisorder`, `manifestation` | AnimalModel, CellLine, Biobank |
-| `HasTumorType` | `tumorType` | Biobank, PatientDerivedModel |
+| `HasGeneticDisorder` | `geneticDisorder`, `manifestation` | AnimalModel, CellLine, Biobank (via mixin); PatientDerivedModel, OrganoidProtocol reference `manifestation` directly via `slots:` instead of the full mixin, since they already had `geneticDisorder` added separately |
+| `HasTumorType` (deprecated) | `tumorType` (deprecated, nf-research-tools-schema#262) | Biobank, PatientDerivedModel -- superseded by the unified `manifestation` field/`ManifestationEnum` above; kept for backward compatibility until nothing reads it (see #279) |
 | `HasPassageNumber` | `passageNumber` | OrganoidProtocol, PatientDerivedModel |

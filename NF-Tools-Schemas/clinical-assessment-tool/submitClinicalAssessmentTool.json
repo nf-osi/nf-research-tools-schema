@@ -11,14 +11,6 @@
           "type": "string",
           "title": "Name of Assessment Tool"
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms or Abbreviations"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description (~20-50 words)"
-        },
         "assessmentType": {
           "type": "string",
           "title": "Type of Assessment",
@@ -41,8 +33,28 @@
             "Adult",
             "Elderly",
             "General",
-            "Disease-Specific"
+            "Disease-Specific",
+            "Other"
           ]
+        },
+        "nfGeneticDisorder": {
+          "type": "string",
+          "title": "NF Genetic Disorder",
+          "enum": [
+            "Neurofibromatosis Type 1",
+            "Neurofibromatosis Type 2",
+            "No known genetic disorder",
+            "Unknown",
+            "Other"
+          ]
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms or Abbreviations"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description (~20-50 words)"
         },
         "diseaseSpecific": {
           "type": "string",
@@ -65,8 +77,25 @@
           "type": "array",
           "title": "Validated Languages",
           "items": {
-            "type": "string"
-          }
+            "type": "string",
+            "enum": [
+              "English",
+              "Spanish",
+              "French",
+              "German",
+              "Portuguese",
+              "Italian",
+              "Dutch",
+              "Chinese (Mandarin)",
+              "Japanese",
+              "Korean",
+              "Arabic",
+              "Hebrew",
+              "Russian",
+              "Other"
+            ]
+          },
+          "uniqueItems": true
         },
         "psychometricProperties": {
           "type": "string",
@@ -129,6 +158,27 @@
           "title": "Regulatory Acceptance History",
           "description": "Known FDA/EMA endorsement or acceptance of this tool as a clinical outcome assessment (COA) for trials."
         },
+        "manifestation": {
+          "type": "string",
+          "title": "Manifestation / Tumor Type (if applicable)",
+          "description": "The NF manifestation this assessment tool is designed to evaluate, if applicable.",
+          "enum": [
+            "Plexiform Neurofibroma",
+            "Cutaneous Neurofibroma",
+            "Atypical Neurofibroma",
+            "Malignant Peripheral Nerve Sheath Tumor",
+            "Schwannoma",
+            "Meningioma",
+            "Low Grade Glioma",
+            "High Grade Glioma",
+            "Optic Nerve Glioma",
+            "Pheochromocytoma",
+            "Cognition",
+            "Other",
+            "None",
+            "Unknown"
+          ]
+        },
         "rrid": {
           "type": "string",
           "title": "RRID (if available)"
@@ -147,6 +197,11 @@
         "assessmentType",
         "targetPopulation"
       ]
+    },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -236,67 +291,12 @@
         "properties": {
           "additionalDetails": {
             "type": "string",
-            "title": "Please provide additional details."
+            "title": "Please describe how to acquire this (you selected \"Other\")"
           }
         },
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "assessmentType": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "assessmentType"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "assessmentTypeOther": {
-                "type": "string",
-                "title": "Please specify assessment type"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "cognitiveAndBehavioralDomains": {
-                "contains": {
-                  "const": "Other"
-                }
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "otherCognitiveAndBehavioralDomains": {
-                "type": "string",
-                "title": "Please specify cognitive/behavioral domain(s)"
-              }
-            }
-          }
-        }
       }
     }
   ]

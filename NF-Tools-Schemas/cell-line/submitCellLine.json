@@ -22,11 +22,6 @@
             "maxLength": "Cell line name should not exceed 100 characters."
           }
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms",
-          "description": "Add one or more synonyms for the cell line."
-        },
         "description": {
           "type": "string",
           "title": "Description (~20 words)",
@@ -40,8 +35,14 @@
             "Mouse",
             "Dog",
             "Chinese Hamster",
-            "E. Coli"
+            "E. Coli",
+            "Other"
           ]
+        },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms",
+          "description": "Add one or more synonyms for the cell line."
         },
         "sex": {
           "type": "string",
@@ -87,6 +88,86 @@
         "cellLineName",
         "description",
         "species"
+      ]
+    },
+    "cellLineGeneticDisorder": {
+      "type": "string",
+      "title": "Genetic Disorder",
+      "enum": [
+        "Neurofibromatosis Type 1",
+        "Neurofibromatosis Type 2",
+        "No known genetic disorder",
+        "Unknown",
+        "Other"
+      ]
+    },
+    "cellLineManifestation": {
+      "type": "string",
+      "title": "Manifestation",
+      "enum": [
+        "Acute Lymphocytic Leukemia",
+        "Adult T Acute Lymphoblastic Leukemia",
+        "Amelanotic Cutaneous Melanoma",
+        "Askin Tumor",
+        "Astrocytoma",
+        "Atypical Neurofibroma",
+        "BRCA2 Syndrome",
+        "BCR-ABL1 positive",
+        "Cafe-Au-Lait Spots",
+        "Canine Histiocytic Sarcoma",
+        "Canine Lymphoma",
+        "Canine Melanoma",
+        "Canine Soft Tissue Sarcoma",
+        "Cecum Adenocarcinoma",
+        "Cervical Adenocarcinoma",
+        "Chronic Myelogenous Leukemia",
+        "Clinically Affected",
+        "Clinically Asymptomatic (Self-reported)",
+        "Clinically Asymptomatic But At Risk",
+        "Colon Adenocarcinoma",
+        "Colon Carcinoma",
+        "Cutaneous Melanoma",
+        "Cutaneous Neurofibroma",
+        "Cystic Fibrosis",
+        "General NF1 Deficiency",
+        "Glioblastoma",
+        "Hereditary Breast and Ovarian Cancer Syndrome",
+        "Human Papillomavirus-Related Endocervical Adenocarcinoma",
+        "Invasive Breast Carcinoma",
+        "Lipoma",
+        "Lung Adenocarcinoma",
+        "Lung Adenosquamous Carcinoma",
+        "Lung Carcinoid Tumor",
+        "Lung Giant Cell Carcinoma",
+        "Lung Large Cell Carcinoma",
+        "Lung Non-Small Cell Carcinoma",
+        "Lung Papillary Adenocarcinoma",
+        "Lung Small Cell Carcinoma",
+        "Lung Squamous Cell Carcinoma",
+        "Malignant Peripheral Nerve Sheath Tumor",
+        "Melanoma",
+        "Minimally Invasive Lung Adenocarcinoma",
+        "Mouse Adrenal Gland Pheochromocytoma",
+        "Neuroblastoma",
+        "Neurofibroma",
+        "Noonan Syndrome",
+        "Ovarian Cystadenocarcinoma",
+        "Pancreatic Adenocarcinoma",
+        "Pancreatic Adenosquamous Carcinoma",
+        "Pancreatic Carcinoma",
+        "Pancreatic Ductal Adenocarcinoma",
+        "Pancreatic Somatostatinoma",
+        "Plexiform Neurofibroma",
+        "Pleural Malignant Mesothelioma",
+        "Poorly Differentiated Thyroid Gland Carcinoma",
+        "Rectal Adenocarcinoma",
+        "Schwannoma",
+        "Thyroid Gland Anaplastic Carcinoma",
+        "Thyroid Gland Follicular Carcinoma",
+        "Unaffected Nerve",
+        "None",
+        "Unknown",
+        "Other"
       ]
     },
     "cellLineCategory": {
@@ -144,82 +225,6 @@
     "originYear": {
       "type": "integer",
       "title": "Year of Establishment"
-    },
-    "cellLineGeneticDisorder": {
-      "type": "string",
-      "title": "Genetic Disorder",
-      "enum": [
-        "Neurofibromatosis Type 1",
-        "Neurofibromatosis Type 2",
-        "Schwannomatosis",
-        "None"
-      ]
-    },
-    "cellLineManifestation": {
-      "type": "string",
-      "title": "Manifestation",
-      "enum": [
-        "Acute Lymphocytic Leukemia",
-        "Adult T Acute Lymphoblastic Leukemia",
-        "Amelanotic Cutaneous Melanoma",
-        "Askin Tumor",
-        "Astrocytoma",
-        "Atypical",
-        "BRCA2 Syndrome",
-        "BCR-ABL1 positive",
-        "Cafe-Au-Lait Spots",
-        "Canine Histiocytic Sarcoma",
-        "Canine Lymphoma",
-        "Canine Melanoma",
-        "Canine Soft Tissue Sarcoma",
-        "Cecum Adenocarcinoma",
-        "Cervical Adenocarcinoma",
-        "Chronic Myelogenous Leukemia",
-        "Clinically Affected",
-        "Clinically Asymptomatic (Self-reported)",
-        "Clinically Asymptomatic But At Risk",
-        "Colon Adenocarcinoma",
-        "Colon Carcinoma",
-        "Cutaneous Melanoma",
-        "Cutaneous Neurofibroma",
-        "Cystic Fibrosis",
-        "General NF1 Deficiency",
-        "Glioblastoma",
-        "Hereditary Breast and Ovarian Cancer Syndrome",
-        "Human Papillomavirus-Related Endocervical Adenocarcinoma",
-        "Invasive Breast Carcinoma",
-        "Lipoma",
-        "Lung Adenocarcinoma",
-        "Lung Adenosquamous Carcinoma",
-        "Lung Carcinoid Tumor",
-        "Lung Giant Cell Carcinoma",
-        "Lung Large Cell Carcinoma",
-        "Lung Non-Small Cell Carcinoma",
-        "Lung Papillary Adenocarcinoma",
-        "Lung Small Cell Carcinoma",
-        "Lung Squamous Cell Carcinoma",
-        "Malignant Peripheral Nerve Sheath Tumor",
-        "Melanoma",
-        "Minimally Invasive Lung Adenocarcinoma",
-        "Mouse Adrenal Gland Pheochromocytoma",
-        "Neuroblastoma",
-        "Neurofibroma",
-        "Noonan Syndrome",
-        "Ovarian Cystadenocarcinoma",
-        "Pancreatic Adenocarcinoma",
-        "Pancreatic Adenosquamous Carcinoma",
-        "Pancreatic Carcinoma",
-        "Pancreatic Ductal Adenocarcinoma",
-        "Pancreatic Somatostatinoma",
-        "Plexiform Neurofibroma",
-        "Pleural Malignant Mesothelioma",
-        "Poorly Differentiated Thyroid Gland Carcinoma",
-        "Rectal Adenocarcinoma",
-        "Schwannoma",
-        "Thyroid Gland Anaplastic Carcinoma",
-        "Thyroid Gland Follicular Carcinoma",
-        "Unaffected Nerve"
-      ]
     },
     "tissue": {
       "type": "string",
@@ -327,6 +332,11 @@
       "title": "Deposited in NGNRI Repository?",
       "description": "Whether this cell line is deposited in the Nick Gilbert Neurofibromatosis Research Institute repository for equitable access."
     },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
+    },
     "developmentPublicationDOI": {
       "type": "string",
       "title": "Development Publication DOI (where tool was first described)",
@@ -425,95 +435,12 @@
         "properties": {
           "additionalDetails": {
             "type": "string",
-            "title": "Please provide additional details."
+            "title": "Please describe how to acquire this (you selected \"Other\")"
           }
         },
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "race": {
-                "const": "Other"
-              }
-            },
-            "required": [
-              "race"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "basicInfo": {
-            "properties": {
-              "raceOther": {
-                "type": "string",
-                "title": "Please specify race/ethnicity"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "organ": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "organOther": {
-            "type": "string",
-            "title": "Please specify organ"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "pkpdCapabilities": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherPkpdCapabilities": {
-            "type": "string",
-            "title": "Please specify PK/PD capability/capabilities"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "mechanismOfActionValidation": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherMechanismOfActionValidation": {
-            "type": "string",
-            "title": "Please specify mechanism(s) of action"
-          }
-        }
       }
     }
   ]

@@ -159,8 +159,8 @@ def generate_review_summary():
 
             # Check for common critical fields
             for field in ['organ', 'tissue', 'backgroundStrain', 'vectorType',
-                         'targetAntigen', 'softwareType', 'modelSystemType',
-                         'assessmentType', 'tumorType']:
+                         'targetAntigen', 'softwareType', 'modelType',
+                         'assessmentType', 'manifestation']:
                 if field in metadata and metadata[field]:
                     value = metadata[field]
                     # Truncate if too long

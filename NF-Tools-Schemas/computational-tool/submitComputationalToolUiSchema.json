@@ -2,10 +2,10 @@
   "basicInfo": {
     "ui:order": [
       "softwareName",
+      "softwareType",
+      "nfGeneticDisorder",
       "synonyms",
       "description",
-      "softwareType",
-      "softwareVersion",
       "programmingLanguage",
       "sourceRepository",
       "documentation",
@@ -17,23 +17,49 @@
       "lastUpdate",
       "maintainer",
       "analyticalPlatformSupport",
+      "manifestation",
       "rrid",
       "developerName",
       "developerAffiliation"
     ],
-    "description": { "ui:widget": "textarea" },
-    "programmingLanguage": { "ui:widget": "checkboxes" },
-    "dependencies": { "ui:options": { "orderable": false } },
-    "systemRequirements": { "ui:widget": "textarea" },
-    "analyticalPlatformSupport": { "ui:widget": "checkboxes" }
+    "description": {
+      "ui:widget": "textarea"
+    },
+    "programmingLanguage": {
+      "ui:widget": "checkboxes"
+    },
+    "dependencies": {
+      "ui:placeholder": "e.g. numpy, pandas, scikit-learn"
+    },
+    "systemRequirements": {
+      "ui:widget": "textarea"
+    },
+    "analyticalPlatformSupport": {
+      "ui:widget": "textarea",
+      "ui:options": {
+        "rows": 3
+      }
+    },
+    "nfGeneticDisorder": {
+      "ui:widget": "select"
+    },
+    "manifestation": {
+      "ui:widget": "select"
+    }
   },
   "developmentPublicationDOI": {
     "ui:placeholder": "e.g. 10.1000/xyz123"
   },
   "usagePublicationDOIs": {
-    "ui:options": { "addButtonText": "Add Another DOI", "itemTitle": "DOI", "orderable": false }
+    "ui:options": {
+      "addButtonText": "Add Another DOI",
+      "itemTitle": "DOI",
+      "orderable": false
+    }
   },
-  "itemAcquisition": { "ui:widget": "select" },
+  "itemAcquisition": {
+    "ui:widget": "select"
+  },
   "downloadURL": {
     "ui:placeholder": "https://"
   },
@@ -49,5 +75,14 @@
   "contactEmail": {
     "ui:placeholder": "your@email.com"
   },
-  "resourceType": { "ui:widget": "hidden" }
+  "resourceType": {
+    "ui:widget": "hidden"
+  },
+  "otherInformation": {
+    "ui:widget": "textarea",
+    "ui:placeholder": "Optional — anything else a curator should know",
+    "ui:options": {
+      "rows": 3
+    }
+  }
 }
