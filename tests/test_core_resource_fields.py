@@ -76,3 +76,26 @@ def test_res_map_tolerates_blank_registry_names(monkeypatch):
             return type("R", (), {"asDataFrame": lambda _s: frame})()
 
     assert upl._build_res_map(_Syn()) == {("mcf-7", "Cell Line"): "a"}
+
+
+@pytest.mark.parametrize("raw,expected", [
+    # Genotype synonyms carry bare ';' — only '; ' separates entries.
+    ("NI; Nf1f/f;Cdkn2a;CGD; Nf1-/-;Ink4a/Arf-/-", ["NI", "Nf1f/f;Cdkn2a;CGD", "Nf1-/-;Ink4a/Arf-/-"]),
+    ("MCF7; MCF 7", ["MCF7", "MCF 7"]),
+    ("a, b,c", ["a", "b", "c"]),
+    ("a;b", ["a", "b"]),
+    # Own name and duplicates are dropped (case-insensitive).
+    ("Mouse X; mx; MX; other", ["mx", "other"]),
+    (["mouse x", " y ", "y", ""], ["y"]),
+    ("", []),
+])
+def test_split_synonyms(raw, expected):
+    assert cas._split_synonyms(raw, "Mouse X") == expected
+
+
+def test_apply_core_fields_keeps_genotype_synonyms_whole():
+    row = {"_resourceName": "Nf1 flox/flox"}
+    cas._apply_core_resource_fields(
+        row, {"basicInfo": {"synonyms": "NI; Nf1f/f;Cdkn2a;CGD; Nf1-/-;Ink4a/Arf-/-; nf1 flox/flox; NI"}},
+        "animal_model")
+    assert json.loads(row["synonyms"]) == ["NI", "Nf1f/f;Cdkn2a;CGD", "Nf1-/-;Ink4a/Arf-/-"]
