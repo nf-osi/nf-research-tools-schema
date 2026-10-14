@@ -23,6 +23,12 @@ Checks run per submissions/{type}/*.json file:
   4. Duplicate cellLineName/animalModelName/etc. (the first required basicInfo
      field) or synonym across all submissions of the same tool type. HARD FAILURE
      — this is a real dedup problem, not just a nice-to-have.
+  4b. With --check-synapse: the tool's name (as the upsert compile step names it)
+     or a synonym already matches a live tool of the same type in the resource
+     registry (syn51730943). HARD FAILURE. Uploaded submissions are deleted from
+     submissions/ (#352), so Synapse -- not this folder -- is where duplicates
+     live; changes to an existing tool belong in Synapse, not a new submission.
+     Needs SYNAPSE_AUTH_TOKEN; without it the check is skipped with a warning.
   5. At least one publication is cited (_publications, usagePublicationDOIs, or
      developmentPublicationDOI). WARNING — some legitimate entries (unpublished
      patient-derived resources, internal tools) have none.
@@ -37,10 +43,12 @@ Usage:
   python tool_coverage/scripts/validate_submissions.py --tool-type cell_line
   python tool_coverage/scripts/validate_submissions.py --check-urls
   python tool_coverage/scripts/validate_submissions.py --strict
+  SYNAPSE_AUTH_TOKEN=... python tool_coverage/scripts/validate_submissions.py --check-synapse
 """
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -70,6 +78,60 @@ TYPE_MAP = {
 }
 
 _URL_RE = re.compile(r'^https?://', re.IGNORECASE)
+
+RES_REGISTRY = "syn51730943"  # portal resource registry (MV over the detail tables)
+
+sys.path.insert(0, str(REPO_ROOT / "tool_coverage" / "scripts"))
+
+
+def _load_live_registry() -> dict | None:
+    """(resourceType, normalized name-or-synonym) -> live resourceName, or None
+    if Synapse isn't reachable (no token / no client)."""
+    token = os.getenv("SYNAPSE_AUTH_TOKEN")
+    if not token:
+        return None
+    import synapseclient
+    from compile_accepted_submissions import _normalize_name
+
+    syn = synapseclient.Synapse()
+    syn.login(authToken=token, silent=True)
+    df = syn.tableQuery(
+        f"SELECT resourceName, resourceType, synonyms FROM {RES_REGISTRY}"
+    ).asDataFrame()
+    live: dict = {}
+    for name, rtype, synonyms in zip(df["resourceName"], df["resourceType"], df["synonyms"]):
+        if not isinstance(name, str) or not isinstance(rtype, str):
+            continue
+        keys = [name] + [s for s in (synonyms if isinstance(synonyms, list) else []) if isinstance(s, str)]
+        for k in keys:
+            live.setdefault((rtype, _normalize_name(k)), name)
+    return live
+
+
+def _check_live_duplicates(data: dict, path: Path, live: dict, errors: list):
+    """Fail if this submission names a tool that's already in Synapse."""
+    from compile_accepted_submissions import (
+        _TTYPE_ID_INFO, _normalize_name, _resource_name_from_data, _tool_type_from_json,
+    )
+
+    ttype = _tool_type_from_json(data)
+    if ttype not in _TTYPE_ID_INFO:
+        return
+    rtype = _TTYPE_ID_INFO[ttype][0]
+    name = _resource_name_from_data(data, ttype)
+    basic_info = data.get("basicInfo", {})
+    synonyms = basic_info.get("synonyms", "")
+    candidates = [name] + (
+        [s.strip() for s in re.split(r"[;,]", synonyms) if s.strip()] if isinstance(synonyms, str) else []
+    )
+    for candidate in candidates:
+        match = live.get((rtype, _normalize_name(candidate))) if candidate else None
+        if match:
+            errors.append(
+                f"{path}: {candidate!r} is already live in Synapse as {rtype} {match!r} "
+                f"({RES_REGISTRY}) -- edit that record in Synapse instead of resubmitting"
+            )
+            return
 
 
 def _load_schema(schema_dir: str, schema_file: str) -> dict | None:
@@ -236,6 +298,8 @@ def main() -> int:
                         choices=list(TYPE_MAP.keys()), help="Restrict to one submissions/ subfolder (repeatable)")
     parser.add_argument("--check-urls", action="store_true", help="Also make live HTTP requests to validate URLs resolve")
     parser.add_argument("--strict", action="store_true", help="Exit non-zero on warnings too, not just hard failures")
+    parser.add_argument("--check-synapse", action="store_true",
+                        help="Also fail on tools already live in Synapse (needs SYNAPSE_AUTH_TOKEN)")
     parser.add_argument(
         "--only-files", metavar="PATH", nargs="+", default=None,
         help="Still scan the whole submissions/ tree (needed for accurate duplicate-name "
@@ -250,6 +314,9 @@ def main() -> int:
     name_registry: dict = {}
     total = 0
     only_files = {str(Path(f).resolve()) for f in args.only_files} if args.only_files else None
+    live_registry = _load_live_registry() if args.check_synapse else None
+    if args.check_synapse and live_registry is None:
+        warnings.append("--check-synapse: SYNAPSE_AUTH_TOKEN not set -- skipped the check against live Synapse tools")
 
     for subdir, schema, path in _iter_submission_files(args.tool_types or None):
         total += 1
@@ -275,6 +342,8 @@ def main() -> int:
         else:
             file_warnings.append(f"{path}: no schema found for type '{subdir}' — skipping schema checks")
 
+        if include and live_registry is not None:
+            _check_live_duplicates(data, path, live_registry, file_errors)
         _check_urls(data, path, args.check_urls, file_errors, file_warnings)
         _check_publications(data, path, file_warnings)
 

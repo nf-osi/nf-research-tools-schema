@@ -1,15 +1,15 @@
 name: Validate Tool Submissions
 
 # Runs general correctness checks (tool_coverage/scripts/validate_submissions.py)
-# against submissions/*/*.json changed in a PR — schema conformance, duplicate
-# name/synonym detection, conditionally-expected fields (e.g. a vendor URL when
-# itemAcquisition is "Purchase from Vendor"), URL syntax, and publication
-# presence. See #182 for why this didn't exist before: upsert-tools.yml only
-# validates on push to main (after merge), not before.
+# against submissions/*/*.json added or changed in a PR, before merge:
+# schema conformance, duplicate names/synonyms (within the PR and against tools
+# already live in Synapse), conditionally-expected fields (e.g. a vendor URL when
+# itemAcquisition is "Purchase from Vendor"), URL syntax, and publication presence.
+# upsert-tools.yml uploads on push to main, so this is the only pre-merge check.
 #
-# Only fails on files this PR actually touches — the pre-existing backlog of
-# violations elsewhere in submissions/ (tracked in #182) is reported but
-# doesn't block unrelated PRs.
+# Runs on every PR that touches submission JSONs -- including automated mining
+# PRs (labelled automated-mining), which are the most error-prone -- rather than
+# only on PRs labelled tool-submissions.
 
 on:
   pull_request:
@@ -23,7 +23,6 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'tool-submissions')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,10 +48,14 @@ jobs:
           cat changed_files.txt
 
       - name: Validate changed submissions
+        env:
+          # Read-only use: checks names against the live resource registry.
+          # Not available on PRs from forks -- the check is then skipped with a warning.
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
         run: |
           if [ ! -s changed_files.txt ]; then
             echo "No submissions/*/*.json files changed — nothing to validate."
             exit 0
           fi
-          python tool_coverage/scripts/validate_submissions.py --check-urls \
+          python tool_coverage/scripts/validate_submissions.py --check-urls --check-synapse \
             --only-files $(cat changed_files.txt)
