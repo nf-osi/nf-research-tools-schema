@@ -401,7 +401,7 @@ with PdfPages(pdf_file) as pdf:
     # Plot 2: Resource type distribution across agencies
     if agency_coverage and link_key:
         # Get resource types for each agency
-        resource_types = sorted(tools_df['resourceType'].unique())
+        resource_types = sorted(tools_df['resourceType'].dropna().unique())  # untyped rows (#358) can't sort with str
         agency_tool_counts = {}
 
         for agency in sorted(agency_coverage.keys()):
@@ -460,7 +460,7 @@ with PdfPages(pdf_file) as pdf:
                                f"({data['coverage_pct']:.1f}%) {status}")
 
     summary_lines.append(f"\nTotal Tools: {len(tools_df)}")
-    for rt in sorted(tools_df['resourceType'].unique()):
+    for rt in sorted(tools_df['resourceType'].dropna().unique())  # untyped rows (#358) can't sort with str:
         count = len(tools_df[tools_df['resourceType']==rt])
         summary_lines.append(f"  {rt}: {count}")
 

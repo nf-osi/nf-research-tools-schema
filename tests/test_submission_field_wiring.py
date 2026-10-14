@@ -358,7 +358,8 @@ def test_compile_accepted_loop_computes_availability_for_tool_types_only():
     import inspect
     src = inspect.getsource(cas.compile_accepted)
     assert '_compute_availability' in src
-    assert '_compute_how_to_acquire' in src
+    assert '_apply_core_resource_fields' in src  # computes howToAcquire
+    assert '_compute_how_to_acquire' in inspect.getsource(cas._apply_core_resource_fields)
     assert 'ttype != "observation"' in src
 
 

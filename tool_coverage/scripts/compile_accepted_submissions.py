@@ -54,9 +54,17 @@ def _make_id(prefix: str, resource_name: str) -> str:
 # Column definitions (must match ACCEPTED_*.csv headers exactly)
 # ---------------------------------------------------------------------------
 
+# Core Tool fields every detail table carries directly since the LinkML
+# migration (#236): the legacy Resource table (syn26450069) used to hold them
+# and is no longer uploaded, so they must be written on the detail row itself
+# or new tools land with a blank name/type (#183's MCF-7).
+_CORE_RESOURCE_COLUMNS = [
+    "resourceName", "resourceType", "description", "synonyms", "rrid",
+]  # howToAcquire/availability are already listed per type (#298)
+
 COLUMNS = {
     "cell_lines": [
-        "resourceId", "organ", "tissue", "manifestation",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "organ", "tissue", "manifestation",
         "geneticDisorder", "cellLineCategory", "donorId", "originYear",
         "strProfile", "resistance",
         "populationDoublingTime", "cultureMedia",
@@ -70,7 +78,7 @@ COLUMNS = {
         "_species", "_sex",
     ],
     "antibodies": [
-        "resourceId", "targetAntigen", "hostOrganism", "clonality", "cloneId",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "targetAntigen", "hostOrganism", "clonality", "cloneId",
         "uniprotId", "reactiveSpecies", "conjugate",
         "vendor", "catalogNumber", "catalogURL",
         "howToAcquire", "availability",
@@ -78,7 +86,7 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "animal_models": [
-        "resourceId", "strainNomenclature", "backgroundStrain",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "strainNomenclature", "backgroundStrain",
         "backgroundSubstrain", "geneticDisorder",
         "manifestation", "transplantationType", "animalState",
         "generation", "donorId", "transplantationDonorId",
@@ -95,7 +103,7 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType", "_species",
     ],
     "genetic_reagents": [
-        "resourceId", "insertName", "vectorType", "vectorBackbone",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "insertName", "vectorType", "vectorBackbone",
         "promoter", "insertSpecies", "insertEntrezId", "selectableMarker",
         "copyNumber", "gRNAshRNASequence", "bacterialResistance", "hazardous",
         "nTerminalTag", "cTerminalTag", "totalSize", "backboneSize", "insertSize",
@@ -107,7 +115,7 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "patient_derived_models": [
-        "resourceId", "modelType", "patientDiagnosis",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "modelType", "patientDiagnosis",
         "hostStrain", "organ", "manifestation", "engraftmentSite", "passageNumber",
         "establishmentRate", "molecularCharacterization", "clinicalData",
         "validationMethods", "geneticDisorder",
@@ -135,18 +143,17 @@ COLUMNS = {
         "_resourceName",
     ],
     "computational_tools": [
-        "resourceId", "softwareName", "softwareType", "softwareVersion",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "softwareName", "softwareType", "softwareVersion",
         "programmingLanguage", "sourceRepository", "documentation", "licenseType",
         "licenseDetails", "containerized", "dependencies", "systemRequirements",
-        "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "rrid",
-        "geneticDisorder", "manifestation",
+        "lastUpdate", "maintainer", "analyticalPlatformSupport", "downloadURL", "geneticDisorder", "manifestation",
         "developerName", "developerAffiliation", "itemAcquisition",
         "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "organoid_protocols": [
-        "resourceId", "modelType", "derivationSource", "cellTypes",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "modelType", "derivationSource", "cellTypes",
         "organ", "matrixType", "cultureSystem", "cultureMedia", "maturationTime",
         "characterizationMethods", "passageNumber", "cryopreservationProtocol",
         "qualityControlMetrics", "geneticDisorder", "manifestation",
@@ -160,7 +167,7 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType", "_toolName",
     ],
     "clinical_assessment_tools": [
-        "resourceId", "assessmentName", "assessmentType",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "assessmentName", "assessmentType",
         "targetPopulation", "diseaseSpecific", "numberOfItems", "scoringMethod",
         "validatedLanguages", "psychometricProperties", "administrationTime",
         "availabilityStatus", "licensingRequirements", "digitalVersion",
@@ -172,10 +179,9 @@ COLUMNS = {
         "_context", "_confidence", "_verdict", "_usageType",
     ],
     "biobanks": [
-        "resourceId", "biobankURL", "biobankName", "geneticDisorder",
+        "resourceId", *_CORE_RESOURCE_COLUMNS, "biobankURL", "biobankName", "geneticDisorder",
         "specimenType", "tissue", "manifestation",
-        "specimenPreparationMethod", "specimenFormat", "contact", "rrid",
-        "mtaRequired", "ngnriRepositoryStatus", "requestFormURL",
+        "specimenPreparationMethod", "specimenFormat", "contact", "mtaRequired", "ngnriRepositoryStatus", "requestFormURL",
         "developerName", "developerAffiliation", "developerContactEmail",
         "howToAcquire", "availability",
         "_resourceName", "_pmid", "_doi", "_publicationTitle", "_year",
@@ -1474,6 +1480,39 @@ def _compute_how_to_acquire(ttype: str, row: dict) -> str:
     return ""
 
 
+# Wording already used by the vendor-bought rows in Synapse.
+_VENDOR_HOW_TO_ACQUIRE = (
+    "This tool is available from a commercial vendor or non-profit repository. "
+    "Please purchase it from the vendor listed below."
+)
+
+
+def _apply_core_resource_fields(row: dict, item: dict, ttype: str) -> None:
+    """Fill the core Tool columns (_CORE_RESOURCE_COLUMNS + howToAcquire) on a
+    detail row from its submission. Values a builder already set win."""
+    bi = item.get("basicInfo") or {}
+    if ttype in _TTYPE_ID_INFO:
+        row["resourceName"] = row.get("resourceName") or row.get("_resourceName", "")
+        row["resourceType"] = _TTYPE_ID_INFO[ttype][0]
+    row["description"] = row.get("description") or _get(bi, "description") or _get(item, "description")
+    row["rrid"] = row.get("rrid") or _get(bi, "rrid") or _get(item, "rrid")
+    if not row.get("synonyms"):
+        raw = _get(bi, "synonyms") or _get(item, "synonyms")
+        if isinstance(raw, list):
+            names = [str(v).strip() for v in raw if str(v).strip()]
+        else:
+            sep = ";" if ";" in (raw or "") else ","
+            names = [v.strip() for v in (raw or "").split(sep) if v.strip()]
+        # JSON array so a comma inside one synonym isn't split on upload.
+        row["synonyms"] = json.dumps(names) if names else ""
+    if not row.get("howToAcquire"):
+        if _get(item, "vendor") or row.get("vendor"):
+            row["howToAcquire"] = _VENDOR_HOW_TO_ACQUIRE
+        else:
+            # Builders don't all copy itemAcquisition etc. onto the row.
+            row["howToAcquire"] = _compute_how_to_acquire(ttype, {**item, **bi, **row})
+
+
 _AVAILABILITY_STATUS_MAP = {
     # Fold-in from AvailabilityEnum's simplification (#295) -- "License
     # Required" is now covered by "Contact Developer".
@@ -1538,6 +1577,8 @@ def _compute_availability(ttype: str, row: dict) -> str:
             return "Contact Developer"
 
     elif ttype in ("cell_line", "genetic_reagent"):
+        if _acq("vendor") or _acq("catalogNumber"):
+            return "Vendor"
         if _acq("developerName") or _acq("developerAffiliation") or _acq("developerContactEmail"):
             return "Contact Developer"
 
@@ -1763,8 +1804,9 @@ def compile_accepted(json_files: list, csv_dir: Path, dry_run: bool) -> None:
             # but no _build_* sets them -- compute here, once, for all 9 types
             # rather than duplicating this in each builder (#298).
             if ttype != "observation":
-                row.setdefault("howToAcquire", _compute_how_to_acquire(ttype, row))
-                row.setdefault("availability", _compute_availability(ttype, row))
+                _apply_core_resource_fields(row, item, ttype)
+                row.setdefault("availability", _compute_availability(
+                    ttype, {**item, **(item.get("basicInfo") or {}), **row}))
             name = row.get(name_col, "")
             norm_name = _normalize_name(name)
             if norm_name in existing:
