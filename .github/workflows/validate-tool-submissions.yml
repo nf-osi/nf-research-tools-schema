@@ -1,0 +1,61 @@
+name: Validate Tool Submissions
+
+# Runs general correctness checks (tool_coverage/scripts/validate_submissions.py)
+# against submissions/*/*.json added or changed in a PR, before merge:
+# schema conformance, duplicate names/synonyms (within the PR and against tools
+# already live in Synapse), conditionally-expected fields (e.g. a vendor URL when
+# itemAcquisition is "Purchase from Vendor"), URL syntax, and publication presence.
+# upsert-tools.yml uploads on push to main, so this is the only pre-merge check.
+#
+# Runs on every PR that touches submission JSONs -- including automated mining
+# PRs (labelled automated-mining), which are the most error-prone -- rather than
+# only on PRs labelled tool-submissions.
+
+on:
+  pull_request:
+    paths:
+      - 'submissions/*/*.json'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r tool_coverage/requirements.txt
+
+      - name: Identify changed submission files
+        id: changed_files
+        run: |
+          git diff --name-only --diff-filter=AM \
+            "origin/${{ github.event.pull_request.base.ref }}" "${{ github.event.pull_request.head.sha }}" \
+            -- 'submissions/*/*.json' > changed_files.txt || true
+          echo "Changed submission files:"
+          cat changed_files.txt
+
+      - name: Validate changed submissions
+        env:
+          # Read-only use: checks names against the live resource registry.
+          # Not available on PRs from forks -- the check is then skipped with a warning.
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          if [ ! -s changed_files.txt ]; then
+            echo "No submissions/*/*.json files changed — nothing to validate."
+            exit 0
+          fi
+          python tool_coverage/scripts/validate_submissions.py --check-urls --check-synapse \
+            --only-files $(cat changed_files.txt)
