@@ -460,7 +460,7 @@ with PdfPages(pdf_file) as pdf:
                                f"({data['coverage_pct']:.1f}%) {status}")
 
     summary_lines.append(f"\nTotal Tools: {len(tools_df)}")
-    for rt in sorted(tools_df['resourceType'].dropna().unique())  # untyped rows (#358) can't sort with str:
+    for rt in sorted(tools_df['resourceType'].dropna().unique()):  # untyped rows (#358) can't sort with str
         count = len(tools_df[tools_df['resourceType']==rt])
         summary_lines.append(f"  {rt}: {count}")
 
