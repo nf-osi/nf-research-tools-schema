@@ -405,7 +405,7 @@ def _patient_derived_model(row: dict) -> dict:
         "toolType": "patient_derived_model",
         "userInfo": {},
         "basicInfo": {
-            "modelName": row.get("_toolName") or row.get("_resourceName", ""),
+            "resourceName": row.get("_toolName") or row.get("_resourceName", ""),
             "description": "",
             "synonyms": "",
             "modelType": row.get("modelType") or row.get("modelSystemType", ""),
@@ -462,7 +462,7 @@ def _organoid_protocol(row: dict) -> dict:
         "toolType": "organoid_protocol",
         "userInfo": {},
         "basicInfo": {
-            "modelName": row.get("_toolName") or row.get("_resourceName", ""),
+            "resourceName": row.get("_toolName") or row.get("_resourceName", ""),
             "description": "",
             "synonyms": "",
             "modelType": row.get("modelType", ""),
