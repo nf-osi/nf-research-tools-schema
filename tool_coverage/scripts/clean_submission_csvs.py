@@ -8,6 +8,7 @@ uploading to Synapse.
 """
 
 import json
+import re
 import pandas as pd
 import os
 import glob
@@ -16,19 +17,62 @@ import synapseclient
 from synapseclient import Table
 from typing import List, Dict, Tuple
 
-SYN_RESOURCES_TABLE = "syn26450069"
+def _normalize_name(name) -> str:
+    """Normalize a name for duplicate detection.
+
+    Mirrors compile_accepted_submissions.py's _normalize_name — see that
+    module's docstring for why this exists: the #213/#220-#222 duplicate-row
+    bug was caused by comparing raw, unnormalized resourceName strings, so
+    incidental formatting drift (capitalization, extra whitespace) between
+    two processing runs of the same tool dodged dedup entirely.
+    """
+    if name is None or (isinstance(name, float) and pd.isna(name)):
+        return ""
+    return re.sub(r"\s+", " ", str(name).strip()).casefold()
+
+
+def _find_resourcename_duplicates(df_clean: pd.DataFrame, existing_names) -> pd.Series:
+    """Return a boolean mask of df_clean rows whose (normalized) resourceName
+    already exists in the target table.
+
+    ``existing_names`` is any iterable of resourceName strings already in
+    Synapse (raw, unnormalized). Rows that match are ones the PK-based dedup
+    missed -- see _normalize_name's docstring for why that happens.
+    """
+    existing_norm_names = {_normalize_name(n) for n in existing_names}
+    return df_clean["resourceName"].apply(lambda n: _normalize_name(n) in existing_norm_names)
 
 # Primary-key column for each detail table — used to skip rows already in Synapse.
+# All 9 tool-type detail tables now key off the unified `resourceId` -- the
+# LinkML migration dropped every type-specific `<type>Id` column in favor of it.
+VENDOR_TABLE = "syn26486850"
+
+
+def normalize_vendor_name(name) -> str:
+    """Vendor match key: case/punctuation-insensitive, ignoring a leading
+    "The" ("Jackson Laboratory" == "The Jackson Laboratory").
+
+    Vendor rows created before the UUID5 scheme have unrelated vendorIds, so
+    vendorId alone can't tell a known vendor from a new one.
+    """
+    if not isinstance(name, str):
+        return ""
+    key = re.sub(r"[^a-z0-9 ]+", " ", name.lower())
+    key = re.sub(r"\s+", " ", key).strip()
+    return re.sub(r"^the ", "", key)
+
+
 _DETAIL_TABLE_PK = {
-    "syn26486808": "animalModelId",
-    "syn26486811": "antibodyId",
-    "syn26486823": "cellLineId",
-    "syn26486832": "geneticReagentId",
+    "syn26486808": "resourceId",  # AnimalModelDetails (was animalModelId)
+    "syn26486811": "resourceId",  # AntibodyDetails (was antibodyId)
+    "syn26486821": "resourceId",  # BiobankDetails (was biobankId)
+    "syn26486823": "resourceId",  # CellLineDetails (was cellLineId)
+    "syn26486832": "resourceId",  # GeneticReagentDetails (was geneticReagentId)
+    "syn73709226": "resourceId",  # ComputationalToolDetails (was computationalToolId)
+    "syn73709227": "resourceId",  # OrganoidProtocolDetails (was organoidProtocolId)
+    "syn73709228": "resourceId",  # PatientDerivedModelDetails (was patientDerivedModelId)
+    "syn73709229": "resourceId",  # ClinicalAssessmentToolDetails (was clinicalAssessmentToolId)
     "syn26486836": "observationId",
-    "syn73709226": "computationalToolId",
-    "syn73709227": "organoidProtocolId",
-    "syn73709228": "patientDerivedModelId",
-    "syn73709229": "clinicalAssessmentToolId",
     "syn26486829": "donorId",
     "syn26486850": "vendorId",
     "syn26486835": "mutationDetailsId",
@@ -48,6 +92,38 @@ def _run_url_comment() -> str:
     repo   = os.getenv("GITHUB_REPOSITORY", "")
     run_id = os.getenv("GITHUB_RUN_ID", "")
     return f"{server}/{repo}/actions/runs/{run_id}" if (server and repo and run_id) else ""
+
+# Tables already snapshotted before their first write in this process.
+_PRE_SNAPSHOTTED: set = set()
+
+
+def _snapshot(syn, table_id: str, when: str) -> None:
+    run_url = _run_url_comment()
+    syn.create_snapshot_version(
+        table_id, comment=f"{when} upsert-tools: {run_url}" if run_url else f"{when} upsert-tools"
+    )
+
+
+def store_with_snapshots(syn, table_id: str, df: pd.DataFrame):
+    """Write df to a Synapse table, snapshotting it before and after.
+
+    The "before" snapshot is taken once per table per run, ahead of its first
+    write, so a rollback point exists even for edits curators made directly in
+    Synapse since the last snapshot. If it can't be created, nothing is
+    written. A failed "after" snapshot only warns.
+    """
+    if table_id not in _PRE_SNAPSHOTTED:
+        _snapshot(syn, table_id, "before")  # raises -> no write
+        _PRE_SNAPSHOTTED.add(table_id)
+        print(f"         📸 Snapshot of {table_id} taken before writing")
+    result = syn.store(Table(table_id, df))
+    try:
+        _snapshot(syn, table_id, "after")
+        print(f"         📸 Snapshot of {table_id} taken after writing")
+    except Exception as e:
+        print(f"         ⚠️  Post-write snapshot failed for {table_id}: {e}")
+    return result
+
 
 # Mapping of CLEAN_*.csv files to Synapse table IDs
 SYNAPSE_TABLE_MAP = {
@@ -77,7 +153,12 @@ SYNAPSE_TABLE_MAP = {
     'CLEAN_mutation.csv': 'syn26486834',           # Mutation junction table
 
     # Common tables
-    'CLEAN_resources.csv': 'syn26450069',
+    # Note: CLEAN_resources.csv is intentionally NOT mapped here -- the legacy
+    # Resource table (syn26450069) was retired in Phase 7 of the LinkML
+    # migration (docs/MIGRATION.md). Every tool-type table now carries its own
+    # resourceId/resourceName/etc. directly, so there is no longer a central
+    # table to upload to. The Phase 1 snapshot of syn26450069 is kept for
+    # reference only.
     'CLEAN_publications.csv': 'syn26486839',  # Base publication table
     'CLEAN_usage.csv': 'syn26486841',  # Publications where tools were USED
     'CLEAN_development.csv': 'syn26486807',  # Publications where tools were DEVELOPED
@@ -91,48 +172,63 @@ SYNAPSE_TABLE_MAP = {
 _STRIP_BEFORE_UPLOAD = {
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     # developerContactEmail → no schema home; dropped
-    # itemAcquisition → resource.howToAcquire (syn26450069); handled by generate pipeline
-    # Columns after transplantationDonorId not yet in syn26486808 — remove once schema updated:
+    # itemAcquisition/developerContactEmail/etc. themselves have no column on
+    # any detail table; compile_accepted_submissions.py derives howToAcquire
+    # and availability from them (kept, not stripped -- see #298), which is
+    # what actually gets uploaded.
+    #
+    # NOTE: alleleType/affectedGeneSymbol/inducedVsDevelopmental/bbbIntegrityStatus/
+    # routeOfAdministration/pkpdCapabilities/mechanismOfActionValidation/
+    # pediatricSuitability/timelineToResults/modelLimitations/clinicalTranslationHistory/
+    # regulatoryAcceptanceHistory/mtaRequired/ngnriRepositoryStatus used to be stripped
+    # here with a "not yet in syn26486808 — remove once schema updated" comment. That
+    # schema update happened; these columns exist on syn26486808 now, so stripping them
+    # was silently discarding real submission data on every upload. Un-stripped.
     'CLEAN_animal_models.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail', 'itemAcquisition',
-        'alleleType', 'affectedGeneSymbol', 'inducedVsDevelopmental', 'bbbIntegrityStatus',
-        'routeOfAdministration', 'pkpdCapabilities', 'mechanismOfActionValidation',
-        'pediatricSuitability', 'timelineToResults', 'modelLimitations',
-        'clinicalTranslationHistory', 'regulatoryAcceptanceHistory', 'mtaRequired',
-        'ngnriRepositoryStatus',
+        'vendor', 'catalogNumber', 'catalogURL',
     ],
     # developerName/Affiliation → investigator table (syn51734029) via upsert_publication_links
     'CLEAN_cell_lines.csv': [
         'developerName', 'developerAffiliation', 'developerContactEmail',
+        'vendor', 'catalogNumber', 'catalogURL',
     ],
     # vendor/catalogNumber/catalogURL → vendorItem pipeline (upsert_publication_links)
     'CLEAN_antibodies.csv': [
         'vendor', 'catalogNumber', 'catalogURL',
     ],
-    # rrid → resource table (syn26450069); developer fields same as animal models
-    # licenseDetails not yet in syn73709226 with sufficient length — remove once schema updated:
+    # developer fields same as animal models.
+    # NOTE: rrid and licenseDetails used to be stripped here too ("not yet in
+    # syn73709226" / "not yet ... with sufficient length") -- both columns exist on
+    # syn73709226 now. Un-stripped.
     'CLEAN_computational_tools.csv': [
-        'rrid', 'developerName', 'developerAffiliation', 'itemAcquisition',
-        'licenseDetails',
+        'developerName', 'developerAffiliation', 'itemAcquisition',
     ],
-    # qualityControlMetrics items up to 118 chars — increase maximumStringLength to ≥200 in syn73709227:
-    # developerName/developerContactEmail used only for howToAcquire in resources table
+    # developerName/developerAffiliation/developerContactEmail → investigator table
+    'CLEAN_biobanks.csv': [
+        'developerName', 'developerAffiliation', 'developerContactEmail',
+    ],
+    # developerName/developerContactEmail have no column on this table; only
+    # feed the derived howToAcquire/availability (kept -- see #298).
+    # NOTE: qualityControlMetrics used to be stripped here too ("items up to 118
+    # chars — increase maximumStringLength to ≥200 in syn73709227") -- the column's
+    # maximumSize is already 200. Un-stripped.
     'CLEAN_organoid_protocols.csv': [
-        'qualityControlMetrics', 'developerName', 'developerContactEmail',
+        'developerName', 'developerContactEmail',
     ],
-    # developerName/developerContactEmail used only for howToAcquire in resources table
+    # developerName/developerContactEmail have no column on this table; only
+    # feed the derived howToAcquire/availability (kept -- see #298).
     'CLEAN_clinical_assessment_tools.csv': [
         'developerName', 'developerContactEmail',
     ],
-    # validationMethods items are 70 chars — increase maximumStringLength to ≥100 in syn73709228:
-    # itemAcquisition/developerName/developerAffiliation used only for howToAcquire in resources table
+    # itemAcquisition/developerName/developerAffiliation have no column on
+    # this table; only feed the derived howToAcquire/availability (kept --
+    # see #298).
+    # NOTE: validationMethods used to be stripped here too ("items are 70 chars —
+    # increase maximumStringLength to ≥100 in syn73709228") -- the column's
+    # maximumSize is already 100. Un-stripped.
     'CLEAN_patient_derived_models.csv': [
-        'validationMethods', 'itemAcquisition', 'developerName', 'developerAffiliation',
-    ],
-    # v2.0 type-specific FK columns not yet added to syn26450069 schema
-    'CLEAN_resources.csv': [
-        'computationalToolId', 'organoidProtocolId', 'patientDerivedModelId',
-        'clinicalAssessmentToolId',
+        'itemAcquisition', 'developerName', 'developerAffiliation',
     ],
     # resourceType/resourceName kept in ACCEPTED for review; strip before Synapse upload.
     # observationTypeOntologyId not in syn26486836 schema.
@@ -234,7 +330,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         # New tool types (v2.0) — syn73709226-syn73709229
         'computational_tools': ['softwareName', 'softwareType'],
         'organoid_protocols': ['modelType', 'derivationSource'],
-        'patient_derived_models': ['modelSystemType', 'patientDiagnosis'],
+        'patient_derived_models': ['modelType', 'patientDiagnosis'],
         'clinical_assessment_tools': ['assessmentName', 'assessmentType', 'targetPopulation'],
 
         # Vendor / donor tables
@@ -248,7 +344,7 @@ def validate_csv_schema(df: pd.DataFrame, file_type: str) -> Tuple[bool, List[st
         'resources': ['resourceName', 'resourceType'],
         'observations': ['observationId', 'resourceType', 'resourceName', 'observationType', 'observationText'],
         'mutation_details': ['mutationDetailsId'],
-        'mutation': ['mutationId', 'mutationDetailsId', 'animalModelId'],
+        'mutation': ['mutationId', 'mutationDetailsId', 'resourceId'],  # was animalModelId pre-migration (see line ~49)
     }
 
     # Extract type name from filename stem (exact match to avoid e.g. "vendor" matching "vendorItem")
@@ -312,8 +408,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
     """Upsert cleaned data to Synapse table.
 
     Strips routing columns (those belonging to other Synapse tables), serializes
-    STRING_LIST columns to JSON arrays, then appends new rows.  Creates a snapshot
-    version after each successful upload.
+    STRING_LIST columns to JSON arrays, then appends new rows.  Snapshots the
+    table before its first write and after each write (store_with_snapshots).
 
     Args:
         syn: Synapse client
@@ -368,55 +464,13 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                 except Exception as e:
                     print(f"      ⚠️  Could not resolve observation publicationIds: {e}")
 
-        # For the Resources table, skip rows whose (resourceName, resourceType) pair is
-        # already in Synapse to prevent duplicate name+type entries.  We check by name+type
-        # (not resourceId) because that is the lookup key used by upsert_publication_links.py
-        # and because ID format may differ between pipeline runs.  Real metadata updates to
-        # existing resources should go through generate_review_csv.py, which preserves
-        # curated fields; uploading here would blank them out.
-        if table_id == SYN_RESOURCES_TABLE and "resourceName" in df_clean.columns:
-            existing_res = syn.tableQuery(
-                f"SELECT resourceName, resourceType, howToAcquire FROM {SYN_RESOURCES_TABLE}"
-            ).asDataFrame()
-
-            # Build lookup: (name.lower(), type) → (ROW_ID, ROW_VERSION, current_howToAcquire)
-            existing_map: dict = {}
-            for idx, erow in existing_res.iterrows():
-                key = (str(erow["resourceName"]).lower(), str(erow.get("resourceType", "")))
-                parts = str(idx).split("_")
-                existing_map[key] = (int(parts[0]), int(parts[1]), erow.get("howToAcquire") or "")
-
-            existing_keys = set(existing_map.keys())
-            before = len(df_clean)
-            mask = df_clean.apply(
-                lambda r: (str(r["resourceName"]).lower(), str(r.get("resourceType", ""))) not in existing_keys,
-                axis=1,
-            )
-            df_existing = df_clean[~mask].copy()
-            df_clean = df_clean[mask].copy()
-            skipped = before - len(df_clean)
-            if skipped:
-                print(f"      ℹ️  {skipped} resource(s) already in Synapse")
-
-            # Patch howToAcquire for existing rows where it was previously blank
-            if "howToAcquire" in df_existing.columns:
-                patch_rows = []
-                for _, prow in df_existing.iterrows():
-                    key = (str(prow["resourceName"]).lower(), str(prow.get("resourceType", "")))
-                    row_id, row_ver, cur_val = existing_map.get(key, (None, None, ""))
-                    raw = prow.get("howToAcquire")
-                    new_val = "" if (raw is None or (isinstance(raw, float) and pd.isna(raw))) else str(raw).strip()
-                    if row_id and new_val and new_val != cur_val:
-                        patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, "howToAcquire": new_val})
-                if patch_rows:
-                    syn.store(Table(table_id, pd.DataFrame(patch_rows)))
-                    print(f"      ✅ Patched howToAcquire for {len(patch_rows)} existing resource(s)")
-
-            if df_clean.empty:
-                print(f"      ✅ No new resources to upload to {table_id}")
-                return True
-
-        elif table_id in _DETAIL_TABLE_PK:
+        # Note: this used to have a special-cased branch here for uploading to
+        # the legacy Resource table (syn26450069) by (resourceName, resourceType)
+        # lookup. That table was retired in Phase 7 of the LinkML migration
+        # (docs/MIGRATION.md) -- every tool-type table now carries its own
+        # resourceId/resourceName/etc. directly and is handled by the
+        # resourceId-based dedup below like every other detail table.
+        if table_id in _DETAIL_TABLE_PK:
             pk_col = _DETAIL_TABLE_PK[table_id]
             patch_field_names = _PATCH_FIELDS.get(table_id, [])
             if pk_col in df_clean.columns:
@@ -432,6 +486,46 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                     skipped = before - len(df_clean)
                     if skipped:
                         print(f"      ℹ️  Skipped {skipped} row(s) already in {table_id} (by {pk_col})")
+
+                    # Safety net for the #213/#220-#222 duplicate-row bug: pk_col is a
+                    # deterministic hash of resourceName, so a "new" pk_col can still be
+                    # the *same* underlying tool reprocessed with slightly different name
+                    # formatting. Cross-check remaining rows against existing resourceName
+                    # values in this table (available directly on every detail table since
+                    # the LinkML migration) before uploading, rather than silently inserting
+                    # a duplicate for a human to find later.
+                    if "resourceName" in df_clean.columns and not df_clean.empty:
+                        try:
+                            existing_names_df = syn.tableQuery(
+                                f"SELECT resourceName FROM {table_id} WHERE resourceName IS NOT NULL"
+                            ).asDataFrame()
+                            suspect_mask = _find_resourcename_duplicates(df_clean, existing_names_df["resourceName"])
+                            n_suspect = int(suspect_mask.sum())
+                            if n_suspect:
+                                print(f"      ⚠️  {n_suspect} row(s) have a new {pk_col} but a resourceName matching "
+                                      f"an existing row in {table_id} — likely duplicates, NOT uploading:")
+                                for name in df_clean.loc[suspect_mask, "resourceName"]:
+                                    print(f"           - {name!r}")
+                                print(f"         Review manually and, if genuinely new, resubmit with a distinct name.")
+                                df_clean = df_clean[~suspect_mask].copy()
+                        except Exception as e:
+                            print(f"      ⚠️  Could not run resourceName duplicate safety-check for {table_id}: {e} — continuing")
+
+                    # Same idea for vendors, matched on vendorName (see normalize_vendor_name).
+                    if table_id == VENDOR_TABLE and "vendorName" in df_clean.columns and not df_clean.empty:
+                        existing_vendor_names = syn.tableQuery(
+                            f"SELECT vendorName FROM {VENDOR_TABLE}"
+                        ).asDataFrame()["vendorName"]
+                        known = {normalize_vendor_name(n) for n in existing_vendor_names}
+                        known_mask = df_clean["vendorName"].apply(normalize_vendor_name).isin(known)
+                        if known_mask.any():
+                            print(f"      ℹ️  Skipped {int(known_mask.sum())} vendor(s) already in {VENDOR_TABLE} by name: "
+                                  f"{list(df_clean.loc[known_mask, 'vendorName'])}")
+                            df_clean = df_clean[~known_mask].copy()
+
+                    if df_clean.empty:
+                        print(f"      ✅ No new rows to upload to {table_id} (all were duplicates)")
+                        return True
 
                     # Patch newly-added fields on existing rows where blank in Synapse.
                     # synapseclient sets the DataFrame index to "ROW_ID_ROW_VERSION" strings
@@ -467,7 +561,7 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                             if updates:
                                 patch_rows.append({"ROW_ID": row_id, "ROW_VERSION": row_ver, **updates})
                         if patch_rows:
-                            syn.store(Table(table_id, pd.DataFrame(patch_rows)))
+                            store_with_snapshots(syn, table_id, pd.DataFrame(patch_rows))
                             print(f"      ✅ Patched {list(patch_field_names)} for {len(patch_rows)} existing row(s) in {table_id}")
 
                     if df_clean.empty:
@@ -476,13 +570,8 @@ def upsert_to_synapse(syn, clean_file, df_clean):
                 except Exception as e:
                     print(f"      ⚠️  Could not check existing {pk_col}s in {table_id}: {e} — uploading without dedup")
 
-        table = Table(table_id, df_clean)
-        table = syn.store(table)
-
+        store_with_snapshots(syn, table_id, df_clean)
         print(f"      ✅ Uploaded {len(df_clean)} rows to {table_id}")
-        print(f"         Creating snapshot version...")
-        syn.create_snapshot_version(table_id, comment=_run_url_comment() or None)
-        print(f"         ✅ Snapshot version created")
 
         return True
 

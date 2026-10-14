@@ -1102,10 +1102,10 @@ def write_validated_tools_submit_csv(validation_results, output_dir='.'):
         elif tool_type == 'patient_derived_model':
             return {
                 '_toolName': tool_name,      # tracking only — name goes in resources
-                'modelSystemType': _f(f, 'modelSystemType'),
+                'modelType': _f(f, 'modelType') or _f(f, 'modelSystemType'),
                 'patientDiagnosis': _f(f, 'patientDiagnosis'),
                 'hostStrain': _f(f, 'hostStrain'),
-                'tumorType': _f(f, 'tumorType'),
+                'manifestation': _f(f, 'manifestation') or _f(f, 'tumorType'),
                 'engraftmentSite': _f(f, 'engraftmentSite'),
                 'passageNumber': _f(f, 'passageNumber'),
                 'establishmentRate': _f(f, 'establishmentRate'),

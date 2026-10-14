@@ -1,0 +1,373 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-researchToolsBiobank",
+  "title": "NF Research Tools - Biobank",
+  "description": "A large collection of biological or medical data and tissue samples, amassed for research purposes.",
+  "type": "object",
+  "properties": {
+    "aiSummary": {
+      "description": "A large language model-generated summary of the resource.",
+      "type": "string"
+    },
+    "availability": {
+      "type": "string",
+      "enum": [
+        "Vendor",
+        "Contact Developer",
+        "Freely Available",
+        "Unknown"
+      ],
+      "description": "How this resource can be obtained."
+    },
+    "biobankName": {
+      "description": "The name of the biobank.",
+      "type": "string"
+    },
+    "biobankURL": {
+      "description": "A URL for the biobank landing page.",
+      "format": "uri",
+      "type": "string"
+    },
+    "contact": {
+      "description": "Guidance on where to find additional information about the biobank.",
+      "type": "string"
+    },
+    "dateAdded": {
+      "description": "The date that the resource was originally added.",
+      "format": "date",
+      "type": "string"
+    },
+    "dateModified": {
+      "description": "The last update of the resource metadata.",
+      "format": "date",
+      "type": "string"
+    },
+    "description": {
+      "description": "Free text description, summary, or purpose of the resource.",
+      "type": "string"
+    },
+    "geneticDisorder": {
+      "description": "Genetic disorders associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Neurofibromatosis type 1",
+          "Neurofibromatosis type 2",
+          "Schwannomatosis",
+          "NF1 Spontaneous Mutation",
+          "No known genetic disorder",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "howToAcquire": {
+      "description": "How to acquire a particular resource.",
+      "type": "string"
+    },
+    "manifestation": {
+      "description": "Manifestations or symptoms that this resource is used to model (e.g. tumor type, behavioral phenotype).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Acute Lymphocytic Leukemia",
+          "Acute Myeloid Leukemia",
+          "Adult T Acute Lymphoblastic Leukemia",
+          "Amelanotic Cutaneous Melanoma",
+          "Askin Tumor",
+          "Astrocytoma",
+          "Astrogliosis",
+          "Atypical Neurofibroma",
+          "BCR-ABL1 positive",
+          "BRCA2 Syndrome",
+          "Brain NOS",
+          "Cafe-Au-Lait Spots",
+          "Canine Histiocytic Sarcoma",
+          "Canine Lymphoma",
+          "Canine Melanoma",
+          "Canine Soft Tissue Sarcoma",
+          "Cecum Adenocarcinoma",
+          "Cervical Adenocarcinoma",
+          "Chronic Myelogenous Leukemia",
+          "Clinically Affected",
+          "Clinically Asymptomatic (Self-reported)",
+          "Clinically Asymptomatic But At Risk",
+          "Cognition",
+          "Colon Adenocarcinoma",
+          "Colon Carcinoma",
+          "Cutaneous Melanoma",
+          "Cutaneous Neurofibroma",
+          "Cystic Fibrosis",
+          "Diffuse Infiltrating Neurofibroma",
+          "Embryonic Lethal",
+          "General NF1 Deficiency",
+          "Glioblastoma",
+          "Growth",
+          "Heart Malformation",
+          "Hereditary Breast and Ovarian Cancer Syndrome",
+          "High Grade Glioma",
+          "Human Papillomavirus-Related Endocervical Adenocarcinoma",
+          "Invasive Breast Carcinoma",
+          "Juvenile Myelomonocytic Leukemia",
+          "Lipoma",
+          "Low Grade Glioma",
+          "Lung Adenocarcinoma",
+          "Lung Adenosquamous Carcinoma",
+          "Lung Carcinoid Tumor",
+          "Lung Giant Cell Carcinoma",
+          "Lung Large Cell Carcinoma",
+          "Lung Non-Small Cell Carcinoma",
+          "Lung Papillary Adenocarcinoma",
+          "Lung Small Cell Carcinoma",
+          "Lung Squamous Cell Carcinoma",
+          "Malignant Peripheral Nerve Sheath Tumor",
+          "Melanoma",
+          "Meningioma",
+          "Metabolic Function",
+          "Mild Or No Symptoms",
+          "Minimally Invasive Lung Adenocarcinoma",
+          "Mouse Adrenal Gland Pheochromocytoma",
+          "Neural Crest Hyperplasia",
+          "Neuroblastoma",
+          "Neurofibroma",
+          "Neurofibroma NOS",
+          "Neurofibromatosis Type 1 (NF1)-Like Syndrome (NFLS)",
+          "No Symptoms",
+          "None",
+          "Noonan Syndrome",
+          "Optic Nerve Glioma",
+          "Other",
+          "Ovarian Cystadenocarcinoma",
+          "Pancreatic Adenocarcinoma",
+          "Pancreatic Adenosquamous Carcinoma",
+          "Pancreatic Carcinoma",
+          "Pancreatic Ductal Adenocarcinoma",
+          "Pancreatic Somatostatinoma",
+          "Pheochromocytoma",
+          "Pleural Malignant Mesothelioma",
+          "Plexiform Neurofibroma",
+          "Poorly Differentiated Thyroid Gland Carcinoma",
+          "Rectal Adenocarcinoma",
+          "Schwannoma",
+          "Spinal Development",
+          "Thyroid Gland Anaplastic Carcinoma",
+          "Thyroid Gland Follicular Carcinoma",
+          "Unaffected Nerve"
+        ]
+      },
+      "type": "array"
+    },
+    "mtaRequired": {
+      "description": "Whether a Material Transfer Agreement is required to request specimens.",
+      "type": "boolean"
+    },
+    "ngnriRepositoryStatus": {
+      "description": "Whether this biobank operates under or is affiliated with the Nick Gilbert Neurofibromatosis Research Institute (NGNRI) equitable access framework.",
+      "type": "boolean"
+    },
+    "requestFormURL": {
+      "description": "A URL for the biobank's specimen request form, if available.",
+      "format": "uri",
+      "type": "string"
+    },
+    "resourceId": {
+      "description": "A unique identifier for the resource.",
+      "type": "string"
+    },
+    "resourceName": {
+      "description": "The canonical name of the resource.",
+      "type": "string"
+    },
+    "resourceType": {
+      "type": "string",
+      "enum": [
+        "Animal Model",
+        "Cell Line",
+        "Antibody",
+        "Genetic Reagent",
+        "Biobank",
+        "Computational Tool",
+        "Organoid Protocol",
+        "Patient-Derived Model",
+        "Clinical Assessment Tool"
+      ],
+      "description": "Type of resource."
+    },
+    "rrid": {
+      "description": "The RRID, a standard resource identifier for interoperability with other databases. Must include the lowercase 'rrid:' prefix.",
+      "pattern": "^rrid:[a-zA-Z]+.+$",
+      "type": "string"
+    },
+    "specimenFormat": {
+      "description": "How specimens have been processed in preparation for distribution.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "whole tumor",
+          "slide",
+          "FFPE sections",
+          "cells",
+          "whole cell lysate",
+          "DNA",
+          "RNA",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "specimenPreparationMethod": {
+      "description": "The preservation methods used by the biobank.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Fresh collected",
+          "Flash frozen",
+          "FFPE",
+          "Cryopreserved",
+          "OCT",
+          "RNA later",
+          "Formalin-fixed",
+          "Ethanol",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "specimenTissueType": {
+      "description": "The types of tissues that are banked.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Blood",
+          "Tumor",
+          "Cerebrospinal Fluid",
+          "Nerve",
+          "Skin",
+          "Bone",
+          "Brain",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "specimenType": {
+      "description": "The types of specimens that are banked.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "human tissue",
+          "xenograft tumors",
+          "cell lines",
+          "blood",
+          "DNA",
+          "RNA",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "synonyms": {
+      "description": "Synonyms of the resource.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "tissue": {
+      "description": "The types of tissues that are banked.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Blood",
+          "Bone",
+          "Bone marrow",
+          "Brain",
+          "Buccal mucosa",
+          "Buffy coat",
+          "Cerebral cortex",
+          "Cerebrospinal fluid",
+          "Dorsal root ganglion",
+          "Embryonic tissue",
+          "Meninges",
+          "Nerve",
+          "Nerve tissue",
+          "Optic nerve",
+          "Other",
+          "Plasma",
+          "Primary tumor",
+          "Recurrent tumor",
+          "Schwann cell",
+          "Sciatic nerve",
+          "Serum",
+          "Skin",
+          "Splenocyte",
+          "Tumor",
+          "Unspecified",
+          "Urine",
+          "Whole brain"
+        ]
+      },
+      "type": "array"
+    },
+    "tumorType": {
+      "description": "Tumor types associated with the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "cutaneous neurofibroma",
+          "plexiform neurofibroma",
+          "atypical neurofibroma",
+          "schwannoma",
+          "meningioma",
+          "malignant peripheral nerve sheath tumor",
+          "low grade glioma",
+          "high grade glioma",
+          "pheochromocytoma",
+          "optic nerve glioma",
+          "neurofibroma NOS",
+          "diffuse infiltrating neurofibroma",
+          "brain NOS",
+          "Other"
+        ]
+      },
+      "type": "array"
+    },
+    "usageRequirements": {
+      "description": "Any known restrictions on use of the resource.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "data sharing required",
+          "non-commercial use only",
+          "re-distribution not permitted",
+          "generation of germ line transmitting chimeras not permitted",
+          "creation of functional gametes not permitted",
+          "generation of interspecies chimeras not permitted",
+          "human cloning not permitted",
+          "cannot be used for treatment purposes",
+          "IRB documentation required",
+          "special licencing restrictions (see vendor for more information)",
+          "unknown"
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "biobankName",
+    "biobankURL",
+    "specimenType",
+    "tissue",
+    "specimenPreparationMethod",
+    "specimenFormat",
+    "geneticDisorder",
+    "manifestation",
+    "resourceId",
+    "resourceName",
+    "resourceType",
+    "availability",
+    "dateAdded",
+    "dateModified"
+  ],
+  "additionalProperties": {}
+}

@@ -24,18 +24,33 @@ classes:
     mixins:
       - HasTumorType
       - HasPassageNumber
+    slots:
+      - geneticDisorder
+      - manifestation
     description: >-
       Patient-derived models including patient-derived xenografts (PDX),
       humanized mice, patient-derived organoids, and patient-derived
       cell lines.
     attributes:
+      modelType:
+        description: Type of patient-derived model system.
+        range: ModelTypeEnum
+        required: true
       modelSystemType:
         description: Type of patient-derived model system.
         range: ModelSystemTypeEnum
-        required: true
+        deprecated: >-
+          Use modelType instead (nf-research-tools-schema#262) --
+          unified with OrganoidProtocol's modelType field/enum,
+          disambiguated by resourceType rather than by prefixing
+          values with "Patient-Derived". Kept populated for backward
+          compatibility until nothing reads it.
       patientDiagnosis:
         description: Original patient diagnosis or condition.
         required: true
+      organ:
+        description: The organ the patient-derived model is derived from.
+        range: OrganEnum
       hostStrain:
         description: Host organism strain for xenografts.
         range: HostStrainEnum
@@ -53,9 +68,70 @@ classes:
       validationMethods:
         description: Methods used to validate model fidelity to patient.
         multivalued: true
+      bbbIntegrityStatus:
+        range: BbbIntegrityStatusEnum
+      clinicalTranslationHistory:
+        description: >-
+          Known instances where findings from this model did or did not
+          translate to human clinical outcomes.
+      routeOfAdministration:
+        description: >-
+          Drug delivery routes that have been validated or are feasible
+          in this model.
+        range: RouteOfAdministrationEnum
+        multivalued: true
+      otherRouteOfAdministration:
+        description: >-
+          Free-text specification when routeOfAdministration includes "Other".
+      pkpdCapabilities:
+        description: >-
+          Pharmacokinetic and pharmacodynamic measurements that can be
+          performed in this model.
+        range: PkpdCapabilitiesEnum
+        multivalued: true
+      mechanismOfActionValidation:
+        description: >-
+          Drug mechanisms of action that have been successfully tested
+          in this model.
+        range: MechanismOfActionEnum
+        multivalued: true
+      otherMechanismOfActionValidation:
+        description: >-
+          Free-text specification when mechanismOfActionValidation
+          includes "Other".
+      pediatricSuitability:
+        description: >-
+          Whether this model is suitable for studying pediatric, adult,
+          or both age groups.
+        range: PediatricSuitabilityEnum
+      timelineToResults:
+        description: >-
+          Estimated time from experiment start to primary endpoint readout.
+        range: TimelineToResultsEnum
+      modelLimitations:
+        description: >-
+          Explicit description of what this model does NOT recapitulate
+          or where it may produce false positive/negative results.
+      regulatoryAcceptanceHistory:
+        description: >-
+          Known FDA/EMA precedents where data from this model type
+          supported a regulatory submission or approval.
+      mtaRequired:
+        description: >-
+          Whether a Material Transfer Agreement is required to access
+          this model.
+        range: boolean
+      ngnriRepositoryStatus:
+        description: >-
+          Whether this model is deposited in the Nick Gilbert
+          Neurofibromatosis Research Institute (NGNRI) repository for
+          equitable access.
+        range: boolean
     slot_usage:
       resourceType:
         ifabsent: string(Patient-Derived Model)
+      manifestation:
+        required: true
 
 enums:
 
@@ -73,6 +149,7 @@ enums:
     permissible_values:
       NSG: {}
       NOD-SCID: {}
+      NRG: {}
       nude: {}
       SCID: {}
       Other: {}
@@ -90,7 +167,11 @@ enums:
     description: Molecular characterization methods.
     permissible_values:
       Genomic Sequencing: {}
+      Whole Genome Sequencing: {}
       RNA-seq: {}
+      RNA sequencing: {}
       Proteomics: {}
       Immunohistochemistry: {}
+      Flow Cytometry: {}
+      Methylation: {}
       Other: {}

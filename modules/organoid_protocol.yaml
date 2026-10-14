@@ -23,13 +23,16 @@ classes:
     is_a: Tool
     mixins:
       - HasPassageNumber
+    slots:
+      - geneticDisorder
+      - manifestation
     description: >-
       Advanced 3D cellular models including organoids, assembloids,
       spheroids, and other 3D culture systems.
     attributes:
       modelType:
         description: Type of 3D cellular model.
-        range: OrganoidModelTypeEnum
+        range: ModelTypeEnum
         required: true
       derivationSource:
         description: Source of cells used to generate the model.
@@ -38,10 +41,21 @@ classes:
       cellTypes:
         description: Cell types present in the model.
         multivalued: true
-        required: true
+      organ:
+        description: The organ the organoid represents or is derived from.
+        range: OrganEnum
       organoidType:
         description: Specific type of organoid, if applicable.
         range: OrganoidTypeEnum
+        deprecated: >-
+          Use organ instead (nf-research-tools-schema#262) -- same
+          concept as organ (shared with CellLine/PatientDerivedModel),
+          phrased adjectivally (e.g. "Cerebral") instead of as an organ
+          noun (e.g. "Brain"). Every OrganoidTypeEnum value maps onto an
+          existing OrganEnum value 1:1 (Cerebral->Brain,
+          Intestinal->Intestine, Cardiac->Heart, Retinal->Eye,
+          Pancreatic->Pancreas; Liver/Kidney/Lung/Other unchanged). Kept
+          populated for backward compatibility until nothing reads it.
       matrixType:
         description: Extracellular matrix or scaffold used.
         range: MatrixTypeEnum
@@ -59,29 +73,93 @@ classes:
       qualityControlMetrics:
         description: Quality control metrics used.
         multivalued: true
+      cultureMedia:
+        description: >-
+          Growth media used to culture this model (e.g. DMEM, RPMI
+          1640, mTeSR1), including any supplements.
+      bbbModelCapability:
+        description: >-
+          Whether this model incorporates blood-brain-barrier
+          components (e.g., endothelial cells, astrocytes) enabling
+          assessment of drug CNS penetration.
+        range: boolean
+      nfManifestation:
+        description: NF manifestation this model is used to study.
+        range: OrganoidNfManifestationEnum
+        deprecated: >-
+          Use manifestation instead (nf-research-tools-schema#262) --
+          same concept, unified with CellLine/AnimalModel/Biobank/
+          PatientDerivedModel's manifestation field/enum. Kept for
+          backward compatibility until nothing reads it; the live
+          Synapse column is empty (no submissions have used it yet),
+          so nothing is lost.
+      routeOfAdministration:
+        description: >-
+          Drug delivery routes that have been validated or are feasible
+          in this model.
+        range: OrganoidRouteOfAdministrationEnum
+        multivalued: true
+      pkpdCapabilities:
+        description: >-
+          Pharmacokinetic and pharmacodynamic measurements that can be
+          performed in this model.
+        range: OrganoidPkpdCapabilitiesEnum
+        multivalued: true
+      mechanismOfActionValidation:
+        description: >-
+          Drug mechanisms of action that have been successfully tested
+          in this model.
+        range: MechanismOfActionEnum
+        multivalued: true
+      pediatricSuitability:
+        description: >-
+          Whether this model is derived from or suitable for studying
+          pediatric, adult, or both age groups.
+        range: PediatricSuitabilityEnum
+      timelineToResults:
+        description: >-
+          Estimated time from model establishment to primary endpoint
+          readout.
+        range: OrganoidTimelineToResultsEnum
+      modelLimitations:
+        description: >-
+          Explicit description of what this model does NOT recapitulate
+          or where it may produce misleading results.
+      regulatoryAcceptanceHistory:
+        description: >-
+          Known FDA/EMA precedents where data from this model type
+          supported a regulatory submission or approval.
+      suitableForRegulatoryPackage:
+        description: >-
+          Whether this model has been accepted or is considered
+          sufficient as standalone (non-animal) evidence in a
+          regulatory submission (e.g., for repurposed drugs).
+        range: boolean
+      mtaRequired:
+        description: >-
+          Whether a Material Transfer Agreement is required to access
+          this model.
+        range: boolean
+      ngnriRepositoryStatus:
+        description: >-
+          Whether this model is deposited in the Nick Gilbert
+          Neurofibromatosis Research Institute (NGNRI) repository for
+          equitable access.
+        range: boolean
     slot_usage:
       resourceType:
         ifabsent: string(Organoid Protocol)
 
 enums:
 
-  OrganoidModelTypeEnum:
-    description: Types of 3D cellular models.
-    permissible_values:
-      Organoid: {}
-      Assembloid: {}
-      Spheroid: {}
-      3D Culture: {}
-      Other: {}
-
   DerivationSourceEnum:
     description: Sources of cells for model generation.
     permissible_values:
-      iPSC: {}
-      ESC: {}
+      Induced Pluripotent Stem Cell (iPSC): {}
+      Embryonic Stem Cell (ESC): {}
       Primary Tissue: {}
       Cell Line: {}
-      Patient-Derived: {}
+      Unknown: {}
       Other: {}
 
   OrganoidTypeEnum:
@@ -123,5 +201,59 @@ enums:
       RNA-seq: {}
       scRNA-seq: {}
       Electrophysiology: {}
+      Flow Cytometry: {}
       Imaging: {}
+      Methylation: {}
       Other: {}
+
+  OrganoidNfManifestationEnum:
+    description: NF manifestation an organoid protocol is used to study.
+    permissible_values:
+      Plexiform Neurofibroma: {}
+      Cutaneous Neurofibroma: {}
+      Atypical Neurofibroma: {}
+      Malignant Peripheral Nerve Sheath Tumor: {}
+      Schwannoma: {}
+      Meningioma: {}
+      Low Grade Glioma: {}
+      High Grade Glioma: {}
+      Optic Nerve Glioma: {}
+      Pheochromocytoma: {}
+      Cognition: {}
+      Other: {}
+      None: {}
+
+  OrganoidRouteOfAdministrationEnum:
+    description: >-
+      Drug delivery routes that have been validated or are feasible in
+      an organoid protocol.
+    permissible_values:
+      Direct media addition: {}
+      Microfluidic perfusion: {}
+      Other: {}
+
+  OrganoidPkpdCapabilitiesEnum:
+    description: >-
+      Pharmacokinetic and pharmacodynamic measurements that can be
+      performed in an organoid protocol.
+    permissible_values:
+      Drug concentration in media: {}
+      Drug concentration in tissue/organoid: {}
+      Target engagement measurement: {}
+      Pathway modulation (e.g., pERK, pAKT): {}
+      Biomarker response: {}
+      Metabolite profiling: {}
+      Metabolic pathway flux analysis: {}
+      Drug-drug interaction assessment: {}
+      Other: {}
+
+  OrganoidTimelineToResultsEnum:
+    description: >-
+      Estimated time from model establishment to primary endpoint
+      readout for an organoid protocol.
+    permissible_values:
+      Less than 1 month: {}
+      1–3 months: {}
+      3–6 months: {}
+      More than 6 months: {}
+      Unknown: {}

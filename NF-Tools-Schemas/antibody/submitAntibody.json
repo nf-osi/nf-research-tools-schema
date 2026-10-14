@@ -11,10 +11,6 @@
           "type": "string",
           "title": "Name of Antibody"
         },
-        "synonyms": {
-          "type": "string",
-          "title": "Synonyms"
-        },
         "description": {
           "type": "string",
           "title": "Description (~20 words)"
@@ -25,7 +21,8 @@
           "enum": [
             "Mouse",
             "Rabbit",
-            "Unknown"
+            "Unknown",
+            "Other"
           ]
         },
         "reactiveSpecies": {
@@ -59,10 +56,10 @@
             "Fish": {
               "type": "boolean"
             },
-            "Non-humanprimate": {
+            "Non-human primate": {
               "type": "boolean"
             },
-            "GuineaPig": {
+            "Guinea pig": {
               "type": "boolean"
             },
             "Hamster": {
@@ -91,6 +88,10 @@
             }
           }
         },
+        "synonyms": {
+          "type": "string",
+          "title": "Synonyms"
+        },
         "developerName": {
           "type": "string",
           "title": "Developer Name"
@@ -107,27 +108,28 @@
         "reactiveSpecies"
       ]
     },
-    "conjugate": {
-      "type": "string",
-      "title": "Conjugated",
-      "enum": [
-        "Conjugated",
-        "Non-conjugated"
-      ]
-    },
     "targetAntigen": {
       "type": "string",
       "title": "Target Antigen"
-    },
-    "cloneId": {
-      "type": "string",
-      "title": "Clone ID",
-      "description": "Clone identifier if monoclonal (e.g. 2D1, EP1879Y)."
     },
     "uniprotId": {
       "type": "string",
       "title": "UniProt ID",
       "description": "UniProt accession for the target protein (e.g. P21359 for NF1). Find at uniprot.org."
+    },
+    "conjugate": {
+      "type": "string",
+      "title": "Conjugated",
+      "enum": [
+        "Conjugated",
+        "Non-conjugated",
+        "Unknown"
+      ]
+    },
+    "cloneId": {
+      "type": "string",
+      "title": "Clone ID",
+      "description": "Clone identifier if monoclonal (e.g. 2D1, EP1879Y)."
     },
     "clonality": {
       "type": "string",
@@ -142,6 +144,11 @@
         "Isotope Control",
         "Unknown"
       ]
+    },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -241,7 +248,7 @@
         "properties": {
           "additionalDetails": {
             "type": "string",
-            "title": "Please provide additional details."
+            "title": "Please describe how to acquire this (you selected \"Other\")"
           }
         },
         "required": [
