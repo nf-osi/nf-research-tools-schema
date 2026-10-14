@@ -299,3 +299,26 @@ def test_mmrrc_outage_is_not_cached(tmp_path, monkeypatch):
     monkeypatch.setattr(lookup, "_MMRRC_CATALOG_CACHE", None)
     assert _real_lookup_mmrrc("anything") == ""
     assert not cache.exists()
+
+
+def test_mmrrc_html_strain_names_match_plain_nomenclature(tmp_path, monkeypatch):
+    """Catalog names carry <i>/<sup> markup; plain-text MGI nomenclature (and
+    nothing looser) must still match them exactly."""
+    pages = {1: [
+        {"strain_name": "C57BL/6-<i>Nf1<sup>tm1Joe</sup></i>/Mmjax",
+         "rrid": "RRID:MMRRC_041154-JAX", "other": "x" * 1000},
+        {"strain_name": "C57BL/6N-<i>Nf1</i><sup><i>tm1a(KOMP)Wtsi</i></sup>/MmucD",
+         "rrid": "RRID:MMRRC_048792-UCD"},
+    ]}
+    monkeypatch.setattr(lookup, "_get",
+                        lambda url, **k: pages.get(int(url.rsplit("/", 1)[1]), []))
+    cache = tmp_path / "mmrrc.json"
+    monkeypatch.setattr(lookup, "_MMRRC_CACHE_FILE", cache)
+    monkeypatch.setattr(lookup, "_MMRRC_CATALOG_CACHE", None)
+
+    assert _real_lookup_mmrrc("C57BL/6-Nf1<tm1Joe>/Mmjax") == "rrid:MMRRC_041154-JAX"
+    assert _real_lookup_mmrrc("C57BL/6-Nf1tm1Joe/Mmjax") == "rrid:MMRRC_041154-JAX"
+    assert _real_lookup_mmrrc("C57BL/6N-Nf1<tm1a(KOMP)Wtsi>/MmucD") == "rrid:MMRRC_048792-UCD"
+    assert _real_lookup_mmrrc("Nf1<tm1Joe>") == ""  # partial name: no match
+    # Only the rrid is cached, not the whole catalog entry.
+    assert "other" not in cache.read_text()

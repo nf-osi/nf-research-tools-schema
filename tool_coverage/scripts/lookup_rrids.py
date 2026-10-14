@@ -221,6 +221,28 @@ _MMRRC_MAX_PAGES = 800  # catalog empties out around page ~650-700 (checked live
                          # cached for the rest of the run) — acceptable for this periodic script.
 
 
+def _norm_ws(s: str) -> str:
+    return re.sub(r"\s+", " ", s.strip().lower())
+
+
+def _mmrrc_name_keys(raw: str) -> set[str]:
+    """Exact-match keys for one MMRRC strain name. Catalog names carry HTML
+    markup (e.g. "B6;129X1-<i>Hnf1a<sup>tm1.1Ylee</sup></i>/Mmnc"), which no
+    submission name will, so also index the plain-text MGI form with the
+    superscript in angle brackets ("B6;129X1-Hnf1a<tm1.1Ylee>/Mmnc") and with
+    all markup dropped ("B6;129X1-Hnf1atm1.1Ylee/Mmnc"). Still whole-name
+    matches only, case/whitespace-insensitive."""
+    raw = raw or ''
+    keys = {_norm_ws(raw)}
+    if '<' in raw:
+        bracketed = re.sub(r'<sup>(.*?)</sup>', '\x00\\1\x01', raw, flags=re.IGNORECASE)
+        bracketed = re.sub(r'<[^>]+>', '', bracketed).replace('\x00', '<').replace('\x01', '>')
+        keys.add(_norm_ws(bracketed))
+        keys.add(_norm_ws(re.sub(r'<[^>]+>', '', raw)))
+    keys.discard('')
+    return keys
+
+
 def _fetch_mmrrc_catalog() -> dict[str, dict]:
     """Fetch and cache the full MMRRC catalog (public getCatalog endpoint), keyed by
     lowercased strain_name. Paginates 100 entries at a time until a page comes back
@@ -262,12 +284,17 @@ def _fetch_mmrrc_catalog() -> dict[str, dict]:
                     done = True  # past the last page
                     break
                 for entry in data:
-                    strain_name = re.sub(r"\s+", " ", (entry.get('strain_name') or '').strip().lower())
-                    if strain_name:
-                        catalog[strain_name] = entry
-                    published_name = re.sub(r"\s+", " ", (entry.get('published_name') or '').strip().lower())
-                    if published_name:
-                        catalog.setdefault(published_name, entry)
+                    rrid = (entry.get('rrid') or '').strip()
+                    if not rrid:
+                        continue
+                    # Keep only the rrid: the full entries make a ~600 MB cache file.
+                    slim = {'rrid': rrid}
+                    for i, field in enumerate(('strain_name', 'published_name')):
+                        for key in _mmrrc_name_keys(entry.get(field) or ''):
+                            if i == 0:
+                                catalog[key] = slim
+                            else:
+                                catalog.setdefault(key, slim)
             page += len(batch)
     print(f'    (MMRRC catalog: fetched {len(catalog)} names'
           f'{", incomplete — not cached" if failed else ""})', end=' ', flush=True)
@@ -302,7 +329,7 @@ def _lookup_mmrrc(name: str) -> str:
     # Exact (case/whitespace-insensitive) match only. A fuzzy fallback across
     # ~65k strain names returned the first token-overlap hit, which risks
     # assigning another strain's RRID.
-    entry = catalog.get(re.sub(r"\s+", " ", name.lower().strip()))
+    entry = catalog.get(_norm_ws(name))
     if not entry:
         return ''
 
