@@ -367,6 +367,12 @@ def main():
         help='Test mode: limit to N publications'
     )
     parser.add_argument(
+        '--include-reviewed',
+        action='store_true',
+        help='Keep publications that already have a tool_reviews/results YAML '
+             '(for --force-rereviews runs)'
+    )
+    parser.add_argument(
         '--output',
         default=None,
         help='Output file for publication list (auto-generated if not specified)'
@@ -402,6 +408,9 @@ def main():
         print("\n2. Loading previously reviewed publications...")
         previously_reviewed = load_previously_reviewed_pmids()
         print(f"   - {len(previously_reviewed)} previously reviewed publications")
+        if args.include_reviewed:
+            print("   - --include-reviewed: keeping them for re-review")
+            previously_reviewed = set()
 
         # Load publications from Synapse
         print("\n3. Loading NF Portal publications from Synapse...")

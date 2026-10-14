@@ -111,11 +111,18 @@ jobs:
           # Create outputs directory
           mkdir -p tool_coverage/outputs
 
+          # Previously reviewed PMIDs are dropped here unless re-reviews are forced
+          INCLUDE_REVIEWED=""
+          if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
+            INCLUDE_REVIEWED="--include-reviewed"
+          fi
+
           # Run bench science query (computational, PDX, organoids, lab tools)
           echo "1a. Bench science query (computational, PDX, organoids, antibodies, cell lines)..."
           python tool_coverage/scripts/prepare_publication_list.py \
             --query-type bench \
             --output tool_coverage/outputs/publication_list_bench.csv \
+            $INCLUDE_REVIEWED \
             2>&1 | tee tool_coverage/outputs/prep_list_bench.log || echo "bench_failed=true" >> $GITHUB_OUTPUT
 
           # Run clinical assessment query (questionnaires, scales, PROMs)
@@ -123,6 +130,7 @@ jobs:
           python tool_coverage/scripts/prepare_publication_list.py \
             --query-type clinical \
             --output tool_coverage/outputs/publication_list_clinical.csv \
+            $INCLUDE_REVIEWED \
             2>&1 | tee tool_coverage/outputs/prep_list_clinical.log || echo "clinical_failed=true" >> $GITHUB_OUTPUT
 
           # Merge publication lists (deduplicate by PMID, merge query_types)
@@ -366,47 +374,16 @@ jobs:
         id: prep_from_cache
         if: steps.phase1_cache.outputs.phase1_complete == 'true'
         run: |
-          echo "Creating processed_publications.csv from cache..."
+          echo "Creating processed_publications.csv from this run's screened PMIDs..."
 
-          # Read cache files and create processed_publications.csv with all metadata
-          python3 <<'EOF'
-          import json
-          import csv
-          from pathlib import Path
-
-          cache_dir = Path('tool_reviews/publication_cache')
-          output_file = 'tool_coverage/outputs/processed_publications.csv'
-
-          publications = []
-          for cache_file in cache_dir.glob('*_text.json'):
-              with open(cache_file) as f:
-                  cache = json.load(f)
-
-              # Extract PMID number
-              pmid = cache['pmid'].replace('PMID:', '')
-
-              publications.append({
-                  'pmid': f"PMID:{pmid}",
-                  'title': cache.get('title', ''),
-                  'abstract': cache.get('abstract', ''),
-                  'methods': cache.get('methods', ''),
-                  'authors': cache.get('authors', ''),
-                  'journal': cache.get('journal', ''),
-                  'publicationDate': cache.get('publicationDate', ''),
-                  'doi': cache.get('doi', ''),
-                  'cache_level': cache.get('cache_level', ''),
-                  'has_fulltext': cache.get('has_fulltext', False)
-              })
-
-          # Write to CSV
-          if publications:
-              with open(output_file, 'w', newline='') as f:
-                  writer = csv.DictWriter(f, fieldnames=publications[0].keys())
-                  writer.writeheader()
-                  writer.writerows(publications)
-
-              print(f"Created {output_file} with {len(publications)} publications")
-          EOF
+          # Only this run's screened PMIDs (not every committed cache file), minus
+          # any that already have a persisted tool_reviews/results/*_tool_review.yaml.
+          CMD="python tool_coverage/scripts/build_processed_publications.py"
+          if [ "${{ github.event.inputs.force_rereviews }}" = "true" ]; then
+            CMD="$CMD --force-rereviews"
+          fi
+          echo "Running: $CMD"
+          $CMD
 
           echo "prep_from_cache_complete=true" >> $GITHUB_OUTPUT
 
@@ -637,6 +614,16 @@ jobs:
           path: tool_coverage/outputs/publications_deferred.txt
           retention-days: 90
 
+      - name: List tool review YAMLs to commit
+        id: review_paths
+        if: steps.format_submissions.outputs.new_count != ''
+        run: |
+          # git add fails (and adds nothing) if any pathspec matches no file,
+          # so only pass the YAML glob when there is at least one.
+          if compgen -G "tool_reviews/results/*_tool_review.yaml" > /dev/null; then
+            echo "paths=tool_reviews/results/*_tool_review.yaml" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Pull Request (mining results)
         if: steps.format_submissions.outputs.new_count != ''
         uses: peter-evans/create-pull-request@v7
@@ -656,6 +643,11 @@ jobs:
           labels: |
             automated-mining
             tool-coverage
+          # *_tool_review.yaml persists the "already reviewed" skip across runs
+          # (prepare_publication_list.py, build_processed_publications.py and
+          # run_publication_reviews.py all check it). *_observations.yaml stays
+          # out: format_mining_as_submissions.py globs every one of them.
           add-paths: |
             tool_reviews/publication_cache/
+            ${{ steps.review_paths.outputs.paths }}
             submissions/**
