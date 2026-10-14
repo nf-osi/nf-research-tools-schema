@@ -515,6 +515,38 @@ jobs:
           echo "new_count=${NEW_COUNT}" >> $GITHUB_OUTPUT
           echo "✅ ${NEW_COUNT} submission JSON files written"
 
+      - name: Month key for MMRRC catalog cache
+        id: mmrrc_key
+        if: steps.format_submissions.outputs.new_count != ''
+        run: echo "month=$(date -u +%Y-%m)" >> $GITHUB_OUTPUT
+
+      # lookup_rrids.py's MMRRC fallback pages through the whole public catalog
+      # (~650 requests). Cache it so that happens at most once a month, not per run.
+      - name: Restore MMRRC catalog cache
+        if: steps.format_submissions.outputs.new_count != ''
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/mmrrc_catalog.json
+          key: mmrrc-catalog-${{ steps.mmrrc_key.outputs.month }}
+
+      - name: Look up RRIDs for new submissions
+        id: rrid_lookup
+        if: steps.format_submissions.outputs.new_count != ''
+        continue-on-error: true  # RRIDs are a nice-to-have; never block the mining PR
+        env:
+          SCICRUNCH_API_KEY: ${{ secrets.SCICRUNCH_API_KEY }}
+        run: |
+          # Only the files this run wrote or changed (untracked + modified), not
+          # submissions already sitting in the workspace from earlier PRs.
+          git ls-files -z --others --modified --exclude-standard -- 'submissions/*.json' \
+            | tr '\0' '\n' | grep -v '/observations/' | sort -u > new_submission_files.txt || true
+          echo "$(wc -l < new_submission_files.txt | tr -d ' ') submission file(s) to check"
+          python tool_coverage/scripts/lookup_rrids.py \
+            --files-list new_submission_files.txt \
+            --mmrrc-cache "${{ runner.temp }}/mmrrc_catalog.json" \
+            --summary-md tool_coverage/outputs/rrid_lookup_summary.md \
+            2>&1 | tee tool_coverage/outputs/rrid_lookup_output.log
+
       - name: Generate confidence score summary
         id: confidence_summary
         if: steps.format_submissions.outputs.new_count != ''
@@ -583,6 +615,9 @@ jobs:
 
           new_count = os.environ.get("NEW_COUNT", "")
 
+          rrid_md_path = pathlib.Path("tool_coverage/outputs/rrid_lookup_summary.md")
+          rrid_md = rrid_md_path.read_text() if rrid_md_path.exists() else ""
+
           # GitHub Step Summary
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
               fh.write("## Confidence Score Summary\n\n")
@@ -599,6 +634,7 @@ jobs:
               f"### Review instructions\n\n"
               f"1. Inspect JSON files in `submissions/{{type}}/`\n"
               f"2. Delete any that are incorrect or duplicates\n"
+              f"   — and check any `rrid` filled by registry lookup (table below)\n"
               f"3. Add label `tool-submissions` before merging — "
               f"triggers `upsert-tools.yml` → Synapse upload\n\n"
               f"> **Note**: `_publications` array shows each publication where the tool was found, "
@@ -608,6 +644,7 @@ jobs:
               f"{table_md}\n"
               f"{detail_md}\n"
               f"{flagged_md}\n"
+              f"\n{rrid_md}"
           )
           with open("pr_body.md", "w") as fh:
               fh.write(pr_body)

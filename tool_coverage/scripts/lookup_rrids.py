@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""lookup_rrids.py — Populate rrid column in ACCEPTED_resources.csv.
+"""lookup_rrids.py — Fill blank `rrid` fields in submission JSONs.
 
-Queries public registries by tool name; writes discovered RRIDs back to
-ACCEPTED_resources.csv and the matching type-specific ACCEPTED_*.csv.
+Takes submissions/{type}/*.json paths (as written by format_mining_as_submissions.py
+or process_formspark_export.py), queries public registries by tool name for each
+file whose rrid is blank, and writes the RRID back into the JSON
+(basicInfo.rrid when the file has a basicInfo block, else top-level rrid).
+compile_accepted_submissions.py carries that value onto the detail row, so it
+reaches Synapse when upsert-tools.yml uploads the submission.
 
 Registries used (all public, no API key required by default):
   cell_line / patient_derived_model
@@ -26,22 +30,34 @@ Registries used (all public, no API key required by default):
 For any tool type, if the context already contains an explicit RRID: string it
 is extracted directly without a network call (normalized to lowercase rrid: prefix).
 
+RRIDs use the repo convention: lowercase rrid: prefix, accession case kept
+(e.g. rrid:CVCL_0031). Registry errors and timeouts are non-fatal: the file is
+left unchanged and the script still exits 0.
+
 Usage:
-  python tool_coverage/scripts/lookup_rrids.py
-  python tool_coverage/scripts/lookup_rrids.py --output-dir tool_coverage/outputs
-  python tool_coverage/scripts/lookup_rrids.py --dry-run
-  python tool_coverage/scripts/lookup_rrids.py --force            # re-query even if rrid filled
-  python tool_coverage/scripts/lookup_rrids.py --api-key KEY      # SciCrunch key for antibodies
-  python tool_coverage/scripts/lookup_rrids.py --tool-type cell_line  # single type only
+  python tool_coverage/scripts/lookup_rrids.py submissions/cell_lines/*.json
+  python tool_coverage/scripts/lookup_rrids.py --files-list new_submissions.txt
+  python tool_coverage/scripts/lookup_rrids.py --dry-run FILE...
+  python tool_coverage/scripts/lookup_rrids.py --force FILE...      # re-query even if rrid filled
+  python tool_coverage/scripts/lookup_rrids.py --api-key KEY FILE... # SciCrunch key for antibodies
+  python tool_coverage/scripts/lookup_rrids.py --mmrrc-cache mmrrc.json FILE...  # reuse MMRRC catalog
+  python tool_coverage/scripts/lookup_rrids.py --summary-md rrids.md FILE...     # markdown for PR body
 """
 
 import argparse
-import csv
+import json
 import os
 import re
+import sys
 import time
 import urllib.parse
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from compile_accepted_submissions import (  # noqa: E402
+    _resource_name_from_data,
+    _tool_type_from_json,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -50,10 +66,28 @@ from pathlib import Path
 _RRID_IN_TEXT_RE = re.compile(r'RRID:\s*([A-Za-z0-9_:\-]+)', re.IGNORECASE)
 
 
-def _extract_rrid_from_text(text: str) -> str:
-    """Return the first RRID:XXXX string found in text, or ''."""
-    m = _RRID_IN_TEXT_RE.search(text or '')
-    return f'rrid:{m.group(1)}' if m else ''
+# Registry prefixes an RRID may carry for each tool type. A publication context
+# snippet often names several tools, so an RRID is only taken from it when its
+# registry fits the tool being looked up.
+_RRID_PREFIXES_BY_TYPE = {
+    'cell_line':             ('CVCL_',),
+    'patient_derived_model': ('CVCL_',),
+    'antibody':              ('AB_',),
+    'genetic_reagent':       ('Addgene_',),
+    'animal_model':          ('IMSR_', 'MMRRC_', 'ZFIN_', 'ZDB-', 'RGD_', 'BDSC_',
+                              'WB-STRAIN', 'NXR_', 'Xenbase', 'MGI'),
+}
+
+
+def _extract_rrid_from_text(text: str, tool_type: str | None = None) -> str:
+    """Return the first RRID:XXXX string found in text (restricted to registries
+    that fit tool_type, when given), or ''."""
+    prefixes = _RRID_PREFIXES_BY_TYPE.get(tool_type or '', ())
+    for m in _RRID_IN_TEXT_RE.finditer(text or ''):
+        acc = m.group(1).rstrip(':-')
+        if tool_type is None or acc.lower().startswith(tuple(p.lower() for p in prefixes)):
+            return f'rrid:{acc}'
+    return ''
 
 
 def _get(url: str, params: dict | None = None, headers: dict | None = None,
@@ -179,6 +213,7 @@ def _lookup_imsr(name: str) -> str:
 
 
 _MMRRC_CATALOG_CACHE: dict[str, dict] | None = None
+_MMRRC_CACHE_FILE: Path | None = None  # set by --mmrrc-cache; read/written as JSON
 _MMRRC_MAX_PAGES = 800  # catalog empties out around page ~650-700 (checked live); safety cap
                          # in case pagination never terminates. ~65-70k strains total, so the
                          # first animal_model lookup in a run is slow (one-time full fetch,
@@ -194,6 +229,14 @@ def _fetch_mmrrc_catalog() -> dict[str, dict]:
     global _MMRRC_CATALOG_CACHE
     if _MMRRC_CATALOG_CACHE is not None:
         return _MMRRC_CATALOG_CACHE
+
+    if _MMRRC_CACHE_FILE and _MMRRC_CACHE_FILE.exists():
+        try:
+            _MMRRC_CATALOG_CACHE = json.loads(_MMRRC_CACHE_FILE.read_text())
+            print(f'    (MMRRC catalog: {len(_MMRRC_CATALOG_CACHE)} names from {_MMRRC_CACHE_FILE})')
+            return _MMRRC_CATALOG_CACHE
+        except (OSError, ValueError) as exc:
+            print(f'    ⚠️  ignoring unreadable MMRRC cache {_MMRRC_CACHE_FILE}: {exc}')
 
     catalog: dict[str, dict] = {}
     page = 1  # API is 1-indexed; page 0 returns a "too big/small" error
@@ -211,6 +254,13 @@ def _fetch_mmrrc_catalog() -> dict[str, dict]:
         page += 1
 
     _MMRRC_CATALOG_CACHE = catalog
+    # Only persist a non-empty catalog, so an MMRRC outage isn't cached as "no strains".
+    if _MMRRC_CACHE_FILE and catalog:
+        try:
+            _MMRRC_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            _MMRRC_CACHE_FILE.write_text(json.dumps(catalog))
+        except OSError as exc:
+            print(f'    ⚠️  could not write MMRRC cache {_MMRRC_CACHE_FILE}: {exc}')
     return catalog
 
 
@@ -287,206 +337,226 @@ def _fuzzy_match(a: str, b: str, threshold: float = 0.85) -> bool:
 # Per-type dispatch
 # ---------------------------------------------------------------------------
 
-_CONTEXT_FIELDS = ('_context', 'context')  # field names to check for embedded RRIDs
-
-_TYPE_TO_TYPED_FILE = {
-    'animal_model':             'ACCEPTED_animal_models.csv',
-    'antibody':                 'ACCEPTED_antibodies.csv',
-    'cell_line':                'ACCEPTED_cell_lines.csv',
-    'genetic_reagent':          'ACCEPTED_genetic_reagents.csv',
-    'patient_derived_model':    'ACCEPTED_patient_derived_models.csv',
-    'organoid_protocol':  'ACCEPTED_organoid_protocols.csv',
-    'clinical_assessment_tool': 'ACCEPTED_clinical_assessment_tools.csv',
-    'computational_tool':       'ACCEPTED_computational_tools.csv',
-}
+TOOL_TYPES = (
+    'animal_model', 'antibody', 'cell_line', 'genetic_reagent', 'patient_derived_model',
+    'organoid_protocol', 'clinical_assessment_tool', 'computational_tool',
+)
 
 
 def _lookup_rrid(name: str, tool_type: str, context: str, api_key: str,
-                 rate_limit: float) -> str:
-    """Return RRID for a single resource, or '' if not found."""
-    # 1. Try to extract an explicit RRID from the context text first (no network call).
-    rrid = _extract_rrid_from_text(context)
+                 rate_limit: float) -> tuple[str, str]:
+    """Return (rrid, source) for a single resource, or ('', '') if not found."""
+    # 1. Explicit RRID in the publication context text (no network call).
+    rrid = _extract_rrid_from_text(context, tool_type)
     if rrid:
-        return rrid
+        return rrid, 'context'
 
     # 2. Registry lookup by tool type.
-    time.sleep(rate_limit)
-
     if tool_type in ('cell_line', 'patient_derived_model'):
-        return _lookup_cellosaurus(name)
+        time.sleep(rate_limit)
+        return _tagged(_lookup_cellosaurus(name), 'Cellosaurus')
 
     if tool_type == 'genetic_reagent':
-        return _lookup_addgene(name)
+        time.sleep(rate_limit)
+        return _tagged(_lookup_addgene(name), 'Addgene')
 
     if tool_type == 'animal_model':
         # IMSR aggregates across repositories (JAX, MMRRC, EMMA, ...) but its index
         # of MMRRC-held strains isn't always complete/matched (see nf-osi/nf-research-
         # tools-schema#169 — KOMP-derived mice sent to MMRRC weren't found via IMSR).
         # Query MMRRC directly as a fallback when IMSR comes up empty.
-        return _lookup_imsr(name) or _lookup_mmrrc(name)
+        time.sleep(rate_limit)
+        rrid = _lookup_imsr(name)
+        if rrid:
+            return rrid, 'IMSR'
+        return _tagged(_lookup_mmrrc(name), 'MMRRC')
 
     if tool_type == 'antibody' and api_key:
-        return _lookup_scicrunch_antibody(name, api_key)
+        time.sleep(rate_limit)
+        return _tagged(_lookup_scicrunch_antibody(name, api_key), 'SciCrunch')
 
-    return ''
+    return '', ''
+
+
+def _tagged(rrid: str, source: str) -> tuple[str, str]:
+    return (rrid, source) if rrid else ('', '')
 
 
 # ---------------------------------------------------------------------------
-# Main logic
+# Submission JSON handling
 # ---------------------------------------------------------------------------
 
-def run_lookup(output_dir: Path, dry_run: bool, force: bool,
-               api_key: str, tool_types: list[str], rate_limit: float) -> None:
-    resources_file = output_dir / 'ACCEPTED_resources.csv'
-    if not resources_file.exists():
-        print(f'❌  {resources_file} not found')
-        return
+def _submission_name(data: dict, ttype: str) -> str:
+    name = _resource_name_from_data(data, ttype).strip()
+    # Mined patient_derived_model/organoid JSONs carry the name in
+    # basicInfo.modelName, which _resource_name_from_data doesn't read; a PDM
+    # then comes back as just " (suffix)" or "".
+    bi = data.get('basicInfo') or {}
+    model_name = (bi.get('modelName') or '').strip() if isinstance(bi, dict) else ''
+    if model_name and (not name or name.startswith('(')):
+        return model_name
+    return name
 
-    with open(resources_file, newline='', encoding='utf-8') as f:
-        res_rows = list(csv.DictReader(f))
-        res_fieldnames = list(csv.DictReader(open(resources_file)).fieldnames or [])
 
-    # Ensure rrid column exists
-    if 'rrid' not in res_fieldnames:
-        res_fieldnames.insert(res_fieldnames.index('synonyms') + 1 if 'synonyms' in res_fieldnames else 3, 'rrid')
+def _existing_rrid(data: dict) -> str:
+    bi = data.get('basicInfo')
+    if isinstance(bi, dict) and str(bi.get('rrid') or '').strip():
+        return str(bi['rrid']).strip()
+    return str(data.get('rrid') or '').strip()
 
-    # Build lookup map from type-specific files: resourceId → context text
-    context_by_id: dict[str, str] = {}
-    for ttype, filename in _TYPE_TO_TYPED_FILE.items():
-        typed_file = output_dir / filename
-        if not typed_file.exists():
+
+def _set_rrid(data: dict, rrid: str) -> None:
+    bi = data.get('basicInfo')
+    if isinstance(bi, dict):
+        bi['rrid'] = rrid
+    else:
+        data['rrid'] = rrid
+
+
+def _context_text(data: dict) -> str:
+    parts = [data.get('_context') or '']
+    for pub in data.get('_publications') or []:
+        if isinstance(pub, dict):
+            parts.append(pub.get('_context') or '')
+    return ' | '.join(p for p in parts if p)
+
+
+def _is_observation_path(path: Path) -> bool:
+    return 'observations' in path.parts
+
+
+def run_lookup(paths: list[Path], dry_run: bool = False, force: bool = False,
+               api_key: str = '', rate_limit: float = 0.3) -> list[dict]:
+    """Fill blank rrids in the given submission JSONs. Returns one result dict
+    per tool file looked at: {path, name, toolType, rrid, source, status}, where
+    status is 'filled', 'not_found', 'already_set', 'skipped' or 'error'."""
+    results: list[dict] = []
+    for path in paths:
+        if path.suffix != '.json' or _is_observation_path(path):
             continue
-        with open(typed_file, newline='', encoding='utf-8') as f:
-            for row in csv.DictReader(f):
-                rid = row.get('resourceId', '').strip()
-                ctx = ' | '.join(row.get(cf, '') for cf in _CONTEXT_FIELDS if row.get(cf, ''))
-                if rid and ctx:
-                    context_by_id[rid] = ctx
-
-    # Build vendorItem-derived RRID map: for resources sold by Addgene, construct
-    # RRID:Addgene_{catalogNumber} directly from the vendor/vendorItem CSVs.
-    rrid_from_vendor: dict[str, str] = {}
-    vendor_file    = output_dir / 'ACCEPTED_vendor.csv'
-    vendoritem_file = output_dir / 'ACCEPTED_vendorItem.csv'
-    if vendor_file.exists() and vendoritem_file.exists():
-        with open(vendor_file, newline='', encoding='utf-8') as f:
-            vendors = {row['vendorId']: row.get('vendorName', '') for row in csv.DictReader(f)}
-        with open(vendoritem_file, newline='', encoding='utf-8') as f:
-            for row in csv.DictReader(f):
-                vname = vendors.get(row.get('vendorId', ''), '').lower()
-                cat   = row.get('catalogNumber', '').strip()
-                rid   = row.get('resourceId', '').strip()
-                if rid and cat:
-                    if 'addgene' in vname:
-                        rrid_from_vendor[rid] = f'rrid:Addgene_{cat}'
-                    elif 'jax' in vname or 'jackson' in vname:
-                        rrid_from_vendor[rid] = f'rrid:IMSR_JAX:{cat}'
-
-    total = attempted = found = skipped = 0
-    for row in res_rows:
-        ttype = row.get('_toolType', '').strip()
-        if tool_types and ttype not in tool_types:
+        res = {'path': str(path), 'name': '', 'toolType': '', 'rrid': '', 'source': '',
+               'status': 'skipped'}
+        results.append(res)
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+        except (OSError, ValueError) as exc:
+            print(f'  ⚠️  {path}: unreadable ({exc})')
+            res['status'] = 'error'
             continue
-        total += 1
-
-        existing_rrid = row.get('rrid', '').strip()
-        if existing_rrid and not force:
-            skipped += 1
+        if not isinstance(data, dict):
             continue
 
-        name = row.get('resourceName', '').strip()
-        rid  = row.get('resourceId', '').strip()
-        ctx  = context_by_id.get(rid, '')
+        ttype = _tool_type_from_json(data) or ''
+        res['toolType'] = ttype
+        if ttype not in TOOL_TYPES:
+            continue
+        name = _submission_name(data, ttype)
+        res['name'] = name
 
-        attempted += 1
+        existing = _existing_rrid(data)
+        if existing and not force:
+            res['status'] = 'already_set'
+            res['rrid'] = existing
+            continue
+        if not name:
+            continue
+
         print(f'  [{ttype}] {name[:55]}', end=' ... ', flush=True)
-        rrid = _lookup_rrid(name, ttype, ctx, api_key, rate_limit)
-        # Fallback: use vendorItem-derived RRID if registry lookup failed
-        if not rrid and rid in rrid_from_vendor:
-            rrid = rrid_from_vendor[rid]
+        try:
+            rrid, source = _lookup_rrid(name, ttype, _context_text(data), api_key, rate_limit)
+        except Exception as exc:  # registry quirks must never fail the mining run
+            print(f'⚠️  {exc}')
+            res['status'] = 'error'
+            continue
 
-        if rrid:
-            found += 1
-            print(f'✅ {rrid}')
-            if not dry_run:
-                row['rrid'] = rrid
-        else:
+        if not rrid:
             print('—')
+            res['status'] = 'not_found'
+            continue
 
-    print(f'\nSummary: {found}/{attempted} RRIDs found '
-          f'({skipped} already filled, {total - attempted - skipped} other types skipped)')
-
-    if dry_run:
-        print('(dry-run: no files written)')
-        return
-
-    # Write updated ACCEPTED_resources.csv
-    with open(resources_file, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=res_fieldnames, extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(res_rows)
-
-    print(f'\n✅  RRID lookup complete — {resources_file}')
+        print(f'✅ {rrid} ({source})')
+        res.update(rrid=rrid, source=source, status='filled')
+        if not dry_run:
+            _set_rrid(data, rrid)
+            path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n',
+                            encoding='utf-8')
+    return results
 
 
-def main() -> None:
+def summarize(results: list[dict]) -> str:
+    counts = {s: sum(r['status'] == s for r in results)
+              for s in ('filled', 'not_found', 'already_set', 'error', 'skipped')}
+    return (f"{counts['filled']} filled, {counts['not_found']} not found, "
+            f"{counts['already_set']} already set, {counts['error']} errors, "
+            f"{counts['skipped']} skipped (type without registry / no name)")
+
+
+def summary_markdown(results: list[dict]) -> str:
+    filled = [r for r in results if r['status'] == 'filled']
+    lines = ['### RRIDs filled by registry lookup', '']
+    if not filled:
+        lines.append('_No RRIDs were filled automatically._')
+        return '\n'.join(lines) + '\n'
+    lines += [
+        f'{len(filled)} submission(s) got an `rrid` from a registry name match. '
+        'Check each one is the right strain/line — a wrong RRID is worse than a blank one; '
+        'clear the field in the JSON if it is not.',
+        '',
+        '| Tool | Type | RRID | Source | File |',
+        '|---|---|---|---|---|',
+    ]
+    for r in sorted(filled, key=lambda r: (r['toolType'], r['name'].lower())):
+        lines.append(f"| {r['name']} | {r['toolType']} | `{r['rrid']}` | {r['source']} "
+                     f"| `{r['path']}` |")
+    return '\n'.join(lines) + '\n'
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description='Populate rrid column in ACCEPTED_resources.csv from public registries.',
+        description='Fill blank rrid fields in submission JSONs from public registries.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    parser.add_argument(
-        '--output-dir', default='tool_coverage/outputs',
-        help='Directory containing ACCEPTED_*.csv (default: tool_coverage/outputs)',
-    )
-    parser.add_argument(
-        '--dry-run', action='store_true',
-        help='Print discovered RRIDs without writing any files',
-    )
-    parser.add_argument(
-        '--force', action='store_true',
-        help='Re-query even for resources that already have an rrid value',
-    )
-    parser.add_argument(
-        '--api-key', default='',
-        help='SciCrunch API key for antibody lookups '
-             '(or set SCICRUNCH_API_KEY environment variable)',
-    )
-    parser.add_argument(
-        '--tool-type', dest='tool_types', action='append', default=[],
-        choices=list(_TYPE_TO_TYPED_FILE.keys()),
-        help='Restrict to one tool type (can be repeated; default: all)',
-    )
-    parser.add_argument(
-        '--rate-limit', type=float, default=0.3,
-        help='Seconds to sleep between API calls (default: 0.3)',
-    )
-    args = parser.parse_args()
+    parser.add_argument('files', nargs='*', help='submissions/{type}/*.json paths')
+    parser.add_argument('--files-list', help='File with one submission JSON path per line')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Print discovered RRIDs without writing any files')
+    parser.add_argument('--force', action='store_true',
+                        help='Re-query even for submissions that already have an rrid')
+    parser.add_argument('--api-key', default='',
+                        help='SciCrunch API key for antibody lookups '
+                             '(or set SCICRUNCH_API_KEY environment variable)')
+    parser.add_argument('--rate-limit', type=float, default=0.3,
+                        help='Seconds to sleep between API calls (default: 0.3)')
+    parser.add_argument('--mmrrc-cache', default='',
+                        help='JSON file to read the MMRRC catalog from / write it to, '
+                             'so the ~650-page fetch happens at most once')
+    parser.add_argument('--summary-md', default='',
+                        help='Write a markdown table of filled RRIDs here (for the PR body)')
+    args = parser.parse_args(argv)
+
+    global _MMRRC_CACHE_FILE
+    _MMRRC_CACHE_FILE = Path(args.mmrrc_cache) if args.mmrrc_cache else None
+
+    paths = [Path(f) for f in args.files]
+    if args.files_list:
+        paths += [Path(line.strip()) for line in Path(args.files_list).read_text().splitlines()
+                  if line.strip()]
 
     api_key = args.api_key or os.environ.get('SCICRUNCH_API_KEY', '')
-
-    output_dir = Path(args.output_dir)
-    if not output_dir.is_dir():
-        print(f'❌  Output directory not found: {output_dir}')
-        return
-
-    print(f'RRID lookup — output dir: {output_dir}')
+    print(f'RRID lookup — {len(paths)} file(s)')
     if args.dry_run:
         print('(DRY RUN — no files will be modified)')
     if not api_key:
         print('⚠️   No SciCrunch API key — antibody lookups will be skipped')
-        print('    Set SCICRUNCH_API_KEY or pass --api-key to enable')
-    print()
 
-    run_lookup(
-        output_dir=output_dir,
-        dry_run=args.dry_run,
-        force=args.force,
-        api_key=api_key,
-        tool_types=args.tool_types,
-        rate_limit=args.rate_limit,
-    )
+    results = run_lookup(paths, dry_run=args.dry_run, force=args.force,
+                         api_key=api_key, rate_limit=args.rate_limit)
+    print(f'\nSummary: {summarize(results)}')
+    if args.summary_md:
+        Path(args.summary_md).write_text(summary_markdown(results), encoding='utf-8')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
