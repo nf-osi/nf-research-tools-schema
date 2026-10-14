@@ -37,7 +37,12 @@ classes:
         materializes all inherited slots into each subclass.
     class_uri: schema:Thing
     annotations:
-      synapse_table_id: syn26450069
+      # No synapse_table_id: Tool is abstract and, since Phase 7 of the
+      # LinkML migration (docs/MIGRATION.md) retired the legacy Resource
+      # table (syn26450069), is no longer backed by any single table --
+      # every Tool row lives in one of the 9 concrete subclass tables.
+      # synapse_view_id below is the live, unified read-only view over all
+      # of them.
       synapse_view_id: syn51730943
       synapse_project_id: syn26338068
     slots:
@@ -49,6 +54,7 @@ classes:
       - description
       - aiSummary
       - usageRequirements
+      - availability
       - howToAcquire
       - dateAdded
       - dateModified
@@ -136,9 +142,18 @@ slots:
     range: UsageRequirementEnum
     multivalued: true
 
+  availability:
+    description: How this resource can be obtained.
+    range: AvailabilityEnum
+    required: true
+
   howToAcquire:
     description: How to acquire a particular resource.
-    required: true
+    deprecated: >-
+      Use availability instead (nf-research-tools-schema#262) -- same
+      concept (both describe how to obtain the resource), availability
+      is a controlled vocabulary rather than free text. Kept populated
+      for backward compatibility until nothing reads it.
 
   dateAdded:
     description: The date that the resource was originally added.

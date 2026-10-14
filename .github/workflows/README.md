@@ -21,10 +21,11 @@ Workflows are coordinated through **issue close triggers and PR merges**:
    ├─ Extracts observations for high-confidence tools (Phase 2)
    ├─ Formats mined tools as JSON in submissions/{type}/
    └─ Creates PR with label: tool-submissions
-         ↓ (reviewer moves accepted files to submissions/{type}/accepted/, then merges PR)
+         ↓ (reviewer deletes rejected files from submissions/{type}/, then merges PR --
+            there is no accepted/ subfolder step; whatever remains at merge time uploads)
 
 3. upsert-tools.yml
-   ├─ Compiles submissions/{type}/accepted/**/*.json → ACCEPTED_*.csv
+   ├─ Compiles submissions/{type}/*.json → ACCEPTED_*.csv
    ├─ Validates CSV schemas
    ├─ Uploads to Synapse tables (animal models, antibodies, cell lines, etc.)
    └─ No PR created (uploads directly to Synapse)
@@ -47,9 +48,9 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 
 - **Entry point**: `monthly-submission-check.yml` runs on the 1st of each month (9 AM UTC)
 - **publication-mining**: Triggers when monthly issue with label `tool-submissions` is closed
-- **upsert-tools**: Triggers on push to main with files in `submissions/*/accepted/`
+- **upsert-tools**: Triggers on push to main with files in `submissions/*/*.json` (no `accepted/` subfolder — that step was dropped in 2026-04, see the Upsert Tools section below)
 - **score-tools**: Triggers on PR merge with label `tool-submissions`
-- **update-observation-schema**: Triggers after `upsert-tools` completes (independent of score-tools)
+- **update-observation-schema**: Triggers after `upsert-tools` completes, OR weekly (every Monday, as a fallback — see 4a below for why)
 - **Manual triggers**: All workflows support `workflow_dispatch` for testing
 - **Annotation review**: Embedded in the monthly issue workflow (not a separate weekly step)
 
@@ -137,12 +138,27 @@ Workflows are coordinated through **issue close triggers and PR merges**:
 
 **Trigger**:
 - After `upsert-tools.yml` completes on main (independent of score-tools)
+- Weekly fallback: every Monday at 9 AM UTC (added for #336, see below)
 - Manual: workflow_dispatch
+
+**Why the weekly fallback exists (#336)**: the `upsert-tools.yml` trigger only fires
+when a `submissions/*.json` file is pushed to main. A `resourceName` can also
+change directly in a live Synapse table — a rename/curation fix applied via a
+one-time script (see `scripts/README.md`) rather than a submission JSON — and
+that kind of write never touches `submissions/`, so it never triggers
+`upsert-tools.yml` and this workflow would never fire either. That gap let the
+schema drift stale for over a month before #336 (e.g. it was still offering
+`Central AI-enabled Volumetric Service for NF1` after that tool was renamed to
+`CAVS-NF1` via a one-time script, and still listed a retired `Nf1tm1a(KOMP)Wtsi`
+row). The weekly cron re-checks `syn51730943` regardless of what caused a
+change, so drift from any source is caught within a week.
 
 **What it does**:
 1. Fetches current tool data from syn51730943
 2. Updates `resourceType` and `resourceName` enum values in `SubmitObservationSchema.json`
 3. Creates a PR if changes are detected (label: `schema-update`)
+4. Fails the run loudly (rather than silently reporting "up to date") if the
+   Synapse fetch itself errors — see the workflow file for why this matters
 
 **No PR Created if no changes**: Only creates PR when enums differ from current schema
 
@@ -176,31 +192,36 @@ These workflows support the main sequence but run independently:
 **Purpose**: Compile accepted JSON submissions and upload to Synapse
 
 **Trigger**:
-- When `submissions/*/accepted/**/*.json` files are pushed to main (i.e. when a tool-submissions PR is merged)
-- Manual: workflow_dispatch with optional dry-run
+- When `submissions/*/*.json` files are pushed to main (i.e. when a tool-submissions PR is merged) — `submissions/*/observations/*.json` is excluded from this trigger
+- Manual: workflow_dispatch with optional dry-run (processes files changed since the last successful push run on main; there is no "process everything" mode)
 
 **What it does**:
 1. Diffs changed files — only processes JSON files that changed in the push (diff-based compile)
-2. Compiles `submissions/{type}/accepted/**/*.json` → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
+2. Compiles `submissions/{type}/*.json` (+ `submissions/{type}/observations/*.json`) → `ACCEPTED_*.csv` + `submission_publications.csv`, `submission_dev_links.csv`, `submission_usage_links.csv`
 3. Validates CSV schemas (including `publicationId` resolution for observations)
 4. Cleans tracking columns (prefixed with `_`)
-5. Uploads to corresponding Synapse tables:
+5. Uploads to corresponding Synapse tables, one type-specific detail table per
+   tool type (each carries its own `resourceId`/`resourceName`/etc. directly —
+   there's no longer a central Resources table these feed into; the legacy
+   `syn26450069` was retired in the Phase 7 LinkML migration, see
+   `docs/MIGRATION.md`):
    - syn26486808 (animal models)
    - syn26486811 (antibodies)
    - syn26486823 (cell lines)
    - syn26486832 (genetic reagents)
-   - syn26450069 (resources)
    - syn26486839 (publications)
    - syn26486807 (development links)
    - syn26486841 (usage links — non-development publications)
+   - syn26486836 (observations)
 6. Regenerates coverage report
+7. **Cleanup PR**: only for push runs with zero upload failures. `cleanup_upserted_submissions.py` deletes each changed JSON whose resource (name + type) is now in syn51730943, retrying while that materialized view catches up, and `peter-evans/create-pull-request` opens a `submission-cleanup` PR with the deletions. Files it can't confirm are kept and listed in the PR body. Synapse is the source of truth once a tool is uploaded, so keeping the JSON would only let it drift (#349). Merging the cleanup PR re-triggers this workflow, but deletions aren't compiled, so nothing is uploaded.
 
-**Review flow**:
-- Mined tools are written as JSON to `submissions/{type}/`
-- Reviewer moves accepted files: `git mv submissions/{type}/file.json submissions/{type}/accepted/`
-- Merging the PR pushes `*/accepted/*.json` to main → triggers this workflow
+**Review flow** (no `accepted/` subfolder — dropped 2026-04, see `submissions/README.md`):
+- Mined tools are written as JSON directly to `submissions/{type}/`
+- Reviewer edits/deletes files in place in the PR; whatever remains in `submissions/{type}/` at merge time is what gets uploaded — no file move needed
+- Merging the PR pushes the surviving `submissions/*/*.json` files to main → triggers this workflow
 
-**No PR Created**: Uploads directly, creates summary in Actions
+**PRs**: Uploads directly (no PR for the upload itself), creates a summary in Actions, then opens the cleanup PR described in step 7.
 
 ---
 
@@ -240,10 +261,7 @@ These workflows support the main sequence but run independently:
 
 ### Required Secrets
 
-1. **NF_SERVICE_GIT_TOKEN** (required for all workflows that create PRs)
-   - GitHub Personal Access Token with `repo` scope
-   - Used to create pull requests
-   - Configure in: Settings → Secrets and variables → Actions
+1. **No personal access token is needed to open PRs.** Workflows that open PRs (`upsert-tools.yml`, `update-observation-schema.yml`, and others) use the built-in `GITHUB_TOKEN`, with `contents: write` / `pull-requests: write` (plus `issues: write` for labels and assignees). PRs opened this way don't trigger other workflows' CI. `NF_SERVICE_GIT_TOKEN` is no longer used by any workflow and can be deleted from the repo secrets.
 
 2. **SYNAPSE_AUTH_TOKEN** (required for Synapse operations)
    - Synapse Personal Access Token
@@ -275,7 +293,7 @@ All workflows can be manually triggered:
 **Testing Order** (if running entire chain manually):
 1. monthly-submission-check (entry point) — or close an issue with `tool-submissions` label
 2. publication-mining triggers automatically → creates PR
-3. Review PR: move accepted JSONs to `submissions/{type}/accepted/`, merge → triggers upsert-tools
+3. Review PR: delete rejected JSONs from `submissions/{type}/`, merge → triggers upsert-tools
 4. Merge also triggers score-tools and update-observation-schema (independently)
 
 ## 📊 Monitoring
@@ -291,7 +309,7 @@ All workflows can be manually triggered:
 
 Filter PRs by labels:
 - `annotation-submissions` - New cell lines from annotations
-- `tool-submissions` - Mined tools from publications (review + move to accepted/ before merging)
+- `tool-submissions` - Mined tools from publications (review in place — delete rejected files before merging, no accepted/ move)
 
 
 
@@ -322,7 +340,7 @@ Filter PRs by labels:
 **Problem**: Workflow ran but didn't create PR
 
 **Check**:
-- Verify NF_SERVICE_GIT_TOKEN is set correctly
+- Check the job has `contents: write` and `pull-requests: write` (and `issues: write` if it sets labels/assignees)
 - Check workflow logs for errors
 - Confirm there were actually changes to commit
 - Verify repository allows automated PRs

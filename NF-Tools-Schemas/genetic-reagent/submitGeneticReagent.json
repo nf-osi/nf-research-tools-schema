@@ -11,6 +11,16 @@
           "type": "string",
           "title": "Insert Name"
         },
+        "insertSpecies": {
+          "type": "string",
+          "title": "Insert Species",
+          "enum": [
+            "Human",
+            "Mouse",
+            "Rat",
+            "Other"
+          ]
+        },
         "synonyms": {
           "type": "string",
           "title": "Synonyms"
@@ -18,15 +28,6 @@
         "description": {
           "type": "string",
           "title": "Description (~20 words)"
-        },
-        "insertSpecies": {
-          "type": "string",
-          "title": "Insert Species",
-          "enum": [
-            "Human",
-            "Mouse",
-            "Rat"
-          ]
         },
         "developerName": {
           "type": "string",
@@ -45,6 +46,36 @@
     "insertEntrezId": {
       "type": "string",
       "title": "Insert Entrez ID"
+    },
+    "vectorBackbone": {
+      "type": "string",
+      "title": "Vector Backbone"
+    },
+    "vectorType": {
+      "type": "string",
+      "title": "Vector Type",
+      "enum": [
+        "Mammalian Expression",
+        "Bacterial Expression",
+        "Gateway Entry Clone",
+        "Lentiviral",
+        "Adenoviral",
+        "AAV",
+        "RNAi",
+        "Luciferase",
+        "Cre/Lox",
+        "Yeast Expression",
+        "Worm Expression",
+        "Insect Expression",
+        "Plant Expression",
+        "Mouse Targeting",
+        "CRISPR",
+        "TALEN",
+        "Synthetic Biology",
+        "Transfer Vector",
+        "Unspecified",
+        "Other"
+      ]
     },
     "gRNAshRNASequence": {
       "type": "string",
@@ -115,36 +146,6 @@
       "title": "3 Primer",
       "description": "Primer to sequence the 3' end (C-terminal) of the insert"
     },
-    "vectorBackbone": {
-      "type": "string",
-      "title": "Vector Backbone"
-    },
-    "vectorType": {
-      "type": "string",
-      "title": "Vector Type",
-      "enum": [
-        "Mammalian Expression",
-        "Bacterial Expression",
-        "Gateway Entry Clone",
-        "Lentiviral",
-        "Adenoviral",
-        "AAV",
-        "RNAi",
-        "Luciferase",
-        "Cre/Lox",
-        "Yeast Expression",
-        "Worm Expression",
-        "Insect Expression",
-        "Plant Expression",
-        "Mouse Targeting",
-        "CRISPR",
-        "TALEN",
-        "Synthetic Biology",
-        "Transfer Vector",
-        "Unspecified",
-        "Other"
-      ]
-    },
     "backboneSize": {
       "type": "string",
       "title": "Backbone Size"
@@ -211,7 +212,8 @@
       "enum": [
         "37 degrees Celsius",
         "30 degrees Celsius",
-        "Room Temperature"
+        "Room Temperature",
+        "Unknown"
       ]
     },
     "growthStrain": {
@@ -234,6 +236,11 @@
         "No",
         "Unknown"
       ]
+    },
+    "otherInformation": {
+      "type": "string",
+      "title": "Any other information (optional)",
+      "description": "Anything else worth noting that isn't captured above — e.g. what \"Other\" means for a field you selected it on. A curator reviews this and may add it as a new option for future submissions."
     },
     "developmentPublicationDOI": {
       "type": "string",
@@ -334,101 +341,12 @@
         "properties": {
           "additionalDetails": {
             "type": "string",
-            "title": "Please provide additional details."
+            "title": "Please describe how to acquire this (you selected \"Other\")"
           }
         },
         "required": [
           "additionalDetails"
         ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "cloningMethod": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "cloningMethodOther": {
-            "type": "string",
-            "title": "Please specify cloning method"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "vectorType": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "vectorTypeOther": {
-            "type": "string",
-            "title": "Please specify vector type"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "bacterialResistance": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherBacterialResistance": {
-            "type": "string",
-            "title": "Please specify bacterial resistance marker(s)"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "selectableMarker": {
-            "contains": {
-              "const": "Other"
-            }
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "otherSelectableMarker": {
-            "type": "string",
-            "title": "Please specify selection marker(s)"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "growthStrain": {
-            "const": "Other"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "growthStrainOther": {
-            "type": "string",
-            "title": "Please specify growth strain"
-          }
-        }
       }
     }
   ]

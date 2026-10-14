@@ -12,77 +12,38 @@ schema_config= SchemaConfig(
         schema_url=schema_link
     )
 
+# NOTE: the LinkML migration (see docs/MIGRATION.md) collapsed the separate
+# `Resource` table and each tool-type table's own `<type>Id` primary key into a
+# single unified `resourceId` column, present directly on every one of the 9
+# tool-type tables. There is no longer a single central "Resource" table for
+# other entities to point a foreign key at -- resourceId is now a distributed
+# identifier owned collectively by whichever tool-type table a given resource
+# actually lives in. The tables below that used to declare a
+# `"foreign_table_name": "Resource"` FK (VendorItem, BiobankDetails,
+# Observation, ResourceApplication, Development, Usage) keep `resourceId` as a
+# plain column but no longer declare that FK, since there's no single parent
+# table to reference and this tool's DatabaseConfig has no notion of a
+# polymorphic/multi-table FK.
 db_config = [
     {
-        "name": "Resource",
-        "primary_key": "resourceId",
-        "foreign_keys": [
-            {
-                "column_name": "geneticReagentId",
-                "foreign_table_name": "GeneticReagentDetails",
-                "foreign_column_name": "geneticReagentId"
-            },
-            {
-                "column_name": "antibodyId",
-                "foreign_table_name": "AntibodyDetails",
-                "foreign_column_name": "antibodyId"
-            },
-            {
-                "column_name": "cellLineId",
-                "foreign_table_name": "CellLineDetails",
-                "foreign_column_name": "cellLineId"
-            },
-            {
-                "column_name": "animalModelId",
-                "foreign_table_name": "AnimalModelDetails",
-                "foreign_column_name": "animalModelId"
-            },
-            {
-                "column_name": "biobankId",
-                "foreign_table_name": "BiobankDetails",
-                "foreign_column_name": "biobankId"
-            },
-            {
-                "column_name": "computationalToolId",
-                "foreign_table_name": "ComputationalToolDetails",
-                "foreign_column_name": "computationalToolId"
-            },
-            {
-                "column_name": "organoidProtocolId",
-                "foreign_table_name": "OrganoidProtocolDetails",
-                "foreign_column_name": "organoidProtocolId"
-            },
-            {
-                "column_name": "patientDerivedModelId",
-                "foreign_table_name": "PatientDerivedModelDetails",
-                "foreign_column_name": "patientDerivedModelId"
-            },
-            {
-                "column_name": "clinicalAssessmentToolId",
-                "foreign_table_name": "ClinicalAssessmentToolDetails",
-                "foreign_column_name": "clinicalAssessmentToolId"
-            }
-        ]
-    },
-    {
         "name": "GeneticReagentDetails",
-        "primary_key": "geneticReagentId"
+        "primary_key": "resourceId"
     },
     {
         "name": "ComputationalToolDetails",
-        "primary_key": "computationalToolId"
+        "primary_key": "resourceId"
     },
     {
         "name": "OrganoidProtocolDetails",
-        "primary_key": "organoidProtocolId"
+        "primary_key": "resourceId"
     },
     {
         "name": "PatientDerivedModelDetails",
-        "primary_key": "patientDerivedModelId"
+        "primary_key": "resourceId"
     },
     {
         "name": "ClinicalAssessmentToolDetails",
-        "primary_key": "clinicalAssessmentToolId"
+        "primary_key": "resourceId"
     },
     {
         "name": "VendorItem",
@@ -92,11 +53,6 @@ db_config = [
                 "column_name": "vendorId",
                 "foreign_table_name": "Vendor",
                 "foreign_column_name": "vendorId"
-            },
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
             }
         ]
     },
@@ -106,24 +62,12 @@ db_config = [
     },
     {
         "name": "BiobankDetails",
-        "primary_key": "biobankId",
-        "foreign_keys": [
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
-            }
-        ]
+        "primary_key": "resourceId"
     },
     {
         "name": "Observation",
         "primary_key": "observationId",
         "foreign_keys": [
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
-            },
             {
                 "column_name": "publicationId",
                 "foreign_table_name": "Publication",
@@ -133,18 +77,11 @@ db_config = [
     },
     {
         "name": "ResourceApplication",
-        "primary_key": "resourceApplicationId",
-        "foreign_keys": [
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
-            }
-        ]
+        "primary_key": "resourceApplicationId"
     },
     {
         "name": "AntibodyDetails",
-        "primary_key": "antibodyId",
+        "primary_key": "resourceId",
     },
     {
         "name": "Donor",
@@ -152,7 +89,7 @@ db_config = [
     },
     {
         "name": "CellLineDetails",
-        "primary_key": "cellLineId",
+        "primary_key": "resourceId",
         "foreign_keys": [
             {
                 "column_name": "donorId",
@@ -173,22 +110,12 @@ db_config = [
                 "column_name": "mutationDetailsId",
                 "foreign_table_name": "MutationDetails",
                 "foreign_column_name": "mutationDetailsId"
-            },
-            {
-                "column_name": "animalModelId",
-                "foreign_table_name": "AnimalModelDetails",
-                "foreign_column_name": "animalModelId"
-            },
-            {
-                "column_name": "cellLineId",
-                "foreign_table_name": "CellLineDetails",
-                "foreign_column_name": "cellLineId"
             }
         ]
     },
     {
         "name": "AnimalModelDetails",
-        "primary_key": "animalModelId",
+        "primary_key": "resourceId",
         "foreign_keys": [
             {
                 "column_name": "donorId",
@@ -206,11 +133,6 @@ db_config = [
         "name": "Development",
         "primary_key": "developmentId",
         "foreign_keys": [
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
-            },
             {
                 "column_name": "investigatorId",
                 "foreign_table_name": "Investigator",
@@ -248,11 +170,6 @@ db_config = [
                 "column_name": "publicationId",
                 "foreign_table_name": "Publication",
                 "foreign_column_name": "publicationId"
-            },
-            {
-                "column_name": "resourceId",
-                "foreign_table_name": "Resource",
-                "foreign_column_name": "resourceId"
             }
         ]
     }

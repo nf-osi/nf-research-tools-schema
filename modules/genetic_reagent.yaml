@@ -55,6 +55,8 @@ classes:
       cloningMethod:
         description: How the vector was constructed.
         range: CloningMethodEnum
+      cloningMethodOther:
+        description: Free-text specification when cloningMethod is "Other".
       5primeCloningSite:
         description: >-
           If Restriction Enzyme was selected as the cloning method,
@@ -95,11 +97,16 @@ classes:
         description: >-
           Antibiotic(s) for selection in bacteria.
         range: BacterialResistanceEnum
+      otherBacterialResistance:
+        description: >-
+          Free-text specification when bacterialResistance is "Other".
       selectableMarker:
         description: >-
           Additional selection markers, such as mammalian selection
           markers or fluorescent proteins.
         range: SelectableMarkerEnum
+      otherSelectableMarker:
+        description: Free-text specification when selectableMarker is "Other".
       copyNumber:
         description: >-
           Whether the plasmid produces sufficient DNA from a normal
@@ -113,6 +120,10 @@ classes:
         description: >-
           The E. coli strain for distributing the plasmid.
         range: GrowthStrainEnum
+      growthStrainOther:
+        description: Free-text specification when growthStrain is "Other".
+      vectorTypeOther:
+        description: Free-text specification when vectorType includes "Other".
       hazardous:
         description: >-
           Whether the unmodified plasmid DNA requires handling at
@@ -134,6 +145,7 @@ enums:
       Ligation Independent Cloning: {}
       Gibson Cloning: {}
       Unknown: {}
+      Other: {}
 
   VectorTypeEnum:
     description: Primary functions of plasmids.
@@ -219,6 +231,7 @@ enums:
       37 C: {}
       30 C: {}
       Room Temperature: {}
+      Unknown: {}
 
   GrowthStrainEnum:
     description: E. coli strains for plasmid distribution.
