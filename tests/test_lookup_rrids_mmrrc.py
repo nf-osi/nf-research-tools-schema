@@ -17,5 +17,5 @@ def test_exact_match_only(monkeypatch):
     monkeypatch.setattr(lr, "_MMRRC_CATALOG_CACHE", {
         "b6.129s4-nf1 tm1fcr /j": {"rrid": "RRID:MMRRC_000001-UNC"},
     })
-    assert lr._lookup_mmrrc("  B6.129S4-Nf1  tm1Fcr /J ") == "rrid:mmrrc_000001-unc"
+    assert lr._lookup_mmrrc("  B6.129S4-Nf1  tm1Fcr /J ") == "rrid:MMRRC_000001-UNC"
     assert lr._lookup_mmrrc("B6.129S4-Nf1 tm1Fcr") == ""  # near-miss: no fuzzy hit

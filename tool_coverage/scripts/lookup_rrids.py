@@ -236,8 +236,10 @@ def _lookup_mmrrc(name: str) -> str:
     if not entry:
         return ''
 
+    # Catalog gives "RRID:MMRRC_000001-UNC"; repo convention lowercases only the
+    # prefix (rrid:CVCL_..., rrid:IMSR_JAX:...), keeping the accession's case.
     rrid = (entry.get('rrid') or '').strip()
-    return rrid.lower() if rrid else ''
+    return re.sub(r'^rrid:', 'rrid:', rrid, flags=re.IGNORECASE) if rrid else ''
 
 
 def _lookup_scicrunch_antibody(name: str, api_key: str) -> str:
