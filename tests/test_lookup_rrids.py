@@ -271,13 +271,25 @@ def test_mmrrc_catalog_disk_cache(tmp_path, monkeypatch):
     monkeypatch.setattr(lookup, "_MMRRC_CACHE_FILE", cache)
     monkeypatch.setattr(lookup, "_MMRRC_CATALOG_CACHE", None)
     assert _real_lookup_mmrrc("b6.nf1  ko") == "rrid:MMRRC_000001-UNC"
-    assert fetched == [1, 2] and cache.exists()
+    assert sorted(fetched) == list(range(1, lookup._MMRRC_WORKERS + 1))  # one batch
+    assert cache.exists()
 
     # New "run": in-memory cache cleared, catalog read back from disk.
     monkeypatch.setattr(lookup, "_MMRRC_CATALOG_CACHE", None)
     fetched.clear()
     assert _real_lookup_mmrrc("B6.Nf1 KO") == "rrid:MMRRC_000001-UNC"
     assert fetched == []
+
+
+def test_mmrrc_partial_fetch_is_not_cached(tmp_path, monkeypatch):
+    cache = tmp_path / "mmrrc.json"
+    entry = {"strain_name": "A", "rrid": "RRID:MMRRC_1-UNC"}
+    monkeypatch.setattr(lookup, "_get",
+                        lambda url, **k: [entry] if url.endswith("/1") else None)
+    monkeypatch.setattr(lookup, "_MMRRC_CACHE_FILE", cache)
+    monkeypatch.setattr(lookup, "_MMRRC_CATALOG_CACHE", None)
+    assert _real_lookup_mmrrc("A") == "rrid:MMRRC_1-UNC"  # still usable this run
+    assert not cache.exists()
 
 
 def test_mmrrc_outage_is_not_cached(tmp_path, monkeypatch):

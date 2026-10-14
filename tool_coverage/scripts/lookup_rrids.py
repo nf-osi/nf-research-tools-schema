@@ -213,6 +213,7 @@ def _lookup_imsr(name: str) -> str:
 
 
 _MMRRC_CATALOG_CACHE: dict[str, dict] | None = None
+_MMRRC_WORKERS = 6  # concurrent page requests; modest, it's a public API
 _MMRRC_CACHE_FILE: Path | None = None  # set by --mmrrc-cache; read/written as JSON
 _MMRRC_MAX_PAGES = 800  # catalog empties out around page ~650-700 (checked live); safety cap
                          # in case pagination never terminates. ~65-70k strains total, so the
@@ -238,24 +239,43 @@ def _fetch_mmrrc_catalog() -> dict[str, dict]:
         except (OSError, ValueError) as exc:
             print(f'    ⚠️  ignoring unreadable MMRRC cache {_MMRRC_CACHE_FILE}: {exc}')
 
+    # Each page takes ~3s, so fetching ~650 pages one by one is ~35 min. Fetch a
+    # small batch of pages concurrently and stop at the first batch that has an
+    # empty page (end of catalog) or a failed one (outage; don't keep hammering).
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _page(n: int):
+        return _get(f'https://api.mmrrc.org/api/v1/catalog/getCatalog/{n}',
+                    timeout=30, quiet=True)
+
     catalog: dict[str, dict] = {}
     page = 1  # API is 1-indexed; page 0 returns a "too big/small" error
-    while page <= _MMRRC_MAX_PAGES:
-        data = _get(f'https://api.mmrrc.org/api/v1/catalog/getCatalog/{page}', quiet=True)
-        if not isinstance(data, list) or not data:
-            break
-        for entry in data:
-            strain_name = re.sub(r"\s+", " ", (entry.get('strain_name') or '').strip().lower())
-            if strain_name:
-                catalog[strain_name] = entry
-            published_name = re.sub(r"\s+", " ", (entry.get('published_name') or '').strip().lower())
-            if published_name:
-                catalog.setdefault(published_name, entry)
-        page += 1
+    done = failed = False
+    with ThreadPoolExecutor(max_workers=_MMRRC_WORKERS) as pool:
+        while page <= _MMRRC_MAX_PAGES and not done:
+            batch = list(range(page, min(page + _MMRRC_WORKERS, _MMRRC_MAX_PAGES + 1)))
+            for data in pool.map(_page, batch):  # in page order
+                if not isinstance(data, list):
+                    failed = done = True  # error/timeout: catalog is incomplete
+                    break
+                if not data:
+                    done = True  # past the last page
+                    break
+                for entry in data:
+                    strain_name = re.sub(r"\s+", " ", (entry.get('strain_name') or '').strip().lower())
+                    if strain_name:
+                        catalog[strain_name] = entry
+                    published_name = re.sub(r"\s+", " ", (entry.get('published_name') or '').strip().lower())
+                    if published_name:
+                        catalog.setdefault(published_name, entry)
+            page += len(batch)
+    print(f'    (MMRRC catalog: fetched {len(catalog)} names'
+          f'{", incomplete — not cached" if failed else ""})', end=' ', flush=True)
 
     _MMRRC_CATALOG_CACHE = catalog
-    # Only persist a non-empty catalog, so an MMRRC outage isn't cached as "no strains".
-    if _MMRRC_CACHE_FILE and catalog:
+    # Only persist a complete catalog, so an MMRRC outage or a dropped page isn't
+    # cached for the month as "no such strain".
+    if _MMRRC_CACHE_FILE and catalog and not failed:
         try:
             _MMRRC_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
             _MMRRC_CACHE_FILE.write_text(json.dumps(catalog))
