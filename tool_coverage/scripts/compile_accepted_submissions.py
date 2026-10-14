@@ -1487,6 +1487,29 @@ _VENDOR_HOW_TO_ACQUIRE = (
 )
 
 
+def _split_synonyms(raw, resource_name: str = "") -> list[str]:
+    """Split a submitted synonyms value into names. Genotype synonyms carry
+    bare ';' (e.g. 'Nf1f/f;Cdkn2a'), so when '; ' separates entries split
+    only on that; otherwise fall back to ';' or ','. Drops the resource's own
+    name and duplicates (case-insensitive), keeping first-seen order."""
+    if isinstance(raw, list):
+        parts = [str(v) for v in raw]
+    else:
+        raw = raw or ""
+        if re.search(r";\s+", raw):
+            parts = re.split(r";\s+", raw)
+        else:
+            parts = raw.split(";" if ";" in raw else ",")
+    seen = {resource_name.strip().lower()} if resource_name.strip() else set()
+    names = []
+    for v in parts:
+        v = v.strip()
+        if v and v.lower() not in seen:
+            seen.add(v.lower())
+            names.append(v)
+    return names
+
+
 def _apply_core_resource_fields(row: dict, item: dict, ttype: str) -> None:
     """Fill the core Tool columns (_CORE_RESOURCE_COLUMNS + howToAcquire) on a
     detail row from its submission. Values a builder already set win."""
@@ -1498,11 +1521,7 @@ def _apply_core_resource_fields(row: dict, item: dict, ttype: str) -> None:
     row["rrid"] = row.get("rrid") or _get(bi, "rrid") or _get(item, "rrid")
     if not row.get("synonyms"):
         raw = _get(bi, "synonyms") or _get(item, "synonyms")
-        if isinstance(raw, list):
-            names = [str(v).strip() for v in raw if str(v).strip()]
-        else:
-            sep = ";" if ";" in (raw or "") else ","
-            names = [v.strip() for v in (raw or "").split(sep) if v.strip()]
+        names = _split_synonyms(raw, row.get("resourceName") or row.get("_resourceName", ""))
         # JSON array so a comma inside one synonym isn't split on upload.
         row["synonyms"] = json.dumps(names) if names else ""
     if not row.get("howToAcquire"):
