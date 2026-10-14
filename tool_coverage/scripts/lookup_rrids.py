@@ -202,10 +202,10 @@ def _fetch_mmrrc_catalog() -> dict[str, dict]:
         if not isinstance(data, list) or not data:
             break
         for entry in data:
-            strain_name = (entry.get('strain_name') or '').strip().lower()
+            strain_name = re.sub(r"\s+", " ", (entry.get('strain_name') or '').strip().lower())
             if strain_name:
                 catalog[strain_name] = entry
-            published_name = (entry.get('published_name') or '').strip().lower()
+            published_name = re.sub(r"\s+", " ", (entry.get('published_name') or '').strip().lower())
             if published_name:
                 catalog.setdefault(published_name, entry)
         page += 1
@@ -229,15 +229,10 @@ def _lookup_mmrrc(name: str) -> str:
     if not catalog:
         return ''
 
-    norm = name.lower().strip()
-    if norm in catalog:
-        entry = catalog[norm]
-    else:
-        entry = None
-        for strain_name, candidate in catalog.items():
-            if _fuzzy_match(norm, strain_name):
-                entry = candidate
-                break
+    # Exact (case/whitespace-insensitive) match only. A fuzzy fallback across
+    # ~65k strain names returned the first token-overlap hit, which risks
+    # assigning another strain's RRID.
+    entry = catalog.get(re.sub(r"\s+", " ", name.lower().strip()))
     if not entry:
         return ''
 
