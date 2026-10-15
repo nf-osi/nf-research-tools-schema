@@ -114,3 +114,20 @@ def test_resource_name_from_mined_json(tmp_path):
     org = json.loads(org_path.read_text())
     assert cas._resource_name_from_data(pdm, "patient_derived_model") == "JH-2-002 PDX (PDX)"
     assert cas._resource_name_from_data(org, "organoid_protocol") == "cNF organoid protocol"
+
+
+pfe = _load_module("process_formspark_export")
+
+
+def test_formspark_pdm_and_organoid_detection_and_names():
+    """Formspark exports follow the submit*.json schemas: basicInfo.resourceName,
+    and both forms carry basicInfo.modelType -- so detection must key on each
+    form's own required field, not modelType (which sent organoids to PDM)."""
+    pdm = {"basicInfo": {"resourceName": "JH-2-002", "modelType": "PDX",
+                         "patientDiagnosis": "MPNST", "species": "Human"}}
+    org = {"basicInfo": {"resourceName": "cNF organoids", "modelType": "Organoid",
+                         "derivationSource": "Patient tumor"}}
+    assert pfe._detect_tool_type(pdm) == "patient_derived_model"
+    assert pfe._detect_tool_type(org) == "organoid_protocol"
+    assert pfe._resource_name(pdm, "patient_derived_model") == "JH-2-002"
+    assert pfe._resource_name(org, "organoid_protocol") == "cNF organoids"
