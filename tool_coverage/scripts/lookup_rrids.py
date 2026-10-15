@@ -433,18 +433,6 @@ def _tagged(rrid: str, source: str) -> tuple[str, str]:
 # Submission JSON handling
 # ---------------------------------------------------------------------------
 
-def _submission_name(data: dict, ttype: str) -> str:
-    name = _resource_name_from_data(data, ttype).strip()
-    # Mined patient_derived_model/organoid JSONs carry the name in
-    # basicInfo.modelName, which _resource_name_from_data doesn't read; a PDM
-    # then comes back as just " (suffix)" or "".
-    bi = data.get('basicInfo') or {}
-    model_name = (bi.get('modelName') or '').strip() if isinstance(bi, dict) else ''
-    if model_name and (not name or name.startswith('(')):
-        return model_name
-    return name
-
-
 def _existing_rrid(data: dict) -> str:
     bi = data.get('basicInfo')
     if isinstance(bi, dict) and str(bi.get('rrid') or '').strip():
@@ -497,7 +485,7 @@ def run_lookup(paths: list[Path], dry_run: bool = False, force: bool = False,
         res['toolType'] = ttype
         if ttype not in TOOL_TYPES:
             continue
-        name = _submission_name(data, ttype)
+        name = _resource_name_from_data(data, ttype).strip()
         res['name'] = name
 
         existing = _existing_rrid(data)

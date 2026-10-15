@@ -191,12 +191,12 @@ def test_types_without_registry_make_no_calls(tmp_path, offline):
     assert calls == []
 
 
-def test_mined_pdm_uses_model_name(tmp_path, offline):
+def test_pdm_uses_resource_name(tmp_path, offline):
     calls, registry = offline
     registry[("cellosaurus", "JH-2-002")] = "rrid:CVCL_A123"
     p = _write(tmp_path, "patient_derived_models", "jh", {
         "toolType": "patient_derived_model",
-        "basicInfo": {"modelName": "JH-2-002", "modelType": ""},
+        "basicInfo": {"resourceName": "JH-2-002", "modelType": ""},
     })
     lookup.run_lookup([p])
     assert calls == [("cellosaurus", "JH-2-002")]
