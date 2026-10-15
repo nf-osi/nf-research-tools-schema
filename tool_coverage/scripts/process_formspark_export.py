@@ -66,9 +66,9 @@ def _detect_tool_type(s: dict) -> str | None:
         ("antibody",               ["basicInfo.antibodyName", "antibodyName", "targetAntigen"]),
         ("animal_model",           ["basicInfo.animalModelName", "animalModelName", "animalModelDisease"]),
         ("genetic_reagent",        ["insertName", "vectorType", "vectorBackbone"]),
-        ("patient_derived_model",  ["basicInfo.modelName", "modelName", "basicInfo.modelType"]),
+        ("patient_derived_model",  ["basicInfo.patientDiagnosis", "patientDiagnosis"]),
         ("computational_tool",     ["basicInfo.softwareName", "softwareName", "softwareType"]),
-        ("organoid_protocol",["basicInfo.modelType", "modelType", "derivationSource"]),
+        ("organoid_protocol",      ["basicInfo.derivationSource", "derivationSource"]),
         ("clinical_assessment_tool",["basicInfo.assessmentName", "assessmentName", "assessmentType"]),
         ("observation",            ["observationsSection", "resourceType", "observationType"]),
     ]
@@ -84,9 +84,9 @@ def _resource_name(s: dict, ttype: str) -> str:
         "antibody":                ["basicInfo.antibodyName", "antibodyName"],
         "animal_model":            ["basicInfo.animalModelName", "animalModelName"],
         "genetic_reagent":         ["insertName"],
-        "patient_derived_model":   ["basicInfo.modelName", "modelName"],
+        "patient_derived_model":   ["basicInfo.resourceName", "resourceName"],
         "computational_tool":      ["basicInfo.softwareName", "softwareName"],
-        "organoid_protocol": ["basicInfo.modelName", "modelName"],
+        "organoid_protocol":       ["basicInfo.resourceName", "resourceName"],
         "clinical_assessment_tool":["basicInfo.assessmentName", "assessmentName"],
         "observation":             ["observationsSection.observations.0.resourceName", "resourceName"],
     }
